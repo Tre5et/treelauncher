@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" stylesheets="@/css/LoginUi.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.LoginUiController">
+   <children>
+        <Button fx:id="loginButton" onAction="#onLoginButtonClicked" text="%login.button.microsoft" />
+        <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" textAlignment="CENTER" />
+   </children>
+</VBox>

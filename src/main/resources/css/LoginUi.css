@@ -1,0 +1,16 @@
+.root {
+    -fx-background-color: #363336;
+}
+Button {
+    -fx-background-color: #BCC7CF;
+    -fx-border-radius: 1;
+    -fx-border-color: #84EF24;
+    -fx-border-width: 2;
+    -fx-font-weight: bold;
+    -fx-font-size: 12;
+}
+Label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: lighter;
+    -fx-font-size: 12pt;
+}
