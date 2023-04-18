@@ -1,0 +1,20 @@
+{
+    "active_instance": "activeSha1",
+    "assets_dir": "assets",
+    "gamedata_dir": "game_data",
+    "gamedate_type": "game",
+    "instances_dir": "instance_data",
+    "instances_type": "instances",
+    "javas_dir": "java_data",
+    "javas_type": "javas",
+    "libraries_dir": "libraries",
+    "mods_type": "mods",
+    "options_dir": "options_data",
+    "options_type": "options",
+    "resourcepacks_dir": "resourcepack_data",
+    "resourcepacks_type": "resourcepacks",
+    "saves_type": "saves",
+    "type": "general",
+    "versions_dir": "version_data",
+    "versions_type": "versions"
+}

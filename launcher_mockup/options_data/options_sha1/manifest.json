@@ -1,0 +1,10 @@
+{
+    "id": "sha1",
+    "included_files": [
+        "options\\.txt",
+        "servers\\.dat",
+        "usercache\\.json"
+    ],
+    "name": "PrettyOptionsName",
+    "type": "options_component"
+}

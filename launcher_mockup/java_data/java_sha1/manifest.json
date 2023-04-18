@@ -1,0 +1,7 @@
+{
+    "id": "sha1",
+    "included_files": [
+    ],
+    "name": "PrettyName",
+    "type": "java_component"
+}

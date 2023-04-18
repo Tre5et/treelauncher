@@ -1,0 +1,18 @@
+{
+    "features": {
+        "resolution_x": 1000,
+        "resolution_y": 500
+    },
+    "ignored_files": [
+        "server\\.dat_old",
+        "XaeroWaypoints_BACKUP.*/"
+    ],
+    "jvm_arguments": [
+        "-Xmx4G"
+    ],
+    "mods": "modsSha1",
+    "options": "optionsSha1",
+    "resourcepacks": "resourceSha1",
+    "saves": "savesSha1",
+    "version": "versionSha1"
+}

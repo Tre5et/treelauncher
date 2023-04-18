@@ -1,0 +1,16 @@
+{
+    "details": "mods.json",
+    "id": "sha1",
+    "included_files": [
+        "config/",
+        "\\.bobby/",
+        "schematics/",
+        "XaeroWaypoints/",
+        "XaeroWorldmap/",
+        "optionsviveprofile.txt",
+        "itemscroller/",
+        "g4amespeed/"
+    ],
+    "name": "PrettyModsComponentName",
+    "type": "mods_component"
+}
