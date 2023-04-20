@@ -11,6 +11,6 @@
         "itemscroller/",
         "g4amespeed/"
     ],
-    "name": "PrettyModsComponentName",
+	"name": "prettyname"
     "type": "mods_component"
 }
