@@ -41,7 +41,11 @@ public class LauncherFiles {
                 LOGGER.log(Level.INFO, "Loaded base launcher files");
             }
         }
+    }
 
+    public boolean reloadAll() {
+        return reloadMainManifest() && reloadLauncherDetails() && reloadGameDetailsManifest() && reloadModsManifest() && reloadModsComponents() && reloadSavesManifest() && reloadSavesComponents() && reloadInstanceManifest() && reloadInstanceComponents()
+                && reloadJavaManifest() && reloadJavaComponents() && reloadOptionsManifest() && reloadOptionsComponents() && reloadResourcepackManifest() && reloadResourcepackComponents() && reloadVersionManifest() && reloadVersionComponents();
     }
 
     public LauncherManifest getMainManifest() {
@@ -60,6 +64,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load launcher manifest: incorrect contents");
             return false;
         }
+        mainManifest.setDirectory(Config.BASE_DIR);
         LOGGER.log(Level.INFO, "Loaded launcher manifest");
         return true;
     }
@@ -229,7 +234,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load java components: invalid configuration");
             return false;
         }
-        javaComponents = reloadComponents(getSavesManifest(), getLauncherDetails().getJavasDir(), LauncherManifestType.SAVES_COMPONENT);
+        javaComponents = reloadComponents(getJavaManifest(), getLauncherDetails().getJavasDir(), LauncherManifestType.JAVA_COMPONENT);
         return savesComponents != null;
     }
 
@@ -293,7 +298,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load resourcepack components: invalid configuration");
             return false;
         }
-        resourcepackComponents = reloadComponents(getSavesManifest(), getLauncherDetails().getResourcepacksDir(), LauncherManifestType.SAVES_COMPONENT);
+        resourcepackComponents = reloadComponents(getResourcepackManifest(), getLauncherDetails().getResourcepacksDir(), LauncherManifestType.RESOURCEPACKS_COMPONENT);
         return resourcepackComponents != null;
     }
 
@@ -352,6 +357,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " manifest: incorrect contents");
             return null;
         }
+        out.setDirectory(Config.BASE_DIR + relativePath + "/");
         LOGGER.log(Level.INFO, "Loaded " + expectedType.name().toLowerCase() + " manifest");
         return out;
     }
@@ -377,6 +383,7 @@ public class LauncherFiles {
                 LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + c);
                 return null;
             }
+            manifest.setDirectory(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/");
             out.add(manifest);
         }
         LOGGER.log(Level.INFO, "Loaded resourcepack components");
@@ -404,6 +411,7 @@ public class LauncherFiles {
                 LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + c);
                 return null;
             }
+            manifest.setDirectory(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/");
             String detailsFile = FileUtil.loadFile(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/" + manifest.getDetails());
             if(detailsFile == null) {
                 LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component details: file error: id=" + c);

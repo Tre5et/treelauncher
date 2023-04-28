@@ -19,9 +19,9 @@
             "feature": "testFeature"
         }
     ],
-    "mods_component": "modsSha1",
-    "options_component": "optionsSha1",
-    "resourcepacks_component": "resourceSha1",
-    "saves_component": "savesSha1",
-    "version_component": "versionSha1"
+    "mods_component": "test1",
+    "options_component": "sha1",
+    "resourcepacks_component": "sha1",
+    "saves_component": "sha1",
+    "version_component": "version1Sha1"
 }

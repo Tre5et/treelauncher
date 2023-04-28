@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.file_loading.LauncherFiles;
+import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.controller.LoginUiController;
 
@@ -18,21 +19,7 @@ public class LauncherApplication extends Application {
 
     public static void main(String[] args) {
         LauncherFiles files = new LauncherFiles();
-        files.getGameDetailsManifest();
-        files.getModsManifest();
-        files.getModsComponents();
-        files.getSavesManifest();
-        files.getSavesComponents();
-        files.getInstanceManifest();
-        files.getInstanceComponents();
-        files.getJavaManifest();
-        files.getJavaComponents();
-        files.getOptionsManifest();
-        files.getOptionsComponents();
-        files.getResourcepackManifest();
-        files.getResourcepackComponents();
-        files.getVersionManifest();
-        files.getVersionComponents();
+        GameLauncher.prepareResources(files.getInstanceComponents().get(0), files);
         launch(args);
     }
 

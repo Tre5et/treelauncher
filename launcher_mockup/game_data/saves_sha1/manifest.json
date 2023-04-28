@@ -1,6 +1,4 @@
 {
-    "id": "someSha1Probably",
-    "included_files": [
-    ],
-    "type": "saves_component"
+	"id":"sha1",
+	"type":"saves_component"
 }

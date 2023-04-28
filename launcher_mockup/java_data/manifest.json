@@ -1,5 +1,6 @@
 {
     "components": [
+	"java1"
     ],
 	"prefix": "java",
     "type": "javas"
