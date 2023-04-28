@@ -1,5 +1,6 @@
 {
     "components": [
+		"test1"
     ],
 	"prefix": "mods",
     "type": "mods"

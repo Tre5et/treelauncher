@@ -1,6 +1,6 @@
 {
     "id": "sha1",
     "name": "PrettyInstanceName",
-    "type": "instance",
+    "type": "instance_component",
 	"details":"instance.json"
 }

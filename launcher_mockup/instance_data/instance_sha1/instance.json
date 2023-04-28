@@ -1,18 +1,27 @@
 {
-    "features": {
-        "resolution_x": 1000,
-        "resolution_y": 500
-    },
+    "features": [
+        {
+            "feature": "resolution_x",
+            "value": "1000"
+        },
+        {
+            "feature": "resolution_y",
+            "value": "500"
+        }
+    ],
     "ignored_files": [
         "server\\.dat_old",
         "XaeroWaypoints_BACKUP.*/"
     ],
     "jvm_arguments": [
-        "-Xmx4G"
+        {
+            "argument": "test",
+            "feature": "testFeature"
+        }
     ],
-    "mods": "modsSha1",
-    "options": "optionsSha1",
-    "resourcepacks": "resourceSha1",
-    "saves": "savesSha1",
-    "version": "versionSha1"
+    "mods_component": "modsSha1",
+    "options_component": "optionsSha1",
+    "resourcepacks_component": "resourceSha1",
+    "saves_component": "savesSha1",
+    "version_component": "versionSha1"
 }

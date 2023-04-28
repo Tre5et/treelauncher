@@ -1,5 +1,6 @@
 {
     "components": [
+	"sha1"
     ],
 	"prefix": "instance",
     "type": "instances"

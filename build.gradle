@@ -13,10 +13,12 @@ repositories {
     maven {
         url = "https://repo.u-team.info"
     }
+    maven { url = 'https://raw.githubusercontent.com/Tre5et/maven/main/' }
 }
 
 dependencies {
     implementation "net.hycrafthd:minecraft_authenticator:3.0.4"
+    implementation "net.treset:mc-version-loader:0.1.0"
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
