@@ -18,8 +18,6 @@ public class LauncherApplication extends Application {
     public static final StringLocalizer stringLocalizer = new StringLocalizer();
 
     public static void main(String[] args) {
-        LauncherFiles files = new LauncherFiles();
-        GameLauncher.prepareResources(files.getInstanceComponents().get(0), files);
         launch(args);
     }
 

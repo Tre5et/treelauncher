@@ -6,6 +6,8 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.file_loading.LauncherFiles;
+import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.UiLoader;
 
 import java.io.IOException;
@@ -32,6 +34,10 @@ public class LoginUiController {
         if(success) {
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
             LOGGER.log(Level.INFO, "Login success");
+
+            LauncherFiles files = new LauncherFiles();
+            GameLauncher.prepareResources(files.getInstanceComponents().get(0), files, LauncherApplication.userAuth.getMinecraftUser());
+            return;
         } else {
             loginButton.setDisable(false);
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));

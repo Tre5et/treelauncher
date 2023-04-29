@@ -2,18 +2,137 @@
     "assets": "3",
     "depends": "versionSha1",
     "game_arguments": [
-        {
-            "argument": "arg=${argvalue}",
-            "feature": "feature_to_apply_on",
-            "os_type": "os_type_to_apply_on",
-            "os_version": "os_version_to_appy_on"
+		{
+            "argument": "--username"
+        },
+		{
+            "argument": "${auth_player_name}"
+        },
+		{
+            "argument": "--version"
+        },
+		{
+            "argument": "${version_name}"
+        },
+		{
+            "argument": "--gameDir"
+        },
+		{
+            "argument": "${game_directory}"
+        },		
+		{
+            "argument": "--assetsDir"
+        },
+		{
+            "argument": "${assets_root}"
+        },
+		{
+            "argument": "--assetIndex"
+        },
+		{
+            "argument": "${assets_index_name}"
+        },
+		{
+            "argument": "--uuid"
+        },
+		{
+            "argument": "${auth_uuid}"
+        },		
+		{
+            "argument": "--accessToken"
+        },
+		{
+            "argument": "${auth_access_token}"
+        },
+		{
+            "argument": "--clientId"
+        },
+		{
+            "argument": "${clientId}"
+        },
+		{
+            "argument": "--xuid"
+        },
+		{
+            "argument": "${auth_xuid}"
+        },		
+		{
+            "argument": "--userType"
+        },
+		{
+            "argument": "${user_type}"
+        },
+		{
+            "argument": "--versionType"
+        },
+		{
+            "argument": "${version_type}"
+        },
+		{
+            "argument": "--demo",
+			"feature": "is_demo_user"
+        },
+		{
+            "argument": "--width",
+			"feature": "resolution_x"
+        },		
+		{
+            "argument": "${resolution_width}",
+			"feature": "resolution_x"
+        },
+		{
+            "argument": "--height",
+			"feature": "resolution_y"
+        },		
+		{
+            "argument": "${resolution_height}",
+			"feature": "resolution_y"
+        }		
+    ],
+    "jvm_arguments": [
+		{
+			"argument": "-XstartOnFirstThread",
+			"os_name": "osx"
+		},
+		{
+			"argument": "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
+			"os_name": "windows"
+		},
+		{
+			"argument": "-Dos.name=Windows 10",
+			"os_name": "windows",
+			"os_version": "^10\\."
+		},
+		{
+			"argument": "-Dos.version=10.0",
+			"os_name": "windows",
+			"os_version": "^10\\."
+		},
+		{
+			"argument": "-Xss1M",
+			"os_arch": "x86"
+		},
+		{
+            "argument": "-Djava.library.path=${natives_directory}"
+        },
+		{
+            "argument": "-Dminecraft.launcher.brand=${launcher_name}"
+        },
+		{
+            "argument": "-Dminecraft.launcher.version=${launcher_version}"
+        },
+		{
+            "argument": "-cp"
+        },
+		{
+            "argument": "${classpath}"
         }
     ],
-    "java": "java1",
-    "jvm_arguments": [
-    ],
     "libraries": [
-        "path/to/library.jar"
+        "ca/weblite/java-objc-bridge/1.1/java-objc-bridge-1.1.jar",
+		"com/github/oshi/oshi-core/6.2.2/oshi-core-6.2.2.jar",
+		"com/google/code/gson/gson/2.10/gson-2.10.jar",
+		"com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar"
     ],
     "main_class": "net.minecraft.client.main.Main",
     "main_file": "client.jar"

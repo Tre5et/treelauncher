@@ -1,0 +1,8 @@
+{
+    "details": "version.json",
+    "id": "versionSha1",
+    "included_files": [
+    ],
+    "name": "PrettyVersionName",
+    "type": "version_component"
+}

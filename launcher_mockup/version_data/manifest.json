@@ -1,6 +1,7 @@
 {
     "components": [
-        "version1Sha1"
+        "version1Sha1",
+		"versionSha1"
     ],
     "prefix": "version",
     "type": "versions"
