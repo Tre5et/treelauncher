@@ -137,7 +137,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load mods components: invalid configuration");
             return false;
         }
-        modsComponents = reloadComponents(getModsManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.MODS_COMPONENT, LauncherModsDetails.class);
+        modsComponents = reloadComponents(getModsManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.MODS_COMPONENT, LauncherModsDetails.class, getLauncherDetails().getGamedataDir() + "/mods/");
         return modsComponents != null;
     }
 
@@ -169,7 +169,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load save components: invalid configuration");
             return false;
         }
-        savesComponents = reloadComponents(getSavesManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.SAVES_COMPONENT);
+        savesComponents = reloadComponents(getSavesManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.SAVES_COMPONENT, getLauncherDetails().getGamedataDir() + "/saves/");
         return savesComponents != null;
     }
 
@@ -201,7 +201,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load instance components: invalid configuration");
             return false;
         }
-        instanceComponents = reloadComponents(getInstanceManifest(), getLauncherDetails().getInstancesDir(), LauncherManifestType.INSTANCE_COMPONENT, LauncherInstanceDetails.class);
+        instanceComponents = reloadComponents(getInstanceManifest(), getLauncherDetails().getInstancesDir(), LauncherManifestType.INSTANCE_COMPONENT, LauncherInstanceDetails.class, null);
         return instanceComponents != null;
     }
 
@@ -234,7 +234,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load java components: invalid configuration");
             return false;
         }
-        javaComponents = reloadComponents(getJavaManifest(), getLauncherDetails().getJavasDir(), LauncherManifestType.JAVA_COMPONENT);
+        javaComponents = reloadComponents(getJavaManifest(), getLauncherDetails().getJavasDir(), LauncherManifestType.JAVA_COMPONENT, null);
         return savesComponents != null;
     }
 
@@ -266,7 +266,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load option components: invalid configuration");
             return false;
         }
-        optionsComponents = reloadComponents(getOptionsManifest(), getLauncherDetails().getOptionsDir(), LauncherManifestType.OPTIONS_COMPONENT);
+        optionsComponents = reloadComponents(getOptionsManifest(), getLauncherDetails().getOptionsDir(), LauncherManifestType.OPTIONS_COMPONENT, null);
         return optionsComponents != null;
     }
 
@@ -298,7 +298,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load resourcepack components: invalid configuration");
             return false;
         }
-        resourcepackComponents = reloadComponents(getResourcepackManifest(), getLauncherDetails().getResourcepacksDir(), LauncherManifestType.RESOURCEPACKS_COMPONENT);
+        resourcepackComponents = reloadComponents(getResourcepackManifest(), getLauncherDetails().getResourcepacksDir(), LauncherManifestType.RESOURCEPACKS_COMPONENT, null);
         return resourcepackComponents != null;
     }
 
@@ -330,7 +330,7 @@ public class LauncherFiles {
             LOGGER.log(Level.WARNING, "Unable to load version components: invalid configuration");
             return false;
         }
-        versionComponents = reloadComponents(getVersionManifest(), getLauncherDetails().getVersionDir(), LauncherManifestType.VERSION_COMPONENT, LauncherVersionDetails.class);
+        versionComponents = reloadComponents(getVersionManifest(), getLauncherDetails().getVersionDir(), LauncherManifestType.VERSION_COMPONENT, LauncherVersionDetails.class, null);
         return versionComponents != null;
     }
 
@@ -362,69 +362,110 @@ public class LauncherFiles {
         return out;
     }
 
-    public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, LauncherManifestType expectedType) {
-        return reloadComponents(parentManifest, parentPath, Config.MANIFEST_FILE_NAME, expectedType);
+    public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, LauncherManifestType expectedType, String fallbackPath) {
+        return reloadComponents(parentManifest, parentPath, Config.MANIFEST_FILE_NAME, expectedType, fallbackPath);
     }
 
-    public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType) {
+    public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, String fallbackPath) {
         if(!isValid() || parentManifest == null || parentManifest.getPrefix() == null || parentManifest.getComponents() == null) {
             LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + "components: invalid configuration");
             return null;
         }
         List<LauncherManifest> out = new ArrayList<>();
         for(String c : parentManifest.getComponents()) {
-            String manifestFile = FileUtil.loadFile(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/" + filename);
-            if(manifestFile == null) {
-                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: file error: id=" + c);
+            if(!addComponent(out, Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, c, Config.BASE_DIR + fallbackPath)) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " components: component not found: id=" + c);
                 return null;
             }
-            LauncherManifest manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
-            if(manifest == null || manifest.getType() != expectedType) {
-                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + c);
-                return null;
-            }
-            manifest.setDirectory(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/");
-            out.add(manifest);
         }
         LOGGER.log(Level.INFO, "Loaded resourcepack components");
         return out;
     }
 
-    public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, LauncherManifestType expectedType, Class<T> targetClass) {
-        return reloadComponents(parentManifest, parentPath, Config.MANIFEST_FILE_NAME, expectedType, targetClass);
+    private boolean addComponent(List<LauncherManifest> list, String path, String filename, LauncherManifestType expectedType, String expectedId, String fallbackPath) {
+        String manifestFile = FileUtil.loadFile(path + filename);
+        if(manifestFile == null) {
+            if(fallbackPath == null) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: file error: id=" + expectedId);
+                return false;
+            }
+            LOGGER.log(Level.INFO, "Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
+            return addComponent(list, fallbackPath, filename, expectedType, expectedId, null);
+        }
+        LauncherManifest manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
+        if(manifest == null || manifest.getType() == null || manifest.getType() != expectedType || manifest.getId() == null || !manifest.getId().equals(expectedId)) {
+            if(fallbackPath == null) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + expectedId);
+                return false;
+            }
+            LOGGER.log(Level.INFO, "Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
+            return addComponent(list, fallbackPath, filename, expectedType, expectedId, null);
+        }
+        manifest.setDirectory(path);
+        list.add(manifest);
+        return true;
     }
 
-    public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, Class<T> targetClass) {
+    public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath) {
+        return reloadComponents(parentManifest, parentPath, Config.MANIFEST_FILE_NAME, expectedType, targetClass, fallbackPath);
+    }
+
+    public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath) {
         if(!isValid() || parentManifest == null || parentManifest.getPrefix() == null || parentManifest.getComponents() == null) {
             LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " components: invalid configuration");
             return null;
         }
         List<Pair<LauncherManifest, T>> out = new ArrayList<>();
         for(String c : parentManifest.getComponents()) {
-            String manifestFile = FileUtil.loadFile(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/" + filename);
-            if(manifestFile == null) {
-                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: file error: id=" + c);
+            if(!addComponent(out, Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, targetClass, Config.BASE_DIR + fallbackPath, c)) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " components: component not found: id=" + c);
                 return null;
             }
-            LauncherManifest manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
-            if(manifest == null || manifest.getType() != expectedType|| manifest.getDetails() == null) {
-                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + c);
-                return null;
-            }
-            manifest.setDirectory(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/");
-            String detailsFile = FileUtil.loadFile(Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/" + manifest.getDetails());
-            if(detailsFile == null) {
-                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component details: file error: id=" + c);
-                return null;
-            }
-            T details = GenericJsonParsable.fromJson(detailsFile, targetClass);
-            if(details == null) {
-                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component details: incorrect contents: id=" + c);
-                return null;
-            }
-            out.add(new Pair<>(manifest, details));
         }
         LOGGER.log(Level.INFO, "Loaded " + expectedType.name().toLowerCase() + " components");
         return out;
+    }
+
+
+    private <T extends GenericJsonParsable> boolean addComponent(List<Pair<LauncherManifest, T>> list, String path, String filename, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath, String expectedId) {
+        String manifestFile = FileUtil.loadFile(path + filename);
+        if(manifestFile == null) {
+            if(fallbackPath == null) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: file error: path=" + path);
+                return false;
+            }
+            LOGGER.log(Level.INFO, "Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
+            return addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId);
+        }
+        LauncherManifest manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
+        if(manifest == null || manifest.getType() == null || manifest.getType() != expectedType || manifest.getId() == null || !manifest.getId().equals(expectedId) || manifest.getDetails() == null) {
+            if(fallbackPath == null) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + expectedId);
+                return false;
+            }
+            LOGGER.log(Level.INFO, "Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
+            return addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId);
+        }
+        manifest.setDirectory(path);
+        String detailsFile = FileUtil.loadFile(path + manifest.getDetails());
+        if(detailsFile == null) {
+            if(fallbackPath == null) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component details: file error: id=" + expectedId);
+                return false;
+            }
+            LOGGER.log(Level.INFO, "Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
+            return addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId);
+        }
+        T details = GenericJsonParsable.fromJson(detailsFile, targetClass);
+        if(details == null) {
+            if(fallbackPath == null) {
+                LOGGER.log(Level.WARNING, "Unable to load " + expectedType.name().toLowerCase() + " component details: incorrect contents: id=" + expectedId);
+                return false;
+            }
+            LOGGER.log(Level.INFO, "Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
+            return addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId);
+        }
+        list.add(new Pair<>(manifest, details));
+        return true;
     }
 }

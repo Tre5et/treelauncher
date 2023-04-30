@@ -2,11 +2,12 @@ plugins {
     id("java")
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group = "net.treset"
 version = "1.0-SNAPSHOT"
-mainClassName = "net.treset.minecraftlauncher.LauncherApplication"
+mainClassName = "net.treset.minecraftlauncher.Main"
 
 repositories {
     mavenCentral()
@@ -27,6 +28,12 @@ dependencies {
 javafx {
     version = "17"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
+}
+
+shadowJar {
+    manifest {
+        attributes "Main-Class": "net.treset.minecraftlauncher.Main"
+    }
 }
 
 tasks.test {

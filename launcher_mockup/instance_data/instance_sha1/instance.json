@@ -23,5 +23,5 @@
     "options_component": "sha1",
     "resourcepacks_component": "sha1",
     "saves_component": "sha1",
-    "version_component": "version1Sha1"
+    "version_component": "fabric1.19.4"
 }

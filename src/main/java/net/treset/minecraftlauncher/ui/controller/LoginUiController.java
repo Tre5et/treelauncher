@@ -19,12 +19,12 @@ public class LoginUiController {
     private static final Logger LOGGER = Logger.getLogger(LoginUiController.class.toString());
 
     @FXML
-    private Button loginButton;
+    public Button loginButton;
     @FXML
-    private Label statusLabel;
+    public Label statusLabel;
 
     @FXML
-    private void onLoginButtonClicked() {
+    public void onLoginButtonClicked() {
         loginButton.setDisable(true);
         statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
         LauncherApplication.userAuth.authenticate(Config.AUTH_FILE, this::onLoginDone);
@@ -36,7 +36,8 @@ public class LoginUiController {
             LOGGER.log(Level.INFO, "Login success");
 
             LauncherFiles files = new LauncherFiles();
-            GameLauncher.prepareResources(files.getInstanceComponents().get(0), files, LauncherApplication.userAuth.getMinecraftUser());
+            files.reloadAll();
+            Process gameProcess = GameLauncher.launchGame(files.getInstanceComponents().get(0), files, LauncherApplication.userAuth.getMinecraftUser());
             return;
         } else {
             loginButton.setDisable(false);

@@ -1,6 +1,8 @@
 {
+    "details": "instance.json",
     "id": "sha1",
+    "included_files": [
+    ],
     "name": "PrettyInstanceName",
-    "type": "instance_component",
-	"details":"instance.json"
+    "type": "instance_component"
 }

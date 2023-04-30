@@ -1,0 +1,18 @@
+{
+  "minecraft:recipes/decorations/crafting_table": {
+    "criteria": {
+      "unlock_right_away": "2023-04-29 20:32:35 +0200"
+    },
+    "done": true
+  },
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:stony_shore": "2023-04-30 15:16:41 +0200",
+      "minecraft:snowy_taiga": "2023-04-29 21:53:37 +0200",
+      "minecraft:grove": "2023-04-29 20:32:35 +0200",
+      "minecraft:frozen_ocean": "2023-04-30 15:16:42 +0200"
+    },
+    "done": false
+  },
+  "DataVersion": 3337
+}

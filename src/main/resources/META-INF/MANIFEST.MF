@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Main-Class: net.treset.minecraftlauncher.Main
+Class-Path: javafx-base-17.jar mc-version-loader-0.1.4.jar javafx-fxml-1
+ 7-win.jar javafx-graphics-17.jar javafx-controls-17.jar javafx-base-17-
+ win.jar javafx-graphics-17-win.jar javafx-controls-17-win.jar minecraft
+ _authenticator-3.0.4.jar javafx-web-17-win.jar javafx-media-17-win.jar 
+ gson-2.10.1.jar javafx-media-17.jar
+

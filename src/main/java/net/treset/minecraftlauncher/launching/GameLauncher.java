@@ -2,167 +2,282 @@ package net.treset.minecraftlauncher.launching;
 
 import javafx.util.Pair;
 import net.hycrafthd.minecraft_authenticator.login.User;
+import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.mc_version_loader.launcher.*;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.file_loading.InstanceData;
 import net.treset.minecraftlauncher.file_loading.LauncherFiles;
+import net.treset.minecraftlauncher.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameLauncher {
-    private static Logger LOGGER = Logger.getLogger(LauncherFiles.class.getName());
+    private static Logger LOGGER = Logger.getLogger(GameLauncher.class.getName());
 
-    public static boolean prepareResources(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files, User minecraftUser) {
-        if(!files.reloadAll()) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: file reload failed");
-            return false;
+    public static Process launchGame(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files, User minecraftUser) {
+        if(!files.isValid() || !files.reloadAll()) {
+            LOGGER.log(Level.WARNING, "Unable to launch game: file reload failed");
+            return null;
         }
 
-        List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents = new ArrayList<>();
-        Pair<LauncherManifest, LauncherVersionDetails> currentComponent = null;
-        for (Pair<LauncherManifest, LauncherVersionDetails> v : files.getVersionComponents()) {
-            if (Objects.equals(v.getKey().getId(), instance.getValue().getVersionComponent())) {
-                currentComponent = v;
-                break;
-            }
-        }
-        if(currentComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find version component: versionId=" + instance.getValue().getVersionComponent());
-            return false;
-        }
-        versionComponents.add(currentComponent);
-
-        while(currentComponent.getValue().getDepends() != null && !currentComponent.getValue().getDepends().isBlank()) {
+        if(files.getLauncherDetails().getActiveInstance() != null && !files.getLauncherDetails().getActiveInstance().isBlank()) {
+            LOGGER.log(Level.INFO, "Cleaning up old instance resources: id=" + files.getLauncherDetails().getActiveInstance());
             boolean found = false;
-            for (Pair<LauncherManifest, LauncherVersionDetails> v : files.getVersionComponents()) {
-                if (Objects.equals(v.getKey().getId(), currentComponent.getValue().getDepends())) {
-                    currentComponent = v;
+            for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
+                if(Objects.equals(i.getKey().getId(), files.getLauncherDetails().getActiveInstance())) {
+                    InstanceData instanceData = InstanceData.of(i, files);
+                    if(instanceData == null) {
+                        LOGGER.log(Level.WARNING, "Unable to cleanup old instance: instance data loaded incorrectly");
+                        return null;
+                    }
+
+                    if(!cleanupResources(instanceData, Config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/", files.getGameDetailsManifest().getComponents(), files.getModsManifest().getPrefix(), files.getSavesManifest().getPrefix())) {
+                        LOGGER.log(Level.WARNING, "Unable to cleanup old instance: unable to cleanup resources");
+                        return null;
+                    }
                     found = true;
                     break;
                 }
             }
             if(!found) {
-                LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find dependent version component");
+                LOGGER.log(Level.WARNING, "Unable to cleanup old instance: instance not found");
+                return null;
+            }
+            files.getLauncherDetails().setActiveInstance(null);
+            if(!files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails())) {
+                LOGGER.log(Level.WARNING, "Unable abort launch correctly: unable to write launcher details");
+                return null;
+            }
+        }
+
+        InstanceData instanceData = InstanceData.of(instance, files);
+        if(instanceData == null) {
+            LOGGER.log(Level.WARNING, "Unable to start game: instance data loaded incorrectly");
+            return null;
+        }
+
+
+        files.getLauncherDetails().setActiveInstance(instance.getKey().getId());
+        if(!files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails())) {
+            LOGGER.log(Level.WARNING, "Unable to launch game: unable to write launcher details");
+            return null;
+        }
+
+        if(!prepareResources(instanceData, Config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/")) {
+            LOGGER.log(Level.WARNING, "Unable to launch game: unable to prepare resources");
+            abortInstanceLaunch(files, instanceData);
+            return null;
+        }
+
+        String command = createStartCommand(instanceData, Config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/", Config.BASE_DIR + files.getLauncherDetails().getAssetsDir() + "/", Config.BASE_DIR + files.getLauncherDetails().getLibrariesDir() + "/", minecraftUser);
+        if(command == null) {
+            LOGGER.log(Level.WARNING, "Unable to launch game: unable to create start command");
+            abortInstanceLaunch(files, instanceData);
+            return null;
+        }
+
+        LOGGER.log(Level.INFO, "Launching game: command=" + command);
+
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            return runtime.exec(command);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Unable to launch game: unable to execute command: " + command, e);
+            abortInstanceLaunch(files, instanceData);
+            return null;
+        }
+    }
+
+
+    private static void abortInstanceLaunch(LauncherFiles files, InstanceData instanceData) {
+        if(!cleanupResources(instanceData, Config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/", files.getGameDetailsManifest().getComponents(), files.getModsManifest().getPrefix(), files.getSavesManifest().getPrefix())) {
+            LOGGER.log(Level.WARNING, "Unable abort launch correctly: unable to cleanup resources");
+            return;
+        }
+        files.getLauncherDetails().setActiveInstance(null);
+        if(!files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails())) {
+            LOGGER.log(Level.WARNING, "Unable abort launch correctly: unable to write launcher details");
+        }
+    }
+
+    public static boolean cleanupResources(InstanceData instanceData, String gameDataPath, List<String> gameDataManifests, String prefixMods, String prefixSaves) {
+        try {
+            Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(gameDataPath + "saves_" + instanceData.getSavesComponent().getId()));
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: rename saves file failed", e);
+            return false;
+        }
+        instanceData.getSavesComponent().setDirectory(gameDataPath + "saves_" + instanceData.getSavesComponent().getId() + "/");
+
+        if(instanceData.getModsComponent() != null) {
+            try {
+                Files.move(Path.of(instanceData.getModsComponent().getKey().getDirectory()), Path.of(gameDataPath + "mods_" + instanceData.getModsComponent().getKey().getId()));
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: rename mods file failed", e);
                 return false;
             }
-            versionComponents.add(currentComponent);
+            instanceData.getModsComponent().getKey().setDirectory(gameDataPath + "mods_" + instanceData.getModsComponent().getKey().getId() + "/");
         }
 
+        File gameDataDir = new File(gameDataPath);
+        if(!gameDataDir.isDirectory()) {
+            LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: game data directory not found");
+            return false;
+        }
 
-        LauncherManifest javaComponent = null;
-        for(Pair<LauncherManifest, LauncherVersionDetails> v : versionComponents) {
-            if(v.getValue().getJava() != null && !v.getValue().getJava().isBlank()) {
-                for (LauncherManifest j : files.getJavaComponents()) {
-                    if (Objects.equals(j.getId(), v.getValue().getJava())) {
-                        javaComponent = j;
-                        break;
-                    }
+        File[] gameDataFiles = gameDataDir.listFiles();
+        if(gameDataFiles == null) {
+            LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: game data directory is empty");
+            return false;
+        }
+
+        List<File> gameDataFilesList = new ArrayList<>(Arrays.asList(gameDataFiles));
+        List<File> toRemove = new ArrayList<>();
+        for(File f : gameDataFilesList) {
+            if(f.getName().equals(Config.MANIFEST_FILE_NAME) || gameDataManifests.contains(f.getName()) || f.getName().startsWith(prefixMods) || f.getName().startsWith(prefixSaves)) {
+                toRemove.add(f);
+            }
+        }
+        gameDataFilesList.removeAll(toRemove);
+
+        List<File> remainingFiles = removeIncludedFiles(List.of(instanceData.getSavesComponent(), instanceData.getModsComponent().getKey(), instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList);
+        if(remainingFiles == null) {
+            LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: unable to remove included files");
+            return false;
+        }
+
+        File includedFilesDir = new File(instanceData.getInstance().getKey().getDirectory() + Config.INCLUDED_FILES_DIR);
+        if(includedFilesDir.exists()) {
+            if(!FileUtil.deleteDir(includedFilesDir)) {
+                LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: unable to delete instance included files directory");
+                return false;
+            }
+        }
+        if(!includedFilesDir.mkdir()) {
+            LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: unable to create instance included files directory");
+            return false;
+        }
+        for(File f : remainingFiles) {
+            if(instanceData.getInstance().getValue().getIgnoredFiles().contains(f.getName())) {
+                try {
+                    Files.delete(Path.of(f.getPath()));
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: unable to delete file: " + f.getPath(), e);
+                    return false;
                 }
-                break;
+            }
+            else {
+                try {
+                    Files.move(Path.of(f.getPath()), Path.of(instanceData.getInstance().getKey().getDirectory() + Config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Unable to cleanup launch resources: unable to move file: " + f.getPath(), e);
+                    return false;
+                }
             }
         }
-        if(javaComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find suitable java component");
-            return false;
-        }
-        LauncherManifest optionsComponent = null;
-        for(LauncherManifest o : files.getOptionsComponents()) {
-            if(Objects.equals(o.getId(), instance.getValue().getOptionsComponent())) {
-                optionsComponent = o;
-                break;
+
+        return true;
+    }
+
+    public static List<File> removeIncludedFiles(List<LauncherManifest> components, List<File> files) {
+        for(LauncherManifest component : components) {
+            if(component.getIncludedFiles() == null || component.getIncludedFiles().isEmpty()) {
+                continue;
+            }
+            files = removeIncludedFiles(component, files);
+            if(files == null) {
+                LOGGER.log(Level.WARNING, "Unable to remove included files: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId());
+                return null;
             }
         }
-        if(optionsComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find options component: optionsId=" + instance.getValue().getOptionsComponent());
-            return false;
-        }
-        LauncherManifest resourcepacksComponent = null;
-        for(LauncherManifest r : files.getResourcepackComponents()) {
-            if(Objects.equals(r.getId(), instance.getValue().getResourcepacksComponent())) {
-                resourcepacksComponent = r;
-                break;
+        return files;
+    }
+
+    public static List<File> removeIncludedFiles(LauncherManifest component, List<File> files) {
+        File includedFilesDir = new File(component.getDirectory() + Config.INCLUDED_FILES_DIR);
+        if(includedFilesDir.exists()) {
+            if(!FileUtil.deleteDir(includedFilesDir)) {
+                LOGGER.log(Level.WARNING, "Unable to remove included files: unable to delete included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId());
+                return null;
             }
         }
-        if(resourcepacksComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find resourcepacks component: resourcepacksId=" + instance.getValue().getResourcepacksComponent());
-            return false;
+        if(!includedFilesDir.mkdirs()) {
+            LOGGER.log(Level.WARNING, "Unable to remove included files: unable to create included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId());
+            return null;
         }
-        LauncherManifest savesComponent = null;
-        for(LauncherManifest s : files.getSavesComponents()) {
-            if(Objects.equals(s.getId(), instance.getValue().getSavesComponent())) {
-                savesComponent = s;
-                break;
-            }
-        }
-        if(savesComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find saves component: savesId=" + instance.getValue().getSavesComponent());
-            return false;
-        }
-        Pair<LauncherManifest, LauncherModsDetails> modsComponent = null;
-        if(instance.getValue().getModsComponent() != null && !instance.getValue().getModsComponent().isBlank()) {
-            for(Pair<LauncherManifest, LauncherModsDetails> m : files.getModsComponents()) {
-                if(Objects.equals(m.getKey().getId(), instance.getValue().getModsComponent())) {
-                    modsComponent = m;
+        List<File> result = new ArrayList<>();
+        for(File f : files) {
+            String fName = f.isDirectory() ? f.getName() + "/" : f.getName();
+            boolean found = false;
+            for(String i : component.getIncludedFiles()) {
+                if(FormatUtils.matches(fName, i)) {
+                    try {
+                        Files.move(Path.of(f.getPath()), Path.of(component.getDirectory() + Config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.WARNING, "Unable to remove included file: file=" + f.getAbsolutePath(), e);
+                        return null;
+                    }
+                    found = true;
                     break;
                 }
             }
-            if(modsComponent == null) {
-                LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find mods component: modsId=" + instance.getValue().getModsComponent());
-                return false;
+            if(!found) {
+                result.add(f);
             }
         }
+        return result;
+    }
 
-        if(!copyIncludedFiles(savesComponent, files.getGameDetailsManifest())) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for saves failed");
+    public static boolean prepareResources(InstanceData instanceData, String gameDataPath) {
+
+        if(!addIncludedFiles(instanceData.getInstance().getKey(), gameDataPath)) {
+            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for instance failed");
             return false;
         }
+
+        if(!addIncludedFiles(instanceData.getOptionsComponent(), gameDataPath)) {
+            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for options failed");
+            return false;
+        }
+
+        if(!addIncludedFiles(instanceData.getResourcepacksComponent(), gameDataPath)) {
+            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for resourcepacks failed");
+            return false;
+        }
+
         try {
-            Files.move(Path.of(savesComponent.getDirectory()), Path.of(files.getGameDetailsManifest().getDirectory() + "saves"));
+            Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(gameDataPath + "saves"));
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Unable to prepare launch resources: rename saves file failed", e);
             return false;
         }
+        instanceData.getSavesComponent().setDirectory(gameDataPath + "saves/");
 
-        if(modsComponent != null) {
-            if(!copyIncludedFiles(modsComponent.getKey(), files.getGameDetailsManifest())) {
+        if(instanceData.getModsComponent() != null) {
+            if(!addIncludedFiles(instanceData.getModsComponent().getKey(), gameDataPath)) {
                 LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for mods failed");
                 return false;
             }
 
             try {
-                Files.move(Path.of(modsComponent.getKey().getDirectory()), Path.of(files.getGameDetailsManifest().getDirectory() + "mods"));
+                Files.move(Path.of(instanceData.getModsComponent().getKey().getDirectory()), Path.of(gameDataPath + "mods"));
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Unable to prepare launch resources: rename mods file failed", e);
                 return false;
             }
+            instanceData.getModsComponent().getKey().setDirectory(gameDataPath + "mods/");
         }
 
-        if(!copyIncludedFiles(optionsComponent, files.getGameDetailsManifest())) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for options failed");
-            return false;
-        }
-
-        if(!copyIncludedFiles(resourcepacksComponent, files.getGameDetailsManifest())) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for resourcepacks failed");
-            return false;
-        }
-
-        if(!copyIncludedFiles(instance.getKey(), files.getGameDetailsManifest())) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for instance failed");
-            return false;
-        }
-
-        String command = createStartCommand(instance.getValue(), versionComponents, javaComponent, resourcepacksComponent, files.getLauncherDetails(), minecraftUser);
-        if(command == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to create start command");
+        if(!addIncludedFiles(instanceData.getSavesComponent(), gameDataPath)) {
+            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: included files copy for saves failed");
             return false;
         }
 
@@ -170,14 +285,14 @@ public class GameLauncher {
         return true;
     }
 
-    public static String createStartCommand(LauncherInstanceDetails instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versions, LauncherManifest java, LauncherManifest resourcepacks, LauncherDetails details, User minecraftUser) {
-        if(versions == null || versions.isEmpty() || java == null || resourcepacks == null || details == null) {
+    public static String createStartCommand(InstanceData instanceData, String gameDataDir, String assetsDir, String libraryDir, User minecraftUser) {
+        if(instanceData.getVersionComponents() == null || instanceData.getVersionComponents().isEmpty() || instanceData.getJavaComponent() == null || instanceData.getResourcepacksComponent() == null || libraryDir == null) {
             LOGGER.log(Level.WARNING, "Unable to create start command: unmet preconditions");
             return null;
         }
 
         String assetsIndex = null;
-        for(Pair<LauncherManifest, LauncherVersionDetails> v : versions) {
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             if(v.getValue().getAssets() != null && !v.getValue().getAssets().isBlank()) {
                 assetsIndex = v.getValue().getAssets();
                 break;
@@ -188,35 +303,39 @@ public class GameLauncher {
             return null;
         }
 
-        String mainFile = null;
         String mainClass = null;
-        for(Pair<LauncherManifest, LauncherVersionDetails> v : versions) {
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             if(v.getValue().getMainFile() != null && !v.getValue().getMainFile().isBlank()) {
-                mainFile = v.getKey().getDirectory() + v.getValue().getMainFile();
                 mainClass = v.getValue().getMainClass();
                 break;
             }
         }
-        if(mainFile == null || mainClass == null) {
-            LOGGER.log(Level.WARNING, "Unable to create start command: unable to determine main file");
+        if(mainClass == null) {
+            LOGGER.log(Level.WARNING, "Unable to create start command: unable to determine main class");
             return null;
         }
 
         List<String> libraries = new ArrayList<>();
-        for(Pair<LauncherManifest, LauncherVersionDetails> v : versions) {
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             for(String l : v.getValue().getLibraries()) {
-                libraries.add(Config.BASE_DIR + details.getLibrariesDir() + "/" + l);
+                libraries.add(libraryDir + l);
             }
         }
         if(libraries.isEmpty()) {
             LOGGER.log(Level.WARNING, "Unable to create start command: unable to determine libraries");
             return null;
         }
-        libraries.add(mainFile);
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
+            if(v.getValue().getMainFile() == null ||v.getValue().getMainFile().isBlank()) {
+                LOGGER.log(Level.WARNING, "Unable to create start command: unable to determine main file: version=" + v.getKey().getId());
+                return null;
+            }
+            libraries.add(v.getKey().getDirectory() + v.getValue().getMainFile());
+        }
 
         String resX = null;
         String resY = null;
-        for(LauncherFeature f : instance.getFeatures()) {
+        for(LauncherFeature f : instanceData.getInstance().getValue().getFeatures()) {
             if(f.getFeature().equals("resolution_x")) {
                 resX = f.getValue();
             }
@@ -225,15 +344,15 @@ public class GameLauncher {
             }
         }
 
-        StringBuilder sb = new StringBuilder(java.getDirectory() + "bin" + "/" + "java ");
-        for(Pair<LauncherManifest, LauncherVersionDetails> v : versions) {
-            if(!appendArguments(v.getValue().getJvmArguments(), instance, java, details, resourcepacks, minecraftUser, assetsIndex, libraries, mainClass, resX, resY, sb)) {
+        StringBuilder sb = new StringBuilder(instanceData.getJavaComponent().getDirectory() + "bin" + "/" + "java ");
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
+            if(!appendArguments(v.getValue().getJvmArguments(), instanceData, minecraftUser, gameDataDir, assetsDir, assetsIndex, libraries, mainClass, resX, resY, sb)) {
                 LOGGER.log(Level.WARNING, "Unable to create start command: unable to append jvm arguments: version=" + v.getKey().getId());
                 return null;
             }
         }
-        for(Pair<LauncherManifest, LauncherVersionDetails> v : versions) {
-            if(!appendArguments(v.getValue().getGameArguments(), instance, java, details, resourcepacks, minecraftUser, assetsIndex, libraries, mainClass, resX, resY, sb)) {
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
+            if(!appendArguments(v.getValue().getGameArguments(), instanceData, minecraftUser, gameDataDir, assetsDir, assetsIndex, libraries, mainClass, resX, resY, sb)) {
                 LOGGER.log(Level.WARNING, "Unable to create start command: unable to append jvm arguments: version=" + v.getKey().getId());
                 return null;
             }
@@ -242,9 +361,9 @@ public class GameLauncher {
         return sb.toString();
     }
 
-    private static boolean appendArguments(List<LauncherLaunchArgument> args, LauncherInstanceDetails instance, LauncherManifest java, LauncherDetails details, LauncherManifest resourcepacks, User minecraftUser, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY, StringBuilder sb) {
+    private static boolean appendArguments(List<LauncherLaunchArgument> args, InstanceData instanceData, User minecraftUser, String gameDataDir, String assetsDir, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY, StringBuilder sb) {
         for(LauncherLaunchArgument a : args) {
-            if(!appendArgument(instance, java, details, resourcepacks, minecraftUser, assetsIndex, libraries, mainClass, resX, resY, sb, a)) {
+            if(!appendArgument(instanceData, minecraftUser, gameDataDir, assetsDir, assetsIndex, libraries, mainClass, resX, resY, sb, a)) {
                 LOGGER.log(Level.WARNING, "Unable to append arguments: unable to append argument: argument=" + a);
                 return false;
             }
@@ -252,11 +371,11 @@ public class GameLauncher {
         return true;
     }
 
-    private static boolean appendArgument(LauncherInstanceDetails instance, LauncherManifest java, LauncherDetails details, LauncherManifest resourcepacks, User minecraftUser, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY, StringBuilder sb, LauncherLaunchArgument a) {
+    private static boolean appendArgument(InstanceData instanceData, User minecraftUser, String gameDataDir, String assetsDir, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY, StringBuilder sb, LauncherLaunchArgument a) {
         Map<String, String> replacement = new HashMap<>();
-        if(a.isActive(instance.getFeatures())) {
+        if(a.isActive(instanceData.getInstance().getValue().getFeatures())) {
             for (String r : a.getReplacementValues()) {
-                replacement.put(r, computeReplacementValue(r, details.getGamedataDir(), java.getDirectory(), Config.BASE_DIR + details.getAssetsDir(), resourcepacks.getDirectory(), assetsIndex, libraries, mainClass, minecraftUser, "great version", "modded probably", resX, resY));
+                replacement.put(r, computeReplacementValue(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, mainClass, minecraftUser, LauncherApplication.stringLocalizer.get("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug") ), LauncherApplication.stringLocalizer.get("game.version_type", LauncherApplication.stringLocalizer.get("launcher.name"), LauncherApplication.stringLocalizer.get("launcher.version") ), resX, resY));
                 if(replacement.get(r) == null) {
                     LOGGER.log(Level.WARNING, "Unable to append argument: unable to compute replacement value: key=" + r);
                     return false;
@@ -278,10 +397,10 @@ public class GameLauncher {
                 return "\"" + javaDir + "lib" + "\"";
             }
             case "launcher_name" -> {
-                return "\"" + Config.LAUNCHER_NAME + "\"";
+                return "\"" + LauncherApplication.stringLocalizer.get("launcher.name") + "\"";
             }
             case "launcher_version" -> {
-                return "\"" + Config.LAUNCHER_VERSION + "\"";
+                return "\"" + LauncherApplication.stringLocalizer.get("launcher.version") + "\"";
             }
             case "classpath" -> {
                 StringBuilder sb = new StringBuilder("\"");
@@ -338,7 +457,7 @@ public class GameLauncher {
         }
     }
 
-    public static boolean copyIncludedFiles(LauncherManifest manifest, LauncherManifest gameDataManifest) {
+    public static boolean addIncludedFiles(LauncherManifest manifest, String gameDataDir) {
         if(manifest == null) {
             return false;
         }
@@ -349,12 +468,22 @@ public class GameLauncher {
                 return false;
             }
             File[] files = includedFilesDir.listFiles();
+            if(files == null) {
+                LOGGER.log(Level.WARNING, "Unable to move included files: unable to get files: manifestId=" + manifest.getId());
+                return false;
+            }
             boolean success = true;
             for(File f : files) {
-                try {
-                    Files.copy(f.toPath(), Path.of(gameDataManifest.getDirectory() + f.getName()), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Unable to move included files: unable to move file: manifestId=" + manifest.getId(), e);
+                if(f.isFile()) {
+                    try {
+                        Files.copy(Path.of(f.getPath()), Path.of(gameDataDir + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.WARNING, "Unable to move included files: unable to copy file: manifestId=" + manifest.getId(), e);
+                        success = false;
+                    }
+                }
+                else if(f.isDirectory() && !FileUtil.copyDirectory(f.getPath(), gameDataDir + f.getName())){
+                    LOGGER.log(Level.WARNING, "Unable to move included files: unable to copy directory: manifestId=" + manifest.getId());
                     success = false;
                 }
             }
