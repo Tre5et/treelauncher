@@ -4,19 +4,22 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.util.Pair;
+import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.file_loading.LauncherFiles;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.UiLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class LoginUiController {
-    private static final Logger LOGGER = Logger.getLogger(LoginUiController.class.toString());
+    private static final Logger LOGGER = LogManager.getLogger(LoginUiController.class);
 
     @FXML
     public Button loginButton;
@@ -33,16 +36,17 @@ public class LoginUiController {
     private void onLoginDone(Boolean success) {
         if(success) {
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
-            LOGGER.log(Level.INFO, "Login success");
+            LOGGER.info("Login success, username=" + LauncherApplication.userAuth.getMinecraftUser().name());
 
             LauncherFiles files = new LauncherFiles();
             files.reloadAll();
-            Process gameProcess = GameLauncher.launchGame(files.getInstanceComponents().get(0), files, LauncherApplication.userAuth.getMinecraftUser());
+            Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(0);
+            Process gameProcess = GameLauncher.launchGame(instance, files, LauncherApplication.userAuth.getMinecraftUser());
             return;
         } else {
             loginButton.setDisable(false);
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
-            LOGGER.log(Level.INFO, "Login failed");
+            LOGGER.warn("Login failed");
         }
 
     }

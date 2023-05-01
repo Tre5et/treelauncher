@@ -1,5 +1,5 @@
-[15:28:08] [main/INFO]: Loading Minecraft 1.19.4 with Fabric Loader 0.14.19
-[15:28:08] [main/INFO]: Loading 56 mods:
+[18:29:58] [main/INFO]: Loading Minecraft 1.19.4 with Fabric Loader 0.14.19
+[18:29:59] [main/INFO]: Loading 56 mods:
 	- fabric-api 0.78.0+1.19.4
 	   |-- fabric-api-base 0.4.23+9ff28bcef4
 	   |-- fabric-api-lookup-api-v1 1.6.24+49abcf7ef4
@@ -56,38 +56,36 @@
 	- modmenu 6.1.0-rc.4
 	- ridehud 1.2.3+1.19.x
 	- vanillaconfig 1.2.7+1.19.4
-[15:28:08] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=file:/D:/Hannes/Coding/gits/minecraft-launcher/launcher_mockup/libraries/net/fabricmc/sponge-mixin/0.12.4+mixin.0.8.5/sponge-mixin-0.12.4+mixin.0.8.5.jar Service=Knot/Fabric Env=CLIENT
-[15:28:08] [main/INFO]: Compatibility level set to JAVA_16
-[15:28:08] [main/INFO]: Compatibility level set to JAVA_17
-[15:28:12] [Datafixer Bootstrap/INFO]: 180 Datafixer optimizations took 86 milliseconds
-[15:28:13] [Render thread/INFO]: Environment: authHost='https://authserver.mojang.com', accountsHost='https://api.mojang.com', sessionHost='https://sessionserver.mojang.com', servicesHost='https://api.minecraftservices.com', name='PROD'
-[15:28:13] [Render thread/INFO]: Setting user: TreSet
-[15:28:13] [Render thread/INFO]: [Indigo] Registering Indigo renderer!
-[15:28:14] [Worker-Main-1/INFO]: Checking mod updates...
-[15:28:14] [Render thread/WARN]: Skipping bad option: testaaa2222
-[15:28:14] [Render thread/INFO]: Backend library: LWJGL version 3.3.1 SNAPSHOT
-[15:28:14] [Worker-Main-1/INFO]: Update available for 'modmenu@6.1.0-rc.4', (-> 6.2.2)
-[15:28:14] [Worker-Main-1/INFO]: Update available for 'fabric-api@0.78.0+1.19.4', (-> 0.79.0+1.19.4)
-[15:28:14] [Render thread/INFO]: Found non-pack entry 'D:\Hannes\Coding\gits\minecraft-launcher\launcher_mockup\resourcepack_data\resourcepacks_sha1\manifest.json', ignoring
-[15:28:31] [Render thread/INFO]: Narrator library for x64 successfully loaded
-[15:28:31] [Render thread/INFO]: Reloading ResourceManager: vanilla, Fabric Mods (Fabric API, Fabric API Base, Fabric API Lookup API (v1), Fabric Biome API (v1), Fabric Block API (v1), Fabric BlockRenderLayer Registration (v1), Fabric Client Tags, Fabric Command API (v1), Fabric Command API (v2), Fabric Commands (v0), Fabric Containers (v0), Fabric Content Registries (v0), Fabric Convention Tags, Fabric Crash Report Info (v1), Fabric Data Generation API (v1), Fabric Dimensions API (v1), Fabric Entity Events (v1), Fabric Events Interaction (v0), Fabric Events Lifecycle (v0), Fabric Game Rule API (v1), Fabric Item API (v1), Fabric Item Group API (v1), Fabric Key Binding API (v1), Fabric Key Bindings (v0), Fabric Lifecycle Events (v1), Fabric Loot API (v2), Fabric Loot Tables (v1), Fabric Message API (v1), Fabric Mining Level API (v1), Fabric Models (v0), Fabric Networking API (v1), Fabric Networking (v0), Fabric Object Builder API (v1), Fabric Particles (v1), Fabric Recipe API (v1), Fabric Registry Sync (v0), Fabric Renderer API (v1), Fabric Renderer - Indigo, Fabric Renderer Registries (v1), Fabric Rendering Data Attachment (v1), Fabric Rendering Fluids (v1), Fabric Rendering (v0), Fabric Rendering (v1), Fabric Resource Conditions API (v1), Fabric Resource Loader (v0), Fabric Screen API (v1), Fabric Screen Handler API (v1), Fabric Sound API (v1), Fabric Transfer API (v1), Fabric Transitive Access Wideners (v1), Fabric Loader, Mod Menu, Ride Hud, Vanilla Config)
-[15:28:32] [Render thread/WARN]: Missing sound for event: minecraft:item.goat_horn.play
-[15:28:32] [Render thread/WARN]: Missing sound for event: minecraft:entity.goat.screaming.horn_break
-[15:28:32] [Render thread/WARN]: Missing sound for event: minecraft:music.overworld.cherry_grove
-[15:28:32] [Render thread/INFO]: OpenAL initialized on device OpenAL Soft on CABLE Input (VB-Audio Virtual Cable)
-[15:28:32] [Render thread/INFO]: Sound engine started
-[15:28:32] [Render thread/INFO]: Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 256x256x4 minecraft:textures/atlas/signs.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 1024x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 64x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
-[15:28:32] [Render thread/INFO]: Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
-[15:28:33] [Render thread/WARN]: Shader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
-[15:28:33] [Render thread/INFO]: Created: 256x256x0 minecraft:textures/atlas/particles.png-atlas
-[15:28:33] [Render thread/INFO]: Created: 256x256x0 minecraft:textures/atlas/paintings.png-atlas
-[15:28:33] [Render thread/INFO]: Created: 128x128x0 minecraft:textures/atlas/mob_effects.png-atlas
-[15:28:35] [Render thread/INFO]: Stopping!
-[15:28:35] [Render thread/ERROR]: Deleting stream buffers: Invalid name parameter.
+[18:29:59] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=file:/D:/Hannes/Coding/gits/minecraft-launcher/launcher_mockup/libraries/net/fabricmc/sponge-mixin/0.12.4+mixin.0.8.5/sponge-mixin-0.12.4+mixin.0.8.5.jar Service=Knot/Fabric Env=CLIENT
+[18:29:59] [main/INFO]: Compatibility level set to JAVA_16
+[18:29:59] [main/INFO]: Compatibility level set to JAVA_17
+[18:30:04] [Datafixer Bootstrap/INFO]: 180 Datafixer optimizations took 133 milliseconds
+[18:30:06] [Render thread/INFO]: Environment: authHost='https://authserver.mojang.com', accountsHost='https://api.mojang.com', sessionHost='https://sessionserver.mojang.com', servicesHost='https://api.minecraftservices.com', name='PROD'
+[18:30:07] [Render thread/INFO]: Setting user: TreSet
+[18:30:07] [Render thread/INFO]: [Indigo] Registering Indigo renderer!
+[18:30:07] [Worker-Main-1/INFO]: Checking mod updates...
+[18:30:07] [Render thread/INFO]: Backend library: LWJGL version 3.3.1 SNAPSHOT
+[18:30:08] [Render thread/INFO]: Found non-pack entry 'D:\Hannes\Coding\gits\minecraft-launcher\launcher_mockup\resourcepack_data\resourcepacks_sha1\manifest.json', ignoring
+[18:30:08] [Worker-Main-1/INFO]: Update available for 'modmenu@6.1.0-rc.4', (-> 6.2.2)
+[18:30:08] [Worker-Main-1/INFO]: Update available for 'fabric-api@0.78.0+1.19.4', (-> 0.80.0+1.19.4)
+[18:30:08] [Render thread/INFO]: Narrator library for x64 successfully loaded
+[18:30:08] [Render thread/INFO]: Reloading ResourceManager: vanilla, Fabric Mods (Fabric API, Fabric API Base, Fabric API Lookup API (v1), Fabric Biome API (v1), Fabric Block API (v1), Fabric BlockRenderLayer Registration (v1), Fabric Client Tags, Fabric Command API (v1), Fabric Command API (v2), Fabric Commands (v0), Fabric Containers (v0), Fabric Content Registries (v0), Fabric Convention Tags, Fabric Crash Report Info (v1), Fabric Data Generation API (v1), Fabric Dimensions API (v1), Fabric Entity Events (v1), Fabric Events Interaction (v0), Fabric Events Lifecycle (v0), Fabric Game Rule API (v1), Fabric Item API (v1), Fabric Item Group API (v1), Fabric Key Binding API (v1), Fabric Key Bindings (v0), Fabric Lifecycle Events (v1), Fabric Loot API (v2), Fabric Loot Tables (v1), Fabric Message API (v1), Fabric Mining Level API (v1), Fabric Models (v0), Fabric Networking API (v1), Fabric Networking (v0), Fabric Object Builder API (v1), Fabric Particles (v1), Fabric Recipe API (v1), Fabric Registry Sync (v0), Fabric Renderer API (v1), Fabric Renderer - Indigo, Fabric Renderer Registries (v1), Fabric Rendering Data Attachment (v1), Fabric Rendering Fluids (v1), Fabric Rendering (v0), Fabric Rendering (v1), Fabric Resource Conditions API (v1), Fabric Resource Loader (v0), Fabric Screen API (v1), Fabric Screen Handler API (v1), Fabric Sound API (v1), Fabric Transfer API (v1), Fabric Transitive Access Wideners (v1), Fabric Loader, Mod Menu, Ride Hud, Vanilla Config)
+[18:30:10] [Render thread/WARN]: Missing sound for event: minecraft:item.goat_horn.play
+[18:30:10] [Render thread/WARN]: Missing sound for event: minecraft:entity.goat.screaming.horn_break
+[18:30:10] [Render thread/WARN]: Missing sound for event: minecraft:music.overworld.cherry_grove
+[18:30:10] [Render thread/INFO]: OpenAL initialized on device OpenAL Soft on CABLE Input (VB-Audio Virtual Cable)
+[18:30:10] [Render thread/INFO]: Sound engine started
+[18:30:10] [Render thread/INFO]: Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 256x256x4 minecraft:textures/atlas/signs.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 1024x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 64x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[18:30:10] [Render thread/WARN]: Shader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
+[18:30:10] [Render thread/INFO]: Created: 256x256x0 minecraft:textures/atlas/particles.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 256x256x0 minecraft:textures/atlas/paintings.png-atlas
+[18:30:10] [Render thread/INFO]: Created: 128x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[18:30:18] [Render thread/INFO]: Stopping!

@@ -43,3 +43,8 @@ bin/
 
 ### Authentication ###
 *.auth
+
+### Minecraft ###
+*/assets/*
+*/processedMod/*
+*/remappedJars/*

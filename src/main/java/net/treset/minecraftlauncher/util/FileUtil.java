@@ -1,27 +1,28 @@
 package net.treset.minecraftlauncher.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FileUtil {
-    private static Logger LOGGER = Logger.getLogger(FileUtil.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(FileUtil.class);
 
     public static String loadFile(String path) {
         Path filePath = Paths.get(path);
         if(!filePath.toFile().isFile()) {
-            LOGGER.log(Level.WARNING, "Unable to load file: doesn't exist: path=" + path);
+            LOGGER.debug("Unable to load file: doesn't exist: path=" + path);
             return null;
         }
         try {
             return Files.readString(filePath);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Unable to load file: path=" + path, e);
+            LOGGER.debug("Unable to load file: path=" + path, e);
             return null;
         }
     }
@@ -51,7 +52,7 @@ public class FileUtil {
                         }
                     });
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Unable to copy directory: source=" + source, e);
+            LOGGER.debug("Unable to copy directory: source=" + source, e);
             return false;
         }
         return true;

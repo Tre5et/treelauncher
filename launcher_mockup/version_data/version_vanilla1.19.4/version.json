@@ -105,7 +105,7 @@
       "os_name": "windows"
     },
     {
-      "argument": "-Dos.name=\"Windows 10\"",
+      "argument": "-Dos.name=Windows 10",
       "os_name": "windows",
       "os_version": "^10\\."
     },
@@ -131,7 +131,7 @@
       "argument": "-cp"
     },
     {
-      "argument": "${classpath}"
+	"argument": "${classpath}"
     }
   ],
   "libraries": [

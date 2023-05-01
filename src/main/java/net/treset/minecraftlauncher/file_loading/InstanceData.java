@@ -5,15 +5,15 @@ import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class InstanceData {
-    private static Logger LOGGER = Logger.getLogger(InstanceData.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(InstanceData.class);
 
     private Pair<LauncherManifest, LauncherInstanceDetails> instance;
     private List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents;
@@ -25,7 +25,7 @@ public class InstanceData {
 
     public static InstanceData of(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files) {
         if(!files.reloadAll()) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: file reload failed");
+            LOGGER.warn("Unable to prepare launch resources: file reload failed");
             return null;
         }
 
@@ -38,7 +38,7 @@ public class InstanceData {
             }
         }
         if(currentComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find version component: versionId=" + instance.getValue().getVersionComponent());
+            LOGGER.warn("Unable to prepare launch resources: unable to find version component: versionId=" + instance.getValue().getVersionComponent());
             return null;
         }
         versionComponents.add(currentComponent);
@@ -53,7 +53,7 @@ public class InstanceData {
                 }
             }
             if(!found) {
-                LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find dependent version component");
+                LOGGER.warn("Unable to prepare launch resources: unable to find dependent version component: versionId=" + currentComponent.getValue().getDepends());
                 return null;
             }
             versionComponents.add(currentComponent);
@@ -73,7 +73,7 @@ public class InstanceData {
             }
         }
         if(javaComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find suitable java component");
+            LOGGER.warn("Unable to prepare launch resources: unable to find suitable java component");
             return null;
         }
         LauncherManifest optionsComponent = null;
@@ -84,7 +84,7 @@ public class InstanceData {
             }
         }
         if(optionsComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find options component: optionsId=" + instance.getValue().getOptionsComponent());
+            LOGGER.warn("Unable to prepare launch resources: unable to find options component: optionsId=" + instance.getValue().getOptionsComponent());
             return null;
         }
         LauncherManifest resourcepacksComponent = null;
@@ -95,7 +95,7 @@ public class InstanceData {
             }
         }
         if(resourcepacksComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find resourcepacks component: resourcepacksId=" + instance.getValue().getResourcepacksComponent());
+            LOGGER.warn("Unable to prepare launch resources: unable to find resourcepacks component: resourcepacksId=" + instance.getValue().getResourcepacksComponent());
             return null;
         }
         LauncherManifest savesComponent = null;
@@ -106,7 +106,7 @@ public class InstanceData {
             }
         }
         if(savesComponent == null) {
-            LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find saves component: savesId=" + instance.getValue().getSavesComponent());
+            LOGGER.warn("Unable to prepare launch resources: unable to find saves component: savesId=" + instance.getValue().getSavesComponent());
             return null;
         }
         Pair<LauncherManifest, LauncherModsDetails> modsComponent = null;
@@ -118,7 +118,7 @@ public class InstanceData {
                 }
             }
             if(modsComponent == null) {
-                LOGGER.log(Level.WARNING, "Unable to prepare launch resources: unable to find mods component: modsId=" + instance.getValue().getModsComponent());
+                LOGGER.warn("Unable to prepare launch resources: unable to find mods component: modsId=" + instance.getValue().getModsComponent());
                 return null;
             }
         }

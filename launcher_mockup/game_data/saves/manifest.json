@@ -1,8 +1,0 @@
-{
-	"included_files": [
-	"servers.dat",
-	"realms_persistence.json"
-	],
-	"id":"sha1",
-	"type":"saves_component"
-}

@@ -8,19 +8,18 @@ import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.*;
-
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class UserAuth {
-    private final Logger LOGGER = Logger.getLogger(UserAuth.class.toString());
+    private final Logger LOGGER = LogManager.getLogger(UserAuth.class);
 
     private boolean loggedIn = false;
     private boolean authenticating = false;
@@ -34,7 +33,7 @@ public class UserAuth {
             try {
                 authFileStream = new FileInputStream(authFile);
             } catch (FileNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Unable to open create input stream for auth file", e);
+                LOGGER.error("Unable to open create input stream for auth file", e);
                 doneCallback.accept(false);
                 return;
             }
@@ -44,7 +43,7 @@ public class UserAuth {
                 authenticationFile = AuthenticationFile.readCompressed(authFileStream);
                 authFileStream.close();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error reading auth file", e);
+                LOGGER.error("Unable to read auth file", e);
                 doneCallback.accept(false);
                 return;
             }
@@ -76,7 +75,7 @@ public class UserAuth {
         try {
             outputStream = new FileOutputStream(authFile);
         } catch (FileNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Unable to create output stream for auth file", e);
+            LOGGER.error("Unable to create output stream for auth file", e);
             doneCallback.accept(false);
             return;
         }
@@ -90,12 +89,12 @@ public class UserAuth {
                     resultFile.writeCompressed(outputStream);
                     outputStream.close();
                 } catch (IOException e1) {
-                    LOGGER.log(Level.SEVERE, "Unable to write auth file", e1);
+                    LOGGER.error("Unable to write auth file", e1);
                     doneCallback.accept(false);
                     return;
                 }
             }
-            LOGGER.log(Level.SEVERE, "Unable to login", e);
+            LOGGER.error("Unable to login", e);
             doneCallback.accept(false);
             return;
         }
@@ -105,14 +104,14 @@ public class UserAuth {
             resultFile.writeCompressed(outputStream);
             outputStream.close();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to write auth file");
+            LOGGER.error("Unable to write auth file", e);
             doneCallback.accept(false);
             return;
         }
 
         final Optional<User> optionalUser = minecraftAuth.getUser();
         if(optionalUser.isEmpty()) {
-            LOGGER.log(Level.SEVERE, "User not present after login");
+            LOGGER.error("User not present after login");
             doneCallback.accept(false);
             return;
         }
@@ -130,7 +129,7 @@ public class UserAuth {
 
     public void onWebCloseRequested(Stage stage, Consumer<Boolean> doneCallback) {
         stage.close();
-        LOGGER.log(Level.WARNING, "Login window closed");
+        LOGGER.warn("Login window closed");
         doneCallback.accept(false);
     }
 
