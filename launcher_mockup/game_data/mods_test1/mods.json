@@ -1,0 +1,45 @@
+#### subject to change
+{
+    "mods": [
+        {
+            "current_provider": "modrinth",
+            "description": "Descriptionnaaaaa",
+            "downloads": [
+                {
+                    "date": "latest_version_date",
+                    "provider": "modrinth",
+                    "url": "https://version_getter_url_modrinth",
+                    "version": "version_name"
+                }
+            ],
+            "enabled": true,
+            "icon_url": "https://icon_url",
+            "id": "sha1",
+            "name": "name_derived_from_file"
+        },
+        {
+            "current_provider": "curseforge",
+            "description": "Descriptionnaaaaa",
+            "downloads": [
+                {
+                    "date": "date_string",
+                    "provider": "modrinth",
+                    "url": "https://version_getter_url_modrinth",
+                    "version": "version_name"
+                },
+                {
+                    "date": "date_string",
+                    "provider": "curseforge",
+                    "url": "https://version_getter_url_curseforge",
+                    "version": "version_name"
+                }
+            ],
+            "enabled": false,
+            "icon_url": "https://icon_url",
+            "id": "sha1_2",
+            "name": "name_derived_from_file"
+        }
+    ],
+    "mods_type": "fabric",
+    "mods_version": "1.19.4"
+}

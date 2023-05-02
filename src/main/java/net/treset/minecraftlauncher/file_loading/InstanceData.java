@@ -1,10 +1,9 @@
 package net.treset.minecraftlauncher.file_loading;
 
 import javafx.util.Pair;
-import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
-import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.mc_version_loader.launcher.LauncherModsDetails;
-import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
+import net.treset.mc_version_loader.launcher.*;
+import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +14,8 @@ import java.util.Objects;
 public class InstanceData {
     private static Logger LOGGER = LogManager.getLogger(InstanceData.class);
 
+    private LauncherDetails launcherDetails;
+    private String launcherDetailsFile;
     private Pair<LauncherManifest, LauncherInstanceDetails> instance;
     private List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents;
     private LauncherManifest javaComponent = null;
@@ -22,6 +23,12 @@ public class InstanceData {
     LauncherManifest resourcepacksComponent = null;
     LauncherManifest savesComponent = null;
     Pair<LauncherManifest, LauncherModsDetails> modsComponent = null;
+    String gameDataDir;
+    String assetsDir;
+    String librariesDir;
+    String modsPrefix;
+    String savesPrefix;
+    List<String> gameDataExcludedFiles;
 
     public static InstanceData of(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files) {
         if(!files.reloadAll()) {
@@ -123,18 +130,35 @@ public class InstanceData {
             }
         }
 
+        ArrayList<String> gameDataExcludedFiles = new ArrayList<>();
+        for(String c : files.getGameDetailsManifest().getComponents()) {
+            gameDataExcludedFiles.add(FormatUtil.toRegexPattern(c));
+        }
+        gameDataExcludedFiles.add(FormatUtil.toRegexPattern(files.getModsManifest().getPrefix()) + ".*");
+        gameDataExcludedFiles.add(FormatUtil.toRegexPattern(files.getSavesManifest().getPrefix()) + ".*");
+
         return new InstanceData(
+                files.getLauncherDetails(),
+                files.getMainManifest().getDirectory() + files.getMainManifest().getDetails(),
                 instance,
                 versionComponents,
                 javaComponent,
                 optionsComponent,
                 resourcepacksComponent,
                 savesComponent,
-                modsComponent
+                modsComponent,
+                Config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/",
+                Config.BASE_DIR + files.getLauncherDetails().getAssetsDir() + "/",
+                Config.BASE_DIR + files.getLauncherDetails().getLibrariesDir() + "/",
+                files.getModsManifest().getPrefix(),
+                files.getSavesManifest().getPrefix(),
+                gameDataExcludedFiles
         );
     }
 
-    public InstanceData(Pair<LauncherManifest, LauncherInstanceDetails> instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents, LauncherManifest javaComponent, LauncherManifest optionsComponent, LauncherManifest resourcepacksComponent, LauncherManifest savesComponent, Pair<LauncherManifest, LauncherModsDetails> modsComponent) {
+    public InstanceData(LauncherDetails launcherDetails, String launcherDetailsFile, Pair<LauncherManifest, LauncherInstanceDetails> instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents, LauncherManifest javaComponent, LauncherManifest optionsComponent, LauncherManifest resourcepacksComponent, LauncherManifest savesComponent, Pair<LauncherManifest, LauncherModsDetails> modsComponent, String gameDataDir, String assetsDir, String librariesDir, String modsPrefix, String savesPrefix, List<String> gameDataExcludedFiles) {
+        this.launcherDetails = launcherDetails;
+        this.launcherDetailsFile = launcherDetailsFile;
         this.instance = instance;
         this.versionComponents = versionComponents;
         this.javaComponent = javaComponent;
@@ -142,6 +166,21 @@ public class InstanceData {
         this.resourcepacksComponent = resourcepacksComponent;
         this.savesComponent = savesComponent;
         this.modsComponent = modsComponent;
+        this.gameDataDir = gameDataDir;
+        this.assetsDir = assetsDir;
+        this.librariesDir = librariesDir;
+        this.modsPrefix = modsPrefix;
+        this.savesPrefix = savesPrefix;
+        this.gameDataExcludedFiles = gameDataExcludedFiles;
+    }
+
+    public boolean setActive(boolean active) {
+        launcherDetails.setActiveInstance(active ? instance.getKey().getId()  : null);
+        if(!launcherDetails.writeToFile(launcherDetailsFile)) {
+            LOGGER.warn("Unable to launch game: unable to write launcher details");
+            return false;
+        }
+        return true;
     }
 
     public Pair<LauncherManifest, LauncherInstanceDetails> getInstance() {
@@ -197,5 +236,69 @@ public class InstanceData {
 
     public void setModsComponent(Pair<LauncherManifest, LauncherModsDetails> modsComponent) {
         this.modsComponent = modsComponent;
+    }
+
+    public String getGameDataDir() {
+        return gameDataDir;
+    }
+
+    public void setGameDataDir(String gameDataDir) {
+        this.gameDataDir = gameDataDir;
+    }
+
+    public String getAssetsDir() {
+        return assetsDir;
+    }
+
+    public void setAssetsDir(String assetsDir) {
+        this.assetsDir = assetsDir;
+    }
+
+    public String getLibrariesDir() {
+        return librariesDir;
+    }
+
+    public void setLibrariesDir(String librariesDir) {
+        this.librariesDir = librariesDir;
+    }
+
+    public String getModsPrefix() {
+        return modsPrefix;
+    }
+
+    public void setModsPrefix(String modsPrefix) {
+        this.modsPrefix = modsPrefix;
+    }
+
+    public String getSavesPrefix() {
+        return savesPrefix;
+    }
+
+    public void setSavesPrefix(String savesPrefix) {
+        this.savesPrefix = savesPrefix;
+    }
+
+    public List<String> getGameDataExcludedFiles() {
+        return gameDataExcludedFiles;
+    }
+
+    public void setGameDataExcludedFiles(List<String> gameDataExcludedFiles) {
+        this.gameDataExcludedFiles = gameDataExcludedFiles;
+    }
+
+    public LauncherDetails getLauncherDetails() {
+        return launcherDetails;
+    }
+
+    public void setLauncherDetails(LauncherDetails launcherDetails) {
+        this.launcherDetails = launcherDetails;
+    }
+
+    public String getLauncherDetailsFile() {
+        return launcherDetailsFile;
+    }
+
+    public void setLauncherDetailsFile(String launcherDetailsFile) {
+        this.launcherDetailsFile = launcherDetailsFile;
     }
 }

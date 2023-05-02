@@ -41,7 +41,8 @@ public class LoginUiController {
             LauncherFiles files = new LauncherFiles();
             files.reloadAll();
             Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(0);
-            Process gameProcess = GameLauncher.launchGame(instance, files, LauncherApplication.userAuth.getMinecraftUser());
+            GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser());
+            gameLauncher.launch();
             return;
         } else {
             loginButton.setDisable(false);
