@@ -3,7 +3,7 @@ package net.treset.minecraftlauncher.launching;
 import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.config.Config;
-import net.treset.minecraftlauncher.file_loading.InstanceData;
+import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;

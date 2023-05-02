@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.file_loading;
+package net.treset.minecraftlauncher.data;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.json.GenericJsonParsable;

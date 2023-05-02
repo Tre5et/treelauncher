@@ -9,7 +9,7 @@ import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Config;
-import net.treset.minecraftlauncher.file_loading.LauncherFiles;
+import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.UiLoader;
 import org.apache.logging.log4j.LogManager;

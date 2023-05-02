@@ -4,8 +4,8 @@ import javafx.util.Pair;
 import net.hycrafthd.minecraft_authenticator.login.User;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.minecraftlauncher.file_loading.InstanceData;
-import net.treset.minecraftlauncher.file_loading.LauncherFiles;
+import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.data.LauncherFiles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
