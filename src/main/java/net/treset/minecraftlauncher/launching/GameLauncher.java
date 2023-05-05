@@ -10,21 +10,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class GameLauncher {
-    private static Logger LOGGER = LogManager.getLogger(GameLauncher.class);
+    private static final Logger LOGGER = LogManager.getLogger(GameLauncher.class);
 
     private Pair<LauncherManifest, LauncherInstanceDetails> instance;
     private LauncherFiles files;
     private User minecraftUser;
+    private final List<Consumer<String>> exitCallbacks;
     private ResourceManager resourceManager;
     private GameListener gameListener;
 
-    public GameLauncher(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files, User minecraftUser) {
+    public GameLauncher(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files, User minecraftUser, List<Consumer<String>> exitCallbacks) {
         this.instance = instance;
         this.files = files;
         this.minecraftUser = minecraftUser;
+        this.exitCallbacks = exitCallbacks;
     }
 
     public boolean launch() {
@@ -70,7 +74,7 @@ public class GameLauncher {
         LOGGER.debug("command=" + pb.command());
         try {
             Process p = pb.start();
-            gameListener = new GameListener(p, resourceManager);
+            gameListener = new GameListener(p, resourceManager, exitCallbacks);
             gameListener.start();
             return true;
         } catch (IOException e) {
@@ -120,14 +124,6 @@ public class GameLauncher {
             return false;
         }
         return true;
-    }
-
-    public static Logger getLOGGER() {
-        return LOGGER;
-    }
-
-    public static void setLOGGER(Logger LOGGER) {
-        GameLauncher.LOGGER = LOGGER;
     }
 
     public Pair<LauncherManifest, LauncherInstanceDetails> getInstance() {

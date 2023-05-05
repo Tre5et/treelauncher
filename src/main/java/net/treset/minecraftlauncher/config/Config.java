@@ -8,13 +8,9 @@ public class Config {
     public static final String BASE_DIR = "D:/Hannes/Coding/gits/minecraft-launcher/launcher_mockup/";
     public static final String MANIFEST_FILE_NAME = "manifest.json";
     public static final String INCLUDED_FILES_DIR = ".included_files";
-    public static final String INSTANCE_DETAILS_FILENAME = "instance.json";
     public static final List<String> INSTANCE_DEFAULT_INCLUDED_FILES = List.of();
     public static final List<String> INSTANCE_DEFAULT_IGNORED_FILES = List.of(".*backup.*", ".*BACKUP.*");
-    public static final String LAUNCHER_DETAILS_FILENAME = "launcher.json";
-    public static final String VERSION_DETAILS_FILENAME = "version.json";
     public static final List<String> VERSION_DEFAULT_INCLUDED_FILES = List.of();
-    public static final String MODS_DETAILS_FILENAME = "mods.json";
     public static final List<String> MODS_DEFAULT_INCLUDED_FILES = List.of("\\.fabric/", "config/", "schematics/", "\\.bobby/", "XaeroWorldmap/", "XaeroWaypoints/", "itemscroller/");
     public static final List<String> SAVES_DEFAULT_INCLUDED_FILES = List.of("servers\\.dat", "realms_persistence\\.json");
     public static final List<String> RESOURCEPACK_DEFAULT_INCLUDED_FILES = List.of();

@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class LoginUiController {
@@ -41,7 +42,7 @@ public class LoginUiController {
             LauncherFiles files = new LauncherFiles();
             files.reloadAll();
             Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(0);
-            GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser());
+            GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit)));
             gameLauncher.launch();
             return;
         } else {
@@ -50,6 +51,10 @@ public class LoginUiController {
             LOGGER.warn("Login failed");
         }
 
+    }
+
+    private void onGameExit(String error) {
+        LOGGER.debug("Game exited: " + error);
     }
 
     public static LoginUiController showOnStage(Stage stage) throws IOException {
