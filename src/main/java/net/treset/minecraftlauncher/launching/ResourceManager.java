@@ -143,7 +143,7 @@ public class ResourceManager {
                         success = false;
                     }
                 }
-                else if(f.isDirectory() && !FileUtil.copyDirectory(f.getPath(), instanceData.getGameDataDir() + f.getName())){
+                else if(f.isDirectory() && !FileUtil.copyDirectory(f.getPath(), instanceData.getGameDataDir() + f.getName(), StandardCopyOption.REPLACE_EXISTING)){
                     LOGGER.warn("Unable to move included files: unable to copy directory: manifestId=" + manifest.getId());
                     success = false;
                 }
