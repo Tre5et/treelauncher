@@ -10,8 +10,10 @@ public class Config {
     public static final String INCLUDED_FILES_DIR = ".included_files";
     public static final List<String> INSTANCE_DEFAULT_INCLUDED_FILES = List.of();
     public static final List<String> INSTANCE_DEFAULT_IGNORED_FILES = List.of(".*backup.*", ".*BACKUP.*");
+    public static final String INSTANCE_DEFAULT_DETAILS = "instance.json";
     public static final List<String> OPTIONS_DEFAULT_INCLUDED_FILES = List.of();
     public static final List<String> MODS_DEFAULT_INCLUDED_FILES = List.of("\\.fabric/", "config/", "schematics/", "\\.bobby/", "XaeroWorldmap/", "XaeroWaypoints/", "itemscroller/");
+    public static final String MODS_DEFAULT_DETAILS = "mods.json";
     public static final List<String> SAVES_DEFAULT_INCLUDED_FILES = List.of("servers\\.dat", "realms_persistence\\.json");
     public static final List<String> RESOURCEPACK_DEFAULT_INCLUDED_FILES = List.of();
 }
