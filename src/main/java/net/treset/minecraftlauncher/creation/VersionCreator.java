@@ -10,6 +10,8 @@ import net.treset.mc_version_loader.minecraft.MinecraftLaunchArgument;
 import net.treset.mc_version_loader.minecraft.MinecraftLibrary;
 import net.treset.mc_version_loader.minecraft.MinecraftRule;
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
+import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.data.LauncherFiles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,9 +25,13 @@ public class VersionCreator extends GenericComponentCreator {
 
     MinecraftVersionDetails mcVersion;
     FabricVersionDetails fabricVersion;
+    LauncherFiles files;
     String librariesDir;
-    public VersionCreator(String name,  Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest) {
-        super(LauncherManifestType.VERSION_COMPONENT, null, null, name, typeConversion, null, null, componentsManifest);
+    public VersionCreator(String name,  Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, MinecraftVersionDetails mcVersion, LauncherFiles files, String librariesDir) {
+        super(LauncherManifestType.VERSION_COMPONENT, null, null, name, typeConversion, null, Config.VERSION_DEFAULT_DETAILS, componentsManifest);
+        this.mcVersion = mcVersion;
+        this.files = files;
+        this.librariesDir = librariesDir;
     }
 
     public VersionCreator(LauncherManifest uses) {
@@ -61,13 +67,17 @@ public class VersionCreator extends GenericComponentCreator {
                 null,
                 null,
                 null,
-                mcVersion.getJavaVersion().getComponent(),
+                null,
                 null,
                 mcVersion.getMainClass(),
                 null
         );
         if(!addArguments(details)) {
             LOGGER.warn("Failed to add arguments to version");
+            return false;
+        }
+        if(!addJava(details)) {
+            LOGGER.warn("Failed to add java to version");
             return false;
         }
         if(!addLibraries(details)) {
@@ -86,31 +96,55 @@ public class VersionCreator extends GenericComponentCreator {
         return true;
     }
 
+    private boolean addJava(LauncherVersionDetails details) {
+        String javaName = mcVersion.getJavaVersion().getComponent();
+
+        if(javaName == null) {
+            LOGGER.warn("Unable to add java component: java name is null");
+            return false;
+        }
+        for(LauncherManifest j : files.getJavaComponents()) {
+            if(j != null && javaName.equals(j.getName())) {
+                details.setJava(j.getId());
+                return true;
+            }
+        }
+
+        details.setJava(new JavaComponentCreator(javaName, getTypeConversion(), files.getJavaManifest()).createComponent());
+
+        if(details.getJava() == null) {
+            LOGGER.warn("Unable to add java component: failed to create java component");
+            return false;
+        }
+        return true;
+    }
+
     private boolean addLibraries(LauncherVersionDetails details) {
         if(mcVersion.getLibraries() == null) {
-            LOGGER.warn("Mc libraries is null");
+            LOGGER.warn("Unable to add libraries: libraries is null");
             return false;
         }
         File baseDir = new File(librariesDir);
         if(!baseDir.isDirectory()) {
-            LOGGER.warn("Libraries dir is not a directory");
+            LOGGER.warn("Unable to add libraries: libraries dir is not a directory");
             return false;
         }
         List<String> result = new ArrayList<>();
         for(MinecraftLibrary l : mcVersion.getLibraries()) {
             if(l == null || l.getDownloads() == null || l.getDownloads().getArtifacts() == null || l.getDownloads().getArtifacts().getUrl() == null || l.getDownloads().getArtifacts().getPath() == null) {
-                LOGGER.debug("Invalid library in mc libraries");
+                LOGGER.debug("Inconsistency while adding libraries: invalid library in mc libraries");
                 continue;
             }
 
             if(!MinecraftVersionFileDownloader.downloadVersionLibrary(l, baseDir)) {
-                LOGGER.warn("Failed to download library: path={}", l.getDownloads().getArtifacts().getPath());
+                LOGGER.warn("Unable to add libraries: failed to download library: path={}", l.getDownloads().getArtifacts().getPath());
                 return false;
             }
 
             result.add(l.getDownloads().getArtifacts().getPath());
         }
         details.setLibraries(result);
+        LOGGER.debug("Added libraries: {}", result);
         return true;
     }
 
@@ -126,20 +160,22 @@ public class VersionCreator extends GenericComponentCreator {
         }
         String[] urlParts = mcVersion.getDownloads().getClient().getUrl().split("/");
         details.setMainFile(urlParts[urlParts.length - 1]);
+        LOGGER.debug("Added main file: {}", details.getMainFile());
         return true;
     }
 
     private boolean addArguments(LauncherVersionDetails details) {
-        details.setGameArguments(translateArguments(mcVersion.getLaunchArguments().getGame()));
-        details.setJvmArguments(translateArguments(mcVersion.getLaunchArguments().getJvm()));
+        details.setGameArguments(translateArguments(mcVersion.getLaunchArguments().getGame(), Config.MINECRAFT_DEFAULT_GAME_ARGUMENTS));
+        details.setJvmArguments(translateArguments(mcVersion.getLaunchArguments().getJvm(), Config.MINECRAFT_DEFAULT_JVM_ARGUMENTS));
         if(details.getGameArguments() == null || details.getJvmArguments() == null) {
             LOGGER.warn("Failed to add arguments to version");
             return false;
         }
+        LOGGER.debug("Added arguments");
         return true;
     }
 
-    private List<LauncherLaunchArgument> translateArguments(List<MinecraftLaunchArgument> args) {
+    private List<LauncherLaunchArgument> translateArguments(List<MinecraftLaunchArgument> args, List<LauncherLaunchArgument> defaultArgs) {
         if(args == null) {
             LOGGER.warn("Mc arguments is null");
             return List.of();
@@ -178,6 +214,8 @@ public class VersionCreator extends GenericComponentCreator {
             }
             result.add(new LauncherLaunchArgument(a.getName(), feature, osName, osVersion, osArch));
         }
+        result.addAll(defaultArgs);
+        LOGGER.debug("Translated arguments: {}", result);
         return result;
     }
 }

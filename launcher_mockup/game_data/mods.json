@@ -1,7 +1,8 @@
 {
-    "components": [
-		"test1"
-    ],
-	"prefix": "mods",
-    "type": "mods"
+  "type": "mods",
+  "prefix": "mods",
+  "components": [
+    "test1",
+    "4cfc2d4b8e52cb415673887f1ba3e39adb43f0b2"
+  ]
 }

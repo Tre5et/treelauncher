@@ -1,7 +1,8 @@
 {
-    "components": [
-	"sha1"
-    ],
-	"prefix": "instance",
-    "type": "instances"
+  "type": "instances",
+  "prefix": "instance",
+  "components": [
+    "sha1",
+    "171b97991935ff8942ca04eb955357071ef51861"
+  ]
 }

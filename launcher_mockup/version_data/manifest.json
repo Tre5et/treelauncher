@@ -1,8 +1,9 @@
 {
-    "components": [
-        "vanilla1.19.4",
-		"fabric1.19.4"
-    ],
-    "prefix": "version",
-    "type": "versions"
+  "type": "versions",
+  "prefix": "version",
+  "components": [
+    "vanilla1.19.4",
+    "fabric1.19.4",
+    "1e3d4058a04a37d2232cdc69224661014e8aecab"
+  ]
 }

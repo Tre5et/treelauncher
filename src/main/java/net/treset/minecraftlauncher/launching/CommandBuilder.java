@@ -184,7 +184,7 @@ public class CommandBuilder {
             case "auth_access_token" -> {
                 return minecraftUser.accessToken();
             }
-            case "clientId" -> {
+            case "clientid" -> {
                 return minecraftUser.clientId();
             }
             case "user_type" -> {

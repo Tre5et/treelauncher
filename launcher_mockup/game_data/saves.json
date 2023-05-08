@@ -1,7 +1,8 @@
 {
-    "components": [
-	"sha1"
-    ],
-	"prefix": "saves",
-    "type": "saves"
+  "type": "saves",
+  "prefix": "saves",
+  "components": [
+    "sha1",
+    "2ffb992d567831b0f7070479a4fd10d6e8cf2d7d"
+  ]
 }

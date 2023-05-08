@@ -1,7 +1,8 @@
 {
-    "components": [
-	"sha1"
-    ],
-    "prefix": "resourcepacks",
-    "type": "resourcepacks"
+  "type": "resourcepacks",
+  "prefix": "resourcepacks",
+  "components": [
+    "sha1",
+    "621d80e265f4ef8caaf2a0e02d0dcf7bbf992749"
+  ]
 }

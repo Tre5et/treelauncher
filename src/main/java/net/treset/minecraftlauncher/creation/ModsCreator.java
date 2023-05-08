@@ -16,17 +16,20 @@ public class ModsCreator extends GenericComponentCreator {
 
     private final String modsType;
     private final String modsVersion;
+    private LauncherManifest gameManifest;
 
-    public ModsCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, String modsType, String modsVersion) {
+    public ModsCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, String modsType, String modsVersion, LauncherManifest gameManifest) {
         super(LauncherManifestType.MODS_COMPONENT, null, null, name, typeConversion, Config.MODS_DEFAULT_INCLUDED_FILES, Config.MODS_DEFAULT_DETAILS, componentsManifest);
         this.modsType = modsType;
         this.modsVersion = modsVersion;
+        this.gameManifest = gameManifest;
     }
 
-    public ModsCreator(String name, Pair<LauncherManifest, LauncherModsDetails> inheritsFrom, LauncherManifest componentsManifest) {
+    public ModsCreator(String name, Pair<LauncherManifest, LauncherModsDetails> inheritsFrom, LauncherManifest componentsManifest, LauncherManifest gameManifest) {
         super(LauncherManifestType.MODS_COMPONENT, null, inheritsFrom.getKey(), name, null, null, null, componentsManifest);
         modsType = null;
         modsVersion = null;
+        this.gameManifest = gameManifest;
     }
 
     public ModsCreator(LauncherManifest uses) {
@@ -48,5 +51,10 @@ public class ModsCreator extends GenericComponentCreator {
             return null;
         }
         return result;
+    }
+
+    @Override
+    protected String getParentManifestFileName() {
+        return gameManifest.getComponents().get(0);
     }
 }

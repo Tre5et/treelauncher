@@ -41,10 +41,9 @@ public class LoginUiController {
 
             LauncherFiles files = new LauncherFiles();
             files.reloadAll();
-            Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(0);
-            GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit)));
+            Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(1);
+            GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
             gameLauncher.launch();
-            return;
         } else {
             loginButton.setDisable(false);
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));

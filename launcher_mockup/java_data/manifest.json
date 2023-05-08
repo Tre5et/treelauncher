@@ -1,7 +1,8 @@
 {
-    "components": [
-	"java1"
-    ],
-	"prefix": "java",
-    "type": "javas"
+  "type": "javas",
+  "prefix": "java",
+  "components": [
+    "java1",
+    "c5945af636428a8546c1b3693cb28d1298f2c4d7"
+  ]
 }

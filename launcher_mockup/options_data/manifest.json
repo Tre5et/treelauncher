@@ -1,7 +1,8 @@
 {
-    "components": [
-	"sha1"
-    ],
-	"prefix": "options",
-    "type": "options"
+  "type": "options",
+  "prefix": "options",
+  "components": [
+    "sha1",
+    "691497042eb27f87925e52df6d2d792c749b0cf6"
+  ]
 }
