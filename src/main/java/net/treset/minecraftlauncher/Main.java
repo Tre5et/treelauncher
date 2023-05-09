@@ -1,26 +1,37 @@
 package net.treset.minecraftlauncher;
 
+import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.files.Sources;
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
+import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
+import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.creation.*;
+import net.treset.minecraftlauncher.data.LauncherFiles;
+
+import java.util.List;
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args) {
-        /*LauncherFiles files = new LauncherFiles();
+        LauncherFiles files = new LauncherFiles();
         files.reloadAll();
         Map<String, LauncherManifestType> typeConversion = files.getLauncherDetails().getTypeConversion();
         MinecraftVersionDetails mcVersion = MinecraftVersionDetails.fromJson(Sources.getFileFromUrl(VersionLoader.getReleases().get(0).getUrl()));
         InstanceCreator creator = new InstanceCreator(
-                "testInstance",
+                "testInstance2",
                 typeConversion,
                 files.getInstanceManifest(),
                 List.of("testfile"),
                 List.of(),
                 List.of(),
-                new ModsCreator("testMods", typeConversion, files.getModsManifest(), "fabric", "1.19.4", files.getGameDetailsManifest()),
-                new OptionsCreator("testOptions", typeConversion, files.getOptionsManifest()),
-                new ResourcepackCreator("testResourcepacks", typeConversion, files.getResourcepackManifest()),
-                new SavesCreator("testSaves", typeConversion, files.getSavesManifest(), files.getGameDetailsManifest()),
-                new VersionCreator("testVersion", typeConversion, files.getVersionManifest(), mcVersion, files, Config.BASE_DIR + files.getLauncherDetails().getLibrariesDir())
+                new ModsCreator(files.getModsComponents().get(0)),
+                new OptionsCreator(files.getOptionsComponents().get(0)),
+                new ResourcepackCreator(files.getResourcepackComponents().get(0)),
+                new SavesCreator(files.getSavesComponents().get(0)),
+                new VersionCreator("version1", typeConversion, files.getVersionManifest(), mcVersion, files, Config.BASE_DIR + files.getLauncherDetails().getLibrariesDir())
         );
-        String id = creator.createComponent();
-        files.reloadAll();*/
+        String id = creator.getId();
+        files.reloadAll();
 
         LauncherApplication.main(args);
     }

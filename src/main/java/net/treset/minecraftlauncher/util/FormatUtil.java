@@ -28,7 +28,7 @@ public class FormatUtil {
             throw new RuntimeException(e);
         }
 
-        byte[] encrypted = md.digest(source.toString().getBytes());
+        byte[] encrypted = md.digest((source.toString() + System.nanoTime()).getBytes());
         StringBuilder encryptedString = new StringBuilder(new BigInteger(1, encrypted).toString(16));
         for(int i = encryptedString.length(); i < 32; i++) {
             encryptedString.insert(0, "0");

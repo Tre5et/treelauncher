@@ -32,8 +32,8 @@ public class ModsCreator extends GenericComponentCreator {
         this.gameManifest = gameManifest;
     }
 
-    public ModsCreator(LauncherManifest uses) {
-        super(LauncherManifestType.MODS_COMPONENT, uses, null, null, null, null, null, null);
+    public ModsCreator(Pair<LauncherManifest, LauncherModsDetails> uses) {
+        super(LauncherManifestType.MODS_COMPONENT, uses.getKey(), null, null, null, null, null, null);
         modsType = null;
         modsVersion = null;
     }

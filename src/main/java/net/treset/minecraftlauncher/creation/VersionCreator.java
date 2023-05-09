@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.creation;
 
+import javafx.util.Pair;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
 import net.treset.mc_version_loader.files.MinecraftVersionFileDownloader;
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
@@ -34,12 +35,20 @@ public class VersionCreator extends GenericComponentCreator {
         this.librariesDir = librariesDir;
     }
 
-    public VersionCreator(LauncherManifest uses) {
-        super(LauncherManifestType.VERSION_COMPONENT, uses, null, null, null, null, null, null);
+    public VersionCreator(Pair<LauncherManifest, LauncherVersionDetails> uses) {
+        super(LauncherManifestType.VERSION_COMPONENT, uses.getKey(), null, null, null, null, null, null);
     }
 
     @Override
     public String createComponent() {
+        for(Pair<LauncherManifest, LauncherVersionDetails> v : files.getVersionComponents()) {
+            if(v.getValue().getVersionId() != null && v.getValue().getVersionId().equals(mcVersion.getId())) {
+                LOGGER.debug("Matching version already exists, using instead: versionId={}, usingId={}", mcVersion.getId(), v.getKey().getId());
+                this.setUses(v.getKey());
+                return useComponent();
+            }
+        }
+
         String result = super.createComponent();
         if(result == null || getNewManifest() == null || mcVersion == null) {
             LOGGER.warn("Failed to create version component: invalid data");
@@ -70,7 +79,8 @@ public class VersionCreator extends GenericComponentCreator {
                 null,
                 null,
                 mcVersion.getMainClass(),
-                null
+                null,
+                mcVersion.getId()
         );
         if(!addArguments(details)) {
             LOGGER.warn("Failed to add arguments to version");

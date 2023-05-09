@@ -1,5 +1,6 @@
 {
-    "depends": "vanilla1.19.4",
+    "depends": "1e3d4058a04a37d2232cdc69224661014e8aecab",
+	"version_id": "fabric-0.19.4-1.19.4",
     "game_arguments": [
     ],
     "jvm_arguments": [

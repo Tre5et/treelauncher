@@ -16,14 +16,14 @@ import java.util.Map;
 public abstract class GenericComponentCreator implements ComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(GenericComponentCreator.class);
 
-    private final LauncherManifestType type;
-    private final LauncherManifest uses;
-    private final LauncherManifest inheritsFrom;
-    private final String name;
-    private final Map<String, LauncherManifestType> typeConversion;
-    private final List<String> includedFiles;
-    private final String details;
-    private final LauncherManifest componentsManifest;
+    private LauncherManifestType type;
+    private LauncherManifest uses;
+    private LauncherManifest inheritsFrom;
+    private String name;
+    private Map<String, LauncherManifestType> typeConversion;
+    private List<String> includedFiles;
+    private String details;
+    private LauncherManifest componentsManifest;
     private LauncherManifest newManifest;
 
     public GenericComponentCreator(LauncherManifestType type, LauncherManifest uses, LauncherManifest inheritsFrom, String name, Map<String, LauncherManifestType> typeConversion, List<String> includedFiles, String details, LauncherManifest componentsManifest) {
@@ -70,10 +70,10 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles, null);
         newManifest.setId(FormatUtil.hash(newManifest));
         if(!writeNewManifest()) {
-            LOGGER.warn("Unable to create {} component: unable to write manifest", type.toString().toLowerCase());
+            LOGGER.warn("Unable to create {} component: unable to write manifest: id={}", type.toString().toLowerCase(), newManifest.getId());
             return null;
         }
-        LOGGER.debug("Created {} component with id {}", type.toString().toLowerCase(), newManifest.getId());
+        LOGGER.debug("Created {} component: id={}", type.toString().toLowerCase(), newManifest.getId());
         return newManifest.getId();
     }
 
@@ -82,7 +82,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             LOGGER.warn("Unable to use {} component: invalid component specified", type.toString().toLowerCase());
             return null;
         }
-        LOGGER.debug("Using {} component with id {}", type.toString().toLowerCase(), uses.getId());
+        LOGGER.debug("Using {} component: id={}", type.toString().toLowerCase(), uses.getId());
         return uses.getId();
     }
 
@@ -99,16 +99,16 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         newManifest = new LauncherManifest(manifestType, inheritsFrom.getTypeConversion(), null, inheritsFrom.getDetails(), inheritsFrom.getPrefix(), name, inheritsFrom.getIncludedFiles(), inheritsFrom.getComponents());
         newManifest.setId(FormatUtil.hash(newManifest));
         if(!writeNewManifest()) {
-            LOGGER.warn("Unable to inherit {} component: unable to write manifest to file", type.toString().toLowerCase());
+            LOGGER.warn("Unable to inherit {} component: unable to write manifest to file: id={}", type.toString().toLowerCase(), newManifest.getId());
             return null;
         }
 
         if(!copyFiles(inheritsFrom, newManifest)) {
-            LOGGER.warn("Unable to inherit {} component: unable to copy files", type.toString().toLowerCase());
+            LOGGER.warn("Unable to inherit {} component: unable to copy files: id={}", type.toString().toLowerCase(), newManifest.getId());
             return null;
         }
 
-        LOGGER.debug("Inherited {} component with id {}", type.toString().toLowerCase(), newManifest.getId());
+        LOGGER.debug("Inherited {} component: id={}", type.toString().toLowerCase(), newManifest.getId());
         return newManifest.getId();
     }
 
@@ -121,11 +121,11 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             LOGGER.warn("Unable to copy files: invalid parameters");
             return false;
         }
-        if(!FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(Config.MANIFEST_FILE_NAME) || !filename.equals(oldManifest.getDetails()), StandardCopyOption.REPLACE_EXISTING)) {
+        if(!FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(Config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING)) {
             LOGGER.warn("Unable to copy files: unable to copy files");
             return false;
         }
-        LOGGER.debug("Copied files from {} to {}", oldManifest.getDirectory(), newManifest.getDirectory());
+        LOGGER.debug("Copied files: src={}, dst={}", oldManifest.getDirectory(), newManifest.getDirectory());
         return true;
     }
 
@@ -136,23 +136,23 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         }
         newManifest.setDirectory(componentsManifest.getDirectory() + componentsManifest.getPrefix() + "_" + newManifest.getId() + "/");
         if(!newManifest.writeToFile(newManifest.getDirectory() + Config.MANIFEST_FILE_NAME)) {
-            LOGGER.warn("Unable to write manifest: unable to write manifest to file");
+            LOGGER.warn("Unable to write manifest: unable to write manifest to file: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + Config.MANIFEST_FILE_NAME);
             return false;
         }
         ArrayList<String> components = new ArrayList<>(componentsManifest.getComponents());
         components.add(newManifest.getId());
         componentsManifest.setComponents(components);
         if(!componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName())) {
-            LOGGER.warn("Unable to write manifest: unable to write parent manifest to file");
+            LOGGER.warn("Unable to write manifest: unable to write parent manifest to file: id={}, path={}", newManifest.getId(), componentsManifest.getDirectory() + getParentManifestFileName());
             return false;
         }
         if(newManifest.getIncludedFiles() != null) {
             if(!FileUtil.createDir(newManifest.getDirectory() + Config.INCLUDED_FILES_DIR)) {
-                LOGGER.warn("Unable to write manifest: unable to create included files directory");
+                LOGGER.warn("Unable to write manifest: unable to create included files directory: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + Config.INCLUDED_FILES_DIR);
                 return false;
             }
         }
-        LOGGER.debug("Wrote manifest to {}", newManifest.getDirectory() + Config.MANIFEST_FILE_NAME);
+        LOGGER.debug("Wrote manifest: path={}", newManifest.getDirectory() + Config.MANIFEST_FILE_NAME);
         return true;
     }
 
@@ -166,7 +166,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
                 return e.getKey();
             }
         }
-        LOGGER.warn("Unable to get manifest type: no type found");
+        LOGGER.warn("Unable to get manifest type: no type found: type={}", type.toString().toLowerCase());
         return null;
     }
 
@@ -212,5 +212,37 @@ public abstract class GenericComponentCreator implements ComponentCreator {
 
     public LauncherManifest getComponentsManifest() {
         return componentsManifest;
+    }
+
+    public void setType(LauncherManifestType type) {
+        this.type = type;
+    }
+
+    public void setUses(LauncherManifest uses) {
+        this.uses = uses;
+    }
+
+    public void setInheritsFrom(LauncherManifest inheritsFrom) {
+        this.inheritsFrom = inheritsFrom;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTypeConversion(Map<String, LauncherManifestType> typeConversion) {
+        this.typeConversion = typeConversion;
+    }
+
+    public void setIncludedFiles(List<String> includedFiles) {
+        this.includedFiles = includedFiles;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public void setComponentsManifest(LauncherManifest componentsManifest) {
+        this.componentsManifest = componentsManifest;
     }
 }

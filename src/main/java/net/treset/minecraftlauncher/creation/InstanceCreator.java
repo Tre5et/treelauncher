@@ -60,31 +60,31 @@ public class InstanceCreator extends GenericComponentCreator {
                 jvmArguments,
                 null, null, null, null, null);
 
-        details.setModsComponent(modsCreator.createComponent());
+        details.setModsComponent(modsCreator.getId());
         if(details.getModsComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create mods component");
             return null;
         }
 
-        details.setOptionsComponent(optionsCreator.createComponent());
+        details.setOptionsComponent(optionsCreator.getId());
         if(details.getOptionsComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create options component");
             return null;
         }
 
-        details.setResourcepacksComponent(resourcepackCreator.createComponent());
+        details.setResourcepacksComponent(resourcepackCreator.getId());
         if(details.getResourcepacksComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create resourcepacks component");
             return null;
         }
 
-        details.setSavesComponent(savesCreator.createComponent());
+        details.setSavesComponent(savesCreator.getId());
         if(details.getSavesComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create saves component");
             return null;
         }
 
-        details.setVersionComponent(versionCreator.createComponent());
+        details.setVersionComponent(versionCreator.getId());
         if(details.getVersionComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create version component");
             return null;
