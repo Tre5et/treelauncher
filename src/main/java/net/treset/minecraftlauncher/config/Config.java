@@ -24,4 +24,7 @@ public class Config {
     public static final String VERSION_DEFAULT_DETAILS = "version.json";
     public static final List<LauncherLaunchArgument> MINECRAFT_DEFAULT_GAME_ARGUMENTS = List.of(new LauncherLaunchArgument("--resourcePackDir", null, null, null, null), new LauncherLaunchArgument("${resourcepack_directory}", null, null, null, null));
     public static final List<LauncherLaunchArgument> MINECRAFT_DEFAULT_JVM_ARGUMENTS = List.of();
+    public static final List<LauncherLaunchArgument> FABRIC_DEFAULT_GAME_ARGUMENTS = List.of();
+    public static final List<LauncherLaunchArgument> FABRIC_DEFAULT_JVM_ARGUMENTS = List.of();
+    public static final String FABRIC_DEFAULT_CLIENT_FILENAME = "fabric-client.jar";
 }

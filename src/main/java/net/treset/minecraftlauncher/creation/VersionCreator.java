@@ -1,16 +1,18 @@
 package net.treset.minecraftlauncher.creation;
 
 import javafx.util.Pair;
+import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.fabric.FabricLibrary;
+import net.treset.mc_version_loader.fabric.FabricProfile;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
+import net.treset.mc_version_loader.files.FabricFileDownloader;
 import net.treset.mc_version_loader.files.MinecraftVersionFileDownloader;
+import net.treset.mc_version_loader.files.Sources;
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
-import net.treset.mc_version_loader.minecraft.MinecraftLaunchArgument;
-import net.treset.mc_version_loader.minecraft.MinecraftLibrary;
-import net.treset.mc_version_loader.minecraft.MinecraftRule;
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
+import net.treset.mc_version_loader.minecraft.*;
 import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import org.apache.logging.log4j.LogManager;
@@ -26,11 +28,20 @@ public class VersionCreator extends GenericComponentCreator {
 
     MinecraftVersionDetails mcVersion;
     FabricVersionDetails fabricVersion;
+    FabricProfile fabricProfile;
     LauncherFiles files;
     String librariesDir;
     public VersionCreator(String name,  Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, MinecraftVersionDetails mcVersion, LauncherFiles files, String librariesDir) {
         super(LauncherManifestType.VERSION_COMPONENT, null, null, name, typeConversion, null, Config.VERSION_DEFAULT_DETAILS, componentsManifest);
         this.mcVersion = mcVersion;
+        this.files = files;
+        this.librariesDir = librariesDir;
+    }
+
+    public VersionCreator(String name,  Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, FabricVersionDetails fabricVersion, FabricProfile fabricProfile, LauncherFiles files, String librariesDir) {
+        super(LauncherManifestType.VERSION_COMPONENT, null, null, name, typeConversion, null, Config.VERSION_DEFAULT_DETAILS, componentsManifest);
+        this.fabricVersion = fabricVersion;
+        this.fabricProfile = fabricProfile;
         this.files = files;
         this.librariesDir = librariesDir;
     }
@@ -42,15 +53,15 @@ public class VersionCreator extends GenericComponentCreator {
     @Override
     public String createComponent() {
         for(Pair<LauncherManifest, LauncherVersionDetails> v : files.getVersionComponents()) {
-            if(v.getValue().getVersionId() != null && v.getValue().getVersionId().equals(mcVersion.getId())) {
-                LOGGER.debug("Matching version already exists, using instead: versionId={}, usingId={}", mcVersion.getId(), v.getKey().getId());
+            if(v.getValue().getVersionId() != null && ((mcVersion != null && v.getValue().getVersionId().equals(mcVersion.getId())) || (fabricProfile != null && v.getValue().getVersionId().equals(fabricProfile.getId())))) {
+                LOGGER.debug("Matching version already exists, using instead: versionId={}, usingId={}", v.getValue().getVersionId(), v.getKey().getId());
                 this.setUses(v.getKey());
                 return useComponent();
             }
         }
 
         String result = super.createComponent();
-        if(result == null || getNewManifest() == null || mcVersion == null) {
+        if(result == null || getNewManifest() == null || (mcVersion == null && fabricVersion == null)) {
             LOGGER.warn("Failed to create version component: invalid data");
             return null;
         }
@@ -59,6 +70,7 @@ public class VersionCreator extends GenericComponentCreator {
             LOGGER.warn("Failed to create version component: failed to create mc version");
             return null;
         }
+        LOGGER.debug("Created version component: id={}", getNewManifest().getId());
         return result;
     }
 
@@ -69,8 +81,116 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private boolean makeVersion() {
-        // TODO: fabric version
+        if(fabricVersion != null) {
+            return makeFabricVersion();
+        }
+        return makeMinecraftVersion();
+    }
 
+    private boolean makeFabricVersion() {
+        if(fabricProfile == null || fabricProfile.getInheritsFrom() == null) {
+            LOGGER.warn("Unable to create fabric version: no valid fabric profile");
+            return false;
+        }
+        for(MinecraftVersion m : VersionLoader.getVersions()) {
+            if(fabricProfile.getInheritsFrom().equals(m.getId())) {
+                String mcJson = Sources.getFileFromUrl(m.getUrl());
+                if(mcJson == null) {
+                    LOGGER.warn("Unable to create fabric version: failed to download mc version: versionId={}", fabricProfile.getInheritsFrom());
+                    return false;
+                }
+                VersionCreator mcCreator = new VersionCreator(fabricProfile.getInheritsFrom(), getTypeConversion(), getComponentsManifest(), MinecraftVersionDetails.fromJson(mcJson), files, librariesDir);
+                String dependsId = mcCreator.getId();
+                if(dependsId == null) {
+                    LOGGER.warn("Unable to create fabric version: failed to create mc version: versionId={}", fabricProfile.getInheritsFrom());
+                    return false;
+                }
+
+                LauncherVersionDetails details = new LauncherVersionDetails(
+                        null,
+                        dependsId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        fabricProfile.getMainClass(),
+                        null,
+                        fabricProfile.getId()
+                );
+
+                if(!addFabricArguments(details)) {
+                    LOGGER.warn("Unable to create fabric version: failed to add fabric arguments: versionId={}", fabricProfile.getInheritsFrom());
+                    return false;
+                }
+
+                if(!addFabricLibraries(details)) {
+                    LOGGER.warn("Unable to create fabric version: failed to add fabric libraries: versionId={}", fabricProfile.getInheritsFrom());
+                    return false;
+                }
+
+                if(!addFabricFile(details)) {
+                    LOGGER.warn("Unable to create fabric version: failed to add fabric file: versionId={}", fabricProfile.getInheritsFrom());
+                    return false;
+                }
+
+                LOGGER.debug("Created fabric version: id={}", getNewManifest().getId());
+                return true;
+            }
+        }
+        LOGGER.warn("Unable to create fabric version: failed to find mc version: versionId={}", fabricProfile.getInheritsFrom());
+        return false;
+    }
+
+    private boolean addFabricFile(LauncherVersionDetails details) {
+        File baseDir = new File(getNewManifest().getDirectory());
+        if(!baseDir.isDirectory()) {
+            LOGGER.warn("Failed to add fabric file: base dir is not a directory");
+            return false;
+        }
+        if(!FabricFileDownloader.downloadFabricLoader(baseDir, fabricVersion.getLoader())) {
+            LOGGER.warn("Failed to add fabric file: failed to download fabric loader");
+            return false;
+        }
+        details.setMainFile(Config.FABRIC_DEFAULT_CLIENT_FILENAME);
+        LOGGER.debug("Added fabric file: mainFile={}", details.getMainFile());
+        return true;
+    }
+
+    private boolean addFabricLibraries(LauncherVersionDetails details) {
+        if(fabricProfile.getLibraries() == null) {
+            LOGGER.warn("Unable to add fabric libraries: no libraries");
+            return false;
+        }
+        List<String> libs = new ArrayList<>();
+        for(FabricLibrary f : fabricProfile.getLibraries()) {
+            File baseDir = new File(librariesDir);
+            if(!baseDir.isDirectory() && !baseDir.mkdirs()) {
+                LOGGER.warn("Unable to add fabric libraries: failed to create libraries directory: path={}", librariesDir);
+                return false;
+            }
+            if(!FabricFileDownloader.downloadFabricLibrary(baseDir, f) || f.getLocalPath() == null || f.getLocalFileName() == null) {
+                LOGGER.warn("Unable to add fabric libraries: failed to download library: name={}", f.getName());
+                return false;
+            }
+            libs.add(f.getLocalPath() + "/" + f.getLocalFileName());
+        }
+        details.setLibraries(libs);
+        LOGGER.debug("Added fabric libraries");
+        return true;
+    }
+
+    private boolean addFabricArguments(LauncherVersionDetails details) {
+        details.setJvmArguments(translateArguments(fabricProfile.getLaunchArguments().getJvm(), Config.FABRIC_DEFAULT_JVM_ARGUMENTS));
+        details.setGameArguments(translateArguments(fabricProfile.getLaunchArguments().getGame(), Config.FABRIC_DEFAULT_GAME_ARGUMENTS));
+        if(details.getJvmArguments() == null || details.getGameArguments() == null) {
+            LOGGER.warn("Failed to add fabric arguments to version");
+            return false;
+        }
+        LOGGER.debug("Added fabric arguments");
+        return true;
+    }
+
+    private boolean makeMinecraftVersion() {
         LauncherVersionDetails details = new LauncherVersionDetails(
                 mcVersion.getAssets(),
                 null,
@@ -103,6 +223,8 @@ public class VersionCreator extends GenericComponentCreator {
             LOGGER.warn("Failed to write version to file");
             return false;
         }
+
+        LOGGER.debug("Created minecraft version: id={}", getNewManifest().getId());
         return true;
     }
 
@@ -161,16 +283,16 @@ public class VersionCreator extends GenericComponentCreator {
     private boolean addFile(LauncherVersionDetails details) {
         File baseDir = new File(getNewManifest().getDirectory());
         if(!baseDir.isDirectory()) {
-            LOGGER.warn("Version dir is not a directory");
+            LOGGER.warn("Unable to add file: base dir is not a directory");
             return false;
         }
         if(!MinecraftVersionFileDownloader.downloadVersionDownload(mcVersion.getDownloads().getClient(), baseDir)) {
-            LOGGER.warn("Failed to download client: url={}", mcVersion.getDownloads().getClient().getUrl());
+            LOGGER.warn("Unable to add file: Failed to download client: url={}", mcVersion.getDownloads().getClient().getUrl());
             return false;
         }
         String[] urlParts = mcVersion.getDownloads().getClient().getUrl().split("/");
         details.setMainFile(urlParts[urlParts.length - 1]);
-        LOGGER.debug("Added main file: {}", details.getMainFile());
+        LOGGER.debug("Added file: mainFile={}", details.getMainFile());
         return true;
     }
 
