@@ -3,6 +3,7 @@
   "prefix": "version",
   "components": [
     "fabric1.19.4",
-    "1e3d4058a04a37d2232cdc69224661014e8aecab"
+    "1e3d4058a04a37d2232cdc69224661014e8aecab",
+    "d7da5cfa3f77b70df8100684df54f55f0c883dce"
   ]
 }
