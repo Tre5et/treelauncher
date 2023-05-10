@@ -1,0 +1,8 @@
+.split-pane-element {
+    -fx-padding: 10px;
+}
+
+
+.label {
+    -fx-font-weight: bold;
+}

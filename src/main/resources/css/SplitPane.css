@@ -1,0 +1,9 @@
+.split-pane,.split-pane-divider {
+    -fx-split-pane-divider-border: -fx-primary-300;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: -fx-background;
+    -fx-border-width: 0 1px 0 1px;
+    -fx-border-color: -fx-split-pane-divider-border;
+}

@@ -1,0 +1,40 @@
+.button {
+    -fx-button-background: -fx-background;
+    -fx-button-border: -fx-primary-300;
+    -fx-button-text: -fx-primary-300;
+    -fx-button-hover-background: -fx-primary-950;
+    -fx-button-hover-border: -fx-button-border;
+    -fx-button-hover-text: -fx-button-text;
+    -fx-button-active-background: -fx-primary-900;
+    -fx-button-active-border: -fx-button-border;
+    -fx-button-active-text: -fx-button-text;
+    -fx-button-disabled-background: -fx-button-background;
+    -fx-button-disabled-border: -fx-button-border;
+    -fx-button-disabled-text: -fx-button-text;
+}
+
+.button {
+    -fx-border-color: -fx-button-border;
+    -fx-background-color: -fx-button-background;
+    -fx-text-fill: -fx-button-text;
+    -fx-border-radius: 5px;
+}
+
+.button:hover {
+    -fx-border-color: -fx-button-hover-border;
+    -fx-background-color: -fx-button-hover-background;
+    -fx-text-fill: -fx-button-hover-text;
+}
+
+.button:pressed {
+    -fx-border-color: -fx-button-active-border;
+    -fx-background-color: -fx-button-active-background;
+    -fx-text-fill: -fx-button-active-text;
+}
+
+.button:disabled {
+    -fx-border-color: -fx-button-disabled-border;
+    -fx-background-color: -fx-button-disabled-background;
+    -fx-text-fill: -fx-button-disabled-text;
+    -fx-opacity: 0.5;
+}

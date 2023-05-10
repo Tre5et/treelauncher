@@ -1,0 +1,25 @@
+@import url("Button.css");
+@import url("SplitPane.css");
+
+* {
+    -fx-primary-50: #f3fcf6;
+    -fx-primary-100: #e1f9e9;
+    -fx-primary-200: #c0f2cf;
+    -fx-primary-300: #8ee6a1;
+    -fx-primary-400: #6ed883;
+    -fx-primary-500: #2fb643;
+    -fx-primary-600: #21972d;
+    -fx-primary-700: #1e7622;
+    -fx-primary-800: #1c5f1d;
+    -fx-primary-900: #184e18;
+    -fx-primary-950: #0b2a09;
+    -fx-white: #ffffff;
+    -fx-black: #000000;
+    -fx-background: #18181b;
+    -fx-text: -fx-white;
+}
+
+.root {
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-text;
+}

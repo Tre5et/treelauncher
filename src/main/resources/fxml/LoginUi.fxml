@@ -2,10 +2,22 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="260.0" prefWidth="380.0" stylesheets="@/fxml/LoginUi.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.LoginUiController">
-   <children>
-        <Button fx:id="loginButton" onAction="#onLoginButtonClicked" text="%login.button.microsoft" />
-        <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" textAlignment="CENTER" />
-   </children>
-</VBox>
+<SplitPane dividerPositions="0.32405345211581293" prefHeight="400.0" prefWidth="900.0" stylesheets="@/css/Global.css,@/css/LoginUi.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.LoginUiController">
+   <items>
+      <VBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="100.0" styleClass="split-pane-element">
+         <children>
+              <Button fx:id="loginButton" alignment="CENTER" minWidth="-Infinity" onAction="#onLoginButtonClicked" text="%login.button.microsoft" textAlignment="CENTER" />
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="split-pane-element">
+         <children>
+              <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" textAlignment="CENTER">
+               <font>
+                  <Font size="30.0" />
+               </font></Label>
+         </children>
+      </VBox>
+   </items>
+</SplitPane>

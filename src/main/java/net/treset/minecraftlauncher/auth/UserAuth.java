@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.auth;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -8,8 +9,8 @@ import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Optional;
@@ -53,18 +54,21 @@ public class UserAuth {
         else {
             String loginUrl = Authenticator.microsoftLogin().toString();
 
-            Stage stage = new Stage();
-            stage.setTitle(loginUrl);
-            stage.setOnCloseRequest((WindowEvent e) -> onWebCloseRequested(stage, doneCallback));
+            Platform.runLater(() -> {
+                Stage stage = new Stage();
+                stage.setTitle(loginUrl);
+                stage.setOnCloseRequest((WindowEvent e) -> onWebCloseRequested(stage, doneCallback));
 
-            WebView webView = new WebView();
-            webView.getEngine().load(loginUrl);
+                WebView webView = new WebView();
+                webView.getEngine().load(loginUrl);
 
-            webView.getEngine().locationProperty().addListener(((obeservable, oldValue, newValue) -> this.onWebLocationChanged(stage, authFile, newValue, doneCallback)));
+                webView.getEngine().locationProperty().addListener(((obeservable, oldValue, newValue) -> this.onWebLocationChanged(stage, authFile, newValue, doneCallback)));
 
-            Scene webScene = new Scene(webView);
-            stage.setScene(webScene);
-            stage.show();
+                Scene webScene = new Scene(webView);
+                stage.setScene(webScene);
+
+                stage.show();
+            });
         }
 
 
