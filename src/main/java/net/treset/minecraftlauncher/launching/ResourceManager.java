@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +46,31 @@ public class ResourceManager {
         }
 
         LOGGER.info("Prepared resources for launch, instance=" + instanceData.getInstance().getKey().getId());
+        return true;
+    }
+
+    public boolean setLastPlayedTime() {
+        if(instanceData.getInstance().getValue() == null) {
+            LOGGER.warn("Unable to set last played time: instance details are null");
+            return false;
+        }
+        instanceData.getInstance().getValue().setLastPlayedTime(LocalDateTime.now());
+        if(!instanceData.getInstance().getValue().writeToFile(instanceData.getInstance().getKey().getDirectory() + instanceData.getInstance().getKey().getDetails())) {
+            LOGGER.warn("Unable to set last played time: unable to write instance details");
+            return false;
+        }
+        LOGGER.debug("Set last played time: instance={}", instanceData.getInstance().getKey().getId());
+        return true;
+    }
+
+    public boolean addPlayDuration(long duration) {
+        long oldTime = instanceData.getInstance().getValue().getTotalTime();
+        instanceData.getInstance().getValue().setTotalTime(oldTime + duration);
+        if(!instanceData.getInstance().getValue().writeToFile(instanceData.getInstance().getKey().getDirectory() + instanceData.getInstance().getKey().getDetails())) {
+            LOGGER.warn("Unable to add play duration: unable to write instance details");
+            return false;
+        }
+        LOGGER.debug("Added play duration: instance={}, duration={}, totalTime={}", instanceData.getInstance().getKey().getId(), duration, instanceData.getInstance().getValue().getTotalTime());
         return true;
     }
 

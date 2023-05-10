@@ -20,7 +20,7 @@ public class GameLauncher {
     private Pair<LauncherManifest, LauncherInstanceDetails> instance;
     private LauncherFiles files;
     private User minecraftUser;
-    private final List<Consumer<String>> exitCallbacks;
+    private List<Consumer<String>> exitCallbacks;
     private ResourceManager resourceManager;
     private GameListener gameListener;
 
@@ -58,6 +58,12 @@ public class GameLauncher {
 
         if(!resourceManager.prepareResources()) {
             LOGGER.warn("Unable to launch game: unable to prepare resources");
+            abortLaunch();
+            return false;
+        }
+
+        if(!resourceManager.setLastPlayedTime()) {
+            LOGGER.warn("Unable to launch game: unable to set last played time");
             abortLaunch();
             return false;
         }
@@ -156,5 +162,17 @@ public class GameLauncher {
 
     public GameListener getGameListener() {
         return gameListener;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager) {
+        this.resourceManager = resourceManager;
+    }
+
+    public void setGameListener(GameListener gameListener) {
+        this.gameListener = gameListener;
+    }
+
+    public void setExitCallbacks(List<Consumer<String>> exitCallbacks) {
+        this.exitCallbacks = exitCallbacks;
     }
 }

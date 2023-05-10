@@ -19,6 +19,7 @@ public class GameListener {
     private boolean running = false;
     private boolean exited = false;
     private int exitCode = -1;
+    private long playStart;
 
     public GameListener(Process gameProcess, ResourceManager resourceManager, List<Consumer<String>> exitCallbacks) {
         this.gameProcess = gameProcess;
@@ -28,6 +29,7 @@ public class GameListener {
     }
 
     public void start() {
+        playStart = System.currentTimeMillis();
         Thread t = new Thread(this::listenToGameOutput, "GameListener");
         t.start();
     }
@@ -73,6 +75,12 @@ public class GameListener {
             LOGGER.info("Game process exited successfully: pid={}", gameProcess.pid());
         }
         exited = true;
+
+        if(!resourceManager.addPlayDuration((System.currentTimeMillis() - playStart) / 1000)) {
+            LOGGER.warn("Unable to add play duration to statistics: duration={}, pid={}", (System.currentTimeMillis() - playStart) / 1000, gameProcess.pid());
+            error = "Unable to add play duration to statistics";
+        }
+
         if(!resourceManager.cleanupGameFiles()) {
             LOGGER.warn("Unable to clean up game files after exit: pid={}", gameProcess.pid());
             error = "Unable to clean up game files";
