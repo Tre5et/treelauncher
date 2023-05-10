@@ -64,11 +64,13 @@ public class VersionCreator extends GenericComponentCreator {
         String result = super.createComponent();
         if(result == null || getNewManifest() == null || (mcVersion == null && fabricVersion == null)) {
             LOGGER.warn("Failed to create version component: invalid data");
+            attemptCleanup();
             return null;
         }
 
         if(!makeVersion()) {
             LOGGER.warn("Failed to create version component: failed to create mc version");
+            attemptCleanup();
             return null;
         }
         LOGGER.debug("Created version component: id={}", getNewManifest().getId());
@@ -104,6 +106,7 @@ public class VersionCreator extends GenericComponentCreator {
                 String dependsId = mcCreator.getId();
                 if(dependsId == null) {
                     LOGGER.warn("Unable to create fabric version: failed to create mc version: versionId={}", fabricProfile.getInheritsFrom());
+                    mcCreator.attemptCleanup();
                     return false;
                 }
 
@@ -121,21 +124,25 @@ public class VersionCreator extends GenericComponentCreator {
 
                 if(!addFabricArguments(details)) {
                     LOGGER.warn("Unable to create fabric version: failed to add fabric arguments: versionId={}", fabricProfile.getInheritsFrom());
+                    mcCreator.attemptCleanup();
                     return false;
                 }
 
                 if(!addFabricLibraries(details)) {
                     LOGGER.warn("Unable to create fabric version: failed to add fabric libraries: versionId={}", fabricProfile.getInheritsFrom());
+                    mcCreator.attemptCleanup();
                     return false;
                 }
 
                 if(!addFabricFile(details)) {
                     LOGGER.warn("Unable to create fabric version: failed to add fabric file: versionId={}", fabricProfile.getInheritsFrom());
+                    mcCreator.attemptCleanup();
                     return false;
                 }
 
                 if(!details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails())) {
                     LOGGER.warn("Unable to create fabric version: failed to write version details: versionId={}", fabricProfile.getInheritsFrom());
+                    mcCreator.attemptCleanup();
                     return false;
                 }
 
@@ -248,14 +255,17 @@ public class VersionCreator extends GenericComponentCreator {
         for(LauncherManifest j : files.getJavaComponents()) {
             if(j != null && javaName.equals(j.getName())) {
                 details.setJava(j.getId());
+                LOGGER.debug("Using existing java component: id={}", j.getId());
                 return true;
             }
         }
 
-        details.setJava(new JavaComponentCreator(javaName, getTypeConversion(), files.getJavaManifest()).createComponent());
+        JavaComponentCreator javaCreator = new JavaComponentCreator(javaName, getTypeConversion(), files.getJavaManifest());
+        details.setJava(javaCreator.getId());
 
         if(details.getJava() == null) {
             LOGGER.warn("Unable to add java component: failed to create java component");
+            javaCreator.attemptCleanup();
             return false;
         }
         return true;

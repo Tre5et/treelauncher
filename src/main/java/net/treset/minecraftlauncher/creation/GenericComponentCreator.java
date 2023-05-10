@@ -8,6 +8,7 @@ import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         newManifest.setId(FormatUtil.hash(newManifest));
         if(!writeNewManifest()) {
             LOGGER.warn("Unable to create {} component: unable to write manifest: id={}", type.toString().toLowerCase(), newManifest.getId());
+            attemptCleanup();
             return null;
         }
         LOGGER.debug("Created {} component: id={}", type.toString().toLowerCase(), newManifest.getId());
@@ -100,11 +102,13 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         newManifest.setId(FormatUtil.hash(newManifest));
         if(!writeNewManifest()) {
             LOGGER.warn("Unable to inherit {} component: unable to write manifest to file: id={}", type.toString().toLowerCase(), newManifest.getId());
+            attemptCleanup();
             return null;
         }
 
         if(!copyFiles(inheritsFrom, newManifest)) {
             LOGGER.warn("Unable to inherit {} component: unable to copy files: id={}", type.toString().toLowerCase(), newManifest.getId());
+            attemptCleanup();
             return null;
         }
 
@@ -154,6 +158,35 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         }
         LOGGER.debug("Wrote manifest: path={}", newManifest.getDirectory() + Config.MANIFEST_FILE_NAME);
         return true;
+    }
+
+    protected boolean attemptCleanup() {
+        LOGGER.debug("Attempting cleanup");
+        boolean success = true;
+        if(newManifest != null && newManifest.getDirectory() != null) {
+            File directory = new File(newManifest.getDirectory());
+            if(directory.isDirectory()) {
+                if (!FileUtil.deleteDir(directory)) {
+                    LOGGER.warn("Unable to cleanup: unable to delete directory: continuing: path={}", newManifest.getDirectory());
+                    success = false;
+                } else {
+                    LOGGER.debug("Cleaned up manifest: path={}", newManifest.getDirectory());
+                }
+            }
+        }
+        if(componentsManifest != null && componentsManifest.getComponents() != null && newManifest != null && newManifest.getId() != null && componentsManifest.getComponents().contains(newManifest.getId())) {
+            List<String> components = new ArrayList<>(componentsManifest.getComponents());
+            components.remove(newManifest.getId());
+            componentsManifest.setComponents(components);
+            if(!componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName())) {
+                LOGGER.warn("Unable to cleanup: unable to write parent manifest to file: continuing: id={}, path={}", newManifest.getId(), componentsManifest.getDirectory() + getParentManifestFileName());
+                success = false;
+            } else {
+                LOGGER.debug("Cleaned up parent manifest: id={}", newManifest.getId());
+            }
+        }
+        LOGGER.debug(success ? "Cleanup successful" : "Cleanup unsuccessful");
+        return success;
     }
 
     protected String getParentManifestFileName() {

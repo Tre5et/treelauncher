@@ -42,6 +42,7 @@ public class InstanceCreator extends GenericComponentCreator {
 
         if(result == null || getNewManifest() == null) {
             LOGGER.warn("Failed to create instance component: invalid data");
+            attemptCleanup();
             return null;
         }
 
@@ -63,51 +64,71 @@ public class InstanceCreator extends GenericComponentCreator {
         details.setModsComponent(modsCreator.getId());
         if(details.getModsComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create mods component");
+            attemptCleanup();
             return null;
         }
 
         details.setOptionsComponent(optionsCreator.getId());
         if(details.getOptionsComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create options component");
+            attemptCleanup();
             return null;
         }
 
         details.setResourcepacksComponent(resourcepackCreator.getId());
         if(details.getResourcepacksComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create resourcepacks component");
+            attemptCleanup();
             return null;
         }
 
         details.setSavesComponent(savesCreator.getId());
         if(details.getSavesComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create saves component");
+            attemptCleanup();
             return null;
         }
 
         details.setVersionComponent(versionCreator.getId());
         if(details.getVersionComponent() == null) {
             LOGGER.warn("Failed to create instance component: failed to create version component");
+            attemptCleanup();
             return null;
         }
 
         if(!details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails())) {
             LOGGER.warn("Failed to create instance component: failed to write details to file");
+            attemptCleanup();
             return null;
         }
 
-        LOGGER.debug("Created instance component: id={}", getComponentsManifest().getId());
+        LOGGER.debug("Created instance component: id={}", getNewManifest().getId());
         return result;
     }
 
     @Override
     public String inheritComponent() {
         LOGGER.warn("Unable to inherit instance component: unsupported");
+        attemptCleanup();
         return null;
     }
 
     @Override
     public String useComponent() {
         LOGGER.warn("Unable to use instance component: unsupported");
+        attemptCleanup();
         return null;
+    }
+
+    @Override
+    protected boolean attemptCleanup() {
+        boolean success = super.attemptCleanup();
+        success &= optionsCreator.attemptCleanup();
+        success &= modsCreator.attemptCleanup();
+        success &= savesCreator.attemptCleanup();
+        success &= versionCreator.attemptCleanup();
+        success &= resourcepackCreator.attemptCleanup();
+        LOGGER.debug("Attempted cleanup of instance component: success={}", success);
+        return success;
     }
 }

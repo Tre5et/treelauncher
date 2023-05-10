@@ -43,11 +43,13 @@ public class ModsCreator extends GenericComponentCreator {
         String result = super.createComponent();
         if(result == null || getNewManifest() == null) {
             LOGGER.error("Failed to create mods component: invalid data");
+            attemptCleanup();
             return null;
         }
         LauncherModsDetails details = new LauncherModsDetails(modsType, modsVersion, List.of());
         if(!details.writeToFile(getNewManifest().getDirectory() + Config.MODS_DEFAULT_DETAILS)) {
             LOGGER.error("Failed to create mods component: failed to write details");
+            attemptCleanup();
             return null;
         }
         return result;

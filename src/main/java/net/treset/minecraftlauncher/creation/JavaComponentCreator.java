@@ -29,18 +29,21 @@ public class JavaComponentCreator extends GenericComponentCreator {
 
         if(result == null || getNewManifest() == null) {
             LOGGER.warn("Unable to create java component: invalid data");
+            attemptCleanup();
             return null;
         }
 
         JavaRuntime java = JavaRuntime.fromJson(Sources.getJavaRuntimeJson());
         if(java.getRuntimes() == null) {
             LOGGER.warn("Unable to create java component: failed to get java runtime");
+            attemptCleanup();
             return null;
         }
 
         String osIdentifier = OsDetails.getJavaIdentifier();
         if(osIdentifier == null) {
             LOGGER.warn("Unable to create java component: failed to get os identifier");
+            attemptCleanup();
             return null;
         }
 
@@ -53,6 +56,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
         }
         if(os == null || os.getReleases() == null) {
             LOGGER.warn("Unable to create java component: failed to get os runtime");
+            attemptCleanup();
             return null;
         }
 
@@ -66,6 +70,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
 
         if(release == null || release.getManifest() == null || release.getManifest().getUrl() == null) {
             LOGGER.warn("Unable to create java component: failed to get release");
+            attemptCleanup();
             return null;
         }
 
@@ -74,12 +79,14 @@ public class JavaComponentCreator extends GenericComponentCreator {
         File baseDir = new File(getNewManifest().getDirectory());
         if(!baseDir.isDirectory()) {
             LOGGER.warn("Unable to create java component: base dir is not a directory");
+            attemptCleanup();
             return null;
         }
 
         for(JavaFile f : files) {
             if(!JavaFileDownloader.downloadJavaFile(f, baseDir)) {
                 LOGGER.warn("Unable to create java component: failed to download file: name={}", f.getName());
+                attemptCleanup();
                 return null;
             }
         }
@@ -90,12 +97,14 @@ public class JavaComponentCreator extends GenericComponentCreator {
     @Override
     public String useComponent() {
         LOGGER.warn("Unable to use java component: unsupported");
+        attemptCleanup();
         return null;
     }
 
     @Override
     public String inheritComponent() {
         LOGGER.warn("Unable to inherit java component: unsupported");
+        attemptCleanup();
         return null;
     }
 }
