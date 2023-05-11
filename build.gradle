@@ -22,6 +22,8 @@ dependencies {
     implementation "net.treset:mc-version-loader:0.1.14"
     implementation "org.apache.logging.log4j:log4j-api:2.20.0"
     implementation "org.apache.logging.log4j:log4j-core:2.20.0"
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
+    implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

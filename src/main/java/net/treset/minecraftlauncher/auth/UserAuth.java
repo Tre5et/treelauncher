@@ -53,6 +53,11 @@ public class UserAuth {
         }
         else {
             String loginUrl = Authenticator.microsoftLogin().toString();
+            if(!authFile.getParentFile().mkdirs()) {
+                LOGGER.error("Unable to create auth file directory");
+                doneCallback.accept(false);
+                return;
+            }
 
             Platform.runLater(() -> {
                 Stage stage = new Stage();

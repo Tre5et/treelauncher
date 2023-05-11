@@ -7,8 +7,9 @@ import java.io.File;
 import java.util.List;
 
 public class Config {
-    public static final File AUTH_FILE = new File("secrets.auth");
     public static final String BASE_DIR = "D:/Hannes/Coding/gits/minecraft-launcher/launcher_mockup/";
+    private static final String SPECIAL_FILES_FOLDER = BASE_DIR + ".launcher/";
+    public static final File AUTH_FILE = new File(SPECIAL_FILES_FOLDER + "secrets.auth");
     public static final String MANIFEST_FILE_NAME = "manifest.json";
     public static final String INCLUDED_FILES_DIR = ".included_files";
     public static final List<LauncherFeature> INSTANCE_DEFAULT_FEATURES = List.of();

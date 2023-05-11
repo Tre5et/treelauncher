@@ -2,7 +2,7 @@
     -fx-padding: 10px;
 }
 
-
 .label {
     -fx-font-weight: bold;
+    -fx-font-size: 22pt;
 }

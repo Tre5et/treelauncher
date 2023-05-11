@@ -1,25 +1,30 @@
 @import url("Button.css");
 @import url("SplitPane.css");
 
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
 * {
-    -fx-primary-50: #f3fcf6;
-    -fx-primary-100: #e1f9e9;
-    -fx-primary-200: #c0f2cf;
-    -fx-primary-300: #8ee6a1;
-    -fx-primary-400: #6ed883;
-    -fx-primary-500: #2fb643;
-    -fx-primary-600: #21972d;
-    -fx-primary-700: #1e7622;
-    -fx-primary-800: #1c5f1d;
-    -fx-primary-900: #184e18;
+    -fx-primary-50: #a1e8b9;
+    -fx-primary-100: #95eab1;
+    -fx-primary-200: #7ce49b;
+    -fx-primary-300: #54d971;
+    -fx-primary-400: #3ecc5a;
+    -fx-primary-500: #258e34;
+    -fx-primary-600: #1a7523;
+    -fx-primary-700: #185d1c;
+    -fx-primary-800: #174f18;
+    -fx-primary-900: #164616;
     -fx-primary-950: #0b2a09;
     -fx-white: #ffffff;
     -fx-black: #000000;
     -fx-background: #18181b;
+    -fx-background-secondary: -fx-black;
     -fx-text: -fx-white;
 }
 
 .root {
     -fx-background-color: -fx-background;
     -fx-text-fill: -fx-text;
+    -fx-font-family: 'Exo 2';
+    -fx-font-size: 10pt;
 }

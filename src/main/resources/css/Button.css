@@ -1,35 +1,41 @@
 .button {
-    -fx-button-background: -fx-background;
+    -fx-button-background: -fx-primary-400;
     -fx-button-border: -fx-primary-300;
-    -fx-button-text: -fx-primary-300;
-    -fx-button-hover-background: -fx-primary-950;
+    -fx-button-text: -fx-primary-950;
+    -fx-button-hover-background: -fx-primary-300;
     -fx-button-hover-border: -fx-button-border;
     -fx-button-hover-text: -fx-button-text;
-    -fx-button-active-background: -fx-primary-900;
-    -fx-button-active-border: -fx-button-border;
+    -fx-button-active-background: -fx-primary-500;
+    -fx-button-active-border: -fx-primary-500;
     -fx-button-active-text: -fx-button-text;
-    -fx-button-disabled-background: -fx-button-background;
-    -fx-button-disabled-border: -fx-button-border;
-    -fx-button-disabled-text: -fx-button-text;
+    -fx-button-disabled-background: -fx-primary-800;
+    -fx-button-disabled-border: -fx-primary-800;
+    -fx-button-disabled-text: -fx-primary-100;
 }
 
 .button {
     -fx-border-color: -fx-button-border;
     -fx-background-color: -fx-button-background;
     -fx-text-fill: -fx-button-text;
+    -fx-font-size: 12pt;
+    -fx-font-weight: 700;
+    -fx-font-style: italic;
     -fx-border-radius: 5px;
+    -fx-icon-color: -fx-button-text;
 }
 
 .button:hover {
     -fx-border-color: -fx-button-hover-border;
     -fx-background-color: -fx-button-hover-background;
     -fx-text-fill: -fx-button-hover-text;
+    -fx-icon-color: -fx-button-hover-text;
 }
 
 .button:pressed {
     -fx-border-color: -fx-button-active-border;
     -fx-background-color: -fx-button-active-background;
     -fx-text-fill: -fx-button-active-text;
+    -fx-icon-color: -fx-button-active-text;
 }
 
 .button:disabled {
@@ -37,4 +43,20 @@
     -fx-background-color: -fx-button-disabled-background;
     -fx-text-fill: -fx-button-disabled-text;
     -fx-opacity: 0.5;
+}
+
+.button > .button-icon {
+    -fx-icon-color: -fx-button-text;
+}
+
+.button:disabled > .button-icon {
+    -fx-icon-color: -fx-button-hover-text;
+}
+
+.button:pressed > .button-icon {
+    -fx-icon-color: -fx-button-active-text;
+}
+
+.button:disabled > .button-icon {
+    -fx-icon-color: -fx-button-disabled-text;
 }
