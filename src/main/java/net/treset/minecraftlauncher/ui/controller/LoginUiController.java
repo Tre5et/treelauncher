@@ -5,13 +5,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.util.Pair;
+import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.data.LauncherFiles;
+import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.UiLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class LoginUiController {
@@ -38,11 +44,11 @@ public class LoginUiController {
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
             LOGGER.debug("Login success, username=" + LauncherApplication.userAuth.getMinecraftUser().name());
 
-            /*LauncherFiles files = new LauncherFiles();
+            LauncherFiles files = new LauncherFiles();
             files.reloadAll();
             Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(1);
             GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
-            gameLauncher.launch();*/
+            gameLauncher.launch();
         } else {
             loginButton.setDisable(false);
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));

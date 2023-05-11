@@ -11,6 +11,7 @@ import net.treset.minecraftlauncher.data.InstanceData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +89,13 @@ public class CommandBuilder {
             }
         }
 
+        File gameDir = new File(instanceData.getGameDataDir());
+        if(!gameDir.isDirectory()) {
+            LOGGER.warn("Unable to create start command: game directory is not a directory: directory=" + gameDir.getAbsolutePath());
+            return false;
+        }
+
+        processBuilder.directory(gameDir);
         processBuilder.command(new ArrayList<>());
         processBuilder.command().add(instanceData.getJavaComponent().getDirectory() + "bin" + "/" + "java");
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
