@@ -15,10 +15,12 @@ public abstract class UiElement implements UiController {
 
     public void setVisible(boolean visible) {
         if(this.visible == visible) return;
-        beforeShow(null);
+        if(visible)
+            beforeShow(null);
         setRootVisible(visible);
         this.visible = visible;
-        afterShow(null);
+        if(visible)
+            afterShow(null);
     }
 
     public abstract void setRootVisible(boolean visible);

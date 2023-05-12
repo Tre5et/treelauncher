@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="rootPane" alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.InstanceCreatorElement">
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="NEVER" />
+        <RowConstraints vgrow="NEVER" />
+        <RowConstraints vgrow="NEVER" />
+        <RowConstraints vgrow="NEVER" />
+    </rowConstraints>
+
+    <HBox GridPane.rowIndex="0" GridPane.columnIndex="0">
+        <Label styleClass="input" text="%creator.label.name" />
+        <TextField />
+    </HBox>
+    <fx:include fx:id="versionCreator" source="VersionCreatorElement.fxml" GridPane.columnIndex="1" />
+    <fx:include fx:id="savesCreator" source="SavesCreatorElement.fxml" GridPane.rowIndex="1" />
+    <fx:include fx:id="resourcepacksCreator" source="ResourcepacksCratorElement.fxml" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+    <fx:include fx:id="optionsCreator" source="OptionsCreatorElement.fxml" GridPane.rowIndex="2" />
+    <fx:include fx:id="modsCreator" source="ModsCreatorElement.fxml" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+    <Button fx:id="createButton" onAction="#onCreateButtonClicked" text="%creator.button.create" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2" />
+</GridPane>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.SavesCreatorElement">
+   <RadioButton fx:id="radioCreate" onAction="#onRadioCreateSelect" mnemonicParsing="false" selected="true" text="%creator.radio.create">
+      <toggleGroup>
+         <ToggleGroup fx:id="createtype" />
+      </toggleGroup>
+   </RadioButton>
+   <HBox>
+      <Label fx:id="createLabel" text="%creator.label.name" />
+      <TextField fx:id="createName" />
+   </HBox>
+   <RadioButton fx:id="radioUse" onAction="#onRadioUseSelect" mnemonicParsing="false" text="%creator.radio.use" toggleGroup="$createtype" />
+   <HBox>
+      <ChoiceBox fx:id="useChoice" prefWidth="150.0"/>
+   </HBox>
+   <RadioButton fx:id="radioInherit" onAction="#onRadioInheritSelect" mnemonicParsing="false" text="%creator.radio.inherit" toggleGroup="$createtype" />
+   <VBox prefHeight="200.0" prefWidth="100.0">
+      <HBox>
+         <Label fx:id="inheritLabel" text="%creator.label.name"/>
+         <TextField fx:id="inheritName"/>
+      </HBox>
+      <ChoiceBox fx:id="inheritChoice" prefWidth="150.0"/>
+   </VBox>
+</VBox>

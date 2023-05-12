@@ -19,6 +19,7 @@ public class NavbarElement extends UiElement {
 
     @FXML
     private void onAddButtonClicked() {
+        componentActivator.accept(MainController.Component.INSTANCE_CREATOR);
     }
 
     @FXML
