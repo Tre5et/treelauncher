@@ -1,0 +1,5 @@
+.element-container {
+    -fx-border-color: -fx-primary-950;
+    -fx-border-width: 0 0 3px 0;
+    -fx-background-color: -fx-background;
+}

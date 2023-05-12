@@ -1,0 +1,26 @@
+.label {
+    -fx-font-size: 12pt;
+}
+
+.label.title {
+    -fx-font-weight: bold;
+    -fx-font-size: 22pt;
+}
+
+.label.element-title {
+    -fx-font-style: italic;
+    -fx-font-size: 20pt;
+}
+
+.label.element-title.selected {
+    -fx-font-weight: bold;
+}
+
+.label.element-details {
+    -fx-font-style: italic;
+    -fx-font-size: 10pt;
+}
+
+.label.element-details.selected {
+    -fx-font-weight: bold;
+}

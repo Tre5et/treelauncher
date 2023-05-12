@@ -49,7 +49,7 @@
     -fx-icon-color: -fx-button-text;
 }
 
-.button:disabled > .button-icon {
+.button:hover > .button-icon {
     -fx-icon-color: -fx-button-hover-text;
 }
 
@@ -59,4 +59,37 @@
 
 .button:disabled > .button-icon {
     -fx-icon-color: -fx-button-disabled-text;
+}
+
+.button-invisible {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+.button-invisible:hover {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+.button-invisible:pressed {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+.button-invisible:disabled {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+.button-invisible > .button-icon {
+    -fx-icon-color: -fx-button-background;
+}
+
+.button-invisible:hover > .button-icon {
+    -fx-icon-color: -fx-button-hover-background;
+}
+
+.button-invisible:pressed > .button-icon {
+    -fx-icon-color: -fx-button-active-background;
+}
+
+.button-invisible:disabled > .button-icon {
+    -fx-icon-color: -fx-button-disabled-background;
 }

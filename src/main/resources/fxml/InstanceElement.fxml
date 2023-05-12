@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="instanceElement" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onInstanceClicked" styleClass="element-container" stylesheets="@/css/InstanceElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.instances.InstanceElementController">
+   <columnConstraints>
+      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <Label fx:id="title" styleClass="element-title" text="Instance Name" />
+      <Label fx:id="details" styleClass="element-details" text="Instance-Details" GridPane.rowIndex="1" />
+   </children>
+</GridPane>

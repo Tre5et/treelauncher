@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane stylesheets="@/css/Global.css,@/css/InstancesUi.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.instances.InstancesUiController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="48.0" minHeight="48.0" prefHeight="48.0" vgrow="NEVER" />
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="48.0" minHeight="48.0" prefHeight="48.0" valignment="CENTER" vgrow="NEVER" />
+    </rowConstraints>
+    <GridPane GridPane.rowIndex="0">
+      <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+      </columnConstraints>
+      <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      </rowConstraints>
+    </GridPane>
+    <SplitPane dividerPositions="0.5, 0.5" GridPane.rowIndex="1">
+        <AnchorPane fx:id="instancePane" styleClass="split-pane-element-left,instances-container">
+            <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <VBox alignment="TOP_CENTER" styleClass="title-container" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Label styleClass="title" text="%instances.label.title" />
+                </VBox>
+                <fx:include source="InstanceElement.fxml"/>
+                <fx:include source="InstanceElement.fxml"/>
+            </VBox>
+        </AnchorPane>
+        <AnchorPane fx:id="detailsPane" prefHeight="200.0" prefWidth="200.0" styleClass="split-pane-element-center" />
+        <AnchorPane fx:id="componentPane" prefHeight="200.0" prefWidth="200.0" styleClass="split-pane-element-right" />
+    </SplitPane>
+    <fx:include fx:id="navbar" source="Navbar.fxml" GridPane.rowIndex="2" />
+</GridPane>

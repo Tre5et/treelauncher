@@ -1,0 +1,9 @@
+.instances-container {
+    -fx-padding: 0;
+}
+
+.title-container {
+    -fx-background-color: -fx-background-secondary;
+    -fx-border-width: 0 0 4px 0;
+    -fx-border-color: -fx-primary-950;
+}

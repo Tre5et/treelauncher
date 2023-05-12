@@ -26,10 +26,10 @@ public class UserAuth {
     private boolean authenticating = false;
     private User minecraftUser;
 
-    public void authenticate(File authFile, Consumer<Boolean> doneCallback) {
+    public void authenticate(File authFile, boolean ignoreFile , Consumer<Boolean> doneCallback) {
         authenticating = true;
 
-        if(authFile.isFile()) {
+        if(authFile.isFile() && !ignoreFile) {
             InputStream authFileStream;
             try {
                 authFileStream = new FileInputStream(authFile);
