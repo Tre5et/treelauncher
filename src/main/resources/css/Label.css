@@ -24,3 +24,11 @@
 .label.element-details.selected {
     -fx-font-weight: bold;
 }
+
+.icon {
+    -fx-icon-color: -fx-button-background;
+}
+
+.icon.selected {
+    -fx-icon-color: -fx-button-active-background;
+}

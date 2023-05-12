@@ -18,7 +18,7 @@ public class NavbarController {
     public void onResourcepacksButtonClicked() {
     }
     @FXML
-    public void onSettingsButtonClicked() {
+    public void onOptionsButtonClicked() {
     }
     @FXML
     public void onModsButtonClicked() {

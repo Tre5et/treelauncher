@@ -11,12 +11,24 @@ import java.io.IOException;
 import java.net.URL;
 
 public class UiLoader {
-    public static <T extends UiController> T loadFxmlOnStage(String fxmlPath, Stage stage, String title, Object... args) throws IOException {
+    public static FXMLLoader getFXMLLoader(String fxmlPath) {
         FXMLLoader loader = new FXMLLoader();
         URL xmlUrl = UiLoader.class.getResource("/fxml/"+fxmlPath+".fxml");
         loader.setLocation(xmlUrl);
         loader.setResources(LauncherApplication.stringLocalizer.getStringBundle());
-        Parent root = loader.load();
+        return loader;
+    }
+    public static <T> T loadFXML(String fxmlPath) throws IOException {
+        return loadFXML(getFXMLLoader(fxmlPath));
+    }
+
+    public static <T> T loadFXML(FXMLLoader fxmlLoader) throws IOException {
+        return fxmlLoader.load();
+    }
+
+    public static <T extends UiController> T loadFxmlOnStage(String fxmlPath, Stage stage, String title, Object... args) throws IOException {
+        FXMLLoader loader = getFXMLLoader(fxmlPath);
+        Parent root = loadFXML(loader);
 
         stage.setTitle(LauncherApplication.stringLocalizer.get(title, args));
         stage.setScene(new Scene(root));

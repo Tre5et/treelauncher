@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="instanceElement" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onInstanceClicked" styleClass="element-container" stylesheets="@/css/InstanceElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.instances.InstanceElementController">
+<GridPane fx:id="element" minHeight="-Infinity" onMouseClicked="#onElementClicked" styleClass="element-container" stylesheets="@/css/ListElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.ListElementController">
    <columnConstraints>
       <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
    </columnConstraints>
@@ -15,4 +16,7 @@
       <Label fx:id="title" styleClass="element-title" text="Instance Name" />
       <Label fx:id="details" styleClass="element-details" text="Instance-Details" GridPane.rowIndex="1" />
    </children>
+   <cursor>
+      <Cursor fx:constant="HAND" />
+   </cursor>
 </GridPane>

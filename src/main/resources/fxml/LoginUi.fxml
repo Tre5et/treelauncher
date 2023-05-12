@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<SplitPane dividerPositions="0.26057906458797325, 0.6703786191536748" prefHeight="400.0" prefWidth="900.0" stylesheets="@/css/Global.css,@/css/LoginUi.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.LoginUiController">
+<SplitPane dividerPositions="0.26057906458797325" prefHeight="400.0" prefWidth="900.0" stylesheets="@/css/Global.css,@/css/LoginUi.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.LoginUiController">
     <VBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="100.0" styleClass="split-pane-element-left">
         <Button fx:id="loginButton" alignment="CENTER" minWidth="-Infinity" onAction="#onLoginButtonClicked" text="%login.button.microsoft" textAlignment="CENTER" />
     </VBox>

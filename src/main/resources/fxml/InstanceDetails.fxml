@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+
+<VBox prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="net.treset.minecraftlauncher.ui.controller.instances.InstanceDetailsController"
+        fx:id="container" visible="false">
+    <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" VBox.vgrow="NEVER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <cursor>
+            <Cursor fx:constant="HAND"/>
+        </cursor>
+        <FontIcon iconLiteral="mdoal-format_line_spacing:48" styleClass="icon" GridPane.rowSpan="2">
+            <GridPane.margin>
+                <Insets left="5.0" right="5.0"/>
+            </GridPane.margin>
+        </FontIcon>
+        <Label styleClass="element-title" text="%instances.details.label.version" GridPane.columnIndex="1"
+               GridPane.valignment="BOTTOM"/>
+        <Label fx:id="versionName" styleClass="element-details" text="Version Details" GridPane.columnIndex="1"
+               GridPane.rowIndex="1"/>
+    </GridPane>
+    <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" VBox.vgrow="NEVER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <cursor>
+            <Cursor fx:constant="HAND"/>
+        </cursor>
+        <FontIcon iconLiteral="mdomz-move_to_inbox:48" styleClass="icon" GridPane.rowSpan="2">
+            <GridPane.margin>
+                <Insets left="5.0" right="5.0"/>
+            </GridPane.margin>
+        </FontIcon>
+        <Label styleClass="element-title" text="%instances.details.label.saves" GridPane.columnIndex="1"
+               GridPane.valignment="BOTTOM"/>
+        <Label fx:id="savesName" styleClass="element-details" text="Saves Details" GridPane.columnIndex="1"
+               GridPane.rowIndex="1"/>
+    </GridPane>
+    <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" VBox.vgrow="NEVER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <cursor>
+            <Cursor fx:constant="HAND"/>
+        </cursor>
+        <FontIcon iconLiteral="mdoal-folder_special:48" styleClass="icon" GridPane.rowSpan="2">
+            <GridPane.margin>
+                <Insets left="5.0" right="5.0"/>
+            </GridPane.margin>
+        </FontIcon>
+        <Label styleClass="element-title" text="%instances.details.label.resourcepacks" GridPane.columnIndex="1"
+               GridPane.valignment="BOTTOM"/>
+        <Label fx:id="resourcepacksName" styleClass="element-details" text="Version Details" GridPane.columnIndex="1"
+               GridPane.rowIndex="1"/>
+    </GridPane>
+    <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" VBox.vgrow="NEVER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <cursor>
+            <Cursor fx:constant="HAND"/>
+        </cursor>
+        <FontIcon iconLiteral="mdomz-tune:48" styleClass="icon" GridPane.rowSpan="2">
+            <GridPane.margin>
+                <Insets left="5.0" right="5.0"/>
+            </GridPane.margin>
+        </FontIcon>
+        <Label styleClass="element-title" text="%instances.details.label.options" GridPane.columnIndex="1"
+               GridPane.valignment="BOTTOM"/>
+        <Label fx:id="optionsName" styleClass="element-details" text="Option Details" GridPane.columnIndex="1"
+               GridPane.rowIndex="1"/>
+    </GridPane>
+    <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" VBox.vgrow="NEVER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <cursor>
+            <Cursor fx:constant="HAND"/>
+        </cursor>
+        <FontIcon iconLiteral="mdoal-extension:48" styleClass="icon" GridPane.rowSpan="2">
+            <GridPane.margin>
+                <Insets left="5.0" right="5.0"/>
+            </GridPane.margin>
+        </FontIcon>
+        <Label styleClass="element-title" text="%instances.details.label.mods" GridPane.columnIndex="1"
+               GridPane.valignment="BOTTOM"/>
+        <Label fx:id="modsName" styleClass="element-details" text="Mods Details" GridPane.columnIndex="1"
+               GridPane.rowIndex="1"/>
+    </GridPane>
+</VBox>

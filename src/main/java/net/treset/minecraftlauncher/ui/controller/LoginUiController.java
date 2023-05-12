@@ -62,23 +62,12 @@ public class LoginUiController extends GenericUiController {
             LOGGER.debug("Login success, username=" + LauncherApplication.userAuth.getMinecraftUser().name());
 
             continueButton.setVisible(true);
-
-
-            /*LauncherFiles files = new LauncherFiles();
-            files.reloadAll();
-            Pair<LauncherManifest, LauncherInstanceDetails> instance = files.getInstanceComponents().get(1);
-            GameLauncher gameLauncher = new GameLauncher(instance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
-            gameLauncher.launch();*/
         } else {
             loginButton.setDisable(false);
             statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
             loginRetry++;
             LOGGER.warn("Login failed");
         }
-    }
-
-    private void onGameExit(String error) {
-        LOGGER.debug("Game exited: " + error);
     }
 
     public static LoginUiController showOnStage(Stage stage) throws IOException {

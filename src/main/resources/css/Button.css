@@ -1,4 +1,4 @@
-.button {
+* {
     -fx-button-background: -fx-primary-400;
     -fx-button-border: -fx-primary-300;
     -fx-button-text: -fx-primary-950;
@@ -22,6 +22,7 @@
     -fx-font-style: italic;
     -fx-border-radius: 5px;
     -fx-icon-color: -fx-button-text;
+    -fx-cursor: hand;
 }
 
 .button:hover {
@@ -61,35 +62,35 @@
     -fx-icon-color: -fx-button-disabled-text;
 }
 
-.button-invisible {
+.button.invisible {
     -fx-border-width: 0;
     -fx-background-color: transparent;
 }
-.button-invisible:hover {
+.button.invisible:hover {
     -fx-border-width: 0;
     -fx-background-color: transparent;
 }
-.button-invisible:pressed {
+.button.invisible:pressed {
     -fx-border-width: 0;
     -fx-background-color: transparent;
 }
-.button-invisible:disabled {
+.button.invisible:disabled {
     -fx-border-width: 0;
     -fx-background-color: transparent;
 }
 
-.button-invisible > .button-icon {
+.button.invisible > .icon {
     -fx-icon-color: -fx-button-background;
 }
 
-.button-invisible:hover > .button-icon {
+.button.invisible:hover > .icon {
     -fx-icon-color: -fx-button-hover-background;
 }
 
-.button-invisible:pressed > .button-icon {
+.button.invisible:pressed > .icon {
     -fx-icon-color: -fx-button-active-background;
 }
 
-.button-invisible:disabled > .button-icon {
+.button.invisible:disabled > .icon {
     -fx-icon-color: -fx-button-disabled-background;
 }

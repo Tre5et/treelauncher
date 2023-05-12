@@ -17,40 +17,45 @@ import java.util.function.Consumer;
 public class GameLauncher {
     private static final Logger LOGGER = LogManager.getLogger(GameLauncher.class);
 
-    private Pair<LauncherManifest, LauncherInstanceDetails> instance;
+    private InstanceData instance;
     private LauncherFiles files;
     private User minecraftUser;
     private List<Consumer<String>> exitCallbacks;
     private ResourceManager resourceManager;
     private GameListener gameListener;
 
-    public GameLauncher(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files, User minecraftUser, List<Consumer<String>> exitCallbacks) {
+    public GameLauncher(InstanceData instance, LauncherFiles files, User minecraftUser, List<Consumer<String>> exitCallbacks) {
         this.instance = instance;
         this.files = files;
         this.minecraftUser = minecraftUser;
         this.exitCallbacks = exitCallbacks;
     }
 
-    public boolean launch() {
+    public boolean launch(boolean cleanupActiveInstance) {
         if(!files.isValid() || !files.reloadAll()) {
             LOGGER.warn("Unable to launch game: file reload failed");
             return false;
         }
 
-        if(files.getLauncherDetails().getActiveInstance() != null && !files.getLauncherDetails().getActiveInstance().isBlank() && !cleanUpOldInstance()) {
-            LOGGER.warn("Unable to launch game: unable to clean up old instance");
-            return false;
+        if(files.getLauncherDetails().getActiveInstance() != null) {
+            if(!cleanupActiveInstance) {
+                LOGGER.warn("Unable to launch game: active instance already exists");
+                return false;
+            }
+            if(!files.getLauncherDetails().getActiveInstance().isBlank() && !cleanUpOldInstance()) {
+                LOGGER.warn("Unable to launch game: unable to clean up old instance");
+                return false;
+            }
         }
 
-        InstanceData instanceData = InstanceData.of(instance, files);
-        if(instanceData == null) {
+        if(instance == null) {
             LOGGER.warn("Unable to launch game: instance data loaded incorrectly");
             return false;
         }
-        resourceManager = new ResourceManager(instanceData);
+        resourceManager = new ResourceManager(instance);
 
 
-        files.getLauncherDetails().setActiveInstance(instance.getKey().getId());
+        files.getLauncherDetails().setActiveInstance(instance.getInstance().getKey().getId());
         if(!files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails())) {
             LOGGER.warn("Unable to launch game: unable to write launcher details");
             return false;
@@ -69,7 +74,7 @@ public class GameLauncher {
         }
 
         ProcessBuilder pb = new ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE);
-        CommandBuilder commandBuilder = new CommandBuilder(pb, instanceData, minecraftUser);
+        CommandBuilder commandBuilder = new CommandBuilder(pb, instance, minecraftUser);
         if(!commandBuilder.makeStartCommand()) {
             LOGGER.warn("Unable to launch game: unable to set start command");
             abortLaunch();
@@ -132,11 +137,11 @@ public class GameLauncher {
         return true;
     }
 
-    public Pair<LauncherManifest, LauncherInstanceDetails> getInstance() {
+    public InstanceData getInstance() {
         return instance;
     }
 
-    public void setInstance(Pair<LauncherManifest, LauncherInstanceDetails> instance) {
+    public void setInstance(InstanceData instance) {
         this.instance = instance;
     }
 
