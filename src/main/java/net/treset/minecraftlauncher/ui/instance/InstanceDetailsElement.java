@@ -1,11 +1,13 @@
-package net.treset.minecraftlauncher.ui.controller.instances;
+package net.treset.minecraftlauncher.ui.instance;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.ui.base.UiElement;
 
-public class InstanceDetailsController {
+public class InstanceDetailsElement extends UiElement {
     @FXML public VBox container;
     @FXML public Label versionName;
     @FXML public Label savesName;
@@ -14,6 +16,11 @@ public class InstanceDetailsController {
     @FXML public Label modsName;
 
     public void setVisible(boolean visible) {
+        container.setVisible(visible);
+    }
+
+    @Override
+    public void setRootVisible(boolean visible) {
         container.setVisible(visible);
     }
 
@@ -29,4 +36,10 @@ public class InstanceDetailsController {
             modsName.setVisible(false);
         }
     }
+
+    @Override
+    public void beforeShow(Stage stage) {}
+
+    @Override
+    public void afterShow(Stage stage) {}
 }

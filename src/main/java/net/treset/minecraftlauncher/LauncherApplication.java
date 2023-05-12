@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
-import net.treset.minecraftlauncher.ui.controller.LoginUiController;
+import net.treset.minecraftlauncher.ui.login.LoginController;
 
 import java.io.IOException;
 
@@ -21,6 +21,6 @@ public class LauncherApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         System.setProperty("prism.lcdtext", "false");
-        LoginUiController.showOnStage(primaryStage);
+        LoginController.showOnStage(primaryStage);
     }
 }

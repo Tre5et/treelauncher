@@ -8,7 +8,7 @@
 
 <VBox prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="net.treset.minecraftlauncher.ui.controller.instances.InstanceDetailsController"
+      fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceDetailsElement"
         fx:id="container" visible="false">
     <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" VBox.vgrow="NEVER">
         <columnConstraints>

@@ -1,12 +1,14 @@
-package net.treset.minecraftlauncher.ui.controller;
+package net.treset.minecraftlauncher.ui.generic;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.minecraftlauncher.data.InstanceData;
-import net.treset.minecraftlauncher.ui.UiLoader;
+import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.util.UiLoader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class ListElementController {
+public class SelectorEntryElement extends UiElement {
 
     @FXML
     public GridPane element;
@@ -65,10 +67,14 @@ public class ListElementController {
         return false;
     }
 
-    public void beforeShow() {
+    @Override
+    public void beforeShow(Stage stage) {
         title.setText(instanceData.getInstance().getKey().getName());
         details.setText(instanceData.getVersionComponents().get(0).getValue().getVersionId());
     }
+
+    @Override
+    public void afterShow(Stage stage) {}
 
     public InstanceData getInstanceData() {
         return instanceData;
@@ -103,11 +109,16 @@ public class ListElementController {
         this.selectionListeners.add(selectionListener);
     }
 
-    public static Pair<ListElementController, GridPane> from(InstanceData instanceData) throws IOException {
-        FXMLLoader loader = UiLoader.getFXMLLoader("ListElement");
+    public static Pair<SelectorEntryElement, GridPane> from(InstanceData instanceData) throws IOException {
+        FXMLLoader loader = UiLoader.getFXMLLoader("generic/SelectorEntryElement");
         GridPane element = UiLoader.loadFXML(loader);
-        ListElementController listElementController = loader.getController();
+        SelectorEntryElement listElementController = loader.getController();
         listElementController.setInstanceData(instanceData);
         return new Pair<>(listElementController, element);
+    }
+
+    @Override
+    public void setRootVisible(boolean visible) {
+        element.setVisible(visible);
     }
 }

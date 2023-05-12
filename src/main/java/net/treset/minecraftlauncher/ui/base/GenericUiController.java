@@ -1,7 +1,7 @@
-package net.treset.minecraftlauncher.ui.controller;
+package net.treset.minecraftlauncher.ui.base;
 
 import javafx.stage.Stage;
-import net.treset.minecraftlauncher.ui.UiLoader;
+import net.treset.minecraftlauncher.util.UiLoader;
 
 import java.io.IOException;
 
@@ -13,8 +13,7 @@ public class GenericUiController implements UiController {
     }
 
     @Override
-    public void afterShow(Stage stage) {
-    }
+    public void afterShow(Stage stage) {}
 
     public Stage getStage() {
         return stage;

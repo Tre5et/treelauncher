@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<SplitPane fx:id="rootPane" visible="false" dividerPositions="0.33, 0.66" GridPane.rowIndex="1" stylesheets="@/css/instance/InstanceSelector.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceSelectorElement">
+    <AnchorPane styleClass="split-pane-element-left,element-container">
+        <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox alignment="TOP_CENTER" styleClass="title-container">
+                <Label styleClass="title" text="%instances.label.title"/>
+            </VBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true">
+                <VBox fx:id="instanceContainer" alignment="TOP_CENTER">
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </AnchorPane>
+    <AnchorPane fx:id="detailsPane" prefHeight="200.0" prefWidth="200.0" styleClass="split-pane-element-center,element-container">
+        <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox alignment="CENTER_LEFT" styleClass="title-container">
+                <Button fx:id="playButton" disable="true" styleClass="invisible" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onPlayButtonClicked">
+                    <graphic>
+                        <FontIcon iconLiteral="mdomz-play_arrow:48" styleClass="icon"/>
+                    </graphic>
+                </Button>
+                <Label fx:id="instanceDetailsTitle" styleClass="title, disabled" text="%instances.label.details.title"/>
+            </HBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true">
+                <fx:include fx:id="instanceDetails" source="InstanceDetailsElement.fxml"/>
+            </ScrollPane>
+        </VBox>
+    </AnchorPane>
+    <AnchorPane fx:id="componentPane" prefHeight="200.0" prefWidth="200.0" styleClass="split-pane-element-right" />
+</SplitPane>

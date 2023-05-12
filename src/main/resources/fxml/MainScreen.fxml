@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane prefHeight="600.0" prefWidth="1300.0" stylesheets="@/css/global/Global.css" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="net.treset.minecraftlauncher.ui.MainController" xmlns:fx="http://javafx.com/fxml/1">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="48.0" minHeight="48.0" prefHeight="48.0" vgrow="NEVER" />
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="48.0" minHeight="48.0" prefHeight="48.0" valignment="CENTER" vgrow="NEVER" />
+    </rowConstraints>
+    <fx:include fx:id="titlebar" source="title/TitlebarElement.fxml" GridPane.rowIndex="0" GridPane.fillWidth="true" />
+    <fx:include fx:id="instanceSelector" source="instance/InstanceSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true"/>
+    <fx:include fx:id="navbar" source="nav/NavbarElement.fxml" GridPane.rowIndex="2" GridPane.fillWidth="true" />
+</GridPane>

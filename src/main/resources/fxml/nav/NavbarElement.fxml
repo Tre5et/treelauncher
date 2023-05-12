@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<GridPane alignment="CENTER" prefHeight="48" prefWidth="500" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.controller.NavbarController">
+<GridPane stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
    <styleClass>
       <String fx:value="navbar" />
    </styleClass>

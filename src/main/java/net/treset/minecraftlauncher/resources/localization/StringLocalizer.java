@@ -16,8 +16,8 @@ public class StringLocalizer {
         stringBundle = ResourceBundle.getBundle("lang.strings", locale);
     }
 
-    public String get(String property, Object... args) {
-        return getFormatted(property, args);
+    public String get(String property) {
+        return getFormatted(property);
     }
 
     public String getFormatted(String property, Object... args) {

@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.controller;
+package net.treset.minecraftlauncher.ui.base;
 
 import javafx.stage.Stage;
 

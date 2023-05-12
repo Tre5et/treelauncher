@@ -1,11 +1,11 @@
-package net.treset.minecraftlauncher.ui;
+package net.treset.minecraftlauncher.util;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.ui.controller.UiController;
+import net.treset.minecraftlauncher.ui.base.UiController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,7 +30,7 @@ public class UiLoader {
         FXMLLoader loader = getFXMLLoader(fxmlPath);
         Parent root = loadFXML(loader);
 
-        stage.setTitle(LauncherApplication.stringLocalizer.get(title, args));
+        stage.setTitle(LauncherApplication.stringLocalizer.getFormatted(title, args));
         stage.setScene(new Scene(root));
         return loader.getController();
     }

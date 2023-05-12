@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.controller;
+package net.treset.minecraftlauncher.ui.login;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -7,15 +7,16 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Config;
-import net.treset.minecraftlauncher.ui.controller.instances.InstancesUiController;
+import net.treset.minecraftlauncher.ui.base.GenericUiController;
+import net.treset.minecraftlauncher.ui.MainController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 
-public class LoginUiController extends GenericUiController {
-    private static final Logger LOGGER = LogManager.getLogger(LoginUiController.class);
+public class LoginController extends GenericUiController {
+    private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
     @FXML
     public Button loginButton;
@@ -33,7 +34,7 @@ public class LoginUiController extends GenericUiController {
     @FXML
     public void onContinueButtonClicked() {
         try {
-            InstancesUiController.showOnStage(stage);
+            MainController.showOnStage(stage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,7 +59,7 @@ public class LoginUiController extends GenericUiController {
 
     private void loginDoneActions(boolean success) {
         if(success) {
-            statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
+            statusLabel.setText(LauncherApplication.stringLocalizer.getFormatted("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
             LOGGER.debug("Login success, username=" + LauncherApplication.userAuth.getMinecraftUser().name());
 
             continueButton.setVisible(true);
@@ -70,7 +71,7 @@ public class LoginUiController extends GenericUiController {
         }
     }
 
-    public static LoginUiController showOnStage(Stage stage) throws IOException {
-        return showOnStage(stage, "LoginUi", "login.title");
+    public static LoginController showOnStage(Stage stage) throws IOException {
+        return showOnStage(stage, "login/LoginScreen", "login.title");
     }
 }
