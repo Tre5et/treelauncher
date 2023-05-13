@@ -1,0 +1,12 @@
+.text-field {
+    -fx-textfield-background: -fx-background-secondary;
+    -fx-textfield-border: -fx-primary-900;
+}
+
+.text-field {
+    -fx-background-color: -fx-textfield-background;
+    -fx-border-color: -fx-textfield-border;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: -fx-text;
+}

@@ -4,5 +4,6 @@
 	"realms_persistence.json"
 	],
 	"id":"sha1",
+	"name": "sha1",
 	"type":"saves_component"
 }

@@ -29,6 +29,12 @@
     -fx-font-weight: bold;
 }
 
+.label.error {
+    -fx-text-fill: -fx-error;
+    -fx-border-width: 0;
+    -fx-font-size: 10pt;
+}
+
 .icon {
     -fx-icon-color: -fx-button-background;
 }

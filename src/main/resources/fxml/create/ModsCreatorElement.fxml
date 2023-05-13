@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.ModsCreatorElement">
-    <RadioButton mnemonicParsing="false" selected="true" text="%creator.radio.create">
+<VBox fx:id="rootPane" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.ModsCreatorElement">
+    <RadioButton fx:id="radioCreate" mnemonicParsing="false" onAction="#onRadioCreateSelect" selected="true" text="%creator.radio.create">
         <toggleGroup>
             <ToggleGroup fx:id="createtype" />
         </toggleGroup>
     </RadioButton>
-    <HBox>
-        <Label text="%creator.label.name" />
-        <TextField fx:id="createName" />
-    </HBox>
-    <RadioButton mnemonicParsing="false" text="%creator.radio.use" toggleGroup="$createtype" />
-    <HBox>
-        <children>
-            <ChoiceBox prefWidth="150.0" />
-        </children></HBox>
-    <RadioButton mnemonicParsing="false" text="%creator.radio.inherit" toggleGroup="$createtype" />
-    <VBox prefHeight="200.0" prefWidth="100.0">
-        <children>
-            <HBox>
-                <Label text="%creator.label.name" />
-                <TextField fx:id="inheritName" />
-            </HBox>
-            <ChoiceBox prefWidth="150.0" />
-        </children>
+    <VBox fx:id="createBox" minHeight="-Infinity" minWidth="-Infinity">
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="createLabel" text="%creator.label.name" />
+            <TextField fx:id="createName" />
+        </HBox>
+        <Label fx:id="createError" styleClass="error" text="%creator.label.error.name" visible="false" />
     </VBox>
+    <RadioButton fx:id="radioUse" mnemonicParsing="false" onAction="#onRadioUseSelect" text="%creator.radio.use" toggleGroup="$createtype" />
+    <VBox fx:id="useBox" minHeight="-Infinity" minWidth="-Infinity">
+        <ChoiceBox fx:id="useChoice" prefWidth="150.0" />
+        <Label fx:id="useError" styleClass="error" text="%creator.label.error.select" visible="false" />
+    </VBox>
+    <RadioButton fx:id="radioInherit" mnemonicParsing="false" onAction="#onRadioInheritSelect" text="%creator.radio.inherit" toggleGroup="$createtype" />
+    <VBox fx:id="inheritBox" minHeight="-Infinity" minWidth="-Infinity">
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="inheritLabel" text="%creator.label.name" />
+            <TextField fx:id="inheritName" />
+        </HBox>
+        <ChoiceBox fx:id="inheritChoice" prefWidth="150.0" />
+        <Label fx:id="inheritErrorName" styleClass="error" text="%creator.label.error.name" visible="false" />
+        <Label fx:id="inheritErrorSelect" styleClass="error" text="%creator.label.error.select" visible="false" />
+    </VBox>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
 </VBox>
 

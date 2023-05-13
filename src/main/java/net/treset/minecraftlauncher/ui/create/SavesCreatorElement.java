@@ -30,6 +30,13 @@ public class SavesCreatorElement extends UiElement {
     @FXML private TextField inheritName;
     @FXML private ChoiceBox<String> useChoice;
     @FXML private ChoiceBox<String> inheritChoice;
+    @FXML private Label createError;
+    @FXML private Label useError;
+    @FXML private Label inheritErrorName;
+    @FXML private Label inheritErrorSelect;
+    @FXML private VBox createBox;
+    @FXML private VBox useBox;
+    @FXML private VBox inheritBox;
 
     private List<LauncherManifest> savesComponents;
     private Map<String, LauncherManifestType> typeConversion;
@@ -44,41 +51,39 @@ public class SavesCreatorElement extends UiElement {
     }
 
     @FXML private void onRadioCreateSelect() {
-        createLabel.setVisible(true);
-        createName.setVisible(true);
-        useChoice.setVisible(false);
-        inheritLabel.setVisible(false);
-        inheritName.setVisible(false);
-        inheritChoice.setVisible(false);
+        createBox.setDisable(false);
+        useBox.setDisable(true);
+        inheritBox.setDisable(true);
     }
     @FXML private void onRadioUseSelect() {
-        createLabel.setVisible(false);
-        createName.setVisible(false);
-        useChoice.setVisible(true);
-        inheritLabel.setVisible(false);
-        inheritName.setVisible(false);
-        inheritChoice.setVisible(false);
+        createBox.setDisable(true);
+        useBox.setDisable(false);
+        inheritBox.setDisable(true);
     }
     @FXML private void onRadioInheritSelect() {
-        createLabel.setVisible(false);
-        createName.setVisible(false);
-        useChoice.setVisible(false);
-        inheritLabel.setVisible(true);
-        inheritName.setVisible(true);
-        inheritChoice.setVisible(true);
+        createBox.setDisable(true);
+        useBox.setDisable(true);
+        inheritBox.setDisable(false);
     }
 
     @Override
     public void beforeShow(Stage stage) {
         radioCreate.fire();
-        createLabel.setVisible(true);
-        createName.setVisible(true);
-        useChoice.setVisible(false);
-        inheritLabel.setVisible(false);
-        inheritName.setVisible(false);
-        inheritChoice.setVisible(false);
+        createBox.setDisable(false);
+        createName.setText("");
+        createName.getStyleClass().remove("error");
+        createError.setVisible(false);
+        useBox.setDisable(true);
         useChoice.getItems().clear();
+        useChoice.getStyleClass().remove("error");
+        useError.setVisible(false);
+        inheritBox.setDisable(true);
+        inheritName.setText("");
+        inheritName.getStyleClass().remove("error");
+        inheritErrorName.setVisible(false);
         inheritChoice.getItems().clear();
+        inheritChoice.getStyleClass().remove("error");
+        inheritErrorSelect.setVisible(false);
         for(LauncherManifest manifest : savesComponents) {
             useChoice.getItems().add(manifest.getName());
             inheritChoice.getItems().add(manifest.getName());
@@ -98,28 +103,38 @@ public class SavesCreatorElement extends UiElement {
             LOGGER.warn("Not ready to create saves!");
             return false;
         }
-        SavesCreator creator;
+        SavesCreator creator = getCreator();
+        if(creator == null) {
+            LOGGER.warn("Could not create saves!");
+            return false;
+        }
+        return creator.getId() != null;
+    }
+
+    public SavesCreator getCreator() {
+        if(!checkCreateReady()) {
+            LOGGER.warn("Not ready to create saves!");
+            return null;
+        }
         if(radioCreate.isSelected()) {
-            creator = new SavesCreator(createName.getText(), typeConversion, savesManifest, gameManifest);
+            return new SavesCreator(createName.getText(), typeConversion, savesManifest, gameManifest);
         } else if(radioUse.isSelected()) {
             LauncherManifest manifest = getSaveFromName(useChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
                 LOGGER.warn("Could not find save from name: " + useChoice.getSelectionModel().getSelectedItem() + "!");
-                return false;
+                return null;
             }
-            creator = new SavesCreator(manifest);
+            return new SavesCreator(manifest);
         } else if(radioInherit.isSelected()) {
             LauncherManifest manifest = getSaveFromName(inheritChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
                 LOGGER.warn("Could not find save from name: " + inheritChoice.getSelectionModel().getSelectedItem() + "!");
-                return false;
+                return null;
             }
-            creator = new SavesCreator(inheritName.getText(), manifest, savesManifest, gameManifest);
-        } else {
-            LOGGER.warn("No radio button selected!");
-            return false;
+            return new SavesCreator(inheritName.getText(), manifest, savesManifest, gameManifest);
         }
-        return creator.getId() != null;
+        LOGGER.warn("No radio button selected!");
+        return null;
     }
 
     private LauncherManifest getSaveFromName(String name) {
@@ -129,6 +144,35 @@ public class SavesCreatorElement extends UiElement {
             }
         }
         return null;
+    }
+
+    public void showError(boolean show) {
+        createError.setVisible(false);
+        createName.getStyleClass().remove("error");
+        useError.setVisible(false);
+        useChoice.getStyleClass().remove("error");
+        inheritErrorName.setVisible(false);
+        inheritName.getStyleClass().remove("error");
+        inheritErrorSelect.setVisible(false);
+        inheritChoice.getStyleClass().remove("error");
+        if(show) {
+            if(radioCreate.isSelected() && createName.getText().isBlank()) {
+                createError.setVisible(true);
+                createName.getStyleClass().add("error");
+            } else if(radioUse.isSelected() && useChoice.getSelectionModel().isEmpty()) {
+                useError.setVisible(true);
+                useChoice.getStyleClass().add("error");
+            } else if(radioInherit.isSelected()) {
+                if(inheritName.getText().isBlank()) {
+                    inheritErrorName.setVisible(true);
+                    inheritName.getStyleClass().add("error");
+                }
+                if(inheritChoice.getSelectionModel().isEmpty()) {
+                    inheritErrorSelect.setVisible(true);
+                    inheritChoice.getStyleClass().add("error");
+                }
+            }
+        }
     }
 
     public boolean checkCreateReady() {

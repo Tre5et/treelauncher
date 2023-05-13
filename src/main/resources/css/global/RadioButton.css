@@ -1,0 +1,36 @@
+.radio-button {
+    -fx-radio-background: -fx-background-secondary;
+    -fx-radio-border: -fx-primary-900;
+    -fx-radio-selected-border: -fx-primary-600;
+    -fx-radio-dot-background: -fx-primary-950;
+    -fx-radio-dot-selected-background: -fx-primary-400;
+}
+
+.radio-button {
+    -fx-font-size: 12pt;
+    -fx-font-style: italic;
+}
+
+.radio-button:selected {
+    -fx-font-weight: 700;
+}
+
+.radio-button > .radio {
+    -fx-background-color: -fx-radio-background;
+    -fx-border-color: -fx-radio-border;
+    -fx-border-width: 2px;
+    -fx-border-radius: 100px;
+}
+
+.radio-button:selected > .radio {
+    -fx-border-color: -fx-radio-selected-border;
+}
+
+.radio-button > .radio > .dot {
+    -fx-background-color: -fx-radio-dot-background;
+}
+
+.radio-button:selected  > .radio > .dot{
+    -fx-background-color: -fx-radio-dot-selected-background;
+    -fx-translate-y: -1px;
+}
