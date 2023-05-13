@@ -3,7 +3,7 @@ package net.treset.minecraftlauncher.data;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.json.GenericJsonParsable;
 import net.treset.mc_version_loader.launcher.*;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +52,7 @@ public class LauncherFiles {
     }
 
     public boolean reloadMainManifest() {
-        String versionFile = FileUtil.loadFile(Config.BASE_DIR + Config.MANIFEST_FILE_NAME);
+        String versionFile = FileUtil.loadFile(LauncherApplication.config.BASE_DIR + LauncherApplication.config.MANIFEST_FILE_NAME);
         if(versionFile == null) {
             LOGGER.warn("Unable to load launcher manifest: file error");
             return false;
@@ -63,7 +63,7 @@ public class LauncherFiles {
             LOGGER.warn("Unable to load launcher manifest: incorrect contents");
             return false;
         }
-        mainManifest.setDirectory(Config.BASE_DIR);
+        mainManifest.setDirectory(LauncherApplication.config.BASE_DIR);
         LOGGER.debug("Loaded launcher manifest");
         return true;
     }
@@ -77,7 +77,7 @@ public class LauncherFiles {
             LOGGER.warn("Unable to load launcher details: invalid main file");
             return false;
         }
-        String detailsFile = FileUtil.loadFile(Config.BASE_DIR + mainManifest.getDetails());
+        String detailsFile = FileUtil.loadFile(LauncherApplication.config.BASE_DIR + mainManifest.getDetails());
         if(detailsFile == null) {
             LOGGER.warn("Unable to load launcher details: file error");
             return false;
@@ -338,7 +338,7 @@ public class LauncherFiles {
     }
 
     public LauncherManifest reloadManifest(String relativePath, LauncherManifestType expectedType) {
-        return reloadManifest(relativePath, Config.MANIFEST_FILE_NAME, expectedType);
+        return reloadManifest(relativePath, LauncherApplication.config.MANIFEST_FILE_NAME, expectedType);
     }
 
     public LauncherManifest reloadManifest(String relativePath, String filename, LauncherManifestType expectedType) {
@@ -346,7 +346,7 @@ public class LauncherFiles {
             LOGGER.warn("Unable to load " + expectedType.name().toLowerCase() + " manifest: invalid configuration");
             return null;
         }
-        String versionFile = FileUtil.loadFile(Config.BASE_DIR + relativePath + "/" + filename);
+        String versionFile = FileUtil.loadFile(LauncherApplication.config.BASE_DIR + relativePath + "/" + filename);
         if(versionFile == null) {
             LOGGER.warn("Unable to load " + expectedType.name().toLowerCase() + " manifest: file error");
             return null;
@@ -356,13 +356,13 @@ public class LauncherFiles {
             LOGGER.warn("Unable to load " + expectedType.name().toLowerCase() + " manifest: incorrect contents");
             return null;
         }
-        out.setDirectory(Config.BASE_DIR + relativePath + "/");
+        out.setDirectory(LauncherApplication.config.BASE_DIR + relativePath + "/");
         LOGGER.debug("Loaded " + expectedType.name().toLowerCase() + " manifest");
         return out;
     }
 
     public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, LauncherManifestType expectedType, String fallbackPath) {
-        return reloadComponents(parentManifest, parentPath, Config.MANIFEST_FILE_NAME, expectedType, fallbackPath);
+        return reloadComponents(parentManifest, parentPath, LauncherApplication.config.MANIFEST_FILE_NAME, expectedType, fallbackPath);
     }
 
     public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, String fallbackPath) {
@@ -372,7 +372,7 @@ public class LauncherFiles {
         }
         List<LauncherManifest> out = new ArrayList<>();
         for(String c : parentManifest.getComponents()) {
-            if(!addComponent(out, Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, c, Config.BASE_DIR + fallbackPath)) {
+            if(!addComponent(out, LauncherApplication.config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, c, LauncherApplication.config.BASE_DIR + fallbackPath)) {
                 LOGGER.warn("Unable to load " + expectedType.name().toLowerCase() + " components: component error: id=" + c);
                 return null;
             }
@@ -406,7 +406,7 @@ public class LauncherFiles {
     }
 
     public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath) {
-        return reloadComponents(parentManifest, parentPath, Config.MANIFEST_FILE_NAME, expectedType, targetClass, fallbackPath);
+        return reloadComponents(parentManifest, parentPath, LauncherApplication.config.MANIFEST_FILE_NAME, expectedType, targetClass, fallbackPath);
     }
 
     public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath) {
@@ -416,7 +416,7 @@ public class LauncherFiles {
         }
         List<Pair<LauncherManifest, T>> out = new ArrayList<>();
         for(String c : parentManifest.getComponents()) {
-            if(!addComponent(out, Config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, targetClass, Config.BASE_DIR + fallbackPath, c)) {
+            if(!addComponent(out, LauncherApplication.config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, targetClass, LauncherApplication.config.BASE_DIR + fallbackPath, c)) {
                 LOGGER.warn("Unable to load " + expectedType.name().toLowerCase() + " components: component error: id=" + c);
                 return null;
             }

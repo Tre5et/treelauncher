@@ -1,7 +1,7 @@
 package net.treset.minecraftlauncher.creation;
 
 import net.treset.mc_version_loader.launcher.*;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +22,7 @@ public class InstanceCreator extends GenericComponentCreator {
     private final VersionCreator versionCreator;
 
     public InstanceCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, List<String> ignoredFiles, List<LauncherLaunchArgument> jvmArguments, List<LauncherFeature> features, ModsCreator modsCreator, OptionsCreator optionsCreator, ResourcepackCreator resourcepackCreator, SavesCreator savesCreator, VersionCreator versionCreator) {
-        super(LauncherManifestType.INSTANCE_COMPONENT, null, null, name, typeConversion, Config.INSTANCE_DEFAULT_INCLUDED_FILES, Config.INSTANCE_DEFAULT_DETAILS, componentsManifest);
+        super(LauncherManifestType.INSTANCE_COMPONENT, null, null, name, typeConversion, LauncherApplication.config.INSTANCE_DEFAULT_INCLUDED_FILES, LauncherApplication.config.INSTANCE_DEFAULT_DETAILS, componentsManifest);
         this.ignoredFiles = ignoredFiles;
         this.jvmArguments = jvmArguments;
         this.features = features;
@@ -45,13 +45,13 @@ public class InstanceCreator extends GenericComponentCreator {
         }
 
         ArrayList<LauncherFeature> features = new ArrayList<>(this.features);
-        features.addAll(Config.INSTANCE_DEFAULT_FEATURES);
+        features.addAll(LauncherApplication.config.INSTANCE_DEFAULT_FEATURES);
 
         ArrayList<String> ignoredFiles = new ArrayList<>(this.ignoredFiles);
-        ignoredFiles.addAll(Config.INSTANCE_DEFAULT_IGNORED_FILES);
+        ignoredFiles.addAll(LauncherApplication.config.INSTANCE_DEFAULT_IGNORED_FILES);
 
         ArrayList<LauncherLaunchArgument> jvmArguments = new ArrayList<>(this.jvmArguments);
-        jvmArguments.addAll(Config.INSTANCE_DEFAULT_JVM_ARGUMENTS);
+        jvmArguments.addAll(LauncherApplication.config.INSTANCE_DEFAULT_JVM_ARGUMENTS);
 
         LauncherInstanceDetails details = new LauncherInstanceDetails(
                 features,

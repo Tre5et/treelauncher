@@ -1,6 +1,5 @@
 package net.treset.minecraftlauncher.util;
 
-import net.treset.minecraftlauncher.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

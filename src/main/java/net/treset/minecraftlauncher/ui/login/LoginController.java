@@ -6,9 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.config.Config;
-import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import net.treset.minecraftlauncher.ui.MainController;
+import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,7 +41,7 @@ public class LoginController extends GenericUiController {
 
     @Override
     public void afterShow(Stage stage) {
-        if(Config.AUTH_FILE.isFile()) {
+        if(LauncherApplication.config.AUTH_FILE.isFile()) {
             triggerLogin(false);
         }
     }
@@ -50,7 +49,7 @@ public class LoginController extends GenericUiController {
     private void triggerLogin(boolean ignoreFile) {
         loginButton.setDisable(true);
         statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
-        new Thread(() -> LauncherApplication.userAuth.authenticate(Config.AUTH_FILE, ignoreFile, this::onLoginDone)).start();
+        new Thread(() -> LauncherApplication.userAuth.authenticate(LauncherApplication.config.AUTH_FILE, ignoreFile, this::onLoginDone)).start();
     }
 
     private void onLoginDone(Boolean success) {

@@ -2,7 +2,7 @@ package net.treset.minecraftlauncher.data;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.*;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -147,9 +147,9 @@ public class InstanceData {
                 resourcepacksComponent,
                 savesComponent,
                 modsComponent,
-                Config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/",
-                Config.BASE_DIR + files.getLauncherDetails().getAssetsDir() + "/",
-                Config.BASE_DIR + files.getLauncherDetails().getLibrariesDir() + "/",
+                LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/",
+                LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getAssetsDir() + "/",
+                LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir() + "/",
                 files.getModsManifest().getPrefix(),
                 files.getSavesManifest().getPrefix(),
                 gameDataExcludedFiles

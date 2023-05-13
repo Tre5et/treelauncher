@@ -2,7 +2,7 @@ package net.treset.minecraftlauncher.creation;
 
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
@@ -125,7 +125,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             LOGGER.warn("Unable to copy files: invalid parameters");
             return false;
         }
-        if(!FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(Config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING)) {
+        if(!FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING)) {
             LOGGER.warn("Unable to copy files: unable to copy files");
             return false;
         }
@@ -139,8 +139,8 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             return false;
         }
         newManifest.setDirectory(componentsManifest.getDirectory() + componentsManifest.getPrefix() + "_" + newManifest.getId() + "/");
-        if(!newManifest.writeToFile(newManifest.getDirectory() + Config.MANIFEST_FILE_NAME)) {
-            LOGGER.warn("Unable to write manifest: unable to write manifest to file: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + Config.MANIFEST_FILE_NAME);
+        if(!newManifest.writeToFile(newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
+            LOGGER.warn("Unable to write manifest: unable to write manifest to file: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
             return false;
         }
         ArrayList<String> components = new ArrayList<>(componentsManifest.getComponents());
@@ -151,12 +151,12 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             return false;
         }
         if(newManifest.getIncludedFiles() != null) {
-            if(!FileUtil.createDir(newManifest.getDirectory() + Config.INCLUDED_FILES_DIR)) {
-                LOGGER.warn("Unable to write manifest: unable to create included files directory: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + Config.INCLUDED_FILES_DIR);
+            if(!FileUtil.createDir(newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR)) {
+                LOGGER.warn("Unable to write manifest: unable to create included files directory: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
                 return false;
             }
         }
-        LOGGER.debug("Wrote manifest: path={}", newManifest.getDirectory() + Config.MANIFEST_FILE_NAME);
+        LOGGER.debug("Wrote manifest: path={}", newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
         return true;
     }
 
@@ -190,7 +190,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
     }
 
     protected String getParentManifestFileName() {
-        return Config.MANIFEST_FILE_NAME;
+        return LauncherApplication.config.MANIFEST_FILE_NAME;
     }
 
     public String getManifestType(LauncherManifestType type, Map<String, LauncherManifestType> typeConversion) {

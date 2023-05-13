@@ -2,7 +2,7 @@ package net.treset.minecraftlauncher.launching;
 
 import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
@@ -98,7 +98,7 @@ public class ResourceManager {
             return false;
         }
 
-        if(!removeIncludedFiles(List.of(instanceData.getSavesComponent(), instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList)) {
+        if(!removeIncludedFiles(List.of(instanceData.getSavesComponent()), gameDataFilesList)) {
             LOGGER.warn("Unable to cleanup launch resources: unable to remove save included files");
             return false;
         }
@@ -167,7 +167,7 @@ public class ResourceManager {
             return false;
         }
         if(manifest.getIncludedFiles() != null) {
-            File includedFilesDir = new File(manifest.getDirectory() + Config.INCLUDED_FILES_DIR);
+            File includedFilesDir = new File(manifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
             if(!includedFilesDir.isDirectory()) {
                 LOGGER.warn("Unable to move included files: folder doesn't exist: manifestId=" + manifest.getId());
                 return false;
@@ -237,7 +237,7 @@ public class ResourceManager {
     private boolean removeExcludedFiles(ArrayList<File> files) {
         List<File> toRemove = new ArrayList<>();
         for(File f : files) {
-            if(f.getName().equals(Config.MANIFEST_FILE_NAME) || FormatUtil.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
+            if(f.getName().equals(LauncherApplication.config.MANIFEST_FILE_NAME) || FormatUtil.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
                 toRemove.add(f);
             }
         }
@@ -259,7 +259,7 @@ public class ResourceManager {
     }
 
     private boolean removeIncludedFiles(LauncherManifest component, ArrayList<File> files) {
-        File includedFilesDir = new File(component.getDirectory() + Config.INCLUDED_FILES_DIR);
+        File includedFilesDir = new File(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             if(!FileUtil.deleteDir(includedFilesDir)) {
                 LOGGER.warn("Unable to remove included files: unable to delete included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId());
@@ -277,7 +277,7 @@ public class ResourceManager {
             for(String i : component.getIncludedFiles()) {
                 if(FormatUtils.matches(fName, i)) {
                     try {
-                        Files.move(Path.of(f.getPath()), Path.of(component.getDirectory() + Config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                        Files.move(Path.of(f.getPath()), Path.of(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
                         LOGGER.warn("Unable to remove included file: file=" + f.getAbsolutePath(), e);
                         return false;
@@ -295,7 +295,7 @@ public class ResourceManager {
     }
 
     private boolean removeRemainingFiles(ArrayList<File> files) {
-        File includedFilesDir = new File(instanceData.getInstance().getKey().getDirectory() + Config.INCLUDED_FILES_DIR);
+        File includedFilesDir = new File(instanceData.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             if(!FileUtil.deleteDir(includedFilesDir)) {
                 LOGGER.warn("Unable to cleanup launch resources: unable to delete instance included files directory");
@@ -317,7 +317,7 @@ public class ResourceManager {
             }
             else {
                 try {
-                    Files.move(Path.of(f.getPath()), Path.of(instanceData.getInstance().getKey().getDirectory() + Config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(Path.of(f.getPath()), Path.of(instanceData.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     LOGGER.warn("Unable to cleanup launch resources: unable to move file: " + f.getPath(), e);
                     return false;

@@ -2,7 +2,7 @@ package net.treset.minecraftlauncher.creation;
 
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ public class SavesCreator extends GenericComponentCreator {
     private LauncherManifest gameManifest;
 
     public SavesCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, LauncherManifest gameManifest) {
-        super(LauncherManifestType.SAVES_COMPONENT, null, null, name, typeConversion, Config.SAVES_DEFAULT_INCLUDED_FILES, null, componentsManifest);
+        super(LauncherManifestType.SAVES_COMPONENT, null, null, name, typeConversion, LauncherApplication.config.SAVES_DEFAULT_INCLUDED_FILES, null, componentsManifest);
         this.gameManifest = gameManifest;
     }
 

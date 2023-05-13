@@ -14,7 +14,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
 import net.treset.mc_version_loader.minecraft.*;
-import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,14 +33,14 @@ public class VersionCreator extends GenericComponentCreator {
     LauncherFiles files;
     String librariesDir;
     public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, MinecraftVersionDetails mcVersion, LauncherFiles files, String librariesDir) {
-        super(LauncherManifestType.VERSION_COMPONENT, null, null, mcVersion.getId(), typeConversion, null, Config.VERSION_DEFAULT_DETAILS, componentsManifest);
+        super(LauncherManifestType.VERSION_COMPONENT, null, null, mcVersion.getId(), typeConversion, null, LauncherApplication.config.VERSION_DEFAULT_DETAILS, componentsManifest);
         this.mcVersion = mcVersion;
         this.files = files;
         this.librariesDir = librariesDir;
     }
 
     public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, FabricVersionDetails fabricVersion, FabricProfile fabricProfile, LauncherFiles files, String librariesDir) {
-        super(LauncherManifestType.VERSION_COMPONENT, null, null, fabricProfile.getId(), typeConversion, null, Config.VERSION_DEFAULT_DETAILS, componentsManifest);
+        super(LauncherManifestType.VERSION_COMPONENT, null, null, fabricProfile.getId(), typeConversion, null, LauncherApplication.config.VERSION_DEFAULT_DETAILS, componentsManifest);
         this.fabricVersion = fabricVersion;
         this.fabricProfile = fabricProfile;
         this.files = files;
@@ -164,7 +164,7 @@ public class VersionCreator extends GenericComponentCreator {
             LOGGER.warn("Failed to add fabric file: failed to download fabric loader");
             return false;
         }
-        details.setMainFile(Config.FABRIC_DEFAULT_CLIENT_FILENAME);
+        details.setMainFile(LauncherApplication.config.FABRIC_DEFAULT_CLIENT_FILENAME);
         LOGGER.debug("Added fabric file: mainFile={}", details.getMainFile());
         return true;
     }
@@ -197,8 +197,8 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private boolean addFabricArguments(LauncherVersionDetails details) {
-        details.setJvmArguments(translateArguments(fabricProfile.getLaunchArguments().getJvm(), Config.FABRIC_DEFAULT_JVM_ARGUMENTS));
-        details.setGameArguments(translateArguments(fabricProfile.getLaunchArguments().getGame(), Config.FABRIC_DEFAULT_GAME_ARGUMENTS));
+        details.setJvmArguments(translateArguments(fabricProfile.getLaunchArguments().getJvm(), LauncherApplication.config.FABRIC_DEFAULT_JVM_ARGUMENTS));
+        details.setGameArguments(translateArguments(fabricProfile.getLaunchArguments().getGame(), LauncherApplication.config.FABRIC_DEFAULT_GAME_ARGUMENTS));
         if(details.getJvmArguments() == null || details.getGameArguments() == null) {
             LOGGER.warn("Failed to add fabric arguments to version");
             return false;
@@ -317,8 +317,8 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private boolean addArguments(LauncherVersionDetails details) {
-        details.setGameArguments(translateArguments(mcVersion.getLaunchArguments().getGame(), Config.MINECRAFT_DEFAULT_GAME_ARGUMENTS));
-        details.setJvmArguments(translateArguments(mcVersion.getLaunchArguments().getJvm(), Config.MINECRAFT_DEFAULT_JVM_ARGUMENTS));
+        details.setGameArguments(translateArguments(mcVersion.getLaunchArguments().getGame(), LauncherApplication.config.MINECRAFT_DEFAULT_GAME_ARGUMENTS));
+        details.setJvmArguments(translateArguments(mcVersion.getLaunchArguments().getJvm(), LauncherApplication.config.MINECRAFT_DEFAULT_JVM_ARGUMENTS));
         if(details.getGameArguments() == null || details.getJvmArguments() == null) {
             LOGGER.warn("Failed to add arguments to version");
             return false;

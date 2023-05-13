@@ -43,3 +43,8 @@ shadowJar {
 tasks.test {
     useJUnitPlatform()
 }
+
+run {
+    systemProperties['launcher.path'] = 'D:/Hannes/Coding/gits/minecraft-launcher/launcher_mockup/'
+    systemProperties['launcher.debug'] = 'true'
+}
