@@ -39,7 +39,12 @@ public class InstanceSelectorElement extends UiElement {
     public void init(Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(lockSetter, lockGetter);
         files = new LauncherFiles();
+        reloadComponents();
+    }
+
+    public void reloadComponents() {
         files.reloadAll();
+        instances = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> instance : files.getInstanceComponents()) {
             try {
                 instances.add(SelectorEntryElement.from(InstanceData.of(instance, files)));
@@ -47,6 +52,7 @@ public class InstanceSelectorElement extends UiElement {
                 throw new RuntimeException(e);
             }
         }
+        instanceContainer.getChildren().clear();
         for(Pair<SelectorEntryElement, GridPane> instance : instances) {
             instanceContainer.getChildren().add(instance.getValue());
             instance.getKey().setSelectionAccepted(this::allowSelection);
@@ -56,6 +62,7 @@ public class InstanceSelectorElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
+        reloadComponents();
         for(Pair<SelectorEntryElement, GridPane> instance : instances) {
             instance.getKey().beforeShow(stage);
         }

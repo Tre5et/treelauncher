@@ -31,8 +31,6 @@ public class InstanceCreator extends GenericComponentCreator {
         this.resourcepackCreator = resourcepackCreator;
         this.savesCreator = savesCreator;
         this.versionCreator = versionCreator;
-
-        // TODO: cleanup on fail
     }
 
 
@@ -61,11 +59,13 @@ public class InstanceCreator extends GenericComponentCreator {
                 jvmArguments,
                 null, null, null, null, null);
 
-        details.setModsComponent(modsCreator.getId());
-        if(details.getModsComponent() == null) {
-            LOGGER.warn("Failed to create instance component: failed to create mods component");
-            attemptCleanup();
-            return null;
+        if(modsCreator != null) {
+            details.setModsComponent(modsCreator.getId());
+            if (details.getModsComponent() == null) {
+                LOGGER.warn("Failed to create instance component: failed to create mods component");
+                attemptCleanup();
+                return null;
+            }
         }
 
         details.setOptionsComponent(optionsCreator.getId());
@@ -124,7 +124,7 @@ public class InstanceCreator extends GenericComponentCreator {
     protected boolean attemptCleanup() {
         boolean success = super.attemptCleanup();
         success &= optionsCreator.attemptCleanup();
-        success &= modsCreator.attemptCleanup();
+        success &= modsCreator == null || modsCreator.attemptCleanup();
         success &= savesCreator.attemptCleanup();
         success &= versionCreator.attemptCleanup();
         success &= resourcepackCreator.attemptCleanup();

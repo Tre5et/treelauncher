@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.ui.instance;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.data.InstanceData;
@@ -14,6 +15,7 @@ public class InstanceDetailsElement extends UiElement {
     @FXML public Label resourcepacksName;
     @FXML public Label optionsName;
     @FXML public Label modsName;
+    @FXML private GridPane modsContainer;
 
     public void setVisible(boolean visible) {
         container.setVisible(visible);
@@ -30,10 +32,10 @@ public class InstanceDetailsElement extends UiElement {
         resourcepacksName.setText(instanceData.getResourcepacksComponent().getName());
         optionsName.setText(instanceData.getOptionsComponent().getName());
         if(instanceData.getModsComponent() != null) {
-            modsName.setVisible(true);
+            modsContainer.setVisible(true);
             modsName.setText(instanceData.getModsComponent().getKey().getName());
         } else {
-            modsName.setVisible(false);
+            modsContainer.setVisible(false);
         }
     }
 

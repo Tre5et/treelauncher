@@ -30,9 +30,16 @@ public class ResourceManager {
     }
 
     public boolean prepareResources() {
-        if(!addIncludedFiles(List.of(instanceData.getInstance().getKey(), instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent(), instanceData.getSavesComponent(), instanceData.getModsComponent().getKey()))) {
+        if(!addIncludedFiles(List.of(instanceData.getInstance().getKey(), instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent(), instanceData.getSavesComponent()))) {
             LOGGER.warn("Unable to prepare launch resources: included files copy failed");
             return false;
+        }
+
+        if(instanceData.getModsComponent() != null) {
+            if(!addIncludedFiles(List.of(instanceData.getModsComponent().getKey()))) {
+                LOGGER.warn("Unable to prepare launch resources: included files copy failed");
+                return false;
+            }
         }
 
         if(!renameComponents()) {
@@ -91,7 +98,18 @@ public class ResourceManager {
             return false;
         }
 
-        if(!removeIncludedFiles(List.of(instanceData.getSavesComponent(), instanceData.getModsComponent().getKey(), instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList)) {
+        if(!removeIncludedFiles(List.of(instanceData.getSavesComponent(), instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList)) {
+            LOGGER.warn("Unable to cleanup launch resources: unable to remove save included files");
+            return false;
+        }
+
+        if(instanceData.getModsComponent() != null) {
+            if(!removeIncludedFiles(List.of(instanceData.getModsComponent().getKey()), gameDataFilesList)) {
+                LOGGER.warn("Unable to cleanup launch resources: unable to remove mods included files");
+                return false;
+            }
+        }
+        if(!removeIncludedFiles(List.of(instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList)) {
             LOGGER.warn("Unable to cleanup launch resources: unable to remove included files");
             return false;
         }

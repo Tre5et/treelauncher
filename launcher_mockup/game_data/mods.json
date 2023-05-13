@@ -3,6 +3,7 @@
   "prefix": "mods",
   "components": [
     "test1",
-    "4cfc2d4b8e52cb415673887f1ba3e39adb43f0b2"
+    "4cfc2d4b8e52cb415673887f1ba3e39adb43f0b2",
+    "ba625d06e535ee1ae77f0b56e932ca0531d50848"
   ]
 }
