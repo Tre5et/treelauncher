@@ -2,9 +2,15 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<AnchorPane fx:id="rootPane" prefHeight="48" styleClass="element" stylesheets="@/css/title/Titlebar.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.title.TitlebarElement">
-   <HBox alignment="BOTTOM_CENTER" prefHeight="48.0" styleClass="title-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<VBox fx:id="rootPane" onMousePressed="#onMousePressed" onMouseDragged="#onMouseDragged" prefHeight="68" styleClass="element" stylesheets="@/css/title/Titlebar.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.title.TitlebarElement">
+   <HBox alignment="TOP_RIGHT" prefHeight="20">
+      <FontIcon fx:id="minimizeButton" onMouseClicked="#onMinimizeButtonClicked" styleClass="title-button" iconLiteral="mdmz-minimize:20" />
+      <FontIcon fx:id="maximizeButton" onMouseClicked="#onMaximizeButtonClicked" styleClass="title-button" iconLiteral="mdoal-fullscreen:20" />
+      <FontIcon fx:id="closeButton" onMouseClicked="#onCloseButtonClicked" styleClass="title-button" iconLiteral="mdal-close:20" />
+   </HBox>
+   <HBox alignment="BOTTOM_CENTER" prefHeight="48.0" styleClass="title-container">
       <Label alignment="BOTTOM_CENTER" contentDisplay="BOTTOM" styleClass="title" text="%launcher.name" textAlignment="CENTER" />
    </HBox>
-</AnchorPane>
+</VBox>

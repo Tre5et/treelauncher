@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
+import net.treset.minecraftlauncher.ui.title.TitlebarElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,12 +18,10 @@ import java.io.IOException;
 public class LoginController extends GenericUiController {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
-    @FXML
-    public Button loginButton;
-    @FXML
-    public Button continueButton;
-    @FXML
-    public Label statusLabel;
+    @FXML private TitlebarElement titlebarController;
+    @FXML private Button loginButton;
+    @FXML private Button continueButton;
+    @FXML private Label statusLabel;
     public int loginRetry = 0;
 
     @FXML
@@ -40,10 +39,17 @@ public class LoginController extends GenericUiController {
     }
 
     @Override
+    public void beforeShow(Stage stage) {
+        super.beforeShow(stage);
+        titlebarController.beforeShow(stage);
+    }
+
+    @Override
     public void afterShow(Stage stage) {
         if(LauncherApplication.config.AUTH_FILE.isFile()) {
             triggerLogin(false);
         }
+        titlebarController.afterShow(stage);
     }
 
     private void triggerLogin(boolean ignoreFile) {

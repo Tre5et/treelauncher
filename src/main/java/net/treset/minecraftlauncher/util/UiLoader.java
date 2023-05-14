@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.util;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
@@ -31,7 +32,10 @@ public class UiLoader {
         Parent root = loadFXML(loader);
 
         stage.setTitle(LauncherApplication.stringLocalizer.getFormatted(title, args));
-        stage.setScene(new Scene(root));
-        return loader.getController();
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        stage.setScene(scene);
+        T controller = loader.getController();
+        return controller;
     }
 }

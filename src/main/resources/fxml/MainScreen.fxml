@@ -10,7 +10,7 @@
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints maxHeight="48.0" minHeight="48.0" prefHeight="48.0" vgrow="NEVER" />
+        <RowConstraints maxHeight="68.0" minHeight="68.0" prefHeight="48.0" vgrow="NEVER" />
         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="48.0" minHeight="48.0" prefHeight="48.0" valignment="CENTER" vgrow="NEVER" />
     </rowConstraints>

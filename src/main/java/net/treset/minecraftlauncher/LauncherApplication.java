@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
@@ -74,6 +75,8 @@ public class LauncherApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         System.setProperty("prism.lcdtext", "false");
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+
         LoginController.showOnStage(primaryStage);
     }
 }

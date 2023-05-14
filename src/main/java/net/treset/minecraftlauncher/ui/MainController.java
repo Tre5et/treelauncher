@@ -22,11 +22,20 @@ public class MainController extends GenericUiController {
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         titlebarController.init(this::setLocked, this::getLocked);
+        titlebarController.beforeShow(stage);
         navbarController.init(this::setLocked, this::getLocked);
         navbarController.setComponentActivator(this::activate);
+        navbarController.beforeShow(stage);
         instanceSelectorController.init(this::setLocked, this::getLocked);
         instanceCreatorController.init(this::setLocked, this::getLocked);
         activate(Component.INSTANCE_SELECTOR);
+    }
+
+    @Override
+    public void afterShow(Stage stage) {
+        super.afterShow(stage);
+        titlebarController.afterShow(stage);
+        navbarController.afterShow(stage);
     }
 
     public static MainController showOnStage(Stage stage) throws IOException {

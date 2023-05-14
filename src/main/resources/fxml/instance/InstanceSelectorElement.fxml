@@ -2,32 +2,32 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-<SplitPane fx:id="rootPane" styleClass="element-root" visible="false" dividerPositions="0.33, 0.66" GridPane.rowIndex="1" stylesheets="@/css/instance/InstanceSelector.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceSelectorElement">
-    <AnchorPane styleClass="element">
-        <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<SplitPane fx:id="rootPane" dividerPositions="0.33, 0.66" styleClass="element-root" stylesheets="@/css/instance/InstanceSelector.css" visible="false" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceSelectorElement">
+    <AnchorPane minWidth="-Infinity" styleClass="element">
+        <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" styleClass="title-container">
-                <Label styleClass="title" text="%instances.label.title"/>
+                <Label styleClass="title" text="%instances.label.title" />
             </VBox>
-            <ScrollPane fitToHeight="true" fitToWidth="true">
+            <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
                 <VBox fx:id="instanceContainer" alignment="TOP_CENTER">
                 </VBox>
             </ScrollPane>
         </VBox>
     </AnchorPane>
-    <AnchorPane fx:id="detailsPane" prefHeight="200.0" prefWidth="200.0" styleClass="element">
-        <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
+        <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <HBox alignment="CENTER_LEFT" styleClass="title-container">
-                <Button fx:id="playButton" disable="true" styleClass="invisible" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onPlayButtonClicked">
+                <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onPlayButtonClicked" styleClass="invisible">
                     <graphic>
-                        <FontIcon iconLiteral="mdomz-play_arrow:48" styleClass="icon"/>
+                        <FontIcon iconLiteral="mdomz-play_arrow:48" styleClass="icon" />
                     </graphic>
                 </Button>
-                <Label fx:id="instanceDetailsTitle" styleClass="title, disabled" text="%instances.label.details.title"/>
+                <Label fx:id="instanceDetailsTitle" styleClass="title, disabled" text="%instances.label.details.title" />
             </HBox>
-            <ScrollPane fitToHeight="true" fitToWidth="true">
-                <fx:include fx:id="instanceDetails" source="InstanceDetailsElement.fxml"/>
+            <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
+                <fx:include fx:id="instanceDetails" source="InstanceDetailsElement.fxml" />
             </ScrollPane>
         </VBox>
     </AnchorPane>

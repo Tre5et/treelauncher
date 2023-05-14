@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<VBox fx:id="container" prefHeight="400.0" prefWidth="400.0" stylesheets="@/css/instance/InstanceDetails.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceDetailsElement">
-    <AnchorPane styleClass="details-container">
-        <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
+<VBox fx:id="container" minWidth="-Infinity" stylesheets="@/css/instance/InstanceDetails.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceDetailsElement">
+    <AnchorPane minWidth="-Infinity" styleClass="details-container">
+        <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -25,8 +25,8 @@
                     <Insets left="5.0" right="5.0" />
                 </GridPane.margin>
             </FontIcon>
-            <Label styleClass="element-title" text="%instances.details.label.version" GridPane.columnIndex="1" />
-            <Label fx:id="versionName" styleClass="element-details" text="Version Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label minWidth="-Infinity" styleClass="element-title" text="%instances.details.label.version" GridPane.columnIndex="1" />
+            <Label fx:id="versionName" minWidth="-Infinity" styleClass="element-details" text="Version Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         </GridPane>
     </AnchorPane>
     <AnchorPane styleClass="details-container">

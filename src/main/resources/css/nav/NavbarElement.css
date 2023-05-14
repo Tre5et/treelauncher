@@ -1,6 +1,11 @@
 .navbar {
     -fx-translate-z: -1;
     -fx-background-color: -fx-background-secondary;
+    -fx-background-radius: 10px;
+}
+
+.element {
+    -fx-background-color: transparent;
 }
 
 .navbar-cluster {
