@@ -1,0 +1,13 @@
+.element {
+    -fx-padding: 0;
+    -fx-background-color: linear-gradient(-fx-background-secondary, -fx-primary-400 70%);
+}
+
+.title {
+    -fx-font-size: 24pt;
+}
+
+.title-container {
+    -fx-background-image: url("/img/banner.png");
+    -fx-background-position: center center;
+}

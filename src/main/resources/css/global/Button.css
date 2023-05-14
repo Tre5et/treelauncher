@@ -23,6 +23,7 @@
     -fx-border-radius: 5px;
     -fx-icon-color: -fx-button-text;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -fx-drop-shadow, 5, 0.5, 2, 2);
 }
 
 .button:hover {
@@ -37,6 +38,7 @@
     -fx-background-color: -fx-button-active-background;
     -fx-text-fill: -fx-button-active-text;
     -fx-icon-color: -fx-button-active-text;
+    -fx-effect: none
 }
 
 .button:disabled {
@@ -44,6 +46,7 @@
     -fx-background-color: -fx-button-disabled-background;
     -fx-text-fill: -fx-button-disabled-text;
     -fx-opacity: 0.5;
+    -fx-effect: none;
 }
 
 .button > .button-icon {

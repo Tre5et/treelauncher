@@ -4,19 +4,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="element" minHeight="-Infinity" onMouseClicked="#onElementClicked" styleClass="element-container" stylesheets="@/css/generic/SelectorEntryElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.generic.SelectorEntryElement">
-   <columnConstraints>
-      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
-   </rowConstraints>
-   <children>
-      <Label fx:id="title" styleClass="element-title" text="Instance Name" />
-      <Label fx:id="details" styleClass="element-details" text="Instance-Details" GridPane.rowIndex="1" />
-   </children>
-   <cursor>
-      <Cursor fx:constant="HAND" />
-   </cursor>
-</GridPane>
+<AnchorPane fx:id="entryRoot" styleClass="element-root" stylesheets="@/css/generic/SelectorEntryElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.generic.SelectorEntryElement">
+   <GridPane fx:id="entryContainer" minHeight="-Infinity" onMouseClicked="#onElementClicked" styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <columnConstraints>
+         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
+      </rowConstraints>
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor>
+      <Label fx:id="title" styleClass="element-title" text="Instance Name" GridPane.fillWidth="true" />
+      <Label fx:id="details" styleClass="element-details" text="Instance-Details" GridPane.fillWidth="true" GridPane.rowIndex="1" />
+   </GridPane>
+</AnchorPane>

@@ -3,8 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox fx:id="rootPane" alignment="TOP_CENTER" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.InstanceCreatorElement">
-    <ScrollPane fx:id="scrollContainer" minWidth="-Infinity">
+<HBox fx:id="rootPane" styleClass="element-root" alignment="TOP_CENTER" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.InstanceCreatorElement">
+    <ScrollPane fx:id="scrollContainer" styleClass="element" minWidth="-Infinity">
         <GridPane alignment="TOP_CENTER">
             <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" />

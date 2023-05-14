@@ -1,22 +1,9 @@
-.split-pane-element-left {
-    -fx-padding: 10px;
-    -fx-border-width: 1px 1px 1px 0;
-    -fx-border-color: -fx-primary-950;
-    -fx-border-radius: 5px;
-}
-.split-pane-element-center {
-    -fx-padding: 10px;
-    -fx-border-width: 1px 1px 1px 1px;
-    -fx-border-color: -fx-primary-950;
-    -fx-border-radius: 5px;
-}
-.split-pane-element-right {
-    -fx-padding: 10px;
-    -fx-border-width: 1px 0 1px 1px;
-    -fx-border-color: -fx-primary-950;
-    -fx-border-radius: 5px;
+.split-pane {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
 }
 
 .split-pane > .split-pane-divider {
-    -fx-background-color: -fx-background-secondary;
+    -fx-background-color: transparent;
+    -fx-cursor: default;
 }

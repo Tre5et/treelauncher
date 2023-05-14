@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -32,7 +32,7 @@ public class InstanceSelectorElement extends UiElement {
     @FXML public InstanceDetailsElement instanceDetailsController;
 
     private LauncherFiles files;
-    private List<Pair<SelectorEntryElement, GridPane>> instances = new ArrayList<>();
+    private List<Pair<SelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
     private InstanceData currentInstance;
 
     @Override
@@ -53,7 +53,7 @@ public class InstanceSelectorElement extends UiElement {
             }
         }
         instanceContainer.getChildren().clear();
-        for(Pair<SelectorEntryElement, GridPane> instance : instances) {
+        for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
             instanceContainer.getChildren().add(instance.getValue());
             instance.getKey().setSelectionAccepted(this::allowSelection);
             instance.getKey().setSelectionListeners(List.of(this::onSelected));
@@ -63,13 +63,13 @@ public class InstanceSelectorElement extends UiElement {
     @Override
     public void beforeShow(Stage stage) {
         reloadComponents();
-        for(Pair<SelectorEntryElement, GridPane> instance : instances) {
+        for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
             instance.getKey().beforeShow(stage);
         }
     }
     @Override
     public void afterShow(Stage stage) {
-        for(Pair<SelectorEntryElement, GridPane> instance : instances) {
+        for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
             instance.getKey().afterShow(stage);
         }
     }
@@ -81,7 +81,7 @@ public class InstanceSelectorElement extends UiElement {
 
     private void onSelected(InstanceData instanceData, boolean selected) {
         if(selected) {
-            for(Pair<SelectorEntryElement, GridPane> instance : instances) {
+            for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
                 if(instance.getKey().getInstanceData() != instanceData) {
                     instance.getKey().select(false, true, false);
                 }

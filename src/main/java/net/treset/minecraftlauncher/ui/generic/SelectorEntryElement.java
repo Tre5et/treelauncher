@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.ui.generic;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -18,12 +19,10 @@ import java.util.function.BiFunction;
 
 public class SelectorEntryElement extends UiElement {
 
-    @FXML
-    public GridPane element;
-    @FXML
-    public Label title;
-    @FXML
-    public Label details;
+    @FXML private AnchorPane entryRoot;
+    @FXML private GridPane entryContainer;
+    @FXML private Label title;
+    @FXML private Label details;
 
     private boolean selected = false;
     private InstanceData instanceData;
@@ -32,27 +31,17 @@ public class SelectorEntryElement extends UiElement {
 
     @FXML
     public void onElementClicked() {
-        if(selectionAccepted.apply(instanceData, !selected)) {
-            if(!selected) {
-                title.getStyleClass().add("selected");
-                details.getStyleClass().add("selected");
-            } else {
-                title.getStyleClass().remove("selected");
-                details.getStyleClass().remove("selected");
-            }
-            for (BiConsumer<InstanceData, Boolean> selectionListener : selectionListeners) {
-                selectionListener.accept(instanceData, !selected);
-            }
-            selected = !selected;
-        }
+        select(!selected, false, true);
     }
 
     public boolean select(boolean select, boolean force, boolean callback) {
         if(selected != select && (force || selectionAccepted.apply(instanceData, select))) {
             if(select) {
+                entryContainer.getStyleClass().add("selected");
                 title.getStyleClass().add("selected");
                 details.getStyleClass().add("selected");
             } else {
+                entryContainer.getStyleClass().remove("selected");
                 title.getStyleClass().remove("selected");
                 details.getStyleClass().remove("selected");
             }
@@ -109,9 +98,9 @@ public class SelectorEntryElement extends UiElement {
         this.selectionListeners.add(selectionListener);
     }
 
-    public static Pair<SelectorEntryElement, GridPane> from(InstanceData instanceData) throws IOException {
+    public static Pair<SelectorEntryElement, AnchorPane> from(InstanceData instanceData) throws IOException {
         FXMLLoader loader = UiLoader.getFXMLLoader("generic/SelectorEntryElement");
-        GridPane element = UiLoader.loadFXML(loader);
+        AnchorPane element = UiLoader.loadFXML(loader);
         SelectorEntryElement listElementController = loader.getController();
         listElementController.setInstanceData(instanceData);
         return new Pair<>(listElementController, element);
@@ -119,6 +108,6 @@ public class SelectorEntryElement extends UiElement {
 
     @Override
     public void setRootVisible(boolean visible) {
-        element.setVisible(visible);
+        entryRoot.setVisible(visible);
     }
 }

@@ -3,8 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane fx:id="rootPane" prefHeight="48" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="net.treset.minecraftlauncher.ui.title.TitlebarElement">
-   <Label styleClass="title" text="%launcher.name"/>
+<AnchorPane fx:id="rootPane" prefHeight="48" styleClass="element" stylesheets="@/css/title/Titlebar.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.title.TitlebarElement">
+   <HBox alignment="BOTTOM_CENTER" prefHeight="48.0" styleClass="title-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Label alignment="BOTTOM_CENTER" contentDisplay="BOTTOM" styleClass="title" text="%launcher.name" textAlignment="CENTER" />
+   </HBox>
 </AnchorPane>

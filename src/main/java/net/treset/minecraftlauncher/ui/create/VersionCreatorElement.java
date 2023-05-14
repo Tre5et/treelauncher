@@ -73,6 +73,12 @@ public class VersionCreatorElement extends UiElement {
     public void beforeShow(Stage stage) {
         typeContainer.setVisible(false);
         loaderContainer.setVisible(false);
+        errorVersion.setVisible(false);
+        errorType.setVisible(false);
+        errorLoader.setVisible(false);
+        versionChoice.getStyleClass().remove("error");
+        typeChoice.getStyleClass().remove("error");
+        loaderChoice.getStyleClass().remove("error");
         populateVersionChoice();
         versionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(this::updateTypeState);

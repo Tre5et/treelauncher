@@ -70,6 +70,8 @@ public class InstanceCreatorElement extends UiElement {
         scrollContainer.setVvalue(0);
         launcherFiles = new LauncherFiles();
         launcherFiles.reloadAll();
+        nameError.setVisible(false);
+        nameInput.getStyleClass().remove("error");
         versionCreatorController.setPrerequisites(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
         savesCreatorController.setPrerequisites(launcherFiles.getSavesComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getSavesManifest(), launcherFiles.getGameDetailsManifest());
         resourcepacksCreatorController.setPrerequisites(launcherFiles.getResourcepackComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getResourcepackManifest());
@@ -102,7 +104,8 @@ public class InstanceCreatorElement extends UiElement {
         savesCreatorController.showError(show);
         resourcepacksCreatorController.showError(show);
         optionsCreatorController.showError(show);
-        modsCreatorController.showError(show);
+        if(modsActive)
+            modsCreatorController.showError(show);
     }
 
     public boolean checkCreateReady() {
