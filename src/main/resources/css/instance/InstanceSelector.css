@@ -1,9 +1,0 @@
-.element {
-    -fx-padding: 0;
-}
-
-.title-container {
-    -fx-background-color: transparent;
-    -fx-border-width: 0 0 3px 0;
-    -fx-border-color: -fx-primary-500;
-}

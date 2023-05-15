@@ -170,6 +170,11 @@ public class SavesCreatorElement extends UiElement {
         }
     }
 
+    public void enableUse(boolean enable) {
+        radioUse.setVisible(enable);
+        useBox.setVisible(enable);
+    }
+
     public boolean checkCreateReady() {
         boolean result = (savesComponents != null && typeConversion != null && savesManifest != null && gameManifest != null && ((radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
         return result;

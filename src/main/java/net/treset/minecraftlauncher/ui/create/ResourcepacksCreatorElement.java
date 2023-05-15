@@ -38,10 +38,10 @@ public class ResourcepacksCreatorElement extends UiElement {
     private Map<String, LauncherManifestType> typeConversion;
     private LauncherManifest resourcepacksManifest;
 
-    public void setPrerequisites(List<LauncherManifest> savesComponents, Map<String, LauncherManifestType> typeConversion, LauncherManifest savesManifest) {
-        this.resourcepacksComponents = savesComponents;
+    public void setPrerequisites(List<LauncherManifest> resourcepacksComponents, Map<String, LauncherManifestType> typeConversion, LauncherManifest resoucepacksManifest) {
+        this.resourcepacksComponents = resourcepacksComponents;
         this.typeConversion = typeConversion;
-        this.resourcepacksManifest = savesManifest;
+        this.resourcepacksManifest = resoucepacksManifest;
     }
 
     @FXML private void onRadioCreateSelect() {
@@ -167,6 +167,11 @@ public class ResourcepacksCreatorElement extends UiElement {
                 }
             }
         }
+    }
+
+    public void enableUse(boolean enabled) {
+        radioUse.setVisible(enabled);
+        useBox.setVisible(enabled);
     }
 
     public boolean checkCreateReady() {

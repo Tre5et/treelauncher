@@ -40,7 +40,6 @@ public class InstanceSelectorElement extends UiElement {
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         files = new LauncherFiles();
-        reloadComponents();
     }
 
     public void reloadComponents() {
@@ -56,8 +55,8 @@ public class InstanceSelectorElement extends UiElement {
         instanceContainer.getChildren().clear();
         for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
             instanceContainer.getChildren().add(instance.getValue());
-            instance.getKey().setSelectionAccepted(this::allowSelection);
-            instance.getKey().setSelectionListeners(List.of(this::onSelected));
+            instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
+            instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
         }
     }
 
@@ -90,14 +89,14 @@ public class InstanceSelectorElement extends UiElement {
             playButton.setDisable(false);
             currentInstance = instanceData;
             instanceDetailsTitle.setText(instanceData.getInstance().getKey().getName());
-            instanceDetailsTitle.getStyleClass().remove("disabled");
+            instanceDetailsTitle.setDisable(false);
             instanceDetailsController.populate(instanceData);
             instanceDetailsController.setVisible(true);
         } else {
             playButton.setDisable(true);
             currentInstance = null;
             instanceDetailsTitle.setText(LauncherApplication.stringLocalizer.get("instances.label.details.title"));
-            instanceDetailsTitle.getStyleClass().add("disabled");
+            instanceDetailsTitle.setDisable(true);
             instanceDetailsController.setVisible(false);
         }
     }

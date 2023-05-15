@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.UiLoader;
@@ -26,8 +27,11 @@ public class SelectorEntryElement extends UiElement {
 
     private boolean selected = false;
     private InstanceData instanceData;
-    private BiFunction<InstanceData, Boolean, Boolean> selectionAccepted;
-    private List<BiConsumer<InstanceData, Boolean>> selectionListeners;
+    private LauncherManifest manifest;
+    private BiFunction<InstanceData, Boolean, Boolean> selectionInstanceAcceptor;
+    private BiFunction<LauncherManifest, Boolean, Boolean> selectionManifestAcceptor;
+    private List<BiConsumer<InstanceData, Boolean>> selectionInstanceListeners;
+    private List<BiConsumer<LauncherManifest, Boolean>> selectionManifestListener;
 
     @FXML
     public void onElementClicked() {
@@ -35,7 +39,7 @@ public class SelectorEntryElement extends UiElement {
     }
 
     public boolean select(boolean select, boolean force, boolean callback) {
-        if(selected != select && (force || selectionAccepted.apply(instanceData, select))) {
+        if(selected != select && (force || (instanceData != null && selectionInstanceAcceptor.apply(instanceData, select)) || (manifest != null && selectionManifestAcceptor.apply(manifest, select)))) {
             if(select) {
                 entryContainer.getStyleClass().add("selected");
                 title.getStyleClass().add("selected");
@@ -46,8 +50,14 @@ public class SelectorEntryElement extends UiElement {
                 details.getStyleClass().remove("selected");
             }
             if(callback) {
-                for (BiConsumer<InstanceData, Boolean> selectionListener : selectionListeners) {
-                    selectionListener.accept(instanceData, select);
+                if(instanceData != null) {
+                    for (BiConsumer<InstanceData, Boolean> selectionListener : selectionInstanceListeners) {
+                        selectionListener.accept(instanceData, select);
+                    }
+                } else if(manifest != null) {
+                    for (BiConsumer<LauncherManifest, Boolean> selectionListener : selectionManifestListener) {
+                        selectionListener.accept(manifest, select);
+                    }
                 }
             }
             selected = select;
@@ -58,8 +68,13 @@ public class SelectorEntryElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        title.setText(instanceData.getInstance().getKey().getName());
-        details.setText(instanceData.getVersionComponents().get(0).getValue().getVersionId());
+        if(instanceData != null) {
+            title.setText(instanceData.getInstance().getKey().getName());
+            details.setText(instanceData.getVersionComponents().get(0).getValue().getVersionId());
+        } else if(manifest != null) {
+            title.setText(manifest.getName());
+            details.setText(manifest.getId());
+        }
     }
 
     @Override
@@ -73,36 +88,71 @@ public class SelectorEntryElement extends UiElement {
         this.instanceData = instanceData;
     }
 
+    public LauncherManifest getManifest() {
+        return manifest;
+    }
+
+    public void setManifest(LauncherManifest manifest) {
+        this.manifest = manifest;
+    }
+
     public boolean isSelected() {
         return selected;
     }
 
-    public BiFunction<InstanceData, Boolean, Boolean> getSelectionAccepted() {
-        return selectionAccepted;
+    public BiFunction<InstanceData, Boolean, Boolean> getSelectionInstanceAcceptor() {
+        return selectionInstanceAcceptor;
     }
 
-    public void setSelectionAccepted(BiFunction<InstanceData, Boolean, Boolean> selectionAccepted) {
-        this.selectionAccepted = selectionAccepted;
+    public void setSelectionInstanceAcceptor(BiFunction<InstanceData, Boolean, Boolean> selectionInstanceAcceptor) {
+        this.selectionInstanceAcceptor = selectionInstanceAcceptor;
     }
 
-    public List<BiConsumer<InstanceData, Boolean>> getSelectionListeners() {
-        return selectionListeners;
+    public List<BiConsumer<InstanceData, Boolean>> getSelectionInstanceListeners() {
+        return selectionInstanceListeners;
     }
 
-    public void setSelectionListeners(List<BiConsumer<InstanceData, Boolean>> selectionListeners) {
-        this.selectionListeners = selectionListeners;
+    public void setSelectionInstanceListeners(List<BiConsumer<InstanceData, Boolean>> selectionInstanceListeners) {
+        this.selectionInstanceListeners = selectionInstanceListeners;
     }
 
     public void addSelectionListener(BiConsumer<InstanceData, Boolean> selectionListener) {
-        this.selectionListeners = new ArrayList<>(selectionListeners);
-        this.selectionListeners.add(selectionListener);
+        this.selectionInstanceListeners = new ArrayList<>(selectionInstanceListeners);
+        this.selectionInstanceListeners.add(selectionListener);
+    }
+
+    public BiFunction<LauncherManifest, Boolean, Boolean> getSelectionManifestAcceptor() {
+        return selectionManifestAcceptor;
+    }
+
+    public void setSelectionManifestAcceptor(BiFunction<LauncherManifest, Boolean, Boolean> selectionManifestAcceptor) {
+        this.selectionManifestAcceptor = selectionManifestAcceptor;
+    }
+
+    public List<BiConsumer<LauncherManifest, Boolean>> getSelectionManifestListener() {
+        return selectionManifestListener;
+    }
+
+    public void setSelectionManifestListener(List<BiConsumer<LauncherManifest, Boolean>> selectionManifestListener) {
+        this.selectionManifestListener = selectionManifestListener;
     }
 
     public static Pair<SelectorEntryElement, AnchorPane> from(InstanceData instanceData) throws IOException {
+        Pair<SelectorEntryElement, AnchorPane> result = newInstance();
+        result.getKey().setInstanceData(instanceData);
+        return result;
+    }
+
+    public static Pair<SelectorEntryElement, AnchorPane> from(LauncherManifest manifest) throws IOException {
+        Pair<SelectorEntryElement, AnchorPane> result = newInstance();
+        result.getKey().setManifest(manifest);
+        return result;
+    }
+
+    public static Pair<SelectorEntryElement, AnchorPane> newInstance() throws IOException {
         FXMLLoader loader = UiLoader.getFXMLLoader("generic/SelectorEntryElement");
         AnchorPane element = UiLoader.loadFXML(loader);
         SelectorEntryElement listElementController = loader.getController();
-        listElementController.setInstanceData(instanceData);
         return new Pair<>(listElementController, element);
     }
 

@@ -17,5 +17,7 @@
     <fx:include fx:id="titlebar" source="title/TitlebarElement.fxml" GridPane.rowIndex="0" GridPane.fillWidth="true" />
     <fx:include fx:id="instanceSelector" source="instance/InstanceSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true"/>
     <fx:include fx:id="instanceCreator" source="create/InstanceCreatorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true"/>
+    <fx:include fx:id="savesSelector" source="components/SavesSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true"/>
+    <fx:include fx:id="resourcepacksSelector" source="components/ResourcepacksSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true"/>
     <fx:include fx:id="navbar" source="nav/NavbarElement.fxml" GridPane.rowIndex="2" GridPane.fillWidth="true" />
 </GridPane>

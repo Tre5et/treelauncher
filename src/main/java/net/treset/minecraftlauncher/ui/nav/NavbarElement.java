@@ -24,10 +24,12 @@ public class NavbarElement extends UiElement {
 
     @FXML
     private void onSavesButtonClicked() {
+        componentActivator.accept(MainController.Component.SAVES_SELECTOR);
     }
 
     @FXML
     private void onResourcepacksButtonClicked() {
+        componentActivator.accept(MainController.Component.RESOURCEPACKS_SELECTOR);
     }
 
     @FXML
