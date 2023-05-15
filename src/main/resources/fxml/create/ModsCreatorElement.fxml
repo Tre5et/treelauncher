@@ -10,24 +10,18 @@
         </toggleGroup>
     </RadioButton>
     <VBox fx:id="createBox" minHeight="-Infinity" minWidth="-Infinity">
-        <HBox alignment="CENTER_LEFT">
-            <Label fx:id="createLabel" text="%creator.label.name" />
-            <TextField fx:id="createName" />
-        </HBox>
+        <TextField fx:id="createName" promptText="%creator.prompt.name" />
         <Label fx:id="createError" styleClass="error" text="%creator.label.error.name" visible="false" />
     </VBox>
     <RadioButton fx:id="radioUse" mnemonicParsing="false" onAction="#onRadioUseSelect" text="%creator.radio.use" toggleGroup="$createtype" />
     <VBox fx:id="useBox" minHeight="-Infinity" minWidth="-Infinity">
-        <ChoiceBox fx:id="useChoice" prefWidth="150.0" />
+        <ComboBox fx:id="useChoice" promptText="%creator.prompt.component" />
         <Label fx:id="useError" styleClass="error" text="%creator.label.error.select" visible="false" />
     </VBox>
     <RadioButton fx:id="radioInherit" mnemonicParsing="false" onAction="#onRadioInheritSelect" text="%creator.radio.inherit" toggleGroup="$createtype" />
     <VBox fx:id="inheritBox" minHeight="-Infinity" minWidth="-Infinity">
-        <HBox alignment="CENTER_LEFT">
-            <Label fx:id="inheritLabel" text="%creator.label.name" />
-            <TextField fx:id="inheritName" />
-        </HBox>
-        <ChoiceBox fx:id="inheritChoice" prefWidth="150.0" />
+        <TextField fx:id="inheritName" promptText="%creator.prompt.name" />
+        <ComboBox fx:id="inheritChoice" promptText="%creator.prompt.component" />
         <Label fx:id="inheritErrorName" styleClass="error" text="%creator.label.error.name" visible="false" />
         <Label fx:id="inheritErrorSelect" styleClass="error" text="%creator.label.error.select" visible="false" />
     </VBox>

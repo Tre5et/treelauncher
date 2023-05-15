@@ -8,7 +8,7 @@
 <?import org.kordamp.ikonli.javafx.*?>
 
 
-<VBox alignment="TOP_CENTER"  prefHeight="600.0" prefWidth="1300.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+<VBox alignment="TOP_CENTER"  prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="net.treset.minecraftlauncher.ui.login.LoginController">
     <fx:include fx:id="titlebar" source="/fxml/title/TitlebarElement.fxml" VBox.vgrow="NEVER"/>
     <SplitPane dividerPositions="0.26057906458797325" styleClass="element-root"

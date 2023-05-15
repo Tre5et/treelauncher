@@ -5,23 +5,12 @@
 <?import javafx.scene.layout.*?>
 
 <VBox fx:id="rootBox" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.VersionCreatorElement">
-   <HBox alignment="CENTER_LEFT">
-      <Label text="%creator.version.choice.version" />
-      <ChoiceBox fx:id="versionChoice" prefWidth="150.0" />
-   </HBox>
-   <HBox>
-      <CheckBox fx:id="snapshotsCheck" mnemonicParsing="false" onAction="#onSnapshotsCheck" text="%creator.version.checkbox.snapshots" />
-   </HBox>
+   <ComboBox fx:id="versionChoice" promptText="%creator.version.prompt.version" />
+   <CheckBox fx:id="snapshotsCheck" mnemonicParsing="false" onAction="#onSnapshotsCheck" text="%creator.version.checkbox.snapshots" />
    <Label fx:id="errorVersion" styleClass="error" text="%creator.version.label.error.version" visible="false" />
-   <HBox fx:id="typeContainer" alignment="CENTER_LEFT" visible="false">
-      <Label text="%creator.version.choice.type" />
-      <ChoiceBox fx:id="typeChoice" prefWidth="150.0" />
-   </HBox>
+   <ComboBox fx:id="typeChoice" promptText="%creator.version.prompt.type" />
    <Label fx:id="errorType" styleClass="error" text="%creator.version.label.error.type" visible="false" />
-   <HBox fx:id="loaderContainer" alignment="CENTER_LEFT" visible="false">
-      <Label text="%creator.version.choice.loaderversion" />
-      <ChoiceBox fx:id="loaderChoice" prefWidth="150.0" />
-   </HBox>
+   <ComboBox fx:id="loaderChoice" promptText="%creator.version.prompt.loaderversion" />
    <Label fx:id="errorLoader" styleClass="error" text="%creator.version.label.error.loader" visible="false" />
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

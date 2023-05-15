@@ -3,9 +3,8 @@ package net.treset.minecraftlauncher.ui.create;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.VersionLoader;
@@ -32,11 +31,9 @@ public class VersionCreatorElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(VersionCreatorElement.class);
 
     @FXML private VBox rootBox;
-    @FXML private ChoiceBox<String> versionChoice;
-    @FXML private ChoiceBox<String> typeChoice;
-    @FXML private ChoiceBox<String> loaderChoice;
-    @FXML private HBox typeContainer;
-    @FXML private HBox loaderContainer;
+    @FXML private ComboBox<String> versionChoice;
+    @FXML private ComboBox<String> typeChoice;
+    @FXML private ComboBox<String> loaderChoice;
     @FXML private CheckBox snapshotsCheck;
     @FXML private Label errorVersion;
     @FXML private Label errorType;
@@ -71,8 +68,8 @@ public class VersionCreatorElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        typeContainer.setVisible(false);
-        loaderContainer.setVisible(false);
+        typeChoice.setVisible(false);
+        loaderChoice.setVisible(false);
         errorVersion.setVisible(false);
         errorType.setVisible(false);
         errorLoader.setVisible(false);
@@ -96,7 +93,8 @@ public class VersionCreatorElement extends UiElement {
 
     private void populateVersionChoice() {
         versionChoice.getItems().clear();
-        versionChoice.setValue(LauncherApplication.stringLocalizer.get("creator.version.label.loading"));
+        versionChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
+        versionChoice.setDisable(true);
         updateTypeState();
         new Thread(() -> {
             minecraftVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
@@ -106,17 +104,19 @@ public class VersionCreatorElement extends UiElement {
             }
             Platform.runLater(() -> {
                 versionChoice.getItems().addAll(names);
-                versionChoice.setValue("");
+                versionChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
+                versionChoice.setDisable(false);
             });
         }).start();
     }
 
     private void updateTypeState() {
-        if(versionChoice.getValue().isEmpty() || versionChoice.getValue().equals(LauncherApplication.stringLocalizer.get("creator.version.label.loading"))) {
-            typeContainer.setVisible(false);
+        if(versionChoice.getValue() == null || versionChoice.getValue().isEmpty() || versionChoice.getValue().equals(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"))) {
+            typeChoice.setVisible(false);
             typeChoice.getSelectionModel().clearSelection();
         } else {
-            typeContainer.setVisible(true);
+            typeChoice.setVisible(true);
+            errorType.setVisible(false);
         }
         updateLoaderState();
     }
@@ -125,8 +125,9 @@ public class VersionCreatorElement extends UiElement {
         if("Fabric".equals(typeChoice.getValue())) {
             modsActivateCallback.accept(true);
             loaderChoice.getItems().clear();
-            loaderChoice.setValue(LauncherApplication.stringLocalizer.get("creator.version.label.loading"));
-            loaderContainer.setVisible(true);
+            loaderChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
+            loaderChoice.setDisable(true);
+            loaderChoice.setVisible(true);
             new Thread(() -> {
                 fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue()));
                 List<String> names = new ArrayList<>();
@@ -135,14 +136,16 @@ public class VersionCreatorElement extends UiElement {
                 }
                 Platform.runLater(() -> {
                     loaderChoice.getItems().addAll(names);
-                    loaderChoice.setValue("");
+                    loaderChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loaderversion"));
+                    loaderChoice.setDisable(false);
                 });
             }).start();
         } else {
             modsActivateCallback.accept(false);
-            loaderContainer.setVisible(false);
+            loaderChoice.setVisible(false);
             loaderChoice.getItems().clear();
             loaderChoice.getSelectionModel().clearSelection();
+            errorLoader.setVisible(false);
         }
     }
 

@@ -1,10 +1,7 @@
 package net.treset.minecraftlauncher.ui.create;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
@@ -24,12 +21,10 @@ public class OptionsCreatorElement extends UiElement {
     @FXML private RadioButton radioCreate;
     @FXML private RadioButton radioUse;
     @FXML private RadioButton radioInherit;
-    @FXML private Label createLabel;
-    @FXML private Label inheritLabel;
     @FXML private TextField createName;
     @FXML private TextField inheritName;
-    @FXML private ChoiceBox<String> useChoice;
-    @FXML private ChoiceBox<String> inheritChoice;
+    @FXML private ComboBox<String> useChoice;
+    @FXML private ComboBox<String> inheritChoice;
     @FXML private Label createError;
     @FXML private Label useError;
     @FXML private Label inheritErrorName;

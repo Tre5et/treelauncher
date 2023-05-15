@@ -15,6 +15,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.launching.GameLauncher;
+import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 
@@ -36,8 +37,8 @@ public class InstanceSelectorElement extends UiElement {
     private InstanceData currentInstance;
 
     @Override
-    public void init(Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
-        super.init(lockSetter, lockGetter);
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
+        super.init(parent, lockSetter, lockGetter);
         files = new LauncherFiles();
         reloadComponents();
     }

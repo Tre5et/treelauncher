@@ -4,13 +4,20 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class UiElement implements UiController {
+    UiController parent;
     private Function<Boolean, Boolean> lockSetter;
     private Supplier<Boolean> lockGetter;
     private boolean visible = false;
 
-    public void init(Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
+        this.parent = parent;
         this.lockSetter = lockSetter;
         this.lockGetter = lockGetter;
+    }
+
+    @Override
+    public void triggerHomeAction() {
+        parent.triggerHomeAction();
     }
 
     public void setVisible(boolean visible) {

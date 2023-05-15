@@ -1,0 +1,34 @@
+.check-box {
+    -fx-checkbox-background: -fx-background-secondary;
+    -fx-checkbox-border: -fx-primary-900;
+    -fx-checkbox-selected-border: -fx-primary-600;
+    -fx-checkbox-mark: transparent;
+    -fx-checkbox-hover-mark: -fx-primary-900;
+    -fx-checkbox-selected-mark: -fx-primary-400;
+}
+
+.check-box > .box {
+    -fx-background-color: -fx-checkbox-background;
+    -fx-background-radius: 5px;
+    -fx-border-color: -fx-checkbox-border;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.check-box:selected > .box {
+    -fx-border-color: -fx-checkbox-selected-border;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: -fx-checkbox-mark;
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+}
+
+.check-box:hover > .box > .mark {
+    -fx-background-color: -fx-checkbox-hover-mark;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -fx-checkbox-selected-mark;
+}

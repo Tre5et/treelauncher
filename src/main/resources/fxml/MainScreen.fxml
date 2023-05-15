@@ -5,7 +5,7 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane prefHeight="600.0" prefWidth="1300.0" stylesheets="@/css/global/Global.css" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="net.treset.minecraftlauncher.ui.MainController" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="net.treset.minecraftlauncher.ui.MainController" xmlns:fx="http://javafx.com/fxml/1">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
     </columnConstraints>

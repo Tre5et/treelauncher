@@ -7,6 +7,11 @@ import java.io.IOException;
 
 public class GenericUiController implements UiController {
     protected Stage stage;
+
+    @Override
+    public void triggerHomeAction() {
+    }
+
     @Override
     public void beforeShow(Stage stage) {
         this.stage = stage;

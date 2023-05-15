@@ -2,9 +2,11 @@
 @import url("SplitPane.css");
 @import url("Label.css");
 @import url("TextField.css");
-@import url("ChoiceBox.css");
+@import url("ComboBox.css");
 @import url("RadioButton.css");
 @import url("ScrollPane.css");
+@import url("CheckBox.css");
+@import url("Popup.css");
 
 /* Exo 2 : google-fonts */
 @import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
@@ -25,6 +27,7 @@
     -fx-black: #000000;
     -fx-background: #202020;
     -fx-background-secondary: -fx-black;
+    -fx-background-tertiary: #3f3f3f;
     -fx-text: -fx-white;
     -fx-error: red;
     -fx-drop-shadow: rgba(0, 0, 0, 0.3);
@@ -41,7 +44,7 @@
     -fx-text-fill: -fx-text;
     -fx-font-family: 'Exo 2';
     -fx-font-size: 10pt;
-    -fx-background-radius: 10px;
+    -fx-background-radius: 6px;
 }
 
 .element-root {

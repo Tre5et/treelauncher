@@ -21,13 +21,13 @@ public class MainController extends GenericUiController {
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        titlebarController.init(this::setLocked, this::getLocked);
+        titlebarController.init(this, this::setLocked, this::getLocked);
         titlebarController.beforeShow(stage);
-        navbarController.init(this::setLocked, this::getLocked);
+        navbarController.init(this, this::setLocked, this::getLocked);
         navbarController.setComponentActivator(this::activate);
         navbarController.beforeShow(stage);
-        instanceSelectorController.init(this::setLocked, this::getLocked);
-        instanceCreatorController.init(this::setLocked, this::getLocked);
+        instanceSelectorController.init(this, this::setLocked, this::getLocked);
+        instanceCreatorController.init(this, this::setLocked, this::getLocked);
         activate(Component.INSTANCE_SELECTOR);
     }
 
@@ -36,6 +36,11 @@ public class MainController extends GenericUiController {
         super.afterShow(stage);
         titlebarController.afterShow(stage);
         navbarController.afterShow(stage);
+    }
+
+    @Override
+    public void triggerHomeAction() {
+        activate(Component.INSTANCE_SELECTOR);
     }
 
     public static MainController showOnStage(Stage stage) throws IOException {
