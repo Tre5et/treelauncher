@@ -7,13 +7,8 @@ import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.*;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 import java.io.IOException;
 
@@ -41,10 +36,11 @@ public class LauncherApplication extends Application {
     private static void setupLogger() {
         // TODO: file not working in build, why?
 
-        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
-        builder.setStatusLevel(config.DEBUG ? Level.DEBUG : Level.INFO);
+        /* ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+        builder.setStatusLevel(Level.DEBUG);
         builder.setConfigurationName("DefaultLogger");
 
+        // File Logger
         LayoutComponentBuilder layoutBuilder = builder.newLayout("PatternLayout")
                 .addAttribute("pattern", "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level} %logger{1.2*} - %msg%n");
         ComponentBuilder triggeringPolicy = builder.newComponent("Policies")
@@ -55,11 +51,11 @@ public class LauncherApplication extends Application {
                 .addAttribute("filePattern",  config.LOG_PATH + "log-%d{MM-dd-yy-HH-mm-ss}.log.gz")
                 .add(layoutBuilder).addComponent(triggeringPolicy);
 
-        RootLoggerComponentBuilder rootLogger = builder.newRootLogger(config.DEBUG ? Level.DEBUG : Level.INFO);
+        RootLoggerComponentBuilder rootLogger = builder.newRootLogger(Level.DEBUG);
 
+        //Console Logger
         AppenderComponentBuilder consoleAppenderBuilder = builder.newAppender("ConsoleAppender", "CONSOLE")
                 .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT);
-// add a layout like pattern, json etc
         consoleAppenderBuilder.add(builder.newLayout("PatternLayout")
                 .addAttribute("pattern", "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level} %logger{1.2*} - %msg%n"));
 
@@ -69,7 +65,7 @@ public class LauncherApplication extends Application {
         rootLogger.add(builder.newAppenderRef("ConsoleAppender"));
         builder.add(rootLogger);
 
-        Configurator.reconfigure(builder.build());
+        Configurator.reconfigure(builder.build());*/
     }
 
     @Override

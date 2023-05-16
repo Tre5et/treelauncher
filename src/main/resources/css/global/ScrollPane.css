@@ -1,4 +1,4 @@
-.scroll-pane {
+.scroll-pane, .scroll-bar {
     -fx-scrollbar-thumb: -fx-background-tertiary;
     -fx-scrollbar-background: transparent;
 
