@@ -2,9 +2,11 @@ package net.treset.minecraftlauncher.creation;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.assets.AssetIndex;
 import net.treset.mc_version_loader.fabric.FabricLibrary;
 import net.treset.mc_version_loader.fabric.FabricProfile;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
+import net.treset.mc_version_loader.files.AssetsFileDownloader;
 import net.treset.mc_version_loader.files.FabricFileDownloader;
 import net.treset.mc_version_loader.files.MinecraftVersionFileDownloader;
 import net.treset.mc_version_loader.files.Sources;
@@ -208,6 +210,11 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private boolean makeMinecraftVersion() {
+        if(!downloadAssets()) {
+            LOGGER.warn("Failed to download assets");
+            return false;
+        }
+
         LauncherVersionDetails details = new LauncherVersionDetails(
                 mcVersion.getAssets(),
                 null,
@@ -242,6 +249,23 @@ public class VersionCreator extends GenericComponentCreator {
         }
 
         LOGGER.debug("Created minecraft version: id={}", getNewManifest().getId());
+        return true;
+    }
+
+    private boolean downloadAssets() {
+        LOGGER.debug("Downloading assets...");
+        String assetIndexUrl = mcVersion.getAssetIndex().getUrl();
+        AssetIndex index = AssetIndex.fromJson(Sources.getFileFromUrl(assetIndexUrl));
+        if(index.getObjects() == null || index.getObjects().isEmpty()) {
+            LOGGER.warn("Unable to download assets: invalid contents");
+            return false;
+        }
+        File baseDir = new File(LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getAssetsDir());
+        if(!AssetsFileDownloader.downloadAssets(baseDir, index, assetIndexUrl, false)) {
+            LOGGER.warn("Unable to download assets: failed to download assets");
+            return false;
+        }
+        LOGGER.debug("Downloaded assets");
         return true;
     }
 

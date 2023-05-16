@@ -3,6 +3,7 @@
   "prefix": "java",
   "components": [
     "java1",
-    "c5945af636428a8546c1b3693cb28d1298f2c4d7"
+    "c5945af636428a8546c1b3693cb28d1298f2c4d7",
+    "be905e9f90f05d4f3e061cb10b82c420650a4590"
   ]
 }

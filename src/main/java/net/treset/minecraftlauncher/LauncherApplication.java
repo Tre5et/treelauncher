@@ -71,7 +71,7 @@ public class LauncherApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         System.setProperty("prism.lcdtext", "false");
-        primaryStage.initStyle(StageStyle.DECORATED);
+        primaryStage.initStyle(StageStyle.UNIFIED);
 
         LoginController.showOnStage(primaryStage);
     }
