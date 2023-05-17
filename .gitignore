@@ -3,7 +3,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-logs/
 
 ### IntelliJ IDEA ###
 .idea/
@@ -50,3 +49,5 @@ bin/
 */assets/*
 */processedMod/*
 */remappedJars/*
+logs/
+launcher_mockup/

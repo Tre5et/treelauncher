@@ -1,8 +1,0 @@
-{
-    "details": "version.json",
-    "id": "fabric1.19.4",
-    "included_files": [
-    ],
-    "name": "PrettyVersionName",
-    "type": "version_component"
-}
