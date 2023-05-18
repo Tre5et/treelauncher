@@ -2,14 +2,5 @@
   "type": "saves",
   "prefix": "saves",
   "components": [
-    "sha1",
-    "ab5d37ec9861bd7106e38efbbf4fde7a40eaa6ad",
-    "ea875e92db591f1bdac5991f747b1f35dcc79c46",
-    "a99a311e56fe59465e7cddf0df28e367ccf74d73",
-    "74cd852b99906591c629ed2c3031ea71a7b363d9",
-    "36825a74604645d082b3733f04c5ed5354e0bfd8",
-    "4cf37c4787c74debe6f87cb071d133dd2540ac75",
-    "c609e0c01185d2f1fb00df4d29921a4013247381",
-    "eaa31da8f2b8ac2a6c861e760c1d656732ee309f"
   ]
 }

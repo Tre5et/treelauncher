@@ -2,14 +2,5 @@
   "type": "versions",
   "prefix": "version",
   "components": [
-    "fabric1.19.4",
-    "1e3d4058a04a37d2232cdc69224661014e8aecab",
-    "d7da5cfa3f77b70df8100684df54f55f0c883dce",
-    "427cff2aee7e6ac8a8ffd704bce4b7f08072dcfc",
-    "cb9b4d05a3e9a88f2f51c17f249bd74251eed4b",
-    "1985d68665c1714578a683ad9afb584d78f0c4fa",
-    "39384692d6b3557f5e4f94512b7e3ed0e18de57d",
-    "b5d98af4e8b9a272b73c7a6d4f6fd00f3cbb39e",
-    "6b1da4f956a348bd6fff5c07ff4b32dc769b2503"
   ]
 }
