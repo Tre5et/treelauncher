@@ -3,6 +3,8 @@ package net.treset.minecraftlauncher.ui;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
+import net.treset.minecraftlauncher.ui.components.ModsSelectorElement;
+import net.treset.minecraftlauncher.ui.components.OptionsSelectorElement;
 import net.treset.minecraftlauncher.ui.components.ResourcepacksSelectorElement;
 import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
 import net.treset.minecraftlauncher.ui.instance.InstanceSelectorElement;
@@ -18,6 +20,8 @@ public class MainController extends GenericUiController {
     @FXML private InstanceCreatorElement instanceCreatorController;
     @FXML private SavesSelectorElement savesSelectorController;
     @FXML private ResourcepacksSelectorElement resourcepacksSelectorController;
+    @FXML private OptionsSelectorElement optionsSelectorController;
+    @FXML private ModsSelectorElement modsSelectorController;
     @FXML private NavbarElement navbarController;
 
     boolean locked = false;
@@ -34,6 +38,8 @@ public class MainController extends GenericUiController {
         instanceCreatorController.init(this, this::setLocked, this::getLocked);
         savesSelectorController.init(this, this::setLocked, this::getLocked);
         resourcepacksSelectorController.init(this, this::setLocked, this::getLocked);
+        optionsSelectorController.init(this, this::setLocked, this::getLocked);
+        modsSelectorController.init(this, this::setLocked, this::getLocked);
         activate(Component.INSTANCE_SELECTOR);
     }
 
@@ -72,6 +78,14 @@ public class MainController extends GenericUiController {
                 setAllInvisible();
                 resourcepacksSelectorController.setVisible(true);
                 break;
+            case OPTIONS_SELECTOR:
+                setAllInvisible();
+                optionsSelectorController.setVisible(true);
+                break;
+            case MODS_SELECTOR:
+                setAllInvisible();
+                modsSelectorController.setVisible(true);
+                break;
         }
     }
 
@@ -80,6 +94,8 @@ public class MainController extends GenericUiController {
         instanceCreatorController.setVisible(false);
         savesSelectorController.setVisible(false);
         resourcepacksSelectorController.setVisible(false);
+        optionsSelectorController.setVisible(false);
+        modsSelectorController.setVisible(false);
     }
 
     public boolean getLocked() {
@@ -95,6 +111,8 @@ public class MainController extends GenericUiController {
         INSTANCE_SELECTOR,
         INSTANCE_CREATOR,
         SAVES_SELECTOR,
-        RESOURCEPACKS_SELECTOR;
+        RESOURCEPACKS_SELECTOR,
+        OPTIONS_SELECTOR,
+        MODS_SELECTOR;
     }
 }

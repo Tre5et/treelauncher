@@ -10,13 +10,13 @@
         </toggleGroup>
     </RadioButton>
     <VBox fx:id="createBox" minHeight="-Infinity" minWidth="-Infinity">
-        <TextField fx:id="createName" promptText="%creator.prompt.name" />
+        <HBox alignment="CENTER_LEFT">
+            <TextField fx:id="createName" promptText="%creator.prompt.name" HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="createVersionChoice" visible="false" promptText="%creator.mods.prompt.version" HBox.hgrow="NEVER" />
+            <CheckBox fx:id="createSnapshotsCheck" onAction="#onSnapshotsCheck" visible="false" text="%creator.version.checkbox.snapshots" />
+        </HBox>
         <Label fx:id="createError" styleClass="error" text="%creator.label.error.name" visible="false" />
-    </VBox>
-    <RadioButton fx:id="radioUse" mnemonicParsing="false" onAction="#onRadioUseSelect" text="%creator.radio.use" toggleGroup="$createtype" />
-    <VBox fx:id="useBox" minHeight="-Infinity" minWidth="-Infinity">
-        <ComboBox fx:id="useChoice" promptText="%creator.prompt.component" />
-        <Label fx:id="useError" styleClass="error" text="%creator.label.error.select" visible="false" />
+        <Label fx:id="createVersionError" styleClass="error" text="%creator.version.label.error.version" visible="false" />
     </VBox>
     <RadioButton fx:id="radioInherit" mnemonicParsing="false" onAction="#onRadioInheritSelect" text="%creator.radio.inherit" toggleGroup="$createtype" />
     <VBox fx:id="inheritBox" minHeight="-Infinity" minWidth="-Infinity">
@@ -24,6 +24,11 @@
         <ComboBox fx:id="inheritChoice" promptText="%creator.prompt.component" />
         <Label fx:id="inheritErrorName" styleClass="error" text="%creator.label.error.name" visible="false" />
         <Label fx:id="inheritErrorSelect" styleClass="error" text="%creator.label.error.select" visible="false" />
+    </VBox>
+    <RadioButton fx:id="radioUse" mnemonicParsing="false" onAction="#onRadioUseSelect" text="%creator.radio.use" toggleGroup="$createtype" />
+    <VBox fx:id="useBox" minHeight="-Infinity" minWidth="-Infinity">
+        <ComboBox fx:id="useChoice" promptText="%creator.prompt.component" />
+        <Label fx:id="useError" styleClass="error" text="%creator.label.error.select" visible="false" />
     </VBox>
     <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

@@ -34,10 +34,12 @@ public class NavbarElement extends UiElement {
 
     @FXML
     private void onOptionsButtonClicked() {
+        componentActivator.accept(MainController.Component.OPTIONS_SELECTOR);
     }
 
     @FXML
     private void onModsButtonClicked() {
+        componentActivator.accept(MainController.Component.MODS_SELECTOR);
     }
 
     @FXML
