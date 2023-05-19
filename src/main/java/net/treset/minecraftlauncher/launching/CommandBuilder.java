@@ -207,6 +207,13 @@ public class CommandBuilder {
             case "resolution_height" -> {
                 return resY;
             }
+            case "quickPlayPath" -> {
+                return "quickPlay/log.json";
+            }
+            case "quickPlaySingleplayer", "quickPlayMultiplayer", "quickPlayRealms" -> {
+                return "";
+            }
+
             default -> {
                 return null;
             }

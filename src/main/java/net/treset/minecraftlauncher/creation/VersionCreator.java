@@ -176,23 +176,19 @@ public class VersionCreator extends GenericComponentCreator {
             LOGGER.warn("Unable to add fabric libraries: no libraries");
             return false;
         }
-        List<String> libs = new ArrayList<>();
-        List<FabricLibrary> clientLibs = new ArrayList<>(fabricProfile.getLibraries());
-        for(FabricLibrary f : clientLibs) {
-            if(FormatUtils.matches(f.getName(), ":fabric-loader:")) {
-                continue;
-            }
-            File baseDir = new File(librariesDir);
-            if(!baseDir.isDirectory() && !baseDir.mkdirs()) {
-                LOGGER.warn("Unable to add fabric libraries: failed to create libraries directory: path={}", librariesDir);
-                return false;
-            }
-            if(!FabricFileDownloader.downloadFabricLibrary(baseDir, f) || f.getLocalPath() == null || f.getLocalFileName() == null) {
-                LOGGER.warn("Unable to add fabric libraries: failed to download library: name={}", f.getName());
-                return false;
-            }
-            libs.add(f.getLocalPath() + f.getLocalFileName());
+        File baseDir = new File(librariesDir);
+        if(!baseDir.isDirectory() && !baseDir.mkdirs()) {
+            LOGGER.warn("Unable to add fabric libraries: failed to create libraries directory: path={}", librariesDir);
+            return false;
         }
+        List<FabricLibrary> clientLibs = new ArrayList<>(fabricProfile.getLibraries()).stream().filter(f -> !FormatUtils.matches(f.getName(), ":fabric-loader:")).toList();
+
+        List<String> libs = FabricFileDownloader.downloadFabricLibraries(baseDir, clientLibs);
+        if(libs == null) {
+            LOGGER.warn("Unable to add fabric libraries: failed to download libraries");
+            return false;
+        }
+
         details.setLibraries(libs);
         LOGGER.debug("Added fabric libraries");
         return true;
@@ -305,20 +301,13 @@ public class VersionCreator extends GenericComponentCreator {
             LOGGER.warn("Unable to add libraries: libraries dir is not a directory");
             return false;
         }
-        List<String> result = new ArrayList<>();
-        for(MinecraftLibrary l : mcVersion.getLibraries()) {
-            if(l == null || l.getDownloads() == null || l.getDownloads().getArtifacts() == null || l.getDownloads().getArtifacts().getUrl() == null || l.getDownloads().getArtifacts().getPath() == null) {
-                LOGGER.debug("Inconsistency while adding libraries: invalid library in mc libraries");
-                continue;
-            }
 
-            if(!MinecraftVersionFileDownloader.downloadVersionLibrary(l, baseDir)) {
-                LOGGER.warn("Unable to add libraries: failed to download library: path={}", l.getDownloads().getArtifacts().getPath());
-                return false;
-            }
-
-            result.add(l.getDownloads().getArtifacts().getPath());
+        List<String> result = MinecraftVersionFileDownloader.downloadVersionLibraries(mcVersion.getLibraries(), baseDir, List.of());
+        if(result == null) {
+            LOGGER.warn("Unable to add libraries: failed to download libraries");
+            return false;
         }
+
         details.setLibraries(result);
         LOGGER.debug("Added libraries: {}", result);
         return true;

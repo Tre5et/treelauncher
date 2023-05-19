@@ -84,6 +84,7 @@ public class ModsCreatorElement extends UiElement {
     @Override
     public void beforeShow(Stage stage) {
         radioCreate.fire();
+        radioCreate.setSelected(true);
         createBox.setDisable(false);
         createName.setText("");
         createName.getStyleClass().remove("error");

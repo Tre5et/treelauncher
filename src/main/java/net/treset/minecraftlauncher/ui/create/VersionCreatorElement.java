@@ -185,9 +185,10 @@ public class VersionCreatorElement extends UiElement {
         } else if("Fabric".equals(typeChoice.getValue())) {
             FabricVersionDetails details = getFabricFromString(loaderChoice.getValue());
             if(details == null) {
+                LOGGER.warn("Could not get Fabric version details");
                 return null;
             }
-            FabricProfile profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/1.19.4/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
+            FabricProfile profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/" + versionChoice.getValue() + "/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
             if(profile == null) {
                 LOGGER.warn("Could not get Fabric profile!");
                 return null;
