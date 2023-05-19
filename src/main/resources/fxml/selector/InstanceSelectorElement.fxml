@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<SplitPane fx:id="rootPane" dividerPositions="0.33, 0.66" styleClass="element-root" stylesheets="@/css/generic/SelectorElement.css" visible="false" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.instance.InstanceSelectorElement">
+<SplitPane fx:id="rootPane" dividerPositions="0.33, 0.66" styleClass="element-root" stylesheets="@/css/generic/SelectorElement.css" visible="false" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement">
     <AnchorPane minWidth="-Infinity" styleClass="element">
         <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" styleClass="title-container">
@@ -27,7 +27,7 @@
                 <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" />
             </HBox>
             <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
-                <fx:include fx:id="instanceDetails" source="InstanceDetailsElement.fxml" />
+                <fx:include fx:id="instanceDetails" source="../manager/InstanceDetailsElement.fxml" />
             </ScrollPane>
         </VBox>
     </AnchorPane>

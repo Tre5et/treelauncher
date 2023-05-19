@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.components;
+package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,6 +17,7 @@ import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.create.ModsCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
+import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,10 +41,11 @@ public class ModsSelectorElement extends UiElement {
     @FXML private VBox creatorContainer;
     @FXML private ModsCreatorElement modsCreatorController;
     @FXML private Button createButton;
+    @FXML private ModsManagerElement modsManagerController;
 
     private LauncherFiles files;
     private List<Pair<SelectorEntryElement, AnchorPane>> mods = new ArrayList<>();
-    private LauncherManifest currentOptions;
+    private Pair<LauncherManifest, LauncherModsDetails> currentMods;
     private boolean createSelected;
 
     @Override
@@ -55,6 +57,7 @@ public class ModsSelectorElement extends UiElement {
         modsCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
         modsCreatorController.enableVersionSelect(true);
         modsCreatorController.setModsType("fabric");
+        modsManagerController.setVisible(false);
     }
 
     private void reloadComponents() {
@@ -99,10 +102,10 @@ public class ModsSelectorElement extends UiElement {
 
     @FXML
     private void onFolderButtonClicked() {
-        if(currentOptions == null) {
+        if(currentMods == null) {
             LOGGER.warn("No saves selected");
         }
-        File folder = new File(currentOptions.getDirectory());
+        File folder = new File(currentMods.getKey().getDirectory());
         try {
             Desktop.getDesktop().open(folder);
         } catch (IOException e) {
@@ -127,6 +130,7 @@ public class ModsSelectorElement extends UiElement {
                 folderButton.setDisable(true);
                 modsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.create"));
                 modsDetailsTitle.setDisable(false);
+                modsManagerController.setVisible(false);
                 modsCreatorController.beforeShow(null);
                 creatorContainer.setVisible(true);
                 modsCreatorController.afterShow(null);
@@ -162,18 +166,31 @@ public class ModsSelectorElement extends UiElement {
             for(Pair<SelectorEntryElement, AnchorPane> mod : mods) {
                 mod.getKey().select(false, true, false);
             }
-            currentOptions = manifest;
+            currentMods = null;
+            for(Pair<LauncherManifest, LauncherModsDetails> m : files.getModsComponents()) {
+                if(m.getKey().equals(manifest)) {
+                    currentMods = m;
+                    break;
+                }
+            }
+            if(currentMods == null) {
+                return;
+            }
             createSelected = false;
             createSelector.getStyleClass().remove("selected");
             creatorContainer.setVisible(false);
             folderButton.setDisable(false);
             modsDetailsTitle.setText(manifest.getName());
             modsDetailsTitle.setDisable(false);
+            modsManagerController.setLauncherMods(currentMods.getValue());
+            modsManagerController.setVisible(false);
+            modsManagerController.setVisible(true);
         } else {
-            currentOptions = null;
+            currentMods = null;
             folderButton.setDisable(true);
             modsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             modsDetailsTitle.setDisable(true);
+            modsManagerController.setVisible(false);
         }
     }
 }

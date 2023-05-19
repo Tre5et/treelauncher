@@ -1,0 +1,11 @@
+.element-root {
+    -fx-background-color: -fx-background;
+    -fx-padding: 5px 10px 5px 10px;
+}
+
+.element-container {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-color: -fx-background-secondary;
+    -fx-padding: 3px 3px 3px 3px;
+}

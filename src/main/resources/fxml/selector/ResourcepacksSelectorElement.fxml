@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import javafx.geometry.Insets?>
-<SplitPane fx:id="rootPane" dividerPositions="0.45" styleClass="element-root" stylesheets="@/css/generic/SelectorElement.css" visible="false" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.components.ModsSelectorElement">
+<SplitPane fx:id="rootPane" dividerPositions="0.45" styleClass="element-root" stylesheets="@/css/generic/SelectorElement.css" visible="false" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ResourcepacksSelectorElement">
     <AnchorPane minWidth="-Infinity" styleClass="element">
         <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
-                <Label styleClass="title" text="%mods.label.title" />
+                <Label styleClass="title" text="%resourcepacks.label.title" />
             </VBox>
             <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity" VBox.vgrow="ALWAYS">
-                <VBox fx:id="modsContainer" alignment="TOP_CENTER">
+                <VBox fx:id="resourcepacksContainer" alignment="TOP_CENTER">
                 </VBox>
             </ScrollPane>
             <HBox fx:id="createSelector" alignment="CENTER_LEFT" onMouseClicked="#onCreateSelectorClicked" styleClass="create-container" VBox.vgrow="NEVER">
@@ -38,10 +36,10 @@
                         <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
                     </graphic>
                 </Button>
-                <Label fx:id="modsDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
+                <Label fx:id="resourcepacksDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
             </HBox>
-            <VBox fx:id="creatorContainer" visible="false" alignment="TOP_CENTER">
-                <fx:include fx:id="modsCreator" source="/fxml/create/ModsCreatorElement.fxml" />
+            <VBox fx:id="creatorContainer" alignment="TOP_CENTER" visible="false">
+                <fx:include fx:id="resourcepacksCreator" source="/fxml/create/ResourcepacksCreatorElement.fxml" />
                 <Button fx:id="createButton" onMouseClicked="#onCreateButtonClicked" text="%creator.button.create" />
             </VBox>
         </VBox>

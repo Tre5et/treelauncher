@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.instance;
+package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -18,6 +18,7 @@ import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
+import net.treset.minecraftlauncher.ui.manager.InstanceDetailsElement;
 
 import java.io.IOException;
 import java.util.ArrayList;

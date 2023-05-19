@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.instance;
+package net.treset.minecraftlauncher.ui.manager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

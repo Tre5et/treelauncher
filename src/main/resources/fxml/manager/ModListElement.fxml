@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="rootPane" minWidth="-Infinity" styleClass="element-root" stylesheets="@/css/manager/ModsListElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModListElement">
+    <GridPane styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+        </rowConstraints>
+        <VBox alignment="CENTER_LEFT" GridPane.rowSpan="2">
+            <Label fx:id="title" minWidth="-Infinity" styleClass="element-title" text="Title" />
+            <Label fx:id="description" styleClass="element-details" text="Description" />
+        </VBox>
+        <ComboBox fx:id="versionSelector" GridPane.columnIndex="1" GridPane.fillWidth="true" />
+        <HBox alignment="BOTTOM_RIGHT" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <ImageView fx:id="modrinthLogo" fitHeight="36" fitWidth="36" pickOnBounds="true" preserveRatio="true" styleClass="modprovider-icon">
+                <Image url="@../../img/modrinth_white.png" />
+            <HBox.margin>
+               <Insets right="5.0" />
+            </HBox.margin>
+            </ImageView>
+            <ImageView fx:id="curseforgeLogo" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" styleClass="modprovider-icon">
+                <Image url="@../../img/curseforge_white.png" />
+            <HBox.margin>
+               <Insets left="5.0" />
+            </HBox.margin>
+            </ImageView>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+        </HBox>
+    </GridPane>
+</AnchorPane>

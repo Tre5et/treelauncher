@@ -3,13 +3,13 @@ package net.treset.minecraftlauncher.ui;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
-import net.treset.minecraftlauncher.ui.components.ModsSelectorElement;
-import net.treset.minecraftlauncher.ui.components.OptionsSelectorElement;
-import net.treset.minecraftlauncher.ui.components.ResourcepacksSelectorElement;
+import net.treset.minecraftlauncher.ui.selector.ModsSelectorElement;
+import net.treset.minecraftlauncher.ui.selector.OptionsSelectorElement;
+import net.treset.minecraftlauncher.ui.selector.ResourcepacksSelectorElement;
 import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
-import net.treset.minecraftlauncher.ui.instance.InstanceSelectorElement;
+import net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement;
 import net.treset.minecraftlauncher.ui.nav.NavbarElement;
-import net.treset.minecraftlauncher.ui.components.SavesSelectorElement;
+import net.treset.minecraftlauncher.ui.selector.SavesSelectorElement;
 import net.treset.minecraftlauncher.ui.title.TitlebarElement;
 
 import java.io.IOException;

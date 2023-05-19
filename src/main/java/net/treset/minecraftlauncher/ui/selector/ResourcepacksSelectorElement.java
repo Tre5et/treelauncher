@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.components;
+package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

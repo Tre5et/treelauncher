@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.components;
+package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,7 +14,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.ui.create.OptionsCreatorElement;
+import net.treset.minecraftlauncher.ui.create.SavesCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,79 +27,78 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class OptionsSelectorElement extends UiElement {
-    private static final Logger LOGGER = LogManager.getLogger(OptionsSelectorElement.class);
+public class SavesSelectorElement extends UiElement {
+    private static final Logger LOGGER = LogManager.getLogger(SavesSelectorElement.class);
 
-    @FXML
-    private SplitPane rootPane;
-    @FXML private VBox optionsContainer;
+    @FXML private SplitPane rootPane;
+    @FXML private VBox savesContainer;
     @FXML private HBox createSelector;
     @FXML private Button folderButton;
-    @FXML private Label optionsDetailsTitle;
+    @FXML private Label savesDetailsTitle;
     @FXML private VBox creatorContainer;
-    @FXML private OptionsCreatorElement optionsCreatorController;
+    @FXML private SavesCreatorElement savesCreatorController;
     @FXML private Button createButton;
 
     private LauncherFiles files;
-    private List<Pair<SelectorEntryElement, AnchorPane>> options = new ArrayList<>();
-    private LauncherManifest currentOptions;
+    private List<Pair<SelectorEntryElement, AnchorPane>> saves = new ArrayList<>();
+    private LauncherManifest currentSaves;
     private boolean createSelected;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         files = new LauncherFiles();
-        optionsCreatorController.enableUse(false);
-        optionsCreatorController.init(this, lockSetter, lockGetter);
-        optionsCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
+        savesCreatorController.enableUse(false);
+        savesCreatorController.init(this, lockSetter, lockGetter);
+        savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
     }
 
     private void reloadComponents() {
         files.reloadAll();
-        options = new ArrayList<>();
-        for(LauncherManifest save: files.getOptionsComponents()) {
+        saves = new ArrayList<>();
+        for(LauncherManifest save: files.getSavesComponents()) {
             try {
-                options.add(SelectorEntryElement.from(save));
+                saves.add(SelectorEntryElement.from(save));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        optionsContainer.getChildren().clear();
+        savesContainer.getChildren().clear();
         folderButton.setDisable(true);
-        optionsDetailsTitle.setDisable(true);
+        savesDetailsTitle.setDisable(true);
         createSelected = false;
         createSelector.getStyleClass().remove("selected");
         creatorContainer.setVisible(false);
-        for(Pair<SelectorEntryElement, AnchorPane> options : options) {
-            optionsContainer.getChildren().add(options.getValue());
-            options.getKey().setSelectionManifestAcceptor(this::allowSelection);
-            options.getKey().setSelectionManifestListener(List.of(this::onSelected));
+        for(Pair<SelectorEntryElement, AnchorPane> save : saves) {
+            savesContainer.getChildren().add(save.getValue());
+            save.getKey().setSelectionManifestAcceptor(this::allowSelection);
+            save.getKey().setSelectionManifestListener(List.of(this::onSelected));
         }
     }
 
     @Override
     public void beforeShow(Stage stage) {
         reloadComponents();
-        optionsCreatorController.beforeShow(stage);
-        for(Pair<SelectorEntryElement, AnchorPane> save: options) {
+        savesCreatorController.beforeShow(stage);
+        for(Pair<SelectorEntryElement, AnchorPane> save: saves) {
             save.getKey().beforeShow(stage);
         }
     }
 
     @Override
     public void afterShow(Stage stage) {
-        optionsCreatorController.afterShow(stage);
-        for(Pair<SelectorEntryElement, AnchorPane> save: options) {
+        savesCreatorController.afterShow(stage);
+        for(Pair<SelectorEntryElement, AnchorPane> save: saves) {
             save.getKey().afterShow(stage);
         }
     }
 
     @FXML
     private void onFolderButtonClicked() {
-        if(currentOptions == null) {
+        if(currentSaves == null) {
             LOGGER.warn("No saves selected");
         }
-        File folder = new File(currentOptions.getDirectory());
+        File folder = new File(currentSaves.getDirectory());
         try {
             Desktop.getDesktop().open(folder);
         } catch (IOException e) {
@@ -113,20 +112,20 @@ public class OptionsSelectorElement extends UiElement {
             if(createSelected) {
                 createSelector.getStyleClass().remove("selected");
                 folderButton.setDisable(true);
-                optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
-                optionsDetailsTitle.setDisable(true);
+                savesDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
+                savesDetailsTitle.setDisable(true);
                 creatorContainer.setVisible(false);
             } else {
                 createSelector.getStyleClass().add("selected");
-                for(Pair<SelectorEntryElement, AnchorPane> save : options) {
+                for(Pair<SelectorEntryElement, AnchorPane> save : saves) {
                     save.getKey().select(false, true, false);
                 }
                 folderButton.setDisable(true);
-                optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.create"));
-                optionsDetailsTitle.setDisable(false);
-                optionsCreatorController.beforeShow(null);
+                savesDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.create"));
+                savesDetailsTitle.setDisable(false);
+                savesCreatorController.beforeShow(null);
                 creatorContainer.setVisible(true);
-                optionsCreatorController.afterShow(null);
+                savesCreatorController.afterShow(null);
             }
             createSelected = !createSelected;
         }
@@ -134,14 +133,14 @@ public class OptionsSelectorElement extends UiElement {
 
     @FXML
     private void onCreateButtonClicked() {
-        if(optionsCreatorController.checkCreateReady()) {
-            optionsCreatorController.getCreator().getId();
+        if(savesCreatorController.checkCreateReady()) {
+            savesCreatorController.getCreator().getId();
             reloadComponents();
-            for(Pair<SelectorEntryElement, AnchorPane> option: options) {
-                option.getKey().beforeShow(null);
+            for(Pair<SelectorEntryElement, AnchorPane> save: saves) {
+                save.getKey().beforeShow(null);
             }
         } else {
-            optionsCreatorController.showError(true);
+            savesCreatorController.showError(true);
         }
     }
 
@@ -156,21 +155,21 @@ public class OptionsSelectorElement extends UiElement {
 
     private void onSelected(LauncherManifest manifest, boolean selected) {
         if(selected) {
-            for(Pair<SelectorEntryElement, AnchorPane> option : options) {
-                option.getKey().select(false, true, false);
+            for(Pair<SelectorEntryElement, AnchorPane> save : saves) {
+                save.getKey().select(false, true, false);
             }
-            currentOptions = manifest;
+            currentSaves = manifest;
             createSelected = false;
             createSelector.getStyleClass().remove("selected");
             creatorContainer.setVisible(false);
             folderButton.setDisable(false);
-            optionsDetailsTitle.setText(manifest.getName());
-            optionsDetailsTitle.setDisable(false);
+            savesDetailsTitle.setText(manifest.getName());
+            savesDetailsTitle.setDisable(false);
         } else {
-            currentOptions = null;
+            currentSaves = null;
             folderButton.setDisable(true);
-            optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
-            optionsDetailsTitle.setDisable(true);
+            savesDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
+            savesDetailsTitle.setDisable(true);
         }
     }
 }
