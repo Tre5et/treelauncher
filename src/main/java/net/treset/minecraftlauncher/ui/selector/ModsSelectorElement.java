@@ -87,6 +87,7 @@ public class ModsSelectorElement extends UiElement {
     public void beforeShow(Stage stage) {
         reloadComponents();
         modsCreatorController.beforeShow(stage);
+        modsManagerController.setVisible(false);
         for(Pair<SelectorEntryElement, AnchorPane> save: mods) {
             save.getKey().beforeShow(stage);
         }
@@ -182,7 +183,7 @@ public class ModsSelectorElement extends UiElement {
             folderButton.setDisable(false);
             modsDetailsTitle.setText(manifest.getName());
             modsDetailsTitle.setDisable(false);
-            modsManagerController.setLauncherMods(currentMods.getValue());
+            modsManagerController.setLauncherMods(currentMods);
             modsManagerController.setVisible(false);
             modsManagerController.setVisible(true);
         } else {

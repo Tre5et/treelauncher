@@ -232,7 +232,7 @@ public class ModsCreatorElement extends UiElement {
     }
 
     public boolean checkCreateReady() {
-        boolean result = (modsComponents != null && typeConversion != null && modsManifest != null && gameManifest != null && gameVersion != null && modsType != null && ((radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
+        boolean result = (modsComponents != null && typeConversion != null && modsManifest != null && gameManifest != null && (((gameVersion != null || (selectVersion && createVersionChoice.getSelectionModel().getSelectedItem() != null)) && modsType != null && radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
         return result;
     }
 

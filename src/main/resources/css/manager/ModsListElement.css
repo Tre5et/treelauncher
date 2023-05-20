@@ -9,6 +9,11 @@
     -fx-background-color: -fx-background-secondary;
     -fx-padding: 3px 3px 3px 3px;
 }
+.icon-container {
+    -fx-padding: 5px 5px 5px 5px;
+    -fx-background-color: -fx-background-tertiary;
+    -fx-background-radius: 3px;
+}
 
 .image-view.modrinth.current {
     -fx-image: url("/img/modprovider/modrinth.png");

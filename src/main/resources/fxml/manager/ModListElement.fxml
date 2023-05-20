@@ -9,6 +9,7 @@
 <AnchorPane fx:id="rootPane" minWidth="-Infinity" styleClass="element-root" stylesheets="@/css/manager/ModsListElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModListElement">
     <GridPane styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
+         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
             <ColumnConstraints hgrow="ALWAYS" />
             <ColumnConstraints hgrow="SOMETIMES" />
         </columnConstraints>
@@ -16,19 +17,37 @@
             <RowConstraints vgrow="SOMETIMES" />
             <RowConstraints vgrow="SOMETIMES" />
         </rowConstraints>
-        <VBox alignment="CENTER_LEFT" GridPane.rowSpan="2">
+        <GridPane GridPane.fillHeight="true" GridPane.fillWidth="true" GridPane.rowSpan="2">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" />
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" />
+                <ColumnConstraints hgrow="SOMETIMES" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS" />
+                <RowConstraints fillHeight="false" vgrow="NEVER" />
+                <RowConstraints vgrow="ALWAYS" />
+            </rowConstraints>
+            <GridPane.margin>
+                <Insets left="10.0" right="10.0" />
+            </GridPane.margin>
+            <HBox styleClass="icon-container" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <ImageView fx:id="logoImage" fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            </HBox>
+        </GridPane>
+        <VBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowSpan="2">
             <Label fx:id="title" minWidth="-Infinity" styleClass="element-title" text="Title" />
             <Label fx:id="description" styleClass="element-details" text="Description" />
         </VBox>
-        <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.fillWidth="true">
-            <Button fx:id="installButton" styleClass="button, invisible" >
+        <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="2" GridPane.fillWidth="true">
+            <Button fx:id="installButton" onMouseClicked="#onInstallClicked" styleClass="button, invisible">
                 <graphic>
                     <FontIcon iconLiteral="mdoal-cloud_download:32" styleClass="icon" />
                 </graphic>
             </Button>
-            <ComboBox fx:id="versionSelector" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="versionSelector" HBox.hgrow="ALWAYS" />
         </HBox>
-        <HBox alignment="BOTTOM_RIGHT" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <HBox alignment="BOTTOM_RIGHT" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1">
             <ImageView fx:id="modrinthLogo" fitHeight="36" fitWidth="36" pickOnBounds="true" preserveRatio="true" styleClass="modrinth">
             <HBox.margin>
                <Insets right="5.0" />
