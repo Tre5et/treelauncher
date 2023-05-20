@@ -9,3 +9,23 @@
     -fx-background-color: -fx-background-secondary;
     -fx-padding: 3px 3px 3px 3px;
 }
+
+.image-view.modrinth.current {
+    -fx-image: url("/img/modprovider/modrinth.png");
+}
+.image-view.modrinth.available {
+    -fx-image: url("/img/modprovider/modrinth_available.png");
+}
+.image-view.modrinth {
+    -fx-image: url("/img/modprovider/modrinth_unavailabe.png");
+}
+
+.image-view.curseforge.current {
+    -fx-image: url("/img/modprovider/curseforge.png");
+}
+.image-view.curseforge.available {
+    -fx-image: url("/img/modprovider/curseforge_availabe.png");
+}
+.image-view.curseforge {
+    -fx-image: url("/img/modprovider/curseforge_unavailabe.png");
+}

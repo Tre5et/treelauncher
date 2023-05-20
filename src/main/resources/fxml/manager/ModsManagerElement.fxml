@@ -3,10 +3,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <AnchorPane fx:id="rootPane" visible="false" styleClass="element-root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
     <VBox fx:id="currentModsBox" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <HBox alignment="TOP_CENTER" VBox.vgrow="NEVER">
-            <Label text="%manager.mods.label.current" />
+        <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+            <Button fx:id="addButton" styleClass="button, invisible">
+                <graphic>
+                    <FontIcon iconLiteral="mdomz-plus:48" styleClass="icon" />
+                </graphic>
+            </Button>
+            <Label styleClass="title" text="%manager.mods.label.current" />
         </HBox>
         <VBox fx:id="currentModsContainer" VBox.vgrow="ALWAYS">
         </VBox>

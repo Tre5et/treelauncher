@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.ui.manager;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -11,18 +12,16 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
-import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.UiLoader;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class ModListElement extends UiElement {
     @FXML private AnchorPane rootPane;
     @FXML private Label title;
     @FXML private Label description;
+    @FXML private Button installButton;
     @FXML private ComboBox<String> versionSelector;
     @FXML private ImageView modrinthLogo;
     @FXML private ImageView curseforgeLogo;
@@ -35,11 +34,26 @@ public class ModListElement extends UiElement {
         if(mod != null) {
             title.setText(mod.getName());
             description.setText(mod.getDescription());
+            versionSelector.getItems().clear();
+            versionSelector.getItems().add(mod.getVersion());
+            versionSelector.getSelectionModel().select(0);
+            modrinthLogo.getStyleClass().remove("current");
+            modrinthLogo.getStyleClass().remove("available");
+            curseforgeLogo.getStyleClass().remove("current");
+            curseforgeLogo.getStyleClass().remove("available");
             for(LauncherModDownload d : mod.getDownloads()) {
                 if("modrinth".equals(d.getProvider())) {
-                    modrinthLogo.setImage(new Image("/img/modrinth.png"));
+                    if("modrinth".equals(mod.getCurrentProvider())) {
+                        modrinthLogo.getStyleClass().add("current");
+                    } else {
+                        modrinthLogo.getStyleClass().add("available");
+                    }
                 } else if("curseforge".equals(d.getProvider())) {
-                    curseforgeLogo.setImage(new Image("/img/curseforge.png"));
+                    if("curseforge".equals(mod.getCurrentProvider())) {
+                        curseforgeLogo.getStyleClass().add("current");
+                    } else {
+                        curseforgeLogo.getStyleClass().add("available");
+                    }
                 }
             }
         }
@@ -52,6 +66,10 @@ public class ModListElement extends UiElement {
     @Override
     public void setRootVisible(boolean visible) {
         rootPane.setVisible(visible);
+    }
+
+    public void setInstallAvailable(boolean available) {
+        installButton.setVisible(available);
     }
 
     public LauncherMod getMod() {
