@@ -34,3 +34,13 @@
 .image-view.curseforge {
     -fx-image: url("/img/modprovider/curseforge_unavailabe.png");
 }
+
+.icon.select-disabled {
+    -fx-icon-code: "mdomz-visibility";
+    -fx-icon-size: 32;
+}
+
+.icon.select-enabled {
+    -fx-icon-code: "mdomz-visibility_off";
+    -fx-icon-size: 32;
+}

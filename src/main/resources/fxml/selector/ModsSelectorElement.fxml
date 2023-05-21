@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import javafx.geometry.Insets?>
 <SplitPane fx:id="rootPane" dividerPositions="0.45" styleClass="element-root" stylesheets="@/css/generic/SelectorElement.css" visible="false" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ModsSelectorElement">
-    <AnchorPane minWidth="-Infinity" styleClass="element">
+    <AnchorPane styleClass="element">
         <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
                 <Label styleClass="title" text="%mods.label.title" />
             </VBox>
-            <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity" VBox.vgrow="ALWAYS">
+            <ScrollPane fitToWidth="true" minHeight="10.0" VBox.vgrow="ALWAYS">
                 <VBox fx:id="modsContainer" alignment="TOP_CENTER">
                 </VBox>
             </ScrollPane>
@@ -41,11 +39,11 @@
                 <Label fx:id="modsDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
             </HBox>
             <AnchorPane>
-                <VBox fx:id="creatorContainer" visible="false" alignment="TOP_CENTER" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+                <VBox fx:id="creatorContainer" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
                     <fx:include fx:id="modsCreator" source="/fxml/create/ModsCreatorElement.fxml" />
                     <Button fx:id="createButton" onMouseClicked="#onCreateButtonClicked" text="%creator.button.create" />
                 </VBox>
-                <fx:include fx:id="modsManager" source="/fxml/manager/ModsManagerElement.fxml" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"/>
+                <fx:include fx:id="modsManager" source="/fxml/manager/ModsManagerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
             </AnchorPane>
         </VBox>
     </AnchorPane>

@@ -10,3 +10,8 @@
     -fx-border-radius: 5px;
     -fx-text-fill: -fx-text;
 }
+
+.text-field.search {
+    -fx-font-size: 16pt;
+    -fx-font-weight: 700;
+}

@@ -35,25 +35,42 @@
                 <ImageView fx:id="logoImage" fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             </HBox>
         </GridPane>
-        <VBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowSpan="2">
+        <VBox alignment="CENTER_LEFT" minWidth="10.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowSpan="2">
             <Label fx:id="title" minWidth="-Infinity" styleClass="element-title" text="Title" />
-            <Label fx:id="description" styleClass="element-details" text="Description" />
+            <Label fx:id="description" minWidth="10.0" styleClass="element-details" text="Description" textOverrun="WORD_ELLIPSIS" wrapText="true" />
         </VBox>
-        <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="2" GridPane.fillWidth="true">
-            <Button fx:id="installButton" onMouseClicked="#onInstallClicked" styleClass="button, invisible">
-                <graphic>
-                    <FontIcon iconLiteral="mdoal-cloud_download:32" styleClass="icon" />
-                </graphic>
-            </Button>
-            <ComboBox fx:id="versionSelector" HBox.hgrow="ALWAYS" />
-        </HBox>
+        <VBox alignment="BOTTOM_RIGHT" GridPane.columnIndex="2">
+            <HBox alignment="CENTER_RIGHT">
+                <ImageView fx:id="downloadingImage" visible="false" fitHeight="32" fitWidth="32" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../../img/downloading.gif"/>
+                </ImageView>
+                <Button fx:id="installButton" onMouseClicked="#onInstallButtonClicked" styleClass="invisible">
+                    <graphic>
+                        <FontIcon iconLiteral="mdoal-cloud_download:32" styleClass="icon" />
+                    </graphic>
+                </Button>
+                <ComboBox fx:id="versionSelector" promptText="%manager.mods.prompt.version" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="disableButton" onMouseClicked="#onDisableButtonClicked" styleClass="invisible">
+                    <graphic>
+                        <FontIcon fx:id="disableIcon" styleClass="icon" />
+                    </graphic>
+                </Button>
+                <Button fx:id="deleteButton" onMouseClicked="#onDeleteButtonClicked" styleClass="invisible">
+                    <graphic>
+                        <FontIcon iconLiteral="mdoal-delete:32" styleClass="icon" />
+                    </graphic>
+                </Button>
+            </HBox>
+        </VBox>
         <HBox alignment="BOTTOM_RIGHT" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1">
-            <ImageView fx:id="modrinthLogo" fitHeight="36" fitWidth="36" pickOnBounds="true" preserveRatio="true" styleClass="modrinth">
+            <ImageView fx:id="modrinthLogo" fitHeight="32" fitWidth="32" pickOnBounds="true" preserveRatio="true" styleClass="modrinth">
             <HBox.margin>
                <Insets right="5.0" />
             </HBox.margin>
             </ImageView>
-            <ImageView fx:id="curseforgeLogo" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" styleClass="curseforge">
+            <ImageView fx:id="curseforgeLogo" fitHeight="32" fitWidth="32" pickOnBounds="true" preserveRatio="true" styleClass="curseforge">
             <HBox.margin>
                <Insets left="5.0" />
             </HBox.margin>

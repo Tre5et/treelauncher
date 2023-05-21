@@ -1,0 +1,44 @@
+
+
+.toggle-button {
+    -fx-border-color: -fx-button-border;
+    -fx-background-color: -fx-button-background;
+    -fx-text-fill: -fx-button-text;
+    -fx-font-size: 12pt;
+    -fx-font-weight: 700;
+    -fx-font-style: italic;
+    -fx-border-radius: 5px;
+    -fx-icon-color: -fx-button-text;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -fx-drop-shadow, 5, 0.5, 2, 2);
+}
+
+.toggle-button:hover {
+    -fx-border-color: -fx-button-hover-border;
+    -fx-background-color: -fx-button-hover-background;
+    -fx-text-fill: -fx-button-hover-text;
+    -fx-icon-color: -fx-button-hover-text;
+}
+
+.toggle-button:pressed {
+    -fx-border-color: -fx-button-active-border;
+    -fx-background-color: -fx-button-active-background;
+    -fx-text-fill: -fx-button-active-text;
+    -fx-icon-color: -fx-button-active-text;
+    -fx-effect: none
+}
+
+.toggle-button:selected {
+    -fx-border-color: -fx-button-selected-border;
+    -fx-background-color: -fx-button-selected-background;
+    -fx-text-fill: -fx-button-selected-text;
+    -fx-icon-color: -fx-button-selected-text;
+}
+
+.toggle-button:disabled {
+    -fx-border-color: -fx-button-disabled-border;
+    -fx-background-color: -fx-button-disabled-background;
+    -fx-text-fill: -fx-button-disabled-text;
+    -fx-opacity: 0.5;
+    -fx-effect: none;
+}

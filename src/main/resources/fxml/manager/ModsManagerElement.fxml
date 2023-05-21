@@ -2,19 +2,22 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-<AnchorPane fx:id="rootPane" visible="false" styleClass="element-root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
+<AnchorPane fx:id="rootPane" styleClass="element-root" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
     <VBox fx:id="currentModsBox" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-            <Button fx:id="addButton" styleClass="button, invisible">
+            <Button fx:id="addButton" onMouseClicked="#onAddButtonClicked" styleClass="button, invisible">
                 <graphic>
                     <FontIcon iconLiteral="mdomz-plus:48" styleClass="icon" />
                 </graphic>
             </Button>
             <Label styleClass="title" text="%manager.mods.label.current" />
         </HBox>
-        <VBox fx:id="currentModsContainer" VBox.vgrow="ALWAYS">
-        </VBox>
+        <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+            <VBox fx:id="currentModsContainer" VBox.vgrow="ALWAYS">
+            </VBox>
+        </ScrollPane>
     </VBox>
+    <fx:include fx:id="modSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>

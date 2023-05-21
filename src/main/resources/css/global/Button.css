@@ -8,6 +8,9 @@
     -fx-button-active-background: -fx-primary-500;
     -fx-button-active-border: -fx-primary-500;
     -fx-button-active-text: -fx-button-text;
+    -fx-button-selected-background: -fx-primary-500;
+    -fx-button-selected-border: -fx-primary-400;
+    -fx-button-selected-text: -fx-text;
     -fx-button-disabled-background: -fx-primary-800;
     -fx-button-disabled-border: -fx-primary-800;
     -fx-button-disabled-text: -fx-primary-100;
