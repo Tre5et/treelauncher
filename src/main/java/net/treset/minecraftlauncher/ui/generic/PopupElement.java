@@ -21,6 +21,13 @@ public class PopupElement extends UiElement {
         NEGATIVE
     }
 
+    public enum PopupType {
+        NONE,
+        SUCCESS,
+        WARNING,
+        ERROR
+    }
+
     public static class PopupButton {
         private Button button;
 
@@ -53,12 +60,14 @@ public class PopupElement extends UiElement {
     }
 
     @FXML private GridPane rootPane;
+    @FXML private GridPane popupContainer;
     @FXML private Label titleLabel;
     @FXML private Label messageLabel;
     @FXML private HBox buttonContainer;
 
     private ArrayList<PopupButton> activeButtons;
     private boolean disabled = false;
+    private PopupType popupType = PopupType.NONE;
 
     @Override
     public void beforeShow(Stage stage) {
@@ -87,6 +96,22 @@ public class PopupElement extends UiElement {
     public void setControlsDisabled(boolean disabled) {
         this.disabled = disabled;
         activeButtons.forEach(button -> button.setDisabled(disabled));
+    }
+
+    public void setType(PopupType type) {
+        popupType = type;
+        updateType();
+    }
+
+    private void updateType() {
+        popupContainer.getStyleClass().remove("success");
+        popupContainer.getStyleClass().remove("warning");
+        popupContainer.getStyleClass().remove("error");
+        switch (popupType) {
+            case SUCCESS -> popupContainer.getStyleClass().add("success");
+            case WARNING -> popupContainer.getStyleClass().add("warning");
+            case ERROR -> popupContainer.getStyleClass().add("error");
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package net.treset.minecraftlauncher.ui.base;
 
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 

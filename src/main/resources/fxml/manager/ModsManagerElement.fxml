@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
+<?import javafx.geometry.Insets?>
 <AnchorPane fx:id="rootPane" styleClass="element-root" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
     <VBox fx:id="currentModsBox" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
@@ -15,9 +16,23 @@
             <Label styleClass="title" text="%manager.mods.label.current" />
         </HBox>
         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-            <VBox fx:id="currentModsContainer" VBox.vgrow="ALWAYS">
+            <VBox fx:id="currentModsContainer">
             </VBox>
         </ScrollPane>
+        <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER" >
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+            <Label text="%manager.mods.prompt.changeversion" />
+            <ComboBox fx:id="versionSelector" />
+            <CheckBox fx:id="snapshotsCheck" onMouseClicked="#onSnapshotsChecked" text="%creator.version.checkbox.snapshots" />
+            <Button fx:id="reloadButton" styleClass="invisible" onMouseClicked="#onReloadButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdomz-sync:32" styleClass="icon" />
+                </graphic>
+            </Button>
+        </HBox>
     </VBox>
     <fx:include fx:id="modSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>

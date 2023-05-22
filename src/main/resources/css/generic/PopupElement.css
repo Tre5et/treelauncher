@@ -1,8 +1,31 @@
 .popup-container {
     -fx-background-color: -fx-background-tertiary;
     -fx-background-radius: 5px;
-    -fx-border-color: -fx-primary-400;
+    -fx-border-width: 4px;
+    -fx-padding: 15px 15px 15px 15px;
+    -fx-border-color: #999999;
     -fx-border-radius: 5px;
+}
+
+.popup-container.success {
+    -fx-border-color: -fx-primary-400;
+}
+
+.popup-container.warning {
+    -fx-border-color: -fx-warning;
+}
+
+.popup-container.error {
+    -fx-border-color: -fx-error;
+}
+
+.popup-container.processing {
+}
+
+
+.popup-background {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-background-radius: 5px;
 }
 
 .label.title {
@@ -12,6 +35,10 @@
 
 .label.message {
     -fx-font-style: italic;
+}
+
+.button-container {
+    -fx-padding: 20px 0 0 0;
 }
 
 .button {

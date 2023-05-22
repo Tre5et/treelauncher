@@ -57,6 +57,7 @@ public class InstanceCreatorElement extends UiElement {
                     versionCreatorController.getCreator()
             );
             scrollContainer.getStyleClass().add("popup-background");
+            popupController.setType(PopupElement.PopupType.NONE);
             popupController.setContent("creator.instance.popup.label.creating", "");
             popupController.setVisible(true);
             new Thread(() -> onInstanceCreationDone(creator.getId() != null)).start();
@@ -71,8 +72,10 @@ public class InstanceCreatorElement extends UiElement {
     private void onInstanceCreationDone(boolean success) {
         Platform.runLater(() -> {
             if(success) {
+                popupController.setType(PopupElement.PopupType.SUCCESS);
                 popupController.setContent("creator.instance.popup.label.success", "");
             } else {
+                popupController.setType(PopupElement.PopupType.ERROR);
                 popupController.setContent("creator.instance.popup.label.failure", "");
             }
             popupController.setControlsDisabled(false);

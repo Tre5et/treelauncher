@@ -38,7 +38,7 @@
                 </Button>
                 <Label fx:id="modsDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
             </HBox>
-            <AnchorPane>
+            <AnchorPane VBox.vgrow="ALWAYS">
                 <VBox fx:id="creatorContainer" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
                     <fx:include fx:id="modsCreator" source="/fxml/create/ModsCreatorElement.fxml" />
                     <Button fx:id="createButton" onMouseClicked="#onCreateButtonClicked" text="%creator.button.create" />
