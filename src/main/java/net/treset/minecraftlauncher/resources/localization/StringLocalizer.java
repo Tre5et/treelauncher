@@ -25,7 +25,10 @@ public class StringLocalizer {
     }
 
     public String getTranslated(String property) {
-        return stringBundle.getString(property);
+        if(stringBundle.containsKey(property)) {
+            return stringBundle.getString(property);
+        }
+        return property;
     }
 
     public ResourceBundle getStringBundle() {

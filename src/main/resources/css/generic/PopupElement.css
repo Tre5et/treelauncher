@@ -1,0 +1,48 @@
+.popup-container {
+    -fx-background-color: -fx-background-tertiary;
+    -fx-background-radius: 5px;
+    -fx-border-color: -fx-primary-400;
+    -fx-border-radius: 5px;
+}
+
+.label.title {
+    -fx-font-size: 20pt;
+    -fx-font-weight: 700;
+}
+
+.label.message {
+    -fx-font-style: italic;
+}
+
+.button {
+    -fx-border-width: 2px;
+    -fx-border-radius: 3px;
+}
+
+.button.neutral {
+    -fx-text-fill: -fx-text;
+    -fx-background-color: transparent;
+}
+
+.button.neutral:hover {
+    -fx-text-fill: #eeeeee;
+}
+
+.button.neutral:pressed {
+    -fx-text-fill: #cccccc;
+}
+
+.button.negative {
+    -fx-background-color: #e00000;
+    -fx-border-color: #d00000;
+}
+
+.button.negative:hover {
+    -fx-background-color: #ff0000;
+    -fx-border-color: #e00000;
+}
+
+.button.negative:pressed {
+    -fx-background-color: #b00000;
+    -fx-border-color: #ba0000;
+}

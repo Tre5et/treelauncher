@@ -72,21 +72,6 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </ScrollPane>
-        <GridPane fx:id="creationPopup" visible="false" minWidth="-Infinity" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-            <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" />
-                <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
-                <ColumnConstraints hgrow="ALWAYS" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints vgrow="ALWAYS" />
-                <RowConstraints vgrow="NEVER" valignment="CENTER" />
-                <RowConstraints vgrow="ALWAYS" />
-            </rowConstraints>
-            <VBox styleClass="popup-container" alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1" >
-                <Label fx:id="popupLabel" text="%creator.instance.popup.label.undefined" />
-                <Button fx:id="popupBackButton" onMouseClicked="#onBackButtonClicked" disable="true" text="%creator.instance.popup.button.back" />
-            </VBox>
-        </GridPane>
+        <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
     </AnchorPane>
 </HBox>

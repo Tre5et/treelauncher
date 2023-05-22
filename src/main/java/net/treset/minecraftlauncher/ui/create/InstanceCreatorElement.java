@@ -14,6 +14,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.InstanceCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,10 +34,7 @@ public class InstanceCreatorElement extends UiElement {
     @FXML private ModsCreatorElement modsCreatorController;
     @FXML private VBox modsContainer;
     @FXML private Button createButton;
-    @FXML private GridPane creationPopup;
-    @FXML private Label popupLabel;
-    @FXML private Button popupBackButton;
-
+    @FXML private PopupElement popupController;
     private LauncherFiles launcherFiles;
     private boolean modsActive = true;
 
@@ -58,10 +56,9 @@ public class InstanceCreatorElement extends UiElement {
                     savesCreatorController.getCreator(),
                     versionCreatorController.getCreator()
             );
-            popupBackButton.setDisable(true);
-            popupLabel.setText(LauncherApplication.stringLocalizer.get("creator.instance.popup.label.creating"));
             scrollContainer.getStyleClass().add("popup-background");
-            creationPopup.setVisible(true);
+            popupController.setContent("creator.instance.popup.label.creating", "");
+            popupController.setVisible(true);
             new Thread(() -> onInstanceCreationDone(creator.getId() != null)).start();
 
         } else {
@@ -74,25 +71,31 @@ public class InstanceCreatorElement extends UiElement {
     private void onInstanceCreationDone(boolean success) {
         Platform.runLater(() -> {
             if(success) {
-                popupLabel.setText(LauncherApplication.stringLocalizer.get("creator.instance.popup.label.success"));
+                popupController.setContent("creator.instance.popup.label.success", "");
             } else {
-                popupLabel.setText(LauncherApplication.stringLocalizer.get("creator.instance.popup.label.failure"));
+                popupController.setContent("creator.instance.popup.label.failure", "");
             }
-            popupBackButton.setDisable(false);
+            popupController.setControlsDisabled(false);
             setLock(false);
         });
     }
 
-    @FXML
-    private void onBackButtonClicked() {
+    private void onBackButtonClicked(String id) {
         triggerHomeAction();
     }
 
     @Override
     public void beforeShow(Stage stage) {
-        creationPopup.setVisible(false);
+        popupController.setContent("creator.instance.popup.label.undefined", "");
+        popupController.clearButtons();
+        popupController.addButtons(new PopupElement.PopupButton(
+                PopupElement.ButtonType.POSITIVE,
+                "creator.instance.popup.button.back",
+                "backButton",
+                this::onBackButtonClicked
+        ));
+        popupController.setControlsDisabled(true);
         scrollContainer.getStyleClass().remove("popup-background");
-        popupBackButton.setDisable(true);
         scrollContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollContainer.setVvalue(0);
         launcherFiles = new LauncherFiles();

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class ModsManagerElement extends UiElement {
@@ -63,6 +64,7 @@ public class ModsManagerElement extends UiElement {
                 throw new RuntimeException(e);
             }
         }
+        elements.sort(Comparator.comparing(e -> e.getKey().getMod().getName()));
         currentModsContainer.getChildren().clear();
         for(Pair<ModListElement, AnchorPane> element : elements) {
             element.getKey().beforeShow(null);
