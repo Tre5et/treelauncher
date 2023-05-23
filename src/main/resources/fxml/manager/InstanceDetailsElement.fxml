@@ -8,7 +8,7 @@
 
 <VBox fx:id="container" minWidth="-Infinity" stylesheets="@/css/manager/InstanceDetails.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceDetailsElement">
     <AnchorPane minWidth="-Infinity" styleClass="details-container">
-        <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
+        <GridPane fx:id="versionContainer" onMouseClicked="#onVersionClicked" alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -30,7 +30,7 @@
         </GridPane>
     </AnchorPane>
     <AnchorPane styleClass="details-container">
-        <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
+        <GridPane fx:id="savesContainer" onMouseClicked="#onSavesClicked" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -52,7 +52,7 @@
         </GridPane>
     </AnchorPane>
     <AnchorPane styleClass="details-container">
-        <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
+        <GridPane fx:id="resourcepacksContainer" onMouseClicked="#onResourcepacksClicked" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -74,7 +74,7 @@
         </GridPane>
     </AnchorPane>
     <AnchorPane styleClass="details-container">
-        <GridPane alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
+        <GridPane fx:id="optionsContainer" onMouseClicked="#onOptionsClicked" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -96,7 +96,7 @@
         </GridPane>
     </AnchorPane>
     <AnchorPane styleClass="details-container">
-        <GridPane fx:id="modsContainer" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
+        <GridPane fx:id="modsContainer" onMouseClicked="#onModsClicked" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
                 <ColumnConstraints hgrow="ALWAYS" />

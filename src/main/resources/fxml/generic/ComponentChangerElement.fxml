@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.geometry.Insets?>
+<AnchorPane fx:id="rootPane" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="net.treset.minecraftlauncher.ui.generic.ComponentChangerElement">
+    <HBox alignment="CENTER_LEFT" spacing="5.0" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0">
+        <padding>
+            <Insets top="5" left="15" bottom="5" right="15"/>
+        </padding>
+        <ComboBox fx:id="changeBox" promptText="There should be something here" HBox.hgrow="ALWAYS" />
+        <Button fx:id="changeButton" onMouseClicked="#onChangeButtonClicked" mnemonicParsing="false" styleClass="invisible">
+            <graphic>
+                <FontIcon iconLiteral="mdomz-sync:36" styleClass="icon"/>
+            </graphic>
+        </Button>
+    </HBox>
+</AnchorPane>

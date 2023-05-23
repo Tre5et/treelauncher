@@ -18,18 +18,35 @@
     </AnchorPane>
     <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
         <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <HBox alignment="CENTER_LEFT" styleClass="title-container">
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="title-container">
                 <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onPlayButtonClicked" styleClass="invisible">
                     <graphic>
                         <FontIcon iconLiteral="mdomz-play_arrow:48" styleClass="icon" />
                     </graphic>
                 </Button>
-                <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" />
+                <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" HBox.hgrow="ALWAYS" />
+                <Button fx:id="folderButton" onMouseClicked="#onFolderButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible">
+                    <graphic>
+                        <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
+                    </graphic>
+                </Button>
             </HBox>
             <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
                 <fx:include fx:id="instanceDetails" source="../manager/InstanceDetailsElement.fxml" />
             </ScrollPane>
         </VBox>
     </AnchorPane>
-    <AnchorPane fx:id="componentPane" prefHeight="200.0" prefWidth="200.0" styleClass="element" />
+    <AnchorPane fx:id="componentPane" styleClass="element">
+        <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
+            <HBox styleClass="title-container" alignment="CENTER_LEFT" spacing="10">
+                <Button fx:id="componentFolderButton" disable="true" onMouseClicked="#onComponentFolderButtonClicked" styleClass="invisible">
+                    <graphic>
+                        <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
+                    </graphic>
+                </Button>
+                <Label fx:id="componentTitleLabel" disable="true" styleClass="title" text="%selector.instance.label.component.title" />
+            </HBox>
+            <fx:include fx:id="componentChanger" source="/fxml/generic/ComponentChangerElement.fxml"/>
+        </VBox>
+    </AnchorPane>
 </SplitPane>

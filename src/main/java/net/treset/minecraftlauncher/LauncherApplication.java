@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher;
 
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.config.Config;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
 public class LauncherApplication extends Application {
@@ -70,6 +72,7 @@ public class LauncherApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         System.setProperty("prism.lcdtext", "false");
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/icon.png"))));
 
         LoginController.showOnStage(primaryStage);
     }

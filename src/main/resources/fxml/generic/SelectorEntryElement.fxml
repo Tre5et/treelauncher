@@ -16,7 +16,7 @@
       <cursor>
          <Cursor fx:constant="HAND" />
       </cursor>
-      <Label fx:id="title" styleClass="element-title" text="Instance Name" GridPane.fillWidth="true" />
-      <Label fx:id="details" styleClass="element-details" text="Instance-Details" GridPane.fillWidth="true" GridPane.rowIndex="1" />
+      <Label fx:id="title" styleClass="element-title" text="Something went wrong..." GridPane.fillWidth="true" />
+      <Label fx:id="details" styleClass="element-details" text="If you are seeing this, please report" GridPane.fillWidth="true" GridPane.rowIndex="1" />
    </GridPane>
 </AnchorPane>
