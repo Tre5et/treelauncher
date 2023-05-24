@@ -12,6 +12,7 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.launching.GameLauncher;
@@ -19,6 +20,7 @@ import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.ComponentChangerElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
+import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceDetailsElement;
 
 import java.awt.*;
@@ -39,6 +41,7 @@ public class InstanceSelectorElement extends UiElement {
     @FXML private Button componentFolderButton;
     @FXML private Label componentTitleLabel;
     @FXML private ComponentChangerElement componentChangerController;
+    @FXML private VersionChangerElement versionChangerController;
 
     private LauncherFiles files;
     private List<Pair<SelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
@@ -48,6 +51,7 @@ public class InstanceSelectorElement extends UiElement {
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         instanceDetailsController.init(this::onComponentSelected);
+        versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange);
         files = new LauncherFiles();
     }
 
@@ -91,6 +95,7 @@ public class InstanceSelectorElement extends UiElement {
     private void onSelected(InstanceData instanceData, boolean selected) {
         instanceDetailsController.clearSelection();
         componentChangerController.setVisible(false);
+        versionChangerController.setVisible(false);
         componentTitleLabel.setDisable(true);
         componentTitleLabel.setText(LauncherApplication.stringLocalizer.get("selector.instance.label.component.title"));
         componentFolderButton.setDisable(true);
@@ -139,14 +144,20 @@ public class InstanceSelectorElement extends UiElement {
 
     private void onComponentSelected(boolean selected, InstanceDetailsElement.SelectedType type) {
         componentChangerController.setVisible(false);
+        versionChangerController.setVisible(false);
         componentTitleLabel.setDisable(true);
         componentTitleLabel.setText(LauncherApplication.stringLocalizer.get("selector.instance.label.component.title"));
         componentFolderButton.setDisable(true);
-        if(selected && type != null && type != InstanceDetailsElement.SelectedType.VERSION) {
+        if(selected && type != null) {
             List<LauncherManifest> manifests;
             LauncherManifest currentManifest;
             String label;
             switch(type) {
+                case VERSION -> {
+                    versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
+                    versionChangerController.setVisible(true);
+                    return;
+                }
                 case SAVES -> {
                     manifests = files.getSavesComponents();
                     currentManifest = currentInstance.getSavesComponent();
@@ -194,6 +205,20 @@ public class InstanceSelectorElement extends UiElement {
         if(currentInstance != null) {
             instanceDetailsController.populate(currentInstance);
         }
+    }
+
+    private void onVersionChange(VersionCreator creator) {
+        new Thread(() -> {
+            String id = creator.getId();
+            if(id == null) {
+                return;
+            }
+            currentInstance.getInstance().getValue().setVersionComponent(id);
+            currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
+            files.reloadAll();
+            currentInstance = InstanceData.of(currentInstance.getInstance(), files);
+            Platform.runLater(() -> versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue()));
+        }).start();
     }
 
     @FXML

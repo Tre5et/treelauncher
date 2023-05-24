@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<AnchorPane fx:id="rootPane" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="net.treset.minecraftlauncher.ui.generic.VersionChangerElement">
+    <HBox alignment="CENTER_LEFT" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <ComboBox fx:id="versionChoice" promptText="There should be something here"/>
+        <CheckBox fx:id="snapshotsCheck" mnemonicParsing="false" text="%creator.version.checkbox.snapshots"/>
+        <ComboBox fx:id="typeChoice" promptText="THis bad" />
+        <ComboBox fx:id="loaderChoice" promptText="%creator.version.prompt.loaderversion" />
+        <Button fx:id="changeButton" onMouseClicked="#onChangeButtonClicked" styleClass="invisible">
+            <graphic>
+                <FontIcon iconLiteral="mdomz-sync:32" styleClass="icon" />
+            </graphic>
+        </Button>
+    </HBox>
+</AnchorPane>

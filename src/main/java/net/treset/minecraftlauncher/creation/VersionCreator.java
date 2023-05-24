@@ -113,6 +113,9 @@ public class VersionCreator extends GenericComponentCreator {
                 }
 
                 LauncherVersionDetails details = new LauncherVersionDetails(
+                        fabricProfile.getInheritsFrom(),
+                        "fabric",
+                        fabricVersion.getLoader().getVersion(),
                         null,
                         dependsId,
                         null,
@@ -212,6 +215,9 @@ public class VersionCreator extends GenericComponentCreator {
         }
 
         LauncherVersionDetails details = new LauncherVersionDetails(
+                mcVersion.getId(),
+                "vanilla",
+                null,
                 mcVersion.getAssets(),
                 null,
                 null,

@@ -47,6 +47,7 @@
                 <Label fx:id="componentTitleLabel" disable="true" styleClass="title" text="%selector.instance.label.component.title" />
             </HBox>
             <fx:include fx:id="componentChanger" source="/fxml/generic/ComponentChangerElement.fxml"/>
+            <fx:include fx:id="versionChanger" source="/fxml/generic/VersionChangerElement.fxml"/>
         </VBox>
     </AnchorPane>
 </SplitPane>
