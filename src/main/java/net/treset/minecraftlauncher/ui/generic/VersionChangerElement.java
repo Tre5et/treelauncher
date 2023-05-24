@@ -55,15 +55,27 @@ public class VersionChangerElement extends UiElement {
         this.changeCallback = changeCallback;
         typeChoice.getItems().clear();
         typeChoice.getItems().addAll("Vanilla", "Fabric");
+        versionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(this::onVersionChanged);
+        });
+        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(this::onTypeChanged);
+        });
+        loaderChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(this::onLoaderVersionChanged);
+        });
     }
 
     @Override
     public void beforeShow(Stage stage) {
         if(currentVersion != null) {
             versionChoice.getItems().clear();
-            //versionChoice.getItems().add()
             snapshotsCheck.setSelected(false);
-            //typeChoice.select();
+            loaderChoice.getItems().clear();
+            switch (currentVersion.getVersionType()) {
+                case "vanilla" -> typeChoice.getSelectionModel().select("Vanilla");
+                case "fabric" -> typeChoice.getSelectionModel().select("Fabric");
+            }
             populateVersionChoice();
         }
     }
@@ -81,6 +93,29 @@ public class VersionChangerElement extends UiElement {
         }
     }
 
+    private void onVersionChanged() {
+        updateButtonState();
+        updateLoaderChoice();
+    }
+
+    private void onTypeChanged() {
+        updateButtonState();
+        updateLoaderChoice();
+    }
+
+    private void onLoaderVersionChanged() {
+        updateButtonState();
+    }
+
+    private void updateButtonState() {
+        changeButton.setDisable(currentVersion.getVersionNumber().equals(versionChoice.getValue()) && currentVersion.getVersionType().equals(typeChoice.getValue().toLowerCase()) && (currentVersion.getLoaderVersion() == null || currentVersion.getLoaderVersion().equals(loaderChoice.getValue())));
+    }
+
+    @FXML
+    private void onSnapshotsChecked() {
+        populateVersionChoice();
+    }
+
     public void setCurrentVersion(LauncherVersionDetails currentVersion) {
         this.currentVersion = currentVersion;
     }
@@ -94,6 +129,7 @@ public class VersionChangerElement extends UiElement {
             vanillaVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
             Platform.runLater(() -> {
                 versionChoice.getItems().addAll(vanillaVersions.stream().map(MinecraftVersion::getId).toList());
+                versionChoice.getSelectionModel().select(currentVersion.getVersionNumber());
                 versionChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
                 versionChoice.setDisable(false);
             });
@@ -112,6 +148,7 @@ public class VersionChangerElement extends UiElement {
                 fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue()));
                 Platform.runLater(() -> {
                     loaderChoice.getItems().addAll(fabricVersions.stream().map(v -> v.getLoader().getVersion()).toList());
+                    loaderChoice.getSelectionModel().select(currentVersion.getLoaderVersion());
                     loaderChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loaderversion"));
                     loaderChoice.setDisable(false);
                 });
@@ -175,7 +212,7 @@ public class VersionChangerElement extends UiElement {
 
     @Override
     public void setRootVisible(boolean visible) {
-        rootPane.setVisible(true);
+        rootPane.setVisible(visible);
     }
 
     public boolean checkCreateReady() {

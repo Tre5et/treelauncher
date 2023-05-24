@@ -19,6 +19,7 @@ import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.ComponentChangerElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceDetailsElement;
@@ -32,7 +33,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class InstanceSelectorElement extends UiElement {
-    @FXML private SplitPane rootPane;
+    @FXML private AnchorPane rootPane;
     @FXML private VBox instanceContainer;
     @FXML private Button playButton;
     @FXML private Label instanceDetailsTitle;
@@ -42,6 +43,7 @@ public class InstanceSelectorElement extends UiElement {
     @FXML private Label componentTitleLabel;
     @FXML private ComponentChangerElement componentChangerController;
     @FXML private VersionChangerElement versionChangerController;
+    @FXML private PopupElement popupController;
 
     private LauncherFiles files;
     private List<Pair<SelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
@@ -51,8 +53,8 @@ public class InstanceSelectorElement extends UiElement {
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         instanceDetailsController.init(this::onComponentSelected);
-        versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange);
         files = new LauncherFiles();
+        versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange);
     }
 
     public void reloadComponents() {
@@ -208,17 +210,73 @@ public class InstanceSelectorElement extends UiElement {
     }
 
     private void onVersionChange(VersionCreator creator) {
+        popupController.clearButtons();
+        popupController.setType(PopupElement.PopupType.WARNING);
+        popupController.setContent("selector.instance.version.popup.change.title", "selector.instance.version.popup.change.message");
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "selector.instance.version.popup.change.cancel",
+                        "cancel",
+                        this::onPopupChangeCancel
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.instance.version.popup.change.confirm",
+                        "confirm",
+                        id -> this.onPopupChangeConfirm(id, creator)
+                )
+        );
+        popupController.setVisible(true);
+    }
+
+    private void onPopupChangeConfirm(String id, VersionCreator creator) {
+        popupController.setVisible(false);
+        popupController.setContent("selector.instance.version.popup.changing", "");
+        popupController.setType(PopupElement.PopupType.NONE);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.instance.version.popup.back",
+                        "back",
+                        this::onPopupBackClicked
+                )
+        );
+        popupController.setControlsDisabled(true);
+        popupController.setVisible(true);
+        versionChangerController.setVisible(false);
         new Thread(() -> {
-            String id = creator.getId();
-            if(id == null) {
+            String versionId = creator.getId();
+            if(versionId == null) {
+                Platform.runLater(() -> {
+                    popupController.setType(PopupElement.PopupType.ERROR);
+                    popupController.setContent("selector.instance.version.popup.failure", "");
+                    popupController.setControlsDisabled(false);
+                });
                 return;
             }
-            currentInstance.getInstance().getValue().setVersionComponent(id);
+            currentInstance.getInstance().getValue().setVersionComponent(versionId);
             currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
             files.reloadAll();
             currentInstance = InstanceData.of(currentInstance.getInstance(), files);
-            Platform.runLater(() -> versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue()));
+            Platform.runLater(() -> {
+                instanceDetailsController.populate(currentInstance);
+                versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
+                versionChangerController.setVisible(true);
+                popupController.setType(PopupElement.PopupType.SUCCESS);
+                popupController.setContent("selector.instance.version.popup.success", "");
+                popupController.setControlsDisabled(false);
+            });
         }).start();
+    }
+
+    private void onPopupBackClicked(String id) {
+        popupController.setVisible(false);
+    }
+
+    private void onPopupChangeCancel(String id) {
+        popupController.setVisible(false);
     }
 
     @FXML
