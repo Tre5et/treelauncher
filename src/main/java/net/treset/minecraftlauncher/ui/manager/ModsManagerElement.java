@@ -84,6 +84,7 @@ public class ModsManagerElement extends UiElement {
         popupController.setVisible(false);
         details.getValue().setModsVersion(versionSelector.getSelectionModel().getSelectedItem());
         details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods());
         onVersionSelected();
         reloadMods();
     }
