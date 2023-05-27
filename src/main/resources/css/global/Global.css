@@ -29,6 +29,7 @@
     -fx-background-secondary: -fx-black;
     -fx-background-tertiary: #3f3f3f;
     -fx-text: -fx-white;
+    -fx-text-secondary: #cccccc;
     -fx-warning: yellow;
     -fx-error: red;
     -fx-drop-shadow: rgba(0, 0, 0, 0.3);

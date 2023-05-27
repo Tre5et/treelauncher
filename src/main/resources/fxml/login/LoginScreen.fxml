@@ -13,10 +13,10 @@
     <fx:include fx:id="titlebar" source="/fxml/title/TitlebarElement.fxml" VBox.vgrow="NEVER"/>
     <SplitPane dividerPositions="0.26057906458797325" styleClass="element-root"
                VBox.vgrow="ALWAYS">
-        <VBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="100.0"
-              styleClass="element">
+        <VBox alignment="CENTER" spacing="10" nodeOrientation="LEFT_TO_RIGHT" styleClass="element">
             <Button fx:id="loginButton" alignment="CENTER" minWidth="-Infinity" onAction="#onLoginButtonClicked"
                     text="%login.button.microsoft" textAlignment="CENTER"/>
+            <CheckBox fx:id="rememberChoice" selected="true" text="%login.checkbox.remember"/>
         </VBox>
         <GridPane alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" styleClass="element">
             <columnConstraints>

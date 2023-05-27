@@ -1,8 +1,11 @@
 package net.treset.minecraftlauncher.ui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
+import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.ui.selector.ModsSelectorElement;
 import net.treset.minecraftlauncher.ui.selector.OptionsSelectorElement;
 import net.treset.minecraftlauncher.ui.selector.ResourcepacksSelectorElement;
@@ -10,6 +13,7 @@ import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
 import net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement;
 import net.treset.minecraftlauncher.ui.nav.NavbarElement;
 import net.treset.minecraftlauncher.ui.selector.SavesSelectorElement;
+import net.treset.minecraftlauncher.ui.settings.SettingsElement;
 import net.treset.minecraftlauncher.ui.title.TitlebarElement;
 
 import java.io.IOException;
@@ -22,6 +26,7 @@ public class MainController extends GenericUiController {
     @FXML private ResourcepacksSelectorElement resourcepacksSelectorController;
     @FXML private OptionsSelectorElement optionsSelectorController;
     @FXML private ModsSelectorElement modsSelectorController;
+    @FXML private SettingsElement settingsController;
     @FXML private NavbarElement navbarController;
 
     boolean locked = false;
@@ -40,6 +45,7 @@ public class MainController extends GenericUiController {
         resourcepacksSelectorController.init(this, this::setLocked, this::getLocked);
         optionsSelectorController.init(this, this::setLocked, this::getLocked);
         modsSelectorController.init(this, this::setLocked, this::getLocked);
+        settingsController.init(this::onLogout);
         activate(Component.INSTANCE_SELECTOR);
     }
 
@@ -86,6 +92,10 @@ public class MainController extends GenericUiController {
                 setAllInvisible();
                 modsSelectorController.setVisible(true);
                 break;
+            case SETTINGS:
+                setAllInvisible();
+                settingsController.setVisible(true);
+                break;
         }
     }
 
@@ -96,6 +106,7 @@ public class MainController extends GenericUiController {
         resourcepacksSelectorController.setVisible(false);
         optionsSelectorController.setVisible(false);
         modsSelectorController.setVisible(false);
+        settingsController.setVisible(false);
     }
 
     public boolean getLocked() {
@@ -113,6 +124,17 @@ public class MainController extends GenericUiController {
         SAVES_SELECTOR,
         RESOURCEPACKS_SELECTOR,
         OPTIONS_SELECTOR,
-        MODS_SELECTOR;
+        MODS_SELECTOR,
+        SETTINGS
+    }
+
+    private void onLogout() {
+        LauncherApplication.userAuth.logout();
+        try {
+            LoginController.showOnStage(getStage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            getStage().close();
+        }
     }
 }

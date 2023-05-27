@@ -44,6 +44,7 @@ public class NavbarElement extends UiElement {
 
     @FXML
     private void onProfileButtonClicked() {
+        componentActivator.accept(MainController.Component.SETTINGS);
     }
 
     @Override

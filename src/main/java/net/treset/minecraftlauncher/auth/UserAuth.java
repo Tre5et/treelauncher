@@ -9,10 +9,12 @@ import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
+import net.treset.minecraftlauncher.LauncherApplication;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.sql.Connection;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -26,82 +28,78 @@ public class UserAuth {
     private boolean authenticating = false;
     private User minecraftUser;
 
-    public void authenticate(File authFile, boolean ignoreFile , Consumer<Boolean> doneCallback) {
-        authenticating = true;
-
-        if(authFile.isFile() && !ignoreFile) {
-            InputStream authFileStream;
-            try {
-                authFileStream = new FileInputStream(authFile);
-            } catch (FileNotFoundException e) {
-                LOGGER.error("Unable to open create input stream for auth file", e);
-                doneCallback.accept(false);
-                return;
-            }
-
-            AuthenticationFile authenticationFile;
-            try {
-                authenticationFile = AuthenticationFile.readCompressed(authFileStream);
-                authFileStream.close();
-            } catch (IOException e) {
-                LOGGER.error("Unable to read auth file", e);
-                doneCallback.accept(false);
-                return;
-            }
-
-            completeAuthentication(authFile, Authenticator.of(authenticationFile).shouldAuthenticate().build(), doneCallback);
-        }
-        else {
-            String loginUrl = Authenticator.microsoftLogin().toString();
-            if(!authFile.getParentFile().isDirectory() && !authFile.getParentFile().mkdirs()) {
-                LOGGER.error("Unable to create auth file directory");
-                doneCallback.accept(false);
-                return;
-            }
-
-            Platform.runLater(() -> {
-                Stage stage = new Stage();
-                stage.setTitle(loginUrl);
-                stage.setOnCloseRequest((WindowEvent e) -> onWebCloseRequested(stage, doneCallback));
-
-                WebView webView = new WebView();
-                webView.getEngine().load(loginUrl);
-
-                webView.getEngine().locationProperty().addListener(((obeservable, oldValue, newValue) -> this.onWebLocationChanged(stage, authFile, newValue, doneCallback)));
-
-                Scene webScene = new Scene(webView);
-                stage.setScene(webScene);
-
-                stage.show();
-            });
-        }
-
-
-    }
-
-    private void completeAuthentication(File authFile, Authenticator minecraftAuth, Consumer<Boolean> doneCallback) {
-        FileOutputStream outputStream;
-        try {
-            outputStream = new FileOutputStream(authFile);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Unable to create output stream for auth file", e);
+    public void authenticate(boolean remember, Consumer<Boolean> doneCallback) {
+        String loginUrl = Authenticator.microsoftLogin().toString();
+        if (remember && !LauncherApplication.config.AUTH_FILE.getParentFile().isDirectory() && !LauncherApplication.config.AUTH_FILE.getParentFile().mkdirs()) {
+            LOGGER.error("Unable to create auth file directory");
             doneCallback.accept(false);
             return;
         }
 
+        Platform.runLater(() -> {
+            Stage stage = new Stage();
+            stage.setTitle(loginUrl);
+            stage.setOnCloseRequest((WindowEvent e) -> onWebCloseRequested(stage, doneCallback));
+
+            WebView webView = new WebView();
+            webView.getEngine().load(loginUrl);
+
+            webView.getEngine().locationProperty().addListener(((obeservable, oldValue, newValue) -> this.onWebLocationChanged(stage, remember, newValue, doneCallback)));
+
+            Scene webScene = new Scene(webView);
+            stage.setScene(webScene);
+
+            stage.show();
+        });
+    }
+
+    public void authenticateFromFile(Consumer<Boolean> doneCallback) {
+        if(!LauncherApplication.config.AUTH_FILE.isFile()) {
+            return;
+        }
+
+        InputStream authFileStream;
+        try {
+            authFileStream = new FileInputStream(LauncherApplication.config.AUTH_FILE);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Unable to open create input stream for auth file", e);
+            doneCallback.accept(false);
+            return;
+        }
+
+        AuthenticationFile authenticationFile;
+        try {
+            authenticationFile = AuthenticationFile.readCompressed(authFileStream);
+            authFileStream.close();
+        } catch (IOException e) {
+            LOGGER.error("Unable to read auth file", e);
+            doneCallback.accept(false);
+            return;
+        }
+
+        completeAuthentication(Authenticator.of(authenticationFile).shouldAuthenticate().build(), true, doneCallback);
+    }
+
+    public boolean hasFile() {
+        return LauncherApplication.config.AUTH_FILE.isFile();
+    }
+
+    public void logout() {
+        this.loggedIn = false;
+        this.minecraftUser = null;
+        if(hasFile() && !LauncherApplication.config.AUTH_FILE.delete()) {
+            LOGGER.error("Unable to delete auth file");
+        }
+    }
+
+
+    private void completeAuthentication(Authenticator minecraftAuth, boolean saveResults, Consumer<Boolean> doneCallback) {
         try {
             minecraftAuth.run();
         } catch (AuthenticationException | NullPointerException e) {
             final AuthenticationFile resultFile = minecraftAuth.getResultFile();
-            if(resultFile != null) {
-                try {
-                    resultFile.writeCompressed(outputStream);
-                    outputStream.close();
-                } catch (IOException e1) {
-                    LOGGER.error("Unable to write auth file", e1);
-                    doneCallback.accept(false);
-                    return;
-                }
+            if(resultFile != null && saveResults && !writeToFile(resultFile)) {
+                    LOGGER.error("Unable to write auth file");
             }
             LOGGER.error("Unable to login", e);
             doneCallback.accept(false);
@@ -109,11 +107,8 @@ public class UserAuth {
         }
 
         final AuthenticationFile resultFile = minecraftAuth.getResultFile();
-        try {
-            resultFile.writeCompressed(outputStream);
-            outputStream.close();
-        } catch (IOException e) {
-            LOGGER.error("Unable to write auth file", e);
+        if(saveResults && !writeToFile(resultFile)) {
+            LOGGER.error("Unable to write auth file");
             doneCallback.accept(false);
             return;
         }
@@ -132,6 +127,24 @@ public class UserAuth {
         doneCallback.accept(true);
     }
 
+    private boolean writeToFile(AuthenticationFile file) {
+        FileOutputStream outputStream;
+        try {
+            outputStream = new FileOutputStream(LauncherApplication.config.AUTH_FILE);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Unable to create output stream for auth file", e);
+            return false;
+        }
+        try {
+            file.writeCompressed(outputStream);
+            outputStream.close();
+        } catch (IOException e) {
+            LOGGER.error("Unable to write auth file", e);
+            return false;
+        }
+        return true;
+    }
+
     public User getMinecraftUser() {
         return minecraftUser;
     }
@@ -142,7 +155,7 @@ public class UserAuth {
         doneCallback.accept(false);
     }
 
-    public void onWebLocationChanged(Stage stage, File authFile, String newUrl, Consumer<Boolean> doneCallback) {
+    public void onWebLocationChanged(Stage stage, boolean saveResults, String newUrl, Consumer<Boolean> doneCallback) {
         stage.setTitle(newUrl);
         if(newUrl.startsWith("https://login.live.com/oauth20_desktop.srf?code=")) {
             Pattern pattern = Pattern.compile("code=(.*)&");
@@ -150,7 +163,7 @@ public class UserAuth {
             if(matcher.find()) {
                 String match = matcher.group(1);
                 stage.close();
-                completeAuthentication(authFile, Authenticator.ofMicrosoft(match).shouldAuthenticate().build(), doneCallback);
+                completeAuthentication(Authenticator.ofMicrosoft(match).shouldAuthenticate().build(), saveResults, doneCallback);
             }
         }
     }

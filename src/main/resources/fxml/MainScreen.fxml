@@ -21,5 +21,6 @@
     <fx:include fx:id="resourcepacksSelector" source="selector/ResourcepacksSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true"/>
     <fx:include fx:id="optionsSelector" source="selector/OptionsSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true" />
     <fx:include fx:id="modsSelector" source="selector/ModsSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true" />
+    <fx:include fx:id="settings" source="settings/SettingsElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true" />
     <fx:include fx:id="navbar" source="nav/NavbarElement.fxml" GridPane.rowIndex="2" GridPane.fillWidth="true" />
 </GridPane>

@@ -29,6 +29,12 @@
     -fx-font-weight: bold;
 }
 
+.label.hint {
+    -fx-font-size: 10pt;
+    -fx-font-style: italic;
+    -fx-text-fill: -fx-text-secondary;
+}
+
 .label.error {
     -fx-text-fill: -fx-error;
     -fx-border-width: 0;

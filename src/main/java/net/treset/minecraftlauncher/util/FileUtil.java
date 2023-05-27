@@ -121,4 +121,14 @@ public class FileUtil {
         }
         return true;
     }
+
+    public static boolean writeFile(String path, String content) {
+        try {
+            Files.writeString(Paths.get(path), content);
+        } catch (IOException e) {
+            LOGGER.debug("Unable to write file: path={}", path, e);
+            return false;
+        }
+        return true;
+    }
 }

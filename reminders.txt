@@ -1,5 +1,0 @@
-launch:
-use included java
-args: 
-assetsDir: assets/ root folder
-assetsIndex: assets index name without .json or path (3)

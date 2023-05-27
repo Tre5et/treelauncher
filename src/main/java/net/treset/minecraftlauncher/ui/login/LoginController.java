@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.ui.login;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -20,13 +21,14 @@ public class LoginController extends GenericUiController {
 
     @FXML private TitlebarElement titlebarController;
     @FXML private Button loginButton;
+    @FXML private CheckBox rememberChoice;
     @FXML private Button continueButton;
     @FXML private Label statusLabel;
     public int loginRetry = 0;
 
     @FXML
     public void onLoginButtonClicked() {
-       triggerLogin(loginRetry > 1);
+       triggerLogin(rememberChoice.isSelected() && loginRetry < 1);
     }
 
     @FXML
@@ -46,27 +48,42 @@ public class LoginController extends GenericUiController {
 
     @Override
     public void afterShow(Stage stage) {
-        if(LauncherApplication.config.AUTH_FILE.isFile()) {
-            triggerLogin(false);
+        if(LauncherApplication.userAuth.hasFile()) {
+            loginButton.setDisable(true);
+            rememberChoice.setDisable(true);
+            statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
+            new Thread(() -> LauncherApplication.userAuth.authenticateFromFile(this::onAutoLoginDone)).start();
         }
         titlebarController.afterShow(stage);
     }
 
-    private void triggerLogin(boolean ignoreFile) {
+    private void triggerLogin(boolean remember) {
         loginButton.setDisable(true);
+        rememberChoice.setDisable(true);
         statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
-        new Thread(() -> LauncherApplication.userAuth.authenticate(LauncherApplication.config.AUTH_FILE, ignoreFile, this::onLoginDone)).start();
+        new Thread(() -> LauncherApplication.userAuth.authenticate(remember, this::onLoginDone)).start();
     }
 
     private void onLoginDone(Boolean success) {
         Platform.runLater(() -> loginDoneActions(success));
     }
 
+    private void onAutoLoginDone(boolean success) {
+        if(success) {
+            Platform.runLater(this::onContinueButtonClicked);
+        } else {
+            loginButton.setDisable(false);
+            rememberChoice.setDisable(false);
+            statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
+            loginRetry++;
+            LOGGER.warn("Login failed");
+        }
+    }
+
     private void loginDoneActions(boolean success) {
         if(success) {
             statusLabel.setText(LauncherApplication.stringLocalizer.getFormatted("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
             LOGGER.debug("Login success, username=" + LauncherApplication.userAuth.getMinecraftUser().name());
-
             continueButton.setVisible(true);
         } else {
             loginButton.setDisable(false);

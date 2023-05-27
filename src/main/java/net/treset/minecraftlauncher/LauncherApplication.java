@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.config.Config;
+import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import org.apache.logging.log4j.LogManager;
@@ -18,18 +19,21 @@ public class LauncherApplication extends Application {
     private static final Logger LOGGER = LogManager.getLogger(LauncherApplication.class);
 
     public static final UserAuth userAuth = new UserAuth();
-    public static final StringLocalizer stringLocalizer = new StringLocalizer();
+    public static StringLocalizer stringLocalizer;
     public static Config config;
 
     public static void main(String[] args) {
-        if(System.getProperty("launcher.path") == null || System.getProperty("launcher.path").isEmpty()) {
-            LOGGER.error("No launcher path provided!");
+        setupLogger();
+
+        try{
+            config = GlobalConfigLoader.loadConfig();
+        } catch (IllegalStateException e) {
+            LOGGER.error("Failed to load config!", e);
             System.exit(-1);
             return;
         }
-        config = new Config(System.getProperty("launcher.path"), System.getProperty("launcher.path") != null);
 
-        setupLogger();
+        stringLocalizer = new StringLocalizer(config.LANGUAGE);
 
         launch(args);
     }

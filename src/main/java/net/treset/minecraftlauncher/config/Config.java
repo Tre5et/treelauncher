@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.config;
 
 import net.treset.mc_version_loader.launcher.LauncherFeature;
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
+import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 
 import java.io.File;
 import java.util.List;
@@ -30,13 +31,15 @@ public class Config {
     public final List<LauncherLaunchArgument> FABRIC_DEFAULT_JVM_ARGUMENTS = List.of();
     public final String FABRIC_DEFAULT_CLIENT_FILENAME = "fabric-client.jar";
     public final boolean DEBUG;
+    public final StringLocalizer.Language LANGUAGE;
 
-    public Config(String BASE_DIR, boolean DEBUG) {
+    public Config(String BASE_DIR, boolean DEBUG, StringLocalizer.Language LANGUAGE) {
         this.BASE_DIR = BASE_DIR;
         SPECIAL_FILES_FOLDER = BASE_DIR + ".launcher/";
         AUTH_FILE = new File(SPECIAL_FILES_FOLDER + "secrets.auth");
         LOG_PATH = SPECIAL_FILES_FOLDER + "log/";
 
         this.DEBUG = DEBUG;
+        this.LANGUAGE = LANGUAGE;
     }
 }
