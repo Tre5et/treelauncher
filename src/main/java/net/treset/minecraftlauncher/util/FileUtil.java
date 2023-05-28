@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class FileUtil {
     private static Logger LOGGER = LogManager.getLogger(FileUtil.class);
@@ -80,11 +81,9 @@ public class FileUtil {
             return false;
         }
 
-        try {
-            Files.walk(Paths.get(source))
-                    .forEach(sourceF -> {
-                        Path destinationF = Paths.get(destination, sourceF.toString()
-                                .substring(source.length()));
+        try (Stream<Path> stream = Files.walk(Paths.get(source))) {
+            stream.forEach(sourceF -> {
+                        Path destinationF = Paths.get(destination, sourceF.toString().substring(source.length()));
                         try {
                             Files.copy(sourceF, destinationF, options);
                         } catch (IOException e) {
