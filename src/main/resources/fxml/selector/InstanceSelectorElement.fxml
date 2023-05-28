@@ -31,9 +31,14 @@
                             <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
                         </graphic>
                     </Button>
+                    <Button fx:id="deleteButton" onAction="#onDeleteButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible" >
+                        <graphic>
+                            <FontIcon iconLiteral="mdoal-delete_forever:48" styleClass="icon" />
+                        </graphic>
+                    </Button>
                 </HBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
-                    <fx:include fx:id="instanceDetails" source="../manager/InstanceDetailsElement.fxml" />
+                    <fx:include fx:id="instanceDetails" source="../manager/InstanceManagerElement.fxml" />
                 </ScrollPane>
             </VBox>
         </AnchorPane>

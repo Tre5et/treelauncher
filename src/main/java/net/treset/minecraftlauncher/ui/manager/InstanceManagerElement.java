@@ -10,7 +10,7 @@ import net.treset.minecraftlauncher.ui.base.UiElement;
 
 import java.util.function.BiConsumer;
 
-public class InstanceDetailsElement extends UiElement {
+public class InstanceManagerElement extends UiElement {
     public enum SelectedType {
         VERSION,
         SAVES,

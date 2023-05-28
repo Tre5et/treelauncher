@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<VBox fx:id="container" minWidth="-Infinity" stylesheets="@/css/manager/InstanceDetails.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceDetailsElement">
+<VBox fx:id="container" minWidth="-Infinity" stylesheets="@/css/manager/InstanceManagerElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceManagerElement">
     <AnchorPane minWidth="-Infinity" styleClass="details-container">
         <GridPane fx:id="versionContainer" onMouseClicked="#onVersionClicked" alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
             <columnConstraints>

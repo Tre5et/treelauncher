@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -22,7 +21,7 @@ import net.treset.minecraftlauncher.ui.generic.ComponentChangerElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
-import net.treset.minecraftlauncher.ui.manager.InstanceDetailsElement;
+import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 
 import java.awt.*;
 import java.io.File;
@@ -38,7 +37,8 @@ public class InstanceSelectorElement extends UiElement {
     @FXML private Button playButton;
     @FXML private Label instanceDetailsTitle;
     @FXML private Button folderButton;
-    @FXML private InstanceDetailsElement instanceDetailsController;
+    @FXML private Button deleteButton;
+    @FXML private InstanceManagerElement instanceDetailsController;
     @FXML private Button componentFolderButton;
     @FXML private Label componentTitleLabel;
     @FXML private ComponentChangerElement componentChangerController;
@@ -67,6 +67,7 @@ public class InstanceSelectorElement extends UiElement {
                 throw new RuntimeException(e);
             }
         }
+        popupController.setVisible(false);
         instanceContainer.getChildren().clear();
         for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
             instanceContainer.getChildren().add(instance.getValue());
@@ -112,6 +113,7 @@ public class InstanceSelectorElement extends UiElement {
             instanceDetailsTitle.setText(instanceData.getInstance().getKey().getName());
             instanceDetailsTitle.setDisable(false);
             folderButton.setDisable(false);
+            deleteButton.setDisable(false);
             instanceDetailsController.populate(instanceData);
             instanceDetailsController.setVisible(true);
         } else {
@@ -120,6 +122,7 @@ public class InstanceSelectorElement extends UiElement {
             instanceDetailsTitle.setText(LauncherApplication.stringLocalizer.get("instances.label.details.title"));
             instanceDetailsTitle.setDisable(true);
             folderButton.setDisable(true);
+            deleteButton.setDisable(true);
             instanceDetailsController.setVisible(false);
         }
     }
@@ -144,7 +147,7 @@ public class InstanceSelectorElement extends UiElement {
         Platform.runLater(() -> playButton.setDisable(false));
     }
 
-    private void onComponentSelected(boolean selected, InstanceDetailsElement.SelectedType type) {
+    private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
         componentChangerController.setVisible(false);
         versionChangerController.setVisible(false);
         componentTitleLabel.setDisable(true);
@@ -273,6 +276,8 @@ public class InstanceSelectorElement extends UiElement {
 
     private void onPopupBackClicked(String id) {
         popupController.setVisible(false);
+        setVisible(false);
+        setVisible(true);
     }
 
     private void onPopupChangeCancel(String id) {
@@ -292,6 +297,40 @@ public class InstanceSelectorElement extends UiElement {
     @FXML
     private void onFolderButtonClicked() {
         openFolder(currentInstance.getInstance().getKey().getDirectory());
+    }
+
+    @FXML
+    private void onDeleteButtonClicked() {
+        popupController.setType(PopupElement.PopupType.WARNING);
+        popupController.setContent("selector.instance.delete.title", "selector.instance.delete.message");
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "selector.instance.delete.cancel",
+                        "cancel",
+                        this::onDeleteCancel
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.instance.delete.confirm",
+                        "confirm",
+                        this::onDeleteConfirm
+                )
+        );
+        popupController.setVisible(true);
+    }
+
+    private void onDeleteCancel(String id) {
+        popupController.setVisible(false);
+    }
+
+    private void onDeleteConfirm(String id) {
+        popupController.setVisible(false);
+        currentInstance.delete(files);
+        setVisible(false);
+        reloadComponents();
+        setVisible(true);
     }
 
     private void openFolder(String path) {

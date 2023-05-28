@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -16,8 +17,10 @@ import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.create.ModsCreatorElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
+import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,16 +35,17 @@ import java.util.function.Supplier;
 public class ModsSelectorElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsSelectorElement.class);
 
-    @FXML
-    private SplitPane rootPane;
+    @FXML private AnchorPane rootPane;
     @FXML private VBox modsContainer;
     @FXML private HBox createSelector;
     @FXML private Button folderButton;
     @FXML private Label modsDetailsTitle;
+    @FXML private Button deleteButton;
     @FXML private VBox creatorContainer;
     @FXML private ModsCreatorElement modsCreatorController;
     @FXML private Button createButton;
     @FXML private ModsManagerElement modsManagerController;
+    @FXML private PopupElement popupController;
 
     private LauncherFiles files;
     private List<Pair<SelectorEntryElement, AnchorPane>> mods = new ArrayList<>();
@@ -72,7 +76,9 @@ public class ModsSelectorElement extends UiElement {
         }
         modsContainer.getChildren().clear();
         folderButton.setDisable(true);
+        modsDetailsTitle.setText("components.label.details.title");
         modsDetailsTitle.setDisable(true);
+        deleteButton.setDisable(true);
         createSelected = false;
         createSelector.getStyleClass().remove("selected");
         creatorContainer.setVisible(false);
@@ -88,23 +94,23 @@ public class ModsSelectorElement extends UiElement {
         reloadComponents();
         modsCreatorController.beforeShow(stage);
         modsManagerController.setVisible(false);
-        for(Pair<SelectorEntryElement, AnchorPane> save: mods) {
-            save.getKey().beforeShow(stage);
+        for(Pair<SelectorEntryElement, AnchorPane> m: mods) {
+            m.getKey().beforeShow(stage);
         }
     }
 
     @Override
     public void afterShow(Stage stage) {
         modsCreatorController.afterShow(stage);
-        for(Pair<SelectorEntryElement, AnchorPane> save: mods) {
-            save.getKey().afterShow(stage);
+        for(Pair<SelectorEntryElement, AnchorPane> m: mods) {
+            m.getKey().afterShow(stage);
         }
     }
 
     @FXML
     private void onFolderButtonClicked() {
         if(currentMods == null) {
-            LOGGER.warn("No saves selected");
+            LOGGER.warn("No mods selected");
         }
         File folder = new File(currentMods.getKey().getDirectory());
         try {
@@ -122,6 +128,7 @@ public class ModsSelectorElement extends UiElement {
                 folderButton.setDisable(true);
                 modsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
                 modsDetailsTitle.setDisable(true);
+                deleteButton.setDisable(true);
                 creatorContainer.setVisible(false);
             } else {
                 createSelector.getStyleClass().add("selected");
@@ -131,6 +138,7 @@ public class ModsSelectorElement extends UiElement {
                 folderButton.setDisable(true);
                 modsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.create"));
                 modsDetailsTitle.setDisable(false);
+                deleteButton.setDisable(true);
                 modsManagerController.setVisible(false);
                 modsCreatorController.beforeShow(null);
                 creatorContainer.setVisible(true);
@@ -150,6 +158,73 @@ public class ModsSelectorElement extends UiElement {
             }
         } else {
             modsCreatorController.showError(true);
+        }
+    }
+
+    @FXML
+    private void onDeleteButtonClicked() {
+        for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
+            if(currentMods.getKey().getId().equals(i.getValue().getModsComponent())) {
+                popupController.setType(PopupElement.PopupType.ERROR);
+                popupController.setTitle("selector.component.delete.unable.title");
+                popupController.setMessage("selector.component.delete.unable.message", i.getKey().getName());
+                popupController.clearButtons();
+                popupController.addButtons(
+                        new PopupElement.PopupButton(
+                                PopupElement.ButtonType.POSITIVE,
+                                "selector.component.delete.unable.close",
+                                "close",
+                                id -> popupController.setVisible(false)
+                        )
+                );
+                popupController.setVisible(true);
+                return;
+            }
+        }
+
+        popupController.setType(PopupElement.PopupType.WARNING);
+        popupController.setContent("selector.component.delete.title", "selector.component.delete.message");
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "selector.component.delete.cancel",
+                        "cancel",
+                        this::onDeleteCancel
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.component.delete.confirm",
+                        "confirm",
+                        this::onDeleteConfirm
+                )
+        );
+        popupController.setVisible(true);
+    }
+
+    private void onDeleteCancel(String id) {
+        popupController.setVisible(false);
+    }
+
+    private void onDeleteConfirm(String id) {
+        popupController.setVisible(false);
+        if(currentMods != null) {
+            if(!files.getModsManifest().getComponents().remove(currentMods.getKey().getId())) {
+                LOGGER.warn("Unable to remove mods from manifest");
+                return;
+            }
+            if(!files.getModsManifest().writeToFile(files.getModsManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(0))) {
+                LOGGER.warn("Unable to write mods manifest");
+                return;
+            }
+            modsCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
+            if(!FileUtil.deleteDir(new File(currentMods.getKey().getDirectory()))) {
+                LOGGER.warn("Unable to delete mods directory");
+                return;
+            }
+            LOGGER.debug("Mods deleted");
+            setVisible(false);
+            setVisible(true);
         }
     }
 
@@ -181,6 +256,7 @@ public class ModsSelectorElement extends UiElement {
             createSelector.getStyleClass().remove("selected");
             creatorContainer.setVisible(false);
             folderButton.setDisable(false);
+            deleteButton.setDisable(false);
             modsDetailsTitle.setText(manifest.getName());
             modsDetailsTitle.setDisable(false);
             modsManagerController.setLauncherMods(currentMods);
@@ -189,6 +265,7 @@ public class ModsSelectorElement extends UiElement {
         } else {
             currentMods = null;
             folderButton.setDisable(true);
+            deleteButton.setDisable(true);
             modsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             modsDetailsTitle.setDisable(true);
             modsManagerController.setVisible(false);

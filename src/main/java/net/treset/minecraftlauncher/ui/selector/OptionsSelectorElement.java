@@ -9,13 +9,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.create.OptionsCreatorElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
+import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,15 +33,16 @@ import java.util.function.Supplier;
 public class OptionsSelectorElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(OptionsSelectorElement.class);
 
-    @FXML
-    private SplitPane rootPane;
+    @FXML private AnchorPane rootPane;
     @FXML private VBox optionsContainer;
     @FXML private HBox createSelector;
     @FXML private Button folderButton;
+    @FXML private Button deleteButton;
     @FXML private Label optionsDetailsTitle;
     @FXML private VBox creatorContainer;
     @FXML private OptionsCreatorElement optionsCreatorController;
     @FXML private Button createButton;
+    @FXML private PopupElement popupController;
 
     private LauncherFiles files;
     private List<Pair<SelectorEntryElement, AnchorPane>> options = new ArrayList<>();
@@ -66,7 +70,9 @@ public class OptionsSelectorElement extends UiElement {
         }
         optionsContainer.getChildren().clear();
         folderButton.setDisable(true);
+        optionsDetailsTitle.setText("components.label.details.title");
         optionsDetailsTitle.setDisable(true);
+        deleteButton.setDisable(true);
         createSelected = false;
         createSelector.getStyleClass().remove("selected");
         creatorContainer.setVisible(false);
@@ -115,6 +121,7 @@ public class OptionsSelectorElement extends UiElement {
                 folderButton.setDisable(true);
                 optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
                 optionsDetailsTitle.setDisable(true);
+                deleteButton.setDisable(true);
                 creatorContainer.setVisible(false);
             } else {
                 createSelector.getStyleClass().add("selected");
@@ -124,6 +131,7 @@ public class OptionsSelectorElement extends UiElement {
                 folderButton.setDisable(true);
                 optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.create"));
                 optionsDetailsTitle.setDisable(false);
+                deleteButton.setDisable(true);
                 optionsCreatorController.beforeShow(null);
                 creatorContainer.setVisible(true);
                 optionsCreatorController.afterShow(null);
@@ -142,6 +150,73 @@ public class OptionsSelectorElement extends UiElement {
             }
         } else {
             optionsCreatorController.showError(true);
+        }
+    }
+
+    @FXML
+    private void onDeleteButtonClicked() {
+        for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
+            if(i.getValue().getOptionsComponent().equals(currentOptions.getId())) {
+                popupController.setType(PopupElement.PopupType.ERROR);
+                popupController.setTitle("selector.component.delete.unable.title");
+                popupController.setMessage("selector.component.delete.unable.message", i.getKey().getName());
+                popupController.clearButtons();
+                popupController.addButtons(
+                        new PopupElement.PopupButton(
+                                PopupElement.ButtonType.POSITIVE,
+                                "selector.component.delete.unable.close",
+                                "close",
+                                id -> popupController.setVisible(false)
+                        )
+                );
+                popupController.setVisible(true);
+                return;
+            }
+        }
+
+        popupController.setType(PopupElement.PopupType.WARNING);
+        popupController.setContent("selector.component.delete.title", "selector.component.delete.message");
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "selector.component.delete.cancel",
+                        "cancel",
+                        this::onDeleteCancel
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.component.delete.confirm",
+                        "confirm",
+                        this::onDeleteConfirm
+                )
+        );
+        popupController.setVisible(true);
+    }
+
+    private void onDeleteCancel(String id) {
+        popupController.setVisible(false);
+    }
+
+    private void onDeleteConfirm(String id) {
+        popupController.setVisible(false);
+        if(currentOptions != null) {
+            if(!files.getOptionsManifest().getComponents().remove(currentOptions.getId())) {
+                LOGGER.warn("Unable to remove options from manifest");
+                return;
+            }
+            if(!files.getOptionsManifest().writeToFile(files.getOptionsManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
+                LOGGER.warn("Unable to write options manifest");
+                return;
+            }
+            optionsCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
+            if(!FileUtil.deleteDir(new File(currentOptions.getDirectory()))) {
+                LOGGER.warn("Unable to delete options directory");
+                return;
+            }
+            LOGGER.debug("Options deleted");
+            setVisible(false);
+            setVisible(true);
         }
     }
 
@@ -164,11 +239,13 @@ public class OptionsSelectorElement extends UiElement {
             createSelector.getStyleClass().remove("selected");
             creatorContainer.setVisible(false);
             folderButton.setDisable(false);
+            deleteButton.setDisable(false);
             optionsDetailsTitle.setText(manifest.getName());
             optionsDetailsTitle.setDisable(false);
         } else {
             currentOptions = null;
             folderButton.setDisable(true);
+            deleteButton.setDisable(true);
             optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             optionsDetailsTitle.setDisable(true);
         }

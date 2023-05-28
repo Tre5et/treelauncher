@@ -3,10 +3,12 @@ package net.treset.minecraftlauncher.data;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -180,6 +182,23 @@ public class InstanceData {
             LOGGER.warn("Unable to launch game: unable to write launcher details");
             return false;
         }
+        return true;
+    }
+
+    public boolean delete(LauncherFiles files) {
+        if(!files.getInstanceManifest().getComponents().remove(instance.getKey().getId())) {
+            LOGGER.warn("Unable to delete instance: unable to remove instance from launcher manifest");
+            return false;
+        }
+        if(!files.getInstanceManifest().writeToFile(files.getInstanceManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
+            LOGGER.warn("Unable to delete instance: unable to write instance manifest");
+            return false;
+        }
+        if(!FileUtil.deleteDir(new File(instance.getKey().getDirectory()))) {
+            LOGGER.warn("Unable to delete instance: unable to delete instance directory");
+            return false;
+        }
+        LOGGER.debug("Instance deleted: id=" + instance.getKey().getId());
         return true;
     }
 

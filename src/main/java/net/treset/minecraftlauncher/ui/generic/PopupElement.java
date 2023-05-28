@@ -114,6 +114,14 @@ public class PopupElement extends UiElement {
         }
     }
 
+    public void setTitle(String title, Object... args) {
+        titleLabel.setText(LauncherApplication.stringLocalizer.getFormatted(title, args));
+    }
+
+    public void setMessage(String message, Object... args) {
+        messageLabel.setText(LauncherApplication.stringLocalizer.getFormatted(message, args));
+    }
+
     @Override
     public void setRootVisible(boolean visible) {
         rootPane.setVisible(visible);
