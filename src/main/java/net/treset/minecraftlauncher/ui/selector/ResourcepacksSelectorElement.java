@@ -19,6 +19,8 @@ import net.treset.minecraftlauncher.ui.create.ResourcepacksCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -50,16 +53,24 @@ public class ResourcepacksSelectorElement extends UiElement {
     private boolean createSelected;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
-        super.init(parent, lockSetter, lockGetter);
-        files = new LauncherFiles();
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
+        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
+        try {
+            files = new LauncherFiles();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         resourcepacksCreatorController.enableUse(false);
-        resourcepacksCreatorController.init(this, lockSetter, lockGetter);
+        resourcepacksCreatorController.init(this, lockSetter, lockGetter, severeExceptionHandler);
         resourcepacksCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
     }
 
     private void reloadComponents() {
-        files.reloadAll();
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         resourcepacks = new ArrayList<>();
         for(LauncherManifest resourcepack: files.getResourcepackComponents()) {
             try {
@@ -144,7 +155,11 @@ public class ResourcepacksSelectorElement extends UiElement {
     @FXML
     private void onCreateButtonClicked() {
         if(resourcepacksCreatorController.checkCreateReady()) {
-            resourcepacksCreatorController.getCreator().getId();
+            try {
+                resourcepacksCreatorController.getCreator().getId();
+            } catch (ComponentCreationException e) {
+                displayError(e);
+            }
             reloadComponents();
             for(Pair<SelectorEntryElement, AnchorPane> resourcepack: resourcepacks) {
                 resourcepack.getKey().beforeShow(null);
@@ -206,13 +221,17 @@ public class ResourcepacksSelectorElement extends UiElement {
                 LOGGER.warn("Unable to remove resourcepacks from manifest");
                 return;
             }
-            if(!files.getResourcepackManifest().writeToFile(files.getResourcepackManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
-                LOGGER.warn("Unable to write resourcepacks manifest");
+            try {
+                files.getResourcepackManifest().writeToFile(files.getResourcepackManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             resourcepacksCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
-            if(!FileUtil.deleteDir(new File(currentResourcepacks.getDirectory()))) {
-                LOGGER.warn("Unable to delete resourcepacks directory");
+            try {
+                FileUtil.deleteDir(new File(currentResourcepacks.getDirectory()));
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             LOGGER.debug("Resourcepacks deleted");
@@ -250,5 +269,22 @@ public class ResourcepacksSelectorElement extends UiElement {
             resourcepacksDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             resourcepacksDetailsTitle.setDisable(true);
         }
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

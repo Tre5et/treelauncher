@@ -8,6 +8,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.creation.OptionsCreator;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -91,19 +92,17 @@ public class OptionsCreatorElement extends UiElement {
         rootPane.setVisible(visible);
     }
 
-    public boolean create() {
+    public void create() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create options!");
-            return false;
+            throw new ComponentCreationException("Not ready to create options!");
         }
         OptionsCreator creator = getCreator();
-        return creator.getId() != null;
+        creator.getId();
     }
 
-    public OptionsCreator getCreator() {
+    public OptionsCreator getCreator() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create options!");
-            return null;
+            throw new ComponentCreationException("Not ready to create options!");
         }
 
         if(radioCreate.isSelected()) {
@@ -111,20 +110,17 @@ public class OptionsCreatorElement extends UiElement {
         } else if(radioUse.isSelected()) {
             LauncherManifest manifest = getOptionsFromName(useChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find options from name: " + useChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find options: name=" + useChoice.getSelectionModel().getSelectedItem());
             }
             return new OptionsCreator(manifest);
         } else if(radioInherit.isSelected()) {
             LauncherManifest manifest = getOptionsFromName(inheritChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find options from name: " + inheritChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find options: name=" + inheritChoice.getSelectionModel().getSelectedItem());
             }
             return new OptionsCreator(inheritName.getText(), manifest, ortionsManifest);
         }
-        LOGGER.warn("No radio button selected!");
-        return null;
+        throw new ComponentCreationException("No radio button selected!");
     }
 
     private LauncherManifest getOptionsFromName(String name) {

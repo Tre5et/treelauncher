@@ -6,6 +6,10 @@ import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.exception.GameCommandException;
+import net.treset.minecraftlauncher.util.exception.GameLaunchException;
+import net.treset.minecraftlauncher.util.exception.GameResourceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,110 +35,111 @@ public class GameLauncher {
         this.exitCallbacks = exitCallbacks;
     }
 
-    public boolean launch(boolean cleanupActiveInstance) {
-        if(!files.isValid() || !files.reloadAll()) {
-            LOGGER.warn("Unable to launch game: file reload failed");
-            return false;
+    public void launch(boolean cleanupActiveInstance) throws GameLaunchException {
+        if(!files.isValid()) {
+            throw new GameLaunchException("Unable to launch game: files are not valid");
+        }
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            throw new GameLaunchException("Unable to launch game: file reload failed", e);
         }
 
-        if(files.getLauncherDetails().getActiveInstance() != null) {
+        if(files.getLauncherDetails().getActiveInstance() != null && !files.getLauncherDetails().getActiveInstance().isBlank()) {
             if(!cleanupActiveInstance) {
-                LOGGER.warn("Unable to launch game: active instance already exists");
-                return false;
+                throw new GameLaunchException("Unable to launch game: active instance already exists");
             }
-            if(!files.getLauncherDetails().getActiveInstance().isBlank() && !cleanUpOldInstance()) {
-                LOGGER.warn("Unable to launch game: unable to clean up old instance");
-                return false;
+            try {
+                cleanUpOldInstance();
+            } catch (GameLaunchException e) {
+                throw new GameLaunchException("Unable to launch game: unable to clean up old instance", e);
             }
         }
 
         if(instance == null) {
-            LOGGER.warn("Unable to launch game: instance data loaded incorrectly");
-            return false;
+            throw new GameLaunchException("Unable to launch game: instance data is null");
         }
         resourceManager = new ResourceManager(instance);
 
 
         files.getLauncherDetails().setActiveInstance(instance.getInstance().getKey().getId());
-        if(!files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails())) {
-            LOGGER.warn("Unable to launch game: unable to write launcher details");
-            return false;
+        try {
+            files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails());
+        } catch (IOException e) {
+            throw new GameLaunchException("Unable to launch game: unable to write launcher details", e);
         }
 
-        if(!resourceManager.prepareResources()) {
-            LOGGER.warn("Unable to launch game: unable to prepare resources");
+        try {
+            resourceManager.prepareResources();
+            resourceManager.setLastPlayedTime();
+        } catch (GameResourceException | IOException e) {
             abortLaunch();
-            return false;
-        }
-
-        if(!resourceManager.setLastPlayedTime()) {
-            LOGGER.warn("Unable to launch game: unable to set last played time");
-            abortLaunch();
-            return false;
+            throw new GameLaunchException("Unable to launch game: unable to prepare resources", e);
         }
 
         ProcessBuilder pb = new ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE);
         CommandBuilder commandBuilder = new CommandBuilder(pb, instance, minecraftUser);
-        if(!commandBuilder.makeStartCommand()) {
-            LOGGER.warn("Unable to launch game: unable to set start command");
+        try {
+            commandBuilder.makeStartCommand();
+        } catch (GameCommandException e) {
             abortLaunch();
-            return false;
+            throw new GameLaunchException("Unable to launch game: unable to set start command", e);
         }
 
         LOGGER.info("Starting game");
         LOGGER.debug("command=" + pb.command());
+
         try {
             Process p = pb.start();
             gameListener = new GameListener(p, resourceManager, exitCallbacks);
             gameListener.start();
-            return true;
         } catch (IOException e) {
-            LOGGER.warn("Unable to launch game: unable to execute command", e);
             abortLaunch();
-            return false;
+            throw new GameLaunchException("Unable to launch game: unable to execute command", e);
         }
     }
 
-    private boolean cleanUpOldInstance() {
+    private void cleanUpOldInstance() throws GameLaunchException {
         LOGGER.debug("Cleaning up old instance resources: id=" + files.getLauncherDetails().getActiveInstance());
         boolean found = false;
         for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
             if(Objects.equals(i.getKey().getId(), files.getLauncherDetails().getActiveInstance())) {
-                InstanceData instanceData = InstanceData.of(i, files);
-                if(instanceData == null) {
-                    LOGGER.warn("Unable to cleanup old instance: instance data loaded incorrectly");
-                    return false;
+                InstanceData instanceData;
+                try {
+                    instanceData = InstanceData.of(i, files);
+                } catch (FileLoadException e) {
+                    throw new GameLaunchException("Unable to cleanup old instance: unable to load instance data", e);
                 }
                 ResourceManager resourceManager = new ResourceManager(instanceData);
 
-                if(!resourceManager.cleanupGameFiles()) {
-                    LOGGER.warn("Unable to cleanup old instance: unable to cleanup resources");
-                    return false;
+                try {
+                    resourceManager.cleanupGameFiles();
+                } catch (GameResourceException e) {
+                    throw new GameLaunchException("Unable to cleanup old instance: unable to cleanup resources", e);
                 }
                 found = true;
                 break;
             }
         }
         if(!found) {
-            LOGGER.warn("Unable to cleanup old instance: instance not found");
-            return false;
+            throw new GameLaunchException("Unable to cleanup old instance: instance not found");
         }
         LOGGER.info("Old instance resources cleaned up");
-        return true;
     }
 
-    private boolean abortLaunch() {
+    private void abortLaunch() throws GameLaunchException {
         LOGGER.warn("Aborting launch");
-        if(!resourceManager.cleanupGameFiles()) {
-            LOGGER.warn("Unable to abort launch correctly: failed to cleanup game files");
-            return false;
+        try {
+            resourceManager.cleanupGameFiles();
+        } catch (GameResourceException e) {
+            throw new GameLaunchException("Unable to abort launch correctly: failed to cleanup game files");
         }
         files.getLauncherDetails().setActiveInstance(null);
-        if(!files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails())) {
-            LOGGER.warn("Unable to abort launch: unable to write launcher details");
-            return false;
+        try {
+            files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails());
+        } catch (IOException e) {
+            throw new GameLaunchException("Unable to abort launch correctly: failed to write launcher details");
         }
-        return true;
     }
 
     public InstanceData getInstance() {

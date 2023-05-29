@@ -5,10 +5,12 @@ import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,10 +34,11 @@ public class InstanceData {
     String savesPrefix;
     List<String> gameDataExcludedFiles;
 
-    public static InstanceData of(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files) {
-        if(!files.reloadAll()) {
-            LOGGER.warn("Unable to prepare launch resources: file reload failed");
-            return null;
+    public static InstanceData of(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files) throws FileLoadException {
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            throw new FileLoadException("Failed to load instance data: file reload failed", e);
         }
 
         List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents = new ArrayList<>();
@@ -47,8 +50,7 @@ public class InstanceData {
             }
         }
         if(currentComponent == null) {
-            LOGGER.warn("Unable to prepare launch resources: unable to find version component: versionId=" + instance.getValue().getVersionComponent());
-            return null;
+            throw new FileLoadException("Failed to load instance data: unable to find version component: versionId=" + instance.getValue().getVersionComponent());
         }
         versionComponents.add(currentComponent);
 
@@ -62,8 +64,7 @@ public class InstanceData {
                 }
             }
             if(!found) {
-                LOGGER.warn("Unable to prepare launch resources: unable to find dependent version component: versionId=" + currentComponent.getValue().getDepends());
-                return null;
+                throw new FileLoadException("Failed to load instance data: unable to find dependent version component: versionId=" + currentComponent.getValue().getDepends());
             }
             versionComponents.add(currentComponent);
         }
@@ -82,8 +83,7 @@ public class InstanceData {
             }
         }
         if(javaComponent == null) {
-            LOGGER.warn("Unable to prepare launch resources: unable to find suitable java component");
-            return null;
+            throw new FileLoadException("Failed to load instance data: unable to find suitable java component");
         }
         LauncherManifest optionsComponent = null;
         for(LauncherManifest o : files.getOptionsComponents()) {
@@ -93,8 +93,7 @@ public class InstanceData {
             }
         }
         if(optionsComponent == null) {
-            LOGGER.warn("Unable to prepare launch resources: unable to find options component: optionsId=" + instance.getValue().getOptionsComponent());
-            return null;
+            throw new FileLoadException("Failed to load instance data: unable to find options component: optionsId=" + instance.getValue().getOptionsComponent());
         }
         LauncherManifest resourcepacksComponent = null;
         for(LauncherManifest r : files.getResourcepackComponents()) {
@@ -104,8 +103,7 @@ public class InstanceData {
             }
         }
         if(resourcepacksComponent == null) {
-            LOGGER.warn("Unable to prepare launch resources: unable to find resourcepacks component: resourcepacksId=" + instance.getValue().getResourcepacksComponent());
-            return null;
+            throw new FileLoadException("Failed to load instance data: unable to find resourcepacks component: resourcepacksId=" + instance.getValue().getResourcepacksComponent());
         }
         LauncherManifest savesComponent = null;
         for(LauncherManifest s : files.getSavesComponents()) {
@@ -115,8 +113,7 @@ public class InstanceData {
             }
         }
         if(savesComponent == null) {
-            LOGGER.warn("Unable to prepare launch resources: unable to find saves component: savesId=" + instance.getValue().getSavesComponent());
-            return null;
+            throw new FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.getValue().getSavesComponent());
         }
         Pair<LauncherManifest, LauncherModsDetails> modsComponent = null;
         if(instance.getValue().getModsComponent() != null && !instance.getValue().getModsComponent().isBlank()) {
@@ -127,8 +124,7 @@ public class InstanceData {
                 }
             }
             if(modsComponent == null) {
-                LOGGER.warn("Unable to prepare launch resources: unable to find mods component: modsId=" + instance.getValue().getModsComponent());
-                return null;
+                throw new FileLoadException("Failed to load instance data: unable to find mods component: modsId=" + instance.getValue().getModsComponent());
             }
         }
 
@@ -176,30 +172,30 @@ public class InstanceData {
         this.gameDataExcludedFiles = gameDataExcludedFiles;
     }
 
-    public boolean setActive(boolean active) {
+    public void setActive(boolean active) throws IOException {
         launcherDetails.setActiveInstance(active ? instance.getKey().getId()  : null);
-        if(!launcherDetails.writeToFile(launcherDetailsFile)) {
-            LOGGER.warn("Unable to launch game: unable to write launcher details");
-            return false;
+        try {
+            launcherDetails.writeToFile(launcherDetailsFile);
+        } catch (IOException e) {
+            throw new IOException("Unable to set instance active: unable to write launcher details", e);
         }
-        return true;
     }
 
-    public boolean delete(LauncherFiles files) {
+    public void delete(LauncherFiles files) throws IOException {
         if(!files.getInstanceManifest().getComponents().remove(instance.getKey().getId())) {
-            LOGGER.warn("Unable to delete instance: unable to remove instance from launcher manifest");
-            return false;
+            throw new IOException("Unable to delete instance: unable to remove instance from launcher manifest");
         }
-        if(!files.getInstanceManifest().writeToFile(files.getInstanceManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
-            LOGGER.warn("Unable to delete instance: unable to write instance manifest");
-            return false;
+        try {
+            files.getInstanceManifest().writeToFile(files.getInstanceManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+        } catch (IOException e) {
+            throw new IOException("Unable to delete instance: unable to write launcher manifest", e);
         }
-        if(!FileUtil.deleteDir(new File(instance.getKey().getDirectory()))) {
-            LOGGER.warn("Unable to delete instance: unable to delete instance directory");
-            return false;
+        try {
+            FileUtil.deleteDir(new File(instance.getKey().getDirectory()));
+        } catch (IOException e) {
+            throw new IOException("Unable to delete instance: unable to delete instance directory", e);
         }
         LOGGER.debug("Instance deleted: id=" + instance.getKey().getId());
-        return true;
     }
 
     public Pair<LauncherManifest, LauncherInstanceDetails> getInstance() {

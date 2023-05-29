@@ -1,5 +1,7 @@
 package net.treset.minecraftlauncher.launching;
 
+import net.treset.minecraftlauncher.util.exception.GameLaunchException;
+import net.treset.minecraftlauncher.util.exception.GameResourceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -72,16 +74,20 @@ public class GameListener {
             }
         }
         else {
-            LOGGER.info("Game process exited successfully: pid={}", gameProcess.pid());
+            LOGGER.info("Game exited");
         }
         exited = true;
 
-        if(!resourceManager.addPlayDuration((System.currentTimeMillis() - playStart) / 1000)) {
+        try {
+            resourceManager.addPlayDuration((System.currentTimeMillis() - playStart) / 1000);
+        } catch (IOException e) {
             LOGGER.warn("Unable to add play duration to statistics: duration={}, pid={}", (System.currentTimeMillis() - playStart) / 1000, gameProcess.pid());
             error = "Unable to add play duration to statistics";
         }
 
-        if(!resourceManager.cleanupGameFiles()) {
+        try {
+            resourceManager.cleanupGameFiles();
+        } catch (GameResourceException e) {
             LOGGER.warn("Unable to clean up game files after exit: pid={}", gameProcess.pid());
             error = "Unable to clean up game files";
         }

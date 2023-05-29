@@ -5,9 +5,11 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public class ModsCreator extends GenericComponentCreator {
     }
 
     @Override
-    public String createComponent() {
+    public String createComponent() throws ComponentCreationException {
         String result = super.createComponent();
         if(result == null || getNewManifest() == null) {
             LOGGER.error("Failed to create mods component: invalid data");
@@ -47,10 +49,11 @@ public class ModsCreator extends GenericComponentCreator {
             return null;
         }
         LauncherModsDetails details = new LauncherModsDetails(modsType, modsVersion, List.of());
-        if(!details.writeToFile(getNewManifest().getDirectory() + LauncherApplication.config.MODS_DEFAULT_DETAILS)) {
-            LOGGER.error("Failed to create mods component: failed to write details");
+        try {
+            details.writeToFile(getNewManifest().getDirectory() + LauncherApplication.config.MODS_DEFAULT_DETAILS)
+        } catch (IOException e) {
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create mods component: failed to write details", e);
         }
         return result;
     }

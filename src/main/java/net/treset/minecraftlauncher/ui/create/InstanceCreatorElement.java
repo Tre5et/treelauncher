@@ -15,6 +15,7 @@ import net.treset.minecraftlauncher.creation.InstanceCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,7 +61,14 @@ public class InstanceCreatorElement extends UiElement {
             popupController.setType(PopupElement.PopupType.NONE);
             popupController.setContent("creator.instance.popup.label.creating", "");
             popupController.setVisible(true);
-            new Thread(() -> onInstanceCreationDone(creator.getId() != null)).start();
+            new Thread(() -> {
+                try {
+                    creator.getId();
+                    onInstanceCreationSuccess();
+                } catch (Exception e) {
+                    onInstanceCreationFailure(e);
+                }
+            }).start();
 
         } else {
             showError(true);
@@ -69,15 +77,22 @@ public class InstanceCreatorElement extends UiElement {
         }
     }
 
-    private void onInstanceCreationDone(boolean success) {
+    private void onInstanceCreationSuccess() {
+        LOGGER.info("Created instance");
         Platform.runLater(() -> {
-            if(success) {
-                popupController.setType(PopupElement.PopupType.SUCCESS);
-                popupController.setContent("creator.instance.popup.label.success", "");
-            } else {
-                popupController.setType(PopupElement.PopupType.ERROR);
-                popupController.setContent("creator.instance.popup.label.failure", "");
-            }
+            popupController.setType(PopupElement.PopupType.SUCCESS);
+            popupController.setContent("creator.instance.popup.label.success", "");
+            popupController.setControlsDisabled(false);
+            setLock(false);
+        });
+    }
+
+    private void onInstanceCreationFailure(Exception e) {
+        LOGGER.error("Failed to create instance", e);
+        Platform.runLater(() -> {
+            popupController.setType(PopupElement.PopupType.ERROR);
+            popupController.setTitle("creator.instance.popup.label.failure");
+            popupController.setMessage("error.message", e.getMessage());
             popupController.setControlsDisabled(false);
             setLock(false);
         });
@@ -102,8 +117,12 @@ public class InstanceCreatorElement extends UiElement {
         scrollContainer.getStyleClass().remove("popup-background");
         scrollContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollContainer.setVvalue(0);
-        launcherFiles = new LauncherFiles();
-        launcherFiles.reloadAll();
+        try {
+            launcherFiles = new LauncherFiles();
+            launcherFiles.reloadAll();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         nameError.setVisible(false);
         nameInput.getStyleClass().remove("error");
         nameInput.setText("");
@@ -153,5 +172,22 @@ public class InstanceCreatorElement extends UiElement {
         }
         modsActive = active;
         modsContainer.setDisable(!active);
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

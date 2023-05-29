@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.creation;
 
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.files.JavaFileDownloader;
 import net.treset.mc_version_loader.files.Sources;
 import net.treset.mc_version_loader.java.JavaFile;
@@ -9,10 +10,12 @@ import net.treset.mc_version_loader.java.JavaRuntimeRelease;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.os.OsDetails;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,27 +27,28 @@ public class JavaComponentCreator extends GenericComponentCreator {
     }
 
     @Override
-    public String createComponent() {
+    public String createComponent() throws ComponentCreationException {
         String result = super.createComponent();
 
         if(result == null || getNewManifest() == null) {
-            LOGGER.warn("Unable to create java component: invalid data");
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create java component: invalid data");
         }
 
-        JavaRuntime java = JavaRuntime.fromJson(Sources.getJavaRuntimeJson());
-        if(java.getRuntimes() == null) {
-            LOGGER.warn("Unable to create java component: failed to get java runtime");
+        JavaRuntime java = null;
+        try {
+            java = JavaRuntime.fromJson(Sources.getJavaRuntimeJson());
+        } catch (FileDownloadException e) {
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create java component: failed to download java runtime json", e);
         }
 
-        String osIdentifier = OsDetails.getJavaIdentifier();
-        if(osIdentifier == null) {
-            LOGGER.warn("Unable to create java component: failed to get os identifier");
+        String osIdentifier;
+        try {
+            osIdentifier = OsDetails.getJavaIdentifier();
+        } catch (IllegalArgumentException e) {
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create java component: failed to get os identifier", e);
         }
 
         JavaRuntimeOs os = null;
@@ -55,9 +59,8 @@ public class JavaComponentCreator extends GenericComponentCreator {
             }
         }
         if(os == null || os.getReleases() == null) {
-            LOGGER.warn("Unable to create java component: failed to get os runtime");
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create java component: failed to get os runtime");
         }
 
         JavaRuntimeRelease release = null;
@@ -69,42 +72,49 @@ public class JavaComponentCreator extends GenericComponentCreator {
         }
 
         if(release == null || release.getManifest() == null || release.getManifest().getUrl() == null) {
-            LOGGER.warn("Unable to create java component: failed to get release");
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create java component: failed to get release");
         }
 
-        List<JavaFile> files = JavaFile.fromJsonManifest(Sources.getFileFromUrl(release.getManifest().getUrl()));
+        List<JavaFile> files;
+        try {
+            files = JavaFile.fromJsonManifest(Sources.getFileFromUrl(release.getManifest().getUrl()));
+        } catch (FileDownloadException e) {
+            throw new ComponentCreationException("Failed to create java component: failed to download java file manifest", e);
+        }
 
         File baseDir = new File(getNewManifest().getDirectory());
         if(!baseDir.isDirectory()) {
-            LOGGER.warn("Unable to create java component: base dir is not a directory");
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create java component: base dir is not a directory");
         }
 
+        List<FileDownloadException> exceptionQueue = new ArrayList<>();
         for(JavaFile f : files) {
-            if(!JavaFileDownloader.downloadJavaFile(f, baseDir)) {
-                LOGGER.warn("Unable to create java component: failed to download file: name={}", f.getName());
-                attemptCleanup();
-                return null;
+            try {
+                JavaFileDownloader.downloadJavaFile(f, baseDir);
+            } catch (FileDownloadException e) {
+                exceptionQueue.add(e);
             }
+        }
+
+        if(!exceptionQueue.isEmpty()) {
+            attemptCleanup();
+            throw new ComponentCreationException("Failed to create java component: failed to download " + exceptionQueue.size() + " java files", exceptionQueue.get(0));
         }
 
         return result;
     }
 
     @Override
-    public String useComponent() {
-        LOGGER.warn("Unable to use java component: unsupported");
+    public String useComponent() throws ComponentCreationException {
         attemptCleanup();
-        return null;
+        throw new ComponentCreationException("Unable to use java component: unsupported");
     }
 
     @Override
-    public String inheritComponent() {
-        LOGGER.warn("Unable to inherit java component: unsupported");
+    public String inheritComponent() throws ComponentCreationException {
         attemptCleanup();
-        return null;
+        throw new ComponentCreationException("Unable to inherit java component: unsupported");
     }
 }

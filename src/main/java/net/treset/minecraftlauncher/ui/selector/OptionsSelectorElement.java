@@ -19,6 +19,8 @@ import net.treset.minecraftlauncher.ui.create.OptionsCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -50,16 +53,24 @@ public class OptionsSelectorElement extends UiElement {
     private boolean createSelected;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
-        super.init(parent, lockSetter, lockGetter);
-        files = new LauncherFiles();
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
+        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
+        try {
+            files = new LauncherFiles();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         optionsCreatorController.enableUse(false);
-        optionsCreatorController.init(this, lockSetter, lockGetter);
+        optionsCreatorController.init(this, lockSetter, lockGetter, severeExceptionHandler);
         optionsCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
     }
 
     private void reloadComponents() {
-        files.reloadAll();
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         options = new ArrayList<>();
         for(LauncherManifest save: files.getOptionsComponents()) {
             try {
@@ -143,7 +154,11 @@ public class OptionsSelectorElement extends UiElement {
     @FXML
     private void onCreateButtonClicked() {
         if(optionsCreatorController.checkCreateReady()) {
-            optionsCreatorController.getCreator().getId();
+            try {
+                optionsCreatorController.getCreator().getId();
+            } catch (ComponentCreationException e) {
+                displayError(e);
+            }
             reloadComponents();
             for(Pair<SelectorEntryElement, AnchorPane> option: options) {
                 option.getKey().beforeShow(null);
@@ -205,13 +220,17 @@ public class OptionsSelectorElement extends UiElement {
                 LOGGER.warn("Unable to remove options from manifest");
                 return;
             }
-            if(!files.getOptionsManifest().writeToFile(files.getOptionsManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
-                LOGGER.warn("Unable to write options manifest");
+            try {
+                files.getOptionsManifest().writeToFile(files.getOptionsManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             optionsCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
-            if(!FileUtil.deleteDir(new File(currentOptions.getDirectory()))) {
-                LOGGER.warn("Unable to delete options directory");
+            try {
+                FileUtil.deleteDir(new File(currentOptions.getDirectory()));
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             LOGGER.debug("Options deleted");
@@ -249,5 +268,22 @@ public class OptionsSelectorElement extends UiElement {
             optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             optionsDetailsTitle.setDisable(true);
         }
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

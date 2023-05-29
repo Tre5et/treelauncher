@@ -19,6 +19,8 @@ import net.treset.minecraftlauncher.ui.create.SavesCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -50,16 +53,24 @@ public class SavesSelectorElement extends UiElement {
     private boolean createSelected;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
-        super.init(parent, lockSetter, lockGetter);
-        files = new LauncherFiles();
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
+        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
+        try {
+            files = new LauncherFiles();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         savesCreatorController.enableUse(false);
-        savesCreatorController.init(this, lockSetter, lockGetter);
+        savesCreatorController.init(this, lockSetter, lockGetter, severeExceptionHandler);
         savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
     }
 
     private void reloadComponents() {
-        files.reloadAll();
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         saves = new ArrayList<>();
         for(LauncherManifest save: files.getSavesComponents()) {
             try {
@@ -144,7 +155,11 @@ public class SavesSelectorElement extends UiElement {
     @FXML
     private void onCreateButtonClicked() {
         if(savesCreatorController.checkCreateReady()) {
-            savesCreatorController.getCreator().getId();
+            try {
+                savesCreatorController.getCreator().getId();
+            } catch (ComponentCreationException e) {
+                displayError(e);
+            }
             reloadComponents();
             for(Pair<SelectorEntryElement, AnchorPane> save: saves) {
                 save.getKey().beforeShow(null);
@@ -206,14 +221,17 @@ public class SavesSelectorElement extends UiElement {
                 LOGGER.warn("Unable to remove save from manifest");
                 return;
             }
-            if(!files.getSavesManifest().writeToFile(files.getSavesManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(1))) {
-                LOGGER.warn("Unable to write save manifest");
+            try {
+                files.getSavesManifest().writeToFile(files.getSavesManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(1));
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
-            if(!FileUtil.deleteDir(new File(currentSaves.getDirectory()))) {
-                LOGGER.warn("Unable to delete save directory");
-                return;
+            try {
+                FileUtil.deleteDir(new File(currentSaves.getDirectory()));
+            } catch (IOException e) {
+                displayError(e);
             }
             LOGGER.debug("Save deleted");
             setVisible(false);
@@ -250,5 +268,22 @@ public class SavesSelectorElement extends UiElement {
             savesDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             savesDetailsTitle.setDisable(true);
         }
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

@@ -13,7 +13,7 @@
         <AnchorPane minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
-                    <Label styleClass="title" text="%options.label.title" />
+                    <Label styleClass="title" text="%selector.options.label.title" />
                 </VBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity" VBox.vgrow="ALWAYS">
                     <VBox fx:id="optionsContainer" alignment="TOP_CENTER">

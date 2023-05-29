@@ -8,6 +8,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.util.exception.GameCommandException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,10 +31,9 @@ public class CommandBuilder {
         this.minecraftUser = minecraftUser;
     }
 
-    public boolean makeStartCommand() {
+    public void makeStartCommand() throws GameCommandException {
         if(instanceData.getVersionComponents() == null || instanceData.getVersionComponents().isEmpty() || instanceData.getJavaComponent() == null || instanceData.getResourcepacksComponent() == null || instanceData.getLibrariesDir() == null) {
-            LOGGER.warn("Unable to create start command: unmet preconditions");
-            return false;
+            throw new GameCommandException("Unable to create start command: unmet requirements");
         }
 
         String assetsIndex = null;
@@ -44,8 +44,7 @@ public class CommandBuilder {
             }
         }
         if(assetsIndex == null) {
-            LOGGER.warn("Unable to create start command: unable to determine asset index");
-            return false;
+            throw new GameCommandException("Unable to create start command: unable to determine asset index");
         }
 
         String mainClass = null;
@@ -56,8 +55,7 @@ public class CommandBuilder {
             }
         }
         if(mainClass == null) {
-            LOGGER.warn("Unable to create start command: unable to determine main class");
-            return false;
+            throw new GameCommandException("Unable to create start command: unable to determine main class");
         }
 
         List<String> libraries = new ArrayList<>();
@@ -67,13 +65,11 @@ public class CommandBuilder {
             }
         }
         if(libraries.isEmpty()) {
-            LOGGER.warn("Unable to create start command: unable to determine libraries");
-            return false;
+            throw new GameCommandException("Unable to create start command: unable to determine libraries");
         }
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             if(v.getValue().getMainFile() == null ||v.getValue().getMainFile().isBlank()) {
-                LOGGER.warn("Unable to create start command: unable to determine main file: version=" + v.getKey().getId());
-                return false;
+                throw new GameCommandException("Unable to create start command: unable to determine main file: version=" + v.getKey().getId());
             }
             libraries.add(v.getKey().getDirectory() + v.getValue().getMainFile());
         }
@@ -91,63 +87,71 @@ public class CommandBuilder {
 
         File gameDir = new File(instanceData.getGameDataDir());
         if(!gameDir.isDirectory()) {
-            LOGGER.warn("Unable to create start command: game directory is not a directory: directory=" + gameDir.getAbsolutePath());
-            return false;
+            throw new GameCommandException("Unable to create start command: game directory is not a directory: directory=" + gameDir.getAbsolutePath());
         }
 
         processBuilder.directory(gameDir);
         processBuilder.command(new ArrayList<>());
         processBuilder.command().add(instanceData.getJavaComponent().getDirectory() + "bin" + "/" + "java");
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
-            if(!appendArguments(processBuilder, v.getValue().getJvmArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY)) {
-                LOGGER.warn("Unable to create start command: unable to append jvm arguments: version=" + v.getKey().getId());
-                return false;
+            try {
+                appendArguments(processBuilder, v.getValue().getJvmArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY);
+            } catch(GameCommandException e) {
+                throw new GameCommandException("Unable to create start command: unable to append jvm arguments: version=" + v.getKey().getId(), e);
             }
         }
         processBuilder.command().add(mainClass);
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
-            if(!appendArguments(processBuilder, v.getValue().getGameArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY)) {
-                LOGGER.warn("Unable to create start command: unable to append jvm arguments: version=" + v.getKey().getId());
-                return false;
+            try {
+                appendArguments(processBuilder, v.getValue().getGameArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY);
+            } catch(GameCommandException e) {
+                throw new GameCommandException("Unable to create start command: unable to append game arguments: version=" + v.getKey().getId(), e);
             }
         }
 
         LOGGER.info("Created start command, instance=" + instanceData.getInstance().getKey().getId());
-        return true;
     }
 
-    private boolean appendArguments(ProcessBuilder pb, List<LauncherLaunchArgument> args, InstanceData instanceData, User minecraftUser, String gameDataDir, String assetsDir, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY) {
+    private void appendArguments(ProcessBuilder pb, List<LauncherLaunchArgument> args, InstanceData instanceData, User minecraftUser, String gameDataDir, String assetsDir, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY) throws GameCommandException {
+        List<GameCommandException> exceptionQueue = new ArrayList<>();
         for(LauncherLaunchArgument a : args) {
-            if(!appendArgument(pb, instanceData, minecraftUser, gameDataDir, assetsDir, assetsIndex, libraries, mainClass, resX, resY, a)) {
+            try {
+                appendArgument(pb, instanceData, minecraftUser, gameDataDir, assetsDir, assetsIndex, libraries, mainClass, resX, resY, a);
+            } catch (GameCommandException e) {
+                exceptionQueue.add(e);
                 LOGGER.warn("Unable to append arguments: unable to append argument: argument=" + a);
-                return false;
             }
         }
-        return true;
+        if(!exceptionQueue.isEmpty()) {
+            throw new GameCommandException("Unable to append " + exceptionQueue.size() + " arguments", exceptionQueue.get(0));
+        }
     }
 
-    private boolean appendArgument(ProcessBuilder pb, InstanceData instanceData, User minecraftUser, String gameDataDir, String assetsDir, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY, LauncherLaunchArgument a) {
+    private void appendArgument(ProcessBuilder pb, InstanceData instanceData, User minecraftUser, String gameDataDir, String assetsDir, String assetsIndex, List<String> libraries, String mainClass, String resX, String resY, LauncherLaunchArgument a) throws GameCommandException {
         if(a.isActive(instanceData.getInstance().getValue().getFeatures())) {
             Map<String, String> replacements = new HashMap<>();
+            List<GameCommandException> exceptionQueue = new ArrayList<>();
             for (String r : a.getReplacementValues()) {
-                String replacement = getReplacement(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, mainClass, minecraftUser, LauncherApplication.stringLocalizer.getFormatted("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug") ), LauncherApplication.stringLocalizer.getFormatted("game.version_type", LauncherApplication.stringLocalizer.get("launcher.name"), LauncherApplication.stringLocalizer.get("launcher.version") ), resX, resY);
-                if(replacement == null) {
-                    LOGGER.warn("Unable to append argument: unable to append environment variable: key=" + r);
-                    return false;
+                try {
+                    String replacement = getReplacement(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, mainClass, minecraftUser, LauncherApplication.stringLocalizer.getFormatted("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug")), LauncherApplication.stringLocalizer.getFormatted("game.version_type", LauncherApplication.stringLocalizer.get("launcher.name"), LauncherApplication.stringLocalizer.get("launcher.version")), resX, resY);
+                    replacements.put(r, replacement);
+                } catch (GameCommandException e) {
+                    exceptionQueue.add(e);
+                    LOGGER.warn("Unable to append argument: unable to replace variable: argument=" + a.getArgument() + ", variable=" + r, e);
                 }
-                replacements.put(r, replacement);
+            }
+            if(!exceptionQueue.isEmpty()) {
+                throw new GameCommandException("Unable to append argument: unable to replace " + exceptionQueue.size() + " variables: argument=" + a.getArgument(), exceptionQueue.get(0));
             }
             a.replace(replacements);
             if(!a.isFinished()) {
-                LOGGER.warn("Unable to append argument: unable to replace all environment variables: argument=" + a);
-                return false;
+                throw new GameCommandException("Unable to append argument: unable to replace all variables: argument=" + a);
             }
             pb.command().add(a.getParsedArgument());
         }
-        return true;
     }
 
-    private String getReplacement(String key, String gameDir, String javaDir, String assetsDir, String resourcepackDir, String assetsIndex, List<String> libraries, String mainClass, User minecraftUser, String versionName, String versionType, String resX, String resY) {
+    private String getReplacement(String key, String gameDir, String javaDir, String assetsDir, String resourcepackDir, String assetsIndex, List<String> libraries, String mainClass, User minecraftUser, String versionName, String versionType, String resX, String resY) throws GameCommandException {
         switch(key) {
             case "natives_directory" -> {
                 return javaDir + "lib";
@@ -215,7 +219,7 @@ public class CommandBuilder {
             }
 
             default -> {
-                return null;
+                throw new GameCommandException("Unknown environment variable: key=" + key);
             }
         }
     }

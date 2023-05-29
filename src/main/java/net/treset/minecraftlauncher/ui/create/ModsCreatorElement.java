@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
@@ -14,6 +15,7 @@ import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.ModsCreator;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -121,7 +123,13 @@ public class ModsCreatorElement extends UiElement {
         createVersionChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
         createVersionChoice.setDisable(true);
         new Thread(() -> {
-            List<MinecraftVersion> minecraftVersions = createSnapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+            List<MinecraftVersion> minecraftVersions;
+            try {
+                minecraftVersions = createSnapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+            } catch (FileDownloadException e) {
+                LOGGER.error("Failed to get versions", e);
+                return;
+            }
             List<String> names = new ArrayList<>();
             for (MinecraftVersion version : minecraftVersions) {
                 names.add(version.getId());
@@ -142,36 +150,34 @@ public class ModsCreatorElement extends UiElement {
         rootPane.setVisible(visible);
     }
 
-    public boolean create() {
+    public void create() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create mods!");
-            return false;
+            throw new ComponentCreationException("Not ready to create mods!");
         }
         ModsCreator creator = getCreator();
-        return creator.getId() != null;
+        creator.getId();
     }
 
-    public ModsCreator getCreator() {
+    public ModsCreator getCreator() throws ComponentCreationException {
+        if(!checkCreateReady()) {
+            throw new ComponentCreationException("Not ready to create mods!");
+        }
         if(radioCreate.isSelected()) {
             return new ModsCreator(createName.getText(), typeConversion, modsManifest, modsType, gameVersion, gameManifest);
         } else if(radioUse.isSelected()) {
             Pair<LauncherManifest, LauncherModsDetails> manifest = getModsFromName(useChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find mods from name: " + useChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find mods: name=" + useChoice.getSelectionModel().getSelectedItem());
             }
             return new ModsCreator(manifest);
         } else if(radioInherit.isSelected()) {
             Pair<LauncherManifest, LauncherModsDetails> manifest = getModsFromName(inheritChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find mods from name: " + inheritChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find mods: name=" + inheritChoice.getSelectionModel().getSelectedItem());
             }
             return new ModsCreator(inheritName.getText(), manifest, modsManifest, gameManifest);
-        } else {
-            LOGGER.warn("No radio button selected!");
-            return null;
         }
+        throw new ComponentCreationException("No radio button selected!");
     }
 
     private Pair<LauncherManifest, LauncherModsDetails> getModsFromName(String name) {

@@ -2,9 +2,11 @@ package net.treset.minecraftlauncher.creation;
 
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +37,12 @@ public class InstanceCreator extends GenericComponentCreator {
 
 
     @Override
-    public String createComponent() {
+    public String createComponent() throws ComponentCreationException {
         String result = super.createComponent();
 
         if(result == null || getNewManifest() == null) {
-            LOGGER.warn("Failed to create instance component: invalid data");
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create instance component: invalid data");
         }
 
         ArrayList<LauncherFeature> features = new ArrayList<>(this.features);
@@ -59,47 +60,24 @@ public class InstanceCreator extends GenericComponentCreator {
                 jvmArguments,
                 null, null, null, null, null);
 
-        if(modsCreator != null) {
-            details.setModsComponent(modsCreator.getId());
-            if (details.getModsComponent() == null) {
-                LOGGER.warn("Failed to create instance component: failed to create mods component");
-                attemptCleanup();
-                return null;
+        try {
+            if (modsCreator != null) {
+                details.setModsComponent(modsCreator.getId());
             }
+            details.setOptionsComponent(optionsCreator.getId());
+            details.setResourcepacksComponent(resourcepackCreator.getId());
+            details.setSavesComponent(savesCreator.getId());
+            details.setVersionComponent(versionCreator.getId());
+        } catch (ComponentCreationException e) {
+            attemptCleanup();
+            throw new ComponentCreationException("Failed to create instance: Error creating components", e);
         }
 
-        details.setOptionsComponent(optionsCreator.getId());
-        if(details.getOptionsComponent() == null) {
-            LOGGER.warn("Failed to create instance component: failed to create options component");
+        try {
+            details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails());
+        } catch (IOException e) {
             attemptCleanup();
-            return null;
-        }
-
-        details.setResourcepacksComponent(resourcepackCreator.getId());
-        if(details.getResourcepacksComponent() == null) {
-            LOGGER.warn("Failed to create instance component: failed to create resourcepacks component");
-            attemptCleanup();
-            return null;
-        }
-
-        details.setSavesComponent(savesCreator.getId());
-        if(details.getSavesComponent() == null) {
-            LOGGER.warn("Failed to create instance component: failed to create saves component");
-            attemptCleanup();
-            return null;
-        }
-
-        details.setVersionComponent(versionCreator.getId());
-        if(details.getVersionComponent() == null) {
-            LOGGER.warn("Failed to create instance component: failed to create version component");
-            attemptCleanup();
-            return null;
-        }
-
-        if(!details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails())) {
-            LOGGER.warn("Failed to create instance component: failed to write details to file");
-            attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Failed to create instance component: failed to write details to file", e);
         }
 
         LOGGER.debug("Created instance component: id={}", getNewManifest().getId());
@@ -107,17 +85,15 @@ public class InstanceCreator extends GenericComponentCreator {
     }
 
     @Override
-    public String inheritComponent() {
-        LOGGER.warn("Unable to inherit instance component: unsupported");
+    public String inheritComponent() throws ComponentCreationException {
         attemptCleanup();
-        return null;
+        throw new ComponentCreationException("Unable to inherit instance component: unsupported");
     }
 
     @Override
-    public String useComponent() {
-        LOGGER.warn("Unable to use instance component: unsupported");
+    public String useComponent() throws ComponentCreationException {
         attemptCleanup();
-        return null;
+        throw new ComponentCreationException("Unable to use instance component: unsupported");
     }
 
     @Override

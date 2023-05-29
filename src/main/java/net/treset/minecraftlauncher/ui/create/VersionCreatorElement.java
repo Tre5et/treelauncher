@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.fabric.FabricProfile;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
 import net.treset.mc_version_loader.files.Sources;
@@ -19,6 +20,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -97,7 +99,12 @@ public class VersionCreatorElement extends UiElement {
         versionChoice.setDisable(true);
         updateTypeState();
         new Thread(() -> {
-            minecraftVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+            try {
+                minecraftVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+            } catch (FileDownloadException e) {
+                LOGGER.error("Failed to download versions", e);
+                return;
+            }
             List<String> names = new ArrayList<>();
             for (MinecraftVersion version : minecraftVersions) {
                 names.add(version.getId());
@@ -129,7 +136,12 @@ public class VersionCreatorElement extends UiElement {
             loaderChoice.setDisable(true);
             loaderChoice.setVisible(true);
             new Thread(() -> {
-                fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue()));
+                try {
+                    fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue()));
+                } catch (FileDownloadException e) {
+                    LOGGER.warn("Failed to download fabric versions", e);
+                    return;
+                }
                 List<String> names = new ArrayList<>();
                 for (FabricVersionDetails version : fabricVersions) {
                     names.add(version.getLoader().getVersion());
@@ -157,46 +169,41 @@ public class VersionCreatorElement extends UiElement {
         rootBox.setVisible(visible);
     }
 
-    public boolean create() {
+    public boolean create() throws ComponentCreationException {
         VersionCreator creator = getCreator();
-        if(creator == null) {
-            LOGGER.warn("Could not create version!");
-            return false;
-        }
         return creator.getId() != null;
     }
 
-    public VersionCreator getCreator() {
+    public VersionCreator getCreator() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create version!");
-            return null;
+            throw new ComponentCreationException("Not ready to create version");
         }
         if("Vanilla".equals(typeChoice.getValue())) {
             MinecraftVersion version = getMinecraftFromString(versionChoice.getValue());
             if(version == null) {
-                return null;
+                throw new ComponentCreationException("Could not get Minecraft version");
             }
-            MinecraftVersionDetails details = MinecraftVersionDetails.fromJson(Sources.getFileFromUrl(version.getUrl()));
-            if(details == null) {
-                LOGGER.warn("Could not get Minecraft version details!");
-                return null;
+            MinecraftVersionDetails details = null;
+            try {
+                details = MinecraftVersionDetails.fromJson(Sources.getFileFromUrl(version.getUrl()));
+            } catch (FileDownloadException e) {
+                throw new ComponentCreationException("Could not get Minecraft version details", e);
             }
             return new VersionCreator(typeConversion, versionManifest, details, launcherFiles, librariesDir);
         } else if("Fabric".equals(typeChoice.getValue())) {
             FabricVersionDetails details = getFabricFromString(loaderChoice.getValue());
             if(details == null) {
-                LOGGER.warn("Could not get Fabric version details");
-                return null;
+                throw new ComponentCreationException("Could not get Fabric version details");
             }
-            FabricProfile profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/" + versionChoice.getValue() + "/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
-            if(profile == null) {
-                LOGGER.warn("Could not get Fabric profile!");
-                return null;
+            FabricProfile profile = null;
+            try {
+                profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/" + versionChoice.getValue() + "/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
+            } catch (FileDownloadException e) {
+                throw new ComponentCreationException("Could not get Fabric profile", e);
             }
             return new VersionCreator(typeConversion, versionManifest, details, profile, launcherFiles, librariesDir);
         }
-        LOGGER.warn("No valid version type!");
-        return null;
+        throw new ComponentCreationException("Invalid version type");
     }
 
     private MinecraftVersion getMinecraftFromString(String name) {

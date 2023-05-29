@@ -3,12 +3,14 @@ package net.treset.minecraftlauncher.creation;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +41,13 @@ public abstract class GenericComponentCreator implements ComponentCreator {
     }
 
     @Override
-    public String getId() {
+    public String getId() throws ComponentCreationException {
         if(uses != null) {
             return useComponent();
         }
 
         if(name == null) {
-            LOGGER.warn("Unable to create {} component: invalid name", type.toString().toLowerCase());
-            return null;
+            throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: invalid parameters");
         }
 
         if(inheritsFrom != null) {
@@ -57,107 +58,101 @@ public abstract class GenericComponentCreator implements ComponentCreator {
     }
 
 
-    public String createComponent() {
+    public String createComponent() throws ComponentCreationException {
         if(typeConversion == null) {
-            LOGGER.warn("Unable to create {} component: invalid parameters", type.toString().toLowerCase());
-            return null;
+            throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: invalid parameters");
         }
 
         String manifestType = getManifestType(type, typeConversion);
         if(manifestType == null) {
-            LOGGER.warn("Unable to create {} component: unable to get manifest type", type.toString().toLowerCase());
-            return null;
+            throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: invalid parameters");
         }
         newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles, null);
         newManifest.setId(FormatUtil.hash(newManifest));
-        if(!writeNewManifest()) {
-            LOGGER.warn("Unable to create {} component: unable to write manifest: id={}", type.toString().toLowerCase(), newManifest.getId());
+        try {
+            writeNewManifest();
+        } catch (ComponentCreationException e) {
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: unable to write manifest", e);
         }
         LOGGER.debug("Created {} component: id={}", type.toString().toLowerCase(), newManifest.getId());
         return newManifest.getId();
     }
 
-    public String useComponent() {
+    public String useComponent() throws ComponentCreationException {
         if(uses.getType() != type || uses.getId() == null) {
-            LOGGER.warn("Unable to use {} component: invalid component specified", type.toString().toLowerCase());
-            return null;
+            throw new ComponentCreationException("Unable to use " + type.toString().toLowerCase() + " component: invalid component specified");
         }
         LOGGER.debug("Using {} component: id={}", type.toString().toLowerCase(), uses.getId());
         return uses.getId();
     }
 
-    public String inheritComponent() {
+    public String inheritComponent() throws ComponentCreationException {
         if(inheritsFrom.getType() != type) {
-            LOGGER.warn("Unable to inherit {} component: invalid component specified", type.toString().toLowerCase());
-            return null;
+            throw new ComponentCreationException("Unable to inherit " + type.toString().toLowerCase() + " component: invalid component specified");
         }
         String manifestType = getManifestType(type, inheritsFrom.getTypeConversion());
         if(manifestType == null) {
-            LOGGER.warn("Unable to inherit {} component: unable to get manifest type", type.toString().toLowerCase());
-            return null;
+            throw new ComponentCreationException("Unable to inherit " + type.toString().toLowerCase() + " component: unable to get manifest type");
         }
         newManifest = new LauncherManifest(manifestType, inheritsFrom.getTypeConversion(), null, inheritsFrom.getDetails(), inheritsFrom.getPrefix(), name, inheritsFrom.getIncludedFiles(), inheritsFrom.getComponents());
         newManifest.setId(FormatUtil.hash(newManifest));
-        if(!writeNewManifest()) {
-            LOGGER.warn("Unable to inherit {} component: unable to write manifest to file: id={}", type.toString().toLowerCase(), newManifest.getId());
+        try {
+            writeNewManifest();
+        } catch (ComponentCreationException e){
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Unable to inherit " + type.toString().toLowerCase() + " component: unable to write manifest: id=" + newManifest.getId(), e);
         }
 
-        if(!copyFiles(inheritsFrom, newManifest)) {
-            LOGGER.warn("Unable to inherit {} component: unable to copy files: id={}", type.toString().toLowerCase(), newManifest.getId());
+        try {
+            copyFiles(inheritsFrom, newManifest);
+        } catch (ComponentCreationException e) {
             attemptCleanup();
-            return null;
+            throw new ComponentCreationException("Unable to inherit " + type.toString().toLowerCase() + " component: unable to copy files: id=" + newManifest.getId(), e);
         }
 
         LOGGER.debug("Inherited {} component: id={}", type.toString().toLowerCase(), newManifest.getId());
         return newManifest.getId();
     }
 
-    public boolean copyFiles(LauncherManifest oldManifest, LauncherManifest newManifest) {
-        if(!isValid()) {
-            LOGGER.warn("Unable to copy files: invalid parameters");
-            return false;
+    public void copyFiles(LauncherManifest oldManifest, LauncherManifest newManifest) throws ComponentCreationException {
+        if(!isValid() || oldManifest == null || newManifest == null || oldManifest.getDirectory() == null || newManifest.getDirectory() == null) {
+            throw new ComponentCreationException("Unable to copy files: invalid parameters");
         }
-        if(oldManifest == null || newManifest == null || oldManifest.getDirectory() == null || newManifest.getDirectory() == null) {
-            LOGGER.warn("Unable to copy files: invalid parameters");
-            return false;
-        }
-        if(!FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING)) {
-            LOGGER.warn("Unable to copy files: unable to copy files");
-            return false;
+        try {
+            FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING)
+        } catch (IOException e) {
+            throw new ComponentCreationException("Unable to copy files: unable to copy files", e);
         }
         LOGGER.debug("Copied files: src={}, dst={}", oldManifest.getDirectory(), newManifest.getDirectory());
-        return true;
     }
 
-    public boolean writeNewManifest() {
+    public void writeNewManifest() throws ComponentCreationException {
         if(!isValid() || newManifest == null) {
-            LOGGER.warn("Unable to write manifest: invalid parameters");
-            return false;
+            throw new ComponentCreationException("Unable to write manifest: invalid parameters");
         }
         newManifest.setDirectory(componentsManifest.getDirectory() + componentsManifest.getPrefix() + "_" + newManifest.getId() + "/");
-        if(!newManifest.writeToFile(newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME)) {
-            LOGGER.warn("Unable to write manifest: unable to write manifest to file: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
-            return false;
+        try {
+            newManifest.writeToFile(newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+        } catch (IOException e) {
+            throw new ComponentCreationException("Unable to write manifest: unable to write manifest to file: id=" + newManifest.getId() + ", path=" + newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME, e);
         }
         ArrayList<String> components = new ArrayList<>(componentsManifest.getComponents());
         components.add(newManifest.getId());
         componentsManifest.setComponents(components);
-        if(!componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName())) {
-            LOGGER.warn("Unable to write manifest: unable to write parent manifest to file: id={}, path={}", newManifest.getId(), componentsManifest.getDirectory() + getParentManifestFileName());
-            return false;
+        try {
+            componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName());
+        } catch (IOException e) {
+            throw new ComponentCreationException("Unable to write manifest: unable to write parent manifest to file: id=" + newManifest.getId() + ", path=" + componentsManifest.getDirectory() + getParentManifestFileName(), e);
         }
         if(newManifest.getIncludedFiles() != null) {
-            if(!FileUtil.createDir(newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR)) {
-                LOGGER.warn("Unable to write manifest: unable to create included files directory: id={}, path={}", newManifest.getId(), newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
-                return false;
+            try {
+                FileUtil.createDir(newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
+            } catch (IOException e) {
+                throw new ComponentCreationException("Unable to write manifest: unable to create included files directory: id=" + newManifest.getId() + ", path=" + newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
             }
         }
         LOGGER.debug("Wrote manifest: path={}", newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
-        return true;
     }
 
     protected boolean attemptCleanup() {
@@ -166,11 +161,12 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         if(newManifest != null && newManifest.getDirectory() != null) {
             File directory = new File(newManifest.getDirectory());
             if(directory.isDirectory()) {
-                if (!FileUtil.deleteDir(directory)) {
+                try{
+                    FileUtil.deleteDir(directory);
+                    LOGGER.debug("Cleaned up manifest: path={}", newManifest.getDirectory());
+                } catch (IOException e) {
                     LOGGER.warn("Unable to cleanup: unable to delete directory: continuing: path={}", newManifest.getDirectory());
                     success = false;
-                } else {
-                    LOGGER.debug("Cleaned up manifest: path={}", newManifest.getDirectory());
                 }
             }
         }
@@ -178,11 +174,12 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             List<String> components = new ArrayList<>(componentsManifest.getComponents());
             components.remove(newManifest.getId());
             componentsManifest.setComponents(components);
-            if(!componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName())) {
+            try {
+                componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName());
+                LOGGER.debug("Cleaned up parent manifest: id={}", newManifest.getId());
+            } catch (IOException e) {
                 LOGGER.warn("Unable to cleanup: unable to write parent manifest to file: continuing: id={}, path={}", newManifest.getId(), componentsManifest.getDirectory() + getParentManifestFileName());
                 success = false;
-            } else {
-                LOGGER.debug("Cleaned up parent manifest: id={}", newManifest.getId());
             }
         }
         LOGGER.debug(success ? "Cleanup successful" : "Cleanup unsuccessful");
@@ -193,14 +190,13 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         return LauncherApplication.config.MANIFEST_FILE_NAME;
     }
 
-    public String getManifestType(LauncherManifestType type, Map<String, LauncherManifestType> typeConversion) {
+    public String getManifestType(LauncherManifestType type, Map<String, LauncherManifestType> typeConversion) throws IllegalArgumentException {
         for(Map.Entry<String, LauncherManifestType> e : typeConversion.entrySet()) {
             if(e.getValue() == type) {
                 return e.getKey();
             }
         }
-        LOGGER.warn("Unable to get manifest type: no type found: type={}", type.toString().toLowerCase());
-        return null;
+        throw new IllegalArgumentException("Unable to get manifest type: no type found: type=" + type.toString().toLowerCase());
     }
 
     private boolean isValid() {

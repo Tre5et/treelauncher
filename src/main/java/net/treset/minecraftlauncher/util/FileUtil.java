@@ -12,36 +12,25 @@ import java.util.stream.Stream;
 public class FileUtil {
     private static Logger LOGGER = LogManager.getLogger(FileUtil.class);
 
-    public static String loadFile(String path) {
+    public static String loadFile(String path) throws IOException {
         Path filePath = Paths.get(path);
         if(!filePath.toFile().isFile()) {
-            LOGGER.debug("Unable to load file: doesn't exist: path=" + path);
-            return null;
+            throw new IOException("Unable to load file: doesn't exist: path=" + path);
         }
-        try {
-            return Files.readString(filePath);
-        } catch (IOException e) {
-            LOGGER.debug("Unable to load file: path=" + path, e);
-            return null;
-        }
+        return Files.readString(filePath);
     }
 
-    public static boolean copyContents(String srcDir, String dstDir, Function<String, Boolean> copyChecker, StandardCopyOption... options) {
+    public static void copyContents(String srcDir, String dstDir, Function<String, Boolean> copyChecker, StandardCopyOption... options) throws IOException {
         File src = new File(srcDir);
         if(!src.isDirectory()) {
-            LOGGER.debug("Unable to copy contents: source is not a directory: srcDir=" + srcDir);
-            return false;
+            throw new IOException("Unable to copy contents: source is not a directory: srcDir=" + srcDir);
         }
 
-        if(!createDir(dstDir)) {
-            LOGGER.debug("Unable to copy contents: unable to create directory: dstDir=" + dstDir);
-            return false;
-        }
+        createDir(dstDir);
 
         File[] files = src.listFiles();
         if(files == null) {
-            LOGGER.debug("Unable to copy contents: unable to list files: srcDir=" + srcDir);
-            return false;
+            throw new IOException("Unable to copy contents: unable to list files: srcDir=" + srcDir);
         }
 
         for(File file : files) {
@@ -49,21 +38,14 @@ public class FileUtil {
                 continue;
             }
             if(file.isDirectory()) {
-                if(!FileUtil.copyDirectory(file.getAbsolutePath(), dstDir + file.getName() + "/", options)) {
-                    LOGGER.warn("Unable to copy files: unable to copy directory: name={}", file.getName());
-                    return false;
-                }
+                FileUtil.copyDirectory(file.getAbsolutePath(), dstDir + file.getName() + "/", options);
             } else {
-                if(!FileUtil.copyFile(file.getAbsolutePath(), dstDir + file.getName(), options)) {
-                    LOGGER.warn("Unable to copy files: unable to copy directory: name={}", file.getName());
-                    return false;
-                }
+                FileUtil.copyFile(file.getAbsolutePath(), dstDir + file.getName(), options);
             }
         }
-        return true;
     }
 
-    public static boolean deleteDir(File file) {
+    public static void deleteDir(File file) throws IOException {
         File[] contents = file.listFiles();
         if (contents != null) {
             for (File f : contents) {
@@ -72,15 +54,13 @@ public class FileUtil {
                 }
             }
         }
-        return file.delete();
+        if (! file.delete()) {
+            throw new IOException("Unable to delete file: file=" + file);
+        }
     }
 
-    public static boolean copyDirectory(String source, String destination, CopyOption... options) {
-        if(!createDir(destination)) {
-            LOGGER.debug("Unable to copy directory: unable to create directory: destination=" + destination);
-            return false;
-        }
-
+    public static void copyDirectory(String source, String destination, CopyOption... options) throws IOException {
+        createDir(destination);
         try (Stream<Path> stream = Files.walk(Paths.get(source))) {
             stream.forEach(sourceF -> {
                         Path destinationF = Paths.get(destination, sourceF.toString().substring(source.length()));
@@ -91,43 +71,23 @@ public class FileUtil {
                         }
                     });
         } catch (IOException e) {
-            LOGGER.debug("Unable to copy directory: source=" + source, e);
-            return false;
+            throw new IOException("Unable to copy directory: source=" + source + ", destination=" + destination, e);
         }
-        return true;
     }
 
-    public static boolean copyFile(String source, String destination, CopyOption... options) {
-        if(!createDir(new File(destination).getParent())) {
-            LOGGER.debug("Unable to copy file: unable to make parent dir: destination={}", destination);
-            return false;
-        }
-
-        try {
-            Files.copy(Path.of(source), Path.of(destination), options);
-        } catch (IOException e) {
-            LOGGER.debug("Unable to copy file: source={}, destination={}", source, destination, e);
-            return false;
-        }
-        return true;
+    public static void copyFile(String source, String destination, CopyOption... options) throws IOException {
+        createDir(new File(destination).getParent());
+        Files.copy(Path.of(source), Path.of(destination), options);
     }
 
-    public static boolean createDir(String path) {
+    public static void createDir(String path) throws IOException {
         File dir = new File(path);
         if(!dir.isDirectory() && !dir.mkdirs()) {
-            LOGGER.debug("Unable to create directory: path={}", path);
-            return false;
+            throw new IOException("Unable to create directory: path=" + path);
         }
-        return true;
     }
 
-    public static boolean writeFile(String path, String content) {
-        try {
-            Files.writeString(Paths.get(path), content);
-        } catch (IOException e) {
-            LOGGER.debug("Unable to write file: path={}", path, e);
-            return false;
-        }
-        return true;
+    public static boolean writeFile(String path, String content) throws IOException {
+        Files.writeString(Paths.get(path), content);
     }
 }

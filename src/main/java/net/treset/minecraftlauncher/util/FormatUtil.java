@@ -25,7 +25,7 @@ public class FormatUtil {
         try {
             md = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // this doesn't happen
         }
 
         byte[] encrypted = md.digest((source.toString() + System.nanoTime()).getBytes());

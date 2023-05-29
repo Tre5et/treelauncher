@@ -22,16 +22,24 @@ import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.exception.GameLaunchException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class InstanceSelectorElement extends UiElement {
+    private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
+
     @FXML private AnchorPane rootPane;
     @FXML private VBox instanceContainer;
     @FXML private Button playButton;
@@ -50,21 +58,29 @@ public class InstanceSelectorElement extends UiElement {
     private InstanceData currentInstance;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
-        super.init(parent, lockSetter, lockGetter);
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
+        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
         instanceDetailsController.init(this::onComponentSelected);
-        files = new LauncherFiles();
+        try {
+            files = new LauncherFiles();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange);
     }
 
     public void reloadComponents() {
-        files.reloadAll();
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         instances = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> instance : files.getInstanceComponents()) {
             try {
                 instances.add(SelectorEntryElement.from(InstanceData.of(instance, files)));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (IOException | FileLoadException e) {
+                handleSevereException(e);
             }
         }
         popupController.setVisible(false);
@@ -136,7 +152,10 @@ public class InstanceSelectorElement extends UiElement {
             setLock(true);
             playButton.setDisable(true);
             GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
-            if(!launcher.launch(false)) {
+            try {
+                launcher.launch(false);
+            } catch (GameLaunchException e) {
+                displayGameLaunchFailed(e);
                 onGameExit(null);
             }
         }
@@ -204,9 +223,17 @@ public class InstanceSelectorElement extends UiElement {
             case OPTIONS -> currentInstance.getInstance().getValue().setOptionsComponent(manifest.getId());
             case MODS -> currentInstance.getInstance().getValue().setModsComponent(manifest.getId());
         }
-        currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
-        files.reloadAll();
-        currentInstance = InstanceData.of(currentInstance.getInstance(), files);
+        try {
+            currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
+        } catch (IOException e) {
+            displayError(e);
+        }
+        try {
+            files.reloadAll();
+            currentInstance = InstanceData.of(currentInstance.getInstance(), files);
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         if(currentInstance != null) {
             instanceDetailsController.populate(currentInstance);
         }
@@ -250,8 +277,10 @@ public class InstanceSelectorElement extends UiElement {
         popupController.setVisible(true);
         versionChangerController.setVisible(false);
         new Thread(() -> {
-            String versionId = creator.getId();
-            if(versionId == null) {
+            String versionId = null;
+            try {
+                versionId = creator.getId();
+            } catch (ComponentCreationException e) {
                 Platform.runLater(() -> {
                     popupController.setType(PopupElement.PopupType.ERROR);
                     popupController.setContent("selector.instance.version.popup.failure", "");
@@ -260,9 +289,17 @@ public class InstanceSelectorElement extends UiElement {
                 return;
             }
             currentInstance.getInstance().getValue().setVersionComponent(versionId);
-            currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
-            files.reloadAll();
-            currentInstance = InstanceData.of(currentInstance.getInstance(), files);
+            try {
+                currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
+            } catch (IOException e) {
+                displayError(e);
+            }
+            try {
+                files.reloadAll();
+                currentInstance = InstanceData.of(currentInstance.getInstance(), files);
+            } catch (FileLoadException e) {
+                handleSevereException(e);
+            }
             Platform.runLater(() -> {
                 instanceDetailsController.populate(currentInstance);
                 versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
@@ -327,7 +364,11 @@ public class InstanceSelectorElement extends UiElement {
 
     private void onDeleteConfirm(String id) {
         popupController.setVisible(false);
-        currentInstance.delete(files);
+        try {
+            currentInstance.delete(files);
+        } catch (IOException e) {
+            displayError(e);
+        }
         setVisible(false);
         reloadComponents();
         setVisible(true);
@@ -339,5 +380,40 @@ public class InstanceSelectorElement extends UiElement {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
+    }
+
+    private void displayGameLaunchFailed(Exception e) {
+        LOGGER.error("Failed to launch game", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("selector.instance.error.launch.title");
+        popupController.setMessage("selector.instance.error.launch.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
+        popupController.setVisible(true);
     }
 }

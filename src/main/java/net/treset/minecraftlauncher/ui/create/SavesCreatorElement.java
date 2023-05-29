@@ -8,6 +8,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.creation.SavesCreator;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -93,43 +94,34 @@ public class SavesCreatorElement extends UiElement {
         rootPane.setVisible(visible);
     }
 
-    public boolean create() {
+    public void create() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create saves!");
-            return false;
+            throw new ComponentCreationException("Not ready to create saves!");
         }
         SavesCreator creator = getCreator();
-        if(creator == null) {
-            LOGGER.warn("Could not create saves!");
-            return false;
-        }
-        return creator.getId() != null;
+        creator.getId();
     }
 
-    public SavesCreator getCreator() {
+    public SavesCreator getCreator() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create saves!");
-            return null;
+            throw new ComponentCreationException("Not ready to create saves!");
         }
         if(radioCreate.isSelected()) {
             return new SavesCreator(createName.getText(), typeConversion, savesManifest, gameManifest);
         } else if(radioUse.isSelected()) {
             LauncherManifest manifest = getSaveFromName(useChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find save from name: " + useChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find save: name=" + useChoice.getSelectionModel().getSelectedItem());
             }
             return new SavesCreator(manifest);
         } else if(radioInherit.isSelected()) {
             LauncherManifest manifest = getSaveFromName(inheritChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find save from name: " + inheritChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find save: name=" + inheritChoice.getSelectionModel().getSelectedItem());
             }
             return new SavesCreator(inheritName.getText(), manifest, savesManifest, gameManifest);
         }
-        LOGGER.warn("No radio button selected!");
-        return null;
+        throw new ComponentCreationException("No radio button selected!");
     }
 
     private LauncherManifest getSaveFromName(String name) {

@@ -8,6 +8,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.creation.ResourcepackCreator;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -92,43 +93,34 @@ public class ResourcepacksCreatorElement extends UiElement {
         rootPane.setVisible(visible);
     }
 
-    public boolean create() {
+    public void create() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create resourcepacks!");
-            return false;
+            throw new ComponentCreationException("Not ready to create resourcepacks!");
         }
         ResourcepackCreator creator = getCreator();
-        if(creator == null) {
-            LOGGER.warn("Could not create resourcepacks!");
-            return false;
-        }
-        return creator.getId() != null;
+        creator.getId();
     }
 
-    public ResourcepackCreator getCreator() {
+    public ResourcepackCreator getCreator() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create resourcepacks!");
-            return null;
+            throw new ComponentCreationException("Not ready to create resourcepacks!");
         }
         if(radioCreate.isSelected()) {
             return new ResourcepackCreator(createName.getText(), typeConversion, resourcepacksManifest);
         } else if(radioUse.isSelected()) {
             LauncherManifest manifest = getResourcepacksFromName(useChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find resourcepacks from name: " + useChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find resourcepacks: name=" + useChoice.getSelectionModel().getSelectedItem());
             }
             return new ResourcepackCreator(manifest);
         } else if(radioInherit.isSelected()) {
             LauncherManifest manifest = getResourcepacksFromName(inheritChoice.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                LOGGER.warn("Could not find resourcepacks from name: " + inheritChoice.getSelectionModel().getSelectedItem() + "!");
-                return null;
+                throw new ComponentCreationException("Could not find resourcepacks: name=" + inheritChoice.getSelectionModel().getSelectedItem());
             }
             return new ResourcepackCreator(inheritName.getText(), manifest, resourcepacksManifest);
         }
-        LOGGER.warn("No radio button selected!");
-        return null;
+        throw new ComponentCreationException("No radio button selected!");
     }
 
     private LauncherManifest getResourcepacksFromName(String name) {

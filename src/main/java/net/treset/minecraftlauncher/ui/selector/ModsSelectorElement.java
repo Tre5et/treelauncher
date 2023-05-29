@@ -21,6 +21,9 @@ import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
 import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.exception.GameResourceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -53,11 +57,15 @@ public class ModsSelectorElement extends UiElement {
     private boolean createSelected;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
-        super.init(parent, lockSetter, lockGetter);
-        files = new LauncherFiles();
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
+        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
+        try {
+            files = new LauncherFiles();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         modsCreatorController.enableUse(false);
-        modsCreatorController.init(this, lockSetter, lockGetter);
+        modsCreatorController.init(this, lockSetter, lockGetter, severeExceptionHandler);
         modsCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
         modsCreatorController.enableVersionSelect(true);
         modsCreatorController.setModsType("fabric");
@@ -65,7 +73,11 @@ public class ModsSelectorElement extends UiElement {
     }
 
     private void reloadComponents() {
-        files.reloadAll();
+        try {
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            handleSevereException(e);
+        }
         mods = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherModsDetails> mod: files.getModsComponents()) {
             try {
@@ -151,7 +163,11 @@ public class ModsSelectorElement extends UiElement {
     @FXML
     private void onCreateButtonClicked() {
         if(modsCreatorController.checkCreateReady()) {
-            modsCreatorController.getCreator().getId();
+            try {
+                modsCreatorController.getCreator().getId();
+            } catch (ComponentCreationException e) {
+                displayError(e);
+            }
             reloadComponents();
             for(Pair<SelectorEntryElement, AnchorPane> mod: mods) {
                 mod.getKey().beforeShow(null);
@@ -210,16 +226,20 @@ public class ModsSelectorElement extends UiElement {
         popupController.setVisible(false);
         if(currentMods != null) {
             if(!files.getModsManifest().getComponents().remove(currentMods.getKey().getId())) {
-                LOGGER.warn("Unable to remove mods from manifest");
+                displayError(new GameResourceException("Unable to remove mods from manifest"));
                 return;
             }
-            if(!files.getModsManifest().writeToFile(files.getModsManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(0))) {
-                LOGGER.warn("Unable to write mods manifest");
+            try {
+                files.getModsManifest().writeToFile(files.getModsManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(0));
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             modsCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
-            if(!FileUtil.deleteDir(new File(currentMods.getKey().getDirectory()))) {
-                LOGGER.warn("Unable to delete mods directory");
+            try {
+                FileUtil.deleteDir(new File(currentMods.getKey().getDirectory()));
+            } catch (IOException e) {
+                displayError(e);
                 return;
             }
             LOGGER.debug("Mods deleted");
@@ -270,5 +290,22 @@ public class ModsSelectorElement extends UiElement {
             modsDetailsTitle.setDisable(true);
             modsManagerController.setVisible(false);
         }
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

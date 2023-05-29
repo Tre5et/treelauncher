@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.fabric.FabricProfile;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
 import net.treset.mc_version_loader.files.Sources;
@@ -21,6 +22,7 @@ import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.create.VersionCreatorElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,13 +48,15 @@ public class VersionChangerElement extends UiElement {
     private String librariesDir;
     private LauncherManifest versionManifest;
     private Consumer<VersionCreator> changeCallback;
+    private Consumer<Exception> changeFailCallback;
 
-    public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, String librariesDir, LauncherManifest versionManifest, Consumer<VersionCreator> changeCallback) {
+    public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, String librariesDir, LauncherManifest versionManifest, Consumer<VersionCreator> changeCallback, Consumer<Exception> changeFailCallback) {
         this.typeConversion = typeConversion;
         this.launcherFiles = launcherFiles;
         this.librariesDir = librariesDir;
         this.versionManifest = versionManifest;
         this.changeCallback = changeCallback;
+        this.changeFailCallback = changeFailCallback;
         typeChoice.getItems().clear();
         typeChoice.getItems().addAll("Vanilla", "Fabric");
         versionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
@@ -86,9 +90,11 @@ public class VersionChangerElement extends UiElement {
     @FXML
     private void onChangeButtonClicked() {
         if(checkCreateReady()) {
-            VersionCreator creator = getCreator();
-            if(creator != null) {
+            try {
+                VersionCreator creator = getCreator();
                 changeCallback.accept(creator);
+            } catch (ComponentCreationException e) {
+                changeFailCallback.accept(e);
             }
         }
     }
@@ -126,7 +132,12 @@ public class VersionChangerElement extends UiElement {
         versionChoice.setDisable(true);
         updateLoaderChoice();
         new Thread(() -> {
-            vanillaVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+            try {
+                vanillaVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+            } catch (FileDownloadException e) {
+                LOGGER.error("Failed to load versions", e);
+                return;
+            }
             Platform.runLater(() -> {
                 versionChoice.getItems().addAll(vanillaVersions.stream().map(MinecraftVersion::getId).toList());
                 versionChoice.getSelectionModel().select(currentVersion.getVersionNumber());
@@ -145,7 +156,12 @@ public class VersionChangerElement extends UiElement {
             loaderChoice.setDisable(true);
             loaderChoice.setVisible(true);
             new Thread(() -> {
-                fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue()));
+                try {
+                    fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue()));
+                } catch (FileDownloadException e) {
+                    LOGGER.error("Failed to load fabric versions", e);
+                    return;
+                }
                 Platform.runLater(() -> {
                     loaderChoice.getItems().addAll(fabricVersions.stream().map(v -> v.getLoader().getVersion()).toList());
                     loaderChoice.getSelectionModel().select(currentVersion.getLoaderVersion());
@@ -156,37 +172,36 @@ public class VersionChangerElement extends UiElement {
         }
     }
 
-    private VersionCreator getCreator() {
+    private VersionCreator getCreator() throws ComponentCreationException {
         if(!checkCreateReady()) {
-            LOGGER.warn("Not ready to create version!");
-            return null;
+            throw new ComponentCreationException("Not ready to create version");
         }
         if("Vanilla".equals(typeChoice.getValue())) {
             MinecraftVersion version = getMinecraftFromString(versionChoice.getValue());
             if(version == null) {
-                return null;
+                throw new ComponentCreationException("Could not get Minecraft version");
             }
-            MinecraftVersionDetails details = MinecraftVersionDetails.fromJson(Sources.getFileFromUrl(version.getUrl()));
-            if(details == null) {
-                LOGGER.warn("Could not get Minecraft version details!");
-                return null;
+            MinecraftVersionDetails details = null;
+            try {
+                details = MinecraftVersionDetails.fromJson(Sources.getFileFromUrl(version.getUrl()));
+            } catch (FileDownloadException e) {
+                throw new ComponentCreationException("Could not get Minecraft version details", e);
             }
             return new VersionCreator(typeConversion, versionManifest, details, launcherFiles, librariesDir);
         } else if("Fabric".equals(typeChoice.getValue())) {
             FabricVersionDetails details = getFabricFromString(loaderChoice.getValue());
             if(details == null) {
-                LOGGER.warn("Could not get Fabric version details");
-                return null;
+                throw new ComponentCreationException("Could not get Fabric version");
             }
-            FabricProfile profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/" + versionChoice.getValue() + "/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
-            if(profile == null) {
-                LOGGER.warn("Could not get Fabric profile!");
-                return null;
+            FabricProfile profile;
+            try {
+                profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/" + versionChoice.getValue() + "/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
+            } catch (FileDownloadException e) {
+                throw new ComponentCreationException("Could not get Fabric profile", e);
             }
             return new VersionCreator(typeConversion, versionManifest, details, profile, launcherFiles, librariesDir);
         }
-        LOGGER.warn("No valid version type!");
-        return null;
+        throw new ComponentCreationException("Invalid version type");
     }
 
     private MinecraftVersion getMinecraftFromString(String name) {
