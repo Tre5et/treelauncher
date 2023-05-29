@@ -1,0 +1,7 @@
+{
+	"type": "game",
+	"components": [
+		"mods.json",
+		"saves.json"
+	]
+}
