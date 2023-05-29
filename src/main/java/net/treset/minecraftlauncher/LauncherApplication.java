@@ -8,10 +8,13 @@ import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
+import net.treset.minecraftlauncher.util.LoggingOutputStream;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Objects;
 
 
@@ -39,6 +42,9 @@ public class LauncherApplication extends Application {
     }
 
     private static void setupLogger() {
+        System.setOut(new PrintStream(new LoggingOutputStream(
+                LogManager.getLogger(LauncherApplication.class), Level.DEBUG)));
+
         // TODO: file not working in build, why?
 
         /* ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();

@@ -5,14 +5,11 @@ import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 public class GlobalConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger(GlobalConfigLoader.class);
 
     public static Config loadConfig() throws IllegalStateException {
-        String contents = FileUtil.loadFile("launcher.conf");
+        String contents = FileUtil.loadFile("app/launcher.conf");
         if(contents == null) {
             throw new IllegalStateException("Unable to load launcher.conf");
         }

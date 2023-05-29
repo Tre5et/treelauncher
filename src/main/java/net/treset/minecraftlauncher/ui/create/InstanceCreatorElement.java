@@ -98,6 +98,7 @@ public class InstanceCreatorElement extends UiElement {
                 this::onBackButtonClicked
         ));
         popupController.setControlsDisabled(true);
+        popupController.setVisible(false);
         scrollContainer.getStyleClass().remove("popup-background");
         scrollContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollContainer.setVvalue(0);

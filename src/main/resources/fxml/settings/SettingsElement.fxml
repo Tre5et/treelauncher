@@ -37,10 +37,7 @@
                         <Label styleClass="hint" text="%settings.version.version" />
                         <Label styleClass="hint" text="%launcher.version" />
                     </HBox>
-                    <Button styleClass="invisible" onAction="#onSourceButtonClicked">
-                        <graphic>
-                            <FontIcon iconLiteral="fab-github:28" styleClass="icon, github" />
-                        </graphic>
+                    <Button onAction="#onSourceButtonClicked" text="github">
                     </Button>
                 </VBox>
             </VBox>
