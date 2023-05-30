@@ -61,6 +61,7 @@ public class ModsSelectorElement extends UiElement {
         super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
         try {
             files = new LauncherFiles();
+            files.reloadAll();
         } catch (FileLoadException e) {
             handleSevereException(e);
         }
@@ -88,7 +89,7 @@ public class ModsSelectorElement extends UiElement {
         }
         modsContainer.getChildren().clear();
         folderButton.setDisable(true);
-        modsDetailsTitle.setText("components.label.details.title");
+        modsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
         modsDetailsTitle.setDisable(true);
         deleteButton.setDisable(true);
         createSelected = false;

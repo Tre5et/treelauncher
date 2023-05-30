@@ -57,6 +57,7 @@ public class OptionsSelectorElement extends UiElement {
         super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
         try {
             files = new LauncherFiles();
+            files.reloadAll();
         } catch (FileLoadException e) {
             handleSevereException(e);
         }
@@ -81,7 +82,7 @@ public class OptionsSelectorElement extends UiElement {
         }
         optionsContainer.getChildren().clear();
         folderButton.setDisable(true);
-        optionsDetailsTitle.setText("components.label.details.title");
+        optionsDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
         optionsDetailsTitle.setDisable(true);
         deleteButton.setDisable(true);
         createSelected = false;

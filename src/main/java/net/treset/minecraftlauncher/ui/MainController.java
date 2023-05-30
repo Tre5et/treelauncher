@@ -47,7 +47,7 @@ public class MainController extends GenericUiController {
         navbarController.beforeShow(stage);
         instanceSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
         instanceCreatorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
-        savesSelectorController.init(this, this::setLocked, this::getLocked);
+        savesSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
         resourcepacksSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
         optionsSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
         modsSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);

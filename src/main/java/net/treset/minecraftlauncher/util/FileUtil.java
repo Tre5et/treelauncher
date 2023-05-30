@@ -87,7 +87,7 @@ public class FileUtil {
         }
     }
 
-    public static boolean writeFile(String path, String content) throws IOException {
+    public static void writeFile(String path, String content) throws IOException {
         Files.writeString(Paths.get(path), content);
     }
 }

@@ -29,7 +29,7 @@ public class LauncherApplication extends Application {
 
         try{
             config = GlobalConfigLoader.loadConfig();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IOException e) {
             LOGGER.error("Failed to load config!", e);
             System.exit(-1);
             return;

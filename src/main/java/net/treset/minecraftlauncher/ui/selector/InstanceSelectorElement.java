@@ -66,7 +66,7 @@ public class InstanceSelectorElement extends UiElement {
         } catch (FileLoadException e) {
             handleSevereException(e);
         }
-        versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange);
+        versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
     }
 
     public void reloadComponents() {
@@ -157,12 +157,18 @@ public class InstanceSelectorElement extends UiElement {
             } catch (GameLaunchException e) {
                 displayGameLaunchFailed(e);
                 onGameExit(null);
+                return;
             }
+            displayGameRunning();
         }
     }
 
-    private void onGameExit(String s) {
+    private void onGameExit(String error) {
         setLock(false);
+        Platform.runLater(() -> popupController.setVisible(false));
+        if(error != null) {
+            Platform.runLater(() -> displayGameCrash(error));
+        }
         Platform.runLater(() -> playButton.setDisable(false));
     }
 
@@ -258,6 +264,10 @@ public class InstanceSelectorElement extends UiElement {
                 )
         );
         popupController.setVisible(true);
+    }
+
+    private void onVersionChangeFailed(Exception e) {
+        displayError(e);
     }
 
     private void onPopupChangeConfirm(String id, VersionCreator creator) {
@@ -414,6 +424,37 @@ public class InstanceSelectorElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
+    }
+
+    private void displayGameRunning() {
+        popupController.setType(PopupElement.PopupType.NONE);
+        popupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
+        popupController.clearButtons();
+        popupController.setVisible(true);
+    }
+
+    private void displayGameCrash(String error) {
+        popupController.setType(PopupElement.PopupType.WARNING);
+        popupController.setTitle("selector.instance.game.crash.title");
+        popupController.setMessage("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error);
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.instance.game.crash.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.instance.game.crash.reports",
+                        "reports",
+                        id -> openFolder(currentInstance.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/crash-reports")
+                )
+        );
+        popupController.setVisible(false);
         popupController.setVisible(true);
     }
 }

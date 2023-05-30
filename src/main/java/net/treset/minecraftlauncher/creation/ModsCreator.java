@@ -50,7 +50,7 @@ public class ModsCreator extends GenericComponentCreator {
         }
         LauncherModsDetails details = new LauncherModsDetails(modsType, modsVersion, List.of());
         try {
-            details.writeToFile(getNewManifest().getDirectory() + LauncherApplication.config.MODS_DEFAULT_DETAILS)
+            details.writeToFile(getNewManifest().getDirectory() + LauncherApplication.config.MODS_DEFAULT_DETAILS);
         } catch (IOException e) {
             attemptCleanup();
             throw new ComponentCreationException("Failed to create mods component: failed to write details", e);

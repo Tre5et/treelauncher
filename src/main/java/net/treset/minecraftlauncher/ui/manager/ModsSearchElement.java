@@ -11,16 +11,21 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.mods.ModData;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModsSearchElement extends UiElement {
+    private static final Logger LOGGER = LogManager.getLogger(ModsSearchElement.class);
+
     @FXML private AnchorPane rootPane;
     @FXML private Button searchButton;
     @FXML private TextField searchField;
@@ -73,7 +78,13 @@ public class ModsSearchElement extends UiElement {
     }
 
     private void populateResults() {
-        List<ModData> results = VersionLoader.searchCombinedMods(searchField.getText(), gameVersion, loaderType, 20, 0);
+        List<ModData> results;
+        try {
+            results = VersionLoader.searchCombinedMods(searchField.getText(), gameVersion, loaderType, 20, 0);
+        } catch (FileDownloadException e) {
+            LOGGER.error("Failed to search for mods", e);
+            return;
+        }
         ArrayList<Pair<ModListElement, AnchorPane>> elements = new ArrayList<>();
         for(ModData m : results) {
             try {

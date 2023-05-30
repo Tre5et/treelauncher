@@ -57,6 +57,7 @@ public class ResourcepacksSelectorElement extends UiElement {
         super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
         try {
             files = new LauncherFiles();
+            files.reloadAll();
         } catch (FileLoadException e) {
             handleSevereException(e);
         }
@@ -81,7 +82,7 @@ public class ResourcepacksSelectorElement extends UiElement {
         }
         resourcepacksContainer.getChildren().clear();
         folderButton.setDisable(true);
-        resourcepacksDetailsTitle.setText("components.label.details.title");
+        resourcepacksDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
         resourcepacksDetailsTitle.setDisable(true);
         deleteButton.setDisable(true);
         popupController.setVisible(false);

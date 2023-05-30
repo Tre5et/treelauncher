@@ -12,6 +12,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +30,7 @@ public class SettingsElement extends UiElement {
     @FXML private Label usernameLabel;
     @FXML private Label uuidLabel;
     @FXML private Button logoutButton;
+    @FXML private PopupElement popupController;
 
     private Runnable logoutCallback;
 
@@ -59,11 +61,19 @@ public class SettingsElement extends UiElement {
     private void onLanguageComboBoxChanged() {
         String input = languageComboBox.getSelectionModel().getSelectedItem();
         if(input != null) {
-            StringLocalizer.Language language = languageFromString(input);
-            if(language != null) {
-                LauncherApplication.stringLocalizer.setLanguage(language);
-                languageRestartHint.setVisible(true);
+            StringLocalizer.Language language;
+            try {
+                language = languageFromString(input);
+            } catch (IllegalArgumentException e) {
+                displayError(e);
+                return;
+            }
+            LauncherApplication.stringLocalizer.setLanguage(language);
+            languageRestartHint.setVisible(true);
+            try {
                 GlobalConfigLoader.updateLanguage(language);
+            } catch (IOException e) {
+                displayError(e);
             }
         }
     }
@@ -73,14 +83,13 @@ public class SettingsElement extends UiElement {
         Desktop.getDesktop().browse(new URI(LauncherApplication.stringLocalizer.get("url.source")));
     }
 
-    private static StringLocalizer.Language languageFromString(String language) {
+    private static StringLocalizer.Language languageFromString(String language) throws IllegalArgumentException {
         for(StringLocalizer.Language l : StringLocalizer.getAvailableLanguages()) {
             if(l.getName().equals(language) || language.equals(l.getName() + LauncherApplication.stringLocalizer.get("language.default"))) {
                 return l;
             }
         }
-        LOGGER.warn("Could not find language: " + language);
-        return null;
+        throw new IllegalArgumentException("Could not find language: " + language);
     }
 
     @Override
@@ -95,5 +104,22 @@ public class SettingsElement extends UiElement {
     @Override
     public void setRootVisible(boolean visible) {
         rootPane.setVisible(visible);
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

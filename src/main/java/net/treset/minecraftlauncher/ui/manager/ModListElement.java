@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
 import net.treset.mc_version_loader.mods.ModData;
@@ -18,6 +19,8 @@ import net.treset.mc_version_loader.mods.ModProvider;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.UiLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -28,6 +31,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 public class ModListElement extends UiElement {
+    private static final Logger LOGGER = LogManager.getLogger(ModListElement.class);
+
     @FXML private AnchorPane rootPane;
     @FXML private ImageView logoImage;
     @FXML private Label title;
@@ -107,10 +112,19 @@ public class ModListElement extends UiElement {
 
     private void populateVersionChoice() {
         if(modData == null && mod != null) {
-            modData = mod.getModData();
+            try {
+                modData = mod.getModData();
+            } catch (FileDownloadException e) {
+                LOGGER.error("Failed to get mod data", e);
+            }
         }
         if (modData != null) {
-            List<ModVersionData> versionData = modData.getVersions(gameVersion, "fabric");
+            List<ModVersionData> versionData = null;
+            try {
+                versionData = modData.getVersions(gameVersion, "fabric");
+            } catch (FileDownloadException e) {
+                LOGGER.error("Failed to get mod versions", e);
+            }
             List<String> selectorList = new ArrayList<>();
             for (ModVersionData v : versionData) {
                 if(mod == null || !mod.getVersion().equals(v.getVersionNumber())) {
@@ -172,10 +186,14 @@ public class ModListElement extends UiElement {
     private ModVersionData getSelectedVersion() {
         String selected = versionSelector.getSelectionModel().getSelectedItem();
         if(selected != null && modData != null) {
-            for(ModVersionData v : modData.getVersions(gameVersion, "fabric")) {
-                if(selected.equals(v.getVersionNumber())) {
-                    return v;
+            try {
+                for(ModVersionData v : modData.getVersions(gameVersion, "fabric")) {
+                    if(selected.equals(v.getVersionNumber())) {
+                        return v;
+                    }
                 }
+            } catch (FileDownloadException e) {
+                LOGGER.error("Failed to get mod versions", e);
             }
         }
         return null;

@@ -5,10 +5,12 @@ import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+
 public class GlobalConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger(GlobalConfigLoader.class);
 
-    public static Config loadConfig() throws IllegalStateException {
+    public static Config loadConfig() throws IllegalStateException, IOException {
         String contents = FileUtil.loadFile("app/launcher.conf");
         if(contents == null) {
             throw new IllegalStateException("Unable to load launcher.conf");
@@ -34,12 +36,8 @@ public class GlobalConfigLoader {
         return new Config(path, debug, language);
     }
 
-    public static boolean updateLanguage(StringLocalizer.Language language) {
+    public static void updateLanguage(StringLocalizer.Language language) throws IOException {
         String contents = FileUtil.loadFile("launcher.conf");
-        if(contents == null) {
-            LOGGER.error("Unable to load launcher.conf");
-            return false;
-        }
         String[] lines = contents.split("\n");
         StringBuilder newContents = new StringBuilder();
         boolean found = false;
@@ -55,6 +53,6 @@ public class GlobalConfigLoader {
             newContents.append("language=").append(language.name()).append("\n");
         }
 
-        return FileUtil.writeFile("launcher.conf", newContents.toString());
+        FileUtil.writeFile("launcher.conf", newContents.toString());
     }
 }

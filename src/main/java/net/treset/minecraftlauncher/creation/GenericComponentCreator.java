@@ -120,7 +120,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             throw new ComponentCreationException("Unable to copy files: invalid parameters");
         }
         try {
-            FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING)
+            FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ComponentCreationException("Unable to copy files: unable to copy files", e);
         }

@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.files.ModFileDownloader;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
@@ -83,7 +84,11 @@ public class ModsManagerElement extends UiElement {
     private void onVersionChangeAccepted(String id) {
         popupController.setVisible(false);
         details.getValue().setModsVersion(versionSelector.getSelectionModel().getSelectedItem());
-        details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        try {
+            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        } catch (IOException e) {
+            displayError(e);
+        }
         modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods());
         onVersionSelected();
         reloadMods();
@@ -143,15 +148,19 @@ public class ModsManagerElement extends UiElement {
         versionSelector.getItems().add(details.getValue().getModsVersion());
         versionSelector.getSelectionModel().select(0);
         new Thread(() -> {
-            List<String> names = (snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases()).stream()
-                    .map(MinecraftVersion::getId)
-                    .filter(s -> !s.equals(details.getValue().getModsVersion()))
-                    .toList();
-            Platform.runLater(() -> {
-                versionSelector.getItems().addAll(names);
-                versionSelector.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
-                versionSelector.setDisable(false);
-            });
+            try {
+                List <String> names = (snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases()).stream()
+                        .map(MinecraftVersion::getId)
+                        .filter(s -> !s.equals(details.getValue().getModsVersion()))
+                        .toList();
+                Platform.runLater(() -> {
+                    versionSelector.getItems().addAll(names);
+                    versionSelector.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
+                    versionSelector.setDisable(false);
+                });
+            } catch (FileDownloadException e) {
+               displayError(e);
+            }
         }).start();
     }
 
@@ -177,10 +186,16 @@ public class ModsManagerElement extends UiElement {
         try {
             Files.move(modFile.toPath(), newFile.toPath());
         } catch(IOException e) {
-            LOGGER.warn("Failed to rename mod file");
+            displayError(e);
             return false;
         }
-        return details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        try {
+            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        } catch (IOException e) {
+            displayError(e);
+            return true;
+        }
+        return true;
     }
 
     public void onDeleteButtonClicked(LauncherMod modData, ModListElement source) {
@@ -194,7 +209,12 @@ public class ModsManagerElement extends UiElement {
         }
 
         details.getValue().setMods(mods);
-        details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        try {
+            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        } catch (IOException e){
+            displayError(e);
+            return;
+        }
 
         Pair<ModListElement, AnchorPane> element = null;
         for(Pair<ModListElement, AnchorPane> e : elements) {
@@ -237,7 +257,11 @@ public class ModsManagerElement extends UiElement {
             }
             details.getValue().setMods(mods);
             source.setMod(newMod);
-            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+            try {
+                details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+            } catch (IOException e) {
+                displayError(e);
+            }
             Platform.runLater(() -> {
                 source.beforeShow(null);
                 source.afterShow(null);
@@ -246,19 +270,24 @@ public class ModsManagerElement extends UiElement {
     }
 
     private LauncherMod downloadAndAdd(ModVersionData versionData, ArrayList<LauncherMod> mods) {
-        LauncherMod newMod = ModFileDownloader.downloadModFile(versionData, new File(details.getKey().getDirectory()), true);
-        if (newMod == null) {
-            LOGGER.warn("Failed to download mod file");
-            return null;
+        LauncherMod newMod = null;
+        try {
+            newMod = ModFileDownloader.downloadModFile(versionData, new File(details.getKey().getDirectory()), true);
+        } catch (FileDownloadException e) {
+            displayError(e);
         }
 
         mods.add(newMod);
 
-        for(ModVersionData d : versionData.getRequiredDependencies(details.getValue().getModsVersion(), details.getValue().getModsType())) {
-            if(d != null && d.getParentMod() != null && !modExists(d.getParentMod()) && downloadAndAdd(d, mods) == null) {
-                LOGGER.warn("Failed to download mod dependency file");
-                return null;
+        try {
+            for(ModVersionData d : versionData.getRequiredDependencies(details.getValue().getModsVersion(), details.getValue().getModsType())) {
+                if(d != null && d.getParentMod() != null && !modExists(d.getParentMod()) && downloadAndAdd(d, mods) == null) {
+                    displayError(new FileDownloadException("Failed to download mod dependency file"));
+                    return null;
+                }
             }
+        } catch (FileDownloadException e) {
+            displayError(e);
         }
         return newMod;
     }
@@ -278,5 +307,22 @@ public class ModsManagerElement extends UiElement {
         currentModsBox.setVisible(true);
         modSearchController.setVisible(false);
         reloadMods();
+    }
+
+    private void displayError(Exception e) {
+        LOGGER.error("An error occurred", e);
+        popupController.setType(PopupElement.PopupType.ERROR);
+        popupController.setTitle("error.title");
+        popupController.setMessage("error.message", e.getMessage());
+        popupController.setControlsDisabled(false);
+        popupController.clearButtons();
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "error.close",
+                        "close",
+                        id -> popupController.setVisible(false)
+                )
+        );
     }
 }

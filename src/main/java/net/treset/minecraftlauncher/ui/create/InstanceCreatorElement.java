@@ -15,6 +15,7 @@ import net.treset.minecraftlauncher.creation.InstanceCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,19 +45,25 @@ public class InstanceCreatorElement extends UiElement {
         modsCreatorController.setGameVersion(versionCreatorController.getGameVersion());
         modsCreatorController.setModsType(versionCreatorController.getVersionType());
         if(checkCreateReady() && setLock(true)) {
-            InstanceCreator creator = new InstanceCreator(
-                    nameInput.getText(),
-                    launcherFiles.getLauncherDetails().getTypeConversion(),
-                    launcherFiles.getInstanceManifest(),
-                    List.of(),
-                    List.of(),
-                    List.of(),
-                    modsActive ? modsCreatorController.getCreator() : null,
-                    optionsCreatorController.getCreator(),
-                    resourcepacksCreatorController.getCreator(),
-                    savesCreatorController.getCreator(),
-                    versionCreatorController.getCreator()
-            );
+            InstanceCreator creator;
+            try {
+                creator = new InstanceCreator(
+                        nameInput.getText(),
+                        launcherFiles.getLauncherDetails().getTypeConversion(),
+                        launcherFiles.getInstanceManifest(),
+                        List.of(),
+                        List.of(),
+                        List.of(),
+                        modsActive ? modsCreatorController.getCreator() : null,
+                        optionsCreatorController.getCreator(),
+                        resourcepacksCreatorController.getCreator(),
+                        savesCreatorController.getCreator(),
+                        versionCreatorController.getCreator()
+                );
+            } catch (ComponentCreationException e) {
+                displayError(e);
+                return;
+            }
             scrollContainer.getStyleClass().add("popup-background");
             popupController.setType(PopupElement.PopupType.NONE);
             popupController.setContent("creator.instance.popup.label.creating", "");

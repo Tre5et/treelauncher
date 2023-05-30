@@ -57,6 +57,7 @@ public class SavesSelectorElement extends UiElement {
         super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
         try {
             files = new LauncherFiles();
+            files.reloadAll();
         } catch (FileLoadException e) {
             handleSevereException(e);
         }
@@ -81,7 +82,7 @@ public class SavesSelectorElement extends UiElement {
         }
         savesContainer.getChildren().clear();
         folderButton.setDisable(true);
-        savesDetailsTitle.setText("components.label.details.title");
+        savesDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
         deleteButton.setDisable(true);
         savesDetailsTitle.setDisable(true);
         popupController.setVisible(false);
