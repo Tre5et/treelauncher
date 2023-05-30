@@ -407,6 +407,7 @@ public class InstanceSelectorElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
     }
 
     private void displayGameLaunchFailed(Exception e) {

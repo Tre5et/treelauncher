@@ -23,6 +23,7 @@ public class LauncherApplication extends Application {
     public static final UserAuth userAuth = new UserAuth();
     public static StringLocalizer stringLocalizer;
     public static Config config;
+    public static Stage primaryStage;
 
     public static void main(String[] args) {
         setupLogger();
@@ -77,6 +78,8 @@ public class LauncherApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        LauncherApplication.primaryStage = primaryStage;
+
         System.setProperty("prism.lcdtext", "false");
         primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/icon.png"))));
 

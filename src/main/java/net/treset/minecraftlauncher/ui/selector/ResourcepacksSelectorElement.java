@@ -287,5 +287,6 @@ public class ResourcepacksSelectorElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
     }
 }

@@ -286,5 +286,6 @@ public class OptionsSelectorElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
     }
 }

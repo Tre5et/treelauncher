@@ -286,5 +286,6 @@ public class SavesSelectorElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
     }
 }

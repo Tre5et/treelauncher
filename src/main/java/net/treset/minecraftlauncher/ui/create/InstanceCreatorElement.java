@@ -196,5 +196,6 @@ public class InstanceCreatorElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
     }
 }

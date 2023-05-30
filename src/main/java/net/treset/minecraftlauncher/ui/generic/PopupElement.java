@@ -95,7 +95,9 @@ public class PopupElement extends UiElement {
 
     public void setControlsDisabled(boolean disabled) {
         this.disabled = disabled;
-        activeButtons.forEach(button -> button.setDisabled(disabled));
+        if(activeButtons != null){
+            activeButtons.forEach(button -> button.setDisabled(disabled));
+        }
     }
 
     public void setType(PopupType type) {

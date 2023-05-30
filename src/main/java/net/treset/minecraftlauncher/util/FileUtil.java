@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -61,15 +63,23 @@ public class FileUtil {
 
     public static void copyDirectory(String source, String destination, CopyOption... options) throws IOException {
         createDir(destination);
+        if(source.endsWith("/") || source.endsWith("\\")) {
+            source = source.substring(0, source.length() - 1);
+        }
         try (Stream<Path> stream = Files.walk(Paths.get(source))) {
+            String finalSource = source;
+            List<IOException> exceptions = new ArrayList<>();
             stream.forEach(sourceF -> {
-                        Path destinationF = Paths.get(destination, sourceF.toString().substring(source.length()));
+                        Path destinationF = Paths.get(destination, sourceF.toString().substring(finalSource.length()));
                         try {
                             Files.copy(sourceF, destinationF, options);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            exceptions.add(e);
                         }
                     });
+            if(!exceptions.isEmpty()) {
+                throw new IOException("Unable to copy directory: " + exceptions.size() + " file copies failed: source=" + source + ", destination=" + destination, exceptions.get(0));
+            }
         } catch (IOException e) {
             throw new IOException("Unable to copy directory: source=" + source + ", destination=" + destination, e);
         }
@@ -89,5 +99,35 @@ public class FileUtil {
 
     public static void writeFile(String path, String content) throws IOException {
         Files.writeString(Paths.get(path), content);
+    }
+
+    public static boolean isDirEmpty(File dir) throws IOException {
+        if(!dir.isDirectory()) {
+            throw new IOException("Unable to check if directory is empty: not a directory: dir=" + dir);
+        }
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir.toPath())) {
+            return !dirStream.iterator().hasNext();
+        }
+    }
+
+    public static boolean dirContains(File dir, String fileName) throws IOException {
+        if(!dir.isDirectory()) {
+            throw new IOException("Unable to check if directory is empty: not a directory: dir=" + dir);
+        }
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir.toPath())) {
+            for(Path path : dirStream) {
+                if(path.getFileName().toString().equals(fileName)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static boolean isChildOf(File parent, File child) throws IOException {
+        if(!parent.isDirectory()) {
+            throw new IOException("Unable to check if directory is empty: not a directory: dir=" + parent);
+        }
+        return child.toPath().startsWith(parent.toPath());
     }
 }

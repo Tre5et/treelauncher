@@ -324,5 +324,6 @@ public class ModsManagerElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(true);
     }
 }

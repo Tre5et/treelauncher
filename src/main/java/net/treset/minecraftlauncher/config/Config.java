@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.List;
 
 public class Config {
-    public final String BASE_DIR;
+    public String BASE_DIR;
     public final String SPECIAL_FILES_FOLDER;
     public final String LOG_PATH;
     public final File AUTH_FILE;

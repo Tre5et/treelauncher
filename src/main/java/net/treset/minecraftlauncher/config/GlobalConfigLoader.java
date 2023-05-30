@@ -1,11 +1,19 @@
 package net.treset.minecraftlauncher.config;
 
+import com.google.gson.JsonElement;
+import net.treset.mc_version_loader.files.FileUtils;
+import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.StandardCopyOption;
 
 public class GlobalConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger(GlobalConfigLoader.class);
@@ -37,14 +45,14 @@ public class GlobalConfigLoader {
     }
 
     public static void updateLanguage(StringLocalizer.Language language) throws IOException {
-        String contents = FileUtil.loadFile("launcher.conf");
+        String contents = FileUtil.loadFile("app/launcher.conf");
         String[] lines = contents.split("\n");
         StringBuilder newContents = new StringBuilder();
         boolean found = false;
         for(String line : lines) {
             if(line.startsWith("language=")) {
                 newContents.append("language=").append(language.name()).append("\n");
-                found = true;
+                break;
             } else {
                 newContents.append(line).append("\n");
             }
@@ -53,6 +61,61 @@ public class GlobalConfigLoader {
             newContents.append("language=").append(language.name()).append("\n");
         }
 
-        FileUtil.writeFile("launcher.conf", newContents.toString());
+        FileUtil.writeFile("app/launcher.conf", newContents.toString());
+    }
+
+    public static void updatePath(File path, boolean removeOld) throws IOException {
+        LOGGER.info("Updating path: path={}, removeOld={}", path.getAbsolutePath(), removeOld);
+        if(!path.isDirectory()) {
+            throw new IOException("Path is not a directory");
+        }
+        if(FileUtil.isChildOf(new File(LauncherApplication.config.BASE_DIR), path)) {
+            throw new IOException("Path is a child of the current directory");
+        }
+
+        String contents = FileUtil.loadFile("app/launcher.conf");
+        String[] lines = contents.split("\n");
+        StringBuilder newContents = new StringBuilder();
+        for(String line : lines) {
+            if(line.startsWith("path=")) {
+                newContents.append("path=").append(path.getAbsolutePath()).append("/").append("\n");
+                break;
+            } else {
+                newContents.append(line).append("\n");
+            }
+        }
+
+        if(FileUtil.isDirEmpty(path)) {
+            LOGGER.debug("Copying files to new directory");
+            FileUtil.copyDirectory(LauncherApplication.config.BASE_DIR, path.getAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            if(!manifestExists(path)) {
+                throw new IOException("Directory is not empty and doesn't contain manifest file");
+            }
+
+            LOGGER.debug("Not copying files to new directory because it is not empty");
+        }
+
+        LOGGER.debug("Updating config");
+        String oldPath = LauncherApplication.config.BASE_DIR;
+        LauncherApplication.config.BASE_DIR = path.getAbsolutePath() + "/";
+        FileUtil.writeFile("app/launcher.conf", newContents.toString());
+
+        if(removeOld) {
+            LOGGER.debug("Removing old directory");
+            FileUtil.deleteDir(new File(oldPath));
+        }
+    }
+
+    private static boolean manifestExists(File path) throws IOException {
+        if(!FileUtil.dirContains(path, LauncherApplication.config.MANIFEST_FILE_NAME)) {
+            return false;
+        }
+        String contents = FileUtil.loadFile(path.getAbsolutePath() + "/" + LauncherApplication.config.MANIFEST_FILE_NAME);
+        if(contents == null || contents.isBlank()) {
+            return false;
+        }
+        LauncherManifest manifest = LauncherManifest.fromJson(contents);
+        return manifest != null && manifest.getType() == LauncherManifestType.LAUNCHER;
     }
 }

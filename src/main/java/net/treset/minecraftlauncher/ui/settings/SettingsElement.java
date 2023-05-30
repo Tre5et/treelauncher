@@ -3,20 +3,25 @@ package net.treset.minecraftlauncher.ui.settings;
 import com.sun.javafx.application.HostServicesDelegate;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
+import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +32,8 @@ public class SettingsElement extends UiElement {
     @FXML private AnchorPane rootPane;
     @FXML private ComboBox<String> languageComboBox;
     @FXML private Label languageRestartHint;
+    @FXML private TextField pathField;
+    @FXML private CheckBox removeCheckBox;
     @FXML private Label usernameLabel;
     @FXML private Label uuidLabel;
     @FXML private Button logoutButton;
@@ -79,6 +86,73 @@ public class SettingsElement extends UiElement {
     }
 
     @FXML
+    private void onFileSelectorClicked() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setInitialDirectory(new File(pathField.getText()));
+        File chosen = chooser.showDialog(LauncherApplication.primaryStage);
+        if(chosen != null && chosen.isDirectory()) {
+            pathField.setText(chosen.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    private void onPathApplyClicked() {
+        File dir = new File(pathField.getText());
+        if(!dir.isDirectory()) {
+            popupController.setType(PopupElement.PopupType.ERROR);
+            popupController.setContent("settings.path.invalid.title", "");
+            popupController.clearButtons();
+            popupController.addButtons(
+                    new PopupElement.PopupButton(
+                            PopupElement.ButtonType.POSITIVE,
+                            "settings.path.close",
+                            "close",
+                            id -> popupController.setVisible(false)
+                    )
+            );
+            popupController.setVisible(true);
+            return;
+        }
+
+        popupController.setType(PopupElement.PopupType.NONE);
+        popupController.setContent("settings.path.changing.title", "");
+        popupController.clearButtons();
+        popupController.setVisible(true);
+
+        new Thread(() -> {
+            try {
+                GlobalConfigLoader.updatePath(dir, removeCheckBox.isSelected());
+            } catch (IOException e) {
+                displayError(e);
+                return;
+            }
+
+            Platform.runLater(() -> {
+                popupController.setType(PopupElement.PopupType.SUCCESS);
+                popupController.setContent("settings.path.success.title", "");
+                popupController.clearButtons();
+                popupController.addButtons(
+                        new PopupElement.PopupButton(
+                                PopupElement.ButtonType.POSITIVE,
+                                "settings.path.close",
+                                "close",
+                                id -> {
+                                    try {
+                                        MainController.showOnStage(LauncherApplication.primaryStage);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                        )
+                );
+                popupController.setVisible(false);
+                popupController.setVisible(true);
+            });
+        }).start();
+
+    }
+
+    @FXML
     private void onSourceButtonClicked() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI(LauncherApplication.stringLocalizer.get("url.source")));
     }
@@ -94,6 +168,7 @@ public class SettingsElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
+        pathField.setText(LauncherApplication.config.BASE_DIR);
     }
 
     @Override
@@ -121,5 +196,7 @@ public class SettingsElement extends UiElement {
                         id -> popupController.setVisible(false)
                 )
         );
+        popupController.setVisible(false);
+        popupController.setVisible(true);
     }
 }
