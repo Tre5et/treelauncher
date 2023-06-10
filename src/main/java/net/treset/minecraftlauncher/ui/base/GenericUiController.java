@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.ui.base;
 
 import javafx.stage.Stage;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.UiLoader;
 
 import java.io.IOException;

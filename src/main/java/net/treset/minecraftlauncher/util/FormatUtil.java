@@ -35,4 +35,11 @@ public class FormatUtil {
         }
         return encryptedString.toString();
     }
+
+    public static <T> int indexInList(List<T> list, T item) {
+        for(int i = 0; i < list.size(); i++) {
+            if(list.get(i).equals(item)) return i;
+        }
+        return -1;
+    }
 }

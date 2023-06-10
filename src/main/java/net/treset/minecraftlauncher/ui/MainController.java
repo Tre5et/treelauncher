@@ -2,8 +2,10 @@ package net.treset.minecraftlauncher.ui;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
@@ -40,17 +42,17 @@ public class MainController extends GenericUiController {
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        titlebarController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
+        titlebarController.init(this, this::setLocked, this::getLocked);
         titlebarController.beforeShow(stage);
-        navbarController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
+        navbarController.init(this, this::setLocked, this::getLocked);
         navbarController.setComponentActivator(this::activate);
         navbarController.beforeShow(stage);
-        instanceSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
-        instanceCreatorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
-        savesSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
-        resourcepacksSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
-        optionsSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
-        modsSelectorController.init(this, this::setLocked, this::getLocked, this::displaySevereError);
+        instanceSelectorController.init(this, this::setLocked, this::getLocked);
+        instanceCreatorController.init(this, this::setLocked, this::getLocked);
+        savesSelectorController.init(this, this::setLocked, this::getLocked);
+        resourcepacksSelectorController.init(this, this::setLocked, this::getLocked);
+        optionsSelectorController.init(this, this::setLocked, this::getLocked);
+        modsSelectorController.init(this, this::setLocked, this::getLocked);
         settingsController.init(this::onLogout);
         activate(Component.INSTANCE_SELECTOR);
     }
@@ -142,22 +144,5 @@ public class MainController extends GenericUiController {
             e.printStackTrace();
             getStage().close();
         }
-    }
-
-    private void displaySevereError(Exception e) {
-        LOGGER.error("AN ERROR OCCURRED", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("error.severe.title");
-        popupController.setMessage("error.severe.message", e.getMessage());
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.NEGATIVE,
-                        "error.severe.close",
-                        "confirm",
-                        id -> Platform.exit()
-                )
-        );
-        popupController.setVisible(true);
     }
 }

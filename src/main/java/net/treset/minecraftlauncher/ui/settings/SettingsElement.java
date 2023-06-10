@@ -72,7 +72,7 @@ public class SettingsElement extends UiElement {
             try {
                 language = languageFromString(input);
             } catch (IllegalArgumentException e) {
-                displayError(e);
+                LauncherApplication.displaySevereError(e);
                 return;
             }
             LauncherApplication.stringLocalizer.setLanguage(language);
@@ -80,7 +80,7 @@ public class SettingsElement extends UiElement {
             try {
                 GlobalConfigLoader.updateLanguage(language);
             } catch (IOException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
             }
         }
     }
@@ -123,7 +123,8 @@ public class SettingsElement extends UiElement {
             try {
                 GlobalConfigLoader.updatePath(dir, removeCheckBox.isSelected());
             } catch (IOException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
+                popupController.setVisible(false);
                 return;
             }
 
@@ -179,24 +180,5 @@ public class SettingsElement extends UiElement {
     @Override
     public void setRootVisible(boolean visible) {
         rootPane.setVisible(visible);
-    }
-
-    private void displayError(Exception e) {
-        LOGGER.error("An error occurred", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("error.title");
-        popupController.setMessage("error.message", e.getMessage());
-        popupController.setControlsDisabled(false);
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "error.close",
-                        "close",
-                        id -> popupController.setVisible(false)
-                )
-        );
-        popupController.setVisible(false);
-        popupController.setVisible(true);
     }
 }

@@ -10,14 +10,12 @@ public abstract class UiElement implements UiController {
     UiController parent;
     private Function<Boolean, Boolean> lockSetter;
     private Supplier<Boolean> lockGetter;
-    private Consumer<Exception> severeExceptionHandler;
     private boolean visible = false;
 
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         this.parent = parent;
         this.lockSetter = lockSetter;
         this.lockGetter = lockGetter;
-        this.severeExceptionHandler = severeExceptionHandler;
     }
 
     @Override
@@ -43,10 +41,6 @@ public abstract class UiElement implements UiController {
 
     protected boolean getLock() {
         return lockGetter.get();
-    }
-
-    protected void handleSevereException(Exception e) {
-        severeExceptionHandler.accept(e);
     }
 
     public void setLockSetter(Function<Boolean, Boolean> lockSetter) {

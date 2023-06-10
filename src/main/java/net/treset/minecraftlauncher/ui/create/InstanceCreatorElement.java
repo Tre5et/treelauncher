@@ -61,7 +61,7 @@ public class InstanceCreatorElement extends UiElement {
                         versionCreatorController.getCreator()
                 );
             } catch (ComponentCreationException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
                 return;
             }
             scrollContainer.getStyleClass().add("popup-background");
@@ -128,7 +128,7 @@ public class InstanceCreatorElement extends UiElement {
             launcherFiles = new LauncherFiles();
             launcherFiles.reloadAll();
         } catch (FileLoadException e) {
-            handleSevereException(e);
+            LauncherApplication.displaySevereError(e);
         }
         nameError.setVisible(false);
         nameInput.getStyleClass().remove("error");
@@ -179,23 +179,5 @@ public class InstanceCreatorElement extends UiElement {
         }
         modsActive = active;
         modsContainer.setDisable(!active);
-    }
-
-    private void displayError(Exception e) {
-        LOGGER.error("An error occurred", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("error.title");
-        popupController.setMessage("error.message", e.getMessage());
-        popupController.setControlsDisabled(false);
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "error.close",
-                        "close",
-                        id -> popupController.setVisible(false)
-                )
-        );
-        popupController.setVisible(true);
     }
 }

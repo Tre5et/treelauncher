@@ -87,7 +87,7 @@ public class ModsManagerElement extends UiElement {
         try {
             details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
         } catch (IOException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
         }
         modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods());
         onVersionSelected();
@@ -159,7 +159,7 @@ public class ModsManagerElement extends UiElement {
                     versionSelector.setDisable(false);
                 });
             } catch (FileDownloadException e) {
-               displayError(e);
+               LauncherApplication.displayError(e);
             }
         }).start();
     }
@@ -186,13 +186,13 @@ public class ModsManagerElement extends UiElement {
         try {
             Files.move(modFile.toPath(), newFile.toPath());
         } catch(IOException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
             return false;
         }
         try {
             details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
         } catch (IOException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
             return true;
         }
         return true;
@@ -212,7 +212,7 @@ public class ModsManagerElement extends UiElement {
         try {
             details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
         } catch (IOException e){
-            displayError(e);
+            LauncherApplication.displayError(e);
             return;
         }
 
@@ -260,7 +260,7 @@ public class ModsManagerElement extends UiElement {
             try {
                 details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
             } catch (IOException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
             }
             Platform.runLater(() -> {
                 source.beforeShow(null);
@@ -274,7 +274,7 @@ public class ModsManagerElement extends UiElement {
         try {
             newMod = ModFileDownloader.downloadModFile(versionData, new File(details.getKey().getDirectory()), true);
         } catch (FileDownloadException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
         }
 
         mods.add(newMod);
@@ -282,12 +282,12 @@ public class ModsManagerElement extends UiElement {
         try {
             for(ModVersionData d : versionData.getRequiredDependencies(details.getValue().getModsVersion(), details.getValue().getModsType())) {
                 if(d != null && d.getParentMod() != null && !modExists(d.getParentMod()) && downloadAndAdd(d, mods) == null) {
-                    displayError(new FileDownloadException("Failed to download mod dependency file"));
+                    LauncherApplication.displayError(new FileDownloadException("Failed to download mod dependency file"));
                     return null;
                 }
             }
         } catch (FileDownloadException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
         }
         return newMod;
     }
@@ -307,23 +307,5 @@ public class ModsManagerElement extends UiElement {
         currentModsBox.setVisible(true);
         modSearchController.setVisible(false);
         reloadMods();
-    }
-
-    private void displayError(Exception e) {
-        LOGGER.error("An error occurred", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("error.title");
-        popupController.setMessage("error.message", e.getMessage());
-        popupController.setControlsDisabled(false);
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "error.close",
-                        "close",
-                        id -> popupController.setVisible(false)
-                )
-        );
-        popupController.setVisible(true);
     }
 }

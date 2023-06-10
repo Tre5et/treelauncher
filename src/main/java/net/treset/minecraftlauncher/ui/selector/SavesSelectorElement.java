@@ -53,16 +53,16 @@ public class SavesSelectorElement extends UiElement {
     private boolean createSelected;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
-        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
+        super.init(parent, lockSetter, lockGetter);
         try {
             files = new LauncherFiles();
             files.reloadAll();
         } catch (FileLoadException e) {
-            handleSevereException(e);
+            LauncherApplication.displaySevereError(e);
         }
         savesCreatorController.enableUse(false);
-        savesCreatorController.init(this, lockSetter, lockGetter, severeExceptionHandler);
+        savesCreatorController.init(this, lockSetter, lockGetter);
         savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
     }
 
@@ -70,7 +70,7 @@ public class SavesSelectorElement extends UiElement {
         try {
             files.reloadAll();
         } catch (FileLoadException e) {
-            handleSevereException(e);
+            LauncherApplication.displaySevereError(e);
         }
         saves = new ArrayList<>();
         for(LauncherManifest save: files.getSavesComponents()) {
@@ -159,7 +159,7 @@ public class SavesSelectorElement extends UiElement {
             try {
                 savesCreatorController.getCreator().getId();
             } catch (ComponentCreationException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
             }
             reloadComponents();
             for(Pair<SelectorEntryElement, AnchorPane> save: saves) {
@@ -225,14 +225,14 @@ public class SavesSelectorElement extends UiElement {
             try {
                 files.getSavesManifest().writeToFile(files.getSavesManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(1));
             } catch (IOException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
                 return;
             }
             savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
             try {
                 FileUtil.deleteDir(new File(currentSaves.getDirectory()));
             } catch (IOException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
             }
             LOGGER.debug("Save deleted");
             setVisible(false);
@@ -269,23 +269,5 @@ public class SavesSelectorElement extends UiElement {
             savesDetailsTitle.setText(LauncherApplication.stringLocalizer.get("components.label.details.title"));
             savesDetailsTitle.setDisable(true);
         }
-    }
-
-    private void displayError(Exception e) {
-        LOGGER.error("An error occurred", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("error.title");
-        popupController.setMessage("error.message", e.getMessage());
-        popupController.setControlsDisabled(false);
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "error.close",
-                        "close",
-                        id -> popupController.setVisible(false)
-                )
-        );
-        popupController.setVisible(true);
     }
 }

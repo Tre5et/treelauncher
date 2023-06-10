@@ -58,13 +58,13 @@ public class InstanceSelectorElement extends UiElement {
     private InstanceData currentInstance;
 
     @Override
-    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter, Consumer<Exception> severeExceptionHandler) {
-        super.init(parent, lockSetter, lockGetter, severeExceptionHandler);
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
+        super.init(parent, lockSetter, lockGetter);
         instanceDetailsController.init(this::onComponentSelected);
         try {
             files = new LauncherFiles();
         } catch (FileLoadException e) {
-            handleSevereException(e);
+            LauncherApplication.displaySevereError(e);
         }
         versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
     }
@@ -73,14 +73,14 @@ public class InstanceSelectorElement extends UiElement {
         try {
             files.reloadAll();
         } catch (FileLoadException e) {
-            handleSevereException(e);
+            LauncherApplication.displaySevereError(e);
         }
         instances = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> instance : files.getInstanceComponents()) {
             try {
                 instances.add(SelectorEntryElement.from(InstanceData.of(instance, files)));
             } catch (IOException | FileLoadException e) {
-                handleSevereException(e);
+                LauncherApplication.displaySevereError(e);
             }
         }
         popupController.setVisible(false);
@@ -232,13 +232,13 @@ public class InstanceSelectorElement extends UiElement {
         try {
             currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
         } catch (IOException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
         }
         try {
             files.reloadAll();
             currentInstance = InstanceData.of(currentInstance.getInstance(), files);
         } catch (FileLoadException e) {
-            handleSevereException(e);
+            LauncherApplication.displaySevereError(e);
         }
         if(currentInstance != null) {
             instanceDetailsController.populate(currentInstance);
@@ -267,7 +267,7 @@ public class InstanceSelectorElement extends UiElement {
     }
 
     private void onVersionChangeFailed(Exception e) {
-        displayError(e);
+        LauncherApplication.displayError(e);
     }
 
     private void onPopupChangeConfirm(String id, VersionCreator creator) {
@@ -302,13 +302,13 @@ public class InstanceSelectorElement extends UiElement {
             try {
                 currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
             } catch (IOException e) {
-                displayError(e);
+                LauncherApplication.displayError(e);
             }
             try {
                 files.reloadAll();
                 currentInstance = InstanceData.of(currentInstance.getInstance(), files);
             } catch (FileLoadException e) {
-                handleSevereException(e);
+                LauncherApplication.displaySevereError(e);
             }
             Platform.runLater(() -> {
                 instanceDetailsController.populate(currentInstance);
@@ -377,7 +377,7 @@ public class InstanceSelectorElement extends UiElement {
         try {
             currentInstance.delete(files);
         } catch (IOException e) {
-            displayError(e);
+            LauncherApplication.displayError(e);
         }
         setVisible(false);
         reloadComponents();
@@ -390,24 +390,6 @@ public class InstanceSelectorElement extends UiElement {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void displayError(Exception e) {
-        LOGGER.error("An error occurred", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("error.title");
-        popupController.setMessage("error.message", e.getMessage());
-        popupController.setControlsDisabled(false);
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "error.close",
-                        "close",
-                        id -> popupController.setVisible(false)
-                )
-        );
-        popupController.setVisible(true);
     }
 
     private void displayGameLaunchFailed(Exception e) {

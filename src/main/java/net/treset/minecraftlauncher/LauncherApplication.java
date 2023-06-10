@@ -1,6 +1,8 @@
 package net.treset.minecraftlauncher;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.auth.UserAuth;
@@ -84,5 +86,18 @@ public class LauncherApplication extends Application {
         primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/icon.png"))));
 
         LoginController.showOnStage(primaryStage);
+    }
+
+    public static void displayError(Exception e) {
+        LOGGER.warn("An error occurred", e);
+        Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.message", e.getMessage())).show());
+    }
+
+    public static void displaySevereError(Exception e) {
+        LOGGER.error("A SEVERE ERROR OCCURRED", e);
+        Platform.runLater(() -> {
+            new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.severe.message", e.getMessage())).showAndWait();
+            System.exit(-1);
+        });
     }
 }
