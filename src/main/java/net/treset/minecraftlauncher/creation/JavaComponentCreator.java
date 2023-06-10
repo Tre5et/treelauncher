@@ -10,6 +10,7 @@ import net.treset.mc_version_loader.java.JavaRuntimeRelease;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.os.OsDetails;
+import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +19,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class JavaComponentCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(JavaComponentCreator.class);
 
     public JavaComponentCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest) {
         super(LauncherManifestType.JAVA_COMPONENT, null, null, name, typeConversion, null, null, componentsManifest);
+        setDefaultStatus(CreationStatus.JAVA);
     }
 
     @Override

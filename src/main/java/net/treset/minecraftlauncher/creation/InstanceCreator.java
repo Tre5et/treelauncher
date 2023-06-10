@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.creation;
 
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,9 +11,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class InstanceCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(InstanceCreator.class);
+
+    private Consumer<CreationStatus> statusCallback;
 
     private final List<String> ignoredFiles;
     private final List<LauncherLaunchArgument> jvmArguments;
@@ -33,6 +37,7 @@ public class InstanceCreator extends GenericComponentCreator {
         this.resourcepackCreator = resourcepackCreator;
         this.savesCreator = savesCreator;
         this.versionCreator = versionCreator;
+        setDefaultStatus(CreationStatus.STARTING);
     }
 
 
@@ -73,6 +78,8 @@ public class InstanceCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Failed to create instance: Error creating components", e);
         }
 
+        setStatus(CreationStatus.FINISHING);
+
         try {
             details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails());
         } catch (IOException e) {
@@ -106,5 +113,17 @@ public class InstanceCreator extends GenericComponentCreator {
         success &= resourcepackCreator.attemptCleanup();
         LOGGER.debug("Attempted cleanup of instance component: success={}", success);
         return success;
+    }
+
+    @Override
+    public void setStatusCallback(Consumer<CreationStatus> statusCallback) {
+        this.statusCallback = statusCallback;
+        optionsCreator.setStatusCallback(statusCallback);
+        if(modsCreator != null) {
+            modsCreator.setStatusCallback(statusCallback);
+        }
+        savesCreator.setStatusCallback(statusCallback);
+        versionCreator.setStatusCallback(statusCallback);
+        resourcepackCreator.setStatusCallback(statusCallback);
     }
 }

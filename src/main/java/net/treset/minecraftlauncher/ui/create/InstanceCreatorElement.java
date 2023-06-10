@@ -15,6 +15,7 @@ import net.treset.minecraftlauncher.creation.InstanceCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +40,9 @@ public class InstanceCreatorElement extends UiElement {
     @FXML private PopupElement popupController;
     private LauncherFiles launcherFiles;
     private boolean modsActive = true;
+    private void onCreateStatusChanged(CreationStatus status) {
+        Platform.runLater(()-> popupController.setMessage(status.getMessage()));
+    }
 
     @FXML
     private void onCreateButtonClicked() {
@@ -60,6 +64,7 @@ public class InstanceCreatorElement extends UiElement {
                         savesCreatorController.getCreator(),
                         versionCreatorController.getCreator()
                 );
+                creator.setStatusCallback(this::onCreateStatusChanged);
             } catch (ComponentCreationException e) {
                 LauncherApplication.displayError(e);
                 return;

@@ -19,6 +19,7 @@ import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
 import net.treset.mc_version_loader.minecraft.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
+import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class VersionCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(VersionCreator.class);
@@ -42,6 +44,7 @@ public class VersionCreator extends GenericComponentCreator {
         this.mcVersion = mcVersion;
         this.files = files;
         this.librariesDir = librariesDir;
+        setDefaultStatus(CreationStatus.VERSION);
     }
 
     public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, FabricVersionDetails fabricVersion, FabricProfile fabricProfile, LauncherFiles files, String librariesDir) {
@@ -50,10 +53,12 @@ public class VersionCreator extends GenericComponentCreator {
         this.fabricProfile = fabricProfile;
         this.files = files;
         this.librariesDir = librariesDir;
+        setDefaultStatus(CreationStatus.VERSION);
     }
 
     public VersionCreator(Pair<LauncherManifest, LauncherVersionDetails> uses) {
         super(LauncherManifestType.VERSION_COMPONENT, uses.getKey(), null, null, null, null, null, null);
+        setDefaultStatus(CreationStatus.VERSION);
     }
 
     @Override
@@ -91,6 +96,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void makeFabricVersion() throws ComponentCreationException {
+        setStatus(CreationStatus.VERSION_FABRIC);
         if(fabricProfile == null || fabricProfile.getInheritsFrom() == null) {
             throw new ComponentCreationException("Unable to create fabric version: no valid fabric profile");
         }
@@ -168,6 +174,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void addFabricLibraries(LauncherVersionDetails details) throws ComponentCreationException {
+        setStatus(CreationStatus.VERSION_LIBRARIES);
         if(fabricProfile.getLibraries() == null) {
             throw new ComponentCreationException("Unable to add fabric libraries: no libraries");
         }
@@ -195,6 +202,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void makeMinecraftVersion() throws ComponentCreationException {
+        setStatus(CreationStatus.VERSION_VANILLA);
         LauncherVersionDetails details = new LauncherVersionDetails(
                 mcVersion.getId(),
                 "vanilla",
@@ -232,6 +240,7 @@ public class VersionCreator extends GenericComponentCreator {
 
     private void downloadAssets() throws ComponentCreationException {
         LOGGER.debug("Downloading assets...");
+        setStatus(CreationStatus.VERSION_ASSETS);
         String assetIndexUrl = mcVersion.getAssetIndex().getUrl();
         AssetIndex index;
         try {
@@ -266,6 +275,7 @@ public class VersionCreator extends GenericComponentCreator {
         }
 
         JavaComponentCreator javaCreator = new JavaComponentCreator(javaName, getTypeConversion(), files.getJavaManifest());
+        javaCreator.setStatusCallback(this.getStatusCallback());
         try {
             details.setJava(javaCreator.getId());
         } catch (ComponentCreationException e) {
@@ -274,6 +284,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void addLibraries(LauncherVersionDetails details) throws ComponentCreationException {
+        setStatus(CreationStatus.VERSION_LIBRARIES);
         if(mcVersion.getLibraries() == null) {
             throw new ComponentCreationException("Unable to add libraries: libraries is null");
         }

@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.creation;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
@@ -15,6 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public abstract class GenericComponentCreator implements ComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(GenericComponentCreator.class);
@@ -28,6 +30,8 @@ public abstract class GenericComponentCreator implements ComponentCreator {
     private String details;
     private LauncherManifest componentsManifest;
     private LauncherManifest newManifest;
+    private Consumer<CreationStatus> statusCallback;
+    private CreationStatus defaultStatus;
 
     public GenericComponentCreator(LauncherManifestType type, LauncherManifest uses, LauncherManifest inheritsFrom, String name, Map<String, LauncherManifestType> typeConversion, List<String> includedFiles, String details, LauncherManifest componentsManifest) {
         this.type = type;
@@ -42,6 +46,9 @@ public abstract class GenericComponentCreator implements ComponentCreator {
 
     @Override
     public String getId() throws ComponentCreationException {
+        if(defaultStatus != null) {
+            setStatus(defaultStatus);
+        }
         if(uses != null) {
             return useComponent();
         }
@@ -273,5 +280,23 @@ public abstract class GenericComponentCreator implements ComponentCreator {
 
     public void setComponentsManifest(LauncherManifest componentsManifest) {
         this.componentsManifest = componentsManifest;
+    }
+
+    public Consumer<CreationStatus> getStatusCallback() {
+        return statusCallback;
+    }
+
+    public void setStatusCallback(Consumer<CreationStatus> statusCallback) {
+        this.statusCallback = statusCallback;
+    }
+
+    public void setStatus(CreationStatus status) {
+        if(statusCallback != null) {
+            statusCallback.accept(status);
+        }
+    }
+
+    public void setDefaultStatus(CreationStatus status) {
+        defaultStatus = status;
     }
 }

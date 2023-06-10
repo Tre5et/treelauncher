@@ -88,10 +88,14 @@ public class VersionChangerElement extends UiElement {
     }
 
     private void updateButtonState() {
+        if(versionChoice.getValue() == null || typeChoice.getValue() == null) {
+            changeButton.setDisable(true);
+            return;
+        }
         changeButton.setDisable(versionCreationHelper.getCurrentVersion() != null
                 && versionCreationHelper.getCurrentVersion().getVersionNumber().equals(versionChoice.getValue().getId())
                 && versionCreationHelper.getCurrentVersion().getVersionType().equals(typeChoice.getValue().toLowerCase())
-                && (versionCreationHelper.getCurrentVersion().getLoaderVersion() == null || versionCreationHelper.getCurrentVersion().getLoaderVersion().equals(loaderChoice.getValue())));
+                && (versionCreationHelper.getCurrentVersion().getLoaderVersion() == null || versionCreationHelper.getCurrentVersion().getLoaderVersion().equals(loaderChoice.getValue().getLoader().getVersion())));
     }
 
     @FXML
