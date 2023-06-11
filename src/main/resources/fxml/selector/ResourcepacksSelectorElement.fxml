@@ -36,12 +36,18 @@
                         <graphic>
                             <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
                         </graphic>
+                        <tooltip>
+                            <Tooltip text="%selector.component.tooltip.folder" />
+                        </tooltip>
                     </Button>
                     <Label fx:id="resourcepacksDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
                     <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onDeleteButtonClicked" styleClass="invisible">
                         <graphic>
                             <FontIcon iconLiteral="mdoal-delete_forever:48" styleClass="icon" />
                         </graphic>
+                        <tooltip>
+                            <Tooltip text="%selector.component.tooltip.delete" />
+                        </tooltip>
                     </Button>
                 </HBox>
                 <VBox fx:id="creatorContainer" visible="false" alignment="TOP_CENTER">

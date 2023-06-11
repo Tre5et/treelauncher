@@ -25,9 +25,9 @@
     -fx-primary-950: #0b2a09;
     -fx-white: #ffffff;
     -fx-black: #000000;
-    -fx-background: #202020;
-    -fx-background-secondary: -fx-black;
-    -fx-background-tertiary: #3f3f3f;
+    -fx-background: #121212;
+    -fx-background-secondary: #000000;
+    -fx-background-tertiary: #202020;
     -fx-text: -fx-white;
     -fx-text-secondary: #cccccc;
     -fx-warning: yellow;

@@ -24,17 +24,26 @@
                         <graphic>
                             <FontIcon iconLiteral="mdomz-play_arrow:48" styleClass="icon" />
                         </graphic>
+                        <tooltip>
+                            <Tooltip text="%selector.instance.tooltip.play" />
+                        </tooltip>
                     </Button>
                     <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" HBox.hgrow="ALWAYS" />
                     <Button fx:id="folderButton" onMouseClicked="#onFolderButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible">
                         <graphic>
                             <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
                         </graphic>
+                        <tooltip>
+                            <Tooltip text="%selector.component.tooltip.folder" />
+                        </tooltip>
                     </Button>
                     <Button fx:id="deleteButton" onAction="#onDeleteButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible" >
                         <graphic>
                             <FontIcon iconLiteral="mdoal-delete_forever:48" styleClass="icon" />
                         </graphic>
+                        <tooltip>
+                            <Tooltip text="%selector.component.tooltip.delete" />
+                        </tooltip>
                     </Button>
                 </HBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
@@ -49,6 +58,9 @@
                         <graphic>
                             <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
                         </graphic>
+                        <tooltip>
+                            <Tooltip text="%selector.component.tooltip.folder" />
+                        </tooltip>
                     </Button>
                     <Label fx:id="componentTitleLabel" disable="true" styleClass="title" text="%selector.instance.label.component.title" />
                 </HBox>

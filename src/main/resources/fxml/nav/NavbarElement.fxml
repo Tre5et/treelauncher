@@ -7,142 +7,171 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<GridPane stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
+<GridPane stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500"
+          xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
    <styleClass>
-      <String fx:value="navbar" />
+      <String fx:value="navbar"/>
    </styleClass>
    <columnConstraints>
-      <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
+      <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="10.0" prefWidth="100.0"/>
+      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+      <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="10.0" prefWidth="100.0"/>
    </columnConstraints>
    <rowConstraints>
-      <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints />
-      <RowConstraints />
+      <RowConstraints minHeight="0.0" vgrow="SOMETIMES"/>
+      <RowConstraints/>
+      <RowConstraints/>
    </rowConstraints>
-   <children>
-      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" styleClass="navbar-cluster" GridPane.columnIndex="0">
-         <children>
-            <Button fx:id="homeButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onHomeButtonClicked">
+   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" styleClass="navbar-cluster"
+         GridPane.columnIndex="0">
+      <GridPane.margin>
+         <Insets/>
+      </GridPane.margin>
+      <Button fx:id="homeButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onHomeButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdoal-dashboard:38">
                <styleClass>
-                  <String fx:value="invisible" />
+                  <String fx:value="icon"/>
                </styleClass>
-               <graphic>
-                  <FontIcon iconLiteral="mdoal-dashboard:38">
-                     <styleClass>
-                        <String fx:value="icon" />
-                     </styleClass>
-                  </FontIcon>
-               </graphic>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-            <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onAddButtonClicked">
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.home"/>
+         </tooltip>
+      </Button>
+      <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onAddButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdoal-add_box:38">
                <styleClass>
-                  <String fx:value="invisible" />
+                  <String fx:value="icon"/>
                </styleClass>
-               <graphic>
-                  <FontIcon iconLiteral="mdoal-add_box:38">
-                     <styleClass>
-                        <String fx:value="icon" />
-                     </styleClass>
-                  </FontIcon>
-               </graphic>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-         </children>
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="48.0" prefWidth="120.0" styleClass="navbar-cluster" GridPane.columnIndex="1">
-         <Button fx:id="savesButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onSavesButtonClicked">
-            <styleClass>
-               <String fx:value="invisible" />
-            </styleClass>
-            <graphic>
-               <FontIcon iconLiteral="mdomz-move_to_inbox:38">
-                  <styleClass>
-                     <String fx:value="icon" />
-                  </styleClass>
-               </FontIcon>
-            </graphic>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Button>
-         <Button fx:id="resoucepacksButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onResourcepacksButtonClicked">
-            <styleClass>
-               <String fx:value="invisible" />
-            </styleClass>
-            <graphic>
-               <FontIcon iconLiteral="mdoal-folder_special:38">
-                  <styleClass>
-                     <String fx:value="icon" />
-                  </styleClass>
-               </FontIcon>
-            </graphic>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Button>
-         <Button fx:id="optionsButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onOptionsButtonClicked">
-            <styleClass>
-               <String fx:value="invisible" />
-            </styleClass>
-            <graphic>
-               <FontIcon iconLiteral="mdomz-tune:38">
-                  <styleClass>
-                     <String fx:value="icon" />
-                  </styleClass>
-               </FontIcon>
-            </graphic>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Button>
-         <Button fx:id="modsButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onModsButtonClicked">
-            <styleClass>
-               <String fx:value="invisible" />
-            </styleClass>
-            <graphic>
-               <FontIcon iconLiteral="mdoal-extension:38">
-                  <styleClass>
-                     <String fx:value="icon" />
-                  </styleClass>
-               </FontIcon>
-            </graphic>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Button>
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" styleClass="navbar-cluster" GridPane.columnIndex="2">
-         <Button fx:id="profileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onProfileButtonClicked">
-            <styleClass>
-               <String fx:value="invisible" />
-            </styleClass>
-            <graphic>
-               <FontIcon iconLiteral="mdoal-account_box:38">
-                  <styleClass>
-                     <String fx:value="icon" />
-                  </styleClass>
-               </FontIcon>
-            </graphic>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Button>
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-      </HBox>
-   </children>
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.add"/>
+         </tooltip>
+      </Button>
+   </HBox>
+   <HBox alignment="CENTER" prefHeight="48.0" prefWidth="120.0" styleClass="navbar-cluster" GridPane.columnIndex="1">
+      <Button fx:id="savesButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onSavesButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdomz-move_to_inbox:38">
+               <styleClass>
+                  <String fx:value="icon"/>
+               </styleClass>
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.saves"/>
+         </tooltip>
+      </Button>
+      <Button fx:id="resoucepacksButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onResourcepacksButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdoal-folder_special:38">
+               <styleClass>
+                  <String fx:value="icon"/>
+               </styleClass>
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.resourcepacks"/>
+         </tooltip>
+      </Button>
+      <Button fx:id="optionsButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onOptionsButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdomz-tune:38">
+               <styleClass>
+                  <String fx:value="icon"/>
+               </styleClass>
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.options"/>
+         </tooltip>
+      </Button>
+      <Button fx:id="modsButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onModsButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdoal-extension:38">
+               <styleClass>
+                  <String fx:value="icon"/>
+               </styleClass>
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.mods"/>
+         </tooltip>
+      </Button>
+      <GridPane.margin>
+         <Insets left="10.0" right="10.0"/>
+      </GridPane.margin>
+
+   </HBox>
+   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" styleClass="navbar-cluster"
+         GridPane.columnIndex="2">
+      <Button fx:id="profileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onProfileButtonClicked">
+         <styleClass>
+            <String fx:value="invisible"/>
+         </styleClass>
+         <graphic>
+            <FontIcon iconLiteral="mdoal-account_box:38">
+               <styleClass>
+                  <String fx:value="icon"/>
+               </styleClass>
+            </FontIcon>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <tooltip>
+            <Tooltip text="%nav.tooltip.profile"/>
+         </tooltip>
+      </Button>
+      <GridPane.margin>
+         <Insets/>
+      </GridPane.margin>
+   </HBox>
 </GridPane>

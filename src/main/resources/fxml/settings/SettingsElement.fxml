@@ -29,6 +29,9 @@
                             <graphic>
                                 <FontIcon iconLiteral="mdoal-insert_drive_file:28" styleClass="icon" />
                             </graphic>
+                            <tooltip>
+                                <Tooltip text="%settings.tooltip.select" />
+                            </tooltip>
                         </Button>
                     </HBox>
                     <CheckBox fx:id="removeCheckBox" selected="true" text="%settings.label.path.remove" />
