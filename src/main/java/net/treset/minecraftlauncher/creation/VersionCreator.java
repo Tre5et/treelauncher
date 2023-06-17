@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class VersionCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(VersionCreator.class);
@@ -91,6 +90,7 @@ public class VersionCreator extends GenericComponentCreator {
     private void makeVersion() throws ComponentCreationException {
         if(fabricVersion != null) {
             makeFabricVersion();
+            return;
         }
         makeMinecraftVersion();
     }
@@ -108,13 +108,14 @@ public class VersionCreator extends GenericComponentCreator {
         }
         for(MinecraftVersion m : versions) {
             if(fabricProfile.getInheritsFrom().equals(m.getId())) {
-                String mcJson = null;
+                String mcJson;
                 try {
                     mcJson = Sources.getFileFromUrl(m.getUrl());
                 } catch (FileDownloadException e) {
                     throw new ComponentCreationException("Unable to create fabric version: failed to download mc version details: versionId=" + fabricProfile.getInheritsFrom(), e);
                 }
                 VersionCreator mcCreator = new VersionCreator(getTypeConversion(), getComponentsManifest(), MinecraftVersionDetails.fromJson(mcJson), files, librariesDir);
+                mcCreator.setStatusCallback(getStatusCallback());
                 String dependsId;
                 try {
                     dependsId = mcCreator.getId();
@@ -154,6 +155,7 @@ public class VersionCreator extends GenericComponentCreator {
                 }
 
                 LOGGER.debug("Created fabric version: id={}", getNewManifest().getId());
+                return;
             }
         }
         throw new ComponentCreationException("Unable to create fabric version: failed to find mc version: versionId=" + fabricProfile.getInheritsFrom());
@@ -202,6 +204,9 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void makeMinecraftVersion() throws ComponentCreationException {
+        if(mcVersion == null) {
+            throw new ComponentCreationException("Unable to create minecraft version: no valid mc version");
+        }
         setStatus(CreationStatus.VERSION_VANILLA);
         LauncherVersionDetails details = new LauncherVersionDetails(
                 mcVersion.getId(),
@@ -293,7 +298,7 @@ public class VersionCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Unable to add libraries: libraries dir is not a directory: dir=" + librariesDir);
         }
 
-        List<String> result = null;
+        List<String> result;
         try {
             result = MinecraftVersionFileDownloader.downloadVersionLibraries(mcVersion.getLibraries(), baseDir, List.of());
         } catch (FileDownloadException e) {
