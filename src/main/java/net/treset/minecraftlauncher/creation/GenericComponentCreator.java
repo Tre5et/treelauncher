@@ -138,7 +138,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         if(!isValid() || newManifest == null) {
             throw new ComponentCreationException("Unable to write manifest: invalid parameters");
         }
-        newManifest.setDirectory(componentsManifest.getDirectory() + componentsManifest.getPrefix() + "_" + newManifest.getId() + "/");
+        newManifest.setDirectory(FormatUtil.absoluteDirPath(componentsManifest.getDirectory(), componentsManifest.getPrefix() + "_" + newManifest.getId()));
         try {
             newManifest.writeToFile(newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
         } catch (IOException e) {

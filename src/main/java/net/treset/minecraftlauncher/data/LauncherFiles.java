@@ -5,6 +5,7 @@ import net.treset.mc_version_loader.json.GenericJsonParsable;
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LauncherFiles {
-    private static Logger LOGGER = LogManager.getLogger(LauncherFiles.class);
+    private static final Logger LOGGER = LogManager.getLogger(LauncherFiles.class);
 
     private LauncherManifest mainManifest;
     private LauncherDetails launcherDetails;
@@ -33,13 +34,11 @@ public class LauncherFiles {
     private List<LauncherManifest> resourcepackComponents;
     private LauncherManifest versionManifest;
     private List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents;
-    private boolean valid = false;
 
     public LauncherFiles() throws FileLoadException {
         reloadMainManifest();
         reloadLauncherDetails();
 
-        this.valid = true;
         LOGGER.debug("Loaded launcher details");
     }
 
@@ -112,9 +111,6 @@ public class LauncherFiles {
     }
 
     public void reloadGameDetailsManifest() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load game data manifest: invalid configuration");
-        }
         gameDetailsManifest = reloadManifest(getLauncherDetails().getGamedataDir(), LauncherManifestType.GAME);
     }
 
@@ -123,7 +119,7 @@ public class LauncherFiles {
     }
 
     public void reloadModsManifest() throws FileLoadException {
-        if(!isValid() || getGameDetailsManifest() == null || getGameDetailsManifest().getComponents() == null || getGameDetailsManifest().getComponents().size() != 2) {
+        if(getGameDetailsManifest() == null || getGameDetailsManifest().getComponents() == null || getGameDetailsManifest().getComponents().size() != 2) {
             throw new FileLoadException("Unable to load mods manifest: invalid configuration");
         }
         modsManifest = reloadManifest(getLauncherDetails().getGamedataDir(), getGameDetailsManifest().getComponents().get(0), LauncherManifestType.MODS);
@@ -134,10 +130,7 @@ public class LauncherFiles {
     }
 
     public void reloadModsComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load mods components: invalid configuration");
-        }
-        modsComponents = reloadComponents(getModsManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.MODS_COMPONENT, LauncherModsDetails.class, getLauncherDetails().getGamedataDir() + "/mods/");
+        modsComponents = reloadComponents(getModsManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.MODS_COMPONENT, LauncherModsDetails.class, FormatUtil.absoluteDirPath(getLauncherDetails().getGamedataDir(), "mods"));
     }
 
     public LauncherManifest getSavesManifest() {
@@ -145,9 +138,6 @@ public class LauncherFiles {
     }
 
     public void reloadSavesManifest() throws FileLoadException {
-        if(!isValid() || getGameDetailsManifest() == null || getGameDetailsManifest().getComponents() == null || getGameDetailsManifest().getComponents().size() != 2) {
-            throw new FileLoadException("Unable to load saves manifest: invalid configuration");
-        }
         savesManifest = reloadManifest(getLauncherDetails().getGamedataDir(), getGameDetailsManifest().getComponents().get(1), LauncherManifestType.SAVES);
     }
 
@@ -156,10 +146,7 @@ public class LauncherFiles {
     }
 
     public void reloadSavesComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load saves components: invalid configuration");
-        }
-        savesComponents = reloadComponents(getSavesManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.SAVES_COMPONENT, getLauncherDetails().getGamedataDir() + "/saves/");
+        savesComponents = reloadComponents(getSavesManifest(), getLauncherDetails().getGamedataDir(), LauncherManifestType.SAVES_COMPONENT, FormatUtil.absoluteDirPath(getLauncherDetails().getGamedataDir() + "saves"));
     }
 
     public LauncherManifest getInstanceManifest() {
@@ -167,9 +154,6 @@ public class LauncherFiles {
     }
 
     public void reloadInstanceManifest() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load instance manifest: invalid configuration");
-        }
         instanceManifest = reloadManifest(getLauncherDetails().getInstancesDir(), LauncherManifestType.INSTANCES);
     }
 
@@ -178,9 +162,6 @@ public class LauncherFiles {
     }
 
     public void reloadInstanceComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load instance components: invalid configuration");
-        }
         instanceComponents = reloadComponents(getInstanceManifest(), getLauncherDetails().getInstancesDir(), LauncherManifestType.INSTANCE_COMPONENT, LauncherInstanceDetails.class, null);
     }
 
@@ -190,9 +171,6 @@ public class LauncherFiles {
     }
 
     public void reloadJavaManifest() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load java manifest: invalid configuration");
-        }
         javaManifest = reloadManifest(getLauncherDetails().getJavasDir(), LauncherManifestType.JAVAS);
     }
 
@@ -201,9 +179,6 @@ public class LauncherFiles {
     }
 
     public void reloadJavaComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load java components: invalid configuration");
-        }
         javaComponents = reloadComponents(getJavaManifest(), getLauncherDetails().getJavasDir(), LauncherManifestType.JAVA_COMPONENT, null);
     }
 
@@ -212,9 +187,6 @@ public class LauncherFiles {
     }
 
     public void reloadOptionsManifest() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load options manifest: invalid configuration");
-        }
         optionsManifest = reloadManifest(getLauncherDetails().getOptionsDir(), LauncherManifestType.OPTIONS);
     }
 
@@ -223,9 +195,6 @@ public class LauncherFiles {
     }
 
     public void reloadOptionsComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load options components: invalid configuration");
-        }
         optionsComponents = reloadComponents(getOptionsManifest(), getLauncherDetails().getOptionsDir(), LauncherManifestType.OPTIONS_COMPONENT, null);
     }
 
@@ -234,9 +203,6 @@ public class LauncherFiles {
     }
 
     public void reloadResourcepackManifest() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load resourcepack manifest: invalid configuration");
-        }
         resourcepackManifest = reloadManifest(getLauncherDetails().getResourcepacksDir(), LauncherManifestType.RESOURCEPACKS);
     }
 
@@ -245,9 +211,6 @@ public class LauncherFiles {
     }
 
     public void reloadResourcepackComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load resourcepack components: invalid configuration");
-        }
         resourcepackComponents = reloadComponents(getResourcepackManifest(), getLauncherDetails().getResourcepacksDir(), LauncherManifestType.RESOURCEPACKS_COMPONENT, null);
     }
 
@@ -256,9 +219,6 @@ public class LauncherFiles {
     }
 
     public void reloadVersionManifest() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load version manifest: invalid configuration");
-        }
         versionManifest = reloadManifest(getLauncherDetails().getVersionDir(), LauncherManifestType.VERSIONS);
     }
 
@@ -267,14 +227,7 @@ public class LauncherFiles {
     }
 
     public void reloadVersionComponents() throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load version components: invalid configuration");
-        }
         versionComponents = reloadComponents(getVersionManifest(), getLauncherDetails().getVersionDir(), LauncherManifestType.VERSION_COMPONENT, LauncherVersionDetails.class, null);
-    }
-
-    public boolean isValid() {
-        return valid;
     }
 
     public LauncherManifest reloadManifest(String relativePath, LauncherManifestType expectedType) throws FileLoadException {
@@ -282,12 +235,9 @@ public class LauncherFiles {
     }
 
     public LauncherManifest reloadManifest(String relativePath, String filename, LauncherManifestType expectedType) throws FileLoadException {
-        if(!isValid()) {
-            throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " manifest: invalid configuration");
-        }
-        String versionFile = null;
+        String versionFile;
         try {
-            versionFile = FileUtil.loadFile(LauncherApplication.config.BASE_DIR + relativePath + "/" + filename);
+            versionFile = FileUtil.loadFile(FormatUtil.relativeFilePath(relativePath, filename));
         } catch (IOException e) {
             throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " manifest: file error", e);
         }
@@ -298,7 +248,7 @@ public class LauncherFiles {
         if(out == null || out.getType() != expectedType) {
             throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " manifest: incorrect contents");
         }
-        out.setDirectory(LauncherApplication.config.BASE_DIR + relativePath + "/");
+        out.setDirectory(FormatUtil.relativeDirPath(relativePath));
         LOGGER.debug("Loaded " + expectedType.name().toLowerCase() + " manifest");
         return out;
     }
@@ -308,13 +258,10 @@ public class LauncherFiles {
     }
 
     public List<LauncherManifest> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, String fallbackPath) throws FileLoadException {
-        if(!isValid() || parentManifest == null || parentManifest.getPrefix() == null || parentManifest.getComponents() == null) {
-            throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " components: invalid configuration");
-        }
         List<LauncherManifest> out = new ArrayList<>();
         for(String c : parentManifest.getComponents()) {
             try {
-                addComponent(out, LauncherApplication.config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, c, LauncherApplication.config.BASE_DIR + fallbackPath);
+                addComponent(out, FormatUtil.relativeDirPath(parentPath, parentManifest.getPrefix() + "_" + c), filename, expectedType, c, LauncherApplication.config.BASE_DIR + fallbackPath);
             } catch (FileLoadException e) {
                 throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " components: component error: id=" + c);
             }
@@ -354,14 +301,14 @@ public class LauncherFiles {
     }
 
     public <T extends GenericJsonParsable> List<Pair<LauncherManifest, T>> reloadComponents(LauncherManifest parentManifest, String parentPath, String filename, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath) throws FileLoadException {
-        if(!isValid() || parentManifest == null || parentManifest.getPrefix() == null || parentManifest.getComponents() == null) {
+        if(parentManifest == null || parentManifest.getPrefix() == null || parentManifest.getComponents() == null) {
             throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " components: invalid configuration");
         }
         List<Pair<LauncherManifest, T>> out = new ArrayList<>();
         List<FileLoadException> exceptionQueue = new ArrayList<>();
         for(String c : parentManifest.getComponents()) {
             try {
-                addComponent(out, LauncherApplication.config.BASE_DIR + parentPath + "/" + parentManifest.getPrefix() + "_" + c + "/", filename, expectedType, targetClass, LauncherApplication.config.BASE_DIR + fallbackPath, c);
+                addComponent(out, FormatUtil.relativeDirPath(parentPath, parentManifest.getPrefix() + "_" + c), filename, expectedType, targetClass, LauncherApplication.config.BASE_DIR + fallbackPath, c);
             } catch (FileLoadException e) {
                 exceptionQueue.add(e);
             }
@@ -375,7 +322,7 @@ public class LauncherFiles {
 
 
     private <T extends GenericJsonParsable> void addComponent(List<Pair<LauncherManifest, T>> list, String path, String filename, LauncherManifestType expectedType, Class<T> targetClass, String fallbackPath, String expectedId) throws FileLoadException {
-        String manifestFile = null;
+        String manifestFile;
         try {
             manifestFile = FileUtil.loadFile(path + filename);
         } catch (IOException e) {

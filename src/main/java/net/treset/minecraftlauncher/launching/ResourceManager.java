@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ResourceManager {
-    private static Logger LOGGER = LogManager.getLogger(ResourceManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(ResourceManager.class);
     
     private InstanceData instanceData;
     private boolean prepared = false;
@@ -95,7 +95,7 @@ public class ResourceManager {
         } catch (IOException e) {
             throw new GameResourceException("Unable to rename saves file", e);
         }
-        instanceData.getSavesComponent().setDirectory(instanceData.getGameDataDir() + "saves/");
+        instanceData.getSavesComponent().setDirectory(FormatUtil.absoluteDirPath(instanceData.getGameDataDir(), "saves"));
 
         if(instanceData.getModsComponent() != null) {
             try {
@@ -103,7 +103,7 @@ public class ResourceManager {
             } catch (IOException e) {
                 throw new GameResourceException("Unable to rename mods file", e);
             }
-            instanceData.getModsComponent().getKey().setDirectory(instanceData.getGameDataDir() + "mods/");
+            instanceData.getModsComponent().getKey().setDirectory(FormatUtil.absoluteDirPath(instanceData.getGameDataDir(), "mods"));
         }
     }
 
@@ -168,7 +168,7 @@ public class ResourceManager {
         } catch (IOException e) {
             throw new GameResourceException("Unable to cleanup launch resources: rename saves file failed", e);
         }
-        instanceData.getSavesComponent().setDirectory(instanceData.getGameDataDir() + instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId() + "/");
+        instanceData.getSavesComponent().setDirectory(FormatUtil.absoluteDirPath(instanceData.getGameDataDir(), instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId()));
 
         if(instanceData.getModsComponent() != null) {
             try {
@@ -237,7 +237,7 @@ public class ResourceManager {
         List<File> toRemove = new ArrayList<>();
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
-            String fName = f.isDirectory() ? f.getName() + "/" : f.getName();
+            String fName = f.isDirectory() ? FormatUtil.absoluteDirPath(f.getName()): FormatUtil.relativeFilePath(f.getName());
             boolean found = false;
             for(String i : component.getIncludedFiles()) {
                 if(FormatUtils.matches(fName, i)) {
@@ -285,7 +285,7 @@ public class ResourceManager {
             }
             else {
                 try {
-                    Files.move(Path.of(f.getPath()), Path.of(instanceData.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(Path.of(f.getPath()), Path.of(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR , f.getName())), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     exceptionQueue.add(e);
                     LOGGER.warn("Unable to cleanup launch resources: unable to move non-included file: " + f.getName());

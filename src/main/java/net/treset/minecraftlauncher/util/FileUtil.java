@@ -1,8 +1,5 @@
 package net.treset.minecraftlauncher.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -12,7 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class FileUtil {
-    private static Logger LOGGER = LogManager.getLogger(FileUtil.class);
 
     public static String loadFile(String path) throws IOException {
         Path filePath = Paths.get(path);
@@ -40,9 +36,9 @@ public class FileUtil {
                 continue;
             }
             if(file.isDirectory()) {
-                FileUtil.copyDirectory(file.getAbsolutePath(), dstDir + file.getName() + "/", options);
+                FileUtil.copyDirectory(file.getAbsolutePath(), FormatUtil.absoluteDirPath(dstDir, file.getName()), options);
             } else {
-                FileUtil.copyFile(file.getAbsolutePath(), dstDir + file.getName(), options);
+                FileUtil.copyFile(file.getAbsolutePath(), FormatUtil.absoluteFilePath(dstDir, file.getName()), options);
             }
         }
     }

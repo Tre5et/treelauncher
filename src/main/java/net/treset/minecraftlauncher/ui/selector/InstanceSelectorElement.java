@@ -22,6 +22,7 @@ import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.exception.GameLaunchException;
@@ -33,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -287,7 +287,7 @@ public class InstanceSelectorElement extends UiElement {
         popupController.setVisible(true);
         versionChangerController.setVisible(false);
         new Thread(() -> {
-            String versionId = null;
+            String versionId;
             try {
                 versionId = creator.getId();
             } catch (ComponentCreationException e) {
@@ -434,7 +434,7 @@ public class InstanceSelectorElement extends UiElement {
                         PopupElement.ButtonType.POSITIVE,
                         "selector.instance.game.crash.reports",
                         "reports",
-                        id -> openFolder(currentInstance.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/crash-reports")
+                        id -> openFolder(FormatUtil.absoluteDirPath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
                 )
         );
         popupController.setVisible(false);

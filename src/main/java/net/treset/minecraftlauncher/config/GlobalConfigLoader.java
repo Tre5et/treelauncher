@@ -1,13 +1,11 @@
 package net.treset.minecraftlauncher.config;
 
-import com.google.gson.JsonElement;
-import net.treset.mc_version_loader.files.FileUtils;
-import net.treset.mc_version_loader.json.GenericJsonParsable;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -111,7 +109,7 @@ public class GlobalConfigLoader {
         if(!FileUtil.dirContains(path, LauncherApplication.config.MANIFEST_FILE_NAME)) {
             return false;
         }
-        String contents = FileUtil.loadFile(path.getAbsolutePath() + "/" + LauncherApplication.config.MANIFEST_FILE_NAME);
+        String contents = FileUtil.loadFile(FormatUtil.absoluteFilePath(path.getAbsolutePath(), LauncherApplication.config.MANIFEST_FILE_NAME));
         if(contents == null || contents.isBlank()) {
             return false;
         }

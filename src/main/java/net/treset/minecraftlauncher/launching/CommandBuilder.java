@@ -8,6 +8,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.GameCommandException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -92,7 +93,7 @@ public class CommandBuilder {
 
         processBuilder.directory(gameDir);
         processBuilder.command(new ArrayList<>());
-        processBuilder.command().add(instanceData.getJavaComponent().getDirectory() + "bin" + "/" + "java");
+        processBuilder.command().add(FormatUtil.absoluteFilePath(instanceData.getJavaComponent().getDirectory(), "bin", "java"));
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             try {
                 appendArguments(processBuilder, v.getValue().getJvmArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY);
@@ -133,7 +134,7 @@ public class CommandBuilder {
             List<GameCommandException> exceptionQueue = new ArrayList<>();
             for (String r : a.getReplacementValues()) {
                 try {
-                    String replacement = getReplacement(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, mainClass, minecraftUser, LauncherApplication.stringLocalizer.getFormatted("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug")), LauncherApplication.stringLocalizer.getFormatted("game.version_type", LauncherApplication.stringLocalizer.get("launcher.name"), LauncherApplication.stringLocalizer.get("launcher.version")), resX, resY);
+                    String replacement = getReplacement(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, minecraftUser, LauncherApplication.stringLocalizer.getFormatted("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug")), LauncherApplication.stringLocalizer.getFormatted("game.version_type", LauncherApplication.stringLocalizer.get("launcher.name"), LauncherApplication.stringLocalizer.get("launcher.version")), resX, resY);
                     replacements.put(r, replacement);
                 } catch (GameCommandException e) {
                     exceptionQueue.add(e);
@@ -151,7 +152,7 @@ public class CommandBuilder {
         }
     }
 
-    private String getReplacement(String key, String gameDir, String javaDir, String assetsDir, String resourcepackDir, String assetsIndex, List<String> libraries, String mainClass, User minecraftUser, String versionName, String versionType, String resX, String resY) throws GameCommandException {
+    private String getReplacement(String key, String gameDir, String javaDir, String assetsDir, String resourcepackDir, String assetsIndex, List<String> libraries, User minecraftUser, String versionName, String versionType, String resX, String resY) throws GameCommandException {
         switch(key) {
             case "natives_directory" -> {
                 return javaDir + "lib";
@@ -218,9 +219,7 @@ public class CommandBuilder {
                 return "";
             }
 
-            default -> {
-                throw new GameCommandException("Unknown environment variable: key=" + key);
-            }
+            default -> throw new GameCommandException("Unknown environment variable: key=" + key);
         }
     }
 

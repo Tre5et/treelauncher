@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class InstanceData {
-    private static Logger LOGGER = LogManager.getLogger(InstanceData.class);
+    private static final Logger LOGGER = LogManager.getLogger(InstanceData.class);
 
     private LauncherDetails launcherDetails;
     private String launcherDetailsFile;
     private Pair<LauncherManifest, LauncherInstanceDetails> instance;
     private List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents;
-    private LauncherManifest javaComponent = null;
-    LauncherManifest optionsComponent = null;
-    LauncherManifest resourcepacksComponent = null;
-    LauncherManifest savesComponent = null;
-    Pair<LauncherManifest, LauncherModsDetails> modsComponent = null;
+    private LauncherManifest javaComponent;
+    LauncherManifest optionsComponent;
+    LauncherManifest resourcepacksComponent;
+    LauncherManifest savesComponent;
+    Pair<LauncherManifest, LauncherModsDetails> modsComponent;
     String gameDataDir;
     String assetsDir;
     String librariesDir;
@@ -145,9 +145,9 @@ public class InstanceData {
                 resourcepacksComponent,
                 savesComponent,
                 modsComponent,
-                LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getGamedataDir() + "/",
-                LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getAssetsDir() + "/",
-                LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir() + "/",
+                FormatUtil.relativeDirPath(files.getLauncherDetails().getGamedataDir()),
+                FormatUtil.relativeDirPath(files.getLauncherDetails().getAssetsDir()),
+                FormatUtil.relativeDirPath(files.getLauncherDetails().getLibrariesDir()),
                 files.getModsManifest().getPrefix(),
                 files.getSavesManifest().getPrefix(),
                 gameDataExcludedFiles
