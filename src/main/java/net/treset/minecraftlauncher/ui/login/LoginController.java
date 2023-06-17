@@ -72,11 +72,13 @@ public class LoginController extends GenericUiController {
         if(success) {
             Platform.runLater(this::onContinueButtonClicked);
         } else {
-            loginButton.setDisable(false);
-            rememberChoice.setDisable(false);
-            statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
-            loginRetry++;
-            LOGGER.warn("Login failed");
+            Platform.runLater(() -> {
+                loginButton.setDisable(false);
+                rememberChoice.setDisable(false);
+                statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
+                loginRetry++;
+                LOGGER.warn("Login failed");
+            });
         }
     }
 
