@@ -47,6 +47,7 @@ public class ResourceManager {
     }
 
     public void setLastPlayedTime() throws IOException {
+        LOGGER.debug("Setting last played time: instance={}", instanceData.getInstance().getKey().getId());
         if(instanceData.getInstance().getValue() == null) {
             throw new IOException("Unable to set last played time: instance details are null");
         }
@@ -56,6 +57,7 @@ public class ResourceManager {
     }
 
     public void addPlayDuration(long duration) throws IOException {
+        LOGGER.debug("Adding play duration: instance={}, duration={}", instanceData.getInstance().getKey().getId(), duration);
         if(instanceData.getInstance().getValue() == null) {
             throw new IOException("Unable to set last played time: instance details are null");
         }
@@ -67,29 +69,35 @@ public class ResourceManager {
 
     public void cleanupGameFiles() throws GameResourceException {
         try {
-            undoRenameComponents();
-            ArrayList<File> gameDataFilesList = getGameDataFiles();
-            removeExcludedFiles(gameDataFilesList);
-            removeIncludedFiles(List.of(instanceData.getSavesComponent()), gameDataFilesList);
-            if (instanceData.getModsComponent() != null) {
-                removeIncludedFiles(List.of(instanceData.getModsComponent().getKey()), gameDataFilesList);
+            LOGGER.debug("Cleaning up game files: instance={}", instanceData.getInstance().getKey().getId());
+            try {
+                undoRenameComponents();
+                ArrayList<File> gameDataFilesList = getGameDataFiles();
+                removeExcludedFiles(gameDataFilesList);
+                removeIncludedFiles(List.of(instanceData.getSavesComponent()), gameDataFilesList);
+                if (instanceData.getModsComponent() != null) {
+                    removeIncludedFiles(List.of(instanceData.getModsComponent().getKey()), gameDataFilesList);
+                }
+                removeIncludedFiles(List.of(instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList);
+                removeRemainingFiles(gameDataFilesList);
+            } catch (GameResourceException e) {
+                throw new GameResourceException("Unable to cleanup game files", e);
             }
-            removeIncludedFiles(List.of(instanceData.getOptionsComponent(), instanceData.getResourcepacksComponent()), gameDataFilesList);
-            removeRemainingFiles(gameDataFilesList);
-        } catch (GameResourceException e) {
-            throw new GameResourceException("Unable to cleanup game files", e);
-        }
 
-        try {
-            instanceData.setActive(false);
-        } catch (IOException e) {
-            throw new GameResourceException("Unable to cleanup game files: unable to set instance inactive", e);
+            try {
+                instanceData.setActive(false);
+            } catch (IOException e) {
+                throw new GameResourceException("Unable to cleanup game files: unable to set instance inactive", e);
+            }
+        } catch (Exception e) {
+            throw new GameResourceException("Unable to cleanup game files", e);
         }
 
         LOGGER.info("Game files cleaned up");
     }
 
     private void renameComponents() throws GameResourceException {
+        LOGGER.debug("Renaming components: instance={}", instanceData.getInstance().getKey().getId());
         try {
             Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(instanceData.getGameDataDir() + "saves"));
         } catch (IOException e) {
@@ -108,6 +116,7 @@ public class ResourceManager {
     }
 
     private void addIncludedFiles(List<LauncherManifest> components) throws GameResourceException {
+        LOGGER.debug("Adding included files: instance={}", instanceData.getInstance().getKey().getId());
         List<GameResourceException> exceptionQueue = new ArrayList<>();
         for(LauncherManifest c : components) {
             if(c == null) {
@@ -123,9 +132,11 @@ public class ResourceManager {
         if(!exceptionQueue.isEmpty()) {
             throw new GameResourceException("Unable to get included files for " + exceptionQueue.size() + " components", exceptionQueue.get(0));
         }
+        LOGGER.debug("Added included files: instance={}", instanceData.getInstance().getKey().getId());
     }
 
     private void addIncludedFiles(LauncherManifest manifest) throws GameResourceException {
+        LOGGER.debug("Adding included files: manifestId={}", manifest.getId());
         if(manifest == null || manifest.getIncludedFiles() == null) {
             throw new GameResourceException("Unable to get included files: unmet requirements");
         }
@@ -139,6 +150,7 @@ public class ResourceManager {
         }
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
+            LOGGER.debug("Adding included file: manifestId={}, file={}", manifest.getId(), f.getName());
             if(f.isFile()) {
                 try {
                     Files.copy(Path.of(f.getPath()), Path.of(instanceData.getGameDataDir() + f.getName()), StandardCopyOption.REPLACE_EXISTING);
@@ -160,9 +172,11 @@ public class ResourceManager {
         if(!exceptionQueue.isEmpty()) {
             throw new GameResourceException("Unable to move included files: unable to copy " + exceptionQueue.size() + " files", exceptionQueue.get(0));
         }
+        LOGGER.debug("Added included files: manifestId={}", manifest.getId());
     }
 
     private void undoRenameComponents() throws GameResourceException {
+        LOGGER.debug("Undoing component renames: instance={}", instanceData.getInstance().getKey().getId());
         try {
             Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(instanceData.getGameDataDir() + instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId()));
         } catch (IOException e) {
@@ -178,9 +192,11 @@ public class ResourceManager {
             }
             instanceData.getModsComponent().getKey().setDirectory(instanceData.getGameDataDir() + instanceData.getModsPrefix() + "_" + instanceData.getModsComponent().getKey().getId() + "/");
         }
+        LOGGER.debug("Undid component renames: instance={}", instanceData.getInstance().getKey().getId());
     }
 
     private ArrayList<File> getGameDataFiles() throws GameResourceException {
+        LOGGER.debug("Getting game data files: instance={}", instanceData.getInstance().getKey().getId());
         File gameDataDir = new File(instanceData.getGameDataDir());
         if(!gameDataDir.isDirectory()) {
             throw new GameResourceException("Unable to cleanup launch resources: game data directory not found");
@@ -191,22 +207,28 @@ public class ResourceManager {
             throw new GameResourceException("Unable to cleanup launch resources: unable to get game data files");
         }
 
+        LOGGER.debug("Got game data files: instance={}", instanceData.getInstance().getKey().getId());
         return new ArrayList<>(Arrays.asList(gameDataFiles));
     }
 
     private void removeExcludedFiles(ArrayList<File> files) {
+        LOGGER.debug("Removing excluded files: instance={}", instanceData.getInstance().getKey().getId());
         List<File> toRemove = new ArrayList<>();
         for(File f : files) {
+            LOGGER.debug("Removing excluded file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
             if(f.getName().equals(LauncherApplication.config.MANIFEST_FILE_NAME) || FormatUtil.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
                 toRemove.add(f);
             }
         }
         files.removeAll(toRemove);
+        LOGGER.debug("Removed excluded files: instance={}", instanceData.getInstance().getKey().getId());
     }
 
     private void removeIncludedFiles(List<LauncherManifest> components, ArrayList<File> files) throws GameResourceException {
+        LOGGER.debug("Removing included files: instance={}", instanceData.getInstance().getKey().getId());
         List<GameResourceException> exceptionQueue = new ArrayList<>();
         for(LauncherManifest component : components) {
+            LOGGER.debug("Removing included files: manifestId={}", component.getId());
             if(component.getIncludedFiles() == null || component.getIncludedFiles().isEmpty()) {
                 continue;
             }
@@ -220,9 +242,11 @@ public class ResourceManager {
         if(!exceptionQueue.isEmpty()) {
             throw new GameResourceException("Unable to remove included files for " + exceptionQueue.size() + " components", exceptionQueue.get(0));
         }
+        LOGGER.debug("Removed included files: instance={}", instanceData.getInstance().getKey().getId());
     }
 
     private void removeIncludedFiles(LauncherManifest component, ArrayList<File> files) throws GameResourceException {
+        LOGGER.debug("Removing included files: manifestId={}", component.getId());
         File includedFilesDir = new File(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             try {
@@ -237,6 +261,7 @@ public class ResourceManager {
         List<File> toRemove = new ArrayList<>();
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
+            LOGGER.debug("Removing included file: manifestId={}, file={}", component.getId(), f.getName());
             String fName = f.isDirectory() ? FormatUtil.absoluteDirPath(f.getName()): FormatUtil.relativeFilePath(f.getName());
             boolean found = false;
             for(String i : component.getIncludedFiles()) {
@@ -259,9 +284,11 @@ public class ResourceManager {
         if(!exceptionQueue.isEmpty()) {
             throw new GameResourceException("Unable to remove included files: unable to move " + exceptionQueue.size() + " files: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId(), exceptionQueue.get(0));
         }
+        LOGGER.debug("Removed included files: manifestId={}", component.getId());
     }
 
     private void removeRemainingFiles(ArrayList<File> files) throws GameResourceException {
+        LOGGER.debug("Removing remaining files: instance={}", instanceData.getInstance().getKey().getId());
         File includedFilesDir = new File(instanceData.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             try {
@@ -275,6 +302,7 @@ public class ResourceManager {
         }
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
+            LOGGER.debug("Removing remaining file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
             if(instanceData.getInstance().getValue().getIgnoredFiles().contains(f.getName())) {
                 try {
                     Files.delete(Path.of(f.getPath()));
@@ -295,6 +323,7 @@ public class ResourceManager {
         if(!exceptionQueue.isEmpty()) {
             throw new GameResourceException("Unable to cleanup launch resources: unable to cleanup " + exceptionQueue.size() + " non-included files", exceptionQueue.get(0));
         }
+        LOGGER.debug("Removed remaining files: instance={}", instanceData.getInstance().getKey().getId());
     }
 
     public InstanceData getInstanceData() {

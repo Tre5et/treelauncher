@@ -17,13 +17,13 @@ public class Config {
     public final String INCLUDED_FILES_DIR = FormatUtil.absoluteDirPath(".included_files");
     public final List<LauncherFeature> INSTANCE_DEFAULT_FEATURES = List.of();
     public final List<String> INSTANCE_DEFAULT_INCLUDED_FILES = List.of();
-    public final List<String> INSTANCE_DEFAULT_IGNORED_FILES = List.of(".*backup.*", ".*BACKUP.*");
+    public final List<String> INSTANCE_DEFAULT_IGNORED_FILES = FormatUtil.toRegex(".*backup.*", ".*BACKUP.*");
     public final List<LauncherLaunchArgument> INSTANCE_DEFAULT_JVM_ARGUMENTS = List.of();
     public final String INSTANCE_DEFAULT_DETAILS = "instance.json";
-    public final List<String> OPTIONS_DEFAULT_INCLUDED_FILES = List.of("options\\.txt", "usercache\\.json");
-    public final List<String> MODS_DEFAULT_INCLUDED_FILES = List.of(FormatUtil.absoluteDirPath("\\.fabric"), FormatUtil.absoluteDirPath("config"), FormatUtil.absoluteDirPath("schematics"), FormatUtil.absoluteDirPath("\\.bobby"), FormatUtil.absoluteDirPath("XaeroWorldmap"), FormatUtil.absoluteDirPath("XaeroWaypoints"), FormatUtil.absoluteDirPath("itemscroller"));
+    public final List<String> OPTIONS_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex("options.txt", "usercache.json");
+    public final List<String> MODS_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex(FormatUtil.absoluteDirPath(".fabric"), FormatUtil.absoluteDirPath("config"), FormatUtil.absoluteDirPath("schematics"), FormatUtil.absoluteDirPath(".bobby"), FormatUtil.absoluteDirPath("XaeroWorldmap"), FormatUtil.absoluteDirPath("XaeroWaypoints"), FormatUtil.absoluteDirPath("itemscroller"));
     public final String MODS_DEFAULT_DETAILS = "mods.json";
-    public final List<String> SAVES_DEFAULT_INCLUDED_FILES = List.of("servers\\.dat", "realms_persistence\\.json");
+    public final List<String> SAVES_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex("servers.dat", "realms_persistence.json");
     public final List<String> RESOURCEPACK_DEFAULT_INCLUDED_FILES = List.of();
     public final String VERSION_DEFAULT_DETAILS = "version.json";
     public final List<LauncherLaunchArgument> MINECRAFT_DEFAULT_GAME_ARGUMENTS = List.of(new LauncherLaunchArgument("--resourcePackDir", null, null, null, null), new LauncherLaunchArgument("${resourcepack_directory}", null, null, null, null));

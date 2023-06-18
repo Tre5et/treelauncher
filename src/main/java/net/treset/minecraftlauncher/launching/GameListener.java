@@ -1,6 +1,5 @@
 package net.treset.minecraftlauncher.launching;
 
-import net.treset.minecraftlauncher.util.exception.GameLaunchException;
 import net.treset.minecraftlauncher.util.exception.GameResourceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,9 +13,9 @@ import java.util.function.Consumer;
 public class GameListener {
     private static final Logger LOGGER = LogManager.getLogger(GameListener.class);
 
-    private Process gameProcess;
-    private ResourceManager resourceManager;
-    private List<Consumer<String>> exitCallbacks;
+    private final Process gameProcess;
+    private final ResourceManager resourceManager;
+    private final List<Consumer<String>> exitCallbacks;
     private boolean valid = false;
     private boolean running = false;
     private boolean exited = false;
@@ -40,9 +39,7 @@ public class GameListener {
         running = true;
         LOGGER.info("Listening to game process: pid={}", gameProcess.pid());
         try(BufferedReader reader = gameProcess.inputReader()) {
-            reader.lines().iterator().forEachRemaining(value -> {
-                LOGGER.debug("Game: " + value);
-            });
+            reader.lines().iterator().forEachRemaining(value -> LOGGER.debug("Game: " + value));
         } catch (IOException e) {
             LOGGER.debug("Game output forwarding failed: pid={}", gameProcess.pid(), e);
         }
@@ -81,14 +78,14 @@ public class GameListener {
         try {
             resourceManager.addPlayDuration((System.currentTimeMillis() - playStart) / 1000);
         } catch (IOException e) {
-            LOGGER.warn("Unable to add play duration to statistics: duration={}, pid={}", (System.currentTimeMillis() - playStart) / 1000, gameProcess.pid());
+            LOGGER.error("Unable to add play duration to statistics: duration={}, pid={}", (System.currentTimeMillis() - playStart) / 1000, gameProcess.pid(), e);
             error = "Unable to add play duration to statistics";
         }
 
         try {
             resourceManager.cleanupGameFiles();
         } catch (GameResourceException e) {
-            LOGGER.warn("Unable to clean up game files after exit: pid={}", gameProcess.pid());
+            LOGGER.error("Unable to clean up game files after exit: pid={}", gameProcess.pid(), e);
             error = "Unable to clean up game files";
         }
 

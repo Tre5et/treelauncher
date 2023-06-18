@@ -73,4 +73,17 @@ public class FormatUtil {
         partsList.add(0, LauncherApplication.config.BASE_DIR);
         return absoluteFilePath(partsList.toArray(String[]::new));
     }
+
+    // \ -> \\; . -> \.; [.*;.+;.?] unchanged
+    public static String toRegex(String source) {
+        return source.replaceAll("\\\\", "\\\\\\\\").replaceAll("(?<=^|[^\\\\])\\.(?=[^*+?]|$)", "\\\\.");
+    }
+
+    public static List<String> toRegex(String... items) {
+        return Arrays.stream(items).map(FormatUtil::toRegex).toList();
+    }
+
+    public static List<String> toRegex(List<String> items) {
+        return items.stream().map(FormatUtil::toRegex).toList();
+    }
 }
