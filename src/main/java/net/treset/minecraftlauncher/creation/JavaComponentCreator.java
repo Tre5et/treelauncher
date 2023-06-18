@@ -12,21 +12,15 @@ import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.os.OsDetails;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class JavaComponentCreator extends GenericComponentCreator {
-    private static final Logger LOGGER = LogManager.getLogger(JavaComponentCreator.class);
-
     public JavaComponentCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest) {
         super(LauncherManifestType.JAVA_COMPONENT, null, null, name, typeConversion, null, null, componentsManifest);
-        setDefaultStatus(CreationStatus.JAVA);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.JAVA, null));
     }
 
     @Override
@@ -38,7 +32,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Failed to create java component: invalid data");
         }
 
-        JavaRuntime java = null;
+        JavaRuntime java;
         try {
             java = JavaRuntime.fromJson(Sources.getJavaRuntimeJson());
         } catch (FileDownloadException e) {
@@ -87,23 +81,11 @@ public class JavaComponentCreator extends GenericComponentCreator {
         }
 
         File baseDir = new File(getNewManifest().getDirectory());
-        if(!baseDir.isDirectory()) {
-            attemptCleanup();
-            throw new ComponentCreationException("Failed to create java component: base dir is not a directory");
-        }
 
-        List<FileDownloadException> exceptionQueue = new ArrayList<>();
-        for(JavaFile f : files) {
-            try {
-                JavaFileDownloader.downloadJavaFile(f, baseDir);
-            } catch (FileDownloadException e) {
-                exceptionQueue.add(e);
-            }
-        }
-
-        if(!exceptionQueue.isEmpty()) {
-            attemptCleanup();
-            throw new ComponentCreationException("Failed to create java component: failed to download " + exceptionQueue.size() + " java files", exceptionQueue.get(0));
+        try {
+            JavaFileDownloader.downloadJavaFiles(baseDir, files, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.JAVA, status)));
+        } catch (FileDownloadException e) {
+            throw new ComponentCreationException("Failed to create java component: failed to download java files", e);
         }
 
         return result;

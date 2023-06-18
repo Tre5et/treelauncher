@@ -10,16 +10,16 @@ import java.util.Map;
 public class ResourcepackCreator extends GenericComponentCreator {
     public ResourcepackCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest) {
         super(LauncherManifestType.RESOURCEPACKS_COMPONENT, null, null, name, typeConversion, LauncherApplication.config.RESOURCEPACK_DEFAULT_INCLUDED_FILES, null, componentsManifest);
-        setDefaultStatus(CreationStatus.RESOURCEPACKS);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null));
     }
 
     public ResourcepackCreator(String name, LauncherManifest inheritsFrom, LauncherManifest componentsManifest) {
         super(LauncherManifestType.RESOURCEPACKS_COMPONENT, null, inheritsFrom, name, null, null, null, componentsManifest);
-        setDefaultStatus(CreationStatus.RESOURCEPACKS);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null));
     }
 
     public ResourcepackCreator(LauncherManifest uses) {
         super(LauncherManifestType.RESOURCEPACKS_COMPONENT, uses, null, null, null, null, null, null);
-        setDefaultStatus(CreationStatus.RESOURCEPACKS);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null));
     }
 }

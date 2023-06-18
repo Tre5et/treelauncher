@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class ModsCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(ModsCreator.class);
@@ -27,7 +26,7 @@ public class ModsCreator extends GenericComponentCreator {
         this.modsType = modsType;
         this.modsVersion = modsVersion;
         this.gameManifest = gameManifest;
-        setDefaultStatus(CreationStatus.MODS);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.MODS, null));
     }
 
     public ModsCreator(String name, Pair<LauncherManifest, LauncherModsDetails> inheritsFrom, LauncherManifest componentsManifest, LauncherManifest gameManifest) {
@@ -35,14 +34,14 @@ public class ModsCreator extends GenericComponentCreator {
         modsType = null;
         modsVersion = null;
         this.gameManifest = gameManifest;
-        setDefaultStatus(CreationStatus.MODS);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.MODS, null));
     }
 
     public ModsCreator(Pair<LauncherManifest, LauncherModsDetails> uses) {
         super(LauncherManifestType.MODS_COMPONENT, uses.getKey(), null, null, null, null, null, null);
         modsType = null;
         modsVersion = null;
-        setDefaultStatus(CreationStatus.MODS);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.MODS, null));
     }
 
     @Override

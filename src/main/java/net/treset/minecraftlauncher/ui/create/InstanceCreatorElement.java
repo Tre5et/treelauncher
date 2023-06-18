@@ -6,7 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -41,7 +40,11 @@ public class InstanceCreatorElement extends UiElement {
     private LauncherFiles launcherFiles;
     private boolean modsActive = true;
     private void onCreateStatusChanged(CreationStatus status) {
-        Platform.runLater(()-> popupController.setMessage(status.getMessage()));
+        StringBuilder message = new StringBuilder(status.getCurrentStep().getMessage());
+        if(status.getDownloadStatus() != null) {
+            message.append("\n").append(status.getDownloadStatus().getCurrentFile()).append("\n(").append(status.getDownloadStatus().getCurrentAmount()).append("/").append(status.getDownloadStatus().getTotalAmount()).append(")");
+        }
+        Platform.runLater(()-> popupController.setMessage(message.toString()));
     }
 
     @FXML

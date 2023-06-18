@@ -16,8 +16,6 @@ import java.util.function.Consumer;
 public class InstanceCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(InstanceCreator.class);
 
-    private Consumer<CreationStatus> statusCallback;
-
     private final List<String> ignoredFiles;
     private final List<LauncherLaunchArgument> jvmArguments;
     private final List<LauncherFeature> features;
@@ -37,7 +35,7 @@ public class InstanceCreator extends GenericComponentCreator {
         this.resourcepackCreator = resourcepackCreator;
         this.savesCreator = savesCreator;
         this.versionCreator = versionCreator;
-        setDefaultStatus(CreationStatus.STARTING);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.STARTING, null));
     }
 
 
@@ -78,7 +76,7 @@ public class InstanceCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Failed to create instance: Error creating components", e);
         }
 
-        setStatus(CreationStatus.FINISHING);
+        setStatus(new CreationStatus(CreationStatus.DownloadStep.FINISHING, null));
 
         try {
             details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails());
@@ -117,7 +115,7 @@ public class InstanceCreator extends GenericComponentCreator {
 
     @Override
     public void setStatusCallback(Consumer<CreationStatus> statusCallback) {
-        this.statusCallback = statusCallback;
+        super.setStatusCallback(statusCallback);
         optionsCreator.setStatusCallback(statusCallback);
         if(modsCreator != null) {
             modsCreator.setStatusCallback(statusCallback);

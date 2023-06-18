@@ -13,18 +13,18 @@ public class SavesCreator extends GenericComponentCreator {
     public SavesCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, LauncherManifest gameManifest) {
         super(LauncherManifestType.SAVES_COMPONENT, null, null, name, typeConversion, LauncherApplication.config.SAVES_DEFAULT_INCLUDED_FILES, null, componentsManifest);
         this.gameManifest = gameManifest;
-        setDefaultStatus(CreationStatus.SAVES);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null));
     }
 
     public SavesCreator(String name, LauncherManifest inheritsFrom, LauncherManifest componentsManifest, LauncherManifest gameManifest) {
         super(LauncherManifestType.SAVES_COMPONENT, null, inheritsFrom, name, null, null, null, componentsManifest);
         this.gameManifest = gameManifest;
-        setDefaultStatus(CreationStatus.SAVES);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null));
     }
 
     public SavesCreator(LauncherManifest uses) {
         super(LauncherManifestType.SAVES_COMPONENT, uses, null, null, null, null, null, null);
-        setDefaultStatus(CreationStatus.SAVES);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.SAVES, null));
     }
 
     @Override

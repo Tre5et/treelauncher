@@ -299,4 +299,8 @@ public abstract class GenericComponentCreator implements ComponentCreator {
     public void setDefaultStatus(CreationStatus status) {
         defaultStatus = status;
     }
+
+    public CreationStatus getDefaultStatus() {
+        return defaultStatus;
+    }
 }

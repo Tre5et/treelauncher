@@ -43,7 +43,7 @@ public class VersionCreator extends GenericComponentCreator {
         this.mcVersion = mcVersion;
         this.files = files;
         this.librariesDir = librariesDir;
-        setDefaultStatus(CreationStatus.VERSION);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION, null));
     }
 
     public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, FabricVersionDetails fabricVersion, FabricProfile fabricProfile, LauncherFiles files, String librariesDir) {
@@ -52,12 +52,12 @@ public class VersionCreator extends GenericComponentCreator {
         this.fabricProfile = fabricProfile;
         this.files = files;
         this.librariesDir = librariesDir;
-        setDefaultStatus(CreationStatus.VERSION);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION, null));
     }
 
     public VersionCreator(Pair<LauncherManifest, LauncherVersionDetails> uses) {
         super(LauncherManifestType.VERSION_COMPONENT, uses.getKey(), null, null, null, null, null, null);
-        setDefaultStatus(CreationStatus.VERSION);
+        setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION, null));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void makeFabricVersion() throws ComponentCreationException {
-        setStatus(CreationStatus.VERSION_FABRIC);
+        setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC, null));
         if(fabricProfile == null || fabricProfile.getInheritsFrom() == null) {
             throw new ComponentCreationException("Unable to create fabric version: no valid fabric profile");
         }
@@ -176,7 +176,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void addFabricLibraries(LauncherVersionDetails details) throws ComponentCreationException {
-        setStatus(CreationStatus.VERSION_LIBRARIES);
+        setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, null));
         if(fabricProfile.getLibraries() == null) {
             throw new ComponentCreationException("Unable to add fabric libraries: no libraries");
         }
@@ -188,7 +188,7 @@ public class VersionCreator extends GenericComponentCreator {
 
         List<String> libs;
         try {
-            libs = FabricFileDownloader.downloadFabricLibraries(baseDir, clientLibs);
+            libs = FabricFileDownloader.downloadFabricLibraries(baseDir, clientLibs, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add fabric libraries: failed to download libraries", e);
         }
@@ -207,7 +207,7 @@ public class VersionCreator extends GenericComponentCreator {
         if(mcVersion == null) {
             throw new ComponentCreationException("Unable to create minecraft version: no valid mc version");
         }
-        setStatus(CreationStatus.VERSION_VANILLA);
+        setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_VANILLA, null));
         LauncherVersionDetails details = new LauncherVersionDetails(
                 mcVersion.getId(),
                 "vanilla",
@@ -245,7 +245,7 @@ public class VersionCreator extends GenericComponentCreator {
 
     private void downloadAssets() throws ComponentCreationException {
         LOGGER.debug("Downloading assets...");
-        setStatus(CreationStatus.VERSION_ASSETS);
+        setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, null));
         String assetIndexUrl = mcVersion.getAssetIndex().getUrl();
         AssetIndex index;
         try {
@@ -258,7 +258,7 @@ public class VersionCreator extends GenericComponentCreator {
         }
         File baseDir = new File(LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getAssetsDir());
         try {
-            AssetsFileDownloader.downloadAssets(baseDir, index, assetIndexUrl, false);
+            AssetsFileDownloader.downloadAssets(baseDir, index, assetIndexUrl, false, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to download assets: failed to download assets", e);
         }
@@ -289,7 +289,7 @@ public class VersionCreator extends GenericComponentCreator {
     }
 
     private void addLibraries(LauncherVersionDetails details) throws ComponentCreationException {
-        setStatus(CreationStatus.VERSION_LIBRARIES);
+        setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, null));
         if(mcVersion.getLibraries() == null) {
             throw new ComponentCreationException("Unable to add libraries: libraries is null");
         }
@@ -300,7 +300,7 @@ public class VersionCreator extends GenericComponentCreator {
 
         List<String> result;
         try {
-            result = MinecraftVersionFileDownloader.downloadVersionLibraries(mcVersion.getLibraries(), baseDir, List.of());
+            result = MinecraftVersionFileDownloader.downloadVersionLibraries(mcVersion.getLibraries(), baseDir, List.of(), status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add libraries: failed to download libraries", e);
         }

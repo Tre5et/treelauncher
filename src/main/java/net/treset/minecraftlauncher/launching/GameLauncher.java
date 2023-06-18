@@ -36,9 +36,6 @@ public class GameLauncher {
     }
 
     public void launch(boolean cleanupActiveInstance) throws GameLaunchException {
-        if(!files.isValid()) {
-            throw new GameLaunchException("Unable to launch game: files are not valid");
-        }
         try {
             files.reloadAll();
         } catch (FileLoadException e) {
