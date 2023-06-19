@@ -18,8 +18,10 @@ import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.BiConsumer;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,8 @@ public class ModsSearchElement extends UiElement {
     @FXML private TextField searchField;
     @FXML private Label loadingLabel;
     @FXML private VBox resultsContainer;
+    @FXML private Button addButton;
+    @FXML private AddModElement addModElementController;
 
     private String gameVersion;
     private String loaderType;
@@ -38,16 +42,18 @@ public class ModsSearchElement extends UiElement {
     private Runnable backCallback;
     private List<LauncherMod> currentMods;
 
-    public void init(String gameVersion, String loaderType, TriConsumer<ModVersionData, LauncherMod, ModListElement> installCallback, Runnable backCallback, List<LauncherMod> currentMods) {
+    public void init(String gameVersion, String loaderType, TriConsumer<ModVersionData, LauncherMod, ModListElement> installCallback, Runnable backCallback, List<LauncherMod> currentMods, BiConsumer<LauncherMod, File> addCallback) {
         this.gameVersion = gameVersion;
         this.loaderType = loaderType;
         this.installCallback = installCallback;
         this.backCallback = backCallback;
         this.currentMods = currentMods;
+        addModElementController.init(addCallback);
     }
 
     @Override
     public void beforeShow(Stage stage) {
+        addModElementController.setVisible(false);
         searchField.setText(null);
         resultsContainer.getChildren().clear();
     }
@@ -63,6 +69,11 @@ public class ModsSearchElement extends UiElement {
         resultsContainer.getChildren().clear();
         loadingLabel.setVisible(true);
         new Thread(this::populateResults).start();
+    }
+
+    @FXML
+    private void onAddButtonClicked() {
+        addModElementController.setVisible(true);
     }
 
     @FXML

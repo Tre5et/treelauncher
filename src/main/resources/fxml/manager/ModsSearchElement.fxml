@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
+<?import javafx.geometry.Insets?>
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsSearchElement">
    <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <HBox alignment="CENTER_LEFT">
@@ -23,5 +24,12 @@
       <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
          <VBox fx:id="resultsContainer" alignment="TOP_CENTER" />
       </ScrollPane>
+      <HBox>
+         <padding>
+            <Insets topRightBottomLeft="5.0" />
+         </padding>
+         <Button fx:id="addButton" text="%manager.mods.search.button.add" onMouseClicked="#onAddButtonClicked" HBox.hgrow="ALWAYS"/>
+      </HBox>
    </VBox>
+   <fx:include fx:id="addModElement" source="AddModElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
 </AnchorPane>
