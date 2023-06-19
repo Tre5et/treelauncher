@@ -22,6 +22,7 @@ import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -89,7 +90,7 @@ public class ModsManagerElement extends UiElement {
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
-        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods());
+        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
         onVersionSelected();
         reloadMods();
     }
@@ -108,7 +109,7 @@ public class ModsManagerElement extends UiElement {
     public void beforeShow(Stage stage){
         if(details == null || details.getValue().getMods() == null)
             return;
-        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods());
+        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
         snapshotsCheck.setSelected(false);
         versionSelector.getItems().clear();
         versionSelector.setDisable(true);
@@ -267,6 +268,24 @@ public class ModsManagerElement extends UiElement {
                 source.afterShow(null);
             });
         }).start();
+    }
+
+    private void addMod(LauncherMod mod, File source) {
+        try {
+            FileUtil.copyFile(source.getAbsolutePath(), details.getKey().getDirectory() + mod.getFileName());
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
+
+        ArrayList<LauncherMod> mods = new ArrayList<>(details.getValue().getMods());
+        mods.add(mod);
+        details.getValue().setMods(mods);
+        try {
+            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
+        reloadMods();
     }
 
     private LauncherMod downloadAndAdd(ModVersionData versionData, ArrayList<LauncherMod> mods) {

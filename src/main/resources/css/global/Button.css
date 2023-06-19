@@ -100,3 +100,35 @@
 .button.invisible:disabled > .icon {
     -fx-icon-color: -fx-button-disabled-background;
 }
+.button {
+    -fx-border-width: 2px;
+    -fx-border-radius: 3px;
+}
+
+.button.neutral {
+    -fx-text-fill: -fx-text;
+    -fx-background-color: transparent;
+}
+
+.button.neutral:hover {
+    -fx-text-fill: #eeeeee;
+}
+
+.button.neutral:pressed {
+    -fx-text-fill: #cccccc;
+}
+
+.button.negative {
+    -fx-background-color: #e00000;
+    -fx-border-color: #d00000;
+}
+
+.button.negative:hover {
+    -fx-background-color: #ff0000;
+    -fx-border-color: #e00000;
+}
+
+.button.negative:pressed {
+    -fx-background-color: #b00000;
+    -fx-border-color: #ba0000;
+}

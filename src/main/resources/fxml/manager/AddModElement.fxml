@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<AnchorPane fx:id="rootPane" visible="false" styleClass="element" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="net.treset.minecraftlauncher.ui.manager.AddModElement">
+    <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets topRightBottomLeft="10.0" />
+        </padding>
+        <TextField fx:id="modName" promptText="%manager.mods.add.prompt.name" />
+        <Label visible="false" styleClass="error" text="Placeholder" />
+        <HBox>
+            <TextField fx:id="pathField" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
+            <Button onAction="#onFileSelectorClicked" styleClass="invisible">
+                <graphic>
+                    <FontIcon iconLiteral="mdoal-insert_drive_file:28" styleClass="icon" />
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%settings.tooltip.select" />
+                </tooltip>
+            </Button>
+        </HBox>
+        <Label fx:id="fileError" visible="false" styleClass="error" text="%manager.mods.add.error.file" />
+        <TextField fx:id="versionField" promptText="%manager.mods.add.prompt.version" />
+        <Label fx:id="versionError" visible="false" styleClass="error" text="%manager.mods.add.error.version" />
+        <TextField fx:id="modrinthId" promptText="%manager.mods.add.prompt.modrinth" />
+        <Label fx:id="modrinthError" visible="false" text="%manager.mods.add.error.modrinth" >
+            <styleClass>error</styleClass>
+        </Label>
+        <TextField fx:id="curseforgeId" promptText="%manager.mods.add.prompt.curseforge" />
+        <Label fx:id="curseforgeError" visible="false" styleClass="error" text="%manager.mods.add.error.curseforge" />
+        <HBox spacing="10">
+            <Button styleClass="neutral" text="%manager.mods.add.button.cancel" onAction="#onCancelButtonClicked" />
+            <Button styleClass="positive" text="%manager.mods.add.button.add" onAction="#onAddButtonClicked" />
+        </HBox>
+    </VBox>
+</AnchorPane>

@@ -111,7 +111,7 @@ public class ModListElement extends UiElement {
     }
 
     private void populateVersionChoice() {
-        if(modData == null && mod != null) {
+        if(modData == null && mod != null && mod.getDownloads() != null && !mod.getDownloads().isEmpty()) {
             try {
                 modData = mod.getModData();
             } catch (FileDownloadException e) {
@@ -136,10 +136,10 @@ public class ModListElement extends UiElement {
     }
 
     private void loadImage() {
-        if(mod != null) {
+        if(mod != null && mod.getIconUrl() != null) {
             Image logo = new Image(mod.getIconUrl());
             Platform.runLater(() -> logoImage.setImage(logo));
-        } else if(modData != null) {
+        } else if(modData != null && modData.getIconUrl() != null) {
             Image logo = new Image(modData.getIconUrl());
             Platform.runLater(() -> logoImage.setImage(logo));
         }
