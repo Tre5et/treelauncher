@@ -33,9 +33,8 @@ public class UiLoader {
 
         stage.setTitle(LauncherApplication.stringLocalizer.getFormatted(title, args));
         Scene scene = new Scene(root);
-        scene.setFill(Color.BLACK);
+        scene.setFill(Color.WHITE);
         stage.setScene(scene);
-        T controller = loader.getController();
-        return controller;
+        return loader.getController();
     }
 }

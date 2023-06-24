@@ -1,20 +1,20 @@
 .element {
+    -fx-translate-y: -1px;
     -fx-padding: 0;
-    -fx-background-radius: 10px;
-    -fx-background-color: -fx-background-secondary;
+    -fx-background-radius: 5px;
+    -fx-background-color: white;
 }
 
 .label.title {
     -fx-font-size: 24pt;
+    -fx-translate-y: 5px;
+    -fx-text-fill: -fx-primary-950;
 }
 
 .title-container {
     -fx-background-radius: 5px;
     -fx-background-image: url("/img/banner.png");
     -fx-background-position: center center;
-    -fx-background-color: linear-gradient(-fx-background-secondary, -fx-primary-400 70%);
-}
-
-.title-button {
-    -fx-icon-color: -fx-white;
+    -fx-background-size: 2560px;
+    -fx-background-color: linear-gradient(transparent, -fx-primary-400 90%);
 }
