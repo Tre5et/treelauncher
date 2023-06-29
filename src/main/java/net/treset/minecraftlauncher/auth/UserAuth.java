@@ -2,6 +2,8 @@ package net.treset.minecraftlauncher.auth;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -9,12 +11,21 @@ import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
+import net.treset.mc_version_loader.VersionLoader;
+import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.mojang.MinecraftProfile;
+import net.treset.mc_version_loader.mojang.MinecraftProfileProperty;
+import net.treset.mc_version_loader.mojang.MinecraftProfileTextures;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.ImageUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.sql.Connection;
+import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -174,5 +185,40 @@ public class UserAuth {
 
     public boolean isLoggedIn() {
         return loggedIn;
+    }
+
+    private Image userIcon;
+
+    public Image getUserIcon() throws FileDownloadException {
+        if(userIcon == null) {
+            userIcon = loadUserIcon();
+        }
+        return userIcon;
+    }
+
+    private static final int[] headBaseUVWH = new int[]{8, 8, 8, 8};
+    private static final int[] headTopUVWH = new int[]{40, 8, 8, 8};
+
+    public Image loadUserIcon() throws FileDownloadException {
+        MinecraftProfile profile = VersionLoader.getMinecraftProfile(minecraftUser.uuid());
+        if(profile.getProperties() == null || profile.getProperties().isEmpty()) {
+            throw new FileDownloadException("No properties found for user " + minecraftUser.name());
+        }
+        MinecraftProfileTextures textures = profile.getProperties().stream().map(MinecraftProfileProperty::getTextures).filter(Objects::nonNull).findFirst().orElse(null);
+        if(textures == null) {
+            throw new FileDownloadException("No textures found for user " + minecraftUser.name());
+        }
+        Image texture;
+        try {
+            BufferedImage img = ImageIO.read(new URL(textures.getTextures().getSKIN().getUrl()));
+            texture = ImageUtil.getImage(img);
+        } catch (IOException e) {
+            throw new FileDownloadException("Failed to download skin for user " + minecraftUser.name(), e);
+        }
+
+        Image top = new WritableImage(texture.getPixelReader(), headTopUVWH[0], headTopUVWH[1], headTopUVWH[2], headTopUVWH[3]);
+        Image base = new WritableImage(texture.getPixelReader(), headBaseUVWH[0], headBaseUVWH[1], headBaseUVWH[2], headBaseUVWH[3]);
+
+        return ImageUtil.combine(base, top);
     }
 }

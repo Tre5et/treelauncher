@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
+<?import javafx.scene.image.ImageView?>
 <GridPane stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500"
           xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
@@ -151,25 +152,28 @@
    </HBox>
    <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" styleClass="navbar-cluster"
          GridPane.columnIndex="2">
-      <Button fx:id="profileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
-              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onProfileButtonClicked">
-         <styleClass>
-            <String fx:value="invisible"/>
-         </styleClass>
-         <graphic>
-            <FontIcon iconLiteral="mdoal-account_box:38">
-               <styleClass>
-                  <String fx:value="icon"/>
-               </styleClass>
-            </FontIcon>
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.profile"/>
-         </tooltip>
-      </Button>
+      <StackPane>
+         <Button fx:id="profileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
+                 minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onProfileButtonClicked">
+            <styleClass>
+               <String fx:value="invisible"/>
+            </styleClass>
+            <graphic>
+               <FontIcon iconLiteral="mdoal-account_box:38">
+                  <styleClass>
+                     <String fx:value="icon"/>
+                  </styleClass>
+               </FontIcon>
+            </graphic>
+            <cursor>
+               <Cursor fx:constant="HAND"/>
+            </cursor>
+            <tooltip>
+               <Tooltip text="%nav.tooltip.profile"/>
+            </tooltip>
+         </Button>
+         <ImageView fx:id="profileImage" mouseTransparent="true" smooth="false" />
+      </StackPane>
       <GridPane.margin>
          <Insets/>
       </GridPane.margin>

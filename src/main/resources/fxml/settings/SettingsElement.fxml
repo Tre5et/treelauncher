@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
+<?import javafx.scene.image.ImageView?>
 <AnchorPane fx:id="rootPane" styleClass="element-root" stylesheets="@/css/settings/SettingsElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.settings.SettingsElement">
     <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" spacing="20">
@@ -40,6 +41,7 @@
                 <VBox alignment="TOP_CENTER" spacing="2">
                     <Label text="%settings.label.user" />
                     <Label fx:id="usernameLabel" styleClass="username" text="Error getting name" />
+                    <ImageView fx:id="skinView" />
                     <Label fx:id="uuidLabel" styleClass="uuid" text="Error getting uuid" />
                     <Button fx:id="logoutButton" onAction="#onLogoutButtonClicked" styleClass="logout" text="%settings.button.logout">
                         <VBox.margin>

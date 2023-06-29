@@ -1,24 +1,23 @@
 package net.treset.minecraftlauncher.ui.settings;
 
-import com.sun.javafx.application.HostServicesDelegate;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.treset.minecraftlauncher.util.ImageUtil;
 
 import java.awt.*;
 import java.io.File;
@@ -27,8 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class SettingsElement extends UiElement {
-    private static final Logger LOGGER = LogManager.getLogger(SettingsElement.class);
-
     @FXML private AnchorPane rootPane;
     @FXML private ComboBox<String> languageComboBox;
     @FXML private Label languageRestartHint;
@@ -36,7 +33,7 @@ public class SettingsElement extends UiElement {
     @FXML private CheckBox removeCheckBox;
     @FXML private Label usernameLabel;
     @FXML private Label uuidLabel;
-    @FXML private Button logoutButton;
+    @FXML private ImageView skinView;
     @FXML private PopupElement popupController;
 
     private Runnable logoutCallback;
@@ -51,12 +48,24 @@ public class SettingsElement extends UiElement {
         StringLocalizer.Language language = LauncherApplication.stringLocalizer.getLanguage();
         languageComboBox.getSelectionModel().select((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
 
-        languageComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::onLanguageComboBoxChanged);
-        });
+        languageComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onLanguageComboBoxChanged));
 
         usernameLabel.setText(LauncherApplication.userAuth.getMinecraftUser().name());
         uuidLabel.setText(LauncherApplication.userAuth.getMinecraftUser().uuid());
+
+        new Thread(this::loadSkin).start();
+    }
+
+    private void loadSkin() {
+        if(!LauncherApplication.userAuth.isLoggedIn()) {
+            return;
+        }
+        try {
+            Image profileImage = ImageUtil.rescale(LauncherApplication.userAuth.getUserIcon(), 6);
+            Platform.runLater(() -> skinView.setImage(profileImage));
+        } catch (FileDownloadException e) {
+            LauncherApplication.displayError(e);
+        }
     }
 
     @FXML
