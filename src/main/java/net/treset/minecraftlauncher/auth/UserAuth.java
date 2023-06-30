@@ -11,11 +11,11 @@ import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
-import net.treset.mc_version_loader.VersionLoader;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.mojang.MinecraftProfile;
 import net.treset.mc_version_loader.mojang.MinecraftProfileProperty;
 import net.treset.mc_version_loader.mojang.MinecraftProfileTextures;
+import net.treset.mc_version_loader.mojang.MojangUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.ImageUtil;
 import org.apache.logging.log4j.LogManager;
@@ -200,7 +200,7 @@ public class UserAuth {
     private static final int[] headTopUVWH = new int[]{40, 8, 8, 8};
 
     public Image loadUserIcon() throws FileDownloadException {
-        MinecraftProfile profile = VersionLoader.getMinecraftProfile(minecraftUser.uuid());
+        MinecraftProfile profile = MojangUtil.getMinecraftProfile(minecraftUser.uuid());
         if(profile.getProperties() == null || profile.getProperties().isEmpty()) {
             throw new FileDownloadException("No properties found for user " + minecraftUser.name());
         }

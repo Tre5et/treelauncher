@@ -1,15 +1,10 @@
 package net.treset.minecraftlauncher.creation;
 
 import net.treset.mc_version_loader.exception.FileDownloadException;
-import net.treset.mc_version_loader.files.JavaFileDownloader;
-import net.treset.mc_version_loader.files.Sources;
-import net.treset.mc_version_loader.java.JavaFile;
-import net.treset.mc_version_loader.java.JavaRuntime;
-import net.treset.mc_version_loader.java.JavaRuntimeOs;
-import net.treset.mc_version_loader.java.JavaRuntimeRelease;
+import net.treset.mc_version_loader.java.*;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
-import net.treset.mc_version_loader.os.OsDetails;
+import net.treset.mc_version_loader.util.OsUtil;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 
@@ -32,9 +27,9 @@ public class JavaComponentCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Failed to create java component: invalid data");
         }
 
-        JavaRuntime java;
+        JavaRuntimes java;
         try {
-            java = JavaRuntime.fromJson(Sources.getJavaRuntimeJson());
+            java = JavaUtil.getJavaRuntimes();
         } catch (FileDownloadException e) {
             attemptCleanup();
             throw new ComponentCreationException("Failed to create java component: failed to download java runtime json", e);
@@ -42,7 +37,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
 
         String osIdentifier;
         try {
-            osIdentifier = OsDetails.getJavaIdentifier();
+            osIdentifier = OsUtil.getJavaIdentifier();
         } catch (IllegalArgumentException e) {
             attemptCleanup();
             throw new ComponentCreationException("Failed to create java component: failed to get os identifier", e);
@@ -75,7 +70,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
 
         List<JavaFile> files;
         try {
-            files = JavaFile.fromJsonManifest(Sources.getFileFromUrl(release.getManifest().getUrl()));
+            files = JavaUtil.getJavaFile(release.getManifest().getUrl());
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Failed to create java component: failed to download java file manifest", e);
         }
@@ -83,7 +78,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
         File baseDir = new File(getNewManifest().getDirectory());
 
         try {
-            JavaFileDownloader.downloadJavaFiles(baseDir, files, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.JAVA, status)));
+            JavaUtil.downloadJavaFiles(baseDir, files, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.JAVA, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Failed to create java component: failed to download java files", e);
         }

@@ -7,26 +7,16 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import net.treset.mc_version_loader.VersionLoader;
-import net.treset.mc_version_loader.exception.FileDownloadException;
-import net.treset.mc_version_loader.fabric.FabricProfile;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
-import net.treset.mc_version_loader.files.Sources;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
-import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.util.ui.VersionCreationHelper;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.treset.minecraftlauncher.util.ui.VersionCreationHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -59,9 +49,7 @@ public class VersionCreatorElement extends UiElement {
 
         this.modsActivateCallback = modsActivateCallback;
 
-        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::updateLoaderState);
-        });
+        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateLoaderState));
     }
 
     public String getGameVersion() {
@@ -140,7 +128,6 @@ public class VersionCreatorElement extends UiElement {
     }
 
     public boolean checkCreateReady() {
-        boolean result = !versionChoice.getSelectionModel().isEmpty() && ("Vanilla".equals(typeChoice.getValue()) || "Fabric".equals(typeChoice.getValue()) && !loaderChoice.getSelectionModel().isEmpty());
-        return result;
+        return !versionChoice.getSelectionModel().isEmpty() && ("Vanilla".equals(typeChoice.getValue()) || "Fabric".equals(typeChoice.getValue()) && !loaderChoice.getSelectionModel().isEmpty());
     }
 }

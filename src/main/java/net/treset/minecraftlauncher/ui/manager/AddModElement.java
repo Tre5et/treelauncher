@@ -7,11 +7,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.exception.FileDownloadException;
-import net.treset.mc_version_loader.files.Sources;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
-import net.treset.mc_version_loader.mods.curseforge.CurseforgeMod;
-import net.treset.mc_version_loader.mods.modrinth.ModrinthMod;
+import net.treset.mc_version_loader.mods.ModUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import org.apache.logging.log4j.util.BiConsumer;
@@ -83,8 +81,7 @@ public class AddModElement extends UiElement {
     private boolean modrinthValid() {
         if(!modrinthId.getText().isEmpty()) {
             try {
-                String result = Sources.getFileFromHttpGet(String.format(Sources.getModrinthProjectUrl(), modrinthId.getText()), Sources.getModrinthHeaders(), List.of());
-                return result != null && !result.isEmpty();
+                return ModUtil.checkModrinthValid(modrinthId.getText());
             } catch (FileDownloadException e) {
                 return false;
             }
@@ -96,8 +93,7 @@ public class AddModElement extends UiElement {
         if(!curseforgeId.getText().isEmpty()) {
             if(!curseforgeId.getText().matches("[0-9]+")) return false;
             try {
-                String result = Sources.getFileFromHttpGet(String.format(Sources.getCurseforgeProjectUrl(), Integer.parseInt(curseforgeId.getText())), Sources.getCurseforgeHeaders(), List.of());
-                return result != null && !result.isEmpty();
+                return ModUtil.checkCurseforgeValid(Integer.parseInt(curseforgeId.getText()));
             } catch (FileDownloadException e) {
                 return false;
             }
@@ -108,14 +104,12 @@ public class AddModElement extends UiElement {
     private String getIconUrl() {
         if(!modrinthId.getText().isEmpty()) {
             try {
-                String result = Sources.getFileFromHttpGet(String.format(Sources.getModrinthProjectUrl(), modrinthId.getText()), Sources.getModrinthHeaders(), List.of());
-                return ModrinthMod.fromJson(result).getIconUrl();
+                return ModUtil.getModrinthMod(modrinthId.getText()).getIconUrl();
             } catch (FileDownloadException ignored) {}
         }
         if(!curseforgeId.getText().isEmpty()) {
             try {
-                String result = Sources.getFileFromHttpGet(String.format(Sources.getCurseforgeProjectUrl(), Integer.parseInt(curseforgeId.getText())), Sources.getCurseforgeHeaders(), List.of());
-                return CurseforgeMod.fromJson(result).getIconUrl();
+                return ModUtil.getCurseforgeMod(Integer.parseInt(curseforgeId.getText())).getIconUrl();
             } catch (FileDownloadException ignored) {}
         }
         return null;

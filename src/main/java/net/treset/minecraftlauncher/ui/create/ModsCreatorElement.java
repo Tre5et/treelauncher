@@ -6,11 +6,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import net.treset.mc_version_loader.VersionLoader;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
+import net.treset.mc_version_loader.minecraft.MinecraftUtil;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.ModsCreator;
@@ -111,9 +111,7 @@ public class ModsCreatorElement extends UiElement {
         }
         if(selectVersion) {
             populateVersionChoice();
-            createVersionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                Platform.runLater(this::onVersionUpdated);
-            });
+            createVersionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionUpdated));
         }
     }
 
@@ -125,7 +123,7 @@ public class ModsCreatorElement extends UiElement {
         new Thread(() -> {
             List<MinecraftVersion> minecraftVersions;
             try {
-                minecraftVersions = createSnapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+                minecraftVersions = createSnapshotsCheck.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases();
             } catch (FileDownloadException e) {
                 LOGGER.error("Failed to get versions", e);
                 return;
@@ -238,8 +236,7 @@ public class ModsCreatorElement extends UiElement {
     }
 
     public boolean checkCreateReady() {
-        boolean result = (modsComponents != null && typeConversion != null && modsManifest != null && gameManifest != null && (((gameVersion != null || (selectVersion && createVersionChoice.getSelectionModel().getSelectedItem() != null)) && modsType != null && radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
-        return result;
+        return (modsComponents != null && typeConversion != null && modsManifest != null && gameManifest != null && (((gameVersion != null || (selectVersion && createVersionChoice.getSelectionModel().getSelectedItem() != null)) && modsType != null && radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
     }
 
     public String getGameVersion() {

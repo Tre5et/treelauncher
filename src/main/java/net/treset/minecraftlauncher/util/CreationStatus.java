@@ -1,6 +1,6 @@
 package net.treset.minecraftlauncher.util;
 
-import net.treset.mc_version_loader.files.DownloadStatus;
+import net.treset.mc_version_loader.util.DownloadStatus;
 import net.treset.minecraftlauncher.LauncherApplication;
 
 public class CreationStatus {

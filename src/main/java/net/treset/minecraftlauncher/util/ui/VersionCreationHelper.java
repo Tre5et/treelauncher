@@ -3,14 +3,14 @@ package net.treset.minecraftlauncher.util.ui;
 import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import net.treset.mc_version_loader.VersionLoader;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.fabric.FabricProfile;
+import net.treset.mc_version_loader.fabric.FabricUtil;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
-import net.treset.mc_version_loader.files.Sources;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
+import net.treset.mc_version_loader.minecraft.MinecraftUtil;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -57,12 +57,8 @@ public class VersionCreationHelper {
         typeChoice.getItems().clear();
         typeChoice.getItems().addAll("Vanilla", "Fabric");
 
-        versionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::onVersionChanged);
-        });
-        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::onTypeChanged);
-        });
+        versionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionChanged));
+        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onTypeChanged));
     }
 
     public void beforeShow() {
@@ -101,7 +97,7 @@ public class VersionCreationHelper {
         updateLoaderChoice();
         new Thread(() -> {
             try {
-                vanillaVersions = snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases();
+                vanillaVersions = snapshotsCheck.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases();
             } catch (FileDownloadException e) {
                 LOGGER.error("Failed to load versions", e);
                 return;
@@ -127,7 +123,7 @@ public class VersionCreationHelper {
             loaderChoice.setVisible(true);
             new Thread(() -> {
                 try {
-                    fabricVersions = FabricVersionDetails.fromJsonArray(Sources.getFabricForMinecraftVersion(versionChoice.getValue().getId()));
+                    fabricVersions = FabricUtil.getFabricVersions(versionChoice.getValue().getId());
                 } catch (FileDownloadException e) {
                     LOGGER.error("Failed to load fabric versions", e);
                     return;
@@ -155,7 +151,7 @@ public class VersionCreationHelper {
             }
             MinecraftVersionDetails details;
             try {
-                details = MinecraftVersionDetails.fromJson(Sources.getFileFromUrl(version.getUrl()));
+                details = MinecraftUtil.getVersionDetails(version.getUrl());
             } catch (FileDownloadException e) {
                 throw new ComponentCreationException("Could not get Minecraft version details", e);
             }
@@ -167,7 +163,7 @@ public class VersionCreationHelper {
             }
             FabricProfile profile;
             try {
-                profile = FabricProfile.fromJson(Sources.getFileFromHttpGet("https://meta.fabricmc.net/v2/versions/loader/" + versionChoice.getValue() + "/" + details.getLoader().getVersion() + "/profile/json", List.of(), List.of()));
+                profile = FabricUtil.getFabricProfile(versionChoice.getValue().getId(), details.getLoader().getVersion());
             } catch (FileDownloadException e) {
                 throw new ComponentCreationException("Could not get Fabric profile", e);
             }

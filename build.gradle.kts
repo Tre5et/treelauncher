@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation("net.hycrafthd:minecraft_authenticator:3.0.4")
-    implementation("net.treset:mc-version-loader:0.2.13")
+    implementation("net.treset:mc-version-loader:0.3.1")
     implementation("org.apache.logging.log4j:log4j-api:2.20.0")
     implementation("org.apache.logging.log4j:log4j-core:2.20.0")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")

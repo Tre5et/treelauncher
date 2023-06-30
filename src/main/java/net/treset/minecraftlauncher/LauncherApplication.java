@@ -10,12 +10,10 @@ import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Objects;
 
 
@@ -90,13 +88,13 @@ public class LauncherApplication extends Application {
 
     public static void displayError(Exception e) {
         LOGGER.warn("An error occurred", e);
-        Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.message", e.getMessage())).show());
+        Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.message", e)).show());
     }
 
     public static void displaySevereError(Exception e) {
         LOGGER.error("A SEVERE ERROR OCCURRED", e);
         Platform.runLater(() -> {
-            new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.severe.message", e.getMessage())).showAndWait();
+            new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.severe.message", e)).showAndWait();
             System.exit(-1);
         });
     }

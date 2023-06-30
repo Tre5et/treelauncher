@@ -9,15 +9,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import net.treset.mc_version_loader.VersionLoader;
 import net.treset.mc_version_loader.exception.FileDownloadException;
-import net.treset.mc_version_loader.files.ModFileDownloader;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
+import net.treset.mc_version_loader.minecraft.MinecraftUtil;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.mc_version_loader.mods.ModData;
+import net.treset.mc_version_loader.mods.ModUtil;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
@@ -113,9 +113,7 @@ public class ModsManagerElement extends UiElement {
         snapshotsCheck.setSelected(false);
         versionSelector.getItems().clear();
         versionSelector.setDisable(true);
-        versionSelector.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::onVersionSelected);
-        });
+        versionSelector.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
         popupController.setVisible(false);
         currentModsBox.setVisible(true);
         modSearchController.setVisible(false);
@@ -150,7 +148,7 @@ public class ModsManagerElement extends UiElement {
         versionSelector.getSelectionModel().select(0);
         new Thread(() -> {
             try {
-                List <String> names = (snapshotsCheck.isSelected() ? VersionLoader.getVersions() : VersionLoader.getReleases()).stream()
+                List <String> names = (snapshotsCheck.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases()).stream()
                         .map(MinecraftVersion::getId)
                         .filter(s -> !s.equals(details.getValue().getModsVersion()))
                         .toList();
@@ -291,7 +289,7 @@ public class ModsManagerElement extends UiElement {
     private LauncherMod downloadAndAdd(ModVersionData versionData, ArrayList<LauncherMod> mods) {
         LauncherMod newMod = null;
         try {
-            newMod = ModFileDownloader.downloadModFile(versionData, new File(details.getKey().getDirectory()), true);
+            newMod = ModUtil.downloadModFile(versionData, new File(details.getKey().getDirectory()), true);
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);
         }

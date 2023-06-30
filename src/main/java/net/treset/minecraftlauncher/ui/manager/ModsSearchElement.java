@@ -10,10 +10,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import net.treset.mc_version_loader.VersionLoader;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.mods.ModData;
+import net.treset.mc_version_loader.mods.ModUtil;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import org.apache.logging.log4j.LogManager;
@@ -91,7 +91,7 @@ public class ModsSearchElement extends UiElement {
     private void populateResults() {
         List<ModData> results;
         try {
-            results = VersionLoader.searchCombinedMods(searchField.getText(), gameVersion, loaderType, 20, 0);
+            results = ModUtil.searchCombinedMods(searchField.getText(), gameVersion, loaderType, 20, 0);
         } catch (FileDownloadException e) {
             LOGGER.error("Failed to search for mods", e);
             return;
