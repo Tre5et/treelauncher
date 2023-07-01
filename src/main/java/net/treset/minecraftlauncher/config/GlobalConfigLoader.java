@@ -105,7 +105,7 @@ public class GlobalConfigLoader {
         }
     }
 
-    private static boolean manifestExists(File path) throws IOException {
+    public static boolean manifestExists(File path) throws IOException {
         if(!FileUtil.dirContains(path, LauncherApplication.config.MANIFEST_FILE_NAME)) {
             return false;
         }

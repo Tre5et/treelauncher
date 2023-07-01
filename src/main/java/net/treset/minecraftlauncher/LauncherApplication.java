@@ -10,9 +10,11 @@ import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
+import net.treset.minecraftlauncher.util.FileInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -32,6 +34,16 @@ public class LauncherApplication extends Application {
             config = GlobalConfigLoader.loadConfig();
         } catch (IllegalStateException | IOException e) {
             LOGGER.error("Failed to load config!", e);
+            System.exit(-1);
+            return;
+        }
+
+        try {
+            if(!new File(config.BASE_DIR).exists() || !GlobalConfigLoader.manifestExists(new File(config.BASE_DIR))) {
+                new FileInitializer(new File(config.BASE_DIR)).create();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to initialize directory structure!", e);
             System.exit(-1);
             return;
         }
