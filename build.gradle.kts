@@ -9,7 +9,7 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.1.0"
+val version = "0.2.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.4"
@@ -57,17 +57,13 @@ javafx {
 
 val buildDir = "./jpackage"
 
-task("copyResources", Copy::class) {
-    from("./packageRes").into("$buildDir/jars")
-}
-
 task("copyJar", Copy::class) {
     dependsOn("shadowJar")
     from("./build/libs/minecraft-launcher-all.jar").into("$buildDir/jars")
 }
 
 tasks.jpackage {
-    dependsOn("copyJar", "copyResources")
+    dependsOn("copyJar")
 
     input = "$buildDir/jars"
     destination = "$buildDir/dist"
@@ -88,5 +84,6 @@ tasks.jpackage {
         winShortcutPrompt = true
         winDirChooser = true
         winPerUserInstall = true
+        winUpgradeUuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
     }
 }

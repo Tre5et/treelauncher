@@ -3,12 +3,16 @@ package net.treset.minecraftlauncher.util;
 import net.treset.mc_version_loader.json.JsonParsable;
 import net.treset.mc_version_loader.launcher.LauncherDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class FileInitializer {
+    private static final Logger LOGGER = LogManager.getLogger(FileInitializer.class);
+
     private final File directory;
     private final List<File> dirs;
     private final List<InitializingManifest> files;
@@ -59,7 +63,7 @@ public class FileInitializer {
                 new InitializingManifest("game", null, List.of("mods.json", "saves.json"), "game_data", "manifest.json"),
                 new InitializingManifest("mods", "mods", "game_data", "mods.json"),
                 new InitializingManifest("saves", "saves", "game_data", "saves.json"),
-                new InitializingManifest("instance", "instance", "instance_data", "manifest.json"),
+                new InitializingManifest("instances", "instance", "instance_data", "manifest.json"),
                 new InitializingManifest("javas", "java", "java_data", "manifest.json"),
                 new InitializingManifest("options", "options", "options_data", "manifest.json"),
                 new InitializingManifest("resourcepacks", "resourcepacks", "resourcepack_data", "manifest.json"),
@@ -68,13 +72,15 @@ public class FileInitializer {
     }
 
     public void create() throws IOException {
+        LOGGER.info("Creating default files: directory=" + directory.getAbsolutePath());
+
         if(!directory.isDirectory() || !FileUtil.isDirEmpty(directory)) {
             throw new IOException("Directory is not empty");
         }
 
         for(File dir : dirs) {
             if(!dir.mkdirs()) {
-                throw new IOException("Cannot create directory="+ dir.getAbsolutePath());
+                throw new IOException("Cannot create directory=" + dir.getAbsolutePath());
             }
         }
 

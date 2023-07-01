@@ -16,8 +16,14 @@ import java.nio.file.StandardCopyOption;
 public class GlobalConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger(GlobalConfigLoader.class);
 
+    private static final String filePath = "launcher.conf";
+
     public static Config loadConfig() throws IllegalStateException, IOException {
-        String contents = FileUtil.loadFile("app/launcher.conf");
+        if(!new File(filePath).exists()) {
+            LOGGER.info("No config found, creating default");
+            FileUtil.writeFile(filePath, "path=data");
+        }
+        String contents = FileUtil.loadFile(filePath);
         if(contents == null) {
             throw new IllegalStateException("Unable to load launcher.conf");
         }
@@ -43,7 +49,7 @@ public class GlobalConfigLoader {
     }
 
     public static void updateLanguage(StringLocalizer.Language language) throws IOException {
-        String contents = FileUtil.loadFile("app/launcher.conf");
+        String contents = FileUtil.loadFile(filePath);
         String[] lines = contents.split("\n");
         StringBuilder newContents = new StringBuilder();
         boolean found = false;
@@ -59,7 +65,7 @@ public class GlobalConfigLoader {
             newContents.append("language=").append(language.name()).append("\n");
         }
 
-        FileUtil.writeFile("app/launcher.conf", newContents.toString());
+        FileUtil.writeFile(filePath, newContents.toString());
     }
 
     public static void updatePath(File path, boolean removeOld) throws IOException {
@@ -71,7 +77,7 @@ public class GlobalConfigLoader {
             throw new IOException("Path is a child of the current directory");
         }
 
-        String contents = FileUtil.loadFile("app/launcher.conf");
+        String contents = FileUtil.loadFile(filePath);
         String[] lines = contents.split("\n");
         StringBuilder newContents = new StringBuilder();
         for(String line : lines) {
@@ -97,7 +103,7 @@ public class GlobalConfigLoader {
         LOGGER.debug("Updating config");
         String oldPath = LauncherApplication.config.BASE_DIR;
         LauncherApplication.config.BASE_DIR = path.getAbsolutePath() + "/";
-        FileUtil.writeFile("app/launcher.conf", newContents.toString());
+        FileUtil.writeFile(filePath, newContents.toString());
 
         if(removeOld) {
             LOGGER.debug("Removing old directory");

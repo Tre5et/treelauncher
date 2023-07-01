@@ -51,5 +51,4 @@ bin/
 */processedMod/*
 */remappedJars/*
 logs/
-launcher_mockup/*
-/launcher_mockup/
+/data/
