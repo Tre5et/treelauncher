@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -38,16 +37,12 @@
             </Label>
             <Button fx:id="continueButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
                     minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onContinueButtonClicked"
-                    visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    styleClass="invisible" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2">
                 <GridPane.margin>
                     <Insets bottom="20.0" right="20.0"/>
                 </GridPane.margin>
                 <graphic>
-                    <FontIcon iconLiteral="mdal-chevron_right:48">
-                        <styleClass>
-                            <String fx:value="button-icon"/>
-                        </styleClass>
-                    </FontIcon>
+                    <FontIcon iconLiteral="bi-caret-right-square-fill:48" styleClass="icon" />
                 </graphic>
             </Button>
         </GridPane>

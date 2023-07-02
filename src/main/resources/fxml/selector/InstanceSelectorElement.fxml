@@ -22,7 +22,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="10" styleClass="title-container">
                     <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onPlayButtonClicked" styleClass="invisible">
                         <graphic>
-                            <FontIcon iconLiteral="mdomz-play_arrow:48" styleClass="icon" />
+                            <FontIcon iconLiteral="bi-play-fill:48" styleClass="icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%selector.instance.tooltip.play" />
@@ -31,7 +31,7 @@
                     <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" HBox.hgrow="ALWAYS" />
                     <Button fx:id="folderButton" onMouseClicked="#onFolderButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible">
                         <graphic>
-                            <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
+                            <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%selector.component.tooltip.folder" />
@@ -39,7 +39,7 @@
                     </Button>
                     <Button fx:id="deleteButton" onAction="#onDeleteButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible" >
                         <graphic>
-                            <FontIcon iconLiteral="mdoal-delete_forever:48" styleClass="icon" />
+                            <FontIcon iconLiteral="bi-trash:36" styleClass="icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%selector.component.tooltip.delete" />
@@ -56,7 +56,7 @@
                 <HBox styleClass="title-container" alignment="CENTER_LEFT" spacing="10">
                     <Button fx:id="componentFolderButton" disable="true" onMouseClicked="#onComponentFolderButtonClicked" styleClass="invisible">
                         <graphic>
-                            <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
+                            <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%selector.component.tooltip.folder" />

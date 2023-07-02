@@ -17,7 +17,7 @@
             <TextField fx:id="pathField" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
             <Button onAction="#onFileSelectorClicked" styleClass="invisible">
                 <graphic>
-                    <FontIcon iconLiteral="mdoal-insert_drive_file:28" styleClass="icon" />
+                    <FontIcon iconLiteral="bi-file-earmark-code:28" styleClass="icon" />
                 </graphic>
                 <tooltip>
                     <Tooltip text="%settings.tooltip.select" />

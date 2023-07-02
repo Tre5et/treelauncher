@@ -24,7 +24,7 @@
         </HBox>
         <Button fx:id="changeButton" disable="true" onMouseClicked="#onChangeButtonClicked" styleClass="invisible" GridPane.columnIndex="1" GridPane.rowSpan="2">
             <graphic>
-                <FontIcon iconLiteral="mdomz-sync:32" styleClass="icon" />
+                <FontIcon iconLiteral="bi-arrow-repeat:32" styleClass="icon" />
             </graphic>
         </Button>
     </GridPane>

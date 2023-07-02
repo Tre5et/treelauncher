@@ -46,7 +46,7 @@
                 </ImageView>
                 <Button fx:id="installButton" onMouseClicked="#onInstallButtonClicked" styleClass="invisible">
                     <graphic>
-                        <FontIcon iconLiteral="mdoal-cloud_download:32" styleClass="icon" />
+                        <FontIcon iconLiteral="bi-cloud-arrow-down:32" styleClass="icon" />
                     </graphic>
                 </Button>
                 <ComboBox fx:id="versionSelector" promptText="%manager.mods.prompt.version" HBox.hgrow="ALWAYS" />
@@ -59,7 +59,7 @@
                 </Button>
                 <Button fx:id="deleteButton" onMouseClicked="#onDeleteButtonClicked" styleClass="invisible">
                     <graphic>
-                        <FontIcon iconLiteral="mdoal-delete:32" styleClass="icon" />
+                        <FontIcon iconLiteral="bi-trash:32" styleClass="icon" />
                     </graphic>
                 </Button>
             </HBox>

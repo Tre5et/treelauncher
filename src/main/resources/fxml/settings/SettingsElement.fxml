@@ -28,7 +28,7 @@
                         <TextField fx:id="pathField" alignment="CENTER_RIGHT" text="ERROR LOADING CURRENT PATH!" />
                         <Button onAction="#onFileSelectorClicked" styleClass="invisible">
                             <graphic>
-                                <FontIcon iconLiteral="mdoal-insert_drive_file:28" styleClass="icon" />
+                                <FontIcon iconLiteral="bi-folder2-open:28" styleClass="icon" />
                             </graphic>
                             <tooltip>
                                 <Tooltip text="%settings.tooltip.select" />
@@ -55,7 +55,10 @@
                         <Label styleClass="hint" text="%settings.version.version" />
                         <Label styleClass="hint" text="%launcher.version" />
                     </HBox>
-                    <Button onAction="#onSourceButtonClicked" text="github">
+                    <Button onAction="#onSourceButtonClicked" styleClass="invisible" >
+                        <graphic>
+                            <FontIcon iconLiteral="bi-github:24" styleClass="icon" />
+                        </graphic>
                     </Button>
                 </VBox>
             </VBox>

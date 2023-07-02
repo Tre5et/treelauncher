@@ -27,14 +27,19 @@ repositories {
     }
 }
 
+val ikonliPacks = listOf(
+    "ikonli-bootstrapicons-pack"
+)
+
 dependencies {
     implementation("net.hycrafthd", "minecraft_authenticator", mcAuthenticatorVersion)
     implementation("net.treset", "mc-version-loader", mcVersionLoaderVersion)
     implementation("org.apache.logging.log4j", "log4j-api", log4jVersion)
     implementation("org.apache.logging.log4j", "log4j-core", log4jVersion)
     implementation("org.kordamp.ikonli", "ikonli-javafx", ikonliVersion)
-    implementation("org.kordamp.ikonli", "ikonli-material2-pack", ikonliVersion)
-    implementation("org.kordamp.ikonli", "ikonli-fontawesome5-pack", ikonliVersion)
+    for (pack in ikonliPacks) {
+        implementation("org.kordamp.ikonli", pack, ikonliVersion)
+    }
 }
 
 tasks.jar {

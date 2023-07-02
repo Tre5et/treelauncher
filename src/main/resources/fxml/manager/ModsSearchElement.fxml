@@ -10,13 +10,13 @@
       <HBox alignment="CENTER_LEFT">
          <Button fx:id="backButton" onMouseClicked="#onBackButtonClicked" styleClass="invisible" HBox.hgrow="NEVER">
             <graphic>
-               <FontIcon iconLiteral="mdoal-arrow_back_ios:36" styleClass="icon" />
+               <FontIcon iconLiteral="bi-chevron-left:36" styleClass="icon" />
             </graphic>
          </Button>
          <TextField fx:id="searchField" onKeyReleased="#onSearchKeyPress" promptText="%manager.mods.search.prompt.search" styleClass="search" HBox.hgrow="ALWAYS" />
          <Button fx:id="searchButton" onMouseClicked="#onSearchButtonClicked" styleClass="invisible" HBox.hgrow="NEVER">
             <graphic>
-               <FontIcon iconLiteral="mdomz-search:36" styleClass="icon" />
+               <FontIcon iconLiteral="bi-search:36" styleClass="icon" />
             </graphic>
          </Button>
       </HBox>

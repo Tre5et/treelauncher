@@ -8,34 +8,26 @@
 <?import org.kordamp.ikonli.javafx.*?>
 
 <?import javafx.scene.image.ImageView?>
-<GridPane stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500"
+<GridPane stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500" styleClass="navbar"
           xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
-   <styleClass>
-      <String fx:value="navbar"/>
-   </styleClass>
+   <padding>
+      <Insets bottom="5" />
+   </padding>
    <columnConstraints>
       <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="10.0" prefWidth="100.0"/>
       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
       <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="10.0" prefWidth="100.0"/>
    </columnConstraints>
-   <rowConstraints>
-      <RowConstraints minHeight="0.0" vgrow="SOMETIMES"/>
-      <RowConstraints/>
-      <RowConstraints/>
-   </rowConstraints>
    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" styleClass="navbar-cluster"
          GridPane.columnIndex="0">
       <GridPane.margin>
          <Insets/>
       </GridPane.margin>
       <Button fx:id="homeButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
-              minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onHomeButtonClicked">
-         <styleClass>
-            <String fx:value="invisible"/>
-         </styleClass>
+              styleClass="invisible" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onHomeButtonClicked">
          <graphic>
-            <FontIcon iconLiteral="mdoal-dashboard:38">
+            <FontIcon iconLiteral="bi-view-list:32">
                <styleClass>
                   <String fx:value="icon"/>
                </styleClass>
@@ -54,7 +46,7 @@
             <String fx:value="invisible"/>
          </styleClass>
          <graphic>
-            <FontIcon iconLiteral="mdoal-add_box:38">
+            <FontIcon iconLiteral="bi-plus-square:32">
                <styleClass>
                   <String fx:value="icon"/>
                </styleClass>
@@ -75,7 +67,7 @@
             <String fx:value="invisible"/>
          </styleClass>
          <graphic>
-            <FontIcon iconLiteral="mdomz-move_to_inbox:38">
+            <FontIcon iconLiteral="bi-box-arrow-down:32">
                <styleClass>
                   <String fx:value="icon"/>
                </styleClass>
@@ -94,7 +86,7 @@
             <String fx:value="invisible"/>
          </styleClass>
          <graphic>
-            <FontIcon iconLiteral="mdoal-folder_special:38">
+            <FontIcon iconLiteral="bi-file-zip:32">
                <styleClass>
                   <String fx:value="icon"/>
                </styleClass>
@@ -113,7 +105,7 @@
             <String fx:value="invisible"/>
          </styleClass>
          <graphic>
-            <FontIcon iconLiteral="mdomz-tune:38">
+            <FontIcon iconLiteral="bi-sliders:32">
                <styleClass>
                   <String fx:value="icon"/>
                </styleClass>
@@ -132,7 +124,7 @@
             <String fx:value="invisible"/>
          </styleClass>
          <graphic>
-            <FontIcon iconLiteral="mdoal-extension:38">
+            <FontIcon iconLiteral="bi-puzzle:32">
                <styleClass>
                   <String fx:value="icon"/>
                </styleClass>
@@ -159,7 +151,7 @@
                <String fx:value="invisible"/>
             </styleClass>
             <graphic>
-               <FontIcon iconLiteral="mdoal-account_box:38">
+               <FontIcon iconLiteral="bi-person-square:32">
                   <styleClass>
                      <String fx:value="icon"/>
                   </styleClass>

@@ -20,7 +20,7 @@
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
-            <FontIcon iconLiteral="mdoal-format_line_spacing:48" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+            <FontIcon iconLiteral="bi-arrow-left-right:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets left="5.0" right="5.0" />
                 </GridPane.margin>
@@ -42,7 +42,7 @@
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
-            <FontIcon iconLiteral="mdomz-move_to_inbox:48" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+            <FontIcon iconLiteral="bi-box-arrow-down:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets left="5.0" right="5.0" />
                 </GridPane.margin>
@@ -64,7 +64,7 @@
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
-            <FontIcon iconLiteral="mdoal-folder_special:48" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+            <FontIcon iconLiteral="bi-file-zip:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets left="5.0" right="5.0" />
                 </GridPane.margin>
@@ -86,7 +86,7 @@
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
-            <FontIcon iconLiteral="mdomz-tune:48" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+            <FontIcon iconLiteral="bi-sliders:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets left="5.0" right="5.0" />
                 </GridPane.margin>
@@ -108,7 +108,7 @@
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
-            <FontIcon iconLiteral="mdoal-extension:48" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+            <FontIcon iconLiteral="bi-puzzle:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets left="5.0" right="5.0" />
                 </GridPane.margin>

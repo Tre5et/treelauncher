@@ -18,7 +18,7 @@
                     </VBox>
                 </ScrollPane>
                 <HBox fx:id="createSelector" alignment="CENTER_LEFT" onMouseClicked="#onCreateSelectorClicked" styleClass="create-container" VBox.vgrow="NEVER">
-                    <FontIcon iconLiteral="mdoal-add:36" styleClass="icon" />
+                    <FontIcon iconLiteral="bi-plus:36" styleClass="icon" />
                     <Label styleClass="element-title" text="%components.label.create" />
                     <VBox.margin>
                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -34,7 +34,7 @@
                 <HBox alignment="CENTER_LEFT" styleClass="title-container">
                     <Button fx:id="folderButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onFolderButtonClicked" styleClass="invisible">
                         <graphic>
-                            <FontIcon iconLiteral="mdoal-folder:48" styleClass="icon" />
+                            <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%selector.component.tooltip.folder" />
@@ -43,7 +43,7 @@
                     <Label fx:id="savesDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
                     <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onDeleteButtonClicked" styleClass="invisible">
                         <graphic>
-                            <FontIcon iconLiteral="mdoal-delete_forever:48" styleClass="icon" />
+                            <FontIcon iconLiteral="bi-trash:36" styleClass="icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%selector.component.tooltip.delete" />

@@ -36,11 +36,11 @@
 }
 
 .icon.select-disabled {
-    -fx-icon-code: "mdomz-visibility";
+    -fx-icon-code: "bi-eye";
     -fx-icon-size: 32;
 }
 
 .icon.select-enabled {
-    -fx-icon-code: "mdomz-visibility_off";
+    -fx-icon-code: "bi-eye-slash";
     -fx-icon-size: 32;
 }

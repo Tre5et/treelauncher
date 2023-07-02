@@ -10,7 +10,7 @@
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
             <Button fx:id="addButton" onMouseClicked="#onAddButtonClicked" styleClass="button, invisible">
                 <graphic>
-                    <FontIcon iconLiteral="mdomz-plus:48" styleClass="icon" />
+                    <FontIcon iconLiteral="bi-plus:48" styleClass="icon" />
                 </graphic>
             </Button>
             <Label styleClass="title" text="%manager.mods.label.current" />
@@ -28,7 +28,7 @@
             <CheckBox fx:id="snapshotsCheck" onMouseClicked="#onSnapshotsChecked" text="%creator.version.checkbox.snapshots" />
             <Button fx:id="reloadButton" styleClass="invisible" onMouseClicked="#onReloadButtonClicked">
                 <graphic>
-                    <FontIcon iconLiteral="mdomz-sync:32" styleClass="icon" />
+                    <FontIcon iconLiteral="bi-arrow-repeat:32" styleClass="icon" />
                 </graphic>
             </Button>
         </HBox>

@@ -15,7 +15,7 @@
         <ComboBox fx:id="changeBox" promptText="There should be something here" HBox.hgrow="ALWAYS" />
         <Button fx:id="changeButton" onMouseClicked="#onChangeButtonClicked" mnemonicParsing="false" styleClass="invisible">
             <graphic>
-                <FontIcon iconLiteral="mdomz-sync:36" styleClass="icon"/>
+                <FontIcon iconLiteral="bi-arrow-repeat:36" styleClass="icon"/>
             </graphic>
         </Button>
     </HBox>
