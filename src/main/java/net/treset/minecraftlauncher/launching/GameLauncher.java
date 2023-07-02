@@ -35,7 +35,7 @@ public class GameLauncher {
         this.exitCallbacks = exitCallbacks;
     }
 
-    public void launch(boolean cleanupActiveInstance) throws GameLaunchException {
+    public void launch(boolean cleanupActiveInstance, Consumer<Exception> doneCallback) throws GameLaunchException {
         try {
             files.reloadAll();
         } catch (FileLoadException e) {
@@ -66,14 +66,31 @@ public class GameLauncher {
             throw new GameLaunchException("Unable to launch game: unable to write launcher details", e);
         }
 
-        try {
-            resourceManager.prepareResources();
-            resourceManager.setLastPlayedTime();
-        } catch (GameResourceException | IOException e) {
-            abortLaunch();
-            throw new GameLaunchException("Unable to launch game: unable to prepare resources", e);
-        }
+        new Thread(() -> {
+            try {
+                resourceManager.prepareResources();
+                resourceManager.setLastPlayedTime();
+            } catch (GameResourceException | IOException e) {
+                GameLaunchException gle = new GameLaunchException("Unable to launch game: unable to prepare resources", e);
+                try {
+                    abortLaunch();
+                } catch (GameLaunchException ex) {
+                    doneCallback.accept(new GameLaunchException("Unable to launch game: unable to cleanup after fail", gle));
+                }
+                doneCallback.accept(gle);
+            }
+            try {
+                finishLaunch();
+                doneCallback.accept(null);
+            } catch (GameLaunchException e) {
+                doneCallback.accept(e);
+            }
+        }).start();
 
+
+    }
+
+    private void finishLaunch() throws GameLaunchException {
         ProcessBuilder pb = new ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE);
         CommandBuilder commandBuilder = new CommandBuilder(pb, instance, minecraftUser);
         try {

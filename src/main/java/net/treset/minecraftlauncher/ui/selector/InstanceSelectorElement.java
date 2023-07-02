@@ -152,15 +152,31 @@ public class InstanceSelectorElement extends UiElement {
             setLock(true);
             playButton.setDisable(true);
             GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
+            displayGamePreparing();
             try {
-                launcher.launch(false);
+                launcher.launch(false, this::onGameLaunchDone);
             } catch (GameLaunchException e) {
-                displayGameLaunchFailed(e);
                 onGameExit(null);
-                return;
+                displayGameLaunchFailed(e);
             }
-            displayGameRunning();
         }
+    }
+
+    private void onGameLaunchDone(Exception e) {
+        if(e == null) {
+            displayGameRunning();
+        } else {
+            onGameExit(null);
+            displayGameLaunchFailed(e);
+        }
+    }
+
+    private void displayGamePreparing() {
+        Platform.runLater(() -> {
+            popupController.setContent("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message");
+            popupController.clearButtons();
+            popupController.setVisible(true);
+        });
     }
 
     private void onGameExit(String error) {
@@ -394,27 +410,31 @@ public class InstanceSelectorElement extends UiElement {
 
     private void displayGameLaunchFailed(Exception e) {
         LOGGER.error("Failed to launch game", e);
-        popupController.setType(PopupElement.PopupType.ERROR);
-        popupController.setTitle("selector.instance.error.launch.title");
-        popupController.setMessage("selector.instance.error.launch.message", e.getMessage());
-        popupController.setControlsDisabled(false);
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "error.close",
-                        "close",
-                        id -> popupController.setVisible(false)
-                )
-        );
-        popupController.setVisible(true);
+        Platform.runLater(() -> {
+            popupController.setType(PopupElement.PopupType.ERROR);
+            popupController.setTitle("selector.instance.error.launch.title");
+            popupController.setMessage("selector.instance.error.launch.message", e.getMessage());
+            popupController.setControlsDisabled(false);
+            popupController.clearButtons();
+            popupController.addButtons(
+                    new PopupElement.PopupButton(
+                            PopupElement.ButtonType.POSITIVE,
+                            "error.close",
+                            "close",
+                            id -> popupController.setVisible(false)
+                    )
+            );
+            popupController.setVisible(true);
+        });
     }
 
     private void displayGameRunning() {
-        popupController.setType(PopupElement.PopupType.NONE);
-        popupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
-        popupController.clearButtons();
-        popupController.setVisible(true);
+        Platform.runLater(() -> {
+            popupController.setType(PopupElement.PopupType.NONE);
+            popupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
+            popupController.clearButtons();
+            popupController.setVisible(true);
+        });
     }
 
     private void displayGameCrash(String error) {
