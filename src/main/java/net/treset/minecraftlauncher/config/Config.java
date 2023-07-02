@@ -21,7 +21,7 @@ public class Config {
     public final List<LauncherLaunchArgument> INSTANCE_DEFAULT_JVM_ARGUMENTS = List.of();
     public final String INSTANCE_DEFAULT_DETAILS = "instance.json";
     public final List<String> OPTIONS_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex("options.txt", "usercache.json");
-    public final List<String> MODS_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex(FormatUtil.absoluteDirPath(".fabric"), FormatUtil.absoluteDirPath("config"), FormatUtil.absoluteDirPath("schematics"), FormatUtil.absoluteDirPath(".bobby"), FormatUtil.absoluteDirPath("XaeroWorldmap"), FormatUtil.absoluteDirPath("XaeroWaypoints"), FormatUtil.absoluteDirPath("itemscroller"));
+    public final List<String> MODS_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex(FormatUtil.absoluteDirPath(".fabric"), FormatUtil.absoluteDirPath("config"), FormatUtil.absoluteDirPath("schematics"), FormatUtil.absoluteDirPath("syncmatics"), FormatUtil.absoluteDirPath("shaderpacks"), FormatUtil.absoluteDirPath("data"), FormatUtil.absoluteDirPath(".bobby"), FormatUtil.absoluteDirPath("XaeroWorldMap"), FormatUtil.absoluteDirPath("XaeroWaypoints"), FormatUtil.absoluteDirPath("itemscroller"));
     public final String MODS_DEFAULT_DETAILS = "mods.json";
     public final List<String> SAVES_DEFAULT_INCLUDED_FILES = FormatUtil.toRegex("servers.dat", "realms_persistence.json");
     public final List<String> RESOURCEPACK_DEFAULT_INCLUDED_FILES = List.of();
