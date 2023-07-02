@@ -99,7 +99,7 @@ public class ResourceManager {
     private void renameComponents() throws GameResourceException {
         LOGGER.debug("Renaming components: instance={}", instanceData.getInstance().getKey().getId());
         try {
-            Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(instanceData.getGameDataDir() + "saves"));
+            Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(instanceData.getGameDataDir() + "saves"), StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             throw new GameResourceException("Unable to rename saves file", e);
         }
@@ -107,7 +107,7 @@ public class ResourceManager {
 
         if(instanceData.getModsComponent() != null) {
             try {
-                Files.move(Path.of(instanceData.getModsComponent().getKey().getDirectory()), Path.of(instanceData.getGameDataDir() + "mods"));
+                Files.move(Path.of(instanceData.getModsComponent().getKey().getDirectory()), Path.of(instanceData.getGameDataDir() + "mods"), StandardCopyOption.ATOMIC_MOVE);
             } catch (IOException e) {
                 throw new GameResourceException("Unable to rename mods file", e);
             }
@@ -136,10 +136,10 @@ public class ResourceManager {
     }
 
     private void addIncludedFiles(LauncherManifest manifest) throws GameResourceException {
-        LOGGER.debug("Adding included files: manifestId={}", manifest.getId());
         if(manifest == null || manifest.getIncludedFiles() == null) {
             throw new GameResourceException("Unable to get included files: unmet requirements");
         }
+        LOGGER.debug("Adding included files: manifestId={}", manifest.getId());
         File includedFilesDir = new File(manifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(!includedFilesDir.isDirectory()) {
             throw new GameResourceException("Included files directory doesn't exist: manifestId=" + manifest.getId());
