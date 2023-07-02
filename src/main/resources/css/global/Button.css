@@ -1,19 +1,23 @@
 * {
-    -fx-button-background: -fx-primary-400;
-    -fx-button-border: -fx-primary-300;
-    -fx-button-text: -fx-primary-950;
-    -fx-button-hover-background: -fx-primary-300;
-    -fx-button-hover-border: -fx-button-border;
-    -fx-button-hover-text: -fx-button-text;
-    -fx-button-active-background: -fx-primary-500;
-    -fx-button-active-border: -fx-primary-500;
-    -fx-button-active-text: -fx-button-text;
-    -fx-button-selected-background: -fx-primary-500;
-    -fx-button-selected-border: -fx-primary-400;
-    -fx-button-selected-text: -fx-text;
-    -fx-button-disabled-background: -fx-primary-800;
-    -fx-button-disabled-border: -fx-primary-800;
-    -fx-button-disabled-text: -fx-primary-100;
+    -fx-button-default: -fx-primary-300;
+    -fx-button-icon-default: -fx-secondary-400;
+    -fx-button-hover: -fx-primary-300;
+    -fx-button-text-hover: -fx-primary-950;
+    -fx-button-pressed: -fx-primary-500;
+    -fx-button-selected: -fx-primary-400;
+
+    -fx-button-highlight-icon-disable: -fx-secondary-400;
+
+    -fx-button-neutral-default: -fx-secondary-200;
+    -fx-button-neutral-pressed: -fx-secondary-50;
+
+    -fx-button-negative-default: -fx-error;
+    -fx-button-negative-pressed: orange;
+
+    -fx-button-background: transparent;
+    -fx-button-border: -fx-button-default;
+    -fx-button-text: -fx-text;
+    -fx-button-icon: -fx-button-icon-default;
 }
 
 .button {
@@ -24,111 +28,84 @@
     -fx-font-weight: 700;
     -fx-font-style: italic;
     -fx-border-radius: 5px;
-    -fx-icon-color: -fx-button-text;
+    -fx-border-width: 2px;
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, -fx-drop-shadow, 5, 0.5, 2, 2);
+    -fx-background-radius: 5px;
+}
+
+.button > .icon {
+    -fx-icon-color: -fx-button-icon;
 }
 
 .button:hover {
-    -fx-border-color: -fx-button-hover-border;
-    -fx-background-color: -fx-button-hover-background;
-    -fx-text-fill: -fx-button-hover-text;
-    -fx-icon-color: -fx-button-hover-text;
+    -fx-button-background: -fx-button-hover;
+    -fx-button-border: -fx-button-hover;
+    -fx-button-text: -fx-button-text-hover;
+}
+
+.button:hover > .icon {
+    -fx-button-icon: -fx-button-hover;
 }
 
 .button:pressed {
-    -fx-border-color: -fx-button-active-border;
-    -fx-background-color: -fx-button-active-background;
-    -fx-text-fill: -fx-button-active-text;
-    -fx-icon-color: -fx-button-active-text;
-    -fx-effect: none
+    -fx-button-background: -fx-button-pressed;
+    -fx-button-border: -fx-button-pressed;
+}
+
+.button:pressed > .icon {
+    -fx-button-icon: -fx-button-pressed;
 }
 
 .button:disabled {
-    -fx-border-color: -fx-button-disabled-border;
-    -fx-background-color: -fx-button-disabled-background;
-    -fx-text-fill: -fx-button-disabled-text;
     -fx-opacity: 0.5;
-    -fx-effect: none;
 }
 
-.button > .button-icon {
-    -fx-icon-color: -fx-button-text;
+.button.selected {
+    -fx-button-background: -fx-button-selected;
+    -fx-button-border: -fx-button-selected;
+    -fx-button-text: -fx-button-text-hover;
 }
 
-.button:hover > .button-icon {
-    -fx-icon-color: -fx-button-hover-text;
-}
-
-.button:pressed > .button-icon {
-    -fx-icon-color: -fx-button-active-text;
-}
-
-.button:disabled > .button-icon {
-    -fx-icon-color: -fx-button-disabled-text;
+.button.selected > .icon {
+    -fx-button-icon: -fx-button-selected;
 }
 
 .button.invisible {
     -fx-border-width: 0;
     -fx-background-color: transparent;
 }
-.button.invisible:hover {
-    -fx-border-width: 0;
-    -fx-background-color: transparent;
-}
-.button.invisible:pressed {
-    -fx-border-width: 0;
-    -fx-background-color: transparent;
-}
-.button.invisible:disabled {
-    -fx-border-width: 0;
-    -fx-background-color: transparent;
+
+.button.highlight > .icon {
+    -fx-button-icon-default: -fx-button-selected;
 }
 
-.button.invisible > .icon {
-    -fx-icon-color: -fx-button-background;
-}
-
-.button.invisible:hover > .icon {
-    -fx-icon-color: -fx-button-hover-background;
-}
-
-.button.invisible:pressed > .icon {
-    -fx-icon-color: -fx-button-active-background;
-}
-
-.button.invisible:disabled > .icon {
-    -fx-icon-color: -fx-button-disabled-background;
-}
-.button {
-    -fx-border-width: 2px;
-    -fx-border-radius: 3px;
+.button.highlight:disabled > .icon {
+    -fx-button-icon-default: -fx-button-highlight-icon-disable;
 }
 
 .button.neutral {
-    -fx-text-fill: -fx-text;
-    -fx-background-color: transparent;
+    -fx-button-default: -fx-button-neutral-default;
+    -fx-button-hover: -fx-button-neutral-default;
+    -fx-button-pressed: -fx-button-neutral-pressed;
 }
 
-.button.neutral:hover {
-    -fx-text-fill: #eeeeee;
-}
-
-.button.neutral:pressed {
-    -fx-text-fill: #cccccc;
+.button.neutral > .icon {
+    -fx-button-default: -fx-button-neutral-default;
+    -fx-button-hover: -fx-button-neutral-default;
+    -fx-button-pressed: -fx-button-neutral-pressed;
 }
 
 .button.negative {
-    -fx-background-color: #e00000;
-    -fx-border-color: #d00000;
+    -fx-button-default: -fx-button-negative-default;
+    -fx-button-hover: -fx-button-negative-default;
+    -fx-button-pressed: -fx-button-negative-pressed;
+    -fx-button-text-hover: -fx-text;
 }
 
-.button.negative:hover {
-    -fx-background-color: #ff0000;
-    -fx-border-color: #e00000;
+.button.negative > .icon {
+    -fx-button-default: -fx-button-negative-default;
+    -fx-button-hover: -fx-button-negative-default;
+    -fx-button-pressed: -fx-button-negative-pressed;
 }
 
-.button.negative:pressed {
-    -fx-background-color: #b00000;
-    -fx-border-color: #ba0000;
-}

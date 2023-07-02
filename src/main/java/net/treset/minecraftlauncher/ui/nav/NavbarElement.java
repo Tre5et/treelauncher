@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.ui.nav;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -11,48 +12,76 @@ import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.ImageUtil;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class NavbarElement extends UiElement {
+    @FXML private Button homeButton;
+    @FXML private Button addButton;
+    @FXML private Button savesButton;
+    @FXML private Button resourcepacksButton;
+    @FXML private Button optionsButton;
+    @FXML private Button modsButton;
+    @FXML private Button profileButton;
     @FXML private ImageView profileImage;
 
     private boolean locked = false;
     private Stage stage;
-    private Consumer<MainController.Component> componentActivator;
+    private Function<MainController.Component, Boolean> componentActivator;
 
     @FXML
     private void onHomeButtonClicked() {
-        componentActivator.accept(MainController.Component.INSTANCE_SELECTOR);
+        if(componentActivator.apply(MainController.Component.INSTANCE_SELECTOR)) {
+            deselectAll();
+            homeButton.getStyleClass().add("selected");
+        }
     }
 
     @FXML
     private void onAddButtonClicked() {
-        componentActivator.accept(MainController.Component.INSTANCE_CREATOR);
+        if(componentActivator.apply(MainController.Component.INSTANCE_CREATOR)) {
+            deselectAll();
+            addButton.getStyleClass().add("selected");
+        }
     }
 
     @FXML
     private void onSavesButtonClicked() {
-        componentActivator.accept(MainController.Component.SAVES_SELECTOR);
+        if(componentActivator.apply(MainController.Component.SAVES_SELECTOR)) {
+            deselectAll();
+            savesButton.getStyleClass().add("selected");
+        }
     }
 
     @FXML
     private void onResourcepacksButtonClicked() {
-        componentActivator.accept(MainController.Component.RESOURCEPACKS_SELECTOR);
+        if(componentActivator.apply(MainController.Component.RESOURCEPACKS_SELECTOR)) {
+            deselectAll();
+            resourcepacksButton.getStyleClass().add("selected");
+        }
     }
 
     @FXML
     private void onOptionsButtonClicked() {
-        componentActivator.accept(MainController.Component.OPTIONS_SELECTOR);
+        if(componentActivator.apply(MainController.Component.OPTIONS_SELECTOR)) {
+            deselectAll();
+            optionsButton.getStyleClass().add("selected");
+        }
     }
 
     @FXML
     private void onModsButtonClicked() {
-        componentActivator.accept(MainController.Component.MODS_SELECTOR);
+        if(componentActivator.apply(MainController.Component.MODS_SELECTOR)) {
+            deselectAll();
+            modsButton.getStyleClass().add("selected");
+        }
     }
 
     @FXML
     private void onProfileButtonClicked() {
-        componentActivator.accept(MainController.Component.SETTINGS);
+        if(componentActivator.apply(MainController.Component.SETTINGS)) {
+            deselectAll();
+            profileButton.getStyleClass().add("selected");
+        }
     }
 
     @Override
@@ -61,6 +90,16 @@ public class NavbarElement extends UiElement {
     @Override
     public void afterShow(Stage stage) {
         new Thread(this::setProfileImage).start();
+    }
+
+    private void deselectAll() {
+        homeButton.getStyleClass().remove("selected");
+        addButton.getStyleClass().remove("selected");
+        savesButton.getStyleClass().remove("selected");
+        resourcepacksButton.getStyleClass().remove("selected");
+        optionsButton.getStyleClass().remove("selected");
+        modsButton.getStyleClass().remove("selected");
+        profileButton.getStyleClass().remove("selected");
     }
 
     private void setProfileImage() {
@@ -75,11 +114,11 @@ public class NavbarElement extends UiElement {
         }
     }
 
-    public Consumer<MainController.Component> getComponentActivator() {
+    public Function<MainController.Component, Boolean> getComponentActivator() {
         return componentActivator;
     }
 
-    public void setComponentActivator(Consumer<MainController.Component> componentActivator) {
+    public void setComponentActivator(Function<MainController.Component, Boolean> componentActivator) {
         this.componentActivator = componentActivator;
     }
 

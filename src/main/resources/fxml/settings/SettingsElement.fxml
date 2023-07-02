@@ -43,7 +43,7 @@
                     <Label fx:id="usernameLabel" styleClass="username" text="Error getting name" />
                     <ImageView fx:id="skinView" />
                     <Label fx:id="uuidLabel" styleClass="uuid" text="Error getting uuid" />
-                    <Button fx:id="logoutButton" onAction="#onLogoutButtonClicked" styleClass="logout" text="%settings.button.logout">
+                    <Button fx:id="logoutButton" onAction="#onLogoutButtonClicked" styleClass="negative" text="%settings.button.logout">
                         <VBox.margin>
                             <Insets top="10.0" />
                         </VBox.margin>

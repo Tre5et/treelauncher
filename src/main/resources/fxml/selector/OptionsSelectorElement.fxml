@@ -32,7 +32,7 @@
         <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <HBox alignment="CENTER_LEFT" styleClass="title-container">
-                    <Button fx:id="folderButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onFolderButtonClicked" styleClass="invisible">
+                    <Button fx:id="folderButton" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onFolderButtonClicked" styleClass="invisible">
                         <graphic>
                             <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
                         </graphic>
@@ -41,7 +41,7 @@
                         </tooltip>
                     </Button>
                     <Label fx:id="optionsDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
-                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onDeleteButtonClicked" styleClass="invisible">
+                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onDeleteButtonClicked" styleClass="invisible, negative">
                         <graphic>
                             <FontIcon iconLiteral="bi-trash:36" styleClass="icon" />
                         </graphic>

@@ -20,7 +20,7 @@
         <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <HBox alignment="CENTER_LEFT" spacing="10" styleClass="title-container">
-                    <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onPlayButtonClicked" styleClass="invisible">
+                    <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onPlayButtonClicked" styleClass="invisible, highlight">
                         <graphic>
                             <FontIcon iconLiteral="bi-play-fill:48" styleClass="icon" />
                         </graphic>
@@ -29,7 +29,7 @@
                         </tooltip>
                     </Button>
                     <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" HBox.hgrow="ALWAYS" />
-                    <Button fx:id="folderButton" onMouseClicked="#onFolderButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible">
+                    <Button fx:id="folderButton" onMouseClicked="#onFolderButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" styleClass="invisible, neutral">
                         <graphic>
                             <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
                         </graphic>
@@ -37,7 +37,7 @@
                             <Tooltip text="%selector.component.tooltip.folder" />
                         </tooltip>
                     </Button>
-                    <Button fx:id="deleteButton" onAction="#onDeleteButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" mnemonicParsing="false" styleClass="invisible" >
+                    <Button fx:id="deleteButton" onAction="#onDeleteButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" styleClass="invisible, negative" >
                         <graphic>
                             <FontIcon iconLiteral="bi-trash:36" styleClass="icon" />
                         </graphic>

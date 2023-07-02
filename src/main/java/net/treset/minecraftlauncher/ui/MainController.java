@@ -1,21 +1,14 @@
 package net.treset.minecraftlauncher.ui;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
+import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
-import net.treset.minecraftlauncher.ui.selector.ModsSelectorElement;
-import net.treset.minecraftlauncher.ui.selector.OptionsSelectorElement;
-import net.treset.minecraftlauncher.ui.selector.ResourcepacksSelectorElement;
-import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
-import net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement;
 import net.treset.minecraftlauncher.ui.nav.NavbarElement;
-import net.treset.minecraftlauncher.ui.selector.SavesSelectorElement;
+import net.treset.minecraftlauncher.ui.selector.*;
 import net.treset.minecraftlauncher.ui.settings.SettingsElement;
 import net.treset.minecraftlauncher.ui.title.TitlebarElement;
 import org.apache.logging.log4j.LogManager;
@@ -73,38 +66,39 @@ public class MainController extends GenericUiController {
         return showOnStage(stage, "MainScreen", "launcher.name");
     }
 
-    public void activate(Component component) {
-        if(getLocked()) return;
-        switch(component) {
-            case INSTANCE_SELECTOR:
+    public boolean activate(Component component) {
+        if(getLocked()) return false;
+        switch (component) {
+            case INSTANCE_SELECTOR -> {
                 setAllInvisible();
                 instanceSelectorController.setVisible(true);
-                break;
-            case INSTANCE_CREATOR:
+            }
+            case INSTANCE_CREATOR -> {
                 setAllInvisible();
                 instanceCreatorController.setVisible(true);
-                break;
-            case SAVES_SELECTOR:
+            }
+            case SAVES_SELECTOR -> {
                 setAllInvisible();
                 savesSelectorController.setVisible(true);
-                break;
-            case RESOURCEPACKS_SELECTOR:
+            }
+            case RESOURCEPACKS_SELECTOR -> {
                 setAllInvisible();
                 resourcepacksSelectorController.setVisible(true);
-                break;
-            case OPTIONS_SELECTOR:
+            }
+            case OPTIONS_SELECTOR -> {
                 setAllInvisible();
                 optionsSelectorController.setVisible(true);
-                break;
-            case MODS_SELECTOR:
+            }
+            case MODS_SELECTOR -> {
                 setAllInvisible();
                 modsSelectorController.setVisible(true);
-                break;
-            case SETTINGS:
+            }
+            case SETTINGS -> {
                 setAllInvisible();
                 settingsController.setVisible(true);
-                break;
+            }
         }
+        return true;
     }
 
     private void setAllInvisible() {

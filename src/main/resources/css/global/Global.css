@@ -23,6 +23,17 @@
     -fx-primary-800: #174f18;
     -fx-primary-900: #164616;
     -fx-primary-950: #0b2a09;
+    -fx-secondary-50: #dfdfe2;
+    -fx-secondary-100: #dcdde0;
+    -fx-secondary-200: #d4d4d8;
+    -fx-secondary-300: #c7c7cc;
+    -fx-secondary-400: #b6b5bf;
+    -fx-secondary-500: #a8a6b5;
+    -fx-secondary-600: #9a97a5;
+    -fx-secondary-700: #8e8c97;
+    -fx-secondary-800: #777481;
+    -fx-secondary-900: #686576;
+    -fx-secondary-950: #48435b;
     -fx-white: #ffffff;
     -fx-black: #000000;
     -fx-background: #121212;
