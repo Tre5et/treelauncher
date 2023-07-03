@@ -1,14 +1,19 @@
 .combo-box {
-    -fx-combobox-background: -fx-background-secondary;
-    -fx-combobox-hover-background: -fx-primary-800;
-    -fx-combobox-border: -fx-primary-900;
+    -fx-combobox-default: -fx-background-secondary;
+    -fx-combobox-border-default: -fx-primary-300;
+    -fx-combobox-list-hover: -fx-primary-800;
+    -fx-combobox-border-disabled: -fx-secondary-400;
+
+    -fx-combobox-background: -fx-combobox-default;
+    -fx-combobox-border: -fx-combobox-border-default;
     -fx-combobox-arrow: -fx-text;
+    -fx-combobox-list-background: -fx-combobox-list-default;
 }
 
 .combo-box {
     -fx-background-color: -fx-combobox-background;
     -fx-border-color: -fx-combobox-border;
-    -fx-border-width: 2px;
+    -fx-border-width: 1.5px;
     -fx-border-radius: 5px;
     -fx-text-fill: -fx-text;
 }
@@ -24,8 +29,8 @@
 .combo-box > .combo-box-popup > .list-view {
     -fx-background-color: -fx-combobox-background;
     -fx-border-color: -fx-combobox-border;
-    -fx-border-width: 1.5px;
-    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
     -fx-text-fill: -fx-text;
 }
 
@@ -35,5 +40,9 @@
 }
 
 .combo-box > .combo-box-popup > .list-view .list-cell:hover {
-    -fx-background-color: -fx-combobox-hover-background;
+    -fx-combobox-background: -fx-combobox-list-hover;
+}
+
+.combo-box:disabled {
+    -fx-border-color: -fx-combobox-border-disabled;
 }

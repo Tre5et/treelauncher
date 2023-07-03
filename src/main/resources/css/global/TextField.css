@@ -1,14 +1,22 @@
 .text-field {
-    -fx-textfield-background: -fx-background-secondary;
-    -fx-textfield-border: -fx-primary-900;
+    -fx-textfield-default: -fx-background-secondary;
+    -fx-textfield-border-default: -fx-primary-300;
+    -fx-textfield-border-disabled: -fx-secondary-400;
+
+    -fx-textfield-background: -fx-textfield-default;
+    -fx-textfield-border: -fx-textfield-border-default;
 }
 
 .text-field {
     -fx-background-color: -fx-textfield-background;
     -fx-border-color: -fx-textfield-border;
-    -fx-border-width: 2px;
+    -fx-border-width: 1.5px;
     -fx-border-radius: 5px;
     -fx-text-fill: -fx-text;
+}
+
+.text-field:disabled {
+    -fx-textfield-border: -fx-textfield-border-disabled;
 }
 
 .text-field.search {

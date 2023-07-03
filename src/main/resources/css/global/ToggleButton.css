@@ -1,44 +1,29 @@
+.toggle-button {
+    -fx-toggle-default: transparent;
+    -fx-toggle-border-default: -fx-secondary-400;
+    -fx-toggle-hover: -fx-primary-700;
+    -fx-toggle-border-hover: -fx-primary-500;
+    -fx-toggle-selected: -fx-primary-500;
+    -fx-toggle-border-selected: -fx-primary-300;
 
+    -fx-toggle-background: -fx-toggle-default;
+    -fx-toggle-border: -fx-toggle-border-default;
+}
 
 .toggle-button {
-    -fx-border-color: -fx-button-border;
-    -fx-background-color: -fx-button-background;
-    -fx-text-fill: -fx-button-text;
-    -fx-font-size: 12pt;
-    -fx-font-weight: 700;
-    -fx-font-style: italic;
-    -fx-border-radius: 5px;
-    -fx-icon-color: -fx-button-text;
+    -fx-border-color: -fx-toggle-border;
+    -fx-background-color: -fx-toggle-background;
+    -fx-border-radius: 1px;
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, -fx-drop-shadow, 5, 0.5, 2, 2);
 }
 
 .toggle-button:hover {
-    -fx-border-color: -fx-button-hover-border;
-    -fx-background-color: -fx-button-hover-background;
-    -fx-text-fill: -fx-button-hover-text;
-    -fx-icon-color: -fx-button-hover-text;
-}
-
-.toggle-button:pressed {
-    -fx-border-color: -fx-button-active-border;
-    -fx-background-color: -fx-button-active-background;
-    -fx-text-fill: -fx-button-active-text;
-    -fx-icon-color: -fx-button-active-text;
-    -fx-effect: none
+    -fx-border-color: -fx-toggle-border-hover;
+    -fx-background-color: -fx-toggle-hover-default;
 }
 
 .toggle-button:selected {
-    -fx-border-color: -fx-button-selected-border;
-    -fx-background-color: -fx-button-selected-background;
-    -fx-text-fill: -fx-button-selected-text;
-    -fx-icon-color: -fx-button-selected-text;
-}
-
-.toggle-button:disabled {
-    -fx-border-color: -fx-button-disabled-border;
-    -fx-background-color: -fx-button-disabled-background;
-    -fx-text-fill: -fx-button-disabled-text;
-    -fx-opacity: 0.5;
-    -fx-effect: none;
+    -fx-border-color: -fx-toggle-border-selected;
+    -fx-background-color: -fx-toggle-selected;
 }
