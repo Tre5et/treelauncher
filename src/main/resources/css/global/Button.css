@@ -32,9 +32,6 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, -fx-drop-shadow, 5, 0.5, 2, 2);
     -fx-background-radius: 5px;
-}
-
-.button > .icon {
     -fx-icon-color: -fx-button-icon;
 }
 
@@ -42,18 +39,12 @@
     -fx-button-background: -fx-button-hover;
     -fx-button-border: -fx-button-hover;
     -fx-button-text: -fx-button-text-hover;
-}
-
-.button:hover > .icon {
     -fx-button-icon: -fx-button-hover;
 }
 
 .button:pressed {
     -fx-button-background: -fx-button-pressed;
     -fx-button-border: -fx-button-pressed;
-}
-
-.button:pressed > .icon {
     -fx-button-icon: -fx-button-pressed;
 }
 
@@ -65,9 +56,6 @@
     -fx-button-background: -fx-button-selected;
     -fx-button-border: -fx-button-selected;
     -fx-button-text: -fx-button-text-hover;
-}
-
-.button.selected > .icon {
     -fx-button-icon: -fx-button-selected;
 }
 
@@ -76,21 +64,14 @@
     -fx-background-color: transparent;
 }
 
-.button.highlight > .icon {
+.button.highlight {
     -fx-button-icon-default: -fx-button-selected;
 }
-
-.button.highlight:disabled > .icon {
+.button.highlight:disabled {
     -fx-button-icon-default: -fx-button-highlight-icon-disable;
 }
 
 .button.neutral {
-    -fx-button-default: -fx-button-neutral-default;
-    -fx-button-hover: -fx-button-neutral-default;
-    -fx-button-pressed: -fx-button-neutral-pressed;
-}
-
-.button.neutral > .icon {
     -fx-button-default: -fx-button-neutral-default;
     -fx-button-hover: -fx-button-neutral-default;
     -fx-button-pressed: -fx-button-neutral-pressed;
@@ -102,10 +83,3 @@
     -fx-button-pressed: -fx-button-negative-pressed;
     -fx-button-text-hover: -fx-text;
 }
-
-.button.negative > .icon {
-    -fx-button-default: -fx-button-negative-default;
-    -fx-button-hover: -fx-button-negative-default;
-    -fx-button-pressed: -fx-button-negative-pressed;
-}
-

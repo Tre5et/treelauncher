@@ -4,8 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
 
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" minWidth="-Infinity" styleClass="element-root" stylesheets="@/css/manager/ModsListElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModListElement">
     <GridPane styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -44,24 +44,12 @@
                 <ImageView fx:id="downloadingImage" visible="false" fitHeight="32" fitWidth="32" pickOnBounds="true" preserveRatio="true">
                     <Image url="@../../img/downloading.gif"/>
                 </ImageView>
-                <Button fx:id="installButton" onMouseClicked="#onInstallButtonClicked" styleClass="invisible">
-                    <graphic>
-                        <FontIcon iconLiteral="bi-cloud-arrow-down:32" styleClass="icon" />
-                    </graphic>
-                </Button>
+                <IconButton fx:id="installButton" styleClass="download, highlight" iconSize="32" onAction="#onInstallButtonClicked" />
                 <ComboBox fx:id="versionSelector" promptText="%manager.mods.prompt.version" HBox.hgrow="ALWAYS" />
             </HBox>
             <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="disableButton" onMouseClicked="#onDisableButtonClicked" styleClass="invisible">
-                    <graphic>
-                        <FontIcon fx:id="disableIcon" styleClass="icon" />
-                    </graphic>
-                </Button>
-                <Button fx:id="deleteButton" onMouseClicked="#onDeleteButtonClicked" styleClass="invisible">
-                    <graphic>
-                        <FontIcon iconLiteral="bi-trash:32" styleClass="icon" />
-                    </graphic>
-                </Button>
+                <IconButton fx:id="disableButton" styleClass="visibility" iconSize="32" onAction="#onDisableButtonClicked" />
+                <IconButton fx:id="deleteButton" styleClass="neutral, delete" iconSize="32" onAction="#onDeleteButtonClicked" />
             </HBox>
         </VBox>
         <HBox alignment="BOTTOM_RIGHT" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1">

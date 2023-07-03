@@ -2,8 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
 
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement">
     <SplitPane dividerPositions="0.33, 0.66" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <AnchorPane minWidth="-Infinity" styleClass="element">
@@ -12,39 +12,17 @@
                     <Label styleClass="title" text="%instances.label.title" />
                 </VBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
-                    <VBox fx:id="instanceContainer" alignment="TOP_CENTER">
-                    </VBox>
+                    <VBox fx:id="instanceContainer" alignment="TOP_CENTER"/>
                 </ScrollPane>
             </VBox>
         </AnchorPane>
         <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <HBox alignment="CENTER_LEFT" spacing="10" styleClass="title-container">
-                    <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onPlayButtonClicked" styleClass="invisible, highlight">
-                        <graphic>
-                            <FontIcon iconLiteral="bi-play-fill:48" styleClass="icon" />
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%selector.instance.tooltip.play" />
-                        </tooltip>
-                    </Button>
+                    <IconButton fx:id="playButton" styleClass="play, highlight" iconSize="48" tooltipText="%selector.instance.tooltip.play" onAction="#onPlayButtonClicked" />
                     <Label fx:id="instanceDetailsTitle" disable="true" styleClass="title" text="%instances.label.details.title" HBox.hgrow="ALWAYS" />
-                    <Button fx:id="folderButton" onMouseClicked="#onFolderButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" styleClass="invisible, neutral">
-                        <graphic>
-                            <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%selector.component.tooltip.folder" />
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="deleteButton" onAction="#onDeleteButtonClicked" alignment="CENTER" contentDisplay="CENTER" disable="true" styleClass="invisible, negative" >
-                        <graphic>
-                            <FontIcon iconLiteral="bi-trash:36" styleClass="icon" />
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%selector.component.tooltip.delete" />
-                        </tooltip>
-                    </Button>
+                    <IconButton fx:id="folderButton" styleClass="folder, neutral" iconSize="36" tooltipText="%selector.component.tooltip.folder" onAction="#onFolderButtonClicked" />
+                    <IconButton fx:id="deleteButton" styleClass="delete, negative" iconSize="36" tooltipText="%selector.component.tooltip.delete" onAction="#onDeleteButtonClicked" />
                 </HBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
                     <fx:include fx:id="instanceDetails" source="../manager/InstanceManagerElement.fxml" />
@@ -54,14 +32,7 @@
         <AnchorPane fx:id="componentPane" styleClass="element">
             <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
                 <HBox styleClass="title-container" alignment="CENTER_LEFT" spacing="10">
-                    <Button fx:id="componentFolderButton" disable="true" onMouseClicked="#onComponentFolderButtonClicked" styleClass="invisible">
-                        <graphic>
-                            <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%selector.component.tooltip.folder" />
-                        </tooltip>
-                    </Button>
+                    <IconButton fx:id="componentFolderButton" styleClass="folder, neutral" iconSize="36" tooltipText="%selector.component.tooltip.folder" onAction="#onFolderButtonClicked" />
                     <Label fx:id="componentTitleLabel" disable="true" styleClass="title" text="%selector.instance.label.component.title" />
                 </HBox>
                 <AnchorPane>

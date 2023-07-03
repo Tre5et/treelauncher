@@ -2,23 +2,15 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
 
 <?import javafx.geometry.Insets?>
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsSearchElement">
    <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <HBox alignment="CENTER_LEFT">
-         <Button fx:id="backButton" onMouseClicked="#onBackButtonClicked" styleClass="invisible" HBox.hgrow="NEVER">
-            <graphic>
-               <FontIcon iconLiteral="bi-chevron-left:36" styleClass="icon" />
-            </graphic>
-         </Button>
+         <IconButton fx:id="backButton" styleClass="back" iconSize="36" onMouseClicked="#onBackButtonClicked" />
          <TextField fx:id="searchField" onKeyReleased="#onSearchKeyPress" promptText="%manager.mods.search.prompt.search" styleClass="search" HBox.hgrow="ALWAYS" />
-         <Button fx:id="searchButton" onMouseClicked="#onSearchButtonClicked" styleClass="invisible" HBox.hgrow="NEVER">
-            <graphic>
-               <FontIcon iconLiteral="bi-search:36" styleClass="icon" />
-            </graphic>
-         </Button>
+         <IconButton fx:id="searchButton" styleClass="search" iconSize="36" onMouseClicked="#onSearchButtonClicked" />
       </HBox>
       <Label fx:id="loadingLabel" styleClass="element-title" text="%manager.mods.search.label.loading" textAlignment="CENTER" visible="false" />
       <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">

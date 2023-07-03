@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.kordamp.ikonli.javafx.*?>
-
-
-<VBox alignment="TOP_CENTER"  prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.text.Font?>
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
+<VBox alignment="TOP_CENTER" prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="net.treset.minecraftlauncher.ui.login.LoginController">
     <fx:include fx:id="titlebar" source="/fxml/title/TitlebarElement.fxml" VBox.vgrow="NEVER"/>
     <SplitPane dividerPositions="0.26057906458797325" styleClass="element-root"
@@ -35,16 +36,8 @@
                     <Font size="30.0"/>
                 </font>
             </Label>
-            <Button fx:id="continueButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="48.0" maxWidth="48.0"
-                    minHeight="48.0" minWidth="48.0" mnemonicParsing="false" onAction="#onContinueButtonClicked"
-                    styleClass="invisible" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                <GridPane.margin>
-                    <Insets bottom="20.0" right="20.0"/>
-                </GridPane.margin>
-                <graphic>
-                    <FontIcon iconLiteral="bi-caret-right-square-fill:48" styleClass="icon" />
-                </graphic>
-            </Button>
+            <IconButton fx:id="continueButton" styleClass="forward, highlight" iconSize="48" onAction="#onContinueButtonClicked"
+                        GridPane.columnIndex="2" GridPane.rowIndex="2" visible="false" />
         </GridPane>
     </SplitPane>
 </VBox>

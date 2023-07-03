@@ -1,111 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
-
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import net.treset.minecraftlauncher.util.ui.*?>
 <HBox stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500" styleClass="navbar"
-          xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
+      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
    <padding>
       <Insets bottom="5" />
    </padding>
 
    <HBox alignment="CENTER_LEFT" styleClass="navbar-cluster">
-      <Button fx:id="homeButton" alignment="CENTER" contentDisplay="CENTER"
-              styleClass="invisible, selected" onAction="#onHomeButtonClicked">
-         <graphic>
-            <FontIcon iconLiteral="bi-view-list:32" styleClass="icon" />
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.home"/>
-         </tooltip>
-      </Button>
-      <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER"
-              styleClass="invisible" onAction="#onAddButtonClicked">
-         <graphic>
-            <FontIcon iconLiteral="bi-plus-square:32" styleClass="icon" />
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.add"/>
-         </tooltip>
-      </Button>
+      <IconButton fx:id="homeButton" styleClass="instances" iconSize="32" tooltipText="%nav.tooltip.home" onAction="#onHomeButtonClicked" />
+      <IconButton fx:id="addButton" styleClass="add" iconSize="32" tooltipText="%nav.tooltip.add" onAction="#onAddButtonClicked" />
    </HBox>
 
    <HBox alignment="CENTER" styleClass="navbar-cluster" HBox.hgrow="ALWAYS">
-      <Button fx:id="savesButton" alignment="CENTER" contentDisplay="CENTER"
-              styleClass="invisible" onAction="#onSavesButtonClicked">
-         <graphic>
-            <FontIcon iconLiteral="bi-box-arrow-down:32" styleClass="icon" />
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.saves"/>
-         </tooltip>
-      </Button>
-      <Button fx:id="resourcepacksButton" alignment="CENTER" contentDisplay="CENTER"
-              styleClass="invisible" onAction="#onResourcepacksButtonClicked">
-         <graphic>
-            <FontIcon iconLiteral="bi-file-zip:32" styleClass="icon" />
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.resourcepacks"/>
-         </tooltip>
-      </Button>
-      <Button fx:id="optionsButton" alignment="CENTER" contentDisplay="CENTER"
-              styleClass="invisible" onAction="#onOptionsButtonClicked">
-         <graphic>
-            <FontIcon iconLiteral="bi-sliders:32" styleClass="icon" />
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.options"/>
-         </tooltip>
-      </Button>
-      <Button fx:id="modsButton" alignment="CENTER" contentDisplay="CENTER"
-              styleClass="invisible" onAction="#onModsButtonClicked">
-         <graphic>
-            <FontIcon iconLiteral="bi-puzzle:32" styleClass="icon" />
-         </graphic>
-         <cursor>
-            <Cursor fx:constant="HAND"/>
-         </cursor>
-         <tooltip>
-            <Tooltip text="%nav.tooltip.mods"/>
-         </tooltip>
-      </Button>
+      <IconButton fx:id="savesButton" styleClass="saves" iconSize="32" tooltipText="%nav.tooltip.saves" onAction="#onSavesButtonClicked" />
+      <IconButton fx:id="resourcepacksButton" styleClass="resourcepacks" iconSize="32" tooltipText="%nav.tooltip.resourcepacks" onAction="#onResourcepacksButtonClicked" />
+      <IconButton fx:id="optionsButton" styleClass="options" iconSize="32" tooltipText="%nav.tooltip.options" onAction="#onOptionsButtonClicked" />
+      <IconButton fx:id="modsButton" styleClass="mods" iconSize="32" tooltipText="%nav.tooltip.mods" onAction="#onModsButtonClicked" />
    </HBox>
 
    <HBox alignment="CENTER_RIGHT" styleClass="navbar-cluster">
       <StackPane>
-         <Button fx:id="profileButton" alignment="CENTER" contentDisplay="CENTER"
-                 styleClass="invisible" onAction="#onProfileButtonClicked">
-            <graphic>
-               <FontIcon iconLiteral="bi-person-square:32" styleClass="icon" />
-            </graphic>
-            <cursor>
-               <Cursor fx:constant="HAND"/>
-            </cursor>
-            <tooltip>
-               <Tooltip text="%nav.tooltip.profile"/>
-            </tooltip>
-         </Button>
+         <IconButton fx:id="profileButton" styleClass="profile" iconSize="32" tooltipText="%nav.tooltip.profile" onAction="#onProfileButtonClicked" />
          <ImageView fx:id="profileImage" mouseTransparent="true" smooth="false" />
       </StackPane>
    </HBox>

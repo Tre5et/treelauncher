@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
-
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.generic.VersionChangerElement">
     <GridPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
         <columnConstraints>
@@ -22,10 +22,6 @@
             <ComboBox fx:id="typeChoice" promptText="THis bad" />
             <ComboBox fx:id="loaderChoice" promptText="%creator.version.prompt.loaderversion" visible="false" />
         </HBox>
-        <Button fx:id="changeButton" disable="true" onMouseClicked="#onChangeButtonClicked" styleClass="invisible" GridPane.columnIndex="1" GridPane.rowSpan="2">
-            <graphic>
-                <FontIcon iconLiteral="bi-arrow-repeat:32" styleClass="icon" />
-            </graphic>
-        </Button>
+        <IconButton fx:id="changeButton" styleClass="sync, highlight" iconSize="32" onMouseClicked="#onChangeButtonClicked" GridPane.columnIndex="1" GridPane.rowSpan="2" />
     </GridPane>
 </AnchorPane>

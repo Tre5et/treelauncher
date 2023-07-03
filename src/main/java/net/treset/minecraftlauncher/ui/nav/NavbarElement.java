@@ -11,11 +11,12 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.ImageUtil;
+import net.treset.minecraftlauncher.util.ui.IconButton;
 
 import java.util.function.Function;
 
 public class NavbarElement extends UiElement {
-    @FXML private Button homeButton;
+    @FXML private IconButton homeButton;
     @FXML private Button addButton;
     @FXML private Button savesButton;
     @FXML private Button resourcepacksButton;

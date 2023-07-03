@@ -1,0 +1,79 @@
+.instances {
+    -fx-icon-code: bi-view-list;
+}
+
+.add {
+    -fx-icon-code: bi-plus-square;
+}
+
+.saves {
+    -fx-icon-code: bi-box-arrow-down;
+}
+
+.resourcepacks {
+    -fx-icon-code: bi-file-zip;
+}
+
+.options {
+    -fx-icon-code: bi-sliders;
+}
+
+.mods {
+    -fx-icon-code: bi-puzzle;
+}
+
+.profile {
+    -fx-icon-code: bi-person-square;
+}
+
+.play {
+    -fx-icon-code: bi-play-fill;
+}
+
+.folder {
+    -fx-icon-code: bi-folder2;
+}
+
+.folder-open {
+    -fx-icon-code: bi-folder2-open;
+}
+
+.delete {
+    -fx-icon-code: bi-trash;
+}
+
+.sync {
+    -fx-icon-code: bi-arrow-repeat;
+}
+
+.forward {
+    -fx-icon-code: bi-caret-right-square-fill;
+}
+
+.back {
+    -fx-icon-code: bi-caret-left-fill;
+}
+
+.file-code {
+    -fx-icon-code: bi-file-earmark-code;
+}
+
+.download {
+    -fx-icon-code: bi-cloud-arrow-down;
+}
+
+.visibility {
+    -fx-icon-code: bi-eye;
+}
+
+.visibility.disabled {
+    -fx-icon-code: bi-eye-slash;
+}
+
+.search {
+    -fx-icon-code: bi-search;
+}
+
+.github {
+    -fx-icon-code: bi-github;
+}

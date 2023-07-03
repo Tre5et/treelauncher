@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ModsSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
         <AnchorPane styleClass="element">
@@ -32,23 +33,9 @@
         <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <HBox alignment="CENTER_LEFT" styleClass="title-container">
-                    <Button fx:id="folderButton" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onFolderButtonClicked" styleClass="invisible">
-                        <graphic>
-                            <FontIcon iconLiteral="bi-folder2:36" styleClass="icon" />
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%selector.component.tooltip.folder" />
-                        </tooltip>
-                    </Button>
+                    <IconButton fx:id="folderButton" styleClass="folder" iconSize="36" onAction="#onFolderButtonClicked" tooltipText="%selector.component.tooltip.folder" />
                     <Label fx:id="modsDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
-                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onDeleteButtonClicked" styleClass="invisible, negative">
-                        <graphic>
-                            <FontIcon iconLiteral="bi-trash:36" styleClass="icon" />
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%selector.component.tooltip.delete" />
-                        </tooltip>
-                    </Button>
+                    <IconButton fx:id="deleteButton" styleClass="negative, delete" iconSize="36" onAction="#onDeleteButtonClicked" tooltipText="%selector.component.tooltip.delete" />
                 </HBox>
                 <AnchorPane VBox.vgrow="ALWAYS">
                     <VBox fx:id="creatorContainer" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">

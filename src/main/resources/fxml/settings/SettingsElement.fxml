@@ -3,9 +3,9 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
 
 <?import javafx.scene.image.ImageView?>
+<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" styleClass="element-root" stylesheets="@/css/settings/SettingsElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.settings.SettingsElement">
     <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" spacing="20">
@@ -26,14 +26,7 @@
                     <Label text="%settings.label.filepath" />
                     <HBox alignment="CENTER">
                         <TextField fx:id="pathField" alignment="CENTER_RIGHT" text="ERROR LOADING CURRENT PATH!" />
-                        <Button onAction="#onFileSelectorClicked" styleClass="invisible">
-                            <graphic>
-                                <FontIcon iconLiteral="bi-folder2-open:28" styleClass="icon" />
-                            </graphic>
-                            <tooltip>
-                                <Tooltip text="%settings.tooltip.select" />
-                            </tooltip>
-                        </Button>
+                        <IconButton styleClass="neutral, folder-open" iconSize="28" onAction="#onFileSelectorClicked" tooltipText="%settings.tooltip.select" />
                     </HBox>
                     <CheckBox fx:id="removeCheckBox" selected="true" text="%settings.label.path.remove" />
                     <Button onAction="#onPathApplyClicked" text="%settings.button.path.apply" />
@@ -55,11 +48,7 @@
                         <Label styleClass="hint" text="%settings.version.version" />
                         <Label styleClass="hint" text="%launcher.version" />
                     </HBox>
-                    <Button onAction="#onSourceButtonClicked" styleClass="invisible" >
-                        <graphic>
-                            <FontIcon iconLiteral="bi-github:24" styleClass="icon" />
-                        </graphic>
-                    </Button>
+                    <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSourceButtonClicked" />
                 </VBox>
             </VBox>
     </ScrollPane>

@@ -19,10 +19,10 @@ import net.treset.mc_version_loader.mods.ModProvider;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.UiLoader;
+import net.treset.minecraftlauncher.util.ui.IconButton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,8 +40,7 @@ public class ModListElement extends UiElement {
     @FXML private ImageView downloadingImage;
     @FXML private Button installButton;
     @FXML private ComboBox<String> versionSelector;
-    @FXML private Button disableButton;
-    @FXML private FontIcon disableIcon;
+    @FXML private IconButton disableButton;
     @FXML private Button deleteButton;
     @FXML private ImageView modrinthLogo;
     @FXML private ImageView curseforgeLogo;
@@ -64,9 +63,7 @@ public class ModListElement extends UiElement {
         installButton.setDisable(true);
         downloadingImage.setVisible(false);
         versionSelector.getItems().clear();
-        versionSelector.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::onVersionSelected);
-        });
+        versionSelector.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
         if(mod != null) {
             title.setText(mod.getName());
             description.setText(mod.getDescription());
@@ -171,14 +168,12 @@ public class ModListElement extends UiElement {
         if(disabled) {
             installButton.setDisable(true);
             versionSelector.setDisable(true);
-            disableIcon.getStyleClass().remove("select-enabled");
-            disableIcon.getStyleClass().add("select-disabled");
+            disableButton.getStyleClass().add("disabled");
             rootPane.setOpacity(0.5);
         } else {
             installButton.setDisable(mod != null && mod.getVersion().equals(versionSelector.getSelectionModel().getSelectedItem()));
             versionSelector.setDisable(false);
-            disableIcon.getStyleClass().remove("select-disabled");
-            disableIcon.getStyleClass().add("select-enabled");
+            disableButton.getStyleClass().remove("disabled");
             rootPane.setOpacity(1);
         }
     }
