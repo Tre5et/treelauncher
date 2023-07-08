@@ -65,7 +65,7 @@
 }
 
 .button.highlight {
-    -fx-button-icon-default: -fx-button-selected;
+    -fx-button-icon-default: -fx-button-default;
 }
 .button.highlight:disabled {
     -fx-button-icon-default: -fx-button-highlight-icon-disable;
