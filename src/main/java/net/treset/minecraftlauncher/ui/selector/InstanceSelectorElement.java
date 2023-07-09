@@ -3,18 +3,14 @@ package net.treset.minecraftlauncher.ui.selector;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
-import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
-import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
@@ -32,41 +28,29 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class InstanceSelectorElement extends UiElement {
+public class InstanceSelectorElement extends SelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
 
-    @FXML private AnchorPane rootPane;
-    @FXML private VBox instanceContainer;
-    @FXML private ActionBar actionBar;
     @FXML private InstanceManagerElement instanceDetailsController;
     @FXML private ActionBar componentActionBar;
     @FXML private ComponentChangerElement componentChangerController;
     @FXML private VersionChangerElement versionChangerController;
-    @FXML private PopupElement popupController;
 
-    private LauncherFiles files;
-    private List<Pair<SelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
     private InstanceData currentInstance;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         instanceDetailsController.init(this::onComponentSelected);
-        try {
-            files = new LauncherFiles();
-        } catch (FileLoadException e) {
-            LauncherApplication.displaySevereError(e);
-        }
         versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
     }
 
-    public void reloadComponents() {
-        try {
-            files.reloadAll();
-        } catch (FileLoadException e) {
-            LauncherApplication.displaySevereError(e);
-        }
-        instances = new ArrayList<>();
+    @Override
+    protected void onCreateClicked() {}
+
+    @Override
+    protected List<Pair<SelectorEntryElement, AnchorPane>> getElements() {
+        ArrayList<Pair<SelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> instance : files.getInstanceComponents()) {
             try {
                 instances.add(SelectorEntryElement.from(InstanceData.of(instance, files)));
@@ -74,32 +58,10 @@ public class InstanceSelectorElement extends UiElement {
                 LauncherApplication.displaySevereError(e);
             }
         }
-        popupController.setVisible(false);
-        instanceContainer.getChildren().clear();
-        for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
-            instanceContainer.getChildren().add(instance.getValue());
+        return instances.stream().peek(instance -> {
             instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
             instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
-        }
-    }
-
-    @Override
-    public void beforeShow(Stage stage) {
-        reloadComponents();
-        for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
-            instance.getKey().beforeShow(stage);
-        }
-    }
-    @Override
-    public void afterShow(Stage stage) {
-        for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
-            instance.getKey().afterShow(stage);
-        }
-    }
-
-    @Override
-    public void setRootVisible(boolean visible) {
-        rootPane.setVisible(visible);
+        }).toList();
     }
 
     private void onSelected(InstanceData instanceData, boolean selected) {
@@ -109,7 +71,7 @@ public class InstanceSelectorElement extends UiElement {
         componentActionBar.setDisable(true);
         componentActionBar.clearLabel();
         if(selected) {
-            for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
+            for(Pair<SelectorEntryElement, AnchorPane> instance : elements) {
                 if(instance.getKey().getInstanceData() != instanceData) {
                     instance.getKey().select(false, true, false);
                 }
@@ -131,7 +93,7 @@ public class InstanceSelectorElement extends UiElement {
         return !getLock();
     }
 
-    public void onPlayButtonClicked() {
+    public void onPlayClicked() {
         if(currentInstance != null) {
             setLock(true);
             actionBar.setDisable(true);
@@ -330,7 +292,7 @@ public class InstanceSelectorElement extends UiElement {
     }
 
     @FXML
-    private void onComponentFolderButtonClicked() {
+    private void onComponentFolderClicked() {
         switch (instanceDetailsController.getCurrentSelected()) {
             case SAVES -> openFolder(currentInstance.getSavesComponent().getDirectory());
             case RESOURCEPACKS -> openFolder(currentInstance.getResourcepacksComponent().getDirectory());
@@ -340,38 +302,12 @@ public class InstanceSelectorElement extends UiElement {
     }
 
     @FXML
-    private void onFolderButtonClicked() {
+    protected void onFolderClicked() {
         openFolder(currentInstance.getInstance().getKey().getDirectory());
     }
 
-    @FXML
-    private void onDeleteButtonClicked() {
-        popupController.setType(PopupElement.PopupType.WARNING);
-        popupController.setContent("selector.instance.delete.title", "selector.instance.delete.message");
-        popupController.clearButtons();
-        popupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.NEGATIVE,
-                        "selector.instance.delete.cancel",
-                        "cancel",
-                        this::onDeleteCancel
-                ),
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "selector.instance.delete.confirm",
-                        "confirm",
-                        this::onDeleteConfirm
-                )
-        );
-        popupController.setVisible(true);
-    }
-
-    private void onDeleteCancel(String id) {
-        popupController.setVisible(false);
-    }
-
-    private void onDeleteConfirm(String id) {
-        popupController.setVisible(false);
+    @Override
+    protected void deleteCurrent() {
         try {
             currentInstance.delete(files);
         } catch (IOException e) {
@@ -380,6 +316,11 @@ public class InstanceSelectorElement extends UiElement {
         setVisible(false);
         reloadComponents();
         setVisible(true);
+    }
+
+    @Override
+    protected String getCurrentUsedBy() {
+        return null;
     }
 
     private void openFolder(String path) {

@@ -26,7 +26,7 @@ public abstract class SelectorElement extends UiElement {
     @FXML protected ActionBar actionBar;
     @FXML protected CreateSelectable createSelectable;
     @FXML protected VBox createContainer;
-    @FXML private PopupElement popupController;
+    @FXML protected PopupElement popupController;
 
     protected LauncherFiles files;
     protected boolean createSelected = false;

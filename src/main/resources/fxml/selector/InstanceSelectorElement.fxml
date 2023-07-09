@@ -12,7 +12,7 @@
                     <Label styleClass="title" text="%instances.label.title" />
                 </VBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
-                    <VBox fx:id="instanceContainer" alignment="TOP_CENTER"/>
+                    <VBox fx:id="elementContainer" alignment="TOP_CENTER"/>
                 </ScrollPane>
             </VBox>
         </AnchorPane>
@@ -20,9 +20,9 @@
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <ActionBar fx:id="actionBar" disable="true" showPlay="true"
                            defaultLabel="%instances.label.details.title"
-                           onPlay="#onPlayButtonClicked"
-                           onFolder="#onFolderButtonClicked"
-                           onDelete="#onDeleteButtonClicked"
+                           onPlay="#onPlayClicked"
+                           onFolder="#onFolderClicked"
+                           onDelete="#onDeleteClicked"
                 />
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
                     <fx:include fx:id="instanceDetails" source="../manager/InstanceManagerElement.fxml" />
@@ -33,7 +33,7 @@
             <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
                 <ActionBar fx:id="componentActionBar" disable="true" showEdit="false" showDelete="false"
                            defaultLabel="%selector.instance.label.component.title"
-                           onFolder="#onFolderButtonClicked"
+                           onFolder="#onComponentFolderClicked"
                 />
                 <AnchorPane>
                     <fx:include fx:id="componentChanger" source="/fxml/generic/ComponentChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
