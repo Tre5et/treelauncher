@@ -22,7 +22,7 @@ public abstract class ManifestSelectorElement extends SelectorElement {
     @Override
     protected String getCurrentUsedBy() {
         for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
-            if (getManifestId(i.getValue()).equals(currentManifest.getId())) {
+            if (currentManifest.getId().equals(getManifestId(i.getValue()))) {
                 return i.getKey().getName();
             }
         }
@@ -49,11 +49,11 @@ public abstract class ManifestSelectorElement extends SelectorElement {
 
     protected abstract List<LauncherManifest> getComponents();
 
-    private boolean allowSelection(LauncherManifest manifest, boolean selected) {
+    protected boolean allowSelection(LauncherManifest manifest, boolean selected) {
         return !getLock();
     }
 
-    private void onSelected(LauncherManifest manifest, boolean selected) {
+    protected void onSelected(LauncherManifest manifest, boolean selected) {
         if(selected) {
             deselectAll();
             currentManifest = manifest;
