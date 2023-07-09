@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import net.treset.minecraftlauncher.util.ui.IconButton?>
+<?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 <AnchorPane fx:id="rootPane" visible="false" styleClass="element" xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="net.treset.minecraftlauncher.ui.manager.AddModElement">

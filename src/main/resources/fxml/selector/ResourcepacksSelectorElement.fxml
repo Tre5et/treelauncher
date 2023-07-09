@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.*?>
+<?import net.treset.minecraftlauncher.ui.generic.CreateSelectable?>
+<?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
 
-<?import net.treset.minecraftlauncher.util.ui.IconButton?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ResourcepacksSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
         <AnchorPane minWidth="-Infinity" styleClass="element">
@@ -15,31 +13,22 @@
                     <Label styleClass="title" text="%selector.resourcepacks.label.title" />
                 </VBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity" VBox.vgrow="ALWAYS">
-                    <VBox fx:id="resourcepacksContainer" alignment="TOP_CENTER">
+                    <VBox fx:id="elementContainer" alignment="TOP_CENTER">
                     </VBox>
                 </ScrollPane>
-                <HBox fx:id="createSelector" alignment="CENTER_LEFT" onMouseClicked="#onCreateSelectorClicked" styleClass="create-container" VBox.vgrow="NEVER">
-                    <FontIcon iconLiteral="bi-plus:36" styleClass="icon" />
-                    <Label styleClass="element-title" text="%components.label.create" />
-                    <VBox.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </VBox.margin>
-                    <cursor>
-                        <Cursor fx:constant="HAND" />
-                    </cursor>
-                </HBox>
+                <CreateSelectable fx:id="createSelectable" onMouseClicked="#onCreateSelectableClicked" />
             </VBox>
         </AnchorPane>
         <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <HBox alignment="CENTER_LEFT" styleClass="title-container">
-                    <IconButton fx:id="folderButton" styleClass="folder" iconSize="36" onAction="#onFolderButtonClicked" tooltipText="%selector.component.tooltip.folder" />
-                    <Label fx:id="resourcepacksDetailsTitle" disable="true" styleClass="title" text="%components.label.details.title" />
-                    <IconButton fx:id="deleteButton" styleClass="negative, delete" iconSize="36" onAction="#onDeleteButtonClicked" tooltipText="%selector.component.tooltip.delete" />
-                </HBox>
-                <VBox fx:id="creatorContainer" visible="false" alignment="TOP_CENTER">
+                <ActionBar fx:id="actionBar"
+                           defaultLabel="%components.label.details.title"
+                           onFolder="#onFolderClicked"
+                           onDelete="#onDeleteClicked"
+                />
+                <VBox fx:id="createContainer" visible="false" alignment="TOP_CENTER">
                     <fx:include fx:id="resourcepacksCreator" source="/fxml/create/ResourcepacksCreatorElement.fxml" />
-                    <Button fx:id="createButton" onMouseClicked="#onCreateButtonClicked" text="%creator.button.create" />
+                    <Button fx:id="createButton" onMouseClicked="#onCreateClicked" text="%creator.button.create" />
                 </VBox>
             </VBox>
         </AnchorPane>

@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.util.ui;
+package net.treset.minecraftlauncher.ui.generic;
 
 import javafx.css.*;
 import javafx.css.converter.PaintConverter;

@@ -11,7 +11,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.ImageUtil;
-import net.treset.minecraftlauncher.util.ui.IconButton;
+import net.treset.minecraftlauncher.ui.generic.IconButton;
 
 import java.util.function.Function;
 

@@ -3,7 +3,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.*?>
-<?import net.treset.minecraftlauncher.util.ui.IconButton?>
+<?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 <AnchorPane fx:id="rootPane" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.generic.VersionChangerElement">
     <GridPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
         <columnConstraints>

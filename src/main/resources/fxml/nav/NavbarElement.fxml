@@ -3,7 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import net.treset.minecraftlauncher.util.ui.*?>
+<?import net.treset.minecraftlauncher.ui.generic.IconButton?>
+
 <HBox stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500" styleClass="navbar"
       xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">

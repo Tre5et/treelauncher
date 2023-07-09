@@ -2,8 +2,6 @@ package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -17,10 +15,7 @@ import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.ui.generic.ComponentChangerElement;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
-import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
+import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
@@ -42,13 +37,9 @@ public class InstanceSelectorElement extends UiElement {
 
     @FXML private AnchorPane rootPane;
     @FXML private VBox instanceContainer;
-    @FXML private Button playButton;
-    @FXML private Label instanceDetailsTitle;
-    @FXML private Button folderButton;
-    @FXML private Button deleteButton;
+    @FXML private ActionBar actionBar;
     @FXML private InstanceManagerElement instanceDetailsController;
-    @FXML private Button componentFolderButton;
-    @FXML private Label componentTitleLabel;
+    @FXML private ActionBar componentActionBar;
     @FXML private ComponentChangerElement componentChangerController;
     @FXML private VersionChangerElement versionChangerController;
     @FXML private PopupElement popupController;
@@ -115,30 +106,23 @@ public class InstanceSelectorElement extends UiElement {
         instanceDetailsController.clearSelection();
         componentChangerController.setVisible(false);
         versionChangerController.setVisible(false);
-        componentTitleLabel.setDisable(true);
-        componentTitleLabel.setText(LauncherApplication.stringLocalizer.get("selector.instance.label.component.title"));
-        componentFolderButton.setDisable(true);
+        componentActionBar.setDisable(true);
+        componentActionBar.clearLabel();
         if(selected) {
             for(Pair<SelectorEntryElement, AnchorPane> instance : instances) {
                 if(instance.getKey().getInstanceData() != instanceData) {
                     instance.getKey().select(false, true, false);
                 }
             }
-            playButton.setDisable(false);
+            actionBar.setDisable(false);
+            actionBar.setLabel(instanceData.getInstance().getKey().getName());
             currentInstance = instanceData;
-            instanceDetailsTitle.setText(instanceData.getInstance().getKey().getName());
-            instanceDetailsTitle.setDisable(false);
-            folderButton.setDisable(false);
-            deleteButton.setDisable(false);
             instanceDetailsController.populate(instanceData);
             instanceDetailsController.setVisible(true);
         } else {
-            playButton.setDisable(true);
+            actionBar.setDisable(true);
+            actionBar.clearLabel();
             currentInstance = null;
-            instanceDetailsTitle.setText(LauncherApplication.stringLocalizer.get("instances.label.details.title"));
-            instanceDetailsTitle.setDisable(true);
-            folderButton.setDisable(true);
-            deleteButton.setDisable(true);
             instanceDetailsController.setVisible(false);
         }
     }
@@ -150,7 +134,7 @@ public class InstanceSelectorElement extends UiElement {
     public void onPlayButtonClicked() {
         if(currentInstance != null) {
             setLock(true);
-            playButton.setDisable(true);
+            actionBar.setDisable(true);
             GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
             displayGamePreparing();
             try {
@@ -185,15 +169,14 @@ public class InstanceSelectorElement extends UiElement {
         if(error != null) {
             Platform.runLater(() -> displayGameCrash(error));
         }
-        Platform.runLater(() -> playButton.setDisable(false));
+        Platform.runLater(() -> actionBar.setDisable(false));
     }
 
     private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
         componentChangerController.setVisible(false);
         versionChangerController.setVisible(false);
-        componentTitleLabel.setDisable(true);
-        componentTitleLabel.setText(LauncherApplication.stringLocalizer.get("selector.instance.label.component.title"));
-        componentFolderButton.setDisable(true);
+        componentActionBar.setDisable(true);
+        componentActionBar.clearLabel();
         if(selected && type != null) {
             List<LauncherManifest> manifests;
             LauncherManifest currentManifest;
@@ -227,9 +210,8 @@ public class InstanceSelectorElement extends UiElement {
                 default -> throw new IllegalStateException("Unexpected value: " + type);
             }
             componentChangerController.init(manifests, currentManifest, this::onComponentChanged, this::allowChange);
-            componentTitleLabel.setText(label);
-            componentTitleLabel.setDisable(false);
-            componentFolderButton.setDisable(false);
+            componentActionBar.setLabel(label);
+            componentActionBar.setDisable(false);
             componentChangerController.setVisible(true);
         }
     }

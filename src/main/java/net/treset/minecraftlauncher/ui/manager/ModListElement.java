@@ -19,7 +19,7 @@ import net.treset.mc_version_loader.mods.ModProvider;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.UiLoader;
-import net.treset.minecraftlauncher.util.ui.IconButton;
+import net.treset.minecraftlauncher.ui.generic.IconButton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;

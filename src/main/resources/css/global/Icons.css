@@ -77,3 +77,7 @@
 .github {
     -fx-icon-code: bi-github;
 }
+
+.edit {
+    -fx-icon-code: bi-pencil-square;
+}
