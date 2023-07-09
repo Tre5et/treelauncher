@@ -120,7 +120,7 @@ public class InstanceCreatorElement extends UiElement {
     @Override
     public void beforeShow(Stage stage) {
         popupController.setContent("creator.instance.popup.label.undefined", "");
-        popupController.clearButtons();
+        popupController.clearControls();
         popupController.addButtons(new PopupElement.PopupButton(
                 PopupElement.ButtonType.POSITIVE,
                 "creator.instance.popup.button.back",

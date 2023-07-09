@@ -69,7 +69,7 @@ public class ModsManagerElement extends UiElement {
         if(versionSelector.getSelectionModel().getSelectedItem() != null && !Objects.equals(versionSelector.getSelectionModel().getSelectedItem(), details.getValue().getModsVersion())) {
             popupController.setType(PopupElement.PopupType.WARNING);
             popupController.setContent("mods.manager.popup.change.title", "mods.manager.popup.change.message");
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.addButtons(
                     new PopupElement.PopupButton(PopupElement.ButtonType.NEGATIVE,
                             "mods.manager.popup.change.cancel", "cancelButton",

@@ -97,6 +97,41 @@ public abstract class SelectorElement extends UiElement {
     protected abstract void onFolderClicked();
 
     @FXML
+    protected void onEditClicked() {
+        popupController.setType(PopupElement.PopupType.NONE);
+        popupController.setContent("selector.component.edit.title", "");
+        popupController.clearControls();
+        popupController.setTextInput("selector.component.edit.prompt");
+        popupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "selector.component.edit.cancel",
+                        "cancel",
+                        id -> popupController.setVisible(false)
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "selector.component.edit.confirm",
+                        "confirm",
+                        id -> {
+                            String newName = popupController.getTextInputContent();
+                            if(!editValid(newName)) {
+                                popupController.setErrorMessage("selector.component.edit.error");
+                                return;
+                            }
+                            popupController.setVisible(false);
+                            editCurrent(newName);
+                        }
+                )
+        );
+        popupController.setVisible(true);
+    }
+
+    protected abstract boolean editValid(String newName);
+
+    protected abstract void editCurrent(String newName);
+
+    @FXML
     protected void onDeleteClicked() {
         if(getLock()) {
             return;
@@ -106,7 +141,7 @@ public abstract class SelectorElement extends UiElement {
             popupController.setType(PopupElement.PopupType.ERROR);
             popupController.setTitle("selector.component.delete.unable.title");
             popupController.setMessage("selector.component.delete.unable.message", usedBy);
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
@@ -119,7 +154,7 @@ public abstract class SelectorElement extends UiElement {
         } else {
             popupController.setType(PopupElement.PopupType.WARNING);
             popupController.setContent("selector.component.delete.title", "selector.component.delete.message");
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.NEGATIVE,

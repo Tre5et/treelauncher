@@ -26,6 +26,7 @@
                 <ActionBar fx:id="actionBar"
                            defaultLabel="%components.label.details.title"
                            onFolder="#onFolderClicked"
+                           onEdit="#onEditClicked"
                            onDelete="#onDeleteClicked"
                />
                 <VBox fx:id="createContainer" visible="false" alignment="TOP_CENTER">

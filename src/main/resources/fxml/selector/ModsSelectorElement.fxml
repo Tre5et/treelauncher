@@ -26,6 +26,7 @@
                 <ActionBar fx:id="actionBar"
                            defaultLabel="%components.label.details.title"
                            onFolder="#onFolderClicked"
+                           onEdit="#onEditClicked"
                            onDelete="#onDeleteClicked"
                 />
                 <AnchorPane VBox.vgrow="ALWAYS">

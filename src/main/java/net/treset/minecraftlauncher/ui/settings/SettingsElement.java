@@ -110,7 +110,7 @@ public class SettingsElement extends UiElement {
         if(!dir.isDirectory()) {
             popupController.setType(PopupElement.PopupType.ERROR);
             popupController.setContent("settings.path.invalid.title", "");
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
@@ -125,7 +125,7 @@ public class SettingsElement extends UiElement {
 
         popupController.setType(PopupElement.PopupType.NONE);
         popupController.setContent("settings.path.changing.title", "");
-        popupController.clearButtons();
+        popupController.clearControls();
         popupController.setVisible(true);
 
         new Thread(() -> {
@@ -140,7 +140,7 @@ public class SettingsElement extends UiElement {
             Platform.runLater(() -> {
                 popupController.setType(PopupElement.PopupType.SUCCESS);
                 popupController.setContent("settings.path.success.title", "");
-                popupController.clearButtons();
+                popupController.clearControls();
                 popupController.addButtons(
                         new PopupElement.PopupButton(
                                 PopupElement.ButtonType.POSITIVE,

@@ -21,6 +21,7 @@
                 <ActionBar fx:id="actionBar" disable="true" showPlay="true"
                            defaultLabel="%instances.label.details.title"
                            onPlay="#onPlayClicked"
+                           onEdit="#onEditClicked"
                            onFolder="#onFolderClicked"
                            onDelete="#onDeleteClicked"
                 />

@@ -25,8 +25,9 @@
         <VBox alignment="TOP_CENTER" spacing="10.0">
             <Label fx:id="titleLabel" alignment="TOP_CENTER" styleClass="title" text="You should not be seeing this" textAlignment="CENTER" textOverrun="WORD_ELLIPSIS" />
             <Label fx:id="messageLabel" alignment="TOP_CENTER" styleClass="message" text="This isn't good" textAlignment="CENTER" textOverrun="WORD_ELLIPSIS" />
+            <HBox fx:id="textFieldContainer" alignment="CENTER" />
+            <Label fx:id="errorMessage" styleClass="error" alignment="TOP_CENTER" />
         </VBox>
-        <HBox fx:id="buttonContainer" alignment="CENTER" spacing="10.0" styleClass="button-container" GridPane.rowIndex="1">
-        </HBox>
+        <HBox fx:id="buttonContainer" alignment="CENTER" spacing="10.0" styleClass="button-container" GridPane.rowIndex="1" />
     </GridPane>
 </GridPane>

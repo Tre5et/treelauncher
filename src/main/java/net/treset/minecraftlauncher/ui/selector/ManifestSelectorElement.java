@@ -4,7 +4,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,5 +82,26 @@ public abstract class ManifestSelectorElement extends SelectorElement {
         } catch (IOException e) {
             LOGGER.warn("Unable to open folder", e);
         }
+    }
+
+    @Override
+    protected boolean editValid(String newName) {
+        return newName != null && !newName.isBlank() && !newName.equals(currentManifest.getName());
+    }
+
+    @Override
+    protected void editCurrent(String newName) {
+        if(currentManifest == null) {
+            LOGGER.warn("No element selected");
+            return;
+        }
+        currentManifest.setName(newName);
+        try {
+            currentManifest.writeToFile(FormatUtil.absoluteFilePath(currentManifest.getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
+        setVisible(false);
+        setVisible(true);
     }
 }

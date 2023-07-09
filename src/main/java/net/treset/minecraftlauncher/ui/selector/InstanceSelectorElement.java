@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.ui.selector;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
@@ -120,7 +121,7 @@ public class InstanceSelectorElement extends SelectorElement {
     private void displayGamePreparing() {
         Platform.runLater(() -> {
             popupController.setContent("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message");
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.setVisible(true);
         });
     }
@@ -206,7 +207,7 @@ public class InstanceSelectorElement extends SelectorElement {
     }
 
     private void onVersionChange(VersionCreator creator) {
-        popupController.clearButtons();
+        popupController.clearControls();
         popupController.setType(PopupElement.PopupType.WARNING);
         popupController.setContent("selector.instance.version.popup.change.title", "selector.instance.version.popup.change.message");
         popupController.addButtons(
@@ -234,7 +235,7 @@ public class InstanceSelectorElement extends SelectorElement {
         popupController.setVisible(false);
         popupController.setContent("selector.instance.version.popup.changing", "");
         popupController.setType(PopupElement.PopupType.NONE);
-        popupController.clearButtons();
+        popupController.clearControls();
         popupController.addButtons(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
@@ -307,6 +308,27 @@ public class InstanceSelectorElement extends SelectorElement {
     }
 
     @Override
+    protected boolean editValid(String newName) {
+        return newName != null && !newName.isEmpty() && !newName.equals(currentInstance.getInstance().getKey().getName());
+    }
+
+    @Override
+    protected void editCurrent(String newName) {
+        if(currentInstance == null) {
+            LOGGER.warn("Current instance is null");
+            return;
+        }
+        currentInstance.getInstance().getKey().setName(newName);
+        try {
+            currentInstance.getInstance().getKey().writeToFile(FormatUtil.absoluteFilePath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
+        setVisible(false);
+        setVisible(true);
+    }
+
+    @Override
     protected void deleteCurrent() {
         try {
             currentInstance.delete(files);
@@ -338,7 +360,7 @@ public class InstanceSelectorElement extends SelectorElement {
             popupController.setTitle("selector.instance.error.launch.title");
             popupController.setMessage("selector.instance.error.launch.message", e.getMessage());
             popupController.setControlsDisabled(false);
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
@@ -355,7 +377,7 @@ public class InstanceSelectorElement extends SelectorElement {
         Platform.runLater(() -> {
             popupController.setType(PopupElement.PopupType.NONE);
             popupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
-            popupController.clearButtons();
+            popupController.clearControls();
             popupController.setVisible(true);
         });
     }
@@ -365,7 +387,7 @@ public class InstanceSelectorElement extends SelectorElement {
         popupController.setTitle("selector.instance.game.crash.title");
         popupController.setMessage("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error);
         popupController.setControlsDisabled(false);
-        popupController.clearButtons();
+        popupController.clearControls();
         popupController.addButtons(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
@@ -382,5 +404,11 @@ public class InstanceSelectorElement extends SelectorElement {
         );
         popupController.setVisible(false);
         popupController.setVisible(true);
+    }
+
+    @Override
+    public void beforeShow(Stage stage) {
+        super.beforeShow(stage);
+        instanceDetailsController.setVisible(false);
     }
 }
