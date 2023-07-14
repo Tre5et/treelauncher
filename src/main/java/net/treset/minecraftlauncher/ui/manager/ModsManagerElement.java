@@ -228,18 +228,25 @@ public class ModsManagerElement extends UiElement {
     }
 
     private void downloadMod(ModVersionData versionData, LauncherMod modData, ModListElement source) {
+        LOGGER.debug("Downloading mod: name={}, version={}", versionData.getName(), versionData.getVersionNumber());
         source.setDownloading(true);
         new Thread(() -> {
             if (modData != null) {
                 File oldFile = new File(details.getKey().getDirectory() + modData.getFileName());
-                if (oldFile.exists() && !oldFile.delete()) {
-                    LOGGER.warn("Failed to delete old mod file");
-                    Platform.runLater(() -> {
-                        source.beforeShow(null);
-                        source.afterShow(null);
-                    });
-                    return;
+                LOGGER.debug("Deleting old mod file: name={}", oldFile.getName());
+                if (oldFile.exists()) {
+                    if(!oldFile.delete()) {
+                        LOGGER.warn("Failed to delete old mod file: name={}", oldFile.getName());
+                        Platform.runLater(() -> {
+                            source.beforeShow(null);
+                            source.afterShow(null);
+                        });
+                        LauncherApplication.displayError(new IOException("Failed to delete old mod file: name=" + oldFile.getName()));
+                        return;
+                    }
+                    LOGGER.warn("Unable to locate old mod file: name={}", oldFile.getName());
                 }
+                LOGGER.debug("Deleted old mod file: name={}", oldFile.getName());
             }
             ArrayList<LauncherMod> mods = new ArrayList<>(details.getValue().getMods());
             if (modData != null) {
@@ -247,11 +254,12 @@ public class ModsManagerElement extends UiElement {
             }
             LauncherMod newMod = downloadAndAdd(versionData, mods);
             if (newMod == null) {
-                LOGGER.warn("Failed to download mod file");
+                LOGGER.warn("Failed to download mod file, name={}", versionData.getName());
                 Platform.runLater(() -> {
                     source.beforeShow(null);
                     source.afterShow(null);
                 });
+                LauncherApplication.displayError(new IOException("Failed to download mod file, name=" + versionData.getName()));
                 return;
             }
             details.getValue().setMods(mods);
@@ -287,18 +295,24 @@ public class ModsManagerElement extends UiElement {
     }
 
     private LauncherMod downloadAndAdd(ModVersionData versionData, ArrayList<LauncherMod> mods) {
-        LauncherMod newMod = null;
+        LOGGER.debug("Downloading mod file: name={}", versionData.getName());
+        LauncherMod newMod;
         try {
             newMod = ModUtil.downloadModFile(versionData, new File(details.getKey().getDirectory()), true);
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);
+            return null;
         }
 
         mods.add(newMod);
 
         try {
             for(ModVersionData d : versionData.getRequiredDependencies(details.getValue().getModsVersion(), details.getValue().getModsType())) {
-                if(d != null && d.getParentMod() != null && !modExists(d.getParentMod()) && downloadAndAdd(d, mods) == null) {
+                if(d == null) {
+                    continue;
+                }
+                LOGGER.debug("Downloading or skipping mod dependency file: name={}", d.getName());
+                if(d.getParentMod() != null && !modExists(d.getParentMod()) && downloadAndAdd(d, mods) == null) {
                     LauncherApplication.displayError(new FileDownloadException("Failed to download mod dependency file"));
                     return null;
                 }
@@ -306,6 +320,7 @@ public class ModsManagerElement extends UiElement {
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);
         }
+        LOGGER.debug("Downloaded mod file: name={}", versionData.getName());
         return newMod;
     }
 
