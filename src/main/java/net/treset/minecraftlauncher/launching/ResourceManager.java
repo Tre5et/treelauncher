@@ -139,7 +139,7 @@ public class ResourceManager {
         if(manifest == null || manifest.getIncludedFiles() == null) {
             throw new GameResourceException("Unable to get included files: unmet requirements");
         }
-        LOGGER.debug("Adding included files: manifestId={}", manifest.getId());
+        LOGGER.debug("Adding included files: {}Id={}", manifest.getType(), manifest.getId());
         File includedFilesDir = new File(manifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(!includedFilesDir.isDirectory()) {
             throw new GameResourceException("Included files directory doesn't exist: manifestId=" + manifest.getId());
@@ -148,6 +148,7 @@ public class ResourceManager {
         if(files == null) {
             throw new GameResourceException("Unable to get included files: manifestId=" + manifest.getId());
         }
+        LOGGER.debug("Adding included files: {}Id={}, includedFiles={}", manifest.getType(), manifest.getId(), files);
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
             LOGGER.debug("Adding included file: manifestId={}, file={}", manifest.getId(), f.getName());
@@ -212,11 +213,11 @@ public class ResourceManager {
     }
 
     private void removeExcludedFiles(ArrayList<File> files) {
-        LOGGER.debug("Removing excluded files: instance={}", instanceData.getInstance().getKey().getId());
+        LOGGER.debug("Removing excluded files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
         List<File> toRemove = new ArrayList<>();
         for(File f : files) {
-            LOGGER.debug("Removing excluded file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
             if(f.getName().equals(LauncherApplication.config.MANIFEST_FILE_NAME) || FormatUtil.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
+                LOGGER.debug("Removing excluded file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 toRemove.add(f);
             }
         }
@@ -225,13 +226,14 @@ public class ResourceManager {
     }
 
     private void removeIncludedFiles(List<LauncherManifest> components, ArrayList<File> files) throws GameResourceException {
-        LOGGER.debug("Removing included files: instance={}", instanceData.getInstance().getKey().getId());
+        LOGGER.debug("Removing included files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
         List<GameResourceException> exceptionQueue = new ArrayList<>();
         for(LauncherManifest component : components) {
-            LOGGER.debug("Removing included files: manifestId={}", component.getId());
             if(component.getIncludedFiles() == null || component.getIncludedFiles().isEmpty()) {
+                LOGGER.debug("No included files: manifestId={}", component.getId());
                 continue;
             }
+            LOGGER.debug("Removing included files: manifestId={}", component.getId());
             try {
                 removeIncludedFiles(component, files);
             } catch (GameResourceException e) {
@@ -246,7 +248,7 @@ public class ResourceManager {
     }
 
     private void removeIncludedFiles(LauncherManifest component, ArrayList<File> files) throws GameResourceException {
-        LOGGER.debug("Removing included files: manifestId={}", component.getId());
+        LOGGER.debug("Removing included files: {}Id={}, includedFiles={}, files={}", component.getType(), component.getId(), component.getIncludedFiles(), files);
         File includedFilesDir = new File(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             try {
@@ -261,11 +263,11 @@ public class ResourceManager {
         List<File> toRemove = new ArrayList<>();
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
-            LOGGER.debug("Removing included file: manifestId={}, file={}", component.getId(), f.getName());
-            String fName = f.isDirectory() ? FormatUtil.absoluteDirPath(f.getName()): FormatUtil.relativeFilePath(f.getName());
+            String fName = f.isDirectory() ? FormatUtil.absoluteDirPath(f.getName()): FormatUtil.absoluteFilePath(f.getName());
             boolean found = false;
             for(String i : component.getIncludedFiles()) {
                 if(FormatUtils.matches(fName, i)) {
+                    LOGGER.debug("Removing included file: manifestId={}, file={}, matches={}", component.getId(), fName, i);
                     try {
                         Files.move(Path.of(f.getPath()), Path.of(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
                         found = true;
@@ -278,6 +280,8 @@ public class ResourceManager {
             }
             if(found) {
                 toRemove.add(f);
+            } else {
+                LOGGER.debug("Skipping included file: manifestId={}, file={}", component.getId(), f.getName());
             }
         }
         files.removeAll(toRemove);
@@ -288,7 +292,7 @@ public class ResourceManager {
     }
 
     private void removeRemainingFiles(ArrayList<File> files) throws GameResourceException {
-        LOGGER.debug("Removing remaining files: instance={}", instanceData.getInstance().getKey().getId());
+        LOGGER.debug("Removing remaining files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
         File includedFilesDir = new File(instanceData.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             try {
@@ -302,16 +306,21 @@ public class ResourceManager {
         }
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
-            LOGGER.debug("Removing remaining file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
-            if(instanceData.getInstance().getValue().getIgnoredFiles().contains(f.getName())) {
+            if(FormatUtil.matchesAny(f.getName(), instanceData.getInstance().getValue().getIgnoredFiles())) {
+                LOGGER.debug("Deleting ignored file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 try {
-                    Files.delete(Path.of(f.getPath()));
+                    if(f.isDirectory()) {
+                        FileUtil.deleteDir(f);
+                    } else {
+                        Files.delete(Path.of(f.getPath()));
+                    }
                 } catch (IOException e) {
                     exceptionQueue.add(e);
                     LOGGER.warn("Unable to cleanup launch resources: unable to delete non-included file: " + f.getName());
                 }
             }
             else {
+                LOGGER.debug("Moving non-included file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 try {
                     Files.move(Path.of(f.getPath()), Path.of(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR , f.getName())), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {

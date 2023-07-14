@@ -74,9 +74,12 @@ public class FormatUtil {
         return absoluteFilePath(partsList.toArray(String[]::new));
     }
 
-    // \ -> \\; . -> \.; [.*;.+;.?] unchanged
+    // \ -> \\; . -> \.; [.*;.+;.?] unchanged; no .* at start / end -> ^ / $
     public static String toRegex(String source) {
-        return source.replaceAll("\\\\", "\\\\\\\\").replaceAll("(?<=^|[^\\\\])\\.(?=[^*+?]|$)", "\\\\.");
+        String pattern = source.replaceAll("\\\\", "\\\\\\\\").replaceAll("(?<=^|[^\\\\])\\.(?=[^*+?]|$)", "\\\\.");
+        if(!pattern.startsWith(".*")) pattern = "^" + pattern;
+        if(!pattern.endsWith(".*")) pattern += "$";
+        return pattern;
     }
 
     public static List<String> toRegex(String... items) {
