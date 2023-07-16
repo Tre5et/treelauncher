@@ -52,6 +52,7 @@ public class ModListElement extends UiElement {
     private TriConsumer<ModVersionData, LauncherMod, ModListElement> installCallback;
     private BiFunction<Boolean, LauncherMod, Boolean> disableCallback;
     private BiConsumer<LauncherMod, ModListElement> deleteCallback;
+    boolean versionAvailable = false;
 
 
     @Override
@@ -121,14 +122,27 @@ public class ModListElement extends UiElement {
                 versionData = modData.getVersions(gameVersion, "fabric");
             } catch (FileDownloadException e) {
                 LOGGER.error("Failed to get mod versions", e);
+                return;
             }
             List<String> selectorList = new ArrayList<>();
+            int currentIndex = -1;
             for (ModVersionData v : versionData) {
-                if(mod == null || !mod.getVersion().equals(v.getVersionNumber())) {
-                    selectorList.add(v.getVersionNumber());
+                if(mod != null && mod.getVersion().equals(v.getVersionNumber())) {
+                    versionAvailable = true;
+                    currentIndex = selectorList.size();
                 }
+                selectorList.add(v.getVersionNumber());
             }
-            Platform.runLater(() -> versionSelector.getItems().addAll(selectorList));
+            if(currentIndex == -1) {
+                currentIndex = selectorList.size();
+                selectorList.add(mod.getVersion());
+            }
+            int finalCurrentIndex = currentIndex;
+            Platform.runLater(() -> {
+                versionSelector.getItems().clear();
+                versionSelector.getItems().addAll(selectorList);
+                versionSelector.getSelectionModel().select(finalCurrentIndex);
+            });
         }
     }
 
@@ -192,6 +206,27 @@ public class ModListElement extends UiElement {
             }
         }
         return null;
+    }
+
+    public void checkUpdate() {
+        versionSelector.getSelectionModel().select(0);
+    }
+
+    public void confirmVersionChange(boolean enableUpdated) {
+        if(mod == null || !mod.getVersion().equals(versionSelector.getSelectionModel().getSelectedItem())) {
+            if(enableUpdated && disabled) {
+                onDisableButtonClicked();
+            }
+            if(!disabled) {
+                onInstallButtonClicked();
+            }
+        }
+    }
+
+    public void disableNoVersion() {
+        if(!versionAvailable && !disabled) {
+            onDisableButtonClicked();
+        }
     }
 
     @Override

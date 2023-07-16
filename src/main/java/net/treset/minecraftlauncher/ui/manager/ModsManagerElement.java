@@ -38,13 +38,16 @@ public class ModsManagerElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsManagerElement.class);
 
     @FXML private AnchorPane rootPane;
-    @FXML private VBox currentModsBox;
+    @FXML private VBox vbCurrentMods;
+    @FXML private CheckBox chUpdate;
+    @FXML private CheckBox chEnable;
+    @FXML private CheckBox chDisable;
     @FXML private VBox currentModsContainer;
-    @FXML private ComboBox<String> versionSelector;
-    @FXML private CheckBox snapshotsCheck;
-    @FXML private Button reloadButton;
-    @FXML private ModsSearchElement modSearchController;
-    @FXML private PopupElement popupController;
+    @FXML private ComboBox<String> cbVersion;
+    @FXML private CheckBox chSnapshots;
+    @FXML private Button btReload;
+    @FXML private ModsSearchElement icModSearchController;
+    @FXML private PopupElement icPopupController;
 
     private Pair<LauncherManifest, LauncherModsDetails> details;
     private List<Pair<ModListElement, AnchorPane>> elements;
@@ -54,23 +57,42 @@ public class ModsManagerElement extends UiElement {
     }
 
     @FXML
-    private void onAddButtonClicked() {
-        currentModsBox.setVisible(false);
-        modSearchController.setCurrentMods(details.getValue().getMods());
-        modSearchController.setVisible(true);
+    private void onAdd() {
+        vbCurrentMods.setVisible(false);
+        icModSearchController.setCurrentMods(details.getValue().getMods());
+        icModSearchController.setVisible(true);
     }
 
     @FXML
-    private void onSnapshotsChecked() {
+    private void onUpdate(){
+        for(Pair<ModListElement, AnchorPane> e : elements) {
+            e.getKey().checkUpdate();
+            if(chUpdate.isSelected()) {
+                e.getKey().confirmVersionChange(!chEnable.isDisable() && chEnable.isSelected());
+            }
+            if(chDisable.isSelected()) {
+                e.getKey().disableNoVersion();
+            }
+        }
+    }
+
+    @FXML
+    private void onCheckUpdate() {
+        chEnable.setDisable(!chUpdate.isSelected());
+    }
+
+    @FXML
+    private void onCheckSnapshots() {
         populateVersionChoice();
     }
 
-    @FXML private void onReloadButtonClicked() {
-        if(versionSelector.getSelectionModel().getSelectedItem() != null && !Objects.equals(versionSelector.getSelectionModel().getSelectedItem(), details.getValue().getModsVersion())) {
-            popupController.setType(PopupElement.PopupType.WARNING);
-            popupController.setContent("mods.manager.popup.change.title", "mods.manager.popup.change.message");
-            popupController.clearControls();
-            popupController.addButtons(
+    @FXML
+    private void onReload() {
+        if(cbVersion.getSelectionModel().getSelectedItem() != null && !Objects.equals(cbVersion.getSelectionModel().getSelectedItem(), details.getValue().getModsVersion())) {
+            icPopupController.setType(PopupElement.PopupType.WARNING);
+            icPopupController.setContent("mods.manager.popup.change.title", "mods.manager.popup.change.message");
+            icPopupController.clearControls();
+            icPopupController.addButtons(
                     new PopupElement.PopupButton(PopupElement.ButtonType.NEGATIVE,
                             "mods.manager.popup.change.cancel", "cancelButton",
                             this::onVersionChangeCanceled),
@@ -78,45 +100,45 @@ public class ModsManagerElement extends UiElement {
                             "mods.manager.popup.change.accept", "acceptButton",
                             this::onVersionChangeAccepted)
             );
-            popupController.setVisible(true);
+            icPopupController.setVisible(true);
         }
     }
 
     private void onVersionChangeAccepted(String id) {
-        popupController.setVisible(false);
-        details.getValue().setModsVersion(versionSelector.getSelectionModel().getSelectedItem());
+        icPopupController.setVisible(false);
+        details.getValue().setModsVersion(cbVersion.getSelectionModel().getSelectedItem());
         try {
             details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
-        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
+        icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
         onVersionSelected();
         reloadMods();
     }
 
     private void onVersionChangeCanceled(String id) {
-        popupController.setVisible(false);
-        versionSelector.getSelectionModel().select(details.getValue().getModsVersion());
+        icPopupController.setVisible(false);
+        cbVersion.getSelectionModel().select(details.getValue().getModsVersion());
         onVersionSelected();
     }
 
     private void onVersionSelected() {
-        reloadButton.setDisable(details.getValue().getModsVersion().equals(versionSelector.getSelectionModel().getSelectedItem()));
+        btReload.setDisable(details.getValue().getModsVersion().equals(cbVersion.getSelectionModel().getSelectedItem()));
     }
 
     @Override
     public void beforeShow(Stage stage){
         if(details == null || details.getValue().getMods() == null)
             return;
-        modSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
-        snapshotsCheck.setSelected(false);
-        versionSelector.getItems().clear();
-        versionSelector.setDisable(true);
-        versionSelector.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
-        popupController.setVisible(false);
-        currentModsBox.setVisible(true);
-        modSearchController.setVisible(false);
+        icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
+        chSnapshots.setSelected(false);
+        cbVersion.getItems().clear();
+        cbVersion.setDisable(true);
+        cbVersion.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
+        icPopupController.setVisible(false);
+        vbCurrentMods.setVisible(true);
+        icModSearchController.setVisible(false);
     }
 
     private void reloadMods() {
@@ -141,21 +163,21 @@ public class ModsManagerElement extends UiElement {
     }
 
     private void populateVersionChoice() {
-        versionSelector.getItems().clear();
-        versionSelector.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
-        versionSelector.setDisable(true);
-        versionSelector.getItems().add(details.getValue().getModsVersion());
-        versionSelector.getSelectionModel().select(0);
+        cbVersion.getItems().clear();
+        cbVersion.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
+        cbVersion.setDisable(true);
+        cbVersion.getItems().add(details.getValue().getModsVersion());
+        cbVersion.getSelectionModel().select(0);
         new Thread(() -> {
             try {
-                List <String> names = (snapshotsCheck.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases()).stream()
+                List <String> names = (chSnapshots.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases()).stream()
                         .map(MinecraftVersion::getId)
                         .filter(s -> !s.equals(details.getValue().getModsVersion()))
                         .toList();
                 Platform.runLater(() -> {
-                    versionSelector.getItems().addAll(names);
-                    versionSelector.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
-                    versionSelector.setDisable(false);
+                    cbVersion.getItems().addAll(names);
+                    cbVersion.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
+                    cbVersion.setDisable(false);
                 });
             } catch (FileDownloadException e) {
                LauncherApplication.displayError(e);
@@ -336,8 +358,8 @@ public class ModsManagerElement extends UiElement {
     }
 
     public void onSearchBackClicked() {
-        currentModsBox.setVisible(true);
-        modSearchController.setVisible(false);
+        vbCurrentMods.setVisible(true);
+        icModSearchController.setVisible(false);
         reloadMods();
     }
 }

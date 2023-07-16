@@ -81,3 +81,7 @@
 .edit {
     -fx-icon-code: bi-pencil-square;
 }
+
+.update {
+    -fx-icon-code: bi-box-arrow-in-down;
+}

@@ -6,25 +6,32 @@
 <?import javafx.geometry.Insets?>
 <?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 <AnchorPane fx:id="rootPane" styleClass="element-root" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
-    <VBox fx:id="currentModsBox" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <VBox fx:id="vbCurrentMods" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-            <IconButton fx:id="addButton" styleClass="add" iconSize="48" onAction="#onAddButtonClicked" />
+            <IconButton styleClass="add" iconSize="48" onAction="#onAdd" />
             <Label styleClass="title" text="%manager.mods.label.current" />
+            <IconButton styleClass="update" iconSize="42" onAction="#onUpdate" tooltipText="%manager.mods.tooltip.update" />
+            <VBox alignment="CENTER_LEFT">
+                <HBox spacing="10">
+                    <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" onAction="#onCheckUpdate" />
+                    <CheckBox fx:id="chEnable" text="%manager.mods.check.enable" />
+                </HBox>
+                <CheckBox fx:id="chDisable" text="%manager.mods.check.disable" />
+            </VBox>
         </HBox>
         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-            <VBox fx:id="currentModsContainer">
-            </VBox>
+            <VBox fx:id="currentModsContainer" />
         </ScrollPane>
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER" >
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
             <Label text="%manager.mods.prompt.changeversion" />
-            <ComboBox fx:id="versionSelector" />
-            <CheckBox fx:id="snapshotsCheck" onMouseClicked="#onSnapshotsChecked" text="%creator.version.checkbox.snapshots" />
-            <IconButton fx:id="reloadButton" styleClass="sync, highlight" iconSize="32" onAction="#onReloadButtonClicked" />
+            <ComboBox fx:id="cbVersion"/>
+            <CheckBox fx:id="chSnapshots" onMouseClicked="#onCheckSnapshots" text="%creator.version.checkbox.snapshots" />
+            <IconButton fx:id="btReload" styleClass="sync, highlight" iconSize="32" onAction="#onReload" />
         </HBox>
     </VBox>
-    <fx:include fx:id="modSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-    <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <fx:include fx:id="icModSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <fx:include fx:id="icPopup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>
