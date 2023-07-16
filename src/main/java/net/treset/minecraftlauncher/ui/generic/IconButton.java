@@ -1,6 +1,8 @@
 package net.treset.minecraftlauncher.ui.generic;
 
-import javafx.css.*;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableProperty;
 import javafx.css.converter.PaintConverter;
 import javafx.css.converter.SizeConverter;
 import javafx.scene.control.Button;
@@ -17,7 +19,7 @@ import java.util.List;
 import static java.util.Collections.unmodifiableList;
 
 public class IconButton extends Button {
-    private FontIcon icon = new FontIcon();
+    private NullCodeFontIcon icon = new NullCodeFontIcon();
 
     boolean iconOnly = true;
 
@@ -67,7 +69,7 @@ public class IconButton extends Button {
         return icon;
     }
 
-    public void setIcon(FontIcon icon) {
+    public void setIcon(NullCodeFontIcon icon) {
         this.icon = icon;
     }
 

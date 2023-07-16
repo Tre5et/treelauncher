@@ -123,6 +123,11 @@ public class NavbarElement extends UiElement {
         this.componentActivator = componentActivator;
     }
 
+    @Override
+    public void triggerHomeAction() {
+        onHomeButtonClicked();
+    }
+
     public void setLocked(boolean locked) {
         this.locked = locked;
     }

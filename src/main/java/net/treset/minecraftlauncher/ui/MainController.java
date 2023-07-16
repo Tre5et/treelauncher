@@ -47,7 +47,7 @@ public class MainController extends GenericUiController {
         optionsSelectorController.init(this, this::setLocked, this::getLocked);
         modsSelectorController.init(this, this::setLocked, this::getLocked);
         settingsController.init(this::onLogout);
-        activate(Component.INSTANCE_SELECTOR);
+        navbarController.triggerHomeAction();
     }
 
     @Override
