@@ -133,7 +133,7 @@ public class ModListElement extends UiElement {
                 }
                 selectorList.add(v.getVersionNumber());
             }
-            if(currentIndex == -1) {
+            if(currentIndex == -1 && mod != null) {
                 currentIndex = selectorList.size();
                 selectorList.add(mod.getVersion());
             }
@@ -141,16 +141,18 @@ public class ModListElement extends UiElement {
             Platform.runLater(() -> {
                 cbVersion.getItems().clear();
                 cbVersion.getItems().addAll(selectorList);
-                cbVersion.getSelectionModel().select(finalCurrentIndex);
+                if(finalCurrentIndex != -1) {
+                    cbVersion.getSelectionModel().select(finalCurrentIndex);
+                }
             });
         }
     }
 
     private void loadImage() {
-        if(mod != null && mod.getIconUrl() != null) {
+        if(mod != null && mod.getIconUrl() != null && !mod.getIconUrl().isBlank()) {
             Image logo = new Image(mod.getIconUrl());
             Platform.runLater(() -> ivLogo.setImage(logo));
-        } else if(modData != null && modData.getIconUrl() != null) {
+        } else if(modData != null && modData.getIconUrl() != null && !modData.getIconUrl().isBlank()) {
             Image logo = new Image(modData.getIconUrl());
             Platform.runLater(() -> ivLogo.setImage(logo));
         }

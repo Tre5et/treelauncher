@@ -266,6 +266,7 @@ public class ModsManagerElement extends UiElement {
                         LauncherApplication.displayError(new IOException("Failed to delete old mod file: name=" + oldFile.getName()));
                         return;
                     }
+                } else {
                     LOGGER.warn("Unable to locate old mod file: name={}", oldFile.getName());
                 }
                 LOGGER.debug("Deleted old mod file: name={}", oldFile.getName());
