@@ -43,7 +43,7 @@ public class SavesSelectorElement extends ManifestSelectorElement {
 
     @Override
     public void afterShow(Stage stage) {
-        super.beforeShow(stage);
+        super.afterShow(stage);
         savesCreatorController.afterShow(stage);
     }
 
