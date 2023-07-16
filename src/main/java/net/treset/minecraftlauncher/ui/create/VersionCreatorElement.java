@@ -22,13 +22,13 @@ import java.util.function.Consumer;
 
 public class VersionCreatorElement extends UiElement {
     @FXML private VBox rootBox;
-    @FXML private ComboBox<MinecraftVersion> versionChoice;
-    @FXML private ComboBox<String> typeChoice;
-    @FXML private ComboBox<FabricVersionDetails> loaderChoice;
-    @FXML private CheckBox snapshotsCheck;
-    @FXML private Label errorVersion;
-    @FXML private Label errorType;
-    @FXML private Label errorLoader;
+    @FXML private ComboBox<MinecraftVersion> cbVersion;
+    @FXML private ComboBox<String> cbType;
+    @FXML private ComboBox<FabricVersionDetails> cbLoader;
+    @FXML private CheckBox chSnapshots;
+    @FXML private Label lbVersionError;
+    @FXML private Label lbTypeError;
+    @FXML private Label lbLoaderError;
 
     private VersionCreationHelper versionCreationHelper;
 
@@ -36,10 +36,10 @@ public class VersionCreatorElement extends UiElement {
 
     public void setPrerequisites(Map<String, LauncherManifestType> typeConversion, LauncherManifest versionManifest, LauncherFiles launcherFiles, String librariesDir, Consumer<Boolean> modsActivateCallback) {
         versionCreationHelper = new VersionCreationHelper(
-                versionChoice,
-                snapshotsCheck,
-                typeChoice,
-                loaderChoice,
+                cbVersion,
+                chSnapshots,
+                cbType,
+                cbLoader,
                 typeConversion,
                 launcherFiles,
                 librariesDir,
@@ -49,14 +49,14 @@ public class VersionCreatorElement extends UiElement {
 
         this.modsActivateCallback = modsActivateCallback;
 
-        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateLoaderState));
+        cbType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateLoaderState));
     }
 
     public String getGameVersion() {
-        return versionChoice.getValue().getId();
+        return cbVersion.getValue().getId();
     }
     public String getVersionType() {
-        if("Fabric".equals(typeChoice.getValue())) {
+        if("Fabric".equals(cbType.getValue())) {
             return "fabric";
         }
         return null;
@@ -66,24 +66,24 @@ public class VersionCreatorElement extends UiElement {
     @Override
     public void beforeShow(Stage stage) {
         versionCreationHelper.beforeShow();
-        errorVersion.setVisible(false);
-        errorType.setVisible(false);
-        errorLoader.setVisible(false);
-        versionChoice.getStyleClass().remove("error");
-        typeChoice.getStyleClass().remove("error");
-        loaderChoice.getStyleClass().remove("error");
+        lbVersionError.setVisible(false);
+        lbTypeError.setVisible(false);
+        lbLoaderError.setVisible(false);
+        cbVersion.getStyleClass().remove("error");
+        cbType.getStyleClass().remove("error");
+        cbLoader.getStyleClass().remove("error");
     }
 
-    @FXML private void onSnapshotsCheck() {
+    @FXML private void onCheckSnapshots() {
         versionCreationHelper.populateVersionChoice();
     }
 
     private void updateLoaderState() {
-        if("Fabric".equals(typeChoice.getValue())) {
+        if("Fabric".equals(cbType.getValue())) {
             modsActivateCallback.accept(true);
         } else {
             modsActivateCallback.accept(false);
-            errorLoader.setVisible(false);
+            lbLoaderError.setVisible(false);
         }
     }
 
@@ -101,24 +101,24 @@ public class VersionCreatorElement extends UiElement {
     }
 
     public void showError(boolean show) {
-        errorVersion.setVisible(false);
-        versionChoice.getStyleClass().remove("error");
-        errorType.setVisible(false);
-        typeChoice.getStyleClass().remove("error");
-        errorLoader.setVisible(false);
-        loaderChoice.getStyleClass().remove("error");
+        lbVersionError.setVisible(false);
+        cbVersion.getStyleClass().remove("error");
+        lbTypeError.setVisible(false);
+        cbType.getStyleClass().remove("error");
+        lbLoaderError.setVisible(false);
+        cbLoader.getStyleClass().remove("error");
         if(show) {
-            if(versionChoice.getSelectionModel().isEmpty()) {
-                errorVersion.setVisible(true);
-                versionChoice.getStyleClass().add("error");
+            if(cbVersion.getSelectionModel().isEmpty()) {
+                lbVersionError.setVisible(true);
+                cbVersion.getStyleClass().add("error");
             }
-            else if(!"Vanilla".equals(typeChoice.getValue()) && !"Fabric".equals(typeChoice.getValue())) {
-                errorType.setVisible(true);
-                typeChoice.getStyleClass().add("error");
+            else if(!"Vanilla".equals(cbType.getValue()) && !"Fabric".equals(cbType.getValue())) {
+                lbTypeError.setVisible(true);
+                cbType.getStyleClass().add("error");
             }
-            else if("Fabric".equals(typeChoice.getValue()) && loaderChoice.getSelectionModel().isEmpty()) {
-                errorLoader.setVisible(true);
-                loaderChoice.getStyleClass().add("error");
+            else if("Fabric".equals(cbType.getValue()) && cbLoader.getSelectionModel().isEmpty()) {
+                lbLoaderError.setVisible(true);
+                cbLoader.getStyleClass().add("error");
             }
         }
     }
@@ -128,6 +128,6 @@ public class VersionCreatorElement extends UiElement {
     }
 
     public boolean checkCreateReady() {
-        return !versionChoice.getSelectionModel().isEmpty() && ("Vanilla".equals(typeChoice.getValue()) || "Fabric".equals(typeChoice.getValue()) && !loaderChoice.getSelectionModel().isEmpty());
+        return !cbVersion.getSelectionModel().isEmpty() && ("Vanilla".equals(cbType.getValue()) || "Fabric".equals(cbType.getValue()) && !cbLoader.getSelectionModel().isEmpty());
     }
 }

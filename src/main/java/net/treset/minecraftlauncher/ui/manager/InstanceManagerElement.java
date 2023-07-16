@@ -20,16 +20,16 @@ public class InstanceManagerElement extends UiElement {
     }
 
     @FXML public VBox container;
-    @FXML public Label versionName;
-    @FXML public Label savesName;
-    @FXML public Label resourcepacksName;
-    @FXML public Label optionsName;
-    @FXML public Label modsName;
-    @FXML private GridPane versionContainer;
-    @FXML private GridPane savesContainer;
-    @FXML private GridPane resourcepacksContainer;
-    @FXML private GridPane optionsContainer;
-    @FXML private GridPane modsContainer;
+    @FXML public Label lbVersion;
+    @FXML public Label lbSaves;
+    @FXML public Label lbResourcepacks;
+    @FXML public Label lbOptions;
+    @FXML public Label lbMods;
+    @FXML private GridPane gpVersion;
+    @FXML private GridPane gpSaves;
+    @FXML private GridPane gpResourcepacks;
+    @FXML private GridPane gpOptions;
+    @FXML private GridPane gpMods;
 
     private BiConsumer<Boolean, SelectedType> selectionCallback;
     private SelectedType currentSelected = null;
@@ -44,89 +44,89 @@ public class InstanceManagerElement extends UiElement {
     }
 
     public void populate(InstanceData instanceData) {
-        versionName.setText(instanceData.getVersionComponents().get(0).getKey().getName());
-        savesName.setText(instanceData.getSavesComponent().getName());
-        resourcepacksName.setText(instanceData.getResourcepacksComponent().getName());
-        optionsName.setText(instanceData.getOptionsComponent().getName());
+        lbVersion.setText(instanceData.getVersionComponents().get(0).getKey().getName());
+        lbSaves.setText(instanceData.getSavesComponent().getName());
+        lbResourcepacks.setText(instanceData.getResourcepacksComponent().getName());
+        lbOptions.setText(instanceData.getOptionsComponent().getName());
         if(instanceData.getModsComponent() != null) {
-            modsContainer.setVisible(true);
-            modsName.setText(instanceData.getModsComponent().getKey().getName());
+            gpMods.setVisible(true);
+            lbMods.setText(instanceData.getModsComponent().getKey().getName());
         } else {
-            modsContainer.setVisible(false);
+            gpMods.setVisible(false);
         }
     }
 
     @FXML
-    private void onVersionClicked() {
+    private void onSelectVersion() {
         unselectAll();
         if(currentSelected == SelectedType.VERSION) {
             selectionCallback.accept(false, SelectedType.VERSION);
             currentSelected = null;
         } else {
-            versionContainer.getStyleClass().add("selected");
+            gpVersion.getStyleClass().add("selected");
             currentSelected = SelectedType.VERSION;
             selectionCallback.accept(true, SelectedType.VERSION);
         }
     }
 
     @FXML
-    private void onSavesClicked() {
+    private void onSelectSaves() {
         unselectAll();
         if(currentSelected == SelectedType.SAVES) {
             selectionCallback.accept(false, SelectedType.SAVES);
             currentSelected = null;
         } else {
-            savesContainer.getStyleClass().add("selected");
+            gpSaves.getStyleClass().add("selected");
             currentSelected = SelectedType.SAVES;
             selectionCallback.accept(true, SelectedType.SAVES);
         }
     }
 
     @FXML
-    private void onResourcepacksClicked() {
+    private void onSelectResourcepacks() {
         unselectAll();
         if(currentSelected == SelectedType.RESOURCEPACKS) {
             selectionCallback.accept(false, SelectedType.RESOURCEPACKS);
             currentSelected = null;
         } else {
-            resourcepacksContainer.getStyleClass().add("selected");
+            gpResourcepacks.getStyleClass().add("selected");
             currentSelected = SelectedType.RESOURCEPACKS;
             selectionCallback.accept(true, SelectedType.RESOURCEPACKS);
         }
     }
 
     @FXML
-    private void onOptionsClicked() {
+    private void onSelectOptions() {
         unselectAll();
         if(currentSelected == SelectedType.OPTIONS) {
             selectionCallback.accept(false, SelectedType.OPTIONS);
             currentSelected = null;
         } else {
-            optionsContainer.getStyleClass().add("selected");
+            gpOptions.getStyleClass().add("selected");
             currentSelected = SelectedType.OPTIONS;
             selectionCallback.accept(true, SelectedType.OPTIONS);
         }
     }
 
     @FXML
-    private void onModsClicked() {
+    private void onSelectMods() {
         unselectAll();
         if(currentSelected == SelectedType.MODS) {
             selectionCallback.accept(false, SelectedType.MODS);
             currentSelected = null;
         } else {
-            modsContainer.getStyleClass().add("selected");
+            gpMods.getStyleClass().add("selected");
             currentSelected = SelectedType.MODS;
             selectionCallback.accept(true, SelectedType.MODS);
         }
     }
 
     private void unselectAll() {
-        versionContainer.getStyleClass().remove("selected");
-        savesContainer.getStyleClass().remove("selected");
-        resourcepacksContainer.getStyleClass().remove("selected");
-        optionsContainer.getStyleClass().remove("selected");
-        modsContainer.getStyleClass().remove("selected");
+        gpVersion.getStyleClass().remove("selected");
+        gpSaves.getStyleClass().remove("selected");
+        gpResourcepacks.getStyleClass().remove("selected");
+        gpOptions.getStyleClass().remove("selected");
+        gpMods.getStyleClass().remove("selected");
     }
 
     public void clearSelection() {

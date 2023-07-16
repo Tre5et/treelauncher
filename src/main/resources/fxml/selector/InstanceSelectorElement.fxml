@@ -12,33 +12,33 @@
                     <Label styleClass="title" text="%instances.label.title" />
                 </VBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
-                    <VBox fx:id="elementContainer" alignment="TOP_CENTER"/>
+                    <VBox fx:id="vbElements" alignment="TOP_CENTER"/>
                 </ScrollPane>
             </VBox>
         </AnchorPane>
-        <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
+        <AnchorPane minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <ActionBar fx:id="actionBar" disable="true" showPlay="true"
+                <ActionBar fx:id="abMain" disable="true" showPlay="true"
                            defaultLabel="%instances.label.details.title"
-                           onPlay="#onPlayClicked"
-                           onEdit="#onEditClicked"
-                           onFolder="#onFolderClicked"
-                           onDelete="#onDeleteClicked"
+                           onPlay="#onPlay"
+                           onEdit="#onEdit"
+                           onFolder="#onFolder"
+                           onDelete="#onDelete"
                 />
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
-                    <fx:include fx:id="instanceDetails" source="../manager/InstanceManagerElement.fxml" />
+                    <fx:include fx:id="icDetails" source="../manager/InstanceManagerElement.fxml" />
                 </ScrollPane>
             </VBox>
         </AnchorPane>
-        <AnchorPane fx:id="componentPane" styleClass="element">
+        <AnchorPane styleClass="element">
             <VBox alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
-                <ActionBar fx:id="componentActionBar" disable="true" showEdit="false" showDelete="false"
+                <ActionBar fx:id="abComponent" disable="true" showEdit="false" showDelete="false"
                            defaultLabel="%selector.instance.label.component.title"
-                           onFolder="#onComponentFolderClicked"
+                           onFolder="#onComponentFolder"
                 />
                 <AnchorPane>
-                    <fx:include fx:id="componentChanger" source="/fxml/generic/ComponentChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                    <fx:include fx:id="versionChanger" source="/fxml/generic/VersionChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <fx:include fx:id="icComponentChanger" source="/fxml/generic/ComponentChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <fx:include fx:id="icVersionChanger" source="/fxml/generic/VersionChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                 </AnchorPane>
             </VBox>
         </AnchorPane>

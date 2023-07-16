@@ -19,20 +19,20 @@ import java.io.IOException;
 public class LoginController extends GenericUiController {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
-    @FXML private TitlebarElement titlebarController;
-    @FXML private Button loginButton;
-    @FXML private CheckBox rememberChoice;
-    @FXML private Button continueButton;
-    @FXML private Label statusLabel;
+    @FXML private TitlebarElement icTitlebarController;
+    @FXML private Button btLogin;
+    @FXML private CheckBox chRemember;
+    @FXML private Button btContinue;
+    @FXML private Label lbStatus;
     public int loginRetry = 0;
 
     @FXML
-    public void onLoginButtonClicked() {
-       triggerLogin(rememberChoice.isSelected() && loginRetry < 1);
+    public void onLogin() {
+       triggerLogin(chRemember.isSelected() && loginRetry < 1);
     }
 
     @FXML
-    public void onContinueButtonClicked() {
+    public void onContinue() {
         try {
             MainController.showOnStage(stage);
         } catch (IOException e) {
@@ -43,24 +43,24 @@ public class LoginController extends GenericUiController {
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        titlebarController.beforeShow(stage);
+        icTitlebarController.beforeShow(stage);
     }
 
     @Override
     public void afterShow(Stage stage) {
         if(LauncherApplication.userAuth.hasFile()) {
-            loginButton.setDisable(true);
-            rememberChoice.setDisable(true);
-            statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
+            btLogin.setDisable(true);
+            chRemember.setDisable(true);
+            lbStatus.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
             new Thread(() -> LauncherApplication.userAuth.authenticateFromFile(this::onAutoLoginDone)).start();
         }
-        titlebarController.afterShow(stage);
+        icTitlebarController.afterShow(stage);
     }
 
     private void triggerLogin(boolean remember) {
-        loginButton.setDisable(true);
-        rememberChoice.setDisable(true);
-        statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
+        btLogin.setDisable(true);
+        chRemember.setDisable(true);
+        lbStatus.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
         new Thread(() -> LauncherApplication.userAuth.authenticate(remember, this::onLoginDone)).start();
     }
 
@@ -70,12 +70,12 @@ public class LoginController extends GenericUiController {
 
     private void onAutoLoginDone(boolean success) {
         if(success) {
-            Platform.runLater(this::onContinueButtonClicked);
+            Platform.runLater(this::onContinue);
         } else {
             Platform.runLater(() -> {
-                loginButton.setDisable(false);
-                rememberChoice.setDisable(false);
-                statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
+                btLogin.setDisable(false);
+                chRemember.setDisable(false);
+                lbStatus.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
                 loginRetry++;
                 LOGGER.warn("Login failed");
             });
@@ -84,12 +84,12 @@ public class LoginController extends GenericUiController {
 
     private void loginDoneActions(boolean success) {
         if(success) {
-            statusLabel.setText(LauncherApplication.stringLocalizer.getFormatted("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
+            lbStatus.setText(LauncherApplication.stringLocalizer.getFormatted("login.label.success", LauncherApplication.userAuth.getMinecraftUser().name()));
             LOGGER.debug("Login success, username=" + LauncherApplication.userAuth.getMinecraftUser().name());
-            continueButton.setVisible(true);
+            btContinue.setVisible(true);
         } else {
-            loginButton.setDisable(false);
-            statusLabel.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
+            btLogin.setDisable(false);
+            lbStatus.setText(LauncherApplication.stringLocalizer.get("login.label.failure"));
             loginRetry++;
             LOGGER.warn("Login failed");
         }

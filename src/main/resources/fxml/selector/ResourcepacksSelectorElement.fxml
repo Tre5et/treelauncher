@@ -13,26 +13,26 @@
                     <Label styleClass="title" text="%selector.resourcepacks.label.title" />
                 </VBox>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity" VBox.vgrow="ALWAYS">
-                    <VBox fx:id="elementContainer" alignment="TOP_CENTER">
+                    <VBox fx:id="vbElements" alignment="TOP_CENTER">
                     </VBox>
                 </ScrollPane>
-                <CreateSelectable fx:id="createSelectable" onMouseClicked="#onCreateSelectableClicked" />
+                <CreateSelectable fx:id="csCreate" onMouseClicked="#onSelectCreate" />
             </VBox>
         </AnchorPane>
-        <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
+        <AnchorPane minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <ActionBar fx:id="actionBar"
+                <ActionBar fx:id="abMain"
                            defaultLabel="%components.label.details.title"
-                           onFolder="#onFolderClicked"
-                           onEdit="#onEditClicked"
-                           onDelete="#onDeleteClicked"
+                           onFolder="#onFolder"
+                           onEdit="#onEdit"
+                           onDelete="#onDelete"
                 />
-                <VBox fx:id="createContainer" visible="false" alignment="TOP_CENTER">
-                    <fx:include fx:id="resourcepacksCreator" source="/fxml/create/ResourcepacksCreatorElement.fxml" />
-                    <Button fx:id="createButton" onMouseClicked="#onCreateClicked" text="%creator.button.create" />
+                <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER">
+                    <fx:include fx:id="icCreator" source="/fxml/create/ResourcepacksCreatorElement.fxml" />
+                    <Button onMouseClicked="#onCreate" text="%creator.button.create" />
                 </VBox>
             </VBox>
         </AnchorPane>
     </SplitPane>
-    <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <fx:include fx:id="icPopup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>

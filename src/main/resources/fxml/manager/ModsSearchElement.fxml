@@ -8,20 +8,20 @@
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsSearchElement">
    <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <HBox alignment="CENTER_LEFT">
-         <IconButton fx:id="backButton" styleClass="back" iconSize="36" onMouseClicked="#onBackButtonClicked" />
-         <TextField fx:id="searchField" onKeyReleased="#onSearchKeyPress" promptText="%manager.mods.search.prompt.search" styleClass="search" HBox.hgrow="ALWAYS" />
-         <IconButton fx:id="searchButton" styleClass="search" iconSize="36" onMouseClicked="#onSearchButtonClicked" />
+         <IconButton fx:id="btBack" styleClass="back" iconSize="36" onMouseClicked="#onBack" />
+         <TextField fx:id="tfSearch" onKeyReleased="#onSearchKeyPress" promptText="%manager.mods.search.prompt.search" styleClass="search" HBox.hgrow="ALWAYS" />
+         <IconButton fx:id="btSearch" styleClass="search" iconSize="36" onMouseClicked="#onSearch" />
       </HBox>
-      <Label fx:id="loadingLabel" styleClass="element-title" text="%manager.mods.search.label.loading" textAlignment="CENTER" visible="false" />
+      <Label fx:id="lbLoading" styleClass="element-title" text="%manager.mods.search.label.loading" textAlignment="CENTER" visible="false" />
       <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-         <VBox fx:id="resultsContainer" alignment="TOP_CENTER" />
+         <VBox fx:id="vbResults" alignment="TOP_CENTER" />
       </ScrollPane>
       <HBox>
          <padding>
             <Insets topRightBottomLeft="5.0" />
          </padding>
-         <Button fx:id="addButton" text="%manager.mods.search.button.add" onMouseClicked="#onAddButtonClicked" HBox.hgrow="ALWAYS"/>
+         <Button fx:id="btAdd" text="%manager.mods.search.button.add" onMouseClicked="#onAdd" HBox.hgrow="ALWAYS"/>
       </HBox>
    </VBox>
-   <fx:include fx:id="addModElement" source="AddModElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+   <fx:include fx:id="icAddMod" source="AddModElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
 </AnchorPane>

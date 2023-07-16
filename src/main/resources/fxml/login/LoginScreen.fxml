@@ -10,13 +10,13 @@
 <?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 <VBox alignment="TOP_CENTER" prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="net.treset.minecraftlauncher.ui.login.LoginController">
-    <fx:include fx:id="titlebar" source="/fxml/title/TitlebarElement.fxml" VBox.vgrow="NEVER"/>
+    <fx:include fx:id="icTitlebar" source="/fxml/title/TitlebarElement.fxml" VBox.vgrow="NEVER"/>
     <SplitPane dividerPositions="0.26057906458797325" styleClass="element-root"
                VBox.vgrow="ALWAYS">
         <VBox alignment="CENTER" spacing="10" nodeOrientation="LEFT_TO_RIGHT" styleClass="element">
-            <Button fx:id="loginButton" alignment="CENTER" minWidth="-Infinity" onAction="#onLoginButtonClicked"
+            <Button fx:id="btLogin" alignment="CENTER" minWidth="-Infinity" onAction="#onLogin"
                     text="%login.button.microsoft" textAlignment="CENTER"/>
-            <CheckBox fx:id="rememberChoice" selected="true" text="%login.checkbox.remember"/>
+            <CheckBox fx:id="chRemember" selected="true" text="%login.checkbox.remember"/>
         </VBox>
         <GridPane alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" styleClass="element">
             <columnConstraints>
@@ -29,14 +29,14 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity"
+            <Label fx:id="lbStatus" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity"
                    minWidth="-Infinity" styleClass="title" textAlignment="CENTER" GridPane.columnIndex="1"
                    GridPane.rowIndex="1">
                 <font>
                     <Font size="30.0"/>
                 </font>
             </Label>
-            <IconButton fx:id="continueButton" styleClass="forward, highlight" iconSize="48" onAction="#onContinueButtonClicked"
+            <IconButton fx:id="btContinue" styleClass="forward, highlight" iconSize="48" onAction="#onContinue"
                         GridPane.columnIndex="2" GridPane.rowIndex="2" visible="false" />
         </GridPane>
     </SplitPane>

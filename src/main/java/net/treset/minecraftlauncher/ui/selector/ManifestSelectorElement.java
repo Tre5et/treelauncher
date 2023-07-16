@@ -60,19 +60,19 @@ public abstract class ManifestSelectorElement extends SelectorElement {
             deselectAll();
             currentManifest = manifest;
             createSelected = false;
-            createSelectable.getStyleClass().remove("selected");
-            createContainer.setVisible(false);
-            actionBar.setDisable(false);
-            actionBar.setLabel(manifest.getName());
+            csCreate.getStyleClass().remove("selected");
+            vbCreate.setVisible(false);
+            abMain.setDisable(false);
+            abMain.setLabel(manifest.getName());
         } else {
             currentManifest = null;
-            actionBar.setDisable(true);
-            actionBar.clearLabel();
+            abMain.setDisable(true);
+            abMain.clearLabel();
         }
     }
 
     @Override
-    protected void onFolderClicked() {
+    protected void onFolder() {
         if(currentManifest == null) {
             LOGGER.warn("No element selected");
         }

@@ -4,26 +4,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox fx:id="rootPane" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.OptionsCreatorElement">
-    <RadioButton fx:id="radioCreate" mnemonicParsing="false" onAction="#onRadioCreateSelect" selected="true" text="%creator.radio.create">
+    <RadioButton fx:id="rbCreate" mnemonicParsing="false" onAction="#onRadioCreate" selected="true" text="%creator.radio.create">
         <toggleGroup>
-            <ToggleGroup fx:id="createtype" />
+            <ToggleGroup fx:id="tgCreateType"/>
         </toggleGroup>
     </RadioButton>
-    <VBox fx:id="createBox" minHeight="-Infinity" minWidth="-Infinity">
-        <TextField fx:id="createName" promptText="%creator.prompt.name" />
-        <Label fx:id="createError" styleClass="error" text="%creator.label.error.name" visible="false" />
+    <VBox fx:id="vbCreate" minHeight="-Infinity" minWidth="-Infinity">
+        <TextField fx:id="tfCreateName" promptText="%creator.prompt.name" />
+        <Label fx:id="lbCreateError" styleClass="error" text="%creator.label.error.name" visible="false" />
     </VBox>
-    <RadioButton fx:id="radioInherit" mnemonicParsing="false" onAction="#onRadioInheritSelect" text="%creator.radio.inherit" toggleGroup="$createtype" />
-    <VBox fx:id="inheritBox" minHeight="-Infinity" minWidth="-Infinity">
-        <TextField fx:id="inheritName" promptText="%creator.prompt.name" />
-        <ComboBox fx:id="inheritChoice" promptText="%creator.prompt.component" />
-        <Label fx:id="inheritErrorName" styleClass="error" text="%creator.label.error.name" visible="false" />
-        <Label fx:id="inheritErrorSelect" styleClass="error" text="%creator.label.error.select" visible="false" />
+    <RadioButton fx:id="rbInherit" mnemonicParsing="false" onAction="#onRadioInherit" text="%creator.radio.inherit" toggleGroup="$tgCreateType" />
+    <VBox fx:id="vbInherit" minHeight="-Infinity" minWidth="-Infinity">
+        <TextField fx:id="tfInheritName" promptText="%creator.prompt.name" />
+        <ComboBox fx:id="cbInherit" promptText="%creator.prompt.component" />
+        <Label fx:id="lbInheritErrorName" styleClass="error" text="%creator.label.error.name" visible="false" />
+        <Label fx:id="lbInheritErrorSelect" styleClass="error" text="%creator.label.error.select" visible="false" />
     </VBox>
-    <RadioButton fx:id="radioUse" mnemonicParsing="false" onAction="#onRadioUseSelect" text="%creator.radio.use" toggleGroup="$createtype" />
-    <VBox fx:id="useBox" minHeight="-Infinity" minWidth="-Infinity">
-        <ComboBox fx:id="useChoice" promptText="%creator.prompt.component" />
-        <Label fx:id="useError" styleClass="error" text="%creator.label.error.select" visible="false" />
+    <RadioButton fx:id="rbUse" mnemonicParsing="false" onAction="#onRadioUse" text="%creator.radio.use" toggleGroup="$tgCreateType" />
+    <VBox fx:id="vbUse" minHeight="-Infinity" minWidth="-Infinity">
+        <ComboBox fx:id="cbUse" promptText="%creator.prompt.component" />
+        <Label fx:id="lbUseError" styleClass="error" text="%creator.label.error.select" visible="false" />
     </VBox>
     <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

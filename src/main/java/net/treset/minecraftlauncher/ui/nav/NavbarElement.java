@@ -16,72 +16,72 @@ import net.treset.minecraftlauncher.ui.generic.IconButton;
 import java.util.function.Function;
 
 public class NavbarElement extends UiElement {
-    @FXML private IconButton homeButton;
-    @FXML private Button addButton;
-    @FXML private Button savesButton;
-    @FXML private Button resourcepacksButton;
-    @FXML private Button optionsButton;
-    @FXML private Button modsButton;
-    @FXML private Button profileButton;
-    @FXML private ImageView profileImage;
+    @FXML private IconButton btHome;
+    @FXML private Button btAdd;
+    @FXML private Button btSaves;
+    @FXML private Button btResourcepacks;
+    @FXML private Button btOptions;
+    @FXML private Button btMods;
+    @FXML private Button btProfile;
+    @FXML private ImageView ivProfile;
 
     private boolean locked = false;
     private Stage stage;
     private Function<MainController.Component, Boolean> componentActivator;
 
     @FXML
-    private void onHomeButtonClicked() {
+    private void onHome() {
         if(componentActivator.apply(MainController.Component.INSTANCE_SELECTOR)) {
             deselectAll();
-            homeButton.getStyleClass().add("selected");
+            btHome.getStyleClass().add("selected");
         }
     }
 
     @FXML
-    private void onAddButtonClicked() {
+    private void onAdd() {
         if(componentActivator.apply(MainController.Component.INSTANCE_CREATOR)) {
             deselectAll();
-            addButton.getStyleClass().add("selected");
+            btAdd.getStyleClass().add("selected");
         }
     }
 
     @FXML
-    private void onSavesButtonClicked() {
+    private void onSaves() {
         if(componentActivator.apply(MainController.Component.SAVES_SELECTOR)) {
             deselectAll();
-            savesButton.getStyleClass().add("selected");
+            btSaves.getStyleClass().add("selected");
         }
     }
 
     @FXML
-    private void onResourcepacksButtonClicked() {
+    private void onResourcepacks() {
         if(componentActivator.apply(MainController.Component.RESOURCEPACKS_SELECTOR)) {
             deselectAll();
-            resourcepacksButton.getStyleClass().add("selected");
+            btResourcepacks.getStyleClass().add("selected");
         }
     }
 
     @FXML
-    private void onOptionsButtonClicked() {
+    private void onOptions() {
         if(componentActivator.apply(MainController.Component.OPTIONS_SELECTOR)) {
             deselectAll();
-            optionsButton.getStyleClass().add("selected");
+            btOptions.getStyleClass().add("selected");
         }
     }
 
     @FXML
-    private void onModsButtonClicked() {
+    private void onMods() {
         if(componentActivator.apply(MainController.Component.MODS_SELECTOR)) {
             deselectAll();
-            modsButton.getStyleClass().add("selected");
+            btMods.getStyleClass().add("selected");
         }
     }
 
     @FXML
-    private void onProfileButtonClicked() {
+    private void onProfile() {
         if(componentActivator.apply(MainController.Component.SETTINGS)) {
             deselectAll();
-            profileButton.getStyleClass().add("selected");
+            btProfile.getStyleClass().add("selected");
         }
     }
 
@@ -94,20 +94,20 @@ public class NavbarElement extends UiElement {
     }
 
     private void deselectAll() {
-        homeButton.getStyleClass().remove("selected");
-        addButton.getStyleClass().remove("selected");
-        savesButton.getStyleClass().remove("selected");
-        resourcepacksButton.getStyleClass().remove("selected");
-        optionsButton.getStyleClass().remove("selected");
-        modsButton.getStyleClass().remove("selected");
-        profileButton.getStyleClass().remove("selected");
+        btHome.getStyleClass().remove("selected");
+        btAdd.getStyleClass().remove("selected");
+        btSaves.getStyleClass().remove("selected");
+        btResourcepacks.getStyleClass().remove("selected");
+        btOptions.getStyleClass().remove("selected");
+        btMods.getStyleClass().remove("selected");
+        btProfile.getStyleClass().remove("selected");
     }
 
     private void setProfileImage() {
         if(LauncherApplication.userAuth.isLoggedIn()) {
             try {
                 Image profileImage = ImageUtil.rescale(LauncherApplication.userAuth.getUserIcon(), 4);
-                Platform.runLater(() -> this.profileImage.setImage(profileImage));
+                Platform.runLater(() -> this.ivProfile.setImage(profileImage));
 
             } catch (FileDownloadException e) {
                 LauncherApplication.displayError(e);
@@ -125,7 +125,7 @@ public class NavbarElement extends UiElement {
 
     @Override
     public void triggerHomeAction() {
-        onHomeButtonClicked();
+        onHome();
     }
 
     public void setLocked(boolean locked) {

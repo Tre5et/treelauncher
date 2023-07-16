@@ -15,24 +15,20 @@ import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.util.ui.VersionCreationHelper;
-import net.treset.minecraftlauncher.ui.create.VersionCreatorElement;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.treset.minecraftlauncher.util.ui.VersionCreationHelper;
 
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class VersionChangerElement extends UiElement {
-    private static final Logger LOGGER = LogManager.getLogger(VersionCreatorElement.class);
 
     @FXML private AnchorPane rootPane;
-    @FXML private ComboBox<MinecraftVersion> versionChoice;
-    @FXML private CheckBox snapshotsCheck;
-    @FXML private ComboBox<String> typeChoice;
-    @FXML private ComboBox<FabricVersionDetails> loaderChoice;
-    @FXML private Button changeButton;
+    @FXML private ComboBox<MinecraftVersion> cbVersion;
+    @FXML private CheckBox chSnapshots;
+    @FXML private ComboBox<String> cbType;
+    @FXML private ComboBox<FabricVersionDetails> cbLoader;
+    @FXML private Button btChange;
 
     private VersionCreationHelper versionCreationHelper;
 
@@ -41,10 +37,10 @@ public class VersionChangerElement extends UiElement {
 
     public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, String librariesDir, LauncherManifest versionManifest, Consumer<VersionCreator> changeCallback, Consumer<Exception> changeFailCallback) {
         versionCreationHelper = new VersionCreationHelper(
-                versionChoice,
-                snapshotsCheck,
-                typeChoice,
-                loaderChoice,
+                cbVersion,
+                chSnapshots,
+                cbType,
+                cbLoader,
                 typeConversion,
                 launcherFiles,
                 librariesDir,
@@ -54,17 +50,11 @@ public class VersionChangerElement extends UiElement {
 
         this.changeCallback = changeCallback;
         this.changeFailCallback = changeFailCallback;
-        typeChoice.getItems().clear();
-        typeChoice.getItems().addAll("Vanilla", "Fabric");
-        versionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::updateButtonState);
-        });
-        typeChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::updateButtonState);
-        });
-        loaderChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::updateButtonState);
-        });
+        cbType.getItems().clear();
+        cbType.getItems().addAll("Vanilla", "Fabric");
+        cbVersion.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateButtonState));
+        cbType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateButtonState));
+        cbLoader.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateButtonState));
     }
 
     @Override
@@ -76,7 +66,7 @@ public class VersionChangerElement extends UiElement {
     public void afterShow(Stage stage) {}
 
     @FXML
-    private void onChangeButtonClicked() {
+    private void onChange() {
         if(checkCreateReady()) {
             try {
                 VersionCreator creator = versionCreationHelper.getCreator();
@@ -88,18 +78,18 @@ public class VersionChangerElement extends UiElement {
     }
 
     private void updateButtonState() {
-        if(versionChoice.getValue() == null || typeChoice.getValue() == null) {
-            changeButton.setDisable(true);
+        if(cbVersion.getValue() == null || cbType.getValue() == null) {
+            btChange.setDisable(true);
             return;
         }
-        changeButton.setDisable(versionCreationHelper.getCurrentVersion() != null
-                && versionCreationHelper.getCurrentVersion().getVersionNumber().equals(versionChoice.getValue().getId())
-                && versionCreationHelper.getCurrentVersion().getVersionType().equals(typeChoice.getValue().toLowerCase())
-                && (versionCreationHelper.getCurrentVersion().getLoaderVersion() == null || versionCreationHelper.getCurrentVersion().getLoaderVersion().equals(loaderChoice.getValue().getLoader().getVersion())));
+        btChange.setDisable(versionCreationHelper.getCurrentVersion() != null
+                && versionCreationHelper.getCurrentVersion().getVersionNumber().equals(cbVersion.getValue().getId())
+                && versionCreationHelper.getCurrentVersion().getVersionType().equals(cbType.getValue().toLowerCase())
+                && (versionCreationHelper.getCurrentVersion().getLoaderVersion() == null || versionCreationHelper.getCurrentVersion().getLoaderVersion().equals(cbLoader.getValue().getLoader().getVersion())));
     }
 
     @FXML
-    private void onSnapshotsChecked() {
+    private void onCheckSnapshots() {
         versionCreationHelper.populateVersionChoice();
     }
 
@@ -115,6 +105,6 @@ public class VersionChangerElement extends UiElement {
     }
 
     public boolean checkCreateReady() {
-        return !versionChoice.getSelectionModel().isEmpty() && ("Vanilla".equals(typeChoice.getValue()) || "Fabric".equals(typeChoice.getValue()) && !loaderChoice.getSelectionModel().isEmpty());
+        return !cbVersion.getSelectionModel().isEmpty() && ("Vanilla".equals(cbType.getValue()) || "Fabric".equals(cbType.getValue()) && !cbLoader.getSelectionModel().isEmpty());
     }
 }

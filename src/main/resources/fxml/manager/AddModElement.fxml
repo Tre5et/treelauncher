@@ -11,22 +11,22 @@
         <padding>
             <Insets topRightBottomLeft="10.0" />
         </padding>
-        <TextField fx:id="modName" promptText="%manager.mods.add.prompt.name" />
+        <TextField fx:id="tfName" promptText="%manager.mods.add.prompt.name" />
         <Label visible="false" styleClass="error" text="Placeholder" />
         <HBox>
-            <TextField fx:id="pathField" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
-            <IconButton styleClass="file-code" iconSize="28" onAction="#onFileSelectorClicked" tooltipText="%settings.tooltip.select" />
+            <TextField fx:id="tfPath" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
+            <IconButton styleClass="file-code" iconSize="28" onAction="#onFileSelector" tooltipText="%settings.tooltip.select" />
         </HBox>
-        <Label fx:id="fileError" visible="false" styleClass="error" text="%manager.mods.add.error.file" />
-        <TextField fx:id="versionField" promptText="%manager.mods.add.prompt.version" />
-        <Label fx:id="versionError" visible="false" styleClass="error" text="%manager.mods.add.error.version" />
-        <TextField fx:id="modrinthId" promptText="%manager.mods.add.prompt.modrinth" />
-        <Label fx:id="modrinthError" visible="false" styleClass="error" text="%manager.mods.add.error.modrinth" />
-        <TextField fx:id="curseforgeId" promptText="%manager.mods.add.prompt.curseforge" />
-        <Label fx:id="curseforgeError" visible="false" styleClass="error" text="%manager.mods.add.error.curseforge" />
+        <Label fx:id="lbFileError" visible="false" styleClass="error" text="%manager.mods.add.error.file" />
+        <TextField fx:id="tfVersion" promptText="%manager.mods.add.prompt.version" />
+        <Label fx:id="lbVersionError" visible="false" styleClass="error" text="%manager.mods.add.error.version" />
+        <TextField fx:id="tfModrinth" promptText="%manager.mods.add.prompt.modrinth" />
+        <Label fx:id="lbModrinthError" visible="false" styleClass="error" text="%manager.mods.add.error.modrinth" />
+        <TextField fx:id="tfCurseforge" promptText="%manager.mods.add.prompt.curseforge" />
+        <Label fx:id="lbCurseforgeError" visible="false" styleClass="error" text="%manager.mods.add.error.curseforge" />
         <HBox spacing="10">
-            <Button styleClass="neutral" text="%manager.mods.add.button.cancel" onAction="#onCancelButtonClicked" />
-            <Button text="%manager.mods.add.button.add" onAction="#onAddButtonClicked" />
+            <Button styleClass="neutral" text="%manager.mods.add.button.cancel" onAction="#onCancel" />
+            <Button text="%manager.mods.add.button.add" onAction="#onAdd" />
         </HBox>
     </VBox>
 </AnchorPane>

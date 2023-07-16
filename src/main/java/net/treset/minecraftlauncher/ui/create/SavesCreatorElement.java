@@ -1,7 +1,10 @@
 package net.treset.minecraftlauncher.ui.create;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
@@ -9,30 +12,27 @@ import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.creation.SavesCreator;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 
 public class SavesCreatorElement extends UiElement {
-    private static final Logger LOGGER = LogManager.getLogger(SavesCreatorElement.class);
 
     @FXML private VBox rootPane;
-    @FXML private RadioButton radioCreate;
-    @FXML private RadioButton radioUse;
-    @FXML private RadioButton radioInherit;
-    @FXML private TextField createName;
-    @FXML private TextField inheritName;
-    @FXML private ComboBox<String> useChoice;
-    @FXML private ComboBox<String> inheritChoice;
-    @FXML private Label createError;
-    @FXML private Label useError;
-    @FXML private Label inheritErrorName;
-    @FXML private Label inheritErrorSelect;
-    @FXML private VBox createBox;
-    @FXML private VBox useBox;
-    @FXML private VBox inheritBox;
+    @FXML private RadioButton rbCreate;
+    @FXML private RadioButton rbUse;
+    @FXML private RadioButton rbInherit;
+    @FXML private TextField tfCreateName;
+    @FXML private TextField tfInheritName;
+    @FXML private ComboBox<String> cbUse;
+    @FXML private ComboBox<String> cbInherit;
+    @FXML private Label lbCreateError;
+    @FXML private Label lbUseError;
+    @FXML private Label lbInheritErrorName;
+    @FXML private Label lbInheritErrorSelect;
+    @FXML private VBox vbCreate;
+    @FXML private VBox vbUse;
+    @FXML private VBox vbInherit;
 
     private List<LauncherManifest> savesComponents;
     private Map<String, LauncherManifestType> typeConversion;
@@ -46,43 +46,43 @@ public class SavesCreatorElement extends UiElement {
         this.gameManifest = gameManifest;
     }
 
-    @FXML private void onRadioCreateSelect() {
-        createBox.setDisable(false);
-        useBox.setDisable(true);
-        inheritBox.setDisable(true);
+    @FXML private void onRadioCreate() {
+        vbCreate.setDisable(false);
+        vbUse.setDisable(true);
+        vbInherit.setDisable(true);
     }
-    @FXML private void onRadioUseSelect() {
-        createBox.setDisable(true);
-        useBox.setDisable(false);
-        inheritBox.setDisable(true);
+    @FXML private void onRadioUse() {
+        vbCreate.setDisable(true);
+        vbUse.setDisable(false);
+        vbInherit.setDisable(true);
     }
-    @FXML private void onRadioInheritSelect() {
-        createBox.setDisable(true);
-        useBox.setDisable(true);
-        inheritBox.setDisable(false);
+    @FXML private void onRadioInherit() {
+        vbCreate.setDisable(true);
+        vbUse.setDisable(true);
+        vbInherit.setDisable(false);
     }
 
     @Override
     public void beforeShow(Stage stage) {
-        radioCreate.fire();
-        createBox.setDisable(false);
-        createName.setText("");
-        createName.getStyleClass().remove("error");
-        createError.setVisible(false);
-        useBox.setDisable(true);
-        useChoice.getItems().clear();
-        useChoice.getStyleClass().remove("error");
-        useError.setVisible(false);
-        inheritBox.setDisable(true);
-        inheritName.setText("");
-        inheritName.getStyleClass().remove("error");
-        inheritErrorName.setVisible(false);
-        inheritChoice.getItems().clear();
-        inheritChoice.getStyleClass().remove("error");
-        inheritErrorSelect.setVisible(false);
+        rbCreate.fire();
+        vbCreate.setDisable(false);
+        tfCreateName.setText("");
+        tfCreateName.getStyleClass().remove("error");
+        lbCreateError.setVisible(false);
+        vbUse.setDisable(true);
+        cbUse.getItems().clear();
+        cbUse.getStyleClass().remove("error");
+        lbUseError.setVisible(false);
+        vbInherit.setDisable(true);
+        tfInheritName.setText("");
+        tfInheritName.getStyleClass().remove("error");
+        lbInheritErrorName.setVisible(false);
+        cbInherit.getItems().clear();
+        cbInherit.getStyleClass().remove("error");
+        lbInheritErrorSelect.setVisible(false);
         for(LauncherManifest manifest : savesComponents) {
-            useChoice.getItems().add(manifest.getName());
-            inheritChoice.getItems().add(manifest.getName());
+            cbUse.getItems().add(manifest.getName());
+            cbInherit.getItems().add(manifest.getName());
         }
     }
 
@@ -106,20 +106,20 @@ public class SavesCreatorElement extends UiElement {
         if(!checkCreateReady()) {
             throw new ComponentCreationException("Not ready to create saves!");
         }
-        if(radioCreate.isSelected()) {
-            return new SavesCreator(createName.getText(), typeConversion, savesManifest, gameManifest);
-        } else if(radioUse.isSelected()) {
-            LauncherManifest manifest = getSaveFromName(useChoice.getSelectionModel().getSelectedItem());
+        if(rbCreate.isSelected()) {
+            return new SavesCreator(tfCreateName.getText(), typeConversion, savesManifest, gameManifest);
+        } else if(rbUse.isSelected()) {
+            LauncherManifest manifest = getSaveFromName(cbUse.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                throw new ComponentCreationException("Could not find save: name=" + useChoice.getSelectionModel().getSelectedItem());
+                throw new ComponentCreationException("Could not find save: name=" + cbUse.getSelectionModel().getSelectedItem());
             }
             return new SavesCreator(manifest);
-        } else if(radioInherit.isSelected()) {
-            LauncherManifest manifest = getSaveFromName(inheritChoice.getSelectionModel().getSelectedItem());
+        } else if(rbInherit.isSelected()) {
+            LauncherManifest manifest = getSaveFromName(cbInherit.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                throw new ComponentCreationException("Could not find save: name=" + inheritChoice.getSelectionModel().getSelectedItem());
+                throw new ComponentCreationException("Could not find save: name=" + cbInherit.getSelectionModel().getSelectedItem());
             }
-            return new SavesCreator(inheritName.getText(), manifest, savesManifest, gameManifest);
+            return new SavesCreator(tfInheritName.getText(), manifest, savesManifest, gameManifest);
         }
         throw new ComponentCreationException("No radio button selected!");
     }
@@ -134,41 +134,40 @@ public class SavesCreatorElement extends UiElement {
     }
 
     public void showError(boolean show) {
-        createError.setVisible(false);
-        createName.getStyleClass().remove("error");
-        useError.setVisible(false);
-        useChoice.getStyleClass().remove("error");
-        inheritErrorName.setVisible(false);
-        inheritName.getStyleClass().remove("error");
-        inheritErrorSelect.setVisible(false);
-        inheritChoice.getStyleClass().remove("error");
+        lbCreateError.setVisible(false);
+        tfCreateName.getStyleClass().remove("error");
+        lbUseError.setVisible(false);
+        cbUse.getStyleClass().remove("error");
+        lbInheritErrorName.setVisible(false);
+        tfInheritName.getStyleClass().remove("error");
+        lbInheritErrorSelect.setVisible(false);
+        cbInherit.getStyleClass().remove("error");
         if(show) {
-            if(radioCreate.isSelected() && createName.getText().isBlank()) {
-                createError.setVisible(true);
-                createName.getStyleClass().add("error");
-            } else if(radioUse.isSelected() && useChoice.getSelectionModel().isEmpty()) {
-                useError.setVisible(true);
-                useChoice.getStyleClass().add("error");
-            } else if(radioInherit.isSelected()) {
-                if(inheritName.getText().isBlank()) {
-                    inheritErrorName.setVisible(true);
-                    inheritName.getStyleClass().add("error");
+            if(rbCreate.isSelected() && tfCreateName.getText().isBlank()) {
+                lbCreateError.setVisible(true);
+                tfCreateName.getStyleClass().add("error");
+            } else if(rbUse.isSelected() && cbUse.getSelectionModel().isEmpty()) {
+                lbUseError.setVisible(true);
+                cbUse.getStyleClass().add("error");
+            } else if(rbInherit.isSelected()) {
+                if(tfInheritName.getText().isBlank()) {
+                    lbInheritErrorName.setVisible(true);
+                    tfInheritName.getStyleClass().add("error");
                 }
-                if(inheritChoice.getSelectionModel().isEmpty()) {
-                    inheritErrorSelect.setVisible(true);
-                    inheritChoice.getStyleClass().add("error");
+                if(cbInherit.getSelectionModel().isEmpty()) {
+                    lbInheritErrorSelect.setVisible(true);
+                    cbInherit.getStyleClass().add("error");
                 }
             }
         }
     }
 
     public void enableUse(boolean enable) {
-        radioUse.setVisible(enable);
-        useBox.setVisible(enable);
+        rbUse.setVisible(enable);
+        vbUse.setVisible(enable);
     }
 
     public boolean checkCreateReady() {
-        boolean result = (savesComponents != null && typeConversion != null && savesManifest != null && gameManifest != null && ((radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
-        return result;
+        return (savesComponents != null && typeConversion != null && savesManifest != null && gameManifest != null && ((rbCreate.isSelected() && !tfCreateName.getText().isBlank()) || (rbUse.isSelected() && !cbUse.getSelectionModel().isEmpty()) || (rbInherit.isSelected() && !tfInheritName.getText().isBlank() && !cbInherit.getSelectionModel().isEmpty())));
     }
 }

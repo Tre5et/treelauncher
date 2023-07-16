@@ -27,14 +27,14 @@ import java.net.URISyntaxException;
 
 public class SettingsElement extends UiElement {
     @FXML private AnchorPane rootPane;
-    @FXML private ComboBox<String> languageComboBox;
-    @FXML private Label languageRestartHint;
-    @FXML private TextField pathField;
-    @FXML private CheckBox removeCheckBox;
-    @FXML private Label usernameLabel;
-    @FXML private Label uuidLabel;
-    @FXML private ImageView skinView;
-    @FXML private PopupElement popupController;
+    @FXML private ComboBox<String> cbLanguage;
+    @FXML private Label lbLanguage;
+    @FXML private TextField tfPath;
+    @FXML private CheckBox cbRemove;
+    @FXML private Label lbUsername;
+    @FXML private Label lbUuid;
+    @FXML private ImageView ivSkin;
+    @FXML private PopupElement icPopupController;
 
     private Runnable logoutCallback;
 
@@ -43,15 +43,15 @@ public class SettingsElement extends UiElement {
         this.logoutCallback = logoutCallback;
 
         for(StringLocalizer.Language language : StringLocalizer.getAvailableLanguages()) {
-            languageComboBox.getItems().add((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
+            cbLanguage.getItems().add((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
         }
         StringLocalizer.Language language = LauncherApplication.stringLocalizer.getLanguage();
-        languageComboBox.getSelectionModel().select((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
+        cbLanguage.getSelectionModel().select((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
 
-        languageComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onLanguageComboBoxChanged));
+        cbLanguage.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onLanguageComboBoxChanged));
 
-        usernameLabel.setText(LauncherApplication.userAuth.getMinecraftUser().name());
-        uuidLabel.setText(LauncherApplication.userAuth.getMinecraftUser().uuid());
+        lbUsername.setText(LauncherApplication.userAuth.getMinecraftUser().name());
+        lbUuid.setText(LauncherApplication.userAuth.getMinecraftUser().uuid());
 
         new Thread(this::loadSkin).start();
     }
@@ -62,20 +62,20 @@ public class SettingsElement extends UiElement {
         }
         try {
             Image profileImage = ImageUtil.rescale(LauncherApplication.userAuth.getUserIcon(), 6);
-            Platform.runLater(() -> skinView.setImage(profileImage));
+            Platform.runLater(() -> ivSkin.setImage(profileImage));
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);
         }
     }
 
     @FXML
-    private void onLogoutButtonClicked() {
+    private void onLogout() {
         logoutCallback.run();
     }
 
     @FXML
     private void onLanguageComboBoxChanged() {
-        String input = languageComboBox.getSelectionModel().getSelectedItem();
+        String input = cbLanguage.getSelectionModel().getSelectedItem();
         if(input != null) {
             StringLocalizer.Language language;
             try {
@@ -85,7 +85,7 @@ public class SettingsElement extends UiElement {
                 return;
             }
             LauncherApplication.stringLocalizer.setLanguage(language);
-            languageRestartHint.setVisible(true);
+            lbLanguage.setVisible(true);
             try {
                 GlobalConfigLoader.updateLanguage(language);
             } catch (IOException e) {
@@ -95,53 +95,53 @@ public class SettingsElement extends UiElement {
     }
 
     @FXML
-    private void onFileSelectorClicked() {
+    private void onFileSelector() {
         DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setInitialDirectory(new File(pathField.getText()));
+        chooser.setInitialDirectory(new File(tfPath.getText()));
         File chosen = chooser.showDialog(LauncherApplication.primaryStage);
         if(chosen != null && chosen.isDirectory()) {
-            pathField.setText(chosen.getAbsolutePath());
+            tfPath.setText(chosen.getAbsolutePath());
         }
     }
 
     @FXML
-    private void onPathApplyClicked() {
-        File dir = new File(pathField.getText());
+    private void onPathApply() {
+        File dir = new File(tfPath.getText());
         if(!dir.isDirectory()) {
-            popupController.setType(PopupElement.PopupType.ERROR);
-            popupController.setContent("settings.path.invalid.title", "");
-            popupController.clearControls();
-            popupController.addButtons(
+            icPopupController.setType(PopupElement.PopupType.ERROR);
+            icPopupController.setContent("settings.path.invalid.title", "");
+            icPopupController.clearControls();
+            icPopupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
                             "settings.path.close",
                             "close",
-                            id -> popupController.setVisible(false)
+                            id -> icPopupController.setVisible(false)
                     )
             );
-            popupController.setVisible(true);
+            icPopupController.setVisible(true);
             return;
         }
 
-        popupController.setType(PopupElement.PopupType.NONE);
-        popupController.setContent("settings.path.changing.title", "");
-        popupController.clearControls();
-        popupController.setVisible(true);
+        icPopupController.setType(PopupElement.PopupType.NONE);
+        icPopupController.setContent("settings.path.changing.title", "");
+        icPopupController.clearControls();
+        icPopupController.setVisible(true);
 
         new Thread(() -> {
             try {
-                GlobalConfigLoader.updatePath(dir, removeCheckBox.isSelected());
+                GlobalConfigLoader.updatePath(dir, cbRemove.isSelected());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
-                popupController.setVisible(false);
+                icPopupController.setVisible(false);
                 return;
             }
 
             Platform.runLater(() -> {
-                popupController.setType(PopupElement.PopupType.SUCCESS);
-                popupController.setContent("settings.path.success.title", "");
-                popupController.clearControls();
-                popupController.addButtons(
+                icPopupController.setType(PopupElement.PopupType.SUCCESS);
+                icPopupController.setContent("settings.path.success.title", "");
+                icPopupController.clearControls();
+                icPopupController.addButtons(
                         new PopupElement.PopupButton(
                                 PopupElement.ButtonType.POSITIVE,
                                 "settings.path.close",
@@ -155,15 +155,15 @@ public class SettingsElement extends UiElement {
                                 }
                         )
                 );
-                popupController.setVisible(false);
-                popupController.setVisible(true);
+                icPopupController.setVisible(false);
+                icPopupController.setVisible(true);
             });
         }).start();
 
     }
 
     @FXML
-    private void onSourceButtonClicked() throws URISyntaxException, IOException {
+    private void onSource() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI(LauncherApplication.stringLocalizer.get("url.source")));
     }
 
@@ -178,7 +178,7 @@ public class SettingsElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        pathField.setText(LauncherApplication.config.BASE_DIR);
+        tfPath.setText(LauncherApplication.config.BASE_DIR);
     }
 
     @Override

@@ -18,25 +18,25 @@
                 <VBox alignment="TOP_CENTER">
                     <HBox alignment="CENTER" spacing="5">
                         <Label text="%settings.label.language" />
-                        <ComboBox fx:id="languageComboBox" />
+                        <ComboBox fx:id="cbLanguage"/>
                     </HBox>
-                    <Label fx:id="languageRestartHint" styleClass="hint" text="%settings.label.restart" visible="false" />
+                    <Label fx:id="lbLanguage" styleClass="hint" text="%settings.label.restart" visible="false" />
                 </VBox>
                 <VBox alignment="TOP_CENTER">
                     <Label text="%settings.label.filepath" />
                     <HBox alignment="CENTER">
-                        <TextField fx:id="pathField" alignment="CENTER_RIGHT" text="ERROR LOADING CURRENT PATH!" />
-                        <IconButton styleClass="neutral, folder-open" iconSize="28" onAction="#onFileSelectorClicked" tooltipText="%settings.tooltip.select" />
+                        <TextField fx:id="tfPath" alignment="CENTER_RIGHT" text="ERROR LOADING CURRENT PATH!" />
+                        <IconButton styleClass="neutral, folder-open" iconSize="28" onAction="#onFileSelector" tooltipText="%settings.tooltip.select" />
                     </HBox>
-                    <CheckBox fx:id="removeCheckBox" selected="true" text="%settings.label.path.remove" />
-                    <Button onAction="#onPathApplyClicked" text="%settings.button.path.apply" />
+                    <CheckBox fx:id="cbRemove" selected="true" text="%settings.label.path.remove" />
+                    <Button onAction="#onPathApply" text="%settings.button.path.apply" />
                 </VBox>
                 <VBox alignment="TOP_CENTER" spacing="2">
                     <Label text="%settings.label.user" />
-                    <Label fx:id="usernameLabel" styleClass="username" text="Error getting name" />
-                    <ImageView fx:id="skinView" />
-                    <Label fx:id="uuidLabel" styleClass="uuid" text="Error getting uuid" />
-                    <Button fx:id="logoutButton" onAction="#onLogoutButtonClicked" styleClass="negative" text="%settings.button.logout">
+                    <Label fx:id="lbUsername" styleClass="username" text="Error getting name" />
+                    <ImageView fx:id="ivSkin"/>
+                    <Label fx:id="lbUuid" styleClass="uuid" text="Error getting uuid" />
+                    <Button onAction="#onLogout" styleClass="negative" text="%settings.button.logout">
                         <VBox.margin>
                             <Insets top="10.0" />
                         </VBox.margin>
@@ -48,9 +48,9 @@
                         <Label styleClass="hint" text="%settings.version.version" />
                         <Label styleClass="hint" text="%launcher.version" />
                     </HBox>
-                    <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSourceButtonClicked" />
+                    <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSource" />
                 </VBox>
             </VBox>
     </ScrollPane>
-    <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <fx:include fx:id="icPopup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>

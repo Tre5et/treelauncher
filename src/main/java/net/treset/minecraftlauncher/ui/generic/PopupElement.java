@@ -38,16 +38,12 @@ public class PopupElement extends UiElement {
         }
 
         private String getStyleClass(ButtonType type) {
-            switch(type) {
-                case POSITIVE:
-                    return "positive";
-                case NEUTRAL:
-                    return "neutral";
-                case NEGATIVE:
-                    return "negative";
-                default:
-                    return "";
-            }
+            return switch (type) {
+                case POSITIVE -> "positive";
+                case NEUTRAL -> "neutral";
+                case NEGATIVE -> "negative";
+                default -> "";
+            };
         }
 
         public Button getButton() {
@@ -60,12 +56,12 @@ public class PopupElement extends UiElement {
     }
 
     @FXML private GridPane rootPane;
-    @FXML private GridPane popupContainer;
-    @FXML private Label titleLabel;
-    @FXML private Label messageLabel;
-    @FXML private HBox buttonContainer;
-    @FXML private Label errorMessage;
-    @FXML private HBox textFieldContainer;
+    @FXML private GridPane gpContainer;
+    @FXML private Label lbTitle;
+    @FXML private Label lbMessage;
+    @FXML private HBox hbControlContainer;
+    @FXML private Label lbError;
+    @FXML private HBox hbInputContainer;
 
     private ArrayList<PopupButton> activeButtons;
     private boolean disabled = false;
@@ -73,8 +69,8 @@ public class PopupElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        buttonContainer.getChildren().clear();
-        buttonContainer.getChildren().addAll(activeButtons.stream().map(PopupButton::getButton).toList());
+        hbControlContainer.getChildren().clear();
+        hbControlContainer.getChildren().addAll(activeButtons.stream().map(PopupButton::getButton).toList());
     }
 
     @Override
@@ -82,8 +78,8 @@ public class PopupElement extends UiElement {
     }
 
     public void setContent(String title, String message) {
-        titleLabel.setText(LauncherApplication.stringLocalizer.get(title));
-        messageLabel.setText(LauncherApplication.stringLocalizer.get(message));
+        lbTitle.setText(LauncherApplication.stringLocalizer.get(title));
+        lbMessage.setText(LauncherApplication.stringLocalizer.get(message));
     }
 
     public void addButtons(PopupButton... buttons) {
@@ -93,15 +89,15 @@ public class PopupElement extends UiElement {
 
     public void clearControls() {
         activeButtons = new ArrayList<>();
-        textFieldContainer.getChildren().clear();
-        errorMessage.setText("");
+        hbInputContainer.getChildren().clear();
+        lbError.setText("");
     }
 
     public void setControlsDisabled(boolean disabled) {
         this.disabled = disabled;
         if(activeButtons != null){
             activeButtons.forEach(button -> button.setDisabled(disabled));
-            textFieldContainer.setDisable(disabled);
+            hbInputContainer.setDisable(disabled);
         }
     }
 
@@ -111,30 +107,30 @@ public class PopupElement extends UiElement {
     }
 
     private void updateType() {
-        popupContainer.getStyleClass().remove("success");
-        popupContainer.getStyleClass().remove("warning");
-        popupContainer.getStyleClass().remove("error");
+        gpContainer.getStyleClass().remove("success");
+        gpContainer.getStyleClass().remove("warning");
+        gpContainer.getStyleClass().remove("error");
         switch (popupType) {
-            case SUCCESS -> popupContainer.getStyleClass().add("success");
-            case WARNING -> popupContainer.getStyleClass().add("warning");
-            case ERROR -> popupContainer.getStyleClass().add("error");
+            case SUCCESS -> gpContainer.getStyleClass().add("success");
+            case WARNING -> gpContainer.getStyleClass().add("warning");
+            case ERROR -> gpContainer.getStyleClass().add("error");
         }
     }
 
     public void setTitle(String title, Object... args) {
-        titleLabel.setText(LauncherApplication.stringLocalizer.getFormatted(title, args));
+        lbTitle.setText(LauncherApplication.stringLocalizer.getFormatted(title, args));
     }
 
     public void setMessage(String message, Object... args) {
-        messageLabel.setText(LauncherApplication.stringLocalizer.getFormatted(message, args));
+        lbMessage.setText(LauncherApplication.stringLocalizer.getFormatted(message, args));
     }
 
     TextField textField;
     public void setTextInput(String prompt) {
-        textFieldContainer.getChildren().clear();
+        hbInputContainer.getChildren().clear();
         textField = new TextField();
         textField.setPromptText(LauncherApplication.stringLocalizer.get(prompt));
-        textFieldContainer.getChildren().add(textField);
+        hbInputContainer.getChildren().add(textField);
     }
 
     public String getTextInputContent() {
@@ -145,7 +141,7 @@ public class PopupElement extends UiElement {
     }
 
     public void setErrorMessage(String message) {
-        errorMessage.setText(LauncherApplication.stringLocalizer.get(message));
+        lbError.setText(LauncherApplication.stringLocalizer.get(message));
     }
 
     @Override

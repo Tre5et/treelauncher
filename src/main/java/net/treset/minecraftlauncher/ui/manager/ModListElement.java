@@ -34,16 +34,16 @@ public class ModListElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(ModListElement.class);
 
     @FXML private AnchorPane rootPane;
-    @FXML private ImageView logoImage;
-    @FXML private Label title;
-    @FXML private Label description;
-    @FXML private ImageView downloadingImage;
-    @FXML private Button installButton;
-    @FXML private ComboBox<String> versionSelector;
-    @FXML private IconButton disableButton;
-    @FXML private Button deleteButton;
-    @FXML private ImageView modrinthLogo;
-    @FXML private ImageView curseforgeLogo;
+    @FXML private ImageView ivLogo;
+    @FXML private Label lbTitle;
+    @FXML private Label lbDescription;
+    @FXML private ImageView ivDownloading;
+    @FXML private Button btInstall;
+    @FXML private ComboBox<String> cbVersion;
+    @FXML private IconButton btDisable;
+    @FXML private Button btDelete;
+    @FXML private ImageView ivModrinth;
+    @FXML private ImageView ivCurseforge;
 
     private boolean disabled = false;
     private LauncherMod mod;
@@ -57,44 +57,44 @@ public class ModListElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        modrinthLogo.getStyleClass().remove("current");
-        modrinthLogo.getStyleClass().remove("available");
-        curseforgeLogo.getStyleClass().remove("current");
-        curseforgeLogo.getStyleClass().remove("available");
-        installButton.setDisable(true);
-        downloadingImage.setVisible(false);
-        versionSelector.getItems().clear();
-        versionSelector.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
+        ivModrinth.getStyleClass().remove("current");
+        ivModrinth.getStyleClass().remove("available");
+        ivCurseforge.getStyleClass().remove("current");
+        ivCurseforge.getStyleClass().remove("available");
+        btInstall.setDisable(true);
+        ivDownloading.setVisible(false);
+        cbVersion.getItems().clear();
+        cbVersion.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
         if(mod != null) {
-            title.setText(mod.getName());
-            description.setText(mod.getDescription());
-            versionSelector.getItems().add(mod.getVersion());
-            versionSelector.getSelectionModel().select(0);
+            lbTitle.setText(mod.getName());
+            lbDescription.setText(mod.getDescription());
+            cbVersion.getItems().add(mod.getVersion());
+            cbVersion.getSelectionModel().select(0);
             disabled = !mod.isEnabled();
             updateDisableStatus();
             for(LauncherModDownload d : mod.getDownloads()) {
                 if("modrinth".equals(d.getProvider())) {
                     if("modrinth".equals(mod.getCurrentProvider())) {
-                        modrinthLogo.getStyleClass().add("current");
+                        ivModrinth.getStyleClass().add("current");
                     } else {
-                        modrinthLogo.getStyleClass().add("available");
+                        ivModrinth.getStyleClass().add("available");
                     }
                 } else if("curseforge".equals(d.getProvider())) {
                     if("curseforge".equals(mod.getCurrentProvider())) {
-                        curseforgeLogo.getStyleClass().add("current");
+                        ivCurseforge.getStyleClass().add("current");
                     } else {
-                        curseforgeLogo.getStyleClass().add("available");
+                        ivCurseforge.getStyleClass().add("available");
                     }
                 }
             }
         } else if(modData != null) {
-            title.setText(modData.getName());
-            description.setText(modData.getDescription());
+            lbTitle.setText(modData.getName());
+            lbDescription.setText(modData.getDescription());
             for(ModProvider p : modData.getModProviders()) {
                 if(p == ModProvider.MODRINTH) {
-                    modrinthLogo.getStyleClass().add("available");
+                    ivModrinth.getStyleClass().add("available");
                 } else if(p == ModProvider.CURSEFORGE) {
-                    curseforgeLogo.getStyleClass().add("available");
+                    ivCurseforge.getStyleClass().add("available");
                 }
             }
         }
@@ -103,7 +103,7 @@ public class ModListElement extends UiElement {
     @Override
     public void afterShow(Stage stage) {
         new Thread(this::populateVersionChoice).start();
-        if(logoImage.getImage() == null) {
+        if(ivLogo.getImage() == null) {
             new Thread(this::loadImage).start();
         }
     }
@@ -117,7 +117,7 @@ public class ModListElement extends UiElement {
             }
         }
         if (modData != null) {
-            List<ModVersionData> versionData = null;
+            List<ModVersionData> versionData;
             try {
                 versionData = modData.getVersions(gameVersion, "fabric");
             } catch (FileDownloadException e) {
@@ -139,9 +139,9 @@ public class ModListElement extends UiElement {
             }
             int finalCurrentIndex = currentIndex;
             Platform.runLater(() -> {
-                versionSelector.getItems().clear();
-                versionSelector.getItems().addAll(selectorList);
-                versionSelector.getSelectionModel().select(finalCurrentIndex);
+                cbVersion.getItems().clear();
+                cbVersion.getItems().addAll(selectorList);
+                cbVersion.getSelectionModel().select(finalCurrentIndex);
             });
         }
     }
@@ -149,24 +149,24 @@ public class ModListElement extends UiElement {
     private void loadImage() {
         if(mod != null && mod.getIconUrl() != null) {
             Image logo = new Image(mod.getIconUrl());
-            Platform.runLater(() -> logoImage.setImage(logo));
+            Platform.runLater(() -> ivLogo.setImage(logo));
         } else if(modData != null && modData.getIconUrl() != null) {
             Image logo = new Image(modData.getIconUrl());
-            Platform.runLater(() -> logoImage.setImage(logo));
+            Platform.runLater(() -> ivLogo.setImage(logo));
         }
     }
 
     private void onVersionSelected() {
-        installButton.setDisable(mod != null && mod.getVersion().equals(versionSelector.getSelectionModel().getSelectedItem()));
+        btInstall.setDisable(mod != null && mod.getVersion().equals(cbVersion.getSelectionModel().getSelectedItem()));
     }
 
     @FXML
-    private void onInstallButtonClicked() {
+    private void onInstall() {
         installCallback.accept(getSelectedVersion(), mod, this);
     }
 
     @FXML
-    private void onDisableButtonClicked() {
+    private void onDisable() {
         if(disableCallback.apply(!disabled, mod)) {
             disabled = !disabled;
             updateDisableStatus();
@@ -174,26 +174,26 @@ public class ModListElement extends UiElement {
     }
 
     @FXML
-    private void onDeleteButtonClicked() {
+    private void onDelete() {
         deleteCallback.accept(mod, this);
     }
 
     private void updateDisableStatus() {
         if(disabled) {
-            installButton.setDisable(true);
-            versionSelector.setDisable(true);
-            disableButton.getStyleClass().add("disabled");
+            btInstall.setDisable(true);
+            cbVersion.setDisable(true);
+            btDisable.getStyleClass().add("disabled");
             rootPane.setOpacity(0.5);
         } else {
-            installButton.setDisable(mod != null && mod.getVersion().equals(versionSelector.getSelectionModel().getSelectedItem()));
-            versionSelector.setDisable(false);
-            disableButton.getStyleClass().remove("disabled");
+            btInstall.setDisable(mod != null && mod.getVersion().equals(cbVersion.getSelectionModel().getSelectedItem()));
+            cbVersion.setDisable(false);
+            btDisable.getStyleClass().remove("disabled");
             rootPane.setOpacity(1);
         }
     }
 
     private ModVersionData getSelectedVersion() {
-        String selected = versionSelector.getSelectionModel().getSelectedItem();
+        String selected = cbVersion.getSelectionModel().getSelectedItem();
         if(selected != null && modData != null) {
             try {
                 for(ModVersionData v : modData.getVersions(gameVersion, "fabric")) {
@@ -209,23 +209,23 @@ public class ModListElement extends UiElement {
     }
 
     public void checkUpdate() {
-        versionSelector.getSelectionModel().select(0);
+        cbVersion.getSelectionModel().select(0);
     }
 
     public void confirmVersionChange(boolean enableUpdated) {
-        if(mod == null || !mod.getVersion().equals(versionSelector.getSelectionModel().getSelectedItem())) {
+        if(mod == null || !mod.getVersion().equals(cbVersion.getSelectionModel().getSelectedItem())) {
             if(enableUpdated && disabled) {
-                onDisableButtonClicked();
+                onDisable();
             }
             if(!disabled) {
-                onInstallButtonClicked();
+                onInstall();
             }
         }
     }
 
     public void disableNoVersion() {
         if(!versionAvailable && !disabled) {
-            onDisableButtonClicked();
+            onDisable();
         }
     }
 
@@ -235,12 +235,12 @@ public class ModListElement extends UiElement {
     }
 
     public void setInstallAvailable(boolean available) {
-        installButton.setVisible(available);
+        btInstall.setVisible(available);
     }
 
     public void setLocalOperationsAvailable(boolean available) {
-        disableButton.setVisible(available);
-        deleteButton.setVisible(available);
+        btDisable.setVisible(available);
+        btDelete.setVisible(available);
     }
 
     public LauncherMod getMod() {
@@ -292,8 +292,8 @@ public class ModListElement extends UiElement {
     }
 
     public void setDownloading(boolean downloading) {
-        downloadingImage.setVisible(downloading);
-        installButton.setDisable(downloading);
+        ivDownloading.setVisible(downloading);
+        btInstall.setDisable(downloading);
     }
 
     public static Pair<ModListElement, AnchorPane> from(LauncherMod mod, String gameVersion, TriConsumer<ModVersionData, LauncherMod, ModListElement> installCallback, BiFunction<Boolean, LauncherMod, Boolean> disableCallback, BiConsumer<LauncherMod, ModListElement> deleteCallback) throws IOException {

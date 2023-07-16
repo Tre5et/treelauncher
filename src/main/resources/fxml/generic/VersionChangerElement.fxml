@@ -15,13 +15,13 @@
             <RowConstraints vgrow="SOMETIMES" />
         </rowConstraints>
         <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <ComboBox fx:id="versionChoice" promptText="There should be something here" />
-            <CheckBox fx:id="snapshotsCheck" mnemonicParsing="false" onMouseClicked="#onSnapshotsChecked" text="%creator.version.checkbox.snapshots" />
+            <ComboBox fx:id="cbVersion" promptText="There should be something here" />
+            <CheckBox fx:id="chSnapshots" mnemonicParsing="false" onMouseClicked="#onCheckSnapshots" text="%creator.version.checkbox.snapshots" />
         </HBox>
         <HBox GridPane.rowIndex="1">
-            <ComboBox fx:id="typeChoice" promptText="THis bad" />
-            <ComboBox fx:id="loaderChoice" promptText="%creator.version.prompt.loaderversion" visible="false" />
+            <ComboBox fx:id="cbType" promptText="THis bad" />
+            <ComboBox fx:id="cbLoader" promptText="%creator.version.prompt.loaderversion" visible="false" />
         </HBox>
-        <IconButton fx:id="changeButton" styleClass="sync, highlight" iconSize="32" onMouseClicked="#onChangeButtonClicked" GridPane.columnIndex="1" GridPane.rowSpan="2" />
+        <IconButton fx:id="btChange" styleClass="sync, highlight" iconSize="32" onMouseClicked="#onChange" GridPane.columnIndex="1" GridPane.rowSpan="2" />
     </GridPane>
 </AnchorPane>

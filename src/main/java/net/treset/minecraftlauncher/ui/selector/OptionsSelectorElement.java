@@ -24,33 +24,33 @@ import java.util.function.Supplier;
 public class OptionsSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(OptionsSelectorElement.class);
 
-    @FXML private OptionsCreatorElement optionsCreatorController;
+    @FXML private OptionsCreatorElement icCreatorController;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
-        optionsCreatorController.enableUse(false);
-        optionsCreatorController.init(this, lockSetter, lockGetter);
-        optionsCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
+        icCreatorController.enableUse(false);
+        icCreatorController.init(this, lockSetter, lockGetter);
+        icCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
     }
 
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        optionsCreatorController.beforeShow(stage);
+        icCreatorController.beforeShow(stage);
     }
 
     @Override
     public void afterShow(Stage stage) {
         super.afterShow(stage);
-        optionsCreatorController.afterShow(stage);
+        icCreatorController.afterShow(stage);
     }
 
     @Override
-    protected void onCreateClicked() {
-        if(optionsCreatorController.checkCreateReady()) {
+    protected void onCreate() {
+        if(icCreatorController.checkCreateReady()) {
             try {
-                optionsCreatorController.getCreator().getId();
+                icCreatorController.getCreator().getId();
             } catch (ComponentCreationException e) {
                 LauncherApplication.displayError(e);
             }
@@ -59,7 +59,7 @@ public class OptionsSelectorElement extends ManifestSelectorElement {
                 option.getKey().beforeShow(null);
             }
         } else {
-            optionsCreatorController.showError(true);
+            icCreatorController.showError(true);
         }
     }
 
@@ -76,7 +76,7 @@ public class OptionsSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            optionsCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
+            icCreatorController.setPrerequisites(files.getOptionsComponents(), files.getLauncherDetails().getTypeConversion(), files.getOptionsManifest());
             try {
                 FileUtil.deleteDir(new File(currentManifest.getDirectory()));
             } catch (IOException e) {

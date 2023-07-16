@@ -22,11 +22,11 @@ import java.util.function.Supplier;
 
 public abstract class SelectorElement extends UiElement {
     @FXML protected AnchorPane rootPane;
-    @FXML protected VBox elementContainer;
-    @FXML protected ActionBar actionBar;
-    @FXML protected CreateSelectable createSelectable;
-    @FXML protected VBox createContainer;
-    @FXML protected PopupElement popupController;
+    @FXML protected VBox vbElements;
+    @FXML protected ActionBar abMain;
+    @FXML protected CreateSelectable csCreate;
+    @FXML protected VBox vbCreate;
+    @FXML protected PopupElement icPopupController;
 
     protected LauncherFiles files;
     protected boolean createSelected = false;
@@ -50,81 +50,81 @@ public abstract class SelectorElement extends UiElement {
             LauncherApplication.displaySevereError(e);
         }
         elements = getElements();
-        elementContainer.getChildren().clear();
-        if(createSelectable != null) {
-            createSelectable.getStyleClass().remove("selected");
+        vbElements.getChildren().clear();
+        if(csCreate != null) {
+            csCreate.getStyleClass().remove("selected");
         }
         Platform.runLater(() -> {
-            actionBar.setDisable(true);
-            actionBar.clearLabel();
-            if(createContainer != null) {
-                createContainer.setVisible(false);
+            abMain.setDisable(true);
+            abMain.clearLabel();
+            if(vbCreate != null) {
+                vbCreate.setVisible(false);
             }
             for(Pair<SelectorEntryElement, AnchorPane> element : elements) {
-                elementContainer.getChildren().add(element.getValue());
+                vbElements.getChildren().add(element.getValue());
             }
         });
     }
 
-    @FXML protected void onCreateSelectableClicked() {
+    @FXML protected void onSelectCreate() {
         if(!getLock()) {
             if(createSelected) {
-                createSelectable.getStyleClass().remove("selected");
+                csCreate.getStyleClass().remove("selected");
                 setCreatorVisible(false);
-                actionBar.setDisable(true);
-                actionBar.clearLabel();
+                abMain.setDisable(true);
+                abMain.clearLabel();
             } else {
-                createSelectable.getStyleClass().add("selected");
+                csCreate.getStyleClass().add("selected");
                 deselectAll();
                 setCreatorVisible(true);
-                actionBar.setDisable(false);
-                actionBar.setLabel("components.label.create");
+                abMain.setDisable(false);
+                abMain.setLabel("components.label.create");
             }
             createSelected = !createSelected;
         }
     }
 
     protected void setCreatorVisible(boolean visible) {
-        if(createContainer != null) {
-            createContainer.setVisible(visible);
+        if(vbCreate != null) {
+            vbCreate.setVisible(visible);
         }
     }
 
     @FXML
-    protected abstract void onCreateClicked();
+    protected abstract void onCreate();
 
     @FXML
-    protected abstract void onFolderClicked();
+    protected abstract void onFolder();
 
     @FXML
-    protected void onEditClicked() {
-        popupController.setType(PopupElement.PopupType.NONE);
-        popupController.setContent("selector.component.edit.title", "");
-        popupController.clearControls();
-        popupController.setTextInput("selector.component.edit.prompt");
-        popupController.addButtons(
+    protected void onEdit() {
+        icPopupController.setType(PopupElement.PopupType.NONE);
+        icPopupController.setContent("selector.component.edit.title", "");
+        icPopupController.clearControls();
+        icPopupController.setTextInput("selector.component.edit.prompt");
+        icPopupController.addButtons(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.NEGATIVE,
                         "selector.component.edit.cancel",
                         "cancel",
-                        id -> popupController.setVisible(false)
+                        id -> icPopupController.setVisible(false)
                 ),
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
                         "selector.component.edit.confirm",
                         "confirm",
                         id -> {
-                            String newName = popupController.getTextInputContent();
+                            String newName = icPopupController.getTextInputContent();
                             if(!editValid(newName)) {
-                                popupController.setErrorMessage("selector.component.edit.error");
+                                icPopupController.setErrorMessage("selector.component.edit.error");
                                 return;
                             }
-                            popupController.setVisible(false);
+                            icPopupController.setVisible(false);
                             editCurrent(newName);
                         }
                 )
         );
-        popupController.setVisible(true);
+        icPopupController.setVisible(true);
     }
 
     protected abstract boolean editValid(String newName);
@@ -132,47 +132,47 @@ public abstract class SelectorElement extends UiElement {
     protected abstract void editCurrent(String newName);
 
     @FXML
-    protected void onDeleteClicked() {
+    protected void onDelete() {
         if(getLock()) {
             return;
         }
         String usedBy = getCurrentUsedBy();
         if(usedBy != null) {
-            popupController.setType(PopupElement.PopupType.ERROR);
-            popupController.setTitle("selector.component.delete.unable.title");
-            popupController.setMessage("selector.component.delete.unable.message", usedBy);
-            popupController.clearControls();
-            popupController.addButtons(
+            icPopupController.setType(PopupElement.PopupType.ERROR);
+            icPopupController.setTitle("selector.component.delete.unable.title");
+            icPopupController.setMessage("selector.component.delete.unable.message", usedBy);
+            icPopupController.clearControls();
+            icPopupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
                             "selector.component.delete.unable.close",
                             "close",
-                            id -> popupController.setVisible(false)
+                            id -> icPopupController.setVisible(false)
                     )
             );
-            popupController.setVisible(true);
+            icPopupController.setVisible(true);
         } else {
-            popupController.setType(PopupElement.PopupType.WARNING);
-            popupController.setContent("selector.component.delete.title", "selector.component.delete.message");
-            popupController.clearControls();
-            popupController.addButtons(
+            icPopupController.setType(PopupElement.PopupType.WARNING);
+            icPopupController.setContent("selector.component.delete.title", "selector.component.delete.message");
+            icPopupController.clearControls();
+            icPopupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.NEGATIVE,
                             "selector.component.delete.cancel",
                             "cancel",
-                            id -> popupController.setVisible(false)
+                            id -> icPopupController.setVisible(false)
                     ),
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
                             "selector.component.delete.confirm",
                             "confirm",
                             id -> {
-                                popupController.setVisible(false);
+                                icPopupController.setVisible(false);
                                 deleteCurrent();
                             }
                     )
             );
-            popupController.setVisible(true);
+            icPopupController.setVisible(true);
         }
     }
 

@@ -13,21 +13,21 @@
    </padding>
 
    <HBox alignment="CENTER_LEFT" styleClass="navbar-cluster">
-      <IconButton fx:id="homeButton" styleClass="instances" iconSize="32" tooltipText="%nav.tooltip.home" onAction="#onHomeButtonClicked" />
-      <IconButton fx:id="addButton" styleClass="add" iconSize="32" tooltipText="%nav.tooltip.add" onAction="#onAddButtonClicked" />
+      <IconButton fx:id="btHome" styleClass="instances" iconSize="32" tooltipText="%nav.tooltip.home" onAction="#onHome" />
+      <IconButton fx:id="btAdd" styleClass="add" iconSize="32" tooltipText="%nav.tooltip.add" onAction="#onAdd" />
    </HBox>
 
    <HBox alignment="CENTER" styleClass="navbar-cluster" HBox.hgrow="ALWAYS">
-      <IconButton fx:id="savesButton" styleClass="saves" iconSize="32" tooltipText="%nav.tooltip.saves" onAction="#onSavesButtonClicked" />
-      <IconButton fx:id="resourcepacksButton" styleClass="resourcepacks" iconSize="32" tooltipText="%nav.tooltip.resourcepacks" onAction="#onResourcepacksButtonClicked" />
-      <IconButton fx:id="optionsButton" styleClass="options" iconSize="32" tooltipText="%nav.tooltip.options" onAction="#onOptionsButtonClicked" />
-      <IconButton fx:id="modsButton" styleClass="mods" iconSize="32" tooltipText="%nav.tooltip.mods" onAction="#onModsButtonClicked" />
+      <IconButton fx:id="btSaves" styleClass="saves" iconSize="32" tooltipText="%nav.tooltip.saves" onAction="#onSaves" />
+      <IconButton fx:id="btResourcepacks" styleClass="resourcepacks" iconSize="32" tooltipText="%nav.tooltip.resourcepacks" onAction="#onResourcepacks" />
+      <IconButton fx:id="btOptions" styleClass="options" iconSize="32" tooltipText="%nav.tooltip.options" onAction="#onOptions" />
+      <IconButton fx:id="btMods" styleClass="mods" iconSize="32" tooltipText="%nav.tooltip.mods" onAction="#onMods" />
    </HBox>
 
    <HBox alignment="CENTER_RIGHT" styleClass="navbar-cluster">
       <StackPane>
-         <IconButton fx:id="profileButton" styleClass="profile" iconSize="32" tooltipText="%nav.tooltip.profile" onAction="#onProfileButtonClicked" />
-         <ImageView fx:id="profileImage" mouseTransparent="true" smooth="false" />
+         <IconButton fx:id="btProfile" styleClass="profile" iconSize="32" tooltipText="%nav.tooltip.profile" onAction="#onProfile" />
+         <ImageView fx:id="ivProfile" mouseTransparent="true" smooth="false" />
       </StackPane>
    </HBox>
 </HBox>

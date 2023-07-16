@@ -11,7 +11,7 @@
         <padding>
             <Insets top="5" left="15" bottom="5" right="15"/>
         </padding>
-        <ComboBox fx:id="changeBox" promptText="There should be something here" HBox.hgrow="ALWAYS" />
-        <IconButton fx:id="changeButton" styleClass="sync, highlight" iconSize="32" onAction="#onChangeButtonClicked" />
+        <ComboBox fx:id="cbChange" promptText="There should be something here" HBox.hgrow="ALWAYS" />
+        <IconButton fx:id="btChange" styleClass="sync, highlight" iconSize="32" onAction="#onChange" />
     </HBox>
 </AnchorPane>

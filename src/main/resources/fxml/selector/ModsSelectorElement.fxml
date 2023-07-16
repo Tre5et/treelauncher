@@ -16,28 +16,28 @@
                     <Label styleClass="title" text="%mods.label.title" />
                 </VBox>
                 <ScrollPane fitToWidth="true" minHeight="10.0" VBox.vgrow="ALWAYS">
-                    <VBox fx:id="elementContainer" alignment="TOP_CENTER" />
+                    <VBox fx:id="vbElements" alignment="TOP_CENTER" />
                 </ScrollPane>
-                <CreateSelectable fx:id="createSelectable" onMouseClicked="#onCreateSelectableClicked" />
+                <CreateSelectable fx:id="csCreate" onMouseClicked="#onSelectCreate" />
             </VBox>
         </AnchorPane>
-        <AnchorPane fx:id="detailsPane" minWidth="-Infinity" styleClass="element">
+        <AnchorPane minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <ActionBar fx:id="actionBar"
+                <ActionBar fx:id="abMain"
                            defaultLabel="%components.label.details.title"
-                           onFolder="#onFolderClicked"
-                           onEdit="#onEditClicked"
-                           onDelete="#onDeleteClicked"
+                           onFolder="#onFolder"
+                           onEdit="#onEdit"
+                           onDelete="#onDelete"
                 />
                 <AnchorPane VBox.vgrow="ALWAYS">
-                    <VBox fx:id="createContainer" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-                        <fx:include fx:id="modsCreator" source="/fxml/create/ModsCreatorElement.fxml" />
-                        <Button fx:id="createButton" onMouseClicked="#onCreateClicked" text="%creator.button.create" />
+                    <VBox fx:id="vbCreate" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                        <fx:include fx:id="icCreator" source="/fxml/create/ModsCreatorElement.fxml" />
+                        <Button onMouseClicked="#onCreate" text="%creator.button.create" />
                     </VBox>
-                    <fx:include fx:id="modsManager" source="/fxml/manager/ModsManagerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                    <fx:include fx:id="icManager" source="/fxml/manager/ModsManagerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
                 </AnchorPane>
             </VBox>
         </AnchorPane>
     </SplitPane>
-    <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <fx:include fx:id="icPopup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>

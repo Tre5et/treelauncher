@@ -23,33 +23,33 @@ import java.util.function.Supplier;
 
 public class ResourcepacksSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(ResourcepacksSelectorElement.class);
-    @FXML private ResourcepacksCreatorElement resourcepacksCreatorController;
+    @FXML private ResourcepacksCreatorElement icCreatorController;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
-        resourcepacksCreatorController.enableUse(false);
-        resourcepacksCreatorController.init(this, lockSetter, lockGetter);
-        resourcepacksCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
+        icCreatorController.enableUse(false);
+        icCreatorController.init(this, lockSetter, lockGetter);
+        icCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
     }
 
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        resourcepacksCreatorController.beforeShow(stage);
+        icCreatorController.beforeShow(stage);
     }
 
     @Override
     public void afterShow(Stage stage) {
         super.afterShow(stage);
-        resourcepacksCreatorController.afterShow(stage);
+        icCreatorController.afterShow(stage);
     }
 
     @FXML @Override
-    protected void onCreateClicked() {
-        if(resourcepacksCreatorController.checkCreateReady()) {
+    protected void onCreate() {
+        if(icCreatorController.checkCreateReady()) {
             try {
-                resourcepacksCreatorController.getCreator().getId();
+                icCreatorController.getCreator().getId();
             } catch (ComponentCreationException e) {
                 LauncherApplication.displayError(e);
             }
@@ -58,7 +58,7 @@ public class ResourcepacksSelectorElement extends ManifestSelectorElement {
                 resourcepack.getKey().beforeShow(null);
             }
         } else {
-            resourcepacksCreatorController.showError(true);
+            icCreatorController.showError(true);
         }
     }
 
@@ -75,7 +75,7 @@ public class ResourcepacksSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            resourcepacksCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
+            icCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
             try {
                 FileUtil.deleteDir(new File(currentManifest.getDirectory()));
             } catch (IOException e) {

@@ -29,12 +29,12 @@ public class ModsSearchElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsSearchElement.class);
 
     @FXML private AnchorPane rootPane;
-    @FXML private Button searchButton;
-    @FXML private TextField searchField;
-    @FXML private Label loadingLabel;
-    @FXML private VBox resultsContainer;
-    @FXML private Button addButton;
-    @FXML private AddModElement addModElementController;
+    @FXML private Button btSearch;
+    @FXML private TextField tfSearch;
+    @FXML private Label lbLoading;
+    @FXML private VBox vbResults;
+    @FXML private Button btAdd;
+    @FXML private AddModElement icAddModController;
 
     private String gameVersion;
     private String loaderType;
@@ -48,14 +48,14 @@ public class ModsSearchElement extends UiElement {
         this.installCallback = installCallback;
         this.backCallback = backCallback;
         this.currentMods = currentMods;
-        addModElementController.init(addCallback);
+        icAddModController.init(addCallback);
     }
 
     @Override
     public void beforeShow(Stage stage) {
-        addModElementController.setVisible(false);
-        searchField.setText(null);
-        resultsContainer.getChildren().clear();
+        icAddModController.setVisible(false);
+        tfSearch.setText(null);
+        vbResults.getChildren().clear();
     }
 
     @Override
@@ -63,35 +63,35 @@ public class ModsSearchElement extends UiElement {
     }
 
     @FXML
-    private void onSearchButtonClicked() {
-        if(searchField.getText() == null || searchField.getText().isEmpty())
+    private void onSearch() {
+        if(tfSearch.getText() == null || tfSearch.getText().isEmpty())
             return;
-        resultsContainer.getChildren().clear();
-        loadingLabel.setVisible(true);
+        vbResults.getChildren().clear();
+        lbLoading.setVisible(true);
         new Thread(this::populateResults).start();
     }
 
     @FXML
-    private void onAddButtonClicked() {
-        addModElementController.setVisible(true);
+    private void onAdd() {
+        icAddModController.setVisible(true);
     }
 
     @FXML
-    private void onBackButtonClicked() {
+    private void onBack() {
         backCallback.run();
     }
 
     @FXML
     private void onSearchKeyPress(KeyEvent event) {
         if(event.getCode().getName().equals("Enter")) {
-            onSearchButtonClicked();
+            onSearch();
         }
     }
 
     private void populateResults() {
         List<ModData> results;
         try {
-            results = ModUtil.searchCombinedMods(searchField.getText(), gameVersion, loaderType, 20, 0);
+            results = ModUtil.searchCombinedMods(tfSearch.getText(), gameVersion, loaderType, 20, 0);
         } catch (FileDownloadException e) {
             LOGGER.error("Failed to search for mods", e);
             return;
@@ -111,8 +111,8 @@ public class ModsSearchElement extends UiElement {
             element.getKey().beforeShow(null);
         }
         Platform.runLater(() -> {
-            loadingLabel.setVisible(false);
-            resultsContainer.getChildren().addAll(panes);
+            lbLoading.setVisible(false);
+            vbResults.getChildren().addAll(panes);
         });
         for(Pair<ModListElement, AnchorPane> element : elements) {
             element.getKey().afterShow(null);

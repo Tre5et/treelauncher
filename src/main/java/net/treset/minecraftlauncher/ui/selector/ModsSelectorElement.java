@@ -28,50 +28,50 @@ public class ModsSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsSelectorElement.class);
 
     @FXML
-    private ModsCreatorElement modsCreatorController;
+    private ModsCreatorElement icCreatorController;
     @FXML
-    private ModsManagerElement modsManagerController;
+    private ModsManagerElement icManagerController;
 
     private Pair<LauncherManifest, LauncherModsDetails> currentMods;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
-        modsCreatorController.enableUse(false);
-        modsCreatorController.init(this, lockSetter, lockGetter);
-        modsCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
-        modsCreatorController.enableVersionSelect(true);
-        modsCreatorController.setModsType("fabric");
-        modsManagerController.setVisible(false);
+        icCreatorController.enableUse(false);
+        icCreatorController.init(this, lockSetter, lockGetter);
+        icCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
+        icCreatorController.enableVersionSelect(true);
+        icCreatorController.setModsType("fabric");
+        icManagerController.setVisible(false);
     }
 
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        modsCreatorController.beforeShow(stage);
-        modsManagerController.setVisible(false);
+        icCreatorController.beforeShow(stage);
+        icManagerController.setVisible(false);
     }
 
     @Override
     public void afterShow(Stage stage) {
         super.afterShow(stage);
-        modsCreatorController.afterShow(stage);
+        icCreatorController.afterShow(stage);
     }
 
     @Override
-    protected void onCreateSelectableClicked() {
-        super.onCreateSelectableClicked();
+    protected void onSelectCreate() {
+        super.onSelectCreate();
         if (!getLock()) {
-            modsManagerController.setVisible(false);
+            icManagerController.setVisible(false);
         }
     }
 
     @FXML
     @Override
-    protected void onCreateClicked() {
-        if (modsCreatorController.checkCreateReady()) {
+    protected void onCreate() {
+        if (icCreatorController.checkCreateReady()) {
             try {
-                modsCreatorController.getCreator().getId();
+                icCreatorController.getCreator().getId();
             } catch (ComponentCreationException e) {
                 LauncherApplication.displayError(e);
             }
@@ -80,7 +80,7 @@ public class ModsSelectorElement extends ManifestSelectorElement {
                 mod.getKey().beforeShow(null);
             }
         } else {
-            modsCreatorController.showError(true);
+            icCreatorController.showError(true);
         }
     }
 
@@ -97,7 +97,7 @@ public class ModsSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            modsCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
+            icCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
             try {
                 FileUtil.deleteDir(new File(currentMods.getKey().getDirectory()));
             } catch (IOException e) {
@@ -134,12 +134,12 @@ public class ModsSelectorElement extends ManifestSelectorElement {
             if (currentMods == null) {
                 return;
             }
-            modsManagerController.setLauncherMods(currentMods);
-            modsManagerController.setVisible(false);
-            modsManagerController.setVisible(true);
+            icManagerController.setLauncherMods(currentMods);
+            icManagerController.setVisible(false);
+            icManagerController.setVisible(true);
         } else {
             currentMods = null;
-            modsManagerController.setVisible(false);
+            icManagerController.setVisible(false);
         }
     }
 }

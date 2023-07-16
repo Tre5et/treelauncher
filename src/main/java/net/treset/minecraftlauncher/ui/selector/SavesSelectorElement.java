@@ -24,34 +24,34 @@ import java.util.function.Supplier;
 public class SavesSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(SavesSelectorElement.class);
 
-    @FXML private SavesCreatorElement savesCreatorController;
+    @FXML private SavesCreatorElement icCreatorController;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
-        savesCreatorController.enableUse(false);
-        savesCreatorController.init(this, lockSetter, lockGetter);
-        savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
+        icCreatorController.enableUse(false);
+        icCreatorController.init(this, lockSetter, lockGetter);
+        icCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
     }
 
 
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        savesCreatorController.beforeShow(stage);
+        icCreatorController.beforeShow(stage);
     }
 
     @Override
     public void afterShow(Stage stage) {
         super.afterShow(stage);
-        savesCreatorController.afterShow(stage);
+        icCreatorController.afterShow(stage);
     }
 
     @Override
-    protected void onCreateClicked() {
-        if(savesCreatorController.checkCreateReady()) {
+    protected void onCreate() {
+        if(icCreatorController.checkCreateReady()) {
             try {
-                savesCreatorController.getCreator().getId();
+                icCreatorController.getCreator().getId();
             } catch (ComponentCreationException e) {
                 LauncherApplication.displayError(e);
             }
@@ -60,7 +60,7 @@ public class SavesSelectorElement extends ManifestSelectorElement {
                 saves.getKey().beforeShow(null);
             }
         } else {
-            savesCreatorController.showError(true);
+            icCreatorController.showError(true);
         }
     }
 
@@ -77,7 +77,7 @@ public class SavesSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            savesCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
+            icCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
             try {
                 FileUtil.deleteDir(new File(currentManifest.getDirectory()));
             } catch (IOException e) {

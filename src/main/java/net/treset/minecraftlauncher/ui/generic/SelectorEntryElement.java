@@ -22,8 +22,8 @@ public class SelectorEntryElement extends UiElement {
 
     @FXML private AnchorPane entryRoot;
     @FXML private GridPane entryContainer;
-    @FXML private Label title;
-    @FXML private Label details;
+    @FXML private Label lbTitle;
+    @FXML private Label lbDetails;
 
     private boolean selected = false;
     private InstanceData instanceData;
@@ -34,7 +34,7 @@ public class SelectorEntryElement extends UiElement {
     private List<BiConsumer<LauncherManifest, Boolean>> selectionManifestListener;
 
     @FXML
-    public void onElementClicked() {
+    public void onClick() {
         select(!selected, false, true);
     }
 
@@ -42,12 +42,12 @@ public class SelectorEntryElement extends UiElement {
         if(selected != select && (force || (instanceData != null && selectionInstanceAcceptor.apply(instanceData, select)) || (manifest != null && selectionManifestAcceptor.apply(manifest, select)))) {
             if(select) {
                 entryContainer.getStyleClass().add("selected");
-                title.getStyleClass().add("selected");
-                details.getStyleClass().add("selected");
+                lbTitle.getStyleClass().add("selected");
+                lbDetails.getStyleClass().add("selected");
             } else {
                 entryContainer.getStyleClass().remove("selected");
-                title.getStyleClass().remove("selected");
-                details.getStyleClass().remove("selected");
+                lbTitle.getStyleClass().remove("selected");
+                lbDetails.getStyleClass().remove("selected");
             }
             if(callback) {
                 if(instanceData != null) {
@@ -69,11 +69,11 @@ public class SelectorEntryElement extends UiElement {
     @Override
     public void beforeShow(Stage stage) {
         if(instanceData != null) {
-            title.setText(instanceData.getInstance().getKey().getName());
-            details.setText(instanceData.getVersionComponents().get(0).getValue().getVersionId());
+            lbTitle.setText(instanceData.getInstance().getKey().getName());
+            lbDetails.setText(instanceData.getVersionComponents().get(0).getValue().getVersionId());
         } else if(manifest != null) {
-            title.setText(manifest.getName());
-            details.setText(manifest.getId());
+            lbTitle.setText(manifest.getName());
+            lbDetails.setText(manifest.getId());
         }
     }
 

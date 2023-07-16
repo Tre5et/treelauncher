@@ -32,22 +32,22 @@ import java.util.function.Supplier;
 public class InstanceSelectorElement extends SelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
 
-    @FXML private InstanceManagerElement instanceDetailsController;
-    @FXML private ActionBar componentActionBar;
-    @FXML private ComponentChangerElement componentChangerController;
-    @FXML private VersionChangerElement versionChangerController;
+    @FXML private InstanceManagerElement icDetailsController;
+    @FXML private ActionBar abComponent;
+    @FXML private ComponentChangerElement icComponentChangerController;
+    @FXML private VersionChangerElement icVersionChangerController;
 
     private InstanceData currentInstance;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
-        instanceDetailsController.init(this::onComponentSelected);
-        versionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
+        icDetailsController.init(this::onComponentSelected);
+        icVersionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
     }
 
     @Override
-    protected void onCreateClicked() {}
+    protected void onCreate() {}
 
     @Override
     protected List<Pair<SelectorEntryElement, AnchorPane>> getElements() {
@@ -66,27 +66,27 @@ public class InstanceSelectorElement extends SelectorElement {
     }
 
     private void onSelected(InstanceData instanceData, boolean selected) {
-        instanceDetailsController.clearSelection();
-        componentChangerController.setVisible(false);
-        versionChangerController.setVisible(false);
-        componentActionBar.setDisable(true);
-        componentActionBar.clearLabel();
+        icDetailsController.clearSelection();
+        icComponentChangerController.setVisible(false);
+        icVersionChangerController.setVisible(false);
+        abComponent.setDisable(true);
+        abComponent.clearLabel();
         if(selected) {
             for(Pair<SelectorEntryElement, AnchorPane> instance : elements) {
                 if(instance.getKey().getInstanceData() != instanceData) {
                     instance.getKey().select(false, true, false);
                 }
             }
-            actionBar.setDisable(false);
-            actionBar.setLabel(instanceData.getInstance().getKey().getName());
+            abMain.setDisable(false);
+            abMain.setLabel(instanceData.getInstance().getKey().getName());
             currentInstance = instanceData;
-            instanceDetailsController.populate(instanceData);
-            instanceDetailsController.setVisible(true);
+            icDetailsController.populate(instanceData);
+            icDetailsController.setVisible(true);
         } else {
-            actionBar.setDisable(true);
-            actionBar.clearLabel();
+            abMain.setDisable(true);
+            abMain.clearLabel();
             currentInstance = null;
-            instanceDetailsController.setVisible(false);
+            icDetailsController.setVisible(false);
         }
     }
 
@@ -94,10 +94,10 @@ public class InstanceSelectorElement extends SelectorElement {
         return !getLock();
     }
 
-    public void onPlayClicked() {
+    public void onPlay() {
         if(currentInstance != null) {
             setLock(true);
-            actionBar.setDisable(true);
+            abMain.setDisable(true);
             GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
             displayGamePreparing();
             try {
@@ -120,34 +120,34 @@ public class InstanceSelectorElement extends SelectorElement {
 
     private void displayGamePreparing() {
         Platform.runLater(() -> {
-            popupController.setContent("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message");
-            popupController.clearControls();
-            popupController.setVisible(true);
+            icPopupController.setContent("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message");
+            icPopupController.clearControls();
+            icPopupController.setVisible(true);
         });
     }
 
     private void onGameExit(String error) {
         setLock(false);
-        Platform.runLater(() -> popupController.setVisible(false));
+        Platform.runLater(() -> icPopupController.setVisible(false));
         if(error != null) {
             Platform.runLater(() -> displayGameCrash(error));
         }
-        Platform.runLater(() -> actionBar.setDisable(false));
+        Platform.runLater(() -> abMain.setDisable(false));
     }
 
     private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
-        componentChangerController.setVisible(false);
-        versionChangerController.setVisible(false);
-        componentActionBar.setDisable(true);
-        componentActionBar.clearLabel();
+        icComponentChangerController.setVisible(false);
+        icVersionChangerController.setVisible(false);
+        abComponent.setDisable(true);
+        abComponent.clearLabel();
         if(selected && type != null) {
             List<LauncherManifest> manifests;
             LauncherManifest currentManifest;
             String label;
             switch(type) {
                 case VERSION -> {
-                    versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
-                    versionChangerController.setVisible(true);
+                    icVersionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
+                    icVersionChangerController.setVisible(true);
                     return;
                 }
                 case SAVES -> {
@@ -172,10 +172,10 @@ public class InstanceSelectorElement extends SelectorElement {
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + type);
             }
-            componentChangerController.init(manifests, currentManifest, this::onComponentChanged, this::allowChange);
-            componentActionBar.setLabel(label);
-            componentActionBar.setDisable(false);
-            componentChangerController.setVisible(true);
+            icComponentChangerController.init(manifests, currentManifest, this::onComponentChanged, this::allowChange);
+            abComponent.setLabel(label);
+            abComponent.setDisable(false);
+            icComponentChangerController.setVisible(true);
         }
     }
 
@@ -184,7 +184,7 @@ public class InstanceSelectorElement extends SelectorElement {
     }
 
     private void onComponentChanged(LauncherManifest manifest) {
-        switch(instanceDetailsController.getCurrentSelected()) {
+        switch(icDetailsController.getCurrentSelected()) {
             case SAVES -> currentInstance.getInstance().getValue().setSavesComponent(manifest.getId());
             case RESOURCEPACKS -> currentInstance.getInstance().getValue().setResourcepacksComponent(manifest.getId());
             case OPTIONS -> currentInstance.getInstance().getValue().setOptionsComponent(manifest.getId());
@@ -202,15 +202,15 @@ public class InstanceSelectorElement extends SelectorElement {
             LauncherApplication.displaySevereError(e);
         }
         if(currentInstance != null) {
-            instanceDetailsController.populate(currentInstance);
+            icDetailsController.populate(currentInstance);
         }
     }
 
     private void onVersionChange(VersionCreator creator) {
-        popupController.clearControls();
-        popupController.setType(PopupElement.PopupType.WARNING);
-        popupController.setContent("selector.instance.version.popup.change.title", "selector.instance.version.popup.change.message");
-        popupController.addButtons(
+        icPopupController.clearControls();
+        icPopupController.setType(PopupElement.PopupType.WARNING);
+        icPopupController.setContent("selector.instance.version.popup.change.title", "selector.instance.version.popup.change.message");
+        icPopupController.addButtons(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.NEGATIVE,
                         "selector.instance.version.popup.change.cancel",
@@ -224,7 +224,7 @@ public class InstanceSelectorElement extends SelectorElement {
                         id -> this.onPopupChangeConfirm(id, creator)
                 )
         );
-        popupController.setVisible(true);
+        icPopupController.setVisible(true);
     }
 
     private void onVersionChangeFailed(Exception e) {
@@ -232,11 +232,11 @@ public class InstanceSelectorElement extends SelectorElement {
     }
 
     private void onPopupChangeConfirm(String id, VersionCreator creator) {
-        popupController.setVisible(false);
-        popupController.setContent("selector.instance.version.popup.changing", "");
-        popupController.setType(PopupElement.PopupType.NONE);
-        popupController.clearControls();
-        popupController.addButtons(
+        icPopupController.setVisible(false);
+        icPopupController.setContent("selector.instance.version.popup.changing", "");
+        icPopupController.setType(PopupElement.PopupType.NONE);
+        icPopupController.clearControls();
+        icPopupController.addButtons(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
                         "selector.instance.version.popup.back",
@@ -244,18 +244,18 @@ public class InstanceSelectorElement extends SelectorElement {
                         this::onPopupBackClicked
                 )
         );
-        popupController.setControlsDisabled(true);
-        popupController.setVisible(true);
-        versionChangerController.setVisible(false);
+        icPopupController.setControlsDisabled(true);
+        icPopupController.setVisible(true);
+        icVersionChangerController.setVisible(false);
         new Thread(() -> {
             String versionId;
             try {
                 versionId = creator.getId();
             } catch (ComponentCreationException e) {
                 Platform.runLater(() -> {
-                    popupController.setType(PopupElement.PopupType.ERROR);
-                    popupController.setContent("selector.instance.version.popup.failure", "");
-                    popupController.setControlsDisabled(false);
+                    icPopupController.setType(PopupElement.PopupType.ERROR);
+                    icPopupController.setContent("selector.instance.version.popup.failure", "");
+                    icPopupController.setControlsDisabled(false);
                 });
                 return;
             }
@@ -272,29 +272,29 @@ public class InstanceSelectorElement extends SelectorElement {
                 LauncherApplication.displaySevereError(e);
             }
             Platform.runLater(() -> {
-                instanceDetailsController.populate(currentInstance);
-                versionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
-                versionChangerController.setVisible(true);
-                popupController.setType(PopupElement.PopupType.SUCCESS);
-                popupController.setContent("selector.instance.version.popup.success", "");
-                popupController.setControlsDisabled(false);
+                icDetailsController.populate(currentInstance);
+                icVersionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
+                icVersionChangerController.setVisible(true);
+                icPopupController.setType(PopupElement.PopupType.SUCCESS);
+                icPopupController.setContent("selector.instance.version.popup.success", "");
+                icPopupController.setControlsDisabled(false);
             });
         }).start();
     }
 
     private void onPopupBackClicked(String id) {
-        popupController.setVisible(false);
+        icPopupController.setVisible(false);
         setVisible(false);
         setVisible(true);
     }
 
     private void onPopupChangeCancel(String id) {
-        popupController.setVisible(false);
+        icPopupController.setVisible(false);
     }
 
     @FXML
-    private void onComponentFolderClicked() {
-        switch (instanceDetailsController.getCurrentSelected()) {
+    private void onComponentFolder() {
+        switch (icDetailsController.getCurrentSelected()) {
             case SAVES -> openFolder(currentInstance.getSavesComponent().getDirectory());
             case RESOURCEPACKS -> openFolder(currentInstance.getResourcepacksComponent().getDirectory());
             case OPTIONS -> openFolder(currentInstance.getOptionsComponent().getDirectory());
@@ -303,7 +303,7 @@ public class InstanceSelectorElement extends SelectorElement {
     }
 
     @FXML
-    protected void onFolderClicked() {
+    protected void onFolder() {
         openFolder(currentInstance.getInstance().getKey().getDirectory());
     }
 
@@ -356,44 +356,44 @@ public class InstanceSelectorElement extends SelectorElement {
     private void displayGameLaunchFailed(Exception e) {
         LOGGER.error("Failed to launch game", e);
         Platform.runLater(() -> {
-            popupController.setType(PopupElement.PopupType.ERROR);
-            popupController.setTitle("selector.instance.error.launch.title");
-            popupController.setMessage("selector.instance.error.launch.message", e.getMessage());
-            popupController.setControlsDisabled(false);
-            popupController.clearControls();
-            popupController.addButtons(
+            icPopupController.setType(PopupElement.PopupType.ERROR);
+            icPopupController.setTitle("selector.instance.error.launch.title");
+            icPopupController.setMessage("selector.instance.error.launch.message", e.getMessage());
+            icPopupController.setControlsDisabled(false);
+            icPopupController.clearControls();
+            icPopupController.addButtons(
                     new PopupElement.PopupButton(
                             PopupElement.ButtonType.POSITIVE,
                             "error.close",
                             "close",
-                            id -> popupController.setVisible(false)
+                            id -> icPopupController.setVisible(false)
                     )
             );
-            popupController.setVisible(true);
+            icPopupController.setVisible(true);
         });
     }
 
     private void displayGameRunning() {
         Platform.runLater(() -> {
-            popupController.setType(PopupElement.PopupType.NONE);
-            popupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
-            popupController.clearControls();
-            popupController.setVisible(true);
+            icPopupController.setType(PopupElement.PopupType.NONE);
+            icPopupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
+            icPopupController.clearControls();
+            icPopupController.setVisible(true);
         });
     }
 
     private void displayGameCrash(String error) {
-        popupController.setType(PopupElement.PopupType.WARNING);
-        popupController.setTitle("selector.instance.game.crash.title");
-        popupController.setMessage("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error);
-        popupController.setControlsDisabled(false);
-        popupController.clearControls();
-        popupController.addButtons(
+        icPopupController.setType(PopupElement.PopupType.WARNING);
+        icPopupController.setTitle("selector.instance.game.crash.title");
+        icPopupController.setMessage("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error);
+        icPopupController.setControlsDisabled(false);
+        icPopupController.clearControls();
+        icPopupController.addButtons(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
                         "selector.instance.game.crash.close",
                         "close",
-                        id -> popupController.setVisible(false)
+                        id -> icPopupController.setVisible(false)
                 ),
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
@@ -402,17 +402,17 @@ public class InstanceSelectorElement extends SelectorElement {
                         id -> openFolder(FormatUtil.absoluteDirPath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
                 )
         );
-        popupController.setVisible(false);
-        popupController.setVisible(true);
+        icPopupController.setVisible(false);
+        icPopupController.setVisible(true);
     }
 
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        instanceDetailsController.setVisible(false);
-        componentActionBar.clearLabel();
-        componentActionBar.setDisable(true);
-        componentChangerController.setVisible(false);
-        versionChangerController.setVisible(false);
+        icDetailsController.setVisible(false);
+        abComponent.clearLabel();
+        abComponent.setDisable(true);
+        icComponentChangerController.setVisible(false);
+        icVersionChangerController.setVisible(false);
     }
 }

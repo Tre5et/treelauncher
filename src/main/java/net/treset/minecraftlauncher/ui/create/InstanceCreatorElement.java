@@ -26,16 +26,16 @@ public class InstanceCreatorElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(InstanceCreatorElement.class);
 
     @FXML private HBox rootPane;
-    @FXML private ScrollPane scrollContainer;
+    @FXML private ScrollPane spContainer;
     @FXML private TextField nameInput;
-    @FXML private Label nameError;
-    @FXML private VersionCreatorElement versionCreatorController;
-    @FXML private SavesCreatorElement savesCreatorController;
-    @FXML private ResourcepacksCreatorElement resourcepacksCreatorController;
-    @FXML private OptionsCreatorElement optionsCreatorController;
-    @FXML private ModsCreatorElement modsCreatorController;
+    @FXML private Label lbNameError;
+    @FXML private VersionCreatorElement icVersionCreatorController;
+    @FXML private SavesCreatorElement icSavesCreatorController;
+    @FXML private ResourcepacksCreatorElement icResourcepacksCreatorController;
+    @FXML private OptionsCreatorElement icOptionsCreatorController;
+    @FXML private ModsCreatorElement icModsCreatorController;
     @FXML private VBox modsContainer;
-    @FXML private Button createButton;
+    @FXML private Button btCreate;
     @FXML private PopupElement popupController;
     private LauncherFiles launcherFiles;
     private boolean modsActive = true;
@@ -48,9 +48,9 @@ public class InstanceCreatorElement extends UiElement {
     }
 
     @FXML
-    private void onCreateButtonClicked() {
-        modsCreatorController.setGameVersion(versionCreatorController.getGameVersion());
-        modsCreatorController.setModsType(versionCreatorController.getVersionType());
+    private void onCreate() {
+        icModsCreatorController.setGameVersion(icVersionCreatorController.getGameVersion());
+        icModsCreatorController.setModsType(icVersionCreatorController.getVersionType());
         if(checkCreateReady() && setLock(true)) {
             InstanceCreator creator;
             try {
@@ -61,18 +61,18 @@ public class InstanceCreatorElement extends UiElement {
                         List.of(),
                         List.of(),
                         List.of(),
-                        modsActive ? modsCreatorController.getCreator() : null,
-                        optionsCreatorController.getCreator(),
-                        resourcepacksCreatorController.getCreator(),
-                        savesCreatorController.getCreator(),
-                        versionCreatorController.getCreator()
+                        modsActive ? icModsCreatorController.getCreator() : null,
+                        icOptionsCreatorController.getCreator(),
+                        icResourcepacksCreatorController.getCreator(),
+                        icSavesCreatorController.getCreator(),
+                        icVersionCreatorController.getCreator()
                 );
                 creator.setStatusCallback(this::onCreateStatusChanged);
             } catch (ComponentCreationException e) {
                 LauncherApplication.displayError(e);
                 return;
             }
-            scrollContainer.getStyleClass().add("popup-background");
+            spContainer.getStyleClass().add("popup-background");
             popupController.setType(PopupElement.PopupType.NONE);
             popupController.setContent("creator.instance.popup.label.creating", "");
             popupController.setVisible(true);
@@ -87,8 +87,8 @@ public class InstanceCreatorElement extends UiElement {
 
         } else {
             showError(true);
-            modsCreatorController.setGameVersion(null);
-            modsCreatorController.setModsType(null);
+            icModsCreatorController.setGameVersion(null);
+            icModsCreatorController.setModsType(null);
         }
     }
 
@@ -129,28 +129,28 @@ public class InstanceCreatorElement extends UiElement {
         ));
         popupController.setControlsDisabled(true);
         popupController.setVisible(false);
-        scrollContainer.getStyleClass().remove("popup-background");
-        scrollContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollContainer.setVvalue(0);
+        spContainer.getStyleClass().remove("popup-background");
+        spContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        spContainer.setVvalue(0);
         try {
             launcherFiles = new LauncherFiles();
             launcherFiles.reloadAll();
         } catch (FileLoadException e) {
             LauncherApplication.displaySevereError(e);
         }
-        nameError.setVisible(false);
+        lbNameError.setVisible(false);
         nameInput.getStyleClass().remove("error");
         nameInput.setText("");
-        versionCreatorController.setPrerequisites(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
-        savesCreatorController.setPrerequisites(launcherFiles.getSavesComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getSavesManifest(), launcherFiles.getGameDetailsManifest());
-        resourcepacksCreatorController.setPrerequisites(launcherFiles.getResourcepackComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getResourcepackManifest());
-        optionsCreatorController.setPrerequisites(launcherFiles.getOptionsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getOptionsManifest());
-        modsCreatorController.setPrerequisites(launcherFiles.getModsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getModsManifest(), launcherFiles.getGameDetailsManifest());
-        versionCreatorController.beforeShow(stage);
-        savesCreatorController.beforeShow(stage);
-        resourcepacksCreatorController.beforeShow(stage);
-        optionsCreatorController.beforeShow(stage);
-        modsCreatorController.beforeShow(stage);
+        icVersionCreatorController.setPrerequisites(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
+        icSavesCreatorController.setPrerequisites(launcherFiles.getSavesComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getSavesManifest(), launcherFiles.getGameDetailsManifest());
+        icResourcepacksCreatorController.setPrerequisites(launcherFiles.getResourcepackComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getResourcepackManifest());
+        icOptionsCreatorController.setPrerequisites(launcherFiles.getOptionsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getOptionsManifest());
+        icModsCreatorController.setPrerequisites(launcherFiles.getModsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getModsManifest(), launcherFiles.getGameDetailsManifest());
+        icVersionCreatorController.beforeShow(stage);
+        icSavesCreatorController.beforeShow(stage);
+        icResourcepacksCreatorController.beforeShow(stage);
+        icOptionsCreatorController.beforeShow(stage);
+        icModsCreatorController.beforeShow(stage);
         onModsChange(false);
     }
 
@@ -163,22 +163,22 @@ public class InstanceCreatorElement extends UiElement {
     }
 
     public void showError(boolean show) {
-        nameError.setVisible(false);
+        lbNameError.setVisible(false);
         nameInput.getStyleClass().remove("error");
         if(show && nameInput.getText().isEmpty()) {
-            nameError.setVisible(true);
+            lbNameError.setVisible(true);
             nameInput.getStyleClass().add("error");
         }
-        versionCreatorController.showError(show);
-        savesCreatorController.showError(show);
-        resourcepacksCreatorController.showError(show);
-        optionsCreatorController.showError(show);
+        icVersionCreatorController.showError(show);
+        icSavesCreatorController.showError(show);
+        icResourcepacksCreatorController.showError(show);
+        icOptionsCreatorController.showError(show);
         if(modsActive)
-            modsCreatorController.showError(show);
+            icModsCreatorController.showError(show);
     }
 
     public boolean checkCreateReady() {
-        return !nameInput.getText().isEmpty() && versionCreatorController.checkCreateReady() && savesCreatorController.checkCreateReady() && resourcepacksCreatorController.checkCreateReady() && optionsCreatorController.checkCreateReady() && (!modsActive || modsCreatorController.checkCreateReady());
+        return !nameInput.getText().isEmpty() && icVersionCreatorController.checkCreateReady() && icSavesCreatorController.checkCreateReady() && icResourcepacksCreatorController.checkCreateReady() && icOptionsCreatorController.checkCreateReady() && (!modsActive || icModsCreatorController.checkCreateReady());
     }
 
     public void onModsChange(boolean active) {

@@ -4,11 +4,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 
 import java.util.List;
@@ -17,8 +15,8 @@ import java.util.function.Supplier;
 
 public class ComponentChangerElement extends UiElement {
     @FXML private AnchorPane rootPane;
-    @FXML private ComboBox<String> changeBox;
-    @FXML private Button changeButton;
+    @FXML private ComboBox<String> cbChange;
+    @FXML private Button btChange;
 
     private List<LauncherManifest> components;
     private LauncherManifest currentComponent;
@@ -30,19 +28,17 @@ public class ComponentChangerElement extends UiElement {
         this.currentComponent = currentComponent;
         this.changeCallback = changeCallback;
         this.changeGetter = changeGetter;
-        changeBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(this::onSelectionChanged);
-        });
+        cbChange.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onSelectionChanged));
     }
 
     private void onSelectionChanged() {
-        changeButton.setDisable(changeBox.getSelectionModel().getSelectedItem() == null || changeBox.getSelectionModel().getSelectedItem().equals(currentComponent.getName()));
+        btChange.setDisable(cbChange.getSelectionModel().getSelectedItem() == null || cbChange.getSelectionModel().getSelectedItem().equals(currentComponent.getName()));
     }
 
     @FXML
-    private void onChangeButtonClicked() {
-        if(changeGetter.get() && changeBox.getSelectionModel().getSelectedItem() != null && !changeBox.getSelectionModel().getSelectedItem().equals(currentComponent.getName())) {
-            currentComponent = components.stream().filter(manifest -> manifest.getName().equals(changeBox.getSelectionModel().getSelectedItem())).findFirst().orElse(null);
+    private void onChange() {
+        if(changeGetter.get() && cbChange.getSelectionModel().getSelectedItem() != null && !cbChange.getSelectionModel().getSelectedItem().equals(currentComponent.getName())) {
+            currentComponent = components.stream().filter(manifest -> manifest.getName().equals(cbChange.getSelectionModel().getSelectedItem())).findFirst().orElse(null);
             changeCallback.accept(currentComponent);
             onSelectionChanged();
         }
@@ -51,9 +47,9 @@ public class ComponentChangerElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        changeBox.getItems().clear();
-        changeBox.getItems().addAll(components.stream().map(LauncherManifest::getName).toList());
-        changeBox.getSelectionModel().select(currentComponent.getName());
+        cbChange.getItems().clear();
+        cbChange.getItems().addAll(components.stream().map(LauncherManifest::getName).toList());
+        cbChange.getSelectionModel().select(currentComponent.getName());
     }
 
     @Override

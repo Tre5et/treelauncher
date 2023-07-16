@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <AnchorPane fx:id="entryRoot" minHeight="-Infinity" minWidth="-Infinity" styleClass="element-root" stylesheets="@/css/generic/SelectorEntryElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.generic.SelectorEntryElement">
-   <GridPane fx:id="entryContainer" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onElementClicked" styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   <GridPane fx:id="entryContainer" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClick" styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <columnConstraints>
          <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
       </columnConstraints>
@@ -16,7 +16,7 @@
       <cursor>
          <Cursor fx:constant="HAND" />
       </cursor>
-      <Label fx:id="title" styleClass="element-title" text="Something went wrong..." GridPane.fillWidth="true" />
-      <Label fx:id="details" styleClass="element-details" text="If you are seeing this, please report" GridPane.fillWidth="true" GridPane.rowIndex="1" />
+      <Label fx:id="lbTitle" styleClass="element-title" text="Something went wrong..." GridPane.fillWidth="true" />
+      <Label fx:id="lbDetails" styleClass="element-details" text="If you are seeing this, please report" GridPane.fillWidth="true" GridPane.rowIndex="1" />
    </GridPane>
 </AnchorPane>

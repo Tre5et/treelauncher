@@ -28,23 +28,23 @@ public class ModsCreatorElement extends UiElement {
 
     @FXML
     private VBox rootPane;
-    @FXML private RadioButton radioCreate;
-    @FXML private RadioButton radioUse;
-    @FXML private RadioButton radioInherit;
-    @FXML private TextField createName;
-    @FXML private TextField inheritName;
-    @FXML private ComboBox<String> createVersionChoice;
-    @FXML private CheckBox createSnapshotsCheck;
-    @FXML private ComboBox<String> useChoice;
-    @FXML private ComboBox<String> inheritChoice;
-    @FXML private Label createError;
-    @FXML private Label createVersionError;
-    @FXML private Label useError;
-    @FXML private Label inheritErrorName;
-    @FXML private Label inheritErrorSelect;
-    @FXML private VBox createBox;
-    @FXML private VBox useBox;
-    @FXML private VBox inheritBox;
+    @FXML private RadioButton rbCreate;
+    @FXML private RadioButton rbUse;
+    @FXML private RadioButton rbInherit;
+    @FXML private TextField tfCreateName;
+    @FXML private TextField lbInheritName;
+    @FXML private ComboBox<String> cbCreateVersion;
+    @FXML private CheckBox chCreateSnapshots;
+    @FXML private ComboBox<String> cbUse;
+    @FXML private ComboBox<String> cbInherit;
+    @FXML private Label lbCreateError;
+    @FXML private Label lbCreateVersionError;
+    @FXML private Label lbUseError;
+    @FXML private Label lbInheritErrorName;
+    @FXML private Label lbInheritErrorSelect;
+    @FXML private VBox bvCreate;
+    @FXML private VBox vbUse;
+    @FXML private VBox vbInherit;
 
     private List<Pair<LauncherManifest, LauncherModsDetails>> modsComponents;
     private Map<String, LauncherManifestType> typeConversion;
@@ -61,69 +61,69 @@ public class ModsCreatorElement extends UiElement {
         this.gameManifest = gameManifest;
     }
 
-    @FXML private void onRadioCreateSelect() {
-        createBox.setDisable(false);
-        useBox.setDisable(true);
-        inheritBox.setDisable(true);
+    @FXML private void onRadioCreate() {
+        bvCreate.setDisable(false);
+        vbUse.setDisable(true);
+        vbInherit.setDisable(true);
     }
-    @FXML private void onRadioUseSelect() {
-        createBox.setDisable(true);
-        useBox.setDisable(false);
-        inheritBox.setDisable(true);
+    @FXML private void onRadioUse() {
+        bvCreate.setDisable(true);
+        vbUse.setDisable(false);
+        vbInherit.setDisable(true);
     }
-    @FXML private void onRadioInheritSelect() {
-        createBox.setDisable(true);
-        useBox.setDisable(true);
-        inheritBox.setDisable(false);
+    @FXML private void onRadioInherit() {
+        bvCreate.setDisable(true);
+        vbUse.setDisable(true);
+        vbInherit.setDisable(false);
     }
     @FXML private void onSnapshotsCheck() {
         populateVersionChoice();
     }
     private void onVersionUpdated() {
-        gameVersion = createVersionChoice.getSelectionModel().getSelectedItem();
+        gameVersion = cbCreateVersion.getSelectionModel().getSelectedItem();
     }
 
     @Override
     public void beforeShow(Stage stage) {
-        radioCreate.fire();
-        radioCreate.setSelected(true);
-        createBox.setDisable(false);
-        createName.setText("");
-        createName.getStyleClass().remove("error");
-        createError.setVisible(false);
-        createVersionChoice.getItems().clear();
-        createVersionChoice.getStyleClass().remove("error");
-        createVersionError.setVisible(false);
-        useBox.setDisable(true);
-        useChoice.getItems().clear();
-        useChoice.getStyleClass().remove("error");
-        useError.setVisible(false);
-        inheritBox.setDisable(true);
-        inheritName.setText("");
-        inheritName.getStyleClass().remove("error");
-        inheritErrorName.setVisible(false);
-        inheritChoice.getItems().clear();
-        inheritChoice.getStyleClass().remove("error");
-        inheritErrorSelect.setVisible(false);
+        rbCreate.fire();
+        rbCreate.setSelected(true);
+        bvCreate.setDisable(false);
+        tfCreateName.setText("");
+        tfCreateName.getStyleClass().remove("error");
+        lbCreateError.setVisible(false);
+        cbCreateVersion.getItems().clear();
+        cbCreateVersion.getStyleClass().remove("error");
+        lbCreateVersionError.setVisible(false);
+        vbUse.setDisable(true);
+        cbUse.getItems().clear();
+        cbUse.getStyleClass().remove("error");
+        lbUseError.setVisible(false);
+        vbInherit.setDisable(true);
+        lbInheritName.setText("");
+        lbInheritName.getStyleClass().remove("error");
+        lbInheritErrorName.setVisible(false);
+        cbInherit.getItems().clear();
+        cbInherit.getStyleClass().remove("error");
+        lbInheritErrorSelect.setVisible(false);
         for(Pair<LauncherManifest, LauncherModsDetails> manifest : modsComponents) {
-            useChoice.getItems().add(manifest.getKey().getName());
-            inheritChoice.getItems().add(manifest.getKey().getName());
+            cbUse.getItems().add(manifest.getKey().getName());
+            cbInherit.getItems().add(manifest.getKey().getName());
         }
         if(selectVersion) {
             populateVersionChoice();
-            createVersionChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionUpdated));
+            cbCreateVersion.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionUpdated));
         }
     }
 
     private void populateVersionChoice() {
         gameVersion = null;
-        createVersionChoice.getItems().clear();
-        createVersionChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
-        createVersionChoice.setDisable(true);
+        cbCreateVersion.getItems().clear();
+        cbCreateVersion.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
+        cbCreateVersion.setDisable(true);
         new Thread(() -> {
             List<MinecraftVersion> minecraftVersions;
             try {
-                minecraftVersions = createSnapshotsCheck.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases();
+                minecraftVersions = chCreateSnapshots.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases();
             } catch (FileDownloadException e) {
                 LOGGER.error("Failed to get versions", e);
                 return;
@@ -133,9 +133,9 @@ public class ModsCreatorElement extends UiElement {
                 names.add(version.getId());
             }
             Platform.runLater(() -> {
-                createVersionChoice.getItems().addAll(names);
-                createVersionChoice.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
-                createVersionChoice.setDisable(false);
+                cbCreateVersion.getItems().addAll(names);
+                cbCreateVersion.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
+                cbCreateVersion.setDisable(false);
             });
         }).start();
     }
@@ -160,20 +160,20 @@ public class ModsCreatorElement extends UiElement {
         if(!checkCreateReady()) {
             throw new ComponentCreationException("Not ready to create mods!");
         }
-        if(radioCreate.isSelected()) {
-            return new ModsCreator(createName.getText(), typeConversion, modsManifest, modsType, gameVersion, gameManifest);
-        } else if(radioUse.isSelected()) {
-            Pair<LauncherManifest, LauncherModsDetails> manifest = getModsFromName(useChoice.getSelectionModel().getSelectedItem());
+        if(rbCreate.isSelected()) {
+            return new ModsCreator(tfCreateName.getText(), typeConversion, modsManifest, modsType, gameVersion, gameManifest);
+        } else if(rbUse.isSelected()) {
+            Pair<LauncherManifest, LauncherModsDetails> manifest = getModsFromName(cbUse.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                throw new ComponentCreationException("Could not find mods: name=" + useChoice.getSelectionModel().getSelectedItem());
+                throw new ComponentCreationException("Could not find mods: name=" + cbUse.getSelectionModel().getSelectedItem());
             }
             return new ModsCreator(manifest);
-        } else if(radioInherit.isSelected()) {
-            Pair<LauncherManifest, LauncherModsDetails> manifest = getModsFromName(inheritChoice.getSelectionModel().getSelectedItem());
+        } else if(rbInherit.isSelected()) {
+            Pair<LauncherManifest, LauncherModsDetails> manifest = getModsFromName(cbInherit.getSelectionModel().getSelectedItem());
             if(manifest == null) {
-                throw new ComponentCreationException("Could not find mods: name=" + inheritChoice.getSelectionModel().getSelectedItem());
+                throw new ComponentCreationException("Could not find mods: name=" + cbInherit.getSelectionModel().getSelectedItem());
             }
-            return new ModsCreator(inheritName.getText(), manifest, modsManifest, gameManifest);
+            return new ModsCreator(lbInheritName.getText(), manifest, modsManifest, gameManifest);
         }
         throw new ComponentCreationException("No radio button selected!");
     }
@@ -188,55 +188,55 @@ public class ModsCreatorElement extends UiElement {
     }
 
     public void showError(boolean show) {
-        createError.setVisible(false);
-        createName.getStyleClass().remove("error");
-        createVersionError.setVisible(false);
-        createVersionChoice.getStyleClass().remove("error");
-        useError.setVisible(false);
-        useChoice.getStyleClass().remove("error");
-        inheritErrorName.setVisible(false);
-        inheritName.getStyleClass().remove("error");
-        inheritErrorSelect.setVisible(false);
-        inheritChoice.getStyleClass().remove("error");
+        lbCreateError.setVisible(false);
+        tfCreateName.getStyleClass().remove("error");
+        lbCreateVersionError.setVisible(false);
+        cbCreateVersion.getStyleClass().remove("error");
+        lbUseError.setVisible(false);
+        cbUse.getStyleClass().remove("error");
+        lbInheritErrorName.setVisible(false);
+        lbInheritName.getStyleClass().remove("error");
+        lbInheritErrorSelect.setVisible(false);
+        cbInherit.getStyleClass().remove("error");
         if(show) {
-            if(radioCreate.isSelected()) {
-                if(createName.getText().isBlank()) {
-                    createError.setVisible(true);
-                    createName.getStyleClass().add("error");
+            if(rbCreate.isSelected()) {
+                if(tfCreateName.getText().isBlank()) {
+                    lbCreateError.setVisible(true);
+                    tfCreateName.getStyleClass().add("error");
                 }
                 if(selectVersion && (gameVersion == null || gameVersion.isBlank())) {
-                    createVersionError.setVisible(true);
-                    createVersionChoice.getStyleClass().add("error");
+                    lbCreateVersionError.setVisible(true);
+                    cbCreateVersion.getStyleClass().add("error");
                 }
-            } else if(radioUse.isSelected() && useChoice.getSelectionModel().isEmpty()) {
-                useError.setVisible(true);
-                useChoice.getStyleClass().add("error");
-            } else if(radioInherit.isSelected()) {
-                if(inheritName.getText().isBlank()) {
-                    inheritErrorName.setVisible(true);
-                    inheritName.getStyleClass().add("error");
+            } else if(rbUse.isSelected() && cbUse.getSelectionModel().isEmpty()) {
+                lbUseError.setVisible(true);
+                cbUse.getStyleClass().add("error");
+            } else if(rbInherit.isSelected()) {
+                if(lbInheritName.getText().isBlank()) {
+                    lbInheritErrorName.setVisible(true);
+                    lbInheritName.getStyleClass().add("error");
                 }
-                if(inheritChoice.getSelectionModel().isEmpty()) {
-                    inheritErrorSelect.setVisible(true);
-                    inheritChoice.getStyleClass().add("error");
+                if(cbInherit.getSelectionModel().isEmpty()) {
+                    lbInheritErrorSelect.setVisible(true);
+                    cbInherit.getStyleClass().add("error");
                 }
             }
         }
     }
 
     public void enableUse(boolean enable) {
-        radioUse.setVisible(enable);
-        useBox.setVisible(enable);
+        rbUse.setVisible(enable);
+        vbUse.setVisible(enable);
     }
 
     public void enableVersionSelect(boolean enable) {
         selectVersion = true;
-        createVersionChoice.setVisible(enable);
-        createSnapshotsCheck.setVisible(enable);
+        cbCreateVersion.setVisible(enable);
+        chCreateSnapshots.setVisible(enable);
     }
 
     public boolean checkCreateReady() {
-        return (modsComponents != null && typeConversion != null && modsManifest != null && gameManifest != null && (((gameVersion != null || (selectVersion && createVersionChoice.getSelectionModel().getSelectedItem() != null)) && modsType != null && radioCreate.isSelected() && !createName.getText().isBlank()) || (radioUse.isSelected() && !useChoice.getSelectionModel().isEmpty()) || (radioInherit.isSelected() && !inheritName.getText().isBlank() && !inheritChoice.getSelectionModel().isEmpty())));
+        return (modsComponents != null && typeConversion != null && modsManifest != null && gameManifest != null && (((gameVersion != null || (selectVersion && cbCreateVersion.getSelectionModel().getSelectedItem() != null)) && modsType != null && rbCreate.isSelected() && !tfCreateName.getText().isBlank()) || (rbUse.isSelected() && !cbUse.getSelectionModel().isEmpty()) || (rbInherit.isSelected() && !lbInheritName.getText().isBlank() && !cbInherit.getSelectionModel().isEmpty())));
     }
 
     public String getGameVersion() {
