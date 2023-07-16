@@ -410,5 +410,9 @@ public class InstanceSelectorElement extends SelectorElement {
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         instanceDetailsController.setVisible(false);
+        componentActionBar.clearLabel();
+        componentActionBar.setDisable(true);
+        componentChangerController.setVisible(false);
+        versionChangerController.setVisible(false);
     }
 }
