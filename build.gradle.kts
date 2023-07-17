@@ -9,7 +9,7 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.2.0"
+val version = "0.3.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
@@ -58,26 +58,27 @@ javafx {
     modules("javafx.controls", "javafx.fxml", "javafx.web")
 }
 
+val javaLocation = System.getProperty("java.home")
 
-
-val buildDir = "./jpackage"
+val buildDir = "./build/libs"
+val jpackageDir = "./jpackage"
 
 task("copyJar", Copy::class) {
     dependsOn("shadowJar")
-    from("./build/libs/minecraft-launcher-all.jar").into("$buildDir/jars")
-    from("./app/updater.jar").into("$buildDir/jars")
+    from("$buildDir/minecraft-launcher-all.jar").into("$jpackageDir/jars")
+    from("./app/updater.jar").into("$jpackageDir/jars")
 }
 
 tasks.jpackage {
     dependsOn("copyJar")
 
-    input = "$buildDir/jars"
-    destination = "$buildDir/dist"
+    input = "$jpackageDir/jars"
+    destination = "$jpackageDir/dist"
 
     appName = "TreeLauncher"
     appVersion = version
     vendor = "treset"
-    runtimeImage = System.getProperty("java.home")
+    runtimeImage = javaLocation
     mainJar = "minecraft-launcher-all.jar"
     icon = "src/main/resources/img/icon.ico"
     mainClass = mainClassName
@@ -92,4 +93,37 @@ tasks.jpackage {
         winPerUserInstall = true
         winUpgradeUuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
     }
+}
+
+val distDir = "./dist"
+
+task("cleanDist", Delete::class) {
+    delete("$distDir/res")
+}
+
+task("copyAppData", Copy::class) {
+    dependsOn("shadowJar")
+    from("$buildDir/minecraft-launcher-all.jar", "./app/updater.jar").into("$distDir/res/app")
+}
+
+task("copyRuntime", Copy::class) {
+    from(javaLocation).into("$distDir/res/runtime")
+}
+
+task("copyDistRes", Copy::class) {
+    dependsOn("cleanDist", "copyAppData", "copyRuntime")
+    from("distRes/run.bat").into("$distDir/res")
+}
+
+task("copyJpackage", Copy::class) {
+    dependsOn("jpackage")
+    from("$jpackageDir/dist/TreeLauncher-$version.msi").into("$distDir/$version")
+}
+
+task("createDist", Zip::class) {
+    dependsOn("copyDistRes", "copyJpackage")
+    archiveFileName.set("TreeLauncher-$version.zip")
+    destinationDirectory.set(file("$distDir/$version"))
+
+    from("$distDir/res")
 }
