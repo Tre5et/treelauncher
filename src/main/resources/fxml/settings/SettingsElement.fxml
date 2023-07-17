@@ -48,6 +48,7 @@
                         <Label styleClass="hint" text="%settings.version.version" />
                         <Label styleClass="hint" text="%launcher.version" />
                     </HBox>
+                    <IconButton styleClass="highlight, update" iconSize="32" onAction="#onUpdate" tooltipText="%settings.tooltip.update" />
                     <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSource" />
                 </VBox>
             </VBox>

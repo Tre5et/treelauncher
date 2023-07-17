@@ -11,6 +11,7 @@ import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.util.FileInitializer;
+import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -109,5 +110,22 @@ public class LauncherApplication extends Application {
             new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.severe.message", e)).showAndWait();
             System.exit(-1);
         });
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if(new File("update.json").exists()) {
+            try {
+                startUpdater();
+            } catch (IOException e) {
+                displayError(e);
+            }
+        }
+        super.stop();
+    }
+
+    private void startUpdater() throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(FormatUtil.absoluteFilePath(System.getProperty("java.home"), "bin", "java"), "-jar", "app/updater.jar", "1000");
+        pb.start();
     }
 }

@@ -65,6 +65,7 @@ val buildDir = "./jpackage"
 task("copyJar", Copy::class) {
     dependsOn("shadowJar")
     from("./build/libs/minecraft-launcher-all.jar").into("$buildDir/jars")
+    from("./app/updater.jar").into("$buildDir/jars")
 }
 
 tasks.jpackage {

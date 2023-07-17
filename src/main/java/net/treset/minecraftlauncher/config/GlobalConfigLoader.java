@@ -16,12 +16,15 @@ import java.nio.file.StandardCopyOption;
 public class GlobalConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger(GlobalConfigLoader.class);
 
-    private static final String filePath = "launcher.conf";
+    private static final String filePath = FormatUtil.absoluteFilePath("app", "launcher.conf");
 
     public static Config loadConfig() throws IllegalStateException, IOException {
         if(!new File(filePath).exists()) {
             LOGGER.info("No config found, creating default");
-            FileUtil.writeFile(filePath, "path=data");
+            FileUtil.writeFile(filePath,
+                    "path=data" + System.lineSeparator()
+                    + "update_url=https://raw.githubusercontent.com/Tre5et/minecraft-launcher/main/update/"
+            );
         }
         String contents = FileUtil.loadFile(filePath);
         if(contents == null) {
@@ -30,22 +33,25 @@ public class GlobalConfigLoader {
         String[] lines = contents.split("\n");
         String path = null;
         boolean debug = false;
+        String updateUrl = null;
         StringLocalizer.Language language = null;
         for(String line : lines) {
             if(line.startsWith("path=")) {
                 path = line.substring(5).replace("\r", "").replace("\n", "");
             } else if(line.startsWith("debug=")) {
                 debug = Boolean.parseBoolean(line.substring(6));
+            } else if(line.startsWith("update_url=")) {
+                updateUrl = line.substring(11).replace("\r", "").replace("\n", "");
             } else if(line.startsWith("language=")) {
                 String input = line.substring(9).replace("\r", "").replace("\n", "");
                 language = StringLocalizer.Language.fromId(input);
             }
         }
-        if(path == null || path.isBlank()) {
-            throw new IllegalStateException("No path specified in launcher.conf");
+        if(path == null || path.isBlank() || updateUrl == null || updateUrl.isBlank()) {
+            throw new IllegalStateException("Invalid config: path=" + path + ", updateUrl=" + updateUrl);
         }
         LOGGER.info("Loaded config: path={}, debug={}", path, debug);
-        return new Config(path, debug, language);
+        return new Config(path, debug, updateUrl, language);
     }
 
     public static void updateLanguage(StringLocalizer.Language language) throws IOException {

@@ -32,15 +32,17 @@ public class Config {
     public final List<LauncherLaunchArgument> FABRIC_DEFAULT_JVM_ARGUMENTS = List.of();
     public final String FABRIC_DEFAULT_CLIENT_FILENAME = "fabric-client.jar";
     public final boolean DEBUG;
+    public final String UPDATE_URL;
     public final StringLocalizer.Language LANGUAGE;
 
-    public Config(String BASE_DIR, boolean DEBUG, StringLocalizer.Language LANGUAGE) {
+    public Config(String BASE_DIR, boolean DEBUG, String updateUrl, StringLocalizer.Language LANGUAGE) {
         this.BASE_DIR = FormatUtil.absoluteDirPath(new File(BASE_DIR).getAbsolutePath());
         SPECIAL_FILES_FOLDER = FormatUtil.absoluteDirPath(BASE_DIR, ".launcher");
         AUTH_FILE = new File(FormatUtil.absoluteFilePath(SPECIAL_FILES_FOLDER, "secrets.auth"));
         LOG_PATH = FormatUtil.absoluteDirPath(SPECIAL_FILES_FOLDER, "logs");
 
         this.DEBUG = DEBUG;
+        this.UPDATE_URL = updateUrl;
         this.LANGUAGE = LANGUAGE;
     }
 }

@@ -2,7 +2,8 @@ package net.treset.minecraftlauncher.ui.settings;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -17,6 +18,7 @@ import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.ImageUtil;
 
 import java.awt.*;
@@ -165,6 +167,140 @@ public class SettingsElement extends UiElement {
     @FXML
     private void onSource() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI(LauncherApplication.stringLocalizer.get("url.source")));
+    }
+
+    @FXML
+    private void onUpdate() {
+        icPopupController.setVisible(false);
+        icPopupController.setType(PopupElement.PopupType.NONE);
+        icPopupController.setContent("settings.update.checking.title", "");
+        icPopupController.clearControls();
+        icPopupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "settings.update.cancel",
+                        "cancel",
+                        id -> this.cancelUpdate()
+                )
+        );
+        canceled = false;
+        icPopupController.setVisible(true);
+
+        new Thread(() -> {
+            LauncherUpdater updater;
+            try {
+                updater = new LauncherUpdater();
+            } catch (FileDownloadException e) {
+                LauncherApplication.displayError(e);
+                Platform.runLater(() -> icPopupController.setVisible(false));
+                return;
+            }
+
+            if(canceled) {
+                return;
+            }
+
+            if(updater.getUpdateVersion() == null) {
+                Platform.runLater(this::showUpdateLatest);
+            } else {
+                Platform.runLater(() -> showUpdateAvailable(updater));
+            }
+        }).start();
+    }
+
+    private void showUpdateLatest() {
+        icPopupController.setVisible(false);
+        icPopupController.setContent("settings.update.latest.title", LauncherApplication.stringLocalizer.getFormatted("settings.update.latest.message", LauncherApplication.stringLocalizer.get("launcher.version")));
+        icPopupController.clearControls();
+        icPopupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "settings.update.close",
+                        "close",
+                        id -> icPopupController.setVisible(false)
+                )
+        );
+        icPopupController.setVisible(true);
+    }
+
+    private void showUpdateAvailable(LauncherUpdater updater) {
+        icPopupController.setVisible(false);
+        icPopupController.setContent("settings.update.available.title", LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), updater.getUpdateVersion()));
+        icPopupController.clearControls();
+        icPopupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.NEGATIVE,
+                        "settings.update.close",
+                        "close",
+                        id -> icPopupController.setVisible(false)
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "settings.update.download",
+                        "download",
+                        id -> downloadUpdate(updater)
+                )
+        );
+        icPopupController.setVisible(true);
+    }
+
+    private void showUpdateSuccess() {
+        icPopupController.setVisible(false);
+        icPopupController.setContent("settings.update.success.title", "settings.update.success.message");
+        icPopupController.clearControls();
+        icPopupController.addButtons(
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "settings.update.close",
+                        "close",
+                        id -> icPopupController.setVisible(false)
+                ),
+                new PopupElement.PopupButton(
+                        PopupElement.ButtonType.POSITIVE,
+                        "settings.update.restart",
+                        "restart",
+                        id -> Platform.exit()
+                )
+        );
+        icPopupController.setVisible(true);
+    }
+
+    private void downloadUpdate(LauncherUpdater updater) {
+        icPopupController.setVisible(false);
+        icPopupController.setContent("settings.update.downloading.title", "");
+        icPopupController.clearControls();
+        icPopupController.setVisible(true);
+        int total = updater.getFileCount();
+
+        new Thread(() -> {
+            try {
+                updater.downloadFiles(
+                        (amount, file) -> Platform.runLater(() -> icPopupController.setMessage(LauncherApplication.stringLocalizer.getFormatted("settings.update.downloading.message", file, amount, total)))
+                );
+            } catch (FileDownloadException e) {
+                LauncherApplication.displayError(e);
+                Platform.runLater(() -> icPopupController.setVisible(false));
+                return;
+            }
+
+            try {
+                updater.writeFile();
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+            }
+
+            Platform.runLater(this::showUpdateSuccess);
+        }).start();
+    }
+
+    private boolean canceled = false;
+    private void cancelUpdate() {
+        icPopupController.setVisible(false);
+        canceled = true;
+    }
+
+    private boolean getUpdateAvailable() {
+        return false;
     }
 
     private static StringLocalizer.Language languageFromString(String language) throws IllegalArgumentException {
