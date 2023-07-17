@@ -23,7 +23,7 @@ public class GlobalConfigLoader {
             LOGGER.info("No config found, creating default");
             FileUtil.writeFile(filePath,
                     "path=data" + System.lineSeparator()
-                    + "update_url=https://raw.githubusercontent.com/Tre5et/minecraft-launcher/main/update/"
+                    + "update_url=https://raw.githubusercontent.com/Tre5et/treelauncher/main/update/"
             );
         }
         String contents = FileUtil.loadFile(filePath);
