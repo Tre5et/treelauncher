@@ -8,5 +8,5 @@
       "url": "https://github.com/Tre5et/treelauncher/releases/download/v0.3.1-beta/TreeLauncher-0.3.1.jar"
     }
   ],
-  "updater_url": "https://github.com/Tre5et/treelauncher/raw/v0.3.1-beta/app/updater.jar"
+  "updaterUrl": "https://github.com/Tre5et/treelauncher/raw/v0.3.1-beta/app/updater.jar"
 }
