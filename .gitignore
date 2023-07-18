@@ -53,3 +53,4 @@ bin/
 logs/
 /data/
 dist/
+*.debug.*

@@ -125,7 +125,7 @@ public class LauncherApplication extends Application {
     }
 
     private void startUpdater() throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(FormatUtil.absoluteFilePath(System.getProperty("java.home"), "bin", "java"), "-jar", "app/updater.jar", "1000");
+        ProcessBuilder pb = new ProcessBuilder(FormatUtil.absoluteFilePath(System.getProperty("java.home"), "bin", "java"), "-jar", "app/updater.jar");
         pb.start();
     }
 }

@@ -9,13 +9,32 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.3.0"
+val version = "0.3.1"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
 val mcVersionLoaderVersion = "0.3.3"
 val log4jVersion = "2.20.0"
 val ikonliVersion = "12.3.1"
+
+checkVersion()
+
+fun checkVersion() {
+    val stringFile= File("src/main/resources/lang/strings.properties")
+    val content = stringFile.readLines()
+    var matches = false
+    for(line in content) {
+        if (line.startsWith("launcher.version=")) {
+            if (line.substringAfter("launcher.version=").startsWith(version)) {
+                matches = true
+                break
+            }
+        }
+    }
+    if(!matches) {
+        throw Exception("Version in strings.properties does not match version in build.gradle.kts")
+    }
+}
 
 repositories {
     mavenCentral()
@@ -120,8 +139,14 @@ task("copyJpackage", Copy::class) {
     from("$jpackageDir/dist/TreeLauncher-$version.msi").into("$distDir/$version")
 }
 
+task("copyShadowJar", Copy::class) {
+    dependsOn("shadowJar")
+    from("$buildDir/minecraft-launcher-all.jar").into("$distDir/$version")
+    rename("minecraft-launcher-all.jar", "TreeLauncher-$version.jar")
+}
+
 task("createDist", Zip::class) {
-    dependsOn("copyDistRes", "copyJpackage")
+    dependsOn("copyDistRes", "copyJpackage", "copyShadowJar")
     archiveFileName.set("TreeLauncher-$version.zip")
     destinationDirectory.set(file("$distDir/$version"))
 

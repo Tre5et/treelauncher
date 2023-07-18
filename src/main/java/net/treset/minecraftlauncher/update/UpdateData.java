@@ -8,11 +8,13 @@ public class UpdateData {
     private boolean available;
     private String version;
     private List<UpdateFile> files;
+    private String updaterUrl;
 
-    public UpdateData(boolean available, String version, List<UpdateFile> files) {
+    public UpdateData(boolean available, String version, List<UpdateFile> files, String updaterUrl) {
         this.available = available;
         this.version = version;
         this.files = files;
+        this.updaterUrl = updaterUrl;
     }
 
     public boolean isAvailable() {
@@ -37,6 +39,18 @@ public class UpdateData {
 
     public void setFiles(List<UpdateFile> files) {
         this.files = files;
+    }
+
+    public String getUpdaterUrl() {
+        return updaterUrl;
+    }
+
+    public void setUpdaterUrl(String updaterUrl) {
+        this.updaterUrl = updaterUrl;
+    }
+
+    public String toJson() {
+        return new Gson().toJson(this);
     }
 
     public static UpdateData fromJson(String json) {

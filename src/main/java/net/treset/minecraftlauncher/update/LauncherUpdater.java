@@ -7,6 +7,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.function.BiConsumer;
 
 public class LauncherUpdater {
@@ -30,7 +31,7 @@ public class LauncherUpdater {
     }
 
     public int getFileCount() {
-        return updateData.getFiles().stream().filter(file -> file.getUpdate() != null).toArray().length;
+        return updateData.getFiles().stream().filter(file -> file.getUpdate() != null).toArray().length + (updateData.getUpdaterUrl() == null ? 0 : 1);
     }
 
     public void downloadFiles(BiConsumer<Integer, String> changeCallback) throws FileDownloadException {
@@ -54,6 +55,30 @@ public class LauncherUpdater {
                 throw e;
             }
         }
+        if(updateData.getUpdaterUrl() != null) {
+            changeCallback.accept(++count, "app/updater.jar");
+            URL url;
+            try {
+                url = new URL(updateData.getUpdaterUrl());
+            } catch (Exception e) {
+                deleteUpdateFiles();
+                throw new FileDownloadException("Failed to parse url=" + updateData.getUpdaterUrl(), e);
+            }
+            try {
+                FileUtil.downloadFile(url, new File("app/updater.jar.update"));
+            } catch (FileDownloadException e) {
+                deleteUpdateFiles();
+                throw e;
+            }
+
+            try {
+                Files.delete(new File("app/updater.jar").toPath());
+                Files.move(new File("app/updater.jar.update").toPath(), new File("app/updater.jar").toPath());
+            } catch (IOException e) {
+                deleteUpdateFiles();
+                throw new FileDownloadException("Failed to move updater.jar.update to updater.jar", e);
+            }
+        }
     }
 
     public void writeFile() throws IOException {
@@ -72,7 +97,6 @@ public class LauncherUpdater {
         }
         return success;
     }
-
     public UpdateData getUpdateData() {
         return updateData;
     }
