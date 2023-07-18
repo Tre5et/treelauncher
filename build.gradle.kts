@@ -100,6 +100,7 @@ tasks.jpackage {
     runtimeImage = javaLocation
     mainJar = "minecraft-launcher-all.jar"
     icon = "src/main/resources/img/icon.ico"
+    temp = "$jpackageDir/temp"
     mainClass = mainClassName
 
     javaOptions = listOf("-Dfile.encoding=UTF-8")

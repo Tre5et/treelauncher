@@ -87,6 +87,22 @@ public class FileInitializer {
         for(InitializingManifest file : files) {
             file.make();
         }
+
+        // this is a terrible hack for the packaging
+        removeUpdaterFromClasspath();
+    }
+
+    private void removeUpdaterFromClasspath() {
+        File cfg = new File("app/TreeLauncher.cfg");
+        if(cfg.exists()) {
+            try {
+                String content = FileUtil.loadFile(cfg.getPath());
+                content = content.replace("app.classpath=$APPDIR\\updater.jar", "");
+                FileUtil.writeFile(cfg.getPath(), content);
+            } catch(IOException e) {
+                LOGGER.error("Failed to remove updater classpath", e);
+            }
+        }
     }
 
     public class InitializingManifest {
