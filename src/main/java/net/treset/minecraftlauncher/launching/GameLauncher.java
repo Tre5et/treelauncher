@@ -78,6 +78,7 @@ public class GameLauncher {
                     doneCallback.accept(new GameLaunchException("Unable to launch game: unable to cleanup after fail", gle));
                 }
                 doneCallback.accept(gle);
+                return;
             }
             try {
                 finishLaunch();
