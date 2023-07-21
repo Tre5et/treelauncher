@@ -252,9 +252,9 @@ public class ResourceManager {
         File includedFilesDir = new File(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             try {
-                FileUtil.deleteDir(includedFilesDir);
+                Files.move(includedFilesDir.toPath(), Path.of(includedFilesDir.getAbsolutePath() + "_old"), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                throw new GameResourceException("Unable to remove included files: unable to delete included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId(), e);
+                throw new GameResourceException("Unable to remove included files: unable to move included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId(), e);
             }
         }
         if(!includedFilesDir.mkdirs()) {
