@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 
+<?import javafx.scene.shape.Circle?>
 <HBox stylesheets="@/css/nav/NavbarElement.css" alignment="CENTER" prefHeight="48" prefWidth="500" styleClass="navbar"
       xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="net.treset.minecraftlauncher.ui.nav.NavbarElement">
@@ -28,6 +29,7 @@
       <StackPane>
          <IconButton fx:id="btProfile" styleClass="profile" iconSize="32" tooltipText="%nav.tooltip.profile" onAction="#onProfile" />
          <ImageView fx:id="ivProfile" mouseTransparent="true" smooth="false" />
+         <Circle fx:id="ciUpdate" visible="false" styleClass="update-indicator" radius="10" mouseTransparent="true" translateX="9" translateY="-9" />
       </StackPane>
    </HBox>
 </HBox>

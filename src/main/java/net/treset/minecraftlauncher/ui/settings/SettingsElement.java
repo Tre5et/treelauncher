@@ -36,6 +36,7 @@ public class SettingsElement extends UiElement {
     @FXML private Label lbUsername;
     @FXML private Label lbUuid;
     @FXML private ImageView ivSkin;
+    @FXML private Label lbUpdate;
     @FXML private PopupElement icPopupController;
 
     private Runnable logoutCallback;
@@ -187,23 +188,24 @@ public class SettingsElement extends UiElement {
         icPopupController.setVisible(true);
 
         new Thread(() -> {
-            LauncherUpdater updater;
-            try {
-                updater = new LauncherUpdater();
-            } catch (FileDownloadException e) {
-                LauncherApplication.displayError(e);
-                Platform.runLater(() -> icPopupController.setVisible(false));
-                return;
+            if(LauncherApplication.launcherUpdater == null) {
+                try {
+                    LauncherApplication.launcherUpdater = new LauncherUpdater();
+                } catch (FileDownloadException e) {
+                    LauncherApplication.displayError(e);
+                    Platform.runLater(() -> icPopupController.setVisible(false));
+                    return;
+                }
             }
 
             if(canceled) {
                 return;
             }
 
-            if(updater.getUpdateVersion() == null) {
+            if(LauncherApplication.launcherUpdater.getUpdateVersion() == null) {
                 Platform.runLater(this::showUpdateLatest);
             } else {
-                Platform.runLater(() -> showUpdateAvailable(updater));
+                Platform.runLater(this::showUpdateAvailable);
             }
         }).start();
     }
@@ -223,9 +225,9 @@ public class SettingsElement extends UiElement {
         icPopupController.setVisible(true);
     }
 
-    private void showUpdateAvailable(LauncherUpdater updater) {
+    private void showUpdateAvailable() {
         icPopupController.setVisible(false);
-        icPopupController.setContent("settings.update.available.title", LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), updater.getUpdateVersion()));
+        icPopupController.setContent("settings.update.available.title", LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.launcherUpdater.getUpdateVersion()));
         icPopupController.clearControls();
         icPopupController.addButtons(
                 new PopupElement.PopupButton(
@@ -238,7 +240,7 @@ public class SettingsElement extends UiElement {
                         PopupElement.ButtonType.POSITIVE,
                         "settings.update.download",
                         "download",
-                        id -> downloadUpdate(updater)
+                        id -> downloadUpdate()
                 )
         );
         icPopupController.setVisible(true);
@@ -265,16 +267,16 @@ public class SettingsElement extends UiElement {
         icPopupController.setVisible(true);
     }
 
-    private void downloadUpdate(LauncherUpdater updater) {
+    private void downloadUpdate() {
         icPopupController.setVisible(false);
         icPopupController.setContent("settings.update.downloading.title", "");
         icPopupController.clearControls();
         icPopupController.setVisible(true);
-        int total = updater.getFileCount();
+        int total = LauncherApplication.launcherUpdater.getFileCount();
 
         new Thread(() -> {
             try {
-                updater.downloadFiles(
+                LauncherApplication.launcherUpdater.downloadFiles(
                         (amount, file) -> Platform.runLater(() -> icPopupController.setMessage(LauncherApplication.stringLocalizer.getFormatted("settings.update.downloading.message", file, amount, total)))
                 );
             } catch (FileDownloadException e) {
@@ -284,7 +286,7 @@ public class SettingsElement extends UiElement {
             }
 
             try {
-                updater.writeFile();
+                LauncherApplication.launcherUpdater.writeFile();
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }
@@ -299,10 +301,6 @@ public class SettingsElement extends UiElement {
         canceled = true;
     }
 
-    private boolean getUpdateAvailable() {
-        return false;
-    }
-
     private static StringLocalizer.Language languageFromString(String language) throws IllegalArgumentException {
         for(StringLocalizer.Language l : StringLocalizer.getAvailableLanguages()) {
             if(l.getName().equals(language) || language.equals(l.getName() + LauncherApplication.stringLocalizer.get("language.default"))) {
@@ -312,9 +310,24 @@ public class SettingsElement extends UiElement {
         throw new IllegalArgumentException("Could not find language: " + language);
     }
 
+    private void checkUpdate() {
+        if(LauncherApplication.launcherUpdater == null) {
+            try {
+                LauncherApplication.launcherUpdater = new LauncherUpdater();
+            } catch (FileDownloadException e) {
+                LauncherApplication.displayError(e);
+                return;
+            }
+        }
+        if(LauncherApplication.launcherUpdater.getUpdateVersion() != null) {
+            Platform.runLater(() -> lbUpdate.setVisible(true));
+        }
+    }
+
     @Override
     public void beforeShow(Stage stage) {
         tfPath.setText(LauncherApplication.config.BASE_DIR);
+        new Thread(this::checkUpdate).start();
     }
 
     @Override

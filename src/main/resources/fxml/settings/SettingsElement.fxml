@@ -49,6 +49,7 @@
                         <Label styleClass="hint" text="%launcher.version" />
                     </HBox>
                     <IconButton styleClass="highlight, update" iconSize="32" onAction="#onUpdate" tooltipText="%settings.tooltip.update" />
+                    <Label fx:id="lbUpdate" styleClass="update-available-label" visible="false" text="%settings.version.available" />
                     <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSource" />
                 </VBox>
             </VBox>

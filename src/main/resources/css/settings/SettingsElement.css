@@ -44,3 +44,9 @@
 .button.invisible:pressed > .icon {
     -fx-icon-color: #999999;
 }
+
+.update-available-label {
+    -fx-text-fill: -fx-primary-400;
+    -fx-font-style: italic;
+    -fx-font-weight: bold;
+}

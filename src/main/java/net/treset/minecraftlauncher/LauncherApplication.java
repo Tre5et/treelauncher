@@ -10,6 +10,7 @@ import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
+import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.FileInitializer;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +27,7 @@ public class LauncherApplication extends Application {
     public static final UserAuth userAuth = new UserAuth();
     public static StringLocalizer stringLocalizer;
     public static Config config;
+    public static LauncherUpdater launcherUpdater;
     public static Stage primaryStage;
 
     public static void main(String[] args) {

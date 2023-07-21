@@ -12,3 +12,9 @@
     -fx-start-margin: 10px;
     -fx-end-margin: 10px;
 }
+
+.update-indicator {
+    -fx-fill: -fx-primary-600;
+    -fx-stroke-width: 4px;
+    -fx-stroke: -fx-primary-300;
+}

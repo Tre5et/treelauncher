@@ -5,13 +5,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.util.ImageUtil;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
+import net.treset.minecraftlauncher.update.LauncherUpdater;
+import net.treset.minecraftlauncher.util.ImageUtil;
 
 import java.util.function.Function;
 
@@ -24,6 +26,7 @@ public class NavbarElement extends UiElement {
     @FXML private Button btMods;
     @FXML private Button btProfile;
     @FXML private ImageView ivProfile;
+    @FXML private Circle ciUpdate;
 
     private boolean locked = false;
     private Stage stage;
@@ -91,6 +94,7 @@ public class NavbarElement extends UiElement {
     @Override
     public void afterShow(Stage stage) {
         new Thread(this::setProfileImage).start();
+        new Thread(this::checkUpdate).start();
     }
 
     private void deselectAll() {
@@ -112,6 +116,20 @@ public class NavbarElement extends UiElement {
             } catch (FileDownloadException e) {
                 LauncherApplication.displayError(e);
             }
+        }
+    }
+
+    private void checkUpdate() {
+        if(LauncherApplication.launcherUpdater == null) {
+            try {
+                LauncherApplication.launcherUpdater = new LauncherUpdater();
+            } catch (FileDownloadException e) {
+                LauncherApplication.displayError(e);
+                return;
+            }
+        }
+        if(LauncherApplication.launcherUpdater.getUpdateVersion() != null) {
+            Platform.runLater(() -> ciUpdate.setVisible(true));
         }
     }
 
