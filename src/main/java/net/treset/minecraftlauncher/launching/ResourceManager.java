@@ -250,9 +250,13 @@ public class ResourceManager {
     private void removeIncludedFiles(LauncherManifest component, ArrayList<File> files) throws GameResourceException {
         LOGGER.debug("Removing included files: {}Id={}, includedFiles={}, files={}", component.getType(), component.getId(), component.getIncludedFiles(), files);
         File includedFilesDir = new File(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
+        File oldIncludedFilesDir = new File(includedFilesDir.getAbsolutePath() + "_old");
         if(includedFilesDir.exists()) {
             try {
-                Files.move(includedFilesDir.toPath(), Path.of(includedFilesDir.getAbsolutePath() + "_old"), StandardCopyOption.REPLACE_EXISTING);
+                if(oldIncludedFilesDir.exists()) {
+                    FileUtil.deleteDir(oldIncludedFilesDir);
+                }
+                Files.move(includedFilesDir.toPath(), oldIncludedFilesDir.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new GameResourceException("Unable to remove included files: unable to move included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId(), e);
             }
