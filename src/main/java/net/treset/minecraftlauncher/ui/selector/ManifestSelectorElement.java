@@ -94,7 +94,9 @@ public abstract class ManifestSelectorElement extends SelectorElement {
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        ccDetails.setVisible(false);
+        if(ccDetails != null) {
+            ccDetails.setVisible(false);
+        }
     }
 
     @Override
