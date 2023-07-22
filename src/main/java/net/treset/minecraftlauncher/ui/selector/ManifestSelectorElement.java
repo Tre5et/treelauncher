@@ -1,10 +1,13 @@
 package net.treset.minecraftlauncher.ui.selector;
 
+import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.ui.generic.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +21,9 @@ import java.util.List;
 
 public abstract class ManifestSelectorElement extends SelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(ManifestSelectorElement.class);
+
+    @FXML
+    protected FolderContentContainer ccDetails;
 
     protected LauncherManifest currentManifest = null;
 
@@ -56,6 +62,9 @@ public abstract class ManifestSelectorElement extends SelectorElement {
     }
 
     protected void onSelected(LauncherManifest manifest, boolean selected) {
+        if(ccDetails != null) {
+            ccDetails.setVisible(selected);
+        }
         if(selected) {
             deselectAll();
             currentManifest = manifest;
@@ -64,11 +73,28 @@ public abstract class ManifestSelectorElement extends SelectorElement {
             vbCreate.setVisible(false);
             abMain.setDisable(false);
             abMain.setLabel(manifest.getName());
+            if(ccDetails != null) {
+                ccDetails.setFolder(new File(manifest.getDirectory()));
+            }
         } else {
             currentManifest = null;
             abMain.setDisable(true);
             abMain.clearLabel();
         }
+    }
+
+    @Override
+    protected void onSelectCreate() {
+        super.onSelectCreate();
+        if(ccDetails != null) {
+            ccDetails.setVisible(false);
+        }
+    }
+
+    @Override
+    public void beforeShow(Stage stage) {
+        super.beforeShow(stage);
+        ccDetails.setVisible(false);
     }
 
     @Override

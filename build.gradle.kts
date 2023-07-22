@@ -13,7 +13,7 @@ val version = "0.3.1"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
-val mcVersionLoaderVersion = "0.3.3"
+val mcVersionLoaderVersion = "1.1.2"
 val log4jVersion = "2.20.0"
 val ikonliVersion = "12.3.1"
 

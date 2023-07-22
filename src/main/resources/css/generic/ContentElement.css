@@ -1,0 +1,17 @@
+.element-container {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-color: -fx-background-secondary;
+    -fx-padding: 10px 10px 10px 10px;
+    -fx-hgap: 10px;
+}
+
+.icon-container {
+    -fx-padding: 5px 5px 5px 5px;
+    -fx-background-color: -fx-background-tertiary;
+    -fx-background-radius: 3px;
+}
+
+.element-details {
+    -fx-text-overrun: ellipsis;
+}
