@@ -117,6 +117,24 @@ tasks.jpackage {
 
 val distDir = "./dist"
 
+task("createUpdateFiles", Exec::class) {
+    val files = File("versionManifests").listFiles()
+    if(files == null) {
+        throw Exception("No versionManifests found")
+    }
+    var matches = false
+    for(file in files) {
+        if(file.name.substringBeforeLast(".json").equals(version)) {
+            matches = true
+            break
+        }
+    }
+    if(!matches) {
+        throw Exception("No versionManifest for current version found")
+    }
+    commandLine("updateConverter\\node", "updateConverter\\index.js")
+}
+
 task("cleanDist", Delete::class) {
     delete("$distDir/res")
 }
@@ -147,7 +165,7 @@ task("copyShadowJar", Copy::class) {
 }
 
 task("createDist", Zip::class) {
-    dependsOn("copyDistRes", "copyJpackage", "copyShadowJar")
+    dependsOn("createUpdateFiles", "copyDistRes", "copyJpackage", "copyShadowJar")
     archiveFileName.set("TreeLauncher-$version.zip")
     destinationDirectory.set(file("$distDir/$version"))
 

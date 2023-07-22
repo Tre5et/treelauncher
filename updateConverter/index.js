@@ -27,7 +27,7 @@ exports.convert = void 0;
 var console = __importStar(require("console"));
 var Update_1 = require("./Update");
 var fs = require('fs');
-var input = "./version_manifests";
+var input = "./versionManifests";
 var output = "./update";
 function convert() {
     var files = fs.readdirSync(input, { withFileTypes: true });
