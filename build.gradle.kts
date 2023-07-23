@@ -9,7 +9,7 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.3.1"
+val version = "0.4.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
@@ -100,7 +100,6 @@ tasks.jpackage {
     runtimeImage = javaLocation
     mainJar = "minecraft-launcher-all.jar"
     icon = "src/main/resources/img/icon.ico"
-    temp = "$jpackageDir/temp"
     mainClass = mainClassName
 
     javaOptions = listOf("-Dfile.encoding=UTF-8")
