@@ -1,6 +1,8 @@
-package net.treset.minecraftlauncher.ui.generic;
+package net.treset.minecraftlauncher.ui.generic.lists;
 
 import net.treset.mc_version_loader.saves.Save;
+import net.treset.minecraftlauncher.ui.generic.lists.ContentElement;
+import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.util.ImageUtil;
 
 import java.io.File;

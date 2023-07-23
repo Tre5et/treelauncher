@@ -22,6 +22,7 @@ import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
 import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +41,7 @@ public class ModsManagerElement extends UiElement {
     @FXML private AnchorPane rootPane;
     @FXML private VBox vbCurrentMods;
     @FXML private CheckBox chUpdate;
-    @FXML private CheckBox chEnable;
+
     @FXML private CheckBox chDisable;
     @FXML private VBox currentModsContainer;
     @FXML private ComboBox<String> cbVersion;
@@ -50,7 +51,7 @@ public class ModsManagerElement extends UiElement {
     @FXML private PopupElement icPopupController;
 
     private Pair<LauncherManifest, LauncherModsDetails> details;
-    private List<Pair<ModListElement, AnchorPane>> elements;
+    private List<ModContentElement> elements;
 
     public void setLauncherMods(Pair<LauncherManifest, LauncherModsDetails> details) {
         this.details = details;
@@ -65,20 +66,16 @@ public class ModsManagerElement extends UiElement {
 
     @FXML
     private void onUpdate(){
-        for(Pair<ModListElement, AnchorPane> e : elements) {
-            e.getKey().checkUpdate();
+        for(ModContentElement e : elements) {
+            e.checkUpdate();
             if(chUpdate.isSelected()) {
-                e.getKey().confirmVersionChange(!chEnable.isDisable() && chEnable.isSelected());
+                e.changeVersion();
             }
-            if(chDisable.isSelected()) {
-                e.getKey().disableNoVersion();
+            if(chDisable.isSelected() && !e.hasValidVersion()) {
+                //TODO: This is still very broken
+                Platform.runLater(() -> enableMod(false, e));
             }
         }
-    }
-
-    @FXML
-    private void onCheckUpdate() {
-        chEnable.setDisable(!chUpdate.isSelected());
     }
 
     @FXML
@@ -112,7 +109,7 @@ public class ModsManagerElement extends UiElement {
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
-        icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
+        //TODO: icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
         onVersionSelected();
         reloadMods();
     }
@@ -131,7 +128,7 @@ public class ModsManagerElement extends UiElement {
     public void beforeShow(Stage stage){
         if(details == null || details.getValue().getMods() == null)
             return;
-        icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
+        //TODO: icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
         chSnapshots.setSelected(false);
         cbVersion.getItems().clear();
         cbVersion.setDisable(true);
@@ -146,17 +143,11 @@ public class ModsManagerElement extends UiElement {
         new Thread(() -> {
             elements = new ArrayList<>();
             for(LauncherMod m : details.getValue().getMods()) {
-                try {
-                    elements.add(ModListElement.from(m, details.getValue().getModsVersion(), this::onInstallButtonClicked, this::onDisableButtonClicked, this::onDeleteButtonClicked));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                elements.add(new ModContentElement(m, details.getValue().getModsVersion(), this::installMod, this::enableMod, this::deleteMod));
             }
-            elements.sort(Comparator.comparing(e -> e.getKey().getMod().getName()));
-            elements.forEach(e -> e.getKey().beforeShow(null));
+            elements.sort(Comparator.comparing(e -> e.getLauncherMod().getName()));
             Platform.runLater(() -> {
-                currentModsContainer.getChildren().addAll(elements.stream().map(Pair::getValue).toList());
-                elements.forEach(e -> e.getKey().afterShow(null));
+                currentModsContainer.getChildren().addAll(elements);
             });
         }).start();
 
@@ -196,36 +187,36 @@ public class ModsManagerElement extends UiElement {
         rootPane.setVisible(visible);
     }
 
-    public void onInstallButtonClicked(ModVersionData versionData, LauncherMod modData, ModListElement source) {
-        downloadMod(versionData, modData, source);
+    public void installMod(ModContentElement source) {
+        downloadMod(source.getCurrentSelected(), source.getLauncherMod(), source);
     }
 
-    public boolean onDisableButtonClicked(boolean disabled, LauncherMod modData) {
-        modData.setEnabled(!disabled);
-        File modFile = new File(details.getKey().getDirectory() + modData.getFileName() + (disabled ? "" : ".disabled"));
-        File newFile = new File(details.getKey().getDirectory(), modData.getFileName() + (disabled ? ".disabled" : ""));
+    public void enableMod(boolean enable, ModContentElement source) {
+        File modFile = new File(details.getKey().getDirectory() + source.getLauncherMod().getFileName() + (enable ? ".disabled" : ""));
+        File newFile = new File(details.getKey().getDirectory(), source.getLauncherMod().getFileName() + (enable ? "" : ".disabled"));
         try {
             Files.move(modFile.toPath(), newFile.toPath());
         } catch(IOException e) {
             LauncherApplication.displayError(e);
-            return false;
         }
+        source.getLauncherMod().setEnabled(enable);
         try {
             details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
-            return true;
         }
-        return true;
+        source.setEnabled(enable);
     }
 
-    public void onDeleteButtonClicked(LauncherMod modData, ModListElement source) {
+    public void deleteMod(ModContentElement source) {
         ArrayList<LauncherMod> mods = new ArrayList<>(details.getValue().getMods());
-        mods.remove(modData);
+        mods.remove(source.getLauncherMod());
 
-        File modFile = new File(details.getKey().getDirectory(), modData.getFileName() + (modData.isEnabled() ? "" : ".disabled"));
-        if(!modFile.delete()) {
-            LOGGER.warn("Failed to delete mod file");
+        File modFile = new File(details.getKey().getDirectory(), source.getLauncherMod().getFileName() + (source.getLauncherMod().isEnabled() ? "" : ".disabled"));
+        try {
+            Files.delete(modFile.toPath());
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
             return;
         }
 
@@ -237,21 +228,24 @@ public class ModsManagerElement extends UiElement {
             return;
         }
 
-        Pair<ModListElement, AnchorPane> element = null;
-        for(Pair<ModListElement, AnchorPane> e : elements) {
-            if(e.getKey().equals(source)) {
+        ModContentElement element = null;
+        for(ModContentElement e : elements) {
+            if(e.equals(source)) {
                 element = e;
                 break;
             }
         }
         if(element != null) {
-            currentModsContainer.getChildren().remove(element.getValue());
+            currentModsContainer.getChildren().remove(element);
+            elements.remove(element);
+        } else {
+            LauncherApplication.displayError(new IllegalStateException("Unable to locate mod element to remove"));
         }
     }
 
-    private void downloadMod(ModVersionData versionData, LauncherMod modData, ModListElement source) {
+    private void downloadMod(ModVersionData versionData, LauncherMod modData, ModContentElement source) {
         LOGGER.debug("Downloading mod: name={}, version={}", versionData.getName(), versionData.getVersionNumber());
-        source.setDownloading(true);
+        source.setInstalling(true);
         new Thread(() -> {
             if (modData != null) {
                 File oldFile = new File(details.getKey().getDirectory() + modData.getFileName());
@@ -260,8 +254,8 @@ public class ModsManagerElement extends UiElement {
                     if(!oldFile.delete()) {
                         LOGGER.warn("Failed to delete old mod file: name={}", oldFile.getName());
                         Platform.runLater(() -> {
-                            source.beforeShow(null);
-                            source.afterShow(null);
+                            source.setInstalling(false);
+                            source.setCurrentSelected(versionData);
                         });
                         LauncherApplication.displayError(new IOException("Failed to delete old mod file: name=" + oldFile.getName()));
                         return;
@@ -279,23 +273,19 @@ public class ModsManagerElement extends UiElement {
             if (newMod == null) {
                 LOGGER.warn("Failed to download mod file, name={}", versionData.getName());
                 Platform.runLater(() -> {
-                    source.beforeShow(null);
-                    source.afterShow(null);
+                    source.setInstalling(false);
+                    source.setCurrentSelected(versionData);
                 });
                 LauncherApplication.displayError(new IOException("Failed to download mod file, name=" + versionData.getName()));
                 return;
             }
             details.getValue().setMods(mods);
-            source.setMod(newMod);
+            source.setLauncherMod(newMod);
             try {
                 details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }
-            Platform.runLater(() -> {
-                source.beforeShow(null);
-                source.afterShow(null);
-            });
         }).start();
     }
 

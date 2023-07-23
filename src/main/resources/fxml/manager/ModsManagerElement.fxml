@@ -12,15 +12,12 @@
             <Label styleClass="title" text="%manager.mods.label.current" />
             <IconButton styleClass="update" iconSize="42" onAction="#onUpdate" tooltipText="%manager.mods.tooltip.update" />
             <VBox alignment="CENTER_LEFT">
-                <HBox spacing="10">
-                    <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" onAction="#onCheckUpdate" />
-                    <CheckBox fx:id="chEnable" text="%manager.mods.check.enable" />
-                </HBox>
+                <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" />
                 <CheckBox fx:id="chDisable" text="%manager.mods.check.disable" />
             </VBox>
         </HBox>
         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-            <VBox fx:id="currentModsContainer" />
+            <VBox fx:id="currentModsContainer" spacing="10" />
         </ScrollPane>
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER" >
             <padding>

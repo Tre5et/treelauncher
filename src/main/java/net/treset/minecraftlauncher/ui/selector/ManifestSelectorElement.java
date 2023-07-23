@@ -7,7 +7,7 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.ui.generic.FolderContentContainer;
+import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;

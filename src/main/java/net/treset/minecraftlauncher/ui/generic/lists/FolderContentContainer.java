@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.generic;
+package net.treset.minecraftlauncher.ui.generic.lists;
 
 import javafx.application.Platform;
 import javafx.scene.control.ScrollPane;

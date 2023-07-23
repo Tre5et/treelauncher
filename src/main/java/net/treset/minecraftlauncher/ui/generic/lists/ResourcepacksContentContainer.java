@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.generic;
+package net.treset.minecraftlauncher.ui.generic.lists;
 
 import net.treset.mc_version_loader.resoucepacks.Resourcepack;
 import net.treset.minecraftlauncher.util.ImageUtil;
