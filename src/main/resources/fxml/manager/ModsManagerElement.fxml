@@ -12,7 +12,10 @@
             <Label styleClass="title" text="%manager.mods.label.current" />
             <IconButton styleClass="update" iconSize="42" onAction="#onUpdate" tooltipText="%manager.mods.tooltip.update" />
             <VBox alignment="CENTER_LEFT">
-                <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" />
+                <HBox spacing="10">
+                    <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" onAction="#onCheckUpdate" />
+                    <CheckBox fx:id="chEnable" text="%manager.mods.check.enable" />
+                </HBox>
                 <CheckBox fx:id="chDisable" text="%manager.mods.check.disable" />
             </VBox>
         </HBox>

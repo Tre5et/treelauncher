@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.ui.generic.lists;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
@@ -11,18 +12,25 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.util.Pair;
 import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
+import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
-import org.apache.logging.log4j.util.BiConsumer;
+import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ModContentElement extends ContentElement {
     public enum ProviderStatus {
@@ -30,6 +38,9 @@ public class ModContentElement extends ContentElement {
         AVAILABLE,
         CURRENT
     }
+
+    private static final Logger LOGGER = LogManager.getLogger(ModsManagerElement.class);
+
 
     private final HBox downloadContainer = new HBox();
     private final ImageView ivDownloading = new ImageView("img/downloading.gif");
@@ -42,39 +53,35 @@ public class ModContentElement extends ContentElement {
     private final ImageView ivModrinth = new ImageView();
     private final ImageView ivCurseForge = new ImageView();
 
-    private final Consumer<ModContentElement> installCallback;
-    private final BiConsumer<Boolean, ModContentElement> enableCallback;
-    private final Consumer<ModContentElement> deleteCallback;
-    
+    private final ChangeEvent<LauncherMod, ModContentElement> changeEvent;
     private final String gameVersion;
+
     private LauncherMod launcherMod;
+    private LauncherManifest componentManifest;
+    private LauncherModsDetails componentDetails;
     private ModData modData;
     private ModVersionData currentVersion;
     private List<ModVersionData> versions;
     private boolean enabled = true;
     
-    public ModContentElement(LauncherMod launcherMod, String gameVersion, Consumer<ModContentElement> installCallback) {
-        this(launcherMod.getName(), launcherMod.getDescription(), launcherMod, null, gameVersion, false, installCallback, (a,b) -> {}, (a) -> {});
+    public ModContentElement(LauncherMod launcherMod, String gameVersion, ChangeEvent<LauncherMod, ModContentElement> changeEvent, Pair<LauncherManifest, LauncherModsDetails> details, boolean controls) {
+        this(launcherMod.getName(), launcherMod.getDescription(), launcherMod, null, gameVersion, controls, changeEvent, details);
     }
     
-    public ModContentElement(LauncherMod launcherMod, String gameVersion, Consumer<ModContentElement> installCallback, BiConsumer<Boolean, ModContentElement> enableCallback, Consumer<ModContentElement> deleteCallback) {
-        this(launcherMod.getName(), launcherMod.getDescription(), launcherMod, null, gameVersion, true, installCallback, enableCallback, deleteCallback);
-    }
-    
-    public ModContentElement(ModData modData, String gameVersion, Consumer<ModContentElement> installCallback) {
-        this(modData.getName(), modData.getDescription(), null, modData, gameVersion, false, installCallback, (a,b) -> {}, (a) -> {});
+    public ModContentElement(ModData modData, String gameVersion, ChangeEvent<LauncherMod, ModContentElement> changeEvent, Pair<LauncherManifest, LauncherModsDetails> details) {
+        this(modData.getName(), modData.getDescription(), null, modData, gameVersion, false, changeEvent, details);
     }
 
-    public ModContentElement(String title, String details, LauncherMod launcherMod, ModData modData, String gameVersion, boolean controls, Consumer<ModContentElement> installCallback, BiConsumer<Boolean, ModContentElement> enableCallback, Consumer<ModContentElement> deleteCallback) {
-        super(null, title, details);
+    public ModContentElement(String title, String description, LauncherMod launcherMod, ModData modData, String gameVersion, boolean controls, ChangeEvent<LauncherMod, ModContentElement> changeEvent, Pair<LauncherManifest, LauncherModsDetails> details) {
+        super(null, title, description);
 
         this.gameVersion = gameVersion;
         this.launcherMod = launcherMod;
         this.modData = modData;
-        
-        this.installCallback = installCallback;
-        this.enableCallback = enableCallback;
-        this.deleteCallback = deleteCallback;
+
+        this.changeEvent = changeEvent;
+        this.componentManifest = details.getKey();
+        this.componentDetails = details.getValue();
 
         this.getStylesheets().add("css/manager/ModsListElement.css");
         ColumnConstraints constraints0 = new ColumnConstraints();
@@ -209,19 +216,132 @@ public class ModContentElement extends ContentElement {
         }
     }
 
-    public void checkUpdate() {
-        if(cbVersion.getItems().size() > 0 && !cbVersion.getItems().get(0).equals(currentVersion)) {
+    public void update(boolean autoUpdate, boolean enable, boolean disable){
+        if(cbVersion.getSelectionModel().getSelectedIndex() != 0) {
             cbVersion.getSelectionModel().select(0);
+        }
+        if(autoUpdate) {
+            update(enable);
+        }
+        if(disable && cbVersion.getSelectionModel().getSelectedItem().getModProviders() == null) {
+            enable(false);
         }
     }
 
-    public void changeVersion() {
-        if(launcherMod != null && cbVersion.getSelectionModel().getSelectedItem() != null && !cbVersion.getSelectionModel().getSelectedItem().equals(currentVersion)) {
-            Platform.runLater(() -> {
-                onInstall(null);
-            });
+    public void enable(boolean enable) {
+        if(enable == enabled) {
+            return;
+        }
+        File modFile = new File(componentManifest.getDirectory() + launcherMod.getFileName() + (enable ? ".disabled" : ""));
+        File newFile = new File(componentManifest.getDirectory(), launcherMod.getFileName() + (enable ? "" : ".disabled"));
+        try {
+            Files.move(modFile.toPath(), newFile.toPath());
+        } catch(IOException e) {
+            LauncherApplication.displayError(e);
+        }
+        launcherMod.setEnabled(enable);
+        setEnabled(enable);
+        changeEvent.update();
+    }
+
+    public void delete() {
+        File oldFile = new File(componentManifest.getDirectory() + launcherMod.getFileName() + (isEnabled() ? "" : ".disabled"));
+        try {
+            Files.delete(oldFile.toPath());
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+            return;
+        }
+        changeEvent.remove(this);
+    }
+
+    private void update(boolean enable) {
+        if(!cbVersion.getSelectionModel().getSelectedItem().equals(currentVersion)) {
+            downloadMod(cbVersion.getSelectionModel().getSelectedItem(), enable);
         }
     }
+
+    private void downloadMod(ModVersionData versionData, boolean enable) {
+        LOGGER.debug("Downloading mod: name={}, version={}", versionData.getName(), versionData.getVersionNumber());
+        setInstalling(true);
+        new Thread(() -> {
+            if (launcherMod != null) {
+                File oldFile = new File(componentManifest.getDirectory() + launcherMod.getFileName() + (launcherMod.isEnabled() ? "" : ".disabled"));
+                LOGGER.debug("Deleting old mod file: name={}", oldFile.getName());
+                if (oldFile.exists()) {
+                    if(!oldFile.delete()) {
+                        LOGGER.warn("Failed to delete old mod file: name={}", oldFile.getName());
+                        Platform.runLater(() -> {
+                            setInstalling(false);
+                            setCurrentSelected(currentVersion);
+                        });
+                        LauncherApplication.displayError(new IOException("Failed to delete old mod file: name=" + oldFile.getName()));
+                        return;
+                    }
+                } else {
+                    LOGGER.warn("Unable to locate old mod file: name={}", oldFile.getName());
+                }
+                LOGGER.debug("Deleted old mod file: name={}", oldFile.getName());
+            }
+            List<LauncherMod> newMods = downloadRequired(versionData, enabled || enable);
+            if (newMods == null || newMods.isEmpty()) {
+                LOGGER.warn("Failed to download mod file, name={}", versionData.getName());
+                changeEvent.remove(this);
+                LauncherApplication.displayError(new IOException("Failed to download mod file, name=" + versionData.getName()));
+                return;
+            }
+            if(launcherMod != null) {
+                changeEvent.change(launcherMod, newMods.get(0));
+                setLauncherMod(newMods.get(0));
+            }
+            for(int i = launcherMod == null ? 0 : 1; i < newMods.size(); i++) {
+                changeEvent.add(newMods.get(i));
+            }
+            setInstalling(false);
+        }).start();
+    }
+
+    private List<LauncherMod> downloadRequired(ModVersionData versionData, boolean enabled) {
+        LOGGER.debug("Downloading mod file: name={}", versionData.getName());
+        LauncherMod newMod;
+        try {
+            newMod = ModUtil.downloadModFile(versionData, new File(componentManifest.getDirectory()), enabled);
+        } catch (FileDownloadException e) {
+            LauncherApplication.displayError(e);
+            return List.of();
+        }
+
+        ArrayList<LauncherMod> mods = new ArrayList<>();
+        mods.add(newMod);
+
+        try {
+            for(ModVersionData d : versionData.getRequiredDependencies(componentDetails.getModsVersion(), componentDetails.getModsType())) {
+                if(d == null) {
+                    continue;
+                }
+                if(d.getParentMod() != null && !modExists(d.getParentMod())) {
+                    LOGGER.debug("Downloading mod dependency file: name={}", d.getName());
+                    mods.addAll(downloadRequired(d, true));
+                } else {
+                    LOGGER.debug("Skipping mod dependency file: name={}", d.getName());
+                }
+            }
+        } catch (FileDownloadException e) {
+            LauncherApplication.displayError(e);
+        }
+        LOGGER.debug("Downloaded mod file: name={}", versionData.getName());
+        return mods;
+    }
+
+    private boolean modExists(ModData modData) {
+        for(LauncherMod m : componentDetails.getMods()) {
+            if(modData.getName().equals(m.getName()) || modData.getProjectIds().stream().anyMatch(id -> m.getDownloads().stream().anyMatch(d -> d.getId().equals(id)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public boolean hasValidVersion() {
         return currentVersion.getModProviders() != null;
@@ -289,20 +409,19 @@ public class ModContentElement extends ContentElement {
         setCurseforgeStatus(launcherMod.getCurrentProvider().equals("curseforge") ? ProviderStatus.CURRENT : launcherMod.getDownloads().stream().map(LauncherModDownload::getProvider).anyMatch("curseforge"::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
         populateVersions();
     }
-
+    @FXML
     private void onInstall(ActionEvent event) {
-        if(!enabled) {
-            onEnable(null);
-        }
-        installCallback.accept(this);
+        update(true);
     }
 
+    @FXML
     private void onEnable(ActionEvent actionEvent) {
-        enableCallback.accept(!enabled, this);
+        enable(!enabled);
     }
 
+    @FXML
     private void onDelete(ActionEvent actionEvent) {
-        deleteCallback.accept(this);
+        delete();
     }
 
     private void onVersionChange(ObservableValue<? extends ModVersionData> observable, ModVersionData oldValue, ModVersionData newValue) {
