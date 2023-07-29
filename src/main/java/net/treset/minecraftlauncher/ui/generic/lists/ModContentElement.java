@@ -180,7 +180,7 @@ public class ModContentElement extends ContentElement {
         updateCurrentVersion();
         List<ModVersionData> tempVersions = new ArrayList<>(versions);
         if(currentVersion != null && !versions.contains(currentVersion)) {
-            tempVersions.add(0, currentVersion);
+            tempVersions.add(currentVersion);
         }
         Platform.runLater(() -> {
             cbVersion.getItems().clear();
