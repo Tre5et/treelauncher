@@ -22,6 +22,6 @@
             <ComboBox fx:id="cbType" promptText="THis bad" />
             <ComboBox fx:id="cbLoader" promptText="%creator.version.prompt.loaderversion" visible="false" />
         </HBox>
-        <IconButton fx:id="btChange" styleClass="sync, highlight" iconSize="32" onMouseClicked="#onChange" GridPane.columnIndex="1" GridPane.rowSpan="2" />
+        <IconButton fx:id="btChange" styleClass="sync, highlight" iconSize="32" tooltipText="%changer.tooltip.change" onMouseClicked="#onChange" GridPane.columnIndex="1" GridPane.rowSpan="2" />
     </GridPane>
 </AnchorPane>

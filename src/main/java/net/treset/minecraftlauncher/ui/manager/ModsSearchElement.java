@@ -17,6 +17,7 @@ import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.ModData;
 import net.treset.mc_version_loader.mods.ModUtil;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
 import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
@@ -69,6 +70,7 @@ public class ModsSearchElement extends UiElement {
         if(tfSearch.getText() == null || tfSearch.getText().isEmpty())
             return;
         vbResults.getChildren().clear();
+        lbLoading.setText(LauncherApplication.stringLocalizer.get("manager.mods.search.label.loading"));
         lbLoading.setVisible(true);
         new Thread(this::populateResults).start();
     }
@@ -105,8 +107,12 @@ public class ModsSearchElement extends UiElement {
         elements.forEach(e -> e.setLauncherMod(getLocalMod(e.getModData())));
 
         Platform.runLater(() -> {
-            lbLoading.setVisible(false);
-            vbResults.getChildren().addAll(elements);
+            if(elements.isEmpty()) {
+                lbLoading.setText(LauncherApplication.stringLocalizer.get("manager.mods.search.label.noresults"));
+            } else {
+                lbLoading.setVisible(false);
+                vbResults.getChildren().addAll(elements);
+            }
         });
     }
 

@@ -10,7 +10,7 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.util.UiLoader;
+import net.treset.minecraftlauncher.util.UiUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -150,8 +150,8 @@ public class SelectorEntryElement extends UiElement {
     }
 
     public static Pair<SelectorEntryElement, AnchorPane> newInstance() throws IOException {
-        FXMLLoader loader = UiLoader.getFXMLLoader("generic/SelectorEntryElement");
-        AnchorPane element = UiLoader.loadFXML(loader);
+        FXMLLoader loader = UiUtil.getFXMLLoader("generic/SelectorEntryElement");
+        AnchorPane element = UiUtil.loadFXML(loader);
         SelectorEntryElement listElementController = loader.getController();
         return new Pair<>(listElementController, element);
     }

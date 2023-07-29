@@ -85,3 +85,7 @@
 .update {
     -fx-icon-code: bi-box-arrow-in-down;
 }
+
+.open {
+    -fx-icon-code: bi-box-arrow-up-right;
+}

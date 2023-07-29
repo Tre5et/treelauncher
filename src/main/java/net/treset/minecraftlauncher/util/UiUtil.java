@@ -7,13 +7,15 @@ import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
-public class UiLoader {
+public class UiUtil {
     public static FXMLLoader getFXMLLoader(String fxmlPath) {
         FXMLLoader loader = new FXMLLoader();
-        URL xmlUrl = UiLoader.class.getResource("/fxml/"+fxmlPath+".fxml");
+        URL xmlUrl = UiUtil.class.getResource("/fxml/"+fxmlPath+".fxml");
         loader.setLocation(xmlUrl);
         loader.setResources(LauncherApplication.stringLocalizer.getStringBundle());
         return loader;
@@ -34,5 +36,12 @@ public class UiLoader {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         return loader.getController();
+    }
+
+    public static void openBrowser(String url) throws IOException, URISyntaxException {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            desktop.browse(new URL(url).toURI());
+        }
     }
 }

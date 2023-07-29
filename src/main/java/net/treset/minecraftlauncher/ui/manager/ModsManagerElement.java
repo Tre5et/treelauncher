@@ -40,7 +40,7 @@ public class ModsManagerElement extends UiElement {
     @FXML private VBox currentModsContainer;
     @FXML private ComboBox<String> cbVersion;
     @FXML private CheckBox chSnapshots;
-    @FXML private Button btReload;
+    @FXML private Button btChange;
     @FXML private ModsSearchElement icModSearchController;
     @FXML private PopupElement icPopupController;
 
@@ -79,7 +79,7 @@ public class ModsManagerElement extends UiElement {
     }
 
     @FXML
-    private void onReload() {
+    private void onChange() {
         if(cbVersion.getSelectionModel().getSelectedItem() != null && !Objects.equals(cbVersion.getSelectionModel().getSelectedItem(), details.getValue().getModsVersion())) {
             icPopupController.setType(PopupElement.PopupType.WARNING);
             icPopupController.setContent("mods.manager.popup.change.title", "mods.manager.popup.change.message");
@@ -116,7 +116,7 @@ public class ModsManagerElement extends UiElement {
     }
 
     private void onVersionSelected() {
-        btReload.setDisable(details.getValue().getModsVersion().equals(cbVersion.getSelectionModel().getSelectedItem()));
+        btChange.setDisable(details.getValue().getModsVersion().equals(cbVersion.getSelectionModel().getSelectedItem()));
     }
 
     @Override

@@ -8,7 +8,7 @@
 <AnchorPane fx:id="rootPane" styleClass="element-root" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
     <VBox fx:id="vbCurrentMods" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-            <IconButton styleClass="add" iconSize="48" onAction="#onAdd" />
+            <IconButton styleClass="add" iconSize="48" onAction="#onAdd" tooltipText="%manager.mods.tooltip.add" />
             <Label styleClass="title" text="%manager.mods.label.current" />
             <IconButton styleClass="update" iconSize="42" onAction="#onUpdate" tooltipText="%manager.mods.tooltip.update" />
             <VBox alignment="CENTER_LEFT">
@@ -20,7 +20,7 @@
             </VBox>
         </HBox>
         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-            <VBox fx:id="currentModsContainer" />
+            <VBox fx:id="currentModsContainer" spacing="10" />
         </ScrollPane>
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER" >
             <padding>
@@ -29,7 +29,7 @@
             <Label text="%manager.mods.prompt.changeversion" />
             <ComboBox fx:id="cbVersion"/>
             <CheckBox fx:id="chSnapshots" onMouseClicked="#onCheckSnapshots" text="%creator.version.checkbox.snapshots" />
-            <IconButton fx:id="btReload" styleClass="sync, highlight" iconSize="32" onAction="#onReload" />
+            <IconButton fx:id="btChange" styleClass="sync, highlight" iconSize="32" onAction="#onChange" tooltipText="%changer.tooltip.change" />
         </HBox>
     </VBox>
     <fx:include fx:id="icModSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />

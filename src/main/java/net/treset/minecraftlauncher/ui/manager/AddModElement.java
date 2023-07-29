@@ -76,10 +76,13 @@ public class AddModElement extends UiElement {
         File modFile = new File(tfPath.getText());
         String fileName = modFile.getName();
         String name = tfName.getText().isEmpty() ? fileName.substring(0, fileName.length() - 4) : tfName.getText();
+        List<LauncherModDownload> downloads = getDownloads();
+        String url = downloads.isEmpty() ? null : downloads.get(0).getProvider().equals("modrinth") ? "https://modrinth.com/project/" + downloads.get(0).getId() : "https://www.curseforge.com/projects/" + downloads.get(0).getId();
         LauncherMod mod = new LauncherMod(
                 null,
                 null,
                 true,
+                url,
                 getIconUrl(),
                 name,
                 fileName,

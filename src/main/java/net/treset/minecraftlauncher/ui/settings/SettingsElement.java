@@ -20,12 +20,10 @@ import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.ImageUtil;
+import net.treset.minecraftlauncher.util.UiUtil;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class SettingsElement extends UiElement {
     @FXML private AnchorPane rootPane;
@@ -166,8 +164,12 @@ public class SettingsElement extends UiElement {
     }
 
     @FXML
-    private void onSource() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI(LauncherApplication.stringLocalizer.get("url.source")));
+    private void onSource() {
+        try {
+            UiUtil.openBrowser(LauncherApplication.stringLocalizer.get("url.source"));
+        } catch(Exception e) {
+            LauncherApplication.displayError(e);
+        }
     }
 
     @FXML

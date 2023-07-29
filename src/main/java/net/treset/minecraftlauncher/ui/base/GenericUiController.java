@@ -1,8 +1,7 @@
 package net.treset.minecraftlauncher.ui.base;
 
 import javafx.stage.Stage;
-import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.util.UiLoader;
+import net.treset.minecraftlauncher.util.UiUtil;
 
 import java.io.IOException;
 
@@ -30,7 +29,7 @@ public class GenericUiController implements UiController {
     }
 
     public static <T extends GenericUiController> T showOnStage(Stage stage, String fxml, String title) throws IOException {
-        T controller = UiLoader.loadFxmlOnStage(fxml, stage, title);
+        T controller = UiUtil.loadFxmlOnStage(fxml, stage, title);
         controller.beforeShow(stage);
         stage.show();
         controller.afterShow(stage);

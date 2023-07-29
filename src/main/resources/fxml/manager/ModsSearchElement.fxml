@@ -8,9 +8,9 @@
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsSearchElement">
    <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <HBox alignment="CENTER_LEFT">
-         <IconButton fx:id="btBack" styleClass="back" iconSize="36" onMouseClicked="#onBack" />
+         <IconButton fx:id="btBack" styleClass="back" iconSize="36" onMouseClicked="#onBack" tooltipText="%manager.mods.search.tooltip.back" />
          <TextField fx:id="tfSearch" onKeyReleased="#onSearchKeyPress" promptText="%manager.mods.search.prompt.search" styleClass="search" HBox.hgrow="ALWAYS" />
-         <IconButton fx:id="btSearch" styleClass="search" iconSize="36" onMouseClicked="#onSearch" />
+         <IconButton fx:id="btSearch" styleClass="search" iconSize="36" onMouseClicked="#onSearch" tooltipText="%manager.mods.search.tooltip.search" />
       </HBox>
       <Label fx:id="lbLoading" styleClass="element-title" text="%manager.mods.search.label.loading" textAlignment="CENTER" visible="false" />
       <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">

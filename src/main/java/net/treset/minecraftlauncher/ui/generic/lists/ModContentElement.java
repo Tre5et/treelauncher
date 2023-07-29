@@ -3,13 +3,11 @@ package net.treset.minecraftlauncher.ui.generic.lists;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.Pair;
@@ -21,6 +19,7 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
+import net.treset.minecraftlauncher.util.UiUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,6 +48,7 @@ public class ModContentElement extends ContentElement {
     private final IconButton btEnable = new IconButton();
     private final IconButton btDelete = new IconButton();
     private final HBox providerContainer = new HBox();
+    private final IconButton btOpen = new IconButton();
     private final ImageView ivModrinth = new ImageView();
     private final ImageView ivCurseForge = new ImageView();
 
@@ -84,12 +84,6 @@ public class ModContentElement extends ContentElement {
         this.componentDetails = details.getValue();
 
         this.getStylesheets().add("css/manager/ModsListElement.css");
-        ColumnConstraints constraints0 = new ColumnConstraints();
-        constraints0.setHgrow(Priority.NEVER);
-        this.getColumnConstraints().add(constraints0);
-        ColumnConstraints constraints1 = new ColumnConstraints();
-        constraints1.setHgrow(Priority.ALWAYS);
-        this.getColumnConstraints().add(constraints1);
 
         this.ivDownloading.setFitHeight(32);
         this.ivDownloading.setFitWidth(32);
@@ -97,6 +91,7 @@ public class ModContentElement extends ContentElement {
         this.ivDownloading.setVisible(false);
         this.btInstall.getStyleClass().addAll("download", "highlight");
         this.btInstall.setIconSize(32);
+        this.btInstall.setTooltipText(LauncherApplication.stringLocalizer.get("content.mods.tooltip.install"));
         this.btInstall.setOnAction(this::onInstall);
         this.btInstall.setDisable(true);
         this.cbVersion.setPromptText(LauncherApplication.stringLocalizer.get("manager.mods.prompt.version"));
@@ -105,7 +100,11 @@ public class ModContentElement extends ContentElement {
         this.downloadContainer.getChildren().addAll(this.ivDownloading, this.btInstall, this.cbVersion);
         this.add(downloadContainer, 2, 0);
 
-
+        this.btOpen.getStyleClass().add("open");
+        this.btOpen.setIconSize(20);
+        this.btOpen.setIconSize(20);
+        this.btOpen.setTooltipText(LauncherApplication.stringLocalizer.get("content.mods.tooltip.open"));
+        this.btOpen.setOnAction(this::onOpen);
         this.ivModrinth.getStyleClass().add("modrinth");
         this.ivModrinth.setFitHeight(32);
         this.ivModrinth.setFitWidth(32);
@@ -114,17 +113,19 @@ public class ModContentElement extends ContentElement {
         this.ivCurseForge.setFitHeight(32);
         this.ivCurseForge.setFitWidth(32);
         this.ivCurseForge.setPreserveRatio(true);
-        this.providerContainer.setPadding(new Insets(8, 8, 8, 8));
+        this.providerContainer.setPadding(new Insets(0, 8, 8, 8));
         this.providerContainer.setSpacing(10);
         this.providerContainer.setAlignment(Pos.BOTTOM_RIGHT);
-        this.providerContainer.getChildren().addAll(this.ivModrinth, this.ivCurseForge);
+        this.providerContainer.getChildren().addAll(this.btOpen, this.ivModrinth, this.ivCurseForge);
         this.add(providerContainer, 2, 2);
         
         this.btEnable.getStyleClass().add("visibility");
         this.btEnable.setIconSize(32);
+        this.btEnable.setTooltipText(LauncherApplication.stringLocalizer.get("content.mods.tooltip.disable"));
         this.btEnable.setOnAction(this::onEnable);
-        this.btDelete.getStyleClass().addAll("delete", "neutral");
+        this.btDelete.getStyleClass().addAll("delete", "negative");
         this.btDelete.setIconSize(32);
+        this.btDelete.setTooltipText(LauncherApplication.stringLocalizer.get("content.mods.tooltip.delete"));
         this.btDelete.setOnAction(this::onDelete);
         this.controlsContainer.setAlignment(Pos.CENTER_RIGHT);
         this.controlsContainer.getChildren().addAll(btEnable, btDelete);
@@ -409,6 +410,7 @@ public class ModContentElement extends ContentElement {
         cbVersion.setDisable(!enabled);
         controlsContainer.setOpacity(enabled ? 1 : 0.5);
         providerContainer.setOpacity(enabled ? 1 : 0.5);
+        btEnable.setTooltipText(LauncherApplication.stringLocalizer.get(enabled ? "content.mods.tooltip.disable" : "content.mods.tooltip.enable"));
     }
 
     public void setInstalling(boolean installing) {
@@ -425,23 +427,41 @@ public class ModContentElement extends ContentElement {
         setCurseforgeStatus(launcherMod.getCurrentProvider().equals("curseforge") ? ProviderStatus.CURRENT : launcherMod.getDownloads().stream().map(LauncherModDownload::getProvider).anyMatch("curseforge"::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
         populateVersions();
     }
-    @FXML
+
     private void onInstall(ActionEvent event) {
         update(true);
     }
 
-    @FXML
     private void onEnable(ActionEvent actionEvent) {
         enable(!enabled);
     }
 
-    @FXML
     private void onDelete(ActionEvent actionEvent) {
         delete();
     }
 
+    private void onOpen(ActionEvent actionEvent) {
+        String url = getUrl();
+        if(url != null) {
+            try {
+                UiUtil.openBrowser(url);
+            } catch (Exception e) {
+                LauncherApplication.displayError(e);
+            }
+        }
+    }
+
     private void onVersionChange(ObservableValue<? extends ModVersionData> observable, ModVersionData oldValue, ModVersionData newValue) {
         btInstall.setDisable(newValue == null || launcherMod != null && newValue.equals(currentVersion));
+    }
+
+    public String getUrl() {
+        if(launcherMod != null && launcherMod.getUrl() != null) {
+            return launcherMod.getUrl();
+        } else if(modData != null && modData.getUrl() != null) {
+            return modData.getUrl();
+        }
+        return null;
     }
 
     public String getGameVersion() {

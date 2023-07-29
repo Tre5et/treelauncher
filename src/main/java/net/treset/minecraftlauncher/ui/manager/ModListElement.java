@@ -18,7 +18,7 @@ import net.treset.mc_version_loader.mods.ModData;
 import net.treset.mc_version_loader.mods.ModProvider;
 import net.treset.mc_version_loader.mods.ModVersionData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.util.UiLoader;
+import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -318,8 +318,8 @@ public class ModListElement extends UiElement {
     }
 
     public static Pair<ModListElement, AnchorPane> newInstance() throws IOException {
-        FXMLLoader loader = UiLoader.getFXMLLoader("manager/ModListElement");
-        AnchorPane element = UiLoader.loadFXML(loader);
+        FXMLLoader loader = UiUtil.getFXMLLoader("manager/ModListElement");
+        AnchorPane element = UiUtil.loadFXML(loader);
         ModListElement listElementController = loader.getController();
         return new Pair<>(listElementController, element);
     }
