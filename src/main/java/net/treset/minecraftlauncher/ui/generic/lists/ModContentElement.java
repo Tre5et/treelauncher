@@ -21,7 +21,6 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
-import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +38,7 @@ public class ModContentElement extends ContentElement {
         CURRENT
     }
 
-    private static final Logger LOGGER = LogManager.getLogger(ModsManagerElement.class);
+    private static final Logger LOGGER = LogManager.getLogger(ModContentElement.class);
 
 
     private final HBox downloadContainer = new HBox();
@@ -74,6 +73,7 @@ public class ModContentElement extends ContentElement {
 
     public ModContentElement(String title, String description, LauncherMod launcherMod, ModData modData, String gameVersion, boolean controls, ChangeEvent<LauncherMod, ModContentElement> changeEvent, Pair<LauncherManifest, LauncherModsDetails> details) {
         super(null, title, description);
+        long time = System.currentTimeMillis();
 
         this.gameVersion = gameVersion;
         this.launcherMod = launcherMod;
@@ -136,12 +136,16 @@ public class ModContentElement extends ContentElement {
         
         if(launcherMod != null) {
             setEnabled(launcherMod.isEnabled());
-            setModrinthStatus(launcherMod.getCurrentProvider().equals("modrinth") ? ProviderStatus.CURRENT : launcherMod.getDownloads().stream().map(LauncherModDownload::getProvider).anyMatch("modrinth"::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
-            setCurseforgeStatus(launcherMod.getCurrentProvider().equals("curseforge") ? ProviderStatus.CURRENT : launcherMod.getDownloads().stream().map(LauncherModDownload::getProvider).anyMatch("curseforge"::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
+            if(launcherMod.getCurrentProvider() != null) {
+                setModrinthStatus(launcherMod.getCurrentProvider().equals("modrinth") ? ProviderStatus.CURRENT : launcherMod.getDownloads().stream().map(LauncherModDownload::getProvider).anyMatch("modrinth"::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
+                setCurseforgeStatus(launcherMod.getCurrentProvider().equals("curseforge") ? ProviderStatus.CURRENT : launcherMod.getDownloads().stream().map(LauncherModDownload::getProvider).anyMatch("curseforge"::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
+            }
         } else if(modData != null) {
             setModrinthStatus(modData.getModProviders().stream().anyMatch(ModProvider.MODRINTH::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
             setCurseforgeStatus(modData.getModProviders().stream().anyMatch(ModProvider.CURSEFORGE::equals) ? ProviderStatus.AVAILABLE : ProviderStatus.NONE);
         }
+
+        LOGGER.debug("Created mod element: name={}, time={}", title, System.currentTimeMillis() - time);
     }
     
     private void populateVersions() {
@@ -152,39 +156,50 @@ public class ModContentElement extends ContentElement {
                 LauncherApplication.displayError(e);
             }
         }
-        if (modData != null) {
-            if(versions == null) {
-                try {
-                    versions = modData.getVersions(gameVersion, "fabric");
-                } catch (FileDownloadException e) {
-                    LauncherApplication.displayError(e);
-                    return;
-                }
-            }
-
+        if(modData == null) {
             updateCurrentVersion();
-            List<ModVersionData> tempVersions = new ArrayList<>(versions);
-            if(currentVersion != null && !versions.contains(currentVersion)) {
-                tempVersions.add(0, currentVersion);
-            }
             Platform.runLater(() -> {
+                if(currentVersion == null) return;
                 cbVersion.getItems().clear();
-                cbVersion.getItems().addAll(tempVersions);
-                if(currentVersion != null) {
-                    cbVersion.getSelectionModel().select(currentVersion);
-                }
-                cbVersion.getSelectionModel().selectedItemProperty().addListener(this::onVersionChange);
+                cbVersion.getItems().add(currentVersion);
+                cbVersion.getSelectionModel().select(currentVersion);
             });
+            return;
         }
+
+        if(versions == null) {
+            try {
+                versions = modData.getVersions(gameVersion, "fabric");
+            } catch (FileDownloadException e) {
+                LauncherApplication.displayError(e);
+                return;
+            }
+        }
+
+        updateCurrentVersion();
+        List<ModVersionData> tempVersions = new ArrayList<>(versions);
+        if(currentVersion != null && !versions.contains(currentVersion)) {
+            tempVersions.add(0, currentVersion);
+        }
+        Platform.runLater(() -> {
+            cbVersion.getItems().clear();
+            cbVersion.getItems().addAll(tempVersions);
+            if(currentVersion != null) {
+                cbVersion.getSelectionModel().select(currentVersion);
+            }
+            cbVersion.getSelectionModel().selectedItemProperty().addListener(this::onVersionChange);
+        });
     }
 
     private void updateCurrentVersion() {
         if(launcherMod != null) {
             currentVersion = null;
-            for (ModVersionData v : versions) {
-                if(v.getVersionNumber().equals(launcherMod.getVersion())) {
-                    currentVersion = v;
-                    break;
+            if(versions != null) {
+                for (ModVersionData v : versions) {
+                    if (v.getVersionNumber().equals(launcherMod.getVersion())) {
+                        currentVersion = v;
+                        break;
+                    }
                 }
             }
             if(currentVersion == null) {
@@ -402,6 +417,7 @@ public class ModContentElement extends ContentElement {
     }
 
     public void setLauncherMod(LauncherMod launcherMod) {
+        if(launcherMod == null || this.launcherMod == launcherMod) return;
         this.launcherMod = launcherMod;
         setInstalling(false);
         setEnabled(launcherMod.isEnabled());

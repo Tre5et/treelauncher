@@ -20,7 +20,7 @@
             </VBox>
         </HBox>
         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-            <VBox fx:id="currentModsContainer" spacing="10" />
+            <VBox fx:id="currentModsContainer" />
         </ScrollPane>
         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER" >
             <padding>

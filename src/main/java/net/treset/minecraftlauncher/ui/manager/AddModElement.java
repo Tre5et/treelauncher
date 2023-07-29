@@ -6,15 +6,21 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
+import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.ModUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import org.apache.logging.log4j.util.BiConsumer;
+import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
+import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +36,12 @@ public class AddModElement extends UiElement {
     @FXML private TextField tfCurseforge;
     @FXML private Label lbCurseforgeError;
 
-    private BiConsumer<LauncherMod, File> addCallback;
+    private Pair<LauncherManifest, LauncherModsDetails> details;
+    private ChangeEvent<LauncherMod, ModContentElement> searchChangeCallback;
 
-    public void init(BiConsumer<LauncherMod, File> addCallback) {
-        this.addCallback = addCallback;
+    public void init(Pair<LauncherManifest, LauncherModsDetails> details, ChangeEvent<LauncherMod, ModContentElement> searchChangeCallback) {
+        this.details = details;
+        this.searchChangeCallback = searchChangeCallback;
     }
 
     @FXML
@@ -60,7 +68,11 @@ public class AddModElement extends UiElement {
             displayError();
             return;
         }
+        moveModFile();
+        setVisible(false);
+    }
 
+    private void moveModFile() {
         File modFile = new File(tfPath.getText());
         String fileName = modFile.getName();
         String name = tfName.getText().isEmpty() ? fileName.substring(0, fileName.length() - 4) : tfName.getText();
@@ -74,8 +86,25 @@ public class AddModElement extends UiElement {
                 tfVersion.getText(),
                 getDownloads()
         );
-        addCallback.accept(mod, modFile);
-        setVisible(false);
+        File newFile = new File(details.getKey().getDirectory(), fileName);
+
+        if(newFile.exists()) {
+            LauncherApplication.displayError(new IOException("Unable to add local mod: File already exists: " + fileName));
+            return;
+        }
+
+        try {
+            Files.copy(modFile.toPath(), newFile.toPath());
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+            return;
+        }
+
+        ArrayList<LauncherMod> mods = new ArrayList<>(details.getValue().getMods());
+        mods.add(mod);
+        details.getValue().setMods(mods);
+
+        searchChangeCallback.update();
     }
 
     private boolean modrinthValid() {

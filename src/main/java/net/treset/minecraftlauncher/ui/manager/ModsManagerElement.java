@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 public class ModsManagerElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsManagerElement.class);
@@ -45,7 +44,7 @@ public class ModsManagerElement extends UiElement {
     @FXML private ModsSearchElement icModSearchController;
     @FXML private PopupElement icPopupController;
 
-    private ModManagerChangeCallback changeCallback = new ModManagerChangeCallback();
+    private final ModManagerChangeCallback changeCallback = new ModManagerChangeCallback();
     private Pair<LauncherManifest, LauncherModsDetails> details;
     private List<ModContentElement> elements;
 
@@ -56,7 +55,6 @@ public class ModsManagerElement extends UiElement {
     @FXML
     private void onAdd() {
         vbCurrentMods.setVisible(false);
-        icModSearchController.setCurrentMods(details.getValue().getMods());
         icModSearchController.setVisible(true);
     }
 
@@ -106,7 +104,7 @@ public class ModsManagerElement extends UiElement {
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
-        //TODO: icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
+        icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onSearchBackClicked, changeCallback, details);
         onVersionSelected();
         reloadMods();
     }
@@ -125,7 +123,7 @@ public class ModsManagerElement extends UiElement {
     public void beforeShow(Stage stage){
         if(details == null || details.getValue().getMods() == null)
             return;
-        //TODO: icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onInstallButtonClicked, this::onSearchBackClicked, details.getValue().getMods(), this::addMod);
+        icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onSearchBackClicked, changeCallback, details);
         chSnapshots.setSelected(false);
         cbVersion.getItems().clear();
         cbVersion.setDisable(true);
@@ -138,14 +136,13 @@ public class ModsManagerElement extends UiElement {
     private void reloadMods() {
         currentModsContainer.getChildren().clear();
         new Thread(() -> {
-            elements = new ArrayList<>();
-            for(LauncherMod m : details.getValue().getMods()) {
-                elements.add(new ModContentElement(m, details.getValue().getModsVersion(), changeCallback, details, true));
-            }
-            elements.sort(Comparator.comparing(e -> e.getLauncherMod().getName()));
-            Platform.runLater(() -> {
-                currentModsContainer.getChildren().addAll(elements);
-            });
+            long time = System.currentTimeMillis();
+            elements = new ArrayList<>(details.getValue().getMods().parallelStream()
+                    .map(m -> new ModContentElement(m, details.getValue().getModsVersion(), changeCallback, details, true))
+                    .sorted(Comparator.comparing(e -> e.getLauncherMod().getName()))
+                    .toList());
+            Platform.runLater(() -> currentModsContainer.getChildren().addAll(elements));
+            LOGGER.info("Loaded {} mods in {}ms", elements.size(), System.currentTimeMillis() - time);
         }).start();
 
     }
@@ -207,11 +204,20 @@ public class ModsManagerElement extends UiElement {
 
         @Override
         public void add(LauncherMod value) {
-            int index = IntStream.range(0, elements.size()).filter(i -> elements.get(i).getLauncherMod().getName().compareTo(value.getName()) < 0).findFirst().orElse(elements.size());
+            int index = elements.size();
+            for(int i = 0; i < elements.size(); i++) {
+                if(elements.get(i).getLauncherMod().getName().compareToIgnoreCase(value.getName()) > 0) {
+                    index = i;
+                    break;
+                }
+            }
+            int finalIndex = index;
             elements.add(index, new ModContentElement(value, details.getValue().getModsVersion(), this, details, true));
-            Platform.runLater(() -> {
-                currentModsContainer.getChildren().add(index, elements.get(index));
-            });
+            Platform.runLater(() -> currentModsContainer.getChildren().add(finalIndex, elements.get(finalIndex)));
+            ArrayList<LauncherMod> mods = new ArrayList<>(details.getValue().getMods());
+            mods.add(value);
+            details.getValue().setMods(mods);
+            writeModList();
 
         }
 
