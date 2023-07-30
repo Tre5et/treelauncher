@@ -83,7 +83,7 @@ public class ModContentElement extends ContentElement {
         this.componentManifest = details.getKey();
         this.componentDetails = details.getValue();
 
-        this.getStylesheets().add("css/manager/ModsListElement.css");
+        this.getStylesheets().add("css/generic/lists/ModContentElement.css");
 
         this.ivDownloading.setFitHeight(32);
         this.ivDownloading.setFitWidth(32);

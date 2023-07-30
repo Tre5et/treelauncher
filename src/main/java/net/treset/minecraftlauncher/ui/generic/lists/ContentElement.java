@@ -15,7 +15,7 @@ public class ContentElement extends GridPane {
     protected final Label details = new Label();
 
     public ContentElement(Image icon, String title, String details) {
-        this.getStylesheets().add("css/generic/ContentElement.css");
+        this.getStylesheets().add("css/generic/lists/ContentElement.css");
         this.getStyleClass().add("element-container");
 
         ColumnConstraints constraints0 = new ColumnConstraints();

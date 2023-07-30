@@ -13,5 +13,5 @@
 }
 
 .element-details {
-    -fx-text-overrun: ellipsis;
+    -fx-wrap-text: true;
 }
