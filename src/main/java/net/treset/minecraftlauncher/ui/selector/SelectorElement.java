@@ -54,6 +54,9 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
         if(csCreate != null) {
             csCreate.getStyleClass().remove("selected");
         }
+        for(Pair<E, AnchorPane> element : elements) {
+            element.getKey().beforeShow(null);
+        }
         Platform.runLater(() -> {
             abMain.setDisable(true);
             abMain.clearLabel();

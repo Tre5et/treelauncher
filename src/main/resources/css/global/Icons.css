@@ -93,3 +93,7 @@
 .time {
     -fx-icon-code: bi-stopwatch;
 }
+
+.sort {
+    -fx-icon-code: bi-sort-down;
+}

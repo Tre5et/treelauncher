@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -18,6 +19,9 @@ import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.exception.GameLaunchException;
+import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsLastPlayedComparator;
+import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsNameComparator;
+import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsTimeComparator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,6 +29,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -32,6 +37,13 @@ import java.util.function.Supplier;
 public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEntryElement> {
     private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
 
+    private static final List<Comparator<InstanceData>> sorts = List.of(
+            new InstanceDetailsNameComparator(),
+            new InstanceDetailsTimeComparator(),
+            new InstanceDetailsLastPlayedComparator()
+    );
+
+    @FXML private ComboBox<Comparator<InstanceData>> cbSort;
     @FXML private InstanceManagerElement icDetailsController;
     @FXML private ActionBar abComponent;
     @FXML private ComponentChangerElement icComponentChangerController;
@@ -44,6 +56,9 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         super.init(parent, lockSetter, lockGetter);
         icDetailsController.init(this::onComponentSelected);
         icVersionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
+
+        cbSort.getItems().clear();
+        cbSort.getItems().addAll(sorts);
     }
 
     @Override
@@ -63,7 +78,15 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
                 instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
                 instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
             })
+            .sorted((e1, e2) -> cbSort.getSelectionModel().getSelectedItem().compare(e1.getKey().getInstanceData(), e2.getKey().getInstanceData()))
             .toList();
+    }
+
+    @Override
+    protected void reloadComponents() {
+        super.reloadComponents();
+        icDetailsController.setVisible(false);
+        icComponentChangerController.setVisible(false);
     }
 
     private void onSelected(InstanceData instanceData, boolean selected) {
@@ -128,16 +151,14 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     }
 
     private void onGameExit(String error) {
-        setLock(false);
-        Platform.runLater(() -> {
-            icPopupController.setVisible(false);
-            for(Pair<InstanceSelectorEntryElement, AnchorPane> instance : elements) {
-                instance.getKey().updateTime();
-            }
-        });
         if(error != null) {
             Platform.runLater(() -> displayGameCrash(error));
         }
+        reloadComponents();
+        setLock(false);
+        Platform.runLater(() -> {
+            icPopupController.setVisible(false);
+        });
         Platform.runLater(() -> abMain.setDisable(false));
     }
 
@@ -414,11 +435,16 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     @Override
     public void beforeShow(Stage stage) {
+        cbSort.getSelectionModel().select(0);
+        cbSort.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            reloadComponents();
+        });
         super.beforeShow(stage);
         icDetailsController.setVisible(false);
         abComponent.clearLabel();
         abComponent.setDisable(true);
         icComponentChangerController.setVisible(false);
         icVersionChangerController.setVisible(false);
+
     }
 }

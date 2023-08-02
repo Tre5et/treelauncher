@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
-
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement">
     <SplitPane dividerPositions="0.33, 0.66" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <AnchorPane minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <VBox alignment="TOP_CENTER" styleClass="title-container">
-                    <Label styleClass="title" text="%instances.label.title" />
-                </VBox>
+                <StackPane alignment="TOP_CENTER" styleClass="title-container">
+                    <Label styleClass="title" text="%instances.label.title"/>
+                    <HBox GridPane.columnIndex="2" spacing="2" alignment="CENTER_RIGHT">
+                        <padding>
+                            <Insets right="5.0"/>
+                        </padding>
+                        <FontIcon styleClass="sort" iconSize="30" />
+                        <ComboBox fx:id="cbSort"/>
+                    </HBox>
+                </StackPane>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
                     <VBox fx:id="vbElements" alignment="TOP_CENTER"/>
                 </ScrollPane>

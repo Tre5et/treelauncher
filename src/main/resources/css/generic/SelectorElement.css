@@ -2,6 +2,10 @@
     -fx-padding: 0;
 }
 
+.sort {
+    -fx-icon-color: -fx-text-secondary;
+}
+
 .title-container {
     -fx-background-color: transparent;
     -fx-border-width: 0 0 3px 0;
