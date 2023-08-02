@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class InstanceSelectorElement extends SelectorElement {
+public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEntryElement> {
     private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
 
     @FXML private InstanceManagerElement icDetailsController;
@@ -50,19 +50,20 @@ public class InstanceSelectorElement extends SelectorElement {
     protected void onCreate() {}
 
     @Override
-    protected List<Pair<SelectorEntryElement, AnchorPane>> getElements() {
-        ArrayList<Pair<SelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
+    protected List<Pair<InstanceSelectorEntryElement, AnchorPane>> getElements() {
+        ArrayList<Pair<InstanceSelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> instance : files.getInstanceComponents()) {
             try {
-                instances.add(SelectorEntryElement.from(InstanceData.of(instance, files)));
+                instances.add(InstanceSelectorEntryElement.from(InstanceData.of(instance, files)));
             } catch (IOException | FileLoadException e) {
                 LauncherApplication.displaySevereError(e);
             }
         }
         return instances.stream().peek(instance -> {
-            instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
-            instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
-        }).toList();
+                instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
+                instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
+            })
+            .toList();
     }
 
     private void onSelected(InstanceData instanceData, boolean selected) {
@@ -72,7 +73,7 @@ public class InstanceSelectorElement extends SelectorElement {
         abComponent.setDisable(true);
         abComponent.clearLabel();
         if(selected) {
-            for(Pair<SelectorEntryElement, AnchorPane> instance : elements) {
+            for(Pair<InstanceSelectorEntryElement, AnchorPane> instance : elements) {
                 if(instance.getKey().getInstanceData() != instanceData) {
                     instance.getKey().select(false, true, false);
                 }
@@ -128,7 +129,12 @@ public class InstanceSelectorElement extends SelectorElement {
 
     private void onGameExit(String error) {
         setLock(false);
-        Platform.runLater(() -> icPopupController.setVisible(false));
+        Platform.runLater(() -> {
+            icPopupController.setVisible(false);
+            for(Pair<InstanceSelectorEntryElement, AnchorPane> instance : elements) {
+                instance.getKey().updateTime();
+            }
+        });
         if(error != null) {
             Platform.runLater(() -> displayGameCrash(error));
         }

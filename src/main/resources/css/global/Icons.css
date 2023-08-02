@@ -89,3 +89,7 @@
 .open {
     -fx-icon-code: bi-box-arrow-up-right;
 }
+
+.time {
+    -fx-icon-code: bi-stopwatch;
+}

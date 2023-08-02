@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ManifestSelectorElement extends SelectorElement {
+public abstract class ManifestSelectorElement extends SelectorElement<SelectorEntryElement> {
     private static final Logger LOGGER = LogManager.getLogger(ManifestSelectorElement.class);
 
     @FXML

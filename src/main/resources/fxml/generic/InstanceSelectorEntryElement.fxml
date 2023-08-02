@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<AnchorPane fx:id="entryRoot" minHeight="-Infinity" minWidth="-Infinity" styleClass="element-root" stylesheets="@/css/generic/SelectorEntryElement.css,@/css/generic/InstanceSelectorEntryElement.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.generic.InstanceSelectorEntryElement">
+   <GridPane fx:id="entryContainer" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClick" styleClass="element-container" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <columnConstraints>
+         <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="50.0" />
+         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
+         <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="50.0" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
+      </rowConstraints>
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor>
+      <Label fx:id="lbTitle" styleClass="element-title" text="Something went wrong..." GridPane.fillWidth="true" GridPane.columnIndex="1" />
+      <Label fx:id="lbDetails" styleClass="element-details" text="If you are seeing this, please report" GridPane.fillWidth="true" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+      <HBox GridPane.columnIndex="2" spacing="3" alignment="CENTER_RIGHT">
+         <FontIcon styleClass="time"/>
+         <Label fx:id="lbTime" styleClass="hint" text="-12345" />
+      </HBox>
+   </GridPane>
+</AnchorPane>

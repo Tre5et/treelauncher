@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class SelectorElement extends UiElement {
+public abstract class SelectorElement<E extends SelectorEntryElement> extends UiElement {
     @FXML protected AnchorPane rootPane;
     @FXML protected VBox vbElements;
     @FXML protected ActionBar abMain;
@@ -30,7 +30,7 @@ public abstract class SelectorElement extends UiElement {
 
     protected LauncherFiles files;
     protected boolean createSelected = false;
-    protected List<Pair<SelectorEntryElement, AnchorPane>> elements;
+    protected List<Pair<E, AnchorPane>> elements;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
@@ -60,7 +60,7 @@ public abstract class SelectorElement extends UiElement {
             if(vbCreate != null) {
                 vbCreate.setVisible(false);
             }
-            for(Pair<SelectorEntryElement, AnchorPane> element : elements) {
+            for(Pair<E, AnchorPane> element : elements) {
                 vbElements.getChildren().add(element.getValue());
             }
         });
@@ -177,7 +177,7 @@ public abstract class SelectorElement extends UiElement {
     }
 
     protected void deselectAll() {
-        for(Pair<SelectorEntryElement, AnchorPane> element : elements) {
+        for(Pair<E, AnchorPane> element : elements) {
             element.getKey().select(false, true, false);
         }
     }
@@ -186,19 +186,19 @@ public abstract class SelectorElement extends UiElement {
 
     protected abstract void deleteCurrent();
 
-    protected abstract List<Pair<SelectorEntryElement, AnchorPane>> getElements();
+    protected abstract List<Pair<E, AnchorPane>> getElements();
 
     @Override
     public void beforeShow(Stage stage) {
         reloadComponents();
-        for(Pair<SelectorEntryElement, AnchorPane> element : elements) {
+        for(Pair<E, AnchorPane> element : elements) {
             element.getKey().beforeShow(stage);
         }
     }
 
     @Override
     public void afterShow(Stage stage) {
-        for(Pair<SelectorEntryElement, AnchorPane> element : elements) {
+        for(Pair<E, AnchorPane> element : elements) {
             element.getKey().afterShow(stage);
         }
     }

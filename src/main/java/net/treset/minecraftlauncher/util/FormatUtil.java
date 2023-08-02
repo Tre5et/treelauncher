@@ -89,4 +89,21 @@ public class FormatUtil {
     public static List<String> toRegex(List<String> items) {
         return items.stream().map(FormatUtil::toRegex).toList();
     }
+
+    public static String formatSeconds(long seconds) {
+        if (seconds < 60) {
+            return seconds + LauncherApplication.stringLocalizer.get("suffix.seconds");
+        } else if (seconds < 60 * 60) {
+            return (seconds / 60) + LauncherApplication.stringLocalizer.get("suffix.minutes");
+        } else if (seconds < 60 * 60 * 10) {
+            return (seconds / 3600) + LauncherApplication.stringLocalizer.get("suffix.hours") + " " + ((seconds % 3600) / 60) + LauncherApplication.stringLocalizer.get("suffix.minutes");
+        } else if (seconds < 60 * 60 * 24) {
+            return (seconds / 3600) + LauncherApplication.stringLocalizer.get("suffix.hours");
+        } else if (seconds < 60 * 60 * 24 * 10) {
+            return (seconds / (3600 * 24)) + LauncherApplication.stringLocalizer.get("suffix.days") + " " + ((seconds % (3600 * 24)) / 3600) + LauncherApplication.stringLocalizer.get("suffix.hours");
+        }
+        else {
+            return (seconds / (3600 * 24)) + "d ";
+        }
+    }
 }
