@@ -20,7 +20,7 @@
       <Label fx:id="lbTitle" styleClass="element-title" text="Something went wrong..." />
       <Label fx:id="lbDetails" styleClass="element-details" text="If you are seeing this, please report" GridPane.rowIndex="1" />
    </GridPane>
-   <HBox GridPane.columnIndex="2" spacing="3" alignment="CENTER_RIGHT" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   <HBox GridPane.columnIndex="2" spacing="3" alignment="CENTER_RIGHT" AnchorPane.rightAnchor="5" AnchorPane.topAnchor="5">
       <FontIcon styleClass="time"/>
       <Label fx:id="lbTime" styleClass="hint" text="-12345" />
    </HBox>
