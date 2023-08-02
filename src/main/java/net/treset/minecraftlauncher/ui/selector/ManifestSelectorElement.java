@@ -17,6 +17,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class ManifestSelectorElement extends SelectorElement<SelectorEntryElement> {
@@ -50,9 +51,11 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
             }
         }
         return elements.stream().peek(e -> {
-            e.getKey().setSelectionManifestAcceptor(this::allowSelection);
-            e.getKey().setSelectionManifestListener(List.of(this::onSelected));
-        }).toList();
+                e.getKey().setSelectionManifestAcceptor(this::allowSelection);
+                e.getKey().setSelectionManifestListener(List.of(this::onSelected));
+            })
+            .sorted(Comparator.comparing(a -> a.getKey().getManifest().getName()))
+            .toList();
     }
 
     protected abstract List<LauncherManifest> getComponents();
