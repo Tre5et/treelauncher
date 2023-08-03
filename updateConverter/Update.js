@@ -2,12 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateFile = exports.Update = void 0;
 var Update = /** @class */ (function () {
-    function Update(available, version, requires, files, updaterUrl) {
+    function Update(available, version, requires, files, updaterUrl, changes, fixes) {
         this.available = available;
         this.version = version;
         this.requires = requires;
         this.files = files;
         this.updaterUrl = updaterUrl;
+        this.changes = changes;
+        this.fixes = fixes;
     }
     return Update;
 }());

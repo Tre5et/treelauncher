@@ -3,7 +3,7 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
     if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-        desc = { enumerable: true, get: function() { return m[k]; } };
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
     Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
@@ -40,6 +40,7 @@ function convert() {
     if (updates.length == 0) {
         return;
     }
+    create_md(updates[updates.length - 1]);
     console.log("creating latest file " + updates[updates.length - 1].version);
     var latestUpdate = new Update_1.Update(false);
     console.log(latestUpdate);
@@ -92,6 +93,27 @@ function convert() {
     }
 }
 exports.convert = convert;
+function create_md(update) {
+    console.log("Creating md file " + update.version);
+    var md = "";
+    if (update.changes) {
+        md += "**Changes:**\n\n";
+        for (var _i = 0, _a = update.changes; _i < _a.length; _i++) {
+            var change = _a[_i];
+            md += " - " + change + "\n";
+        }
+        md += "\n";
+    }
+    if (update.fixes) {
+        md += "**Fixes:**\n\n";
+        for (var _b = 0, _c = update.fixes; _b < _c.length; _b++) {
+            var fix = _c[_b];
+            md += " - " + fix + "\n";
+        }
+        md += "\n";
+    }
+    fs.writeFileSync(output + "/changes-" + update.version + ".md", md);
+}
 function in_requires(version, requires) {
     var operator = requires.substring(0, 1);
     var requires_parts = requires.substring(1).split(".");
