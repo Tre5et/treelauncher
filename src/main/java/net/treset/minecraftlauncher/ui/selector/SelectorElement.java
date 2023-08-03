@@ -50,7 +50,6 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
             LauncherApplication.displaySevereError(e);
         }
         elements = getElements();
-        vbElements.getChildren().clear();
         if(csCreate != null) {
             csCreate.getStyleClass().remove("selected");
         }
@@ -60,6 +59,7 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
         Platform.runLater(() -> {
             abMain.setDisable(true);
             abMain.clearLabel();
+            vbElements.getChildren().clear();
             if(vbCreate != null) {
                 vbCreate.setVisible(false);
             }
