@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
@@ -19,9 +20,6 @@ import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.exception.GameLaunchException;
-import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsLastPlayedComparator;
-import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsNameComparator;
-import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsTimeComparator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +27,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -37,13 +34,8 @@ import java.util.function.Supplier;
 public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEntryElement> {
     private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
 
-    private static final List<Comparator<InstanceData>> sorts = List.of(
-            new InstanceDetailsNameComparator(),
-            new InstanceDetailsTimeComparator(),
-            new InstanceDetailsLastPlayedComparator()
-    );
-
-    @FXML private ComboBox<Comparator<InstanceData>> cbSort;
+    @FXML private IconButton btSort;
+    @FXML private ComboBox<Settings.InstanceDataSortType> cbSort;
     @FXML private InstanceManagerElement icDetailsController;
     @FXML private ActionBar abComponent;
     @FXML private ComponentChangerElement icComponentChangerController;
@@ -58,7 +50,12 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icVersionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
 
         cbSort.getItems().clear();
-        cbSort.getItems().addAll(sorts);
+        cbSort.getItems().addAll(Settings.InstanceDataSortType.values());
+        cbSort.getSelectionModel().select(LauncherApplication.settings.getInstanceSortType());
+
+        if(LauncherApplication.settings.isInstanceSortReverse()) {
+            btSort.getStyleClass().add("reverse");
+        }
     }
 
     @Override
@@ -78,7 +75,10 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
                 instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
                 instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
             })
-            .sorted((e1, e2) -> cbSort.getSelectionModel().getSelectedItem().compare(e1.getKey().getInstanceData(), e2.getKey().getInstanceData()))
+            .sorted((e1, e2) -> {
+                int result = cbSort.getSelectionModel().getSelectedItem().getComparator().compare(e1.getKey().getInstanceData(), e2.getKey().getInstanceData());
+                return LauncherApplication.settings.isInstanceSortReverse() ? -result : result;
+            })
             .toList();
     }
 
@@ -88,6 +88,18 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icDetailsController.setVisible(false);
         icComponentChangerController.setVisible(false);
     }
+
+    @FXML
+    private void onSort() {
+        if(LauncherApplication.settings.isInstanceSortReverse()) {
+            LauncherApplication.settings.setInstanceSortReverse(false);
+            btSort.getStyleClass().remove("reverse");
+        } else {
+            LauncherApplication.settings.setInstanceSortReverse(true);
+            btSort.getStyleClass().add("reverse");
+        }
+        reloadComponents();
+     }
 
     private void onSelected(InstanceData instanceData, boolean selected) {
         icDetailsController.clearSelection();
@@ -435,21 +447,6 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     @Override
     public void beforeShow(Stage stage) {
-        boolean found = false;
-        for(Comparator<InstanceData> c : cbSort.getItems()) {
-            if(c.getClass().equals(LauncherApplication.settings.getInstanceSortType().getClazz())) {
-                cbSort.getSelectionModel().select(c);
-                found = true;
-                break;
-            }
-        }
-        if(!found) {
-            cbSort.getSelectionModel().select(0);
-        }
-        cbSort.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            reloadComponents();
-            LauncherApplication.settings.setInstanceSortType((Class<? extends Comparator<InstanceData>>) newValue.getClass());
-        });
         super.beforeShow(stage);
         icDetailsController.setVisible(false);
         abComponent.clearLabel();
@@ -457,5 +454,9 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icComponentChangerController.setVisible(false);
         icVersionChangerController.setVisible(false);
 
+        cbSort.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            reloadComponents();
+            LauncherApplication.settings.setInstanceSortType(newValue);
+        });
     }
 }

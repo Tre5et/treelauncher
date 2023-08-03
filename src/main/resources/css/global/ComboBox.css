@@ -22,7 +22,7 @@
     -fx-text-fill: -fx-text;
 }
 
-.combo-box > .arrow-button > .arrow{
+.combo-box > .arrow-button > .arrow {
     -fx-background-color: -fx-combobox-arrow;
 }
 

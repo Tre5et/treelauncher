@@ -13,32 +13,29 @@ import java.util.Comparator;
 
 public class Settings extends GenericJsonParsable {
     public enum InstanceDataSortType {
-        NAME(InstanceDetailsNameComparator.class),
-        TIME(InstanceDetailsTimeComparator.class),
-        LAST_PLAYED(InstanceDetailsLastPlayedComparator.class);
+        NAME(new InstanceDetailsNameComparator()),
+        TIME(new InstanceDetailsTimeComparator()),
+        LAST_PLAYED(new InstanceDetailsLastPlayedComparator());
 
-        private final Class<? extends Comparator<InstanceData>> clazz;
-        InstanceDataSortType(Class<? extends Comparator<InstanceData>> clazz) {
-            this.clazz = clazz;
+        private final Comparator<InstanceData> comparator;
+        InstanceDataSortType(Comparator<InstanceData> comparator) {
+            this.comparator = comparator;
         }
 
-        public Class<? extends Comparator<InstanceData>> getClazz() {
-            return clazz;
+        public Comparator<InstanceData> getComparator() {
+            return comparator;
         }
 
-        public static InstanceDataSortType from(Class<? extends Comparator<InstanceData>> clazz) {
-            for(InstanceDataSortType type : values()) {
-                if(type.getClazz().equals(clazz)) {
-                    return type;
-                }
-            }
-            return NAME;
+        @Override
+        public String toString() {
+            return this.getComparator().toString();
         }
     }
 
     private transient File file;
 
     private InstanceDataSortType instanceSortType;
+    private boolean instanceSortReverse;
 
     public Settings(File file) {
         this.file = file;
@@ -61,8 +58,12 @@ public class Settings extends GenericJsonParsable {
         this.instanceSortType = instanceSortType;
     }
 
-    public void setInstanceSortType(Class<? extends Comparator<InstanceData>> clazz) {
-        this.instanceSortType = InstanceDataSortType.from(clazz);
+    public boolean isInstanceSortReverse() {
+        return instanceSortReverse;
+    }
+
+    public void setInstanceSortReverse(boolean instanceSortReverse) {
+        this.instanceSortReverse = instanceSortReverse;
     }
 
     @Override
