@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
+import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
@@ -27,6 +28,7 @@ public class LauncherApplication extends Application {
     public static final UserAuth userAuth = new UserAuth();
     public static StringLocalizer stringLocalizer;
     public static Config config;
+    public static Settings settings;
     public static LauncherUpdater launcherUpdater;
     public static Stage primaryStage;
 
@@ -47,6 +49,14 @@ public class LauncherApplication extends Application {
             }
         } catch (IOException e) {
             LOGGER.error("Failed to initialize directory structure!", e);
+            System.exit(-1);
+            return;
+        }
+
+        try {
+            loadSettings();
+        } catch (IOException e) {
+            LOGGER.error("Failed to load settings!", e);
             System.exit(-1);
             return;
         }
@@ -91,6 +101,16 @@ public class LauncherApplication extends Application {
         Configurator.reconfigure(builder.build());*/
     }
 
+    private static void loadSettings() throws IOException {
+        File settingsFile = new File(FormatUtil.absoluteFilePath(config.BASE_DIR, config.SETTINGS_FILE_NAME));
+        if(!settingsFile.exists()) {
+            settings = new Settings(settingsFile);
+            settings.save();
+        } else {
+            settings = Settings.load(settingsFile);
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         LauncherApplication.primaryStage = primaryStage;
@@ -116,6 +136,11 @@ public class LauncherApplication extends Application {
 
     @Override
     public void stop() throws Exception {
+        try {
+            settings.save();
+        } catch (IOException e) {
+            displayError(e);
+        }
         if(new File("update.json").exists()) {
             try {
                 startUpdater();

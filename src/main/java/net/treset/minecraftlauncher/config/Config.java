@@ -13,6 +13,7 @@ public class Config {
     public final String SPECIAL_FILES_FOLDER;
     public final String LOG_PATH;
     public final File AUTH_FILE;
+    public final String SETTINGS_FILE_NAME = FormatUtil.absoluteFilePath(".launcher", "settings.json");
     public final String MANIFEST_FILE_NAME = "manifest.json";
     public final String INCLUDED_FILES_DIR = FormatUtil.absoluteDirPath(".included_files");
     public final List<LauncherFeature> INSTANCE_DEFAULT_FEATURES = List.of();
