@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
@@ -435,9 +436,25 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     @Override
     public void beforeShow(Stage stage) {
-        cbSort.getSelectionModel().select(0);
+        boolean found = false;
+        for(Comparator<InstanceData> c : cbSort.getItems()) {
+            if(c.getClass().equals(files.getSettings().getInstanceSortType().getClazz())) {
+                cbSort.getSelectionModel().select(c);
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            cbSort.getSelectionModel().select(0);
+        }
         cbSort.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             reloadComponents();
+            files.getSettings().setInstanceSortType(Settings.InstanceDataSortType.from((Class<? extends Comparator<InstanceData>>) cbSort.getSelectionModel().getSelectedItem().getClass()));
+            try {
+                files.getSettings().writeToFile(FormatUtil.absoluteFilePath(files.getMainManifest().getDetails(), ".launcher", "settings.json"));
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+            }
         });
         super.beforeShow(stage);
         icDetailsController.setVisible(false);

@@ -4,12 +4,14 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.json.GenericJsonParsable;
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 public class LauncherFiles {
     private static final Logger LOGGER = LogManager.getLogger(LauncherFiles.class);
 
+    public Settings settings;
     private LauncherManifest mainManifest;
     private LauncherDetails launcherDetails;
     private LauncherManifest gameDetailsManifest;
@@ -44,6 +47,7 @@ public class LauncherFiles {
 
     public void reloadAll() throws FileLoadException {
         reloadMainManifest();
+        reloadSettings();
         reloadLauncherDetails();
         reloadGameDetailsManifest();
         reloadModsManifest();
@@ -60,6 +64,23 @@ public class LauncherFiles {
         reloadResourcepackComponents();
         reloadVersionManifest();
         reloadVersionComponents();
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public void reloadSettings() throws FileLoadException {
+        if(new File(FormatUtil.absoluteFilePath(LauncherApplication.config.BASE_DIR, ".launcher", "settings.json")).exists()) {
+            try {
+                settings = Settings.fromJson(FileUtil.loadFile(FormatUtil.absoluteFilePath(LauncherApplication.config.BASE_DIR, ".launcher", "settings.json")));
+            } catch (IOException e) {
+                throw new FileLoadException("Unable to load Settings file, file error", e);
+            }
+        } else {
+            LOGGER.info("Generating new Settings...");
+            settings = new Settings();
+        }
     }
 
     public LauncherManifest getMainManifest() {
