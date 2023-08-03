@@ -27,7 +27,7 @@ import java.io.IOException;
 
 public class SettingsElement extends UiElement {
     @FXML private AnchorPane rootPane;
-    @FXML private ComboBox<String> cbLanguage;
+    @FXML private ComboBox<StringLocalizer.Language> cbLanguage;
     @FXML private Label lbLanguage;
     @FXML private TextField tfPath;
     @FXML private CheckBox cbRemove;
@@ -43,11 +43,8 @@ public class SettingsElement extends UiElement {
     public void init(Runnable logoutCallback) {
         this.logoutCallback = logoutCallback;
 
-        for(StringLocalizer.Language language : StringLocalizer.getAvailableLanguages()) {
-            cbLanguage.getItems().add((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
-        }
-        StringLocalizer.Language language = LauncherApplication.stringLocalizer.getLanguage();
-        cbLanguage.getSelectionModel().select((language.equals(StringLocalizer.getSystemLanguage())) ? language.getName() + LauncherApplication.stringLocalizer.get("language.default") : language.getName());
+        cbLanguage.getItems().addAll(StringLocalizer.getAvailableLanguages());
+        cbLanguage.getSelectionModel().select(LauncherApplication.stringLocalizer.getLanguage());
 
         cbLanguage.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onLanguageComboBoxChanged));
 
@@ -76,23 +73,8 @@ public class SettingsElement extends UiElement {
 
     @FXML
     private void onLanguageComboBoxChanged() {
-        String input = cbLanguage.getSelectionModel().getSelectedItem();
-        if(input != null) {
-            StringLocalizer.Language language;
-            try {
-                language = languageFromString(input);
-            } catch (IllegalArgumentException e) {
-                LauncherApplication.displaySevereError(e);
-                return;
-            }
-            LauncherApplication.stringLocalizer.setLanguage(language);
-            lbLanguage.setVisible(true);
-            try {
-                GlobalConfigLoader.updateLanguage(language);
-            } catch (IOException e) {
-                LauncherApplication.displayError(e);
-            }
-        }
+        LauncherApplication.stringLocalizer.setLanguage(cbLanguage.getSelectionModel().getSelectedItem());
+        lbLanguage.setVisible(true);
     }
 
     @FXML
@@ -301,15 +283,6 @@ public class SettingsElement extends UiElement {
     private void cancelUpdate() {
         icPopupController.setVisible(false);
         canceled = true;
-    }
-
-    private static StringLocalizer.Language languageFromString(String language) throws IllegalArgumentException {
-        for(StringLocalizer.Language l : StringLocalizer.getAvailableLanguages()) {
-            if(l.getName().equals(language) || language.equals(l.getName() + LauncherApplication.stringLocalizer.get("language.default"))) {
-                return l;
-            }
-        }
-        throw new IllegalArgumentException("Could not find language: " + language);
     }
 
     private void checkUpdate() {

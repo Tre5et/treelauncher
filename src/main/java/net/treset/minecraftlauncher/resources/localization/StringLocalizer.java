@@ -41,6 +41,7 @@ public class StringLocalizer {
 
     public void setLanguage(Language language) {
         this.language = language;
+        LauncherApplication.settings.setLanguage(language);
     }
 
     public static List<Language> getAvailableLanguages() {
@@ -60,21 +61,24 @@ public class StringLocalizer {
             return LauncherApplication.stringLocalizer.get(name);
         }
 
-        public static Language fromId(String id) {
-            for(Language language : values()) {
-                if(language.name().equals(id)) {
-                    return language;
-                }
+        @Override
+        public String toString() {
+            if(LauncherApplication.stringLocalizer == null) {
+                return name;
             }
-            return null;
+            return LauncherApplication.stringLocalizer.get(name) + (this.equals(getSystemLanguage()) ? LauncherApplication.stringLocalizer.get("language.default") : "");
         }
     }
 
     public static Language getSystemLanguage() {
-        if(Locale.getDefault(Locale.Category.DISPLAY).getLanguage().equals("de")) {
-            return Language.GERMAN;
+        switch(Locale.getDefault(Locale.Category.DISPLAY).getLanguage()) {
+            case "de" -> {
+                return Language.GERMAN;
+            }
+            default -> {
+                return Language.ENGLISH;
+            }
         }
-        return Language.ENGLISH;
     }
 
     public static Locale getLocale(Language language) {

@@ -24,6 +24,9 @@ public class InstanceDetailsLastPlayedComparator implements Comparator<InstanceD
 
     @Override
     public String toString() {
+        if(LauncherApplication.stringLocalizer == null) {
+            return "sort.lastplayed";
+        }
         return LauncherApplication.stringLocalizer.get("sort.lastplayed");
     }
 }

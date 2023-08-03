@@ -2,7 +2,6 @@ package net.treset.minecraftlauncher.config;
 
 import net.treset.mc_version_loader.launcher.LauncherFeature;
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
-import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.util.FormatUtil;
 
 import java.io.File;
@@ -34,9 +33,8 @@ public class Config {
     public final String FABRIC_DEFAULT_CLIENT_FILENAME = "fabric-client.jar";
     public final boolean DEBUG;
     public final String UPDATE_URL;
-    public final StringLocalizer.Language LANGUAGE;
 
-    public Config(String BASE_DIR, boolean DEBUG, String updateUrl, StringLocalizer.Language LANGUAGE) {
+    public Config(String BASE_DIR, boolean DEBUG, String updateUrl) {
         this.BASE_DIR = FormatUtil.absoluteDirPath(new File(BASE_DIR).getAbsolutePath());
         SPECIAL_FILES_FOLDER = FormatUtil.absoluteDirPath(BASE_DIR, ".launcher");
         AUTH_FILE = new File(FormatUtil.absoluteFilePath(SPECIAL_FILES_FOLDER, "secrets.auth"));
@@ -44,6 +42,5 @@ public class Config {
 
         this.DEBUG = DEBUG;
         this.UPDATE_URL = updateUrl;
-        this.LANGUAGE = LANGUAGE;
     }
 }

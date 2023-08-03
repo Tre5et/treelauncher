@@ -34,7 +34,6 @@ public class GlobalConfigLoader {
         String path = null;
         boolean debug = false;
         String updateUrl = null;
-        StringLocalizer.Language language = null;
         for(String line : lines) {
             if(line.startsWith("path=")) {
                 path = line.substring(5).replace("\r", "").replace("\n", "");
@@ -42,16 +41,13 @@ public class GlobalConfigLoader {
                 debug = Boolean.parseBoolean(line.substring(6));
             } else if(line.startsWith("update_url=")) {
                 updateUrl = line.substring(11).replace("\r", "").replace("\n", "");
-            } else if(line.startsWith("language=")) {
-                String input = line.substring(9).replace("\r", "").replace("\n", "");
-                language = StringLocalizer.Language.fromId(input);
             }
         }
         if(path == null || path.isBlank() || updateUrl == null || updateUrl.isBlank()) {
             throw new IllegalStateException("Invalid config: path=" + path + ", updateUrl=" + updateUrl);
         }
         LOGGER.info("Loaded config: path={}, debug={}", path, debug);
-        return new Config(path, debug, updateUrl, language);
+        return new Config(path, debug, updateUrl);
     }
 
     public static void updateLanguage(StringLocalizer.Language language) throws IOException {

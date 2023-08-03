@@ -13,6 +13,9 @@ public class InstanceDetailsTimeComparator implements Comparator<InstanceData> {
 
     @Override
     public String toString() {
+        if(LauncherApplication.stringLocalizer == null) {
+            return "sort.time";
+        }
         return LauncherApplication.stringLocalizer.get("sort.time");
     }
 }

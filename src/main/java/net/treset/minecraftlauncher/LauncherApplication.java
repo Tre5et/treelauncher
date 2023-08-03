@@ -53,8 +53,6 @@ public class LauncherApplication extends Application {
             return;
         }
 
-        stringLocalizer = new StringLocalizer(config.LANGUAGE);
-
         try {
             loadSettings();
         } catch (IOException e) {
@@ -63,6 +61,7 @@ public class LauncherApplication extends Application {
             return;
         }
 
+        stringLocalizer = new StringLocalizer(settings.getLanguage());
 
         launch(args);
     }

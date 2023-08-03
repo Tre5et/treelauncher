@@ -13,6 +13,9 @@ public class InstanceDetailsNameComparator implements Comparator<InstanceData> {
 
     @Override
     public String toString() {
+        if(LauncherApplication.stringLocalizer == null) {
+            return "sort.name";
+        }
         return LauncherApplication.stringLocalizer.get("sort.name");
     }
 }

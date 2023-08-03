@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.config;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
 import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsLastPlayedComparator;
 import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsNameComparator;
@@ -34,12 +35,14 @@ public class Settings extends GenericJsonParsable {
 
     private transient File file;
 
+    private StringLocalizer.Language language;
     private InstanceDataSortType instanceSortType;
     private boolean instanceSortReverse;
 
     public Settings(File file) {
         this.file = file;
         this.instanceSortType = InstanceDataSortType.NAME;
+        this.language = StringLocalizer.Language.ENGLISH;
     }
 
     public File getFile() {
@@ -48,6 +51,14 @@ public class Settings extends GenericJsonParsable {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public StringLocalizer.Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(StringLocalizer.Language language) {
+        this.language = language;
     }
 
     public InstanceDataSortType getInstanceSortType() {
