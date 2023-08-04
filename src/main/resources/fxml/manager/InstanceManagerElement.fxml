@@ -8,7 +8,7 @@
     <HBox fx:id="hbVersion" onMouseClicked="#onSelectVersion" styleClass="details-element">
         <FontIcon styleClass="icon, version" />
         <VBox alignment="CENTER_LEFT" >
-            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label styleClass="element-title" text="%instances.details.label.version" />
             <Label fx:id="lbVersion" styleClass="element-details"/>
         </VBox>
     </HBox>
@@ -22,21 +22,21 @@
     <HBox fx:id="hbResourcepacks" onMouseClicked="#onSelectResourcepacks" styleClass="details-element">
         <FontIcon styleClass="icon, resourcepacks" />
         <VBox alignment="CENTER_LEFT" >
-            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label styleClass="element-title" text="%instances.details.label.resourcepacks" />
             <Label fx:id="lbResourcepacks" styleClass="element-details"/>
         </VBox>
     </HBox>
     <HBox fx:id="hbOptions" onMouseClicked="#onSelectOptions" styleClass="details-element">
         <FontIcon styleClass="icon, options" />
         <VBox alignment="CENTER_LEFT" >
-            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label styleClass="element-title" text="%instances.details.label.options" />
             <Label fx:id="lbOptions" styleClass="element-details"/>
         </VBox>
     </HBox>
     <HBox fx:id="hbMods" onMouseClicked="#onSelectMods" styleClass="details-element">
         <FontIcon styleClass="icon, mods" />
         <VBox alignment="CENTER_LEFT" >
-            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label styleClass="element-title" text="%instances.details.label.mods" />
             <Label fx:id="lbMods" styleClass="element-details"/>
         </VBox>
     </HBox>
