@@ -42,7 +42,7 @@ public class Settings extends GenericJsonParsable {
     public Settings(File file) {
         this.file = file;
         this.instanceSortType = InstanceDataSortType.NAME;
-        this.language = StringLocalizer.Language.ENGLISH;
+        this.language = StringLocalizer.getSystemLanguage();
     }
 
     public File getFile() {
