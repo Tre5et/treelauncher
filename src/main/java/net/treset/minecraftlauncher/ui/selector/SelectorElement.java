@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiController;
@@ -13,14 +12,14 @@ import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.ActionBar;
 import net.treset.minecraftlauncher.ui.generic.CreateSelectable;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
+import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class SelectorElement<E extends SelectorEntryElement> extends UiElement {
+public abstract class SelectorElement<E extends SelectorEntryElement<? extends SelectorEntryElement.ContentProvider>> extends UiElement {
     @FXML protected AnchorPane rootPane;
     @FXML protected VBox vbElements;
     @FXML protected ActionBar abMain;
@@ -30,7 +29,7 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
 
     protected LauncherFiles files;
     protected boolean createSelected = false;
-    protected List<Pair<E, AnchorPane>> elements;
+    protected List<E> elements;
 
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
@@ -53,9 +52,6 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
         if(csCreate != null) {
             csCreate.getStyleClass().remove("selected");
         }
-        for(Pair<E, AnchorPane> element : elements) {
-            element.getKey().beforeShow(null);
-        }
         Platform.runLater(() -> {
             abMain.setDisable(true);
             abMain.clearLabel();
@@ -63,9 +59,7 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
             if(vbCreate != null) {
                 vbCreate.setVisible(false);
             }
-            for(Pair<E, AnchorPane> element : elements) {
-                vbElements.getChildren().add(element.getValue());
-            }
+            vbElements.getChildren().addAll(elements);
         });
     }
 
@@ -180,8 +174,8 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
     }
 
     protected void deselectAll() {
-        for(Pair<E, AnchorPane> element : elements) {
-            element.getKey().select(false, true, false);
+        for(E element : elements) {
+            element.select(false, true, false);
         }
     }
 
@@ -189,22 +183,15 @@ public abstract class SelectorElement<E extends SelectorEntryElement> extends Ui
 
     protected abstract void deleteCurrent();
 
-    protected abstract List<Pair<E, AnchorPane>> getElements();
+    protected abstract List<E> getElements();
 
     @Override
     public void beforeShow(Stage stage) {
         reloadComponents();
-        for(Pair<E, AnchorPane> element : elements) {
-            element.getKey().beforeShow(stage);
-        }
     }
 
     @Override
-    public void afterShow(Stage stage) {
-        for(Pair<E, AnchorPane> element : elements) {
-            element.getKey().afterShow(stage);
-        }
-    }
+    public void afterShow(Stage stage) {}
 
     @Override
     public void setRootVisible(boolean visible) {

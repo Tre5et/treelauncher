@@ -1,15 +1,12 @@
 package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.SavesCreatorElement;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
@@ -56,9 +53,6 @@ public class SavesSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
             }
             reloadComponents();
-            for(Pair<SelectorEntryElement, AnchorPane> saves: elements) {
-                saves.getKey().beforeShow(null);
-            }
         } else {
             icCreatorController.showError(true);
         }
@@ -66,8 +60,8 @@ public class SavesSelectorElement extends ManifestSelectorElement {
 
     @Override
     protected void deleteCurrent() {
-        if(currentManifest != null) {
-            if(!files.getSavesManifest().getComponents().remove(currentManifest.getId())) {
+        if(currentProvider != null) {
+            if(!files.getSavesManifest().getComponents().remove(getManifest().getId())) {
                 LOGGER.warn("Unable to remove save from manifest");
                 return;
             }
@@ -79,7 +73,7 @@ public class SavesSelectorElement extends ManifestSelectorElement {
             }
             icCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
             try {
-                FileUtil.deleteDir(new File(currentManifest.getDirectory()));
+                FileUtil.deleteDir(new File(getManifest().getDirectory()));
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }

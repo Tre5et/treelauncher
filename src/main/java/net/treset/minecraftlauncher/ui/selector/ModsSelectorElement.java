@@ -1,7 +1,6 @@
 package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
@@ -10,7 +9,6 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.ModsCreatorElement;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
@@ -76,9 +74,6 @@ public class ModsSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
             }
             reloadComponents();
-            for (Pair<SelectorEntryElement, AnchorPane> mod : elements) {
-                mod.getKey().beforeShow(null);
-            }
         } else {
             icCreatorController.showError(true);
         }
@@ -121,12 +116,12 @@ public class ModsSelectorElement extends ManifestSelectorElement {
     }
 
     @Override
-    protected void onSelected(LauncherManifest manifest, boolean selected) {
-        super.onSelected(manifest, selected);
+    protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
+        super.onSelected(contentProvider, selected);
         if (selected) {
             currentMods = null;
             for (Pair<LauncherManifest, LauncherModsDetails> m : files.getModsComponents()) {
-                if (m.getKey().equals(manifest)) {
+                if (m.getKey().equals(contentProvider.getManifest())) {
                     currentMods = m;
                     break;
                 }

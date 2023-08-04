@@ -1,6 +1,6 @@
 .element-root {
     -fx-background-color: -fx-background;
-    -fx-padding: 5px 10px 5px 10px;
+    -fx-padding: 5px;
 }
 
 .element-container {

@@ -1,15 +1,12 @@
 package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.ResourcepacksCreatorElement;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
@@ -54,9 +51,6 @@ public class ResourcepacksSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
             }
             reloadComponents();
-            for(Pair<SelectorEntryElement, AnchorPane> resourcepack: elements) {
-                resourcepack.getKey().beforeShow(null);
-            }
         } else {
             icCreatorController.showError(true);
         }
@@ -64,8 +58,8 @@ public class ResourcepacksSelectorElement extends ManifestSelectorElement {
 
     @Override
     protected void deleteCurrent() {
-        if(currentManifest != null) {
-            if(!files.getResourcepackManifest().getComponents().remove(currentManifest.getId())) {
+        if(currentProvider != null) {
+            if(!files.getResourcepackManifest().getComponents().remove(getManifest().getId())) {
                 LOGGER.warn("Unable to remove resourcepacks from manifest");
                 return;
             }
@@ -77,7 +71,7 @@ public class ResourcepacksSelectorElement extends ManifestSelectorElement {
             }
             icCreatorController.setPrerequisites(files.getResourcepackComponents(), files.getLauncherDetails().getTypeConversion(), files.getResourcepackManifest());
             try {
-                FileUtil.deleteDir(new File(currentManifest.getDirectory()));
+                FileUtil.deleteDir(new File(getManifest().getDirectory()));
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 return;

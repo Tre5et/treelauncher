@@ -1,14 +1,13 @@
 package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
-import net.treset.minecraftlauncher.ui.generic.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,18 +19,43 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class ManifestSelectorElement extends SelectorElement<SelectorEntryElement> {
+public abstract class ManifestSelectorElement extends SelectorElement<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> {
+    public static class ManifestContentProvider implements SelectorEntryElement.ContentProvider {
+        private LauncherManifest manifest;
+        public ManifestContentProvider(LauncherManifest manifest) {
+            this.manifest = manifest;
+        }
+
+        public LauncherManifest getManifest() {
+            return manifest;
+        }
+
+        public void setManifest(LauncherManifest manifest) {
+            this.manifest = manifest;
+        }
+
+        @Override
+        public String getTitle() {
+            return manifest.getName();
+        }
+
+        @Override
+        public String getDetails() {
+            return manifest.getId();
+        }
+    }
+
     private static final Logger LOGGER = LogManager.getLogger(ManifestSelectorElement.class);
 
     @FXML
     protected FolderContentContainer ccDetails;
 
-    protected LauncherManifest currentManifest = null;
+    protected ManifestContentProvider currentProvider = null;
 
     @Override
     protected String getCurrentUsedBy() {
         for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
-            if (currentManifest.getId().equals(getManifestId(i.getValue()))) {
+            if (getManifest().getId().equals(getManifestId(i.getValue()))) {
                 return i.getKey().getName();
             }
         }
@@ -41,49 +65,42 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected abstract String getManifestId(LauncherInstanceDetails instanceDetails);
 
     @Override
-    protected List<Pair<SelectorEntryElement, AnchorPane>> getElements() {
-        ArrayList<Pair<SelectorEntryElement, AnchorPane>> elements = new ArrayList<>();
-        for(LauncherManifest save: getComponents()) {
-            try {
-                elements.add(SelectorEntryElement.from(save));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    protected List<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> getElements() {
+        ArrayList<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> elements = new ArrayList<>();
+        for(LauncherManifest manifest: getComponents()) {
+            elements.add(new SelectorEntryElement<>(new ManifestContentProvider(manifest), this::onSelected));
         }
-        return elements.stream().peek(e -> {
-                e.getKey().setSelectionManifestAcceptor(this::allowSelection);
-                e.getKey().setSelectionManifestListener(List.of(this::onSelected));
-            })
-            .sorted(Comparator.comparing(a -> a.getKey().getManifest().getName()))
+        return elements.stream()
+            .sorted(Comparator.comparing(a -> a.getContentProvider().getTitle()))
             .toList();
     }
 
     protected abstract List<LauncherManifest> getComponents();
 
-    protected boolean allowSelection(LauncherManifest manifest, boolean selected) {
-        return !getLock();
-    }
-
-    protected void onSelected(LauncherManifest manifest, boolean selected) {
+    protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
         if(ccDetails != null) {
             ccDetails.setVisible(selected);
         }
         if(selected) {
             deselectAll();
-            currentManifest = manifest;
+            currentProvider = contentProvider;
             createSelected = false;
             csCreate.getStyleClass().remove("selected");
             vbCreate.setVisible(false);
             abMain.setDisable(false);
-            abMain.setLabel(manifest.getName());
+            abMain.setLabel(contentProvider.getManifest().getName());
             if(ccDetails != null) {
-                ccDetails.setFolder(new File(manifest.getDirectory()));
+                ccDetails.setFolder(new File(contentProvider.getManifest().getDirectory()));
             }
         } else {
-            currentManifest = null;
+            currentProvider = null;
             abMain.setDisable(true);
             abMain.clearLabel();
         }
+    }
+
+    public LauncherManifest getManifest() {
+        return currentProvider.getManifest();
     }
 
     @Override
@@ -104,10 +121,10 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
     @Override
     protected void onFolder() {
-        if(currentManifest == null) {
+        if(currentProvider == null) {
             LOGGER.warn("No element selected");
         }
-        File folder = new File(currentManifest.getDirectory());
+        File folder = new File(currentProvider.getManifest().getDirectory());
         try {
             Desktop.getDesktop().open(folder);
         } catch (IOException e) {
@@ -117,18 +134,18 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
     @Override
     protected boolean editValid(String newName) {
-        return newName != null && !newName.isBlank() && !newName.equals(currentManifest.getName());
+        return newName != null && !newName.isBlank() && !newName.equals(currentProvider.getManifest().getName());
     }
 
     @Override
     protected void editCurrent(String newName) {
-        if(currentManifest == null) {
+        if(currentProvider == null) {
             LOGGER.warn("No element selected");
             return;
         }
-        currentManifest.setName(newName);
+        getManifest().setName(newName);
         try {
-            currentManifest.writeToFile(FormatUtil.absoluteFilePath(currentManifest.getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
+            getManifest().writeToFile(FormatUtil.absoluteFilePath(currentProvider.getManifest().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }

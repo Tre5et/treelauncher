@@ -3,7 +3,6 @@ package net.treset.minecraftlauncher.ui.selector;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
@@ -15,6 +14,7 @@ import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.generic.*;
+import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
@@ -62,21 +62,18 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     protected void onCreate() {}
 
     @Override
-    protected List<Pair<InstanceSelectorEntryElement, AnchorPane>> getElements() {
-        ArrayList<Pair<InstanceSelectorEntryElement, AnchorPane>> instances = new ArrayList<>();
+    protected List<InstanceSelectorEntryElement> getElements() {
+        ArrayList<InstanceSelectorEntryElement> instances = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> instance : files.getInstanceComponents()) {
             try {
-                instances.add(InstanceSelectorEntryElement.from(InstanceData.of(instance, files)));
-            } catch (IOException | FileLoadException e) {
+                instances.add(new InstanceSelectorEntryElement(InstanceData.of(instance, files), this::onSelected));
+            } catch (FileLoadException e) {
                 LauncherApplication.displaySevereError(e);
             }
         }
-        return instances.stream().peek(instance -> {
-                instance.getKey().setSelectionInstanceAcceptor(this::allowSelection);
-                instance.getKey().setSelectionInstanceListeners(List.of(this::onSelected));
-            })
+        return instances.stream()
             .sorted((e1, e2) -> {
-                int result = cbSort.getSelectionModel().getSelectedItem().getComparator().compare(e1.getKey().getInstanceData(), e2.getKey().getInstanceData());
+                int result = cbSort.getSelectionModel().getSelectedItem().getComparator().compare(e1.getInstanceData(), e2.getInstanceData());
                 return LauncherApplication.settings.isInstanceSortReverse() ? -result : result;
             })
             .toList();
@@ -108,9 +105,9 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         abComponent.setDisable(true);
         abComponent.clearLabel();
         if(selected) {
-            for(Pair<InstanceSelectorEntryElement, AnchorPane> instance : elements) {
-                if(instance.getKey().getInstanceData() != instanceData) {
-                    instance.getKey().select(false, true, false);
+            for(InstanceSelectorEntryElement instance : elements) {
+                if(instance.getInstanceData() != instanceData) {
+                    instance.select(false, true, false);
                 }
             }
             abMain.setDisable(false);
