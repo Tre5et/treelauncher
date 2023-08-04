@@ -42,9 +42,9 @@
 }
 
 .icon {
-    -fx-icon-color: -fx-button-background;
+    -fx-icon-color: -fx-button-icon;
 }
 
 .icon.selected {
-    -fx-icon-color: -fx-button-active-background;
+    -fx-icon-color: -fx-button-selected;
 }

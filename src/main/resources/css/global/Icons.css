@@ -6,6 +6,10 @@
     -fx-icon-code: bi-plus-square;
 }
 
+.version {
+    -fx-icon-code: bi-arrow-left-right;
+}
+
 .saves {
     -fx-icon-code: bi-box-arrow-down;
 }

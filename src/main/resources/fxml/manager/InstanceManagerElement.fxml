@@ -1,120 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<VBox fx:id="container" minWidth="-Infinity" stylesheets="@/css/manager/InstanceManagerElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceManagerElement">
-    <AnchorPane minWidth="-Infinity" styleClass="details-container">
-        <GridPane fx:id="gpVersion" onMouseClicked="#onSelectVersion" alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
-            <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-            <FontIcon iconLiteral="bi-arrow-left-right:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
-                <GridPane.margin>
-                    <Insets left="5.0" right="5.0" />
-                </GridPane.margin>
-            </FontIcon>
-            <Label minWidth="-Infinity" styleClass="element-title" text="%instances.details.label.version" GridPane.columnIndex="1" />
-            <Label fx:id="lbVersion" minWidth="-Infinity" styleClass="element-details" text="Version Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        </GridPane>
-    </AnchorPane>
-    <AnchorPane styleClass="details-container">
-        <GridPane fx:id="gpSaves" onMouseClicked="#onSelectSaves" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
-            <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-            <FontIcon iconLiteral="bi-box-arrow-down:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
-                <GridPane.margin>
-                    <Insets left="5.0" right="5.0" />
-                </GridPane.margin>
-            </FontIcon>
-            <Label styleClass="element-title" text="%instances.details.label.saves" GridPane.columnIndex="1" />
-            <Label fx:id="lbSaves" styleClass="element-details" text="Saves Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        </GridPane>
-    </AnchorPane>
-    <AnchorPane styleClass="details-container">
-        <GridPane fx:id="gpResourcepacks" onMouseClicked="#onSelectResourcepacks" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
-            <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-            <FontIcon iconLiteral="bi-file-zip:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
-                <GridPane.margin>
-                    <Insets left="5.0" right="5.0" />
-                </GridPane.margin>
-            </FontIcon>
-            <Label styleClass="element-title" text="%instances.details.label.resourcepacks" GridPane.columnIndex="1" />
-            <Label fx:id="lbResourcepacks" styleClass="element-details" text="Version Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        </GridPane>
-    </AnchorPane>
-    <AnchorPane styleClass="details-container">
-        <GridPane fx:id="gpOptions" onMouseClicked="#onSelectOptions" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
-            <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-            <FontIcon iconLiteral="bi-sliders:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
-                <GridPane.margin>
-                    <Insets left="5.0" right="5.0" />
-                </GridPane.margin>
-            </FontIcon>
-            <Label styleClass="element-title" text="%instances.details.label.options" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
-            <Label fx:id="lbOptions" styleClass="element-details" text="Option Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        </GridPane>
-    </AnchorPane>
-    <AnchorPane styleClass="details-container">
-        <GridPane fx:id="gpMods" onMouseClicked="#onSelectMods" alignment="BOTTOM_LEFT" minHeight="-Infinity" styleClass="details-element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="NEVER">
-            <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-                <ColumnConstraints hgrow="ALWAYS" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="NEVER" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="NEVER" />
-            </rowConstraints>
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-            <FontIcon iconLiteral="bi-puzzle:36" styleClass="icon" GridPane.rowSpan="2" GridPane.valignment="CENTER">
-                <GridPane.margin>
-                    <Insets left="5.0" right="5.0" />
-                </GridPane.margin>
-            </FontIcon>
-            <Label styleClass="element-title" text="%instances.details.label.mods" GridPane.columnIndex="1" />
-            <Label fx:id="lbMods" styleClass="element-details" text="Mods Details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-    </GridPane>
-    </AnchorPane>
+<VBox fx:id="container" styleClass="container" minWidth="-Infinity" stylesheets="@/css/manager/InstanceManagerElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceManagerElement">
+    <HBox fx:id="hbVersion" onMouseClicked="#onSelectVersion" styleClass="details-element">
+        <FontIcon styleClass="icon, version" />
+        <VBox alignment="CENTER_LEFT" >
+            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label fx:id="lbVersion" styleClass="element-details"/>
+        </VBox>
+    </HBox>
+    <HBox fx:id="hbSaves" onMouseClicked="#onSelectSaves" styleClass="details-element">
+        <FontIcon styleClass="icon, saves" />
+        <VBox alignment="CENTER_LEFT" >
+            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label fx:id="lbSaves" styleClass="element-details"/>
+        </VBox>
+    </HBox>
+    <HBox fx:id="hbResourcepacks" onMouseClicked="#onSelectResourcepacks" styleClass="details-element">
+        <FontIcon styleClass="icon, resourcepacks" />
+        <VBox alignment="CENTER_LEFT" >
+            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label fx:id="lbResourcepacks" styleClass="element-details"/>
+        </VBox>
+    </HBox>
+    <HBox fx:id="hbOptions" onMouseClicked="#onSelectOptions" styleClass="details-element">
+        <FontIcon styleClass="icon, options" />
+        <VBox alignment="CENTER_LEFT" >
+            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label fx:id="lbOptions" styleClass="element-details"/>
+        </VBox>
+    </HBox>
+    <HBox fx:id="hbMods" onMouseClicked="#onSelectMods" styleClass="details-element">
+        <FontIcon styleClass="icon, mods" />
+        <VBox alignment="CENTER_LEFT" >
+            <Label styleClass="element-title" text="%instances.details.label.saves" />
+            <Label fx:id="lbMods" styleClass="element-details"/>
+        </VBox>
+    </HBox>
 </VBox>

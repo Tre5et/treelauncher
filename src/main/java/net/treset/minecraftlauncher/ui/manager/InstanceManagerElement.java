@@ -2,7 +2,7 @@ package net.treset.minecraftlauncher.ui.manager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.data.InstanceData;
@@ -25,11 +25,11 @@ public class InstanceManagerElement extends UiElement {
     @FXML public Label lbResourcepacks;
     @FXML public Label lbOptions;
     @FXML public Label lbMods;
-    @FXML private GridPane gpVersion;
-    @FXML private GridPane gpSaves;
-    @FXML private GridPane gpResourcepacks;
-    @FXML private GridPane gpOptions;
-    @FXML private GridPane gpMods;
+    @FXML private HBox hbVersion;
+    @FXML private HBox hbSaves;
+    @FXML private HBox hbResourcepacks;
+    @FXML private HBox hbOptions;
+    @FXML private HBox hbMods;
 
     private BiConsumer<Boolean, SelectedType> selectionCallback;
     private SelectedType currentSelected = null;
@@ -49,10 +49,10 @@ public class InstanceManagerElement extends UiElement {
         lbResourcepacks.setText(instanceData.getResourcepacksComponent().getName());
         lbOptions.setText(instanceData.getOptionsComponent().getName());
         if(instanceData.getModsComponent() != null) {
-            gpMods.setVisible(true);
+            hbMods.setVisible(true);
             lbMods.setText(instanceData.getModsComponent().getKey().getName());
         } else {
-            gpMods.setVisible(false);
+            hbMods.setVisible(false);
         }
     }
 
@@ -63,7 +63,7 @@ public class InstanceManagerElement extends UiElement {
             selectionCallback.accept(false, SelectedType.VERSION);
             currentSelected = null;
         } else {
-            gpVersion.getStyleClass().add("selected");
+            hbVersion.getStyleClass().add("selected");
             currentSelected = SelectedType.VERSION;
             selectionCallback.accept(true, SelectedType.VERSION);
         }
@@ -76,7 +76,7 @@ public class InstanceManagerElement extends UiElement {
             selectionCallback.accept(false, SelectedType.SAVES);
             currentSelected = null;
         } else {
-            gpSaves.getStyleClass().add("selected");
+            hbSaves.getStyleClass().add("selected");
             currentSelected = SelectedType.SAVES;
             selectionCallback.accept(true, SelectedType.SAVES);
         }
@@ -89,7 +89,7 @@ public class InstanceManagerElement extends UiElement {
             selectionCallback.accept(false, SelectedType.RESOURCEPACKS);
             currentSelected = null;
         } else {
-            gpResourcepacks.getStyleClass().add("selected");
+            hbResourcepacks.getStyleClass().add("selected");
             currentSelected = SelectedType.RESOURCEPACKS;
             selectionCallback.accept(true, SelectedType.RESOURCEPACKS);
         }
@@ -102,7 +102,7 @@ public class InstanceManagerElement extends UiElement {
             selectionCallback.accept(false, SelectedType.OPTIONS);
             currentSelected = null;
         } else {
-            gpOptions.getStyleClass().add("selected");
+            hbOptions.getStyleClass().add("selected");
             currentSelected = SelectedType.OPTIONS;
             selectionCallback.accept(true, SelectedType.OPTIONS);
         }
@@ -115,18 +115,18 @@ public class InstanceManagerElement extends UiElement {
             selectionCallback.accept(false, SelectedType.MODS);
             currentSelected = null;
         } else {
-            gpMods.getStyleClass().add("selected");
+            hbMods.getStyleClass().add("selected");
             currentSelected = SelectedType.MODS;
             selectionCallback.accept(true, SelectedType.MODS);
         }
     }
 
     private void unselectAll() {
-        gpVersion.getStyleClass().remove("selected");
-        gpSaves.getStyleClass().remove("selected");
-        gpResourcepacks.getStyleClass().remove("selected");
-        gpOptions.getStyleClass().remove("selected");
-        gpMods.getStyleClass().remove("selected");
+        hbVersion.getStyleClass().remove("selected");
+        hbSaves.getStyleClass().remove("selected");
+        hbResourcepacks.getStyleClass().remove("selected");
+        hbOptions.getStyleClass().remove("selected");
+        hbMods.getStyleClass().remove("selected");
     }
 
     public void clearSelection() {

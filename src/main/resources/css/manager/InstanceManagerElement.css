@@ -1,11 +1,16 @@
-.details-container {
-    -fx-padding: 5px 10px 5px 10px;
+.container {
+    -fx-spacing: 5px;
+    -fx-padding: 5px;
 }
 
 .details-element {
     -fx-background-color: -fx-background-secondary;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
+    -fx-padding: 5px 10px;
+    -fx-cursor: hand;
+    -fx-spacing: 15px;
+    -fx-alignment: center-left;
 }
 
 .details-element:hover {
@@ -21,4 +26,9 @@
     -fx-border-width: 1px;
     -fx-border-color: -fx-primary-600;
     -fx-effect: dropshadow(gaussian, -fx-drop-shadow, 10, 0.3, 2, 2);
+}
+
+.icon {
+    -fx-icon-color: -fx-text;
+    -fx-icon-size: 28;
 }
