@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
@@ -152,11 +153,9 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     }
 
     private void displayGamePreparing() {
-        Platform.runLater(() -> {
-            icPopupController.setContent("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message");
-            icPopupController.clearControls();
-            icPopupController.setVisible(true);
-        });
+        LauncherApplication.setPopup(
+                new PopupElement("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message")
+        );
     }
 
     private void onGameExit(String error) {
@@ -165,9 +164,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         }
         reloadComponents();
         setLock(false);
-        Platform.runLater(() -> {
-            icPopupController.setVisible(false);
-        });
+        LauncherApplication.setPopup(null);
         Platform.runLater(() -> abMain.setDisable(false));
     }
 
@@ -243,56 +240,60 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     }
 
     private void onVersionChange(VersionCreator creator) {
-        icPopupController.clearControls();
-        icPopupController.setType(PopupElement.PopupType.WARNING);
-        icPopupController.setContent("selector.instance.version.popup.change.title", "selector.instance.version.popup.change.message");
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.NEGATIVE,
-                        "selector.instance.version.popup.change.cancel",
-                        "cancel",
-                        this::onPopupChangeCancel
-                ),
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "selector.instance.version.popup.change.confirm",
-                        "confirm",
-                        id -> this.onPopupChangeConfirm(id, creator)
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.WARNING,
+                        "selector.instance.version.popup.change.title",
+                        "selector.instance.version.popup.change.message",
+                        List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.NEGATIVE,
+                                        "selector.instance.version.popup.change.cancel",
+                                        this::onPopupChangeCancel
+                                ),
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        "selector.instance.version.popup.change.confirm",
+                                        event -> this.onPopupChangeConfirm(event, creator)
+                                )
+                        )
                 )
         );
-        icPopupController.setVisible(true);
     }
 
     private void onVersionChangeFailed(Exception e) {
         LauncherApplication.displayError(e);
     }
 
-    private void onPopupChangeConfirm(String id, VersionCreator creator) {
-        icPopupController.setVisible(false);
-        icPopupController.setContent("selector.instance.version.popup.changing", "");
-        icPopupController.setType(PopupElement.PopupType.NONE);
-        icPopupController.clearControls();
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "selector.instance.version.popup.back",
-                        "back",
-                        this::onPopupBackClicked
+    private void onPopupChangeConfirm(ActionEvent event, VersionCreator creator) {
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.NONE,
+                        "selector.instance.version.popup.changing",
+                        null
                 )
         );
-        icPopupController.setControlsDisabled(true);
-        icPopupController.setVisible(true);
+
         icVersionChangerController.setVisible(false);
         new Thread(() -> {
             String versionId;
             try {
                 versionId = creator.getId();
             } catch (ComponentCreationException e) {
-                Platform.runLater(() -> {
-                    icPopupController.setType(PopupElement.PopupType.ERROR);
-                    icPopupController.setContent("selector.instance.version.popup.failure", "");
-                    icPopupController.setControlsDisabled(false);
-                });
+                LauncherApplication.setPopup(
+                        new PopupElement(
+                                PopupElement.PopupType.ERROR,
+                                "selector.instance.version.popup.failure",
+                                null,
+                                List.of(
+                                        new PopupElement.PopupButton(
+                                                PopupElement.ButtonType.POSITIVE,
+                                                "selector.instance.version.popup.back",
+                                                this::onPopupBackClicked
+                                        )
+                                )
+                        )
+                );
                 return;
             }
             currentInstance.getInstance().getValue().setVersionComponent(versionId);
@@ -311,21 +312,32 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
                 icDetailsController.populate(currentInstance);
                 icVersionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
                 icVersionChangerController.setVisible(true);
-                icPopupController.setType(PopupElement.PopupType.SUCCESS);
-                icPopupController.setContent("selector.instance.version.popup.success", "");
-                icPopupController.setControlsDisabled(false);
+                LauncherApplication.setPopup(
+                        new PopupElement(
+                                PopupElement.PopupType.SUCCESS,
+                                "selector.instance.version.popup.success",
+                                null,
+                                List.of(
+                                        new PopupElement.PopupButton(
+                                                PopupElement.ButtonType.POSITIVE,
+                                                "selector.instance.version.popup.back",
+                                                this::onPopupBackClicked
+                                        )
+                                )
+                        )
+                );
             });
         }).start();
     }
 
-    private void onPopupBackClicked(String id) {
-        icPopupController.setVisible(false);
+    private void onPopupBackClicked(ActionEvent event) {
+        LauncherApplication.setPopup(null);
         setVisible(false);
         setVisible(true);
     }
 
-    private void onPopupChangeCancel(String id) {
-        icPopupController.setVisible(false);
+    private void onPopupChangeCancel(ActionEvent event) {
+        LauncherApplication.setPopup(null);
     }
 
     @FXML
@@ -385,61 +397,57 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         try {
             Desktop.getDesktop().open(new File(path));
         } catch (IOException e) {
-            e.printStackTrace();
+            LauncherApplication.displayError(e);
         }
     }
 
     private void displayGameLaunchFailed(Exception e) {
         LOGGER.error("Failed to launch game", e);
-        Platform.runLater(() -> {
-            icPopupController.setType(PopupElement.PopupType.ERROR);
-            icPopupController.setTitle("selector.instance.error.launch.title");
-            icPopupController.setMessage("selector.instance.error.launch.message", e.getMessage());
-            icPopupController.setControlsDisabled(false);
-            icPopupController.clearControls();
-            icPopupController.addButtons(
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.POSITIVE,
-                            "error.close",
-                            "close",
-                            id -> icPopupController.setVisible(false)
-                    )
-            );
-            icPopupController.setVisible(true);
-        });
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.ERROR,
+                        "selector.instance.error.launch.title",
+                        "selector.instance.error.launch.message",
+                        List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        "error.close",
+                                        event -> LauncherApplication.setPopup(null)
+                                )
+                        )
+                )
+        );
     }
 
     private void displayGameRunning() {
-        Platform.runLater(() -> {
-            icPopupController.setType(PopupElement.PopupType.NONE);
-            icPopupController.setContent("selector.instance.game.running.title", "selector.instance.game.running.message");
-            icPopupController.clearControls();
-            icPopupController.setVisible(true);
-        });
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        "selector.instance.game.running.title",
+                        "selector.instance.game.running.message"
+                )
+        );
     }
 
     private void displayGameCrash(String error) {
-        icPopupController.setType(PopupElement.PopupType.WARNING);
-        icPopupController.setTitle("selector.instance.game.crash.title");
-        icPopupController.setMessage("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error);
-        icPopupController.setControlsDisabled(false);
-        icPopupController.clearControls();
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "selector.instance.game.crash.close",
-                        "close",
-                        id -> icPopupController.setVisible(false)
-                ),
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "selector.instance.game.crash.reports",
-                        "reports",
-                        id -> openFolder(FormatUtil.absoluteDirPath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
+        LauncherApplication.setPopup(
+            new PopupElement(
+                PopupElement.PopupType.WARNING,
+                "selector.instance.game.crash.title",
+                LauncherApplication.stringLocalizer.getFormatted("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error),
+                List.of(
+                    new PopupElement.PopupButton(
+                            PopupElement.ButtonType.POSITIVE,
+                            "selector.instance.game.crash.close",
+                            event -> LauncherApplication.setPopup(null)
+                    ),
+                    new PopupElement.PopupButton(
+                            PopupElement.ButtonType.POSITIVE,
+                            "selector.instance.game.crash.reports",
+                            event -> openFolder(FormatUtil.absoluteDirPath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
+                    )
                 )
+            )
         );
-        icPopupController.setVisible(false);
-        icPopupController.setVisible(true);
     }
 
     @Override

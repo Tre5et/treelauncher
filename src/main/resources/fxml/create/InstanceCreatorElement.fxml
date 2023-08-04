@@ -72,6 +72,5 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </ScrollPane>
-        <fx:include fx:id="popup" source="/fxml/generic/PopupElement.fxml" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
     </AnchorPane>
 </HBox>

@@ -35,6 +35,8 @@ public class MainController extends GenericUiController {
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
+        LauncherApplication.setPopupConsumer(this::showPopup);
+
         icTitlebarController.init(this, this::setLocked, this::getLocked);
         icTitlebarController.beforeShow(stage);
         icNavbarController.init(this, this::setLocked, this::getLocked);
@@ -135,7 +137,7 @@ public class MainController extends GenericUiController {
         try {
             LoginController.showOnStage(getStage());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to open login screen", e);
             getStage().close();
         }
     }

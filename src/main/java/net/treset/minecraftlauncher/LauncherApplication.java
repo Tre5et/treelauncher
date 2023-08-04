@@ -10,6 +10,7 @@ import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.FileInitializer;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 public class LauncherApplication extends Application {
@@ -31,6 +33,8 @@ public class LauncherApplication extends Application {
     public static Settings settings;
     public static LauncherUpdater launcherUpdater;
     public static Stage primaryStage;
+
+    private static Consumer<PopupElement> popupConsumer;
 
     public static void main(String[] args) {
         setupLogger();
@@ -119,6 +123,14 @@ public class LauncherApplication extends Application {
         primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/icon.png"))));
 
         LoginController.showOnStage(primaryStage);
+    }
+
+    public static void setPopup(PopupElement popupElement) {
+        Platform.runLater(() -> popupConsumer.accept(popupElement));
+    }
+
+    public static void setPopupConsumer(Consumer<PopupElement> popupConsumer) {
+        LauncherApplication.popupConsumer = popupConsumer;
     }
 
     public static void displayError(Exception e) {

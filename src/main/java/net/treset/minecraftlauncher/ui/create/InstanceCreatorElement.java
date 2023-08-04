@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.ui.create;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -36,15 +37,20 @@ public class InstanceCreatorElement extends UiElement {
     @FXML private ModsCreatorElement icModsCreatorController;
     @FXML private VBox modsContainer;
     @FXML private Button btCreate;
-    @FXML private PopupElement popupController;
     private LauncherFiles launcherFiles;
     private boolean modsActive = true;
+
+    private PopupElement popup;
+
     private void onCreateStatusChanged(CreationStatus status) {
         StringBuilder message = new StringBuilder(status.getCurrentStep().getMessage());
         if(status.getDownloadStatus() != null) {
             message.append("\n").append(status.getDownloadStatus().getCurrentFile()).append("\n(").append(status.getDownloadStatus().getCurrentAmount()).append("/").append(status.getDownloadStatus().getTotalAmount()).append(")");
         }
-        Platform.runLater(()-> popupController.setMessage(message.toString()));
+        Platform.runLater(()-> {
+            if(popup == null) return;
+            popup.setMessage(message.toString());
+        });
     }
 
     @FXML
@@ -72,10 +78,11 @@ public class InstanceCreatorElement extends UiElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            spContainer.getStyleClass().add("popup-background");
-            popupController.setType(PopupElement.PopupType.NONE);
-            popupController.setContent("creator.instance.popup.label.creating", "");
-            popupController.setVisible(true);
+            popup = new PopupElement(
+                    "creator.instance.popup.label.creating",
+                    null
+            );
+            LauncherApplication.setPopup(popup);
             new Thread(() -> {
                 try {
                     creator.getId();
@@ -94,41 +101,47 @@ public class InstanceCreatorElement extends UiElement {
 
     private void onInstanceCreationSuccess() {
         LOGGER.info("Created instance");
-        Platform.runLater(() -> {
-            popupController.setType(PopupElement.PopupType.SUCCESS);
-            popupController.setContent("creator.instance.popup.label.success", "");
-            popupController.setControlsDisabled(false);
-            setLock(false);
-        });
+        popup = new PopupElement(
+                PopupElement.PopupType.SUCCESS,
+                "creator.instance.popup.label.success",
+                null,
+                List.of(
+                        new PopupElement.PopupButton(
+                                PopupElement.ButtonType.POSITIVE,
+                                "creator.instance.popup.button.back",
+                                this::onBackButtonClicked
+                        )
+                )
+        );
+        LauncherApplication.setPopup(popup);
+        setLock(false);
     }
 
     private void onInstanceCreationFailure(Exception e) {
         LOGGER.error("Failed to create instance", e);
-        Platform.runLater(() -> {
-            popupController.setType(PopupElement.PopupType.ERROR);
-            popupController.setTitle("creator.instance.popup.label.failure");
-            popupController.setMessage("error.message", e.getMessage());
-            popupController.setControlsDisabled(false);
-            setLock(false);
-        });
+        popup = new PopupElement(
+                PopupElement.PopupType.ERROR,
+                "creator.instance.popup.label.failure",
+                LauncherApplication.stringLocalizer.getFormatted("error.message", e.getMessage()),
+                List.of(
+                        new PopupElement.PopupButton(
+                                PopupElement.ButtonType.POSITIVE,
+                                "creator.instance.popup.button.back",
+                                this::onBackButtonClicked
+                        )
+                )
+        );
+        LauncherApplication.setPopup(popup);
+        setLock(false);
     }
 
-    private void onBackButtonClicked(String id) {
+    private void onBackButtonClicked(ActionEvent event) {
+        LauncherApplication.setPopup(null);
         triggerHomeAction();
     }
 
     @Override
     public void beforeShow(Stage stage) {
-        popupController.setContent("creator.instance.popup.label.undefined", "");
-        popupController.clearControls();
-        popupController.addButtons(new PopupElement.PopupButton(
-                PopupElement.ButtonType.POSITIVE,
-                "creator.instance.popup.button.back",
-                "backButton",
-                this::onBackButtonClicked
-        ));
-        popupController.setControlsDisabled(true);
-        popupController.setVisible(false);
         spContainer.getStyleClass().remove("popup-background");
         spContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         spContainer.setVvalue(0);

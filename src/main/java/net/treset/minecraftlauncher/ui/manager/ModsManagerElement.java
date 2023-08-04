@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.ui.manager;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -42,7 +43,6 @@ public class ModsManagerElement extends UiElement {
     @FXML private CheckBox chSnapshots;
     @FXML private Button btChange;
     @FXML private ModsSearchElement icModSearchController;
-    @FXML private PopupElement icPopupController;
 
     private final ModManagerChangeCallback changeCallback = new ModManagerChangeCallback();
     private Pair<LauncherManifest, LauncherModsDetails> details;
@@ -81,23 +81,24 @@ public class ModsManagerElement extends UiElement {
     @FXML
     private void onChange() {
         if(cbVersion.getSelectionModel().getSelectedItem() != null && !Objects.equals(cbVersion.getSelectionModel().getSelectedItem(), details.getValue().getModsVersion())) {
-            icPopupController.setType(PopupElement.PopupType.WARNING);
-            icPopupController.setContent("mods.manager.popup.change.title", "mods.manager.popup.change.message");
-            icPopupController.clearControls();
-            icPopupController.addButtons(
-                    new PopupElement.PopupButton(PopupElement.ButtonType.NEGATIVE,
-                            "mods.manager.popup.change.cancel", "cancelButton",
-                            this::onVersionChangeCanceled),
-                    new PopupElement.PopupButton(PopupElement.ButtonType.POSITIVE,
-                            "mods.manager.popup.change.accept", "acceptButton",
-                            this::onVersionChangeAccepted)
-            );
-            icPopupController.setVisible(true);
+            LauncherApplication.setPopup(new PopupElement(
+                    PopupElement.PopupType.WARNING,
+                "mods.manager.popup.change.title",
+            "mods.manager.popup.change.message",
+                    List.of(
+                        new PopupElement.PopupButton(PopupElement.ButtonType.NEGATIVE,
+                                "mods.manager.popup.change.cancel",
+                                this::onVersionChangeCanceled),
+                        new PopupElement.PopupButton(PopupElement.ButtonType.POSITIVE,
+                                "mods.manager.popup.change.accept",
+                                this::onVersionChangeAccepted)
+                    )
+            ));
         }
     }
 
-    private void onVersionChangeAccepted(String id) {
-        icPopupController.setVisible(false);
+    private void onVersionChangeAccepted(ActionEvent event) {
+        LauncherApplication.setPopup(null);
         details.getValue().setModsVersion(cbVersion.getSelectionModel().getSelectedItem());
         try {
             details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
@@ -109,8 +110,8 @@ public class ModsManagerElement extends UiElement {
         reloadMods();
     }
 
-    private void onVersionChangeCanceled(String id) {
-        icPopupController.setVisible(false);
+    private void onVersionChangeCanceled(ActionEvent event) {
+        LauncherApplication.setPopup(null);
         cbVersion.getSelectionModel().select(details.getValue().getModsVersion());
         onVersionSelected();
     }
@@ -128,7 +129,6 @@ public class ModsManagerElement extends UiElement {
         cbVersion.getItems().clear();
         cbVersion.setDisable(true);
         cbVersion.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
-        icPopupController.setVisible(false);
         vbCurrentMods.setVisible(true);
         icModSearchController.setVisible(false);
     }

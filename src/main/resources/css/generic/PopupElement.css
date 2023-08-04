@@ -2,9 +2,11 @@
     -fx-background-color: -fx-background-tertiary;
     -fx-background-radius: 5px;
     -fx-border-width: 4px;
-    -fx-padding: 15px 15px 15px 15px;
+    -fx-padding: 30px;
     -fx-border-color: #999999;
     -fx-border-radius: 5px;
+    -fx-alignment: center;
+    -fx-spacing: 10px;
 }
 
 .popup-container.success {
@@ -31,12 +33,16 @@
 .label.title {
     -fx-font-size: 20pt;
     -fx-font-weight: 700;
+    -fx-text-alignment: center;
 }
 
 .label.message {
     -fx-font-style: italic;
+    -fx-text-alignment: center;
 }
 
 .button-container {
-    -fx-padding: 20px 0 0 0;
+    -fx-padding: 5px 0 0 0;
+    -fx-spacing: 10;
+    -fx-alignment: center;
 }

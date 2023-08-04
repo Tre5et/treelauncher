@@ -25,7 +25,6 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
     @FXML protected ActionBar abMain;
     @FXML protected CreateSelectable csCreate;
     @FXML protected VBox vbCreate;
-    @FXML protected PopupElement icPopupController;
 
     protected LauncherFiles files;
     protected boolean createSelected = false;
@@ -95,33 +94,38 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
 
     @FXML
     protected void onEdit() {
-        icPopupController.setType(PopupElement.PopupType.NONE);
-        icPopupController.setContent("selector.component.edit.title", "");
-        icPopupController.clearControls();
-        icPopupController.setTextInput("selector.component.edit.prompt");
-        icPopupController.addButtons(
+        PopupElement.PopupControl tfName = new PopupElement.PopupControl("selector.component.edit.prompt");
+
+        PopupElement popup = new PopupElement(
+                PopupElement.PopupType.NONE,
+                "selector.component.edit.title",
+                null,
+                List.of(tfName),
+                null
+        );
+
+        popup.setButtons(List.of(
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.NEGATIVE,
                         "selector.component.edit.cancel",
-                        "cancel",
-                        id -> icPopupController.setVisible(false)
+                        event -> LauncherApplication.setPopup(null)
                 ),
                 new PopupElement.PopupButton(
                         PopupElement.ButtonType.POSITIVE,
                         "selector.component.edit.confirm",
-                        "confirm",
-                        id -> {
-                            String newName = icPopupController.getTextInputContent();
+                        event -> {
+                            String newName = tfName.getText();
                             if(!editValid(newName)) {
-                                icPopupController.setErrorMessage("selector.component.edit.error");
+                                popup.setError("selector.component.edit.error");
                                 return;
                             }
-                            icPopupController.setVisible(false);
+                            LauncherApplication.setPopup(null);
                             editCurrent(newName);
                         }
                 )
-        );
-        icPopupController.setVisible(true);
+        ));
+
+        LauncherApplication.setPopup(popup);
     }
 
     protected abstract boolean editValid(String newName);
@@ -135,41 +139,45 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
         }
         String usedBy = getCurrentUsedBy();
         if(usedBy != null) {
-            icPopupController.setType(PopupElement.PopupType.ERROR);
-            icPopupController.setTitle("selector.component.delete.unable.title");
-            icPopupController.setMessage("selector.component.delete.unable.message", usedBy);
-            icPopupController.clearControls();
-            icPopupController.addButtons(
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.POSITIVE,
-                            "selector.component.delete.unable.close",
-                            "close",
-                            id -> icPopupController.setVisible(false)
+            LauncherApplication.setPopup(
+                    new PopupElement(
+                            PopupElement.PopupType.ERROR,
+                            "selector.component.delete.unable.title",
+                            LauncherApplication.stringLocalizer.getFormatted("selector.component.delete.unable.message", usedBy),
+                            null,
+                            List.of(
+                                    new PopupElement.PopupButton(
+                                            PopupElement.ButtonType.POSITIVE,
+                                            "selector.component.delete.unable.close",
+                                            event -> LauncherApplication.setPopup(null)
+                                    )
+                            )
                     )
             );
-            icPopupController.setVisible(true);
         } else {
-            icPopupController.setType(PopupElement.PopupType.WARNING);
-            icPopupController.setContent("selector.component.delete.title", "selector.component.delete.message");
-            icPopupController.clearControls();
-            icPopupController.addButtons(
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.NEGATIVE,
-                            "selector.component.delete.cancel",
-                            "cancel",
-                            id -> icPopupController.setVisible(false)
-                    ),
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.POSITIVE,
-                            "selector.component.delete.confirm",
-                            "confirm",
-                            id -> {
-                                icPopupController.setVisible(false);
-                                deleteCurrent();
-                            }
+            LauncherApplication.setPopup(
+                    new PopupElement(
+                            PopupElement.PopupType.WARNING,
+                            "selector.component.delete.title",
+                            "selector.component.delete.message",
+                            null,
+                            List.of(
+                                    new PopupElement.PopupButton(
+                                            PopupElement.ButtonType.NEGATIVE,
+                                            "selector.component.delete.cancel",
+                                            event -> LauncherApplication.setPopup(null)
+                                    ),
+                                    new PopupElement.PopupButton(
+                                            PopupElement.ButtonType.POSITIVE,
+                                            "selector.component.delete.confirm",
+                                            event -> {
+                                                LauncherApplication.setPopup(null);
+                                                deleteCurrent();
+                                            }
+                                    )
+                            )
                     )
             );
-            icPopupController.setVisible(true);
         }
     }
 

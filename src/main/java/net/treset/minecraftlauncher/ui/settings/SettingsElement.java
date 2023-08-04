@@ -24,6 +24,7 @@ import net.treset.minecraftlauncher.util.UiUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class SettingsElement extends UiElement {
     @FXML private AnchorPane rootPane;
@@ -35,7 +36,6 @@ public class SettingsElement extends UiElement {
     @FXML private Label lbUuid;
     @FXML private ImageView ivSkin;
     @FXML private Label lbUpdate;
-    @FXML private PopupElement icPopupController;
 
     private Runnable logoutCallback;
 
@@ -91,58 +91,60 @@ public class SettingsElement extends UiElement {
     private void onPathApply() {
         File dir = new File(tfPath.getText());
         if(!dir.isDirectory()) {
-            icPopupController.setType(PopupElement.PopupType.ERROR);
-            icPopupController.setContent("settings.path.invalid.title", "");
-            icPopupController.clearControls();
-            icPopupController.addButtons(
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.POSITIVE,
-                            "settings.path.close",
-                            "close",
-                            id -> icPopupController.setVisible(false)
+            LauncherApplication.setPopup(
+                    new PopupElement(
+                            PopupElement.PopupType.ERROR,
+                            "settings.path.invalid.title",
+                            null,
+                            List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        LauncherApplication.stringLocalizer.get("settings.path.close"),
+                                        event -> LauncherApplication.setPopup(null)
+                                )
+                            )
                     )
             );
-            icPopupController.setVisible(true);
             return;
         }
 
-        icPopupController.setType(PopupElement.PopupType.NONE);
-        icPopupController.setContent("settings.path.changing.title", "");
-        icPopupController.clearControls();
-        icPopupController.setVisible(true);
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        "settings.path.changing.title",
+                        null
+                )
+        );
 
         new Thread(() -> {
             try {
                 GlobalConfigLoader.updatePath(dir, cbRemove.isSelected());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
-                icPopupController.setVisible(false);
                 return;
             }
 
-            Platform.runLater(() -> {
-                icPopupController.setType(PopupElement.PopupType.SUCCESS);
-                icPopupController.setContent("settings.path.success.title", "");
-                icPopupController.clearControls();
-                icPopupController.addButtons(
-                        new PopupElement.PopupButton(
-                                PopupElement.ButtonType.POSITIVE,
-                                "settings.path.close",
-                                "close",
-                                id -> {
-                                    try {
-                                        MainController.showOnStage(LauncherApplication.primaryStage);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                        )
-                );
-                icPopupController.setVisible(false);
-                icPopupController.setVisible(true);
-            });
+            LauncherApplication.setPopup(
+                    new PopupElement(
+                            PopupElement.PopupType.SUCCESS,
+                            "settings.path.success.title",
+                            null,
+                            List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        LauncherApplication.stringLocalizer.get("settings.path.close"),
+                                        event -> {
+                                            try {
+                                                LauncherApplication.setPopup(null);
+                                                MainController.showOnStage(LauncherApplication.primaryStage);
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                )
+                            )
+                    )
+            );
         }).start();
-
     }
 
     @FXML
@@ -156,20 +158,21 @@ public class SettingsElement extends UiElement {
 
     @FXML
     private void onUpdate() {
-        icPopupController.setVisible(false);
-        icPopupController.setType(PopupElement.PopupType.NONE);
-        icPopupController.setContent("settings.update.checking.title", "");
-        icPopupController.clearControls();
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.NEGATIVE,
-                        "settings.update.cancel",
-                        "cancel",
-                        id -> this.cancelUpdate()
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.NONE,
+                        "settings.update.checking.title",
+                        null,
+                        List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.NEGATIVE,
+                                        "settings.update.cancel",
+                                        event -> this.cancelUpdate()
+                                )
+                        )
                 )
         );
         canceled = false;
-        icPopupController.setVisible(true);
 
         new Thread(() -> {
             if(LauncherApplication.launcherUpdater == null) {
@@ -177,7 +180,7 @@ public class SettingsElement extends UiElement {
                     LauncherApplication.launcherUpdater = new LauncherUpdater();
                 } catch (FileDownloadException e) {
                     LauncherApplication.displayError(e);
-                    Platform.runLater(() -> icPopupController.setVisible(false));
+                    LauncherApplication.setPopup(null);
                     return;
                 }
             }
@@ -195,77 +198,83 @@ public class SettingsElement extends UiElement {
     }
 
     private void showUpdateLatest() {
-        icPopupController.setVisible(false);
-        icPopupController.setContent("settings.update.latest.title", LauncherApplication.stringLocalizer.getFormatted("settings.update.latest.message", LauncherApplication.stringLocalizer.get("launcher.version")));
-        icPopupController.clearControls();
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "settings.update.close",
-                        "close",
-                        id -> icPopupController.setVisible(false)
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.SUCCESS,
+                        "settings.update.latest.title",
+                        LauncherApplication.stringLocalizer.getFormatted("settings.update.latest.message", LauncherApplication.stringLocalizer.get("launcher.version")),
+                        List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        "settings.update.close",
+                                        event -> LauncherApplication.setPopup(null)
+                                )
+                        )
                 )
         );
-        icPopupController.setVisible(true);
     }
 
     private void showUpdateAvailable() {
-        icPopupController.setVisible(false);
-        icPopupController.setContent("settings.update.available.title", LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.launcherUpdater.getUpdateVersion()));
-        icPopupController.clearControls();
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.NEGATIVE,
-                        "settings.update.close",
-                        "close",
-                        id -> icPopupController.setVisible(false)
-                ),
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "settings.update.download",
-                        "download",
-                        id -> downloadUpdate()
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.NONE,
+                        "settings.update.available.title",
+                        LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.launcherUpdater.getUpdateVersion()),
+                        List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.NEGATIVE,
+                                        "settings.update.cancel",
+                                        event -> LauncherApplication.setPopup(null)
+                                ),
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        "settings.update.download",
+                                        event -> downloadUpdate()
+                                )
+                        )
                 )
         );
-        icPopupController.setVisible(true);
     }
 
     private void showUpdateSuccess() {
-        icPopupController.setVisible(false);
-        icPopupController.setContent("settings.update.success.title", "settings.update.success.message");
-        icPopupController.clearControls();
-        icPopupController.addButtons(
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "settings.update.close",
-                        "close",
-                        id -> icPopupController.setVisible(false)
-                ),
-                new PopupElement.PopupButton(
-                        PopupElement.ButtonType.POSITIVE,
-                        "settings.update.restart",
-                        "restart",
-                        id -> Platform.exit()
+        LauncherApplication.setPopup(
+                new PopupElement(
+                        PopupElement.PopupType.SUCCESS,
+                        "settings.update.success.title",
+                        "settings.update.success.message",
+                        List.of(
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        "settings.update.close",
+                                        event -> LauncherApplication.setPopup(null)
+                                ),
+                                new PopupElement.PopupButton(
+                                        PopupElement.ButtonType.POSITIVE,
+                                        "settings.update.restart",
+                                        event -> Platform.exit()
+                                )
+                        )
                 )
         );
-        icPopupController.setVisible(true);
     }
 
     private void downloadUpdate() {
-        icPopupController.setVisible(false);
-        icPopupController.setContent("settings.update.downloading.title", "");
-        icPopupController.clearControls();
-        icPopupController.setVisible(true);
+        PopupElement popup = new PopupElement(
+                "settings.update.downloading.title",
+                null
+        );
+        LauncherApplication.setPopup(popup);
+
         int total = LauncherApplication.launcherUpdater.getFileCount();
 
         new Thread(() -> {
             try {
                 LauncherApplication.launcherUpdater.downloadFiles(
-                        (amount, file) -> Platform.runLater(() -> icPopupController.setMessage(LauncherApplication.stringLocalizer.getFormatted("settings.update.downloading.message", file, amount, total)))
+                        (amount, file) -> Platform.runLater(() -> popup.setMessage(LauncherApplication.stringLocalizer.getFormatted("settings.update.downloading.message", file, amount, total)))
                 );
             } catch (FileDownloadException e) {
                 LauncherApplication.displayError(e);
-                Platform.runLater(() -> icPopupController.setVisible(false));
+                LauncherApplication.setPopup(null);
                 return;
             }
 
@@ -273,6 +282,8 @@ public class SettingsElement extends UiElement {
                 LauncherApplication.launcherUpdater.writeFile();
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
+                LauncherApplication.setPopup(null);
+                return;
             }
 
             Platform.runLater(this::showUpdateSuccess);
@@ -281,7 +292,7 @@ public class SettingsElement extends UiElement {
 
     private boolean canceled = false;
     private void cancelUpdate() {
-        icPopupController.setVisible(false);
+        LauncherApplication.setPopup(null);
         canceled = true;
     }
 

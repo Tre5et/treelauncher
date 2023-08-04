@@ -1,20 +1,18 @@
 package net.treset.minecraftlauncher.ui.generic;
 
-import javafx.fxml.FXML;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
+import javafx.scene.layout.*;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.ui.base.UiElement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
-public class PopupElement extends UiElement {
+public class PopupElement extends GridPane {
     public enum ButtonType {
         POSITIVE,
         NEUTRAL,
@@ -31,10 +29,15 @@ public class PopupElement extends UiElement {
     public static class PopupButton {
         private final Button button;
 
-        public PopupButton(ButtonType type, String text, String id, Consumer<String> onPressed) {
+        public PopupButton(ButtonType type, String text, EventHandler<ActionEvent> onPressed) {
+            this(type, text, onPressed, false);
+        }
+
+        public PopupButton(ButtonType type, String text, EventHandler<ActionEvent> onPressed, boolean disabled) {
             button = new Button(LauncherApplication.stringLocalizer.get(text));
             button.getStyleClass().add(getStyleClass(type));
-            button.setOnAction(event -> onPressed.accept(id));
+            button.setOnAction(onPressed);
+            button.setDisable(disabled);
         }
 
         private String getStyleClass(ButtonType type) {
@@ -42,7 +45,6 @@ public class PopupElement extends UiElement {
                 case POSITIVE -> "positive";
                 case NEUTRAL -> "neutral";
                 case NEGATIVE -> "negative";
-                default -> "";
             };
         }
 
@@ -55,97 +57,184 @@ public class PopupElement extends UiElement {
         }
     }
 
-    @FXML private GridPane rootPane;
-    @FXML private GridPane gpContainer;
-    @FXML private Label lbTitle;
-    @FXML private Label lbMessage;
-    @FXML private HBox hbControlContainer;
-    @FXML private Label lbError;
-    @FXML private HBox hbInputContainer;
+    public static class PopupControl {
+        private final TextField textField;
 
-    private ArrayList<PopupButton> activeButtons;
-    private boolean disabled = false;
-    private PopupType popupType = PopupType.NONE;
+        public PopupControl(String prompt) {
+            this(prompt, null, null);
+        }
 
-    @Override
-    public void beforeShow(Stage stage) {
-        hbControlContainer.getChildren().clear();
-        hbControlContainer.getChildren().addAll(activeButtons.stream().map(PopupButton::getButton).toList());
+        public PopupControl(String prompt, String defaultValue) {
+            this(prompt, defaultValue, null);
+        }
+
+        public PopupControl(String prompt, Consumer<String> onUpdate) {
+            this(prompt, null, onUpdate);
+        }
+
+        public PopupControl(String prompt, String defaultValue, Consumer<String> onUpdate) {
+            textField = new TextField();
+            textField.setPromptText(prompt == null ? "" : LauncherApplication.stringLocalizer.get(prompt));
+            textField.setText(defaultValue == null ? "" : defaultValue);
+            textField.textProperty().addListener(onUpdate == null ? (a,b,c) -> {} : (observable, oldValue, newValue) -> onUpdate.accept(newValue));
+        }
+
+        public Control getControl() {
+            return textField;
+        }
+
+        public String getText() {
+            return textField.getText();
+        }
+
+        public void setDisabled(boolean disabled) {
+            textField.setDisable(disabled);
+        }
     }
 
-    @Override
-    public void afterShow(Stage stage) {
+    private final VBox vbContainer = new VBox();
+    private Label lbTitle;
+    private Label lbMessage;
+    private VBox vbControls;
+    private HBox hbButtons;
+    private Label lbError;
+
+    public PopupElement(String title, String message) {
+        this(PopupType.NONE, title, message, null, null);
+    }
+
+    public PopupElement(PopupType type, String title, String message) {
+        this(type, title, message, null, null);
+    }
+
+    public PopupElement(PopupType type, String title, String message, List<PopupButton> buttons) {
+        this(type, title, message, null, buttons);
+    }
+
+    public PopupElement(PopupType type, String title, String message, List<PopupControl> controls, List<PopupButton> buttons) {
+        this.getStylesheets().add("/css/generic/PopupElement.css");
+        this.getStyleClass().add("popup-background");
+        ColumnConstraints c1 = new ColumnConstraints();
+        ColumnConstraints c2 = new ColumnConstraints();
+        ColumnConstraints c3 = new ColumnConstraints();
+        c1.setHgrow(Priority.ALWAYS);
+        c2.setHgrow(Priority.NEVER);
+        c3.setHgrow(Priority.ALWAYS);
+        this.getColumnConstraints().addAll(c1, c2, c3);
+        RowConstraints r1 = new RowConstraints();
+        RowConstraints r2 = new RowConstraints();
+        RowConstraints r3 = new RowConstraints();
+        r1.setVgrow(Priority.ALWAYS);
+        r2.setVgrow(Priority.NEVER);
+        r3.setVgrow(Priority.ALWAYS);
+        this.getRowConstraints().addAll(r1, r2, r3);
+
+        setType(type);
+        setTitle(title);
+        setMessage(message);
+        setControls(controls);
+        setButtons(buttons);
+
+        vbContainer.getStyleClass().add("popup-container");
+
+        GridPane.setColumnIndex(vbContainer, 1);
+        GridPane.setRowIndex(vbContainer, 1);
+        this.getChildren().add(vbContainer);
     }
 
     public void setContent(String title, String message) {
-        lbTitle.setText(LauncherApplication.stringLocalizer.get(title));
-        lbMessage.setText(LauncherApplication.stringLocalizer.get(message));
+        setTitle(title);
+        setMessage(message);
     }
 
-    public void addButtons(PopupButton... buttons) {
-        activeButtons.addAll(Arrays.stream(buttons).toList());
-        activeButtons.forEach(button -> button.setDisabled(disabled));
+    public void setTitle(String title) {
+        if(lbTitle == null && title != null) {
+            lbTitle = new Label(LauncherApplication.stringLocalizer.get(title));
+            lbTitle.getStyleClass().add("title");
+            vbContainer.getChildren().add(0, lbTitle);
+        } else if(title == null) {
+            vbContainer.getChildren().remove(lbTitle);
+            lbTitle = null;
+        } else {
+            lbTitle.setText(LauncherApplication.stringLocalizer.get(title));
+        }
     }
 
-    public void clearControls() {
-        activeButtons = new ArrayList<>();
-        hbInputContainer.getChildren().clear();
-        lbError.setText("");
+    public void setMessage(String message) {
+        if(lbMessage == null && message != null) {
+            lbMessage = new Label(LauncherApplication.stringLocalizer.get(message));
+            lbMessage.getStyleClass().add("message");
+            vbContainer.getChildren().add(lbTitle == null ? 0 : 1, lbMessage);
+        } else if(message == null) {
+            vbContainer.getChildren().remove(lbMessage);
+            lbMessage = null;
+        } else {
+            lbMessage.setText(LauncherApplication.stringLocalizer.get(message));
+        }
+    }
+
+    public void setControls(List<PopupControl> controls) {
+        if(vbControls == null && controls != null) {
+            vbControls = new VBox();
+            vbControls.getChildren().addAll(controls.stream().map(PopupControl::getControl).toList());
+            vbContainer.getChildren().add(vbControls);
+        } else if(controls == null) {
+            vbContainer.getChildren().remove(vbControls);
+            vbControls = null;
+        } else {
+            vbControls.getChildren().clear();
+            vbControls.getChildren().addAll(controls.stream().map(PopupControl::getControl).toList());
+        }
+    }
+
+    public void setButtons(List<PopupButton> buttons) {
+        if(hbButtons == null && buttons != null) {
+            hbButtons = new HBox();
+            hbButtons.getStyleClass().add("button-container");
+            hbButtons.getChildren().addAll(buttons.stream().map(PopupButton::getButton).toList());
+            vbContainer.getChildren().add(hbButtons);
+        } else if(buttons == null) {
+            vbContainer.getChildren().remove(hbButtons);
+            hbButtons = null;
+        } else {
+            hbButtons.getChildren().clear();
+            hbButtons.getChildren().addAll(buttons.stream().map(PopupButton::getButton).toList());
+        }
+    }
+
+    public void setError(String error) {
+        if(lbError == null && error != null) {
+            lbError = new Label(LauncherApplication.stringLocalizer.get(error));
+            lbError.getStyleClass().add("error");
+            vbContainer.getChildren().add(lbError);
+        } else if(error == null) {
+            vbContainer.getChildren().remove(lbError);
+            lbError = null;
+        } else {
+            lbError.setText(LauncherApplication.stringLocalizer.get(error));
+        }
     }
 
     public void setControlsDisabled(boolean disabled) {
-        this.disabled = disabled;
-        if(activeButtons != null){
-            activeButtons.forEach(button -> button.setDisabled(disabled));
-            hbInputContainer.setDisable(disabled);
+        if(vbControls != null) {
+            vbControls.getChildren().forEach(control -> control.setDisable(disabled));
+        }
+    }
+
+    public void setButtonsDisabled(boolean disabled) {
+        if(hbButtons != null) {
+            hbButtons.getChildren().forEach(button -> button.setDisable(disabled));
         }
     }
 
     public void setType(PopupType type) {
-        popupType = type;
-        updateType();
-    }
-
-    private void updateType() {
-        gpContainer.getStyleClass().remove("success");
-        gpContainer.getStyleClass().remove("warning");
-        gpContainer.getStyleClass().remove("error");
-        switch (popupType) {
-            case SUCCESS -> gpContainer.getStyleClass().add("success");
-            case WARNING -> gpContainer.getStyleClass().add("warning");
-            case ERROR -> gpContainer.getStyleClass().add("error");
+        vbContainer.getStyleClass().remove("success");
+        vbContainer.getStyleClass().remove("warning");
+        vbContainer.getStyleClass().remove("error");
+        switch (type) {
+            case SUCCESS -> vbContainer.getStyleClass().add("success");
+            case WARNING -> vbContainer.getStyleClass().add("warning");
+            case ERROR -> vbContainer.getStyleClass().add("error");
         }
-    }
-
-    public void setTitle(String title, Object... args) {
-        lbTitle.setText(LauncherApplication.stringLocalizer.getFormatted(title, args));
-    }
-
-    public void setMessage(String message, Object... args) {
-        lbMessage.setText(LauncherApplication.stringLocalizer.getFormatted(message, args));
-    }
-
-    TextField textField;
-    public void setTextInput(String prompt) {
-        hbInputContainer.getChildren().clear();
-        textField = new TextField();
-        textField.setPromptText(LauncherApplication.stringLocalizer.get(prompt));
-        hbInputContainer.getChildren().add(textField);
-    }
-
-    public String getTextInputContent() {
-        if(textField != null) {
-            return textField.getText();
-        }
-        return null;
-    }
-
-    public void setErrorMessage(String message) {
-        lbError.setText(LauncherApplication.stringLocalizer.get(message));
-    }
-
-    @Override
-    public void setRootVisible(boolean visible) {
-        rootPane.setVisible(visible);
     }
 }

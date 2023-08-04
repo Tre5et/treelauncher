@@ -33,5 +33,4 @@
         </HBox>
     </VBox>
     <fx:include fx:id="icModSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-    <fx:include fx:id="icPopup" source="/fxml/generic/PopupElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>
