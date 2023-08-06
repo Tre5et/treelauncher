@@ -94,6 +94,11 @@ public class CommandBuilder {
         processBuilder.directory(gameDir);
         processBuilder.command(new ArrayList<>());
         processBuilder.command().add(FormatUtil.absoluteFilePath(instanceData.getJavaComponent().getDirectory(), "bin", "java"));
+        try {
+            appendArguments(processBuilder, instanceData.getInstance().getValue().getJvm_arguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY);
+        } catch(GameCommandException e) {
+            throw new GameCommandException("Unable to create start command: unable to append instance jvm arguments: version=" + instanceData.getInstance().getKey().getId(), e);
+        }
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             try {
                 appendArguments(processBuilder, v.getValue().getJvmArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, mainClass, resX, resY);

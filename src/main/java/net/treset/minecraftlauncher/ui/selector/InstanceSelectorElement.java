@@ -17,6 +17,7 @@ import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
+import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
@@ -41,6 +42,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     @FXML private ActionBar abComponent;
     @FXML private ComponentChangerElement icComponentChangerController;
     @FXML private VersionChangerElement icVersionChangerController;
+    @FXML private InstanceSettingsElement icInstanceSettingsController;
 
     private InstanceData currentInstance;
 
@@ -85,6 +87,8 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         super.reloadComponents();
         icDetailsController.setVisible(false);
         icComponentChangerController.setVisible(false);
+        icVersionChangerController.setVisible(false);
+        icInstanceSettingsController.setVisible(false);
     }
 
     @FXML
@@ -103,6 +107,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icDetailsController.clearSelection();
         icComponentChangerController.setVisible(false);
         icVersionChangerController.setVisible(false);
+        icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
         abComponent.clearLabel();
         if(selected) {
@@ -130,6 +135,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     public void onPlay() {
         if(currentInstance != null) {
+            icInstanceSettingsController.save();
             setLock(true);
             abMain.setDisable(true);
             GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
@@ -171,6 +177,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
         icComponentChangerController.setVisible(false);
         icVersionChangerController.setVisible(false);
+        icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
         abComponent.clearLabel();
         if(selected && type != null) {
@@ -181,6 +188,11 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
                 case VERSION -> {
                     icVersionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
                     icVersionChangerController.setVisible(true);
+                    return;
+                }
+                case SETTINGS -> {
+                    icInstanceSettingsController.init(currentInstance);
+                    icInstanceSettingsController.setVisible(true);
                     return;
                 }
                 case SAVES -> {
@@ -463,5 +475,13 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
             reloadComponents();
             LauncherApplication.settings.setInstanceSortType(newValue);
         });
+    }
+
+    @Override
+    public void setRootVisible(boolean visible) {
+        super.setRootVisible(visible);
+        if(!visible) {
+            icInstanceSettingsController.save();
+        }
     }
 }

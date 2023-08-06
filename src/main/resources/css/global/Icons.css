@@ -105,3 +105,7 @@
 .sort.reverse {
     -fx-icon-code: bi-sort-up;
 }
+
+.settings {
+    -fx-icon-code: bi-gear;
+}

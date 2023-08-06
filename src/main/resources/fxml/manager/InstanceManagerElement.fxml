@@ -40,4 +40,10 @@
             <Label fx:id="lbMods" styleClass="element-details"/>
         </VBox>
     </HBox>
+    <HBox fx:id="hbSettings" onMouseClicked="#onSelectSettings" styleClass="details-element" >
+        <FontIcon styleClass="icon, settings" />
+        <VBox alignment="CENTER_LEFT" >
+            <Label styleClass="element-title" text="%instances.details.label.settings" />
+        </VBox>
+    </HBox>
 </VBox>

@@ -16,7 +16,8 @@ public class InstanceManagerElement extends UiElement {
         SAVES,
         RESOURCEPACKS,
         OPTIONS,
-        MODS
+        MODS,
+        SETTINGS
     }
 
     @FXML public VBox container;
@@ -30,6 +31,7 @@ public class InstanceManagerElement extends UiElement {
     @FXML private HBox hbResourcepacks;
     @FXML private HBox hbOptions;
     @FXML private HBox hbMods;
+    @FXML private HBox hbSettings;
 
     private BiConsumer<Boolean, SelectedType> selectionCallback;
     private SelectedType currentSelected = null;
@@ -121,12 +123,26 @@ public class InstanceManagerElement extends UiElement {
         }
     }
 
+    @FXML
+    private void onSelectSettings() {
+        unselectAll();
+        if(currentSelected == SelectedType.SETTINGS) {
+            selectionCallback.accept(false, SelectedType.SETTINGS);
+            currentSelected = null;
+        } else {
+            hbSettings.getStyleClass().add("selected");
+            currentSelected = SelectedType.SETTINGS;
+            selectionCallback.accept(true, SelectedType.SETTINGS);
+        }
+    }
+
     private void unselectAll() {
         hbVersion.getStyleClass().remove("selected");
         hbSaves.getStyleClass().remove("selected");
         hbResourcepacks.getStyleClass().remove("selected");
         hbOptions.getStyleClass().remove("selected");
         hbMods.getStyleClass().remove("selected");
+        hbSettings.getStyleClass().remove("selected");
     }
 
     public void clearSelection() {

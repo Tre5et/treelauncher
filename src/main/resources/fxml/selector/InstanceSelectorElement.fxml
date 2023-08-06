@@ -43,6 +43,7 @@
                 <AnchorPane>
                     <fx:include fx:id="icComponentChanger" source="/fxml/generic/ComponentChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     <fx:include fx:id="icVersionChanger" source="/fxml/generic/VersionChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <fx:include fx:id="icInstanceSettings" source="/fxml/manager/InstanceSettingsElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                 </AnchorPane>
             </VBox>
         </AnchorPane>
