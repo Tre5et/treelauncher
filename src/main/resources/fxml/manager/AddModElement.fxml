@@ -13,7 +13,7 @@
         </padding>
         <TextField fx:id="tfName" promptText="%manager.mods.add.prompt.name" />
         <Label visible="false" styleClass="error" text="Placeholder" />
-        <HBox>
+        <HBox alignment="CENTER_LEFT">
             <TextField fx:id="tfPath" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
             <IconButton styleClass="file-code" iconSize="28" onAction="#onFileSelector" tooltipText="%settings.tooltip.select" />
         </HBox>
