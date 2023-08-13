@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.ui.generic;
 
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -47,6 +48,10 @@ public class ButtonBox<T> extends HBox {
         cbSort.getItems().addAll(items);
     }
 
+    public ObservableList<T> getItems() {
+        return cbSort.getItems();
+    }
+
     public boolean isReverse() {
         return reverse;
     }
@@ -78,6 +83,7 @@ public class ButtonBox<T> extends HBox {
     }
 
     public void setOnSelectionChanged(ChangeListener<? super T> onChange) {
+        cbSort.getSelectionModel().selectedItemProperty().removeListener(onChange);
         cbSort.getSelectionModel().selectedItemProperty().addListener(onChange);
     }
 }

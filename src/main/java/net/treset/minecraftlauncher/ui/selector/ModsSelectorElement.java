@@ -40,6 +40,7 @@ public class ModsSelectorElement extends ManifestSelectorElement {
         icCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
         icCreatorController.enableVersionSelect(true);
         icCreatorController.setModsType("fabric");
+        icManagerController.init(this, lockSetter, lockGetter);
         icManagerController.setVisible(false);
     }
 

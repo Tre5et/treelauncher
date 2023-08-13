@@ -1,12 +1,11 @@
 package net.treset.minecraftlauncher.config;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.util.FileUtil;
-import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsLastPlayedComparator;
-import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsNameComparator;
-import net.treset.minecraftlauncher.util.ui.sort.InstanceDetailsTimeComparator;
+import net.treset.minecraftlauncher.util.ui.sort.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,15 +32,34 @@ public class Settings extends GenericJsonParsable {
         }
     }
 
+    public enum LauncherModSortType {
+        NAME(new LauncherModNameComparator());
+
+        private final Comparator<LauncherMod> comparator;
+        LauncherModSortType(Comparator<LauncherMod> comparator) {
+            this.comparator = comparator;
+        }
+
+        public Comparator<LauncherMod> getComparator() {
+            return comparator;
+        }
+
+        @Override
+        public String toString() {
+            return this.getComparator().toString();
+        }
+    }
+
     private transient File file;
 
     private StringLocalizer.Language language;
-    private InstanceDataSortType instanceSortType;
-    private boolean instanceSortReverse;
+    private InstanceDataSortType instanceSortType = InstanceDataSortType.NAME;
+    private boolean instanceSortReverse = false;
+    private LauncherModSortType modSortType = LauncherModSortType.NAME;
+    private boolean modSortReverse = false;
 
     public Settings(File file) {
         this.file = file;
-        this.instanceSortType = InstanceDataSortType.NAME;
         this.language = StringLocalizer.getSystemLanguage();
     }
 
@@ -62,7 +80,7 @@ public class Settings extends GenericJsonParsable {
     }
 
     public InstanceDataSortType getInstanceSortType() {
-        return instanceSortType;
+        return instanceSortType == null ? InstanceDataSortType.NAME : instanceSortType;
     }
 
     public void setInstanceSortType(InstanceDataSortType instanceSortType) {
@@ -75,6 +93,22 @@ public class Settings extends GenericJsonParsable {
 
     public void setInstanceSortReverse(boolean instanceSortReverse) {
         this.instanceSortReverse = instanceSortReverse;
+    }
+
+    public LauncherModSortType getModSortType() {
+        return modSortType == null ? LauncherModSortType.NAME : modSortType;
+    }
+
+    public void setModSortType(LauncherModSortType modSortType) {
+        this.modSortType = modSortType;
+    }
+
+    public boolean isModSortReverse() {
+        return modSortReverse;
+    }
+
+    public void setModSortReverse(boolean modSortReverse) {
+        this.modSortReverse = modSortReverse;
     }
 
     @Override

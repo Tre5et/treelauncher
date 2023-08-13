@@ -17,7 +17,10 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.minecraft.MinecraftUtil;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.config.Settings;
+import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.ui.generic.ButtonBox;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
 import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
@@ -26,9 +29,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ModsManagerElement extends UiElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsManagerElement.class);
@@ -38,6 +43,7 @@ public class ModsManagerElement extends UiElement {
     @FXML private CheckBox chUpdate;
     @FXML private CheckBox chEnable;
     @FXML private CheckBox chDisable;
+    @FXML private ButtonBox<Settings.LauncherModSortType> cbSort;
     @FXML private VBox currentModsContainer;
     @FXML private ComboBox<String> cbVersion;
     @FXML private CheckBox chSnapshots;
@@ -50,6 +56,14 @@ public class ModsManagerElement extends UiElement {
 
     public void setLauncherMods(Pair<LauncherManifest, LauncherModsDetails> details) {
         this.details = details;
+    }
+
+    @Override
+    public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
+        super.init(parent, lockSetter, lockGetter);
+        cbSort.setItems(Settings.LauncherModSortType.values());
+        cbSort.select(LauncherApplication.settings.getModSortType());
+        cbSort.setReverse(LauncherApplication.settings.isModSortReverse());
     }
 
     @FXML
@@ -97,6 +111,15 @@ public class ModsManagerElement extends UiElement {
         }
     }
 
+    @FXML
+    private void onSort() {
+        cbSort.toggleReverse();
+        LauncherApplication.settings.setModSortReverse(cbSort.isReverse());
+        Collections.reverse(elements);
+        currentModsContainer.getChildren().clear();
+        currentModsContainer.getChildren().addAll(elements);
+    }
+
     private void onVersionChangeAccepted(ActionEvent event) {
         LauncherApplication.setPopup(null);
         details.getValue().setModsVersion(cbVersion.getSelectionModel().getSelectedItem());
@@ -124,6 +147,13 @@ public class ModsManagerElement extends UiElement {
     public void beforeShow(Stage stage){
         if(details == null || details.getValue().getMods() == null)
             return;
+        cbSort.setOnSelectionChanged((observable, oldValue, newValue) -> {
+            elements.sort((e1, e2) -> newValue.getComparator().compare(e1.getLauncherMod(), e2.getLauncherMod()));
+            if(LauncherApplication.settings.isModSortReverse()) Collections.reverse(currentModsContainer.getChildren());
+            currentModsContainer.getChildren().clear();
+            currentModsContainer.getChildren().addAll(elements);
+            LauncherApplication.settings.setModSortType(newValue);
+        });
         icModSearchController.init(details.getValue().getModsVersion(), details.getValue().getModsType(), this::onSearchBackClicked, changeCallback, details);
         chSnapshots.setSelected(false);
         cbVersion.getItems().clear();
@@ -138,9 +168,10 @@ public class ModsManagerElement extends UiElement {
         new Thread(() -> {
             long time = System.currentTimeMillis();
             elements = new ArrayList<>(details.getValue().getMods().parallelStream()
+                    .sorted(cbSort.getSelected().getComparator())
                     .map(m -> new ModContentElement(m, details.getValue().getModsVersion(), changeCallback, details, true))
-                    .sorted(Comparator.comparing(e -> e.getLauncherMod().getName()))
                     .toList());
+            if(LauncherApplication.settings.isModSortReverse()) Collections.reverse(elements);
             Platform.runLater(() -> currentModsContainer.getChildren().addAll(elements));
             LOGGER.info("Loaded {} mods in {}ms", elements.size(), System.currentTimeMillis() - time);
         }).start();
