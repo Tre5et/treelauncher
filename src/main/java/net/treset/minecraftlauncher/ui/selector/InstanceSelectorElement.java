@@ -3,7 +3,6 @@ package net.treset.minecraftlauncher.ui.selector;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
@@ -36,8 +35,7 @@ import java.util.function.Supplier;
 public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEntryElement> {
     private static final Logger LOGGER = LogManager.getLogger(InstanceSelectorElement.class);
 
-    @FXML private IconButton btSort;
-    @FXML private ComboBox<Settings.InstanceDataSortType> cbSort;
+    @FXML private ButtonBox<Settings.InstanceDataSortType> cbSort;
     @FXML private InstanceManagerElement icDetailsController;
     @FXML private ActionBar abComponent;
     @FXML private ComponentChangerElement icComponentChangerController;
@@ -52,13 +50,10 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icDetailsController.init(this::onComponentSelected);
         icVersionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
 
-        cbSort.getItems().clear();
-        cbSort.getItems().addAll(Settings.InstanceDataSortType.values());
-        cbSort.getSelectionModel().select(LauncherApplication.settings.getInstanceSortType());
+        cbSort.setItems(Settings.InstanceDataSortType.values());
+        cbSort.select(LauncherApplication.settings.getInstanceSortType());
 
-        if(LauncherApplication.settings.isInstanceSortReverse()) {
-            btSort.getStyleClass().add("reverse");
-        }
+        cbSort.setReverse(LauncherApplication.settings.isInstanceSortReverse());
     }
 
     @Override
@@ -76,7 +71,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         }
         return instances.stream()
             .sorted((e1, e2) -> {
-                int result = cbSort.getSelectionModel().getSelectedItem().getComparator().compare(e1.getInstanceData(), e2.getInstanceData());
+                int result = cbSort.getSelected().getComparator().compare(e1.getInstanceData(), e2.getInstanceData());
                 return LauncherApplication.settings.isInstanceSortReverse() ? -result : result;
             })
             .toList();
@@ -93,15 +88,11 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     @FXML
     private void onSort() {
-        if(LauncherApplication.settings.isInstanceSortReverse()) {
-            LauncherApplication.settings.setInstanceSortReverse(false);
-            btSort.getStyleClass().remove("reverse");
-        } else {
-            LauncherApplication.settings.setInstanceSortReverse(true);
-            btSort.getStyleClass().add("reverse");
-        }
+        cbSort.toggleReverse();
+        LauncherApplication.settings.setInstanceSortReverse(cbSort.isReverse());
         reloadComponents();
-     }
+    }
+
 
     private void onSelected(InstanceData instanceData, boolean selected) {
         icDetailsController.clearSelection();
@@ -471,7 +462,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icComponentChangerController.setVisible(false);
         icVersionChangerController.setVisible(false);
 
-        cbSort.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        cbSort.setOnSelectionChanged((observable, oldValue, newValue) -> {
             reloadComponents();
             LauncherApplication.settings.setInstanceSortType(newValue);
         });

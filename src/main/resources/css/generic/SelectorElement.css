@@ -37,20 +37,3 @@
 .create-container > .icon {
     -fx-icon-color: -fx-text;
 }
-
-.sort-box {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-font-size: 11pt;
-    -fx-text-fill: -fx-text-secondary;
-    -fx-font-style: italic;
-    -fx-alignment: center-right;
-}
-
-.sort-box > .list-cell {
-    -fx-alignment: center-right;
-}
-
-.sort-box > .arrow-button > .arrow {
-    -fx-background-color: transparent;
-}

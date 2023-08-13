@@ -46,3 +46,20 @@
 .combo-box:disabled {
     -fx-border-color: -fx-combobox-border-disabled;
 }
+
+.button-box {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-size: 11pt;
+    -fx-text-fill: -fx-text-secondary;
+    -fx-font-style: italic;
+    -fx-alignment: center-right;
+}
+
+.button-box > .list-cell {
+    -fx-alignment: center-right;
+}
+
+.button-box > .arrow-button > .arrow {
+    -fx-background-color: transparent;
+}

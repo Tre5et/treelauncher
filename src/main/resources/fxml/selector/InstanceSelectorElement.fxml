@@ -3,17 +3,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
-<?import net.treset.minecraftlauncher.ui.generic.IconButton?>
+<?import net.treset.minecraftlauncher.ui.generic.ButtonBox?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement">
     <SplitPane dividerPositions="0.33, 0.66" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <AnchorPane minWidth="-Infinity" styleClass="element">
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <StackPane alignment="TOP_CENTER" styleClass="title-container">
                     <Label styleClass="title" text="%instances.label.title"/>
-                    <HBox GridPane.columnIndex="2" spacing="-50" alignment="CENTER_RIGHT">
-                        <ComboBox fx:id="cbSort" styleClass="sort-box"/>
-                        <IconButton fx:id="btSort" styleClass="sort, neutral" iconSize="22" onAction="#onSort" />
-                    </HBox>
+                    <ButtonBox fx:id="cbSort" iconClass="sort" onAction="#onSort" />
                 </StackPane>
                 <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity">
                     <VBox fx:id="vbElements" alignment="TOP_CENTER"/>
