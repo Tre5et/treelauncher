@@ -57,6 +57,9 @@ public class Settings extends GenericJsonParsable {
     private boolean instanceSortReverse = false;
     private LauncherModSortType modSortType = LauncherModSortType.NAME;
     private boolean modSortReverse = false;
+    private boolean modsUpdate = true;
+    private boolean modsEnable = false;
+    private boolean modsDisable = false;
 
     public Settings(File file) {
         this.file = file;
@@ -109,6 +112,30 @@ public class Settings extends GenericJsonParsable {
 
     public void setModSortReverse(boolean modSortReverse) {
         this.modSortReverse = modSortReverse;
+    }
+
+    public boolean isModsUpdate() {
+        return modsUpdate;
+    }
+
+    public void setModsUpdate(boolean modsUpdate) {
+        this.modsUpdate = modsUpdate;
+    }
+
+    public boolean isModsEnable() {
+        return modsEnable;
+    }
+
+    public void setModsEnable(boolean modsEnable) {
+        this.modsEnable = modsEnable;
+    }
+
+    public boolean isModsDisable() {
+        return modsDisable;
+    }
+
+    public void setModsDisable(boolean modsDisable) {
+        this.modsDisable = modsDisable;
     }
 
     @Override

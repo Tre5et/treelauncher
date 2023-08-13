@@ -8,21 +8,19 @@
 <?import net.treset.minecraftlauncher.ui.generic.ButtonBox?>
 <AnchorPane fx:id="rootPane" styleClass="element-root" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.ModsManagerElement">
     <VBox fx:id="vbCurrentMods" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <StackPane>
-            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-                <IconButton styleClass="add" iconSize="48" onAction="#onAdd" tooltipText="%manager.mods.tooltip.add" />
-                <Label styleClass="title" text="%manager.mods.label.current" />
-                <IconButton styleClass="update" iconSize="42" onAction="#onUpdate" tooltipText="%manager.mods.tooltip.update" />
-                <VBox alignment="CENTER_LEFT">
-                    <HBox spacing="10">
-                        <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" onAction="#onCheckUpdate" />
-                        <CheckBox fx:id="chEnable" text="%manager.mods.check.enable" />
-                    </HBox>
-                    <CheckBox fx:id="chDisable" text="%manager.mods.check.disable" />
-                </VBox>
-            </HBox>
-            <ButtonBox fx:id="cbSort" iconClass="sort" onAction="#onSort" />
-        </StackPane>
+        <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+            <IconButton styleClass="add" iconSize="48" onAction="#onAdd" tooltipText="%manager.mods.tooltip.add" />
+            <Label styleClass="title" text="%manager.mods.label.current" />
+            <IconButton styleClass="update" iconSize="42" onAction="#onUpdate" tooltipText="%manager.mods.tooltip.update" />
+            <VBox alignment="CENTER_LEFT">
+                <HBox spacing="10">
+                    <CheckBox fx:id="chUpdate" selected="true" text="%manager.mods.check.update" onAction="#onCheckUpdate" />
+                    <CheckBox fx:id="chEnable" text="%manager.mods.check.enable" onAction="#onCheckEnable" />
+                </HBox>
+                <CheckBox fx:id="chDisable" text="%manager.mods.check.disable" onAction="#onCheckDisable" />
+            </VBox>
+            <ButtonBox fx:id="cbSort" iconClass="sort" onAction="#onSort" HBox.hgrow="ALWAYS" />
+        </HBox>
         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
             <VBox fx:id="currentModsContainer" spacing="10" />
         </ScrollPane>

@@ -64,6 +64,10 @@ public class ModsManagerElement extends UiElement {
         cbSort.setItems(Settings.LauncherModSortType.values());
         cbSort.select(LauncherApplication.settings.getModSortType());
         cbSort.setReverse(LauncherApplication.settings.isModSortReverse());
+        chUpdate.setSelected(LauncherApplication.settings.isModsUpdate());
+        chEnable.setSelected(LauncherApplication.settings.isModsEnable());
+        chEnable.setDisable(!chUpdate.isSelected());
+        chDisable.setSelected(LauncherApplication.settings.isModsDisable());
     }
 
     @FXML
@@ -81,10 +85,21 @@ public class ModsManagerElement extends UiElement {
 
     @FXML
     private void onCheckUpdate() {
+        LauncherApplication.settings.setModsUpdate(chUpdate.isSelected());
         chEnable.setDisable(!chUpdate.isSelected());
         if(!chUpdate.isSelected()) {
             chEnable.setSelected(false);
         }
+    }
+
+    @FXML
+    private void onCheckEnable() {
+        LauncherApplication.settings.setModsEnable(chEnable.isSelected());
+    }
+
+    @FXML
+    private void onCheckDisable() {
+        LauncherApplication.settings.setModsDisable(chDisable.isSelected());
     }
 
     @FXML
