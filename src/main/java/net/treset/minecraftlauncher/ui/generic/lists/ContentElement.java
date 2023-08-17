@@ -1,9 +1,12 @@
 package net.treset.minecraftlauncher.ui.generic.lists;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 public class ContentElement extends GridPane {
@@ -14,7 +17,7 @@ public class ContentElement extends GridPane {
     protected final Label title = new Label();
     protected final Label details = new Label();
 
-    public ContentElement(Image icon, String title, String details) {
+    public ContentElement(Image icon, String title, String details, EventHandler<MouseEvent> onSelect) {
         this.getStylesheets().add("css/generic/lists/ContentElement.css");
         this.getStyleClass().add("element-container");
 
@@ -24,6 +27,10 @@ public class ContentElement extends GridPane {
         ColumnConstraints constraints1 = new ColumnConstraints();
         constraints1.setHgrow(Priority.ALWAYS);
         this.getColumnConstraints().add(constraints1);
+        if(onSelect != null) {
+            this.setOnMouseClicked(onSelect);
+            this.setCursor(Cursor.HAND);
+        }
 
         this.ivIcon.setImage(icon);
         this.ivIcon.setFitHeight(64);
@@ -60,5 +67,13 @@ public class ContentElement extends GridPane {
 
     public void setDetails(String details) {
         this.details.setText(details);
+    }
+
+    public void setSelected(boolean selected) {
+        if(selected) {
+            this.getStyleClass().add("selected");
+        } else {
+            this.getStyleClass().remove("selected");
+        }
     }
 }

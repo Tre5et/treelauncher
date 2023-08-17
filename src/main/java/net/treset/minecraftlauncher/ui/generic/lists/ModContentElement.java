@@ -72,7 +72,7 @@ public class ModContentElement extends ContentElement {
     }
 
     public ModContentElement(String title, String description, LauncherMod launcherMod, ModData modData, String gameVersion, boolean controls, ChangeEvent<LauncherMod, ModContentElement> changeEvent, Pair<LauncherManifest, LauncherModsDetails> details) {
-        super(null, title, description);
+        super(null, title, description, null);
         long time = System.currentTimeMillis();
 
         this.gameVersion = gameVersion;

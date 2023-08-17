@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.ui.generic.lists;
 
 import javafx.application.Platform;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.File;
@@ -56,4 +57,11 @@ public abstract class FolderContentContainer extends ScrollPane {
     }
 
     protected abstract ContentElement createElement(File file);
+
+    protected void onSelect(MouseEvent event) {
+        for(ContentElement element: elements) {
+            element.setSelected(false);
+        }
+        ((ContentElement) event.getSource()).setSelected(true);
+    }
 }
