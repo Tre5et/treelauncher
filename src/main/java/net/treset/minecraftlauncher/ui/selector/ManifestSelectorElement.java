@@ -54,12 +54,18 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
     @Override
     protected String getCurrentUsedBy() {
+        List<Pair<LauncherManifest, LauncherInstanceDetails>> usedBy = getInstances();
+        return usedBy.isEmpty() ? null : usedBy.get(0).getKey().getName();
+    }
+
+    protected List<Pair<LauncherManifest, LauncherInstanceDetails>> getInstances() {
+        List<Pair<LauncherManifest, LauncherInstanceDetails>> usedBy = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherInstanceDetails> i : files.getInstanceComponents()) {
             if (getManifest().getId().equals(getManifestId(i.getValue()))) {
-                return i.getKey().getName();
+                usedBy.add(i);
             }
         }
-        return null;
+        return usedBy;
     }
 
     protected abstract String getManifestId(LauncherInstanceDetails instanceDetails);

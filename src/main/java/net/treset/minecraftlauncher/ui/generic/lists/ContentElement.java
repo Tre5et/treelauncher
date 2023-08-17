@@ -17,6 +17,8 @@ public class ContentElement extends GridPane {
     protected final Label title = new Label();
     protected final Label details = new Label();
 
+    protected boolean selected = false;
+
     public ContentElement(Image icon, String title, String details, EventHandler<MouseEvent> onSelect) {
         this.getStylesheets().add("css/generic/lists/ContentElement.css");
         this.getStyleClass().add("element-container");
@@ -69,11 +71,29 @@ public class ContentElement extends GridPane {
         this.details.setText(details);
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
     public void setSelected(boolean selected) {
+        if(this.selected == selected) {
+            return;
+        }
+
+        this.selected = selected;
+
         if(selected) {
             this.getStyleClass().add("selected");
         } else {
             this.getStyleClass().remove("selected");
         }
+    }
+
+    public String getTitle() {
+        return this.title.getText();
+    }
+
+    public String getDetails() {
+        return this.details.getText();
     }
 }

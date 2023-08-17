@@ -26,12 +26,13 @@
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <ActionBar fx:id="abMain"
                            defaultLabel="%components.label.details.title"
+                           onPlay="#onPlay"
                            onFolder="#onFolder"
                            onEdit="#onEdit"
                            onDelete="#onDelete"
                />
                 <AnchorPane>
-                    <SavesContentContainer fx:id="ccDetails" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <SavesContentContainer fx:id="ccDetails" onSelect="#onSelectWorld" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <fx:include fx:id="icCreator" source="/fxml/create/SavesCreatorElement.fxml" />
                         <Button onMouseClicked="#onCreate" text="%creator.button.create" />

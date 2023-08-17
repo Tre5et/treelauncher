@@ -6,6 +6,7 @@ import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
+import net.treset.minecraftlauncher.util.QuickPlayData;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.exception.GameCommandException;
 import net.treset.minecraftlauncher.util.exception.GameLaunchException;
@@ -24,14 +25,24 @@ public class GameLauncher {
     private InstanceData instance;
     private LauncherFiles files;
     private User minecraftUser;
+    private QuickPlayData quickPlayData;
     private List<Consumer<String>> exitCallbacks;
     private ResourceManager resourceManager;
     private GameListener gameListener;
+
+    public GameLauncher(InstanceData instance, LauncherFiles files, User minecraftUser, QuickPlayData quickPlayData, List<Consumer<String>> exitCallbacks) {
+        this.instance = instance;
+        this.files = files;
+        this.minecraftUser = minecraftUser;
+        this.quickPlayData = quickPlayData;
+        this.exitCallbacks = exitCallbacks;
+    }
 
     public GameLauncher(InstanceData instance, LauncherFiles files, User minecraftUser, List<Consumer<String>> exitCallbacks) {
         this.instance = instance;
         this.files = files;
         this.minecraftUser = minecraftUser;
+        this.quickPlayData = null;
         this.exitCallbacks = exitCallbacks;
     }
 
@@ -93,7 +104,7 @@ public class GameLauncher {
 
     private void finishLaunch() throws GameLaunchException {
         ProcessBuilder pb = new ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE);
-        CommandBuilder commandBuilder = new CommandBuilder(pb, instance, minecraftUser);
+        CommandBuilder commandBuilder = new CommandBuilder(pb, instance, minecraftUser, quickPlayData);
         try {
             commandBuilder.makeStartCommand();
         } catch (GameCommandException e) {
@@ -181,6 +192,18 @@ public class GameLauncher {
         this.minecraftUser = minecraftUser;
     }
 
+    public QuickPlayData getQuickPlayData() {
+        return quickPlayData;
+    }
+
+    public void setQuickPlayData(QuickPlayData quickPlayData) {
+        this.quickPlayData = quickPlayData;
+    }
+
+    public void setExitCallbacks(List<Consumer<String>> exitCallbacks) {
+        this.exitCallbacks = exitCallbacks;
+    }
+
     public ResourceManager getResourceManager() {
         return resourceManager;
     }
@@ -189,15 +212,7 @@ public class GameLauncher {
         return gameListener;
     }
 
-    public void setResourceManager(ResourceManager resourceManager) {
-        this.resourceManager = resourceManager;
-    }
-
     public void setGameListener(GameListener gameListener) {
         this.gameListener = gameListener;
-    }
-
-    public void setExitCallbacks(List<Consumer<String>> exitCallbacks) {
-        this.exitCallbacks = exitCallbacks;
     }
 }

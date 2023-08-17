@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.ui.generic.lists;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -15,6 +16,8 @@ public abstract class FolderContentContainer extends ScrollPane {
     private final VBox container = new VBox();
 
     private File folder = null;
+
+    private EventHandler<MouseEvent> onSelect = null;
 
     public FolderContentContainer() {
         this.getStylesheets().add("css/generic/FolderContentContainer.css");
@@ -59,9 +62,33 @@ public abstract class FolderContentContainer extends ScrollPane {
     protected abstract ContentElement createElement(File file);
 
     protected void onSelect(MouseEvent event) {
+        ContentElement source = (ContentElement) event.getSource();
+        boolean select = !source.isSelected();
         for(ContentElement element: elements) {
             element.setSelected(false);
         }
-        ((ContentElement) event.getSource()).setSelected(true);
+        if(select) {
+            source.setSelected(true);
+        }
+        if(getOnSelect() != null) {
+            getOnSelect().handle(event);
+        }
+    }
+
+    public ContentElement getSelected() {
+        for(ContentElement element: elements) {
+            if(element.isSelected()) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    public EventHandler<MouseEvent> getOnSelect() {
+        return onSelect;
+    }
+
+    public void setOnSelect(EventHandler<MouseEvent> onSelect) {
+        this.onSelect = onSelect;
     }
 }
