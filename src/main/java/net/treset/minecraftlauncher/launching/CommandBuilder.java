@@ -142,7 +142,7 @@ public class CommandBuilder {
             List<GameCommandException> exceptionQueue = new ArrayList<>();
             for (String r : a.getReplacementValues()) {
                 try {
-                    String replacement = getReplacement(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, minecraftUser, LauncherApplication.stringLocalizer.getFormatted("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug")), LauncherApplication.stringLocalizer.getFormatted("game.version_type", LauncherApplication.stringLocalizer.get("launcher.name"), LauncherApplication.stringLocalizer.get("launcher.version")), resX, resY, quickPlayData);
+                    String replacement = getReplacement(r, gameDataDir, instanceData.getJavaComponent().getDirectory(), assetsDir, instanceData.getResourcepacksComponent().getDirectory(), assetsIndex, libraries, minecraftUser, LauncherApplication.stringLocalizer.getFormatted("game.version_name", LauncherApplication.stringLocalizer.get("launcher.slug"), LauncherApplication.stringLocalizer.get("launcher.version"), instanceData.getInstance().getKey().getId().substring(0, 3), instanceData.getInstance().getKey().getId().substring(instanceData.getInstance().getKey().getId().length()-2)), LauncherApplication.stringLocalizer.getFormatted("game.version_type", instanceData.getInstance().getKey().getName()), resX, resY, quickPlayData);
                     replacements.put(r, replacement);
                 } catch (GameCommandException e) {
                     exceptionQueue.add(e);
