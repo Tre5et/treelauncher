@@ -9,10 +9,10 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.UiUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -130,12 +130,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         if(currentProvider == null) {
             LOGGER.warn("No element selected");
         }
-        File folder = new File(currentProvider.getManifest().getDirectory());
-        try {
-            Desktop.getDesktop().open(folder);
-        } catch (IOException e) {
-            LOGGER.warn("Unable to open folder", e);
-        }
+        UiUtil.openFolder(currentProvider.getManifest().getDirectory());
     }
 
     @Override
