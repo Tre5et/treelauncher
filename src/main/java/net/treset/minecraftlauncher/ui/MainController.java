@@ -36,6 +36,7 @@ public class MainController extends GenericUiController {
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         LauncherApplication.setPopupConsumer(this::showPopup);
+        LauncherApplication.setCloseCallback(() -> !getLocked());
 
         icTitlebarController.init(this, this::setLocked, this::getLocked);
         icTitlebarController.beforeShow(stage);

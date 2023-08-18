@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 
 public class LauncherApplication extends Application {
@@ -35,6 +36,7 @@ public class LauncherApplication extends Application {
     public static Stage primaryStage;
 
     private static Consumer<PopupElement> popupConsumer;
+    private static Supplier<Boolean> closeCallback;
 
     public static void main(String[] args) {
         setupLogger();
@@ -118,6 +120,16 @@ public class LauncherApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         LauncherApplication.primaryStage = primaryStage;
+        primaryStage.setOnCloseRequest(
+            event -> {
+                if(closeCallback != null && !closeCallback.get()) {
+                    LOGGER.info("Aborting close request");
+                    event.consume();
+                    return;
+                }
+                primaryStage.close();
+            }
+        );
 
         System.setProperty("prism.lcdtext", "false");
         primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/icon.png"))));
@@ -131,6 +143,10 @@ public class LauncherApplication extends Application {
 
     public static void setPopupConsumer(Consumer<PopupElement> popupConsumer) {
         LauncherApplication.popupConsumer = popupConsumer;
+    }
+
+    public static void setCloseCallback(Supplier<Boolean> closeCallback) {
+        LauncherApplication.closeCallback = closeCallback;
     }
 
     public static void displayError(Exception e) {

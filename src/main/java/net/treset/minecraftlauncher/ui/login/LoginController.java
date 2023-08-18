@@ -19,7 +19,6 @@ import java.io.IOException;
 public class LoginController extends GenericUiController {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
-
     @FXML private TitlebarElement icTitlebarController;
     @FXML private Button btLogin;
     @FXML private CheckBox chRemember;
@@ -45,6 +44,7 @@ public class LoginController extends GenericUiController {
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         LauncherApplication.setPopupConsumer(this::showPopup);
+        LauncherApplication.setCloseCallback(() -> !chRemember.isDisabled());
         icTitlebarController.beforeShow(stage);
     }
 
