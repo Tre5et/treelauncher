@@ -9,6 +9,7 @@
 <?import net.treset.minecraftlauncher.ui.generic.CreateSelectable?>
 
 <?import net.treset.minecraftlauncher.ui.generic.lists.SavesContentContainer?>
+<?import net.treset.minecraftlauncher.ui.generic.lists.ServersContentContainer?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.SavesSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
         <AnchorPane minWidth="-Infinity" styleClass="element">
@@ -32,7 +33,14 @@
                            onDelete="#onDelete"
                />
                 <AnchorPane>
-                    <SavesContentContainer fx:id="ccDetails" onSelect="#onSelectWorld" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <ScrollPane fx:id="spDetailsContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" fitToWidth="true">
+                        <VBox>
+                            <Label text="%selector.saves.label.worlds" styleClass="subtitle" />
+                            <SavesContentContainer fx:id="ccDetails" onSelect="#onSelectWorld" />
+                            <Label text="%selector.saves.label.servers" styleClass="subtitle" />
+                            <ServersContentContainer fx:id="ccServers" onSelect="#onSelectServer"/>
+                        </VBox>
+                    </ScrollPane>
                     <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <fx:include fx:id="icCreator" source="/fxml/create/SavesCreatorElement.fxml" />
                         <Button onMouseClicked="#onCreate" text="%creator.button.create" />
