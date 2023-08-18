@@ -2,10 +2,8 @@ package net.treset.minecraftlauncher.ui.generic;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 
@@ -57,22 +55,22 @@ public class PopupElement extends GridPane {
         }
     }
 
-    public static class PopupControl {
+    public static class PopupTextInput implements PopupControl {
         private final TextField textField;
 
-        public PopupControl(String prompt) {
+        public PopupTextInput(String prompt) {
             this(prompt, null, null);
         }
 
-        public PopupControl(String prompt, String defaultValue) {
+        public PopupTextInput(String prompt, String defaultValue) {
             this(prompt, defaultValue, null);
         }
 
-        public PopupControl(String prompt, Consumer<String> onUpdate) {
+        public PopupTextInput(String prompt, Consumer<String> onUpdate) {
             this(prompt, null, onUpdate);
         }
 
-        public PopupControl(String prompt, String defaultValue, Consumer<String> onUpdate) {
+        public PopupTextInput(String prompt, String defaultValue, Consumer<String> onUpdate) {
             textField = new TextField();
             textField.setPromptText(prompt == null ? "" : LauncherApplication.stringLocalizer.get(prompt));
             textField.setText(defaultValue == null ? "" : defaultValue);
@@ -90,6 +88,54 @@ public class PopupElement extends GridPane {
         public void setDisabled(boolean disabled) {
             textField.setDisable(disabled);
         }
+    }
+
+    public static class PopupComboBox<T> implements PopupControl {
+        private final ComboBox<T> comboBox;
+
+        public PopupComboBox(List<T> elements) {
+            comboBox = new ComboBox<>();
+            comboBox.getItems().addAll(elements);
+        }
+
+        public PopupComboBox(List<T> elements, T selected) {
+            comboBox = new ComboBox<>();
+            comboBox.getItems().addAll(elements);
+            comboBox.getSelectionModel().select(selected);
+        }
+
+        public PopupComboBox(List<T> elements, int selected) {
+            comboBox = new ComboBox<>();
+            comboBox.getItems().addAll(elements);
+            comboBox.getSelectionModel().select(selected);
+        }
+
+        public T getSelected() {
+            return comboBox.getSelectionModel().getSelectedItem();
+        }
+
+        public void select(T value) {
+            comboBox.getSelectionModel().select(value);
+        }
+
+        public void select(int index) {
+            comboBox.getSelectionModel().select(index);
+        }
+
+        @Override
+        public Control getControl() {
+            return comboBox;
+        }
+
+        @Override
+        public void setDisabled(boolean disabled) {
+            comboBox.setDisable(disabled);
+        }
+    }
+
+    public interface PopupControl {
+        public Control getControl();
+        public void setDisabled(boolean disabled);
     }
 
     private final VBox vbContainer = new VBox();
@@ -176,6 +222,7 @@ public class PopupElement extends GridPane {
     public void setControls(List<PopupControl> controls) {
         if(vbControls == null && controls != null) {
             vbControls = new VBox();
+            vbControls.setAlignment(Pos.CENTER);
             vbControls.getChildren().addAll(controls.stream().map(PopupControl::getControl).toList());
             vbContainer.getChildren().add(vbControls);
         } else if(controls == null) {

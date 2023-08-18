@@ -94,7 +94,7 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
 
     @FXML
     protected void onEdit() {
-        PopupElement.PopupControl tfName = new PopupElement.PopupControl("selector.component.edit.prompt");
+        PopupElement.PopupTextInput tfName = new PopupElement.PopupTextInput("selector.component.edit.prompt");
 
         PopupElement popup = new PopupElement(
                 PopupElement.PopupType.NONE,
