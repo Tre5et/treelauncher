@@ -11,7 +11,7 @@ public class ResourcepacksContentContainer extends FolderContentContainer {
     protected ContentElement createElement(File file) {
         try {
             Resourcepack rp = Resourcepack.from(file);
-            return new ContentElement(rp.getImage() == null ? null : ImageUtil.getImage(rp.getImage()), rp.getName(), rp.getPackMcmeta().getPack().getDescription(), this::onSelect);
+            return new ContentElement(rp.getImage() == null ? null : ImageUtil.getImage(rp.getImage()), rp.getName(), rp.getPackMcmeta().getPack().getDescription(), null);
         } catch (IOException e) {
             return null;
         }

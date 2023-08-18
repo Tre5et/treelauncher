@@ -89,8 +89,10 @@ public class GameListener {
             error = "Unable to clean up game files";
         }
 
-        for(Consumer<String> c : exitCallbacks) {
-            c.accept(error);
+        if(exitCallbacks != null) {
+            for (Consumer<String> c : exitCallbacks) {
+                c.accept(error);
+            }
         }
     }
 

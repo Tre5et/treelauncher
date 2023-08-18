@@ -38,12 +38,16 @@ public class GameLauncher {
         this.exitCallbacks = exitCallbacks;
     }
 
+    public GameLauncher(InstanceData instance, LauncherFiles files, User minecraftUser, QuickPlayData quickPlayData) {
+        this(instance, files, minecraftUser, quickPlayData, null);
+    }
+
     public GameLauncher(InstanceData instance, LauncherFiles files, User minecraftUser, List<Consumer<String>> exitCallbacks) {
-        this.instance = instance;
-        this.files = files;
-        this.minecraftUser = minecraftUser;
-        this.quickPlayData = null;
-        this.exitCallbacks = exitCallbacks;
+        this(instance, files, minecraftUser, null, exitCallbacks);
+    }
+
+    public GameLauncher(InstanceData instance, LauncherFiles files, User minecraftUser) {
+        this(instance, files, minecraftUser, null, null);
     }
 
     public void launch(boolean cleanupActiveInstance, Consumer<Exception> doneCallback) throws GameLaunchException {

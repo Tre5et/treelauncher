@@ -158,4 +158,12 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         setVisible(false);
         setVisible(true);
     }
+
+    @Override
+    protected void reloadComponents() {
+        super.reloadComponents();
+        if(ccDetails != null) {
+            ccDetails.setVisible(false);
+        }
+    }
 }

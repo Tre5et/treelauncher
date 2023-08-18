@@ -18,14 +18,13 @@ import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElemen
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
-import net.treset.minecraftlauncher.util.exception.GameLaunchException;
+import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +83,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icComponentChangerController.setVisible(false);
         icVersionChangerController.setVisible(false);
         icInstanceSettingsController.setVisible(false);
+        abComponent.setDisable(true);
     }
 
     @FXML
@@ -129,40 +129,14 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
             icInstanceSettingsController.save();
             setLock(true);
             abMain.setDisable(true);
-            GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser(), List.of(this::onGameExit));
-            displayGamePreparing();
-            try {
-                launcher.launch(false, this::onGameLaunchDone);
-            } catch (GameLaunchException e) {
-                onGameExit(null);
-                displayGameLaunchFailed(e);
-            }
+            GameLauncher launcher = new GameLauncher(currentInstance, files, LauncherApplication.userAuth.getMinecraftUser());
+            GameLauncherHelper gameLauncherHelper = new GameLauncherHelper(launcher, this::onGameExit, getLockSetter());
+            gameLauncherHelper.start();
         }
-    }
-
-    private void onGameLaunchDone(Exception e) {
-        if(e == null) {
-            displayGameRunning();
-        } else {
-            onGameExit(null);
-            displayGameLaunchFailed(e);
-        }
-    }
-
-    private void displayGamePreparing() {
-        LauncherApplication.setPopup(
-                new PopupElement("selector.instance.launch.preparing.title", "selector.instance.launch.preparing.message")
-        );
     }
 
     private void onGameExit(String error) {
-        if(error != null) {
-            Platform.runLater(() -> displayGameCrash(error));
-        }
         reloadComponents();
-        setLock(false);
-        LauncherApplication.setPopup(null);
-        Platform.runLater(() -> abMain.setDisable(false));
     }
 
     private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
@@ -346,16 +320,16 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     @FXML
     private void onComponentFolder() {
         switch (icDetailsController.getCurrentSelected()) {
-            case SAVES -> openFolder(currentInstance.getSavesComponent().getDirectory());
-            case RESOURCEPACKS -> openFolder(currentInstance.getResourcepacksComponent().getDirectory());
-            case OPTIONS -> openFolder(currentInstance.getOptionsComponent().getDirectory());
-            case MODS -> openFolder(currentInstance.getModsComponent().getKey().getDirectory());
+            case SAVES -> UiUtil.openFolder(currentInstance.getSavesComponent().getDirectory());
+            case RESOURCEPACKS -> UiUtil.openFolder(currentInstance.getResourcepacksComponent().getDirectory());
+            case OPTIONS -> UiUtil.openFolder(currentInstance.getOptionsComponent().getDirectory());
+            case MODS -> UiUtil.openFolder(currentInstance.getModsComponent().getKey().getDirectory());
         }
     }
 
     @FXML
     protected void onFolder() {
-        openFolder(currentInstance.getInstance().getKey().getDirectory());
+        UiUtil.openFolder(currentInstance.getInstance().getKey().getDirectory());
     }
 
     @Override
@@ -394,63 +368,6 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     @Override
     protected String getCurrentUsedBy() {
         return null;
-    }
-
-    private void openFolder(String path) {
-        try {
-            Desktop.getDesktop().open(new File(path));
-        } catch (IOException e) {
-            LauncherApplication.displayError(e);
-        }
-    }
-
-    private void displayGameLaunchFailed(Exception e) {
-        LOGGER.error("Failed to launch game", e);
-        LauncherApplication.setPopup(
-                new PopupElement(
-                        PopupElement.PopupType.ERROR,
-                        "selector.instance.error.launch.title",
-                        "selector.instance.error.launch.message",
-                        List.of(
-                                new PopupElement.PopupButton(
-                                        PopupElement.ButtonType.POSITIVE,
-                                        "error.close",
-                                        event -> LauncherApplication.setPopup(null)
-                                )
-                        )
-                )
-        );
-    }
-
-    private void displayGameRunning() {
-        LauncherApplication.setPopup(
-                new PopupElement(
-                        "selector.instance.game.running.title",
-                        "selector.instance.game.running.message"
-                )
-        );
-    }
-
-    private void displayGameCrash(String error) {
-        LauncherApplication.setPopup(
-            new PopupElement(
-                PopupElement.PopupType.WARNING,
-                "selector.instance.game.crash.title",
-                LauncherApplication.stringLocalizer.getFormatted("selector.instance.game.crash.message", error.isBlank() ? "unknown error" : error),
-                List.of(
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.POSITIVE,
-                            "selector.instance.game.crash.close",
-                            event -> LauncherApplication.setPopup(null)
-                    ),
-                    new PopupElement.PopupButton(
-                            PopupElement.ButtonType.POSITIVE,
-                            "selector.instance.game.crash.reports",
-                            event -> openFolder(FormatUtil.absoluteDirPath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
-                    )
-                )
-            )
-        );
     }
 
     @Override

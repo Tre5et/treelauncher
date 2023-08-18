@@ -32,6 +32,7 @@ public class ContentElement extends GridPane {
         if(onSelect != null) {
             this.setOnMouseClicked(onSelect);
             this.setCursor(Cursor.HAND);
+            this.getStyleClass().add("selectable");
         }
 
         this.ivIcon.setImage(icon);

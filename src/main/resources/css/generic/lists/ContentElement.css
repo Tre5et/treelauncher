@@ -6,15 +6,15 @@
     -fx-hgap: 10px;
 }
 
-.element-container:hover {
+.element-container.selectable:hover {
     -fx-background-color: -fx-primary-900;
 }
 
-.element-container:pressed {
+.element-container.selectable:pressed {
     -fx-background-color: -fx-primary-700;
 }
 
-.element-container.selected {
+.element-container.selectable.selected {
     -fx-background-color: -fx-primary-700;
     -fx-border-width: 1px;
     -fx-border-color: -fx-primary-600;

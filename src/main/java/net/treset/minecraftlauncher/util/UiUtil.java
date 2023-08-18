@@ -8,6 +8,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -42,6 +43,14 @@ public class UiUtil {
         Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
             desktop.browse(new URL(url).toURI());
+        }
+    }
+
+    public static void openFolder(String path) {
+        try {
+            Desktop.getDesktop().open(new File(path));
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
         }
     }
 }
