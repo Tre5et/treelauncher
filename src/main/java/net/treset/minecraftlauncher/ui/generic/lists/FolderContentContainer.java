@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class FolderContentContainer extends ScrollPane {
-    private final List<ContentElement> elements = new ArrayList<>();
+    protected final List<ContentElement> elements = new ArrayList<>();
 
-    private final VBox container = new VBox();
+    protected final VBox container = new VBox();
 
     private File folder = null;
 

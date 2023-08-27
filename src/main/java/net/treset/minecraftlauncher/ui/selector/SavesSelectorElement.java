@@ -2,7 +2,6 @@ package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -15,7 +14,7 @@ import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.SavesCreatorElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ContentElement;
-import net.treset.minecraftlauncher.ui.generic.lists.ServersContentContainer;
+import net.treset.minecraftlauncher.ui.generic.lists.SavesContentContainer;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.QuickPlayData;
@@ -34,19 +33,10 @@ import java.util.function.Supplier;
 public class SavesSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(SavesSelectorElement.class);
 
-    @FXML private ScrollPane spDetailsContainer;
     @FXML private SavesCreatorElement icCreatorController;
-    @FXML private ServersContentContainer ccServers;
 
     @FXML
-    private void onSelectWorld(MouseEvent event) {
-        ccServers.clearSelect();
-        abMain.setShowPlay(((ContentElement)event.getSource()).isSelected());
-    }
-
-    @FXML
-    private void onSelectServer(MouseEvent event) {
-        ccDetails.clearSelect();
+    private void onSelect(MouseEvent event) {
         abMain.setShowPlay(((ContentElement)event.getSource()).isSelected());
     }
 
@@ -90,38 +80,25 @@ public class SavesSelectorElement extends ManifestSelectorElement {
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
         super.onSelected(contentProvider, selected);
         abMain.setShowPlay(false);
-        ccServers.clearSelect();
-        ccServers.clear();
         File serversDatFile = new File(FormatUtil.absoluteFilePath(contentProvider.getManifest().getDirectory(), ".included_files", "servers.dat"));
         if(serversDatFile.exists()) {
-            ccServers.populate(serversDatFile);
+            ((SavesContentContainer)ccDetails).setServersFile(serversDatFile);
         }
-        spDetailsContainer.setVisible(selected);
     }
 
     @Override
     protected void reloadComponents() {
         super.reloadComponents();
-        spDetailsContainer.setVisible(false);
         Platform.runLater(() -> abMain.setShowPlay(false));
     }
 
     @FXML
     private void onPlay() {
-        //TODO: Show servers and realms
+        //TODO: Show realms
 
-        ContentElement selectedWorld = ccDetails.getSelected();
-        QuickPlayData quickPlayData;
-        if(selectedWorld != null) {
-            quickPlayData = new QuickPlayData(QuickPlayData.Type.WORLD, selectedWorld.getDetails());
-        } else {
-            ContentElement selectedServer = ccServers.getSelected();
-            if(selectedServer != null) {
-                quickPlayData = new QuickPlayData(QuickPlayData.Type.SERVER, selectedServer.getDetails());
-            } else {
-                LOGGER.warn("No world or server selected");
-                return;
-            }
+        QuickPlayData quickPlayData = ((SavesContentContainer)ccDetails).getQuickPlayData();
+        if(quickPlayData == null) {
+            return;
         }
 
         List<Pair<LauncherManifest, LauncherInstanceDetails>> instances = getInstances();
