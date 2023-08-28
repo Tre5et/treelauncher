@@ -17,6 +17,7 @@ import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
+import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
@@ -38,7 +39,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     @FXML private InstanceManagerElement icDetailsController;
     @FXML private ActionBar abComponent;
     @FXML private ComponentChangerElement ccChanger;
-    @FXML private VersionChangerElement icVersionChangerController;
+    @FXML private VersionChangerElement vcChanger;
     @FXML private InstanceSettingsElement icInstanceSettingsController;
 
     private InstanceData currentInstance;
@@ -47,7 +48,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         icDetailsController.init(this::onComponentSelected);
-        icVersionChangerController.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
+        vcChanger.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
 
         cbSort.setItems(Settings.InstanceDataSortType.values());
         cbSort.select(LauncherApplication.settings.getInstanceSortType());
@@ -81,7 +82,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         super.reloadComponents();
         icDetailsController.setVisible(false);
         ccChanger.setVisible(false);
-        icVersionChangerController.setVisible(false);
+        vcChanger.setVisible(false);
         icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
     }
@@ -97,7 +98,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     private void onSelected(InstanceData instanceData, boolean selected) {
         icDetailsController.clearSelection();
         ccChanger.setVisible(false);
-        icVersionChangerController.setVisible(false);
+        vcChanger.setVisible(false);
         icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
         abComponent.clearLabel();
@@ -141,7 +142,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
         ccChanger.setVisible(false);
-        icVersionChangerController.setVisible(false);
+        vcChanger.setVisible(false);
         icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
         abComponent.clearLabel();
@@ -151,8 +152,8 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
             String label;
             switch(type) {
                 case VERSION -> {
-                    icVersionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
-                    icVersionChangerController.setVisible(true);
+                    vcChanger.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
+                    vcChanger.setVisible(true);
                     return;
                 }
                 case SETTINGS -> {
@@ -242,16 +243,29 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         LauncherApplication.displayError(e);
     }
 
+    private void onCreateStatusChanged(CreationStatus status, PopupElement popup) {
+        StringBuilder message = new StringBuilder(status.getCurrentStep().getMessage());
+        if(status.getDownloadStatus() != null) {
+            message.append("\n").append(status.getDownloadStatus().getCurrentFile()).append("\n(").append(status.getDownloadStatus().getCurrentAmount()).append("/").append(status.getDownloadStatus().getTotalAmount()).append(")");
+        }
+        Platform.runLater(()-> {
+            if(popup == null) return;
+            popup.setMessage(message.toString());
+        });
+    }
+
     private void onPopupChangeConfirm(ActionEvent event, VersionCreator creator) {
-        LauncherApplication.setPopup(
-                new PopupElement(
-                        PopupElement.PopupType.NONE,
-                        "selector.instance.version.popup.changing",
-                        null
-                )
+        PopupElement popup = new PopupElement(
+                PopupElement.PopupType.NONE,
+                "selector.instance.version.popup.changing",
+                null
         );
 
-        icVersionChangerController.setVisible(false);
+        LauncherApplication.setPopup(popup);
+
+        vcChanger.setVisible(false);
+
+        creator.setStatusCallback(status -> onCreateStatusChanged(status, popup));
         new Thread(() -> {
             String versionId;
             try {
@@ -287,8 +301,8 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
             }
             Platform.runLater(() -> {
                 icDetailsController.populate(currentInstance);
-                icVersionChangerController.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
-                icVersionChangerController.setVisible(true);
+                vcChanger.setCurrentVersion(currentInstance.getVersionComponents().get(0).getValue());
+                vcChanger.setVisible(true);
                 LauncherApplication.setPopup(
                         new PopupElement(
                                 PopupElement.PopupType.SUCCESS,
@@ -377,7 +391,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         abComponent.clearLabel();
         abComponent.setDisable(true);
         ccChanger.setVisible(false);
-        icVersionChangerController.setVisible(false);
+        vcChanger.setVisible(false);
 
         cbSort.setOnSelectionChanged((observable, oldValue, newValue) -> {
             reloadComponents();
