@@ -34,7 +34,11 @@ public class SavesContentContainer extends FolderContentContainer {
 
         super.updateElements();
 
-        Platform.runLater(() -> this.container.getChildren().add(0, savesLabel));
+        Platform.runLater(() -> {
+            if(!this.container.getChildren().isEmpty()) {
+                this.container.getChildren().add(0, savesLabel);
+            }
+        });
 
         if(serversFile == null) {
             return;

@@ -83,6 +83,8 @@ public class SavesSelectorElement extends ManifestSelectorElement {
         File serversDatFile = new File(FormatUtil.absoluteFilePath(contentProvider.getManifest().getDirectory(), ".included_files", "servers.dat"));
         if(serversDatFile.exists()) {
             ((SavesContentContainer)ccDetails).setServersFile(serversDatFile);
+        } else {
+            ((SavesContentContainer)ccDetails).setServersFile(null);
         }
     }
 
