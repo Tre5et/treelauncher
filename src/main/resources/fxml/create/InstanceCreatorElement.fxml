@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import net.treset.minecraftlauncher.ui.create.VersionCreatorElement?>
 <HBox fx:id="rootPane" styleClass="element-root" alignment="TOP_CENTER" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.InstanceCreatorElement">
     <AnchorPane minWidth="-Infinity">
         <ScrollPane fx:id="spContainer" styleClass="element" minWidth="-Infinity" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
@@ -35,7 +36,7 @@
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.version"/>
                     </HBox>
-                    <fx:include fx:id="icVersionCreator" source="VersionCreatorElement.fxml" />
+                    <VersionCreatorElement fx:id="vcCreator" layoutType="VERTICAL" />
                 </VBox>
 
                 <VBox GridPane.columnIndex="2">

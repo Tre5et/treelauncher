@@ -30,7 +30,7 @@ public class InstanceCreatorElement extends UiElement {
     @FXML private ScrollPane spContainer;
     @FXML private TextField nameInput;
     @FXML private Label lbNameError;
-    @FXML private VersionCreatorElement icVersionCreatorController;
+    @FXML private VersionCreatorElement vcCreator;
     @FXML private SavesCreatorElement icSavesCreatorController;
     @FXML private ResourcepacksCreatorElement icResourcepacksCreatorController;
     @FXML private OptionsCreatorElement icOptionsCreatorController;
@@ -55,8 +55,8 @@ public class InstanceCreatorElement extends UiElement {
 
     @FXML
     private void onCreate() {
-        icModsCreatorController.setGameVersion(icVersionCreatorController.getGameVersion());
-        icModsCreatorController.setModsType(icVersionCreatorController.getVersionType());
+        icModsCreatorController.setGameVersion(vcCreator.getGameVersion());
+        icModsCreatorController.setModsType(vcCreator.getVersionType());
         if(checkCreateReady() && setLock(true)) {
             InstanceCreator creator;
             try {
@@ -71,7 +71,7 @@ public class InstanceCreatorElement extends UiElement {
                         icOptionsCreatorController.getCreator(),
                         icResourcepacksCreatorController.getCreator(),
                         icSavesCreatorController.getCreator(),
-                        icVersionCreatorController.getCreator()
+                        vcCreator.getCreator()
                 );
                 creator.setStatusCallback(this::onCreateStatusChanged);
             } catch (ComponentCreationException e) {
@@ -154,12 +154,11 @@ public class InstanceCreatorElement extends UiElement {
         lbNameError.setVisible(false);
         nameInput.getStyleClass().remove("error");
         nameInput.setText("");
-        icVersionCreatorController.setPrerequisites(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
+        vcCreator.init(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
         icSavesCreatorController.setPrerequisites(launcherFiles.getSavesComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getSavesManifest(), launcherFiles.getGameDetailsManifest());
         icResourcepacksCreatorController.setPrerequisites(launcherFiles.getResourcepackComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getResourcepackManifest());
         icOptionsCreatorController.setPrerequisites(launcherFiles.getOptionsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getOptionsManifest());
         icModsCreatorController.setPrerequisites(launcherFiles.getModsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getModsManifest(), launcherFiles.getGameDetailsManifest());
-        icVersionCreatorController.beforeShow(stage);
         icSavesCreatorController.beforeShow(stage);
         icResourcepacksCreatorController.beforeShow(stage);
         icOptionsCreatorController.beforeShow(stage);
@@ -182,7 +181,7 @@ public class InstanceCreatorElement extends UiElement {
             lbNameError.setVisible(true);
             nameInput.getStyleClass().add("error");
         }
-        icVersionCreatorController.showError(show);
+        vcCreator.showError(show);
         icSavesCreatorController.showError(show);
         icResourcepacksCreatorController.showError(show);
         icOptionsCreatorController.showError(show);
@@ -191,7 +190,7 @@ public class InstanceCreatorElement extends UiElement {
     }
 
     public boolean checkCreateReady() {
-        return !nameInput.getText().isEmpty() && icVersionCreatorController.checkCreateReady() && icSavesCreatorController.checkCreateReady() && icResourcepacksCreatorController.checkCreateReady() && icOptionsCreatorController.checkCreateReady() && (!modsActive || icModsCreatorController.checkCreateReady());
+        return !nameInput.getText().isEmpty() && vcCreator.isCreateReady() && icSavesCreatorController.checkCreateReady() && icResourcepacksCreatorController.checkCreateReady() && icOptionsCreatorController.checkCreateReady() && (!modsActive || icModsCreatorController.checkCreateReady());
     }
 
     public void onModsChange(boolean active) {

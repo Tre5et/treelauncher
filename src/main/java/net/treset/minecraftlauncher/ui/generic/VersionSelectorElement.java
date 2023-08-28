@@ -36,8 +36,8 @@ public abstract class VersionSelectorElement extends StackPane {
 
 
     protected final ComboBox<MinecraftVersion> cbVersion = new ComboBox<>();
-    protected final CheckBox chSnapshots = new CheckBox();
     protected final ErrorWrapper ewVersion = new ErrorWrapper();
+    protected final CheckBox chSnapshots = new CheckBox();
     protected final ComboBox<String> cbType = new ComboBox<>();
     protected final ErrorWrapper ewType = new ErrorWrapper();
     protected final ComboBox<FabricVersionDetails> cbLoader = new ComboBox<>();
@@ -51,31 +51,33 @@ public abstract class VersionSelectorElement extends StackPane {
     protected String librariesDir;
     protected LauncherManifest versionManifest;
 
-    protected LayoutType layoutType = LayoutType.GRID;
+    protected LayoutType layoutType;
 
     public VersionSelectorElement() {
 
         cbVersion.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.version"));
         cbVersion.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateLoaderChoice));
-
-        chSnapshots.setText(LauncherApplication.stringLocalizer.get("creator.version.checkbox.snapshots"));
-        chSnapshots.setOnAction(this::onCheckSnapshots);
+        cbVersion.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> ewVersion.showError(false));
 
         ewVersion.setErrorMessage("creator.version.label.error.version");
         ewVersion.getChildren().add(cbVersion);
 
+        chSnapshots.setText(LauncherApplication.stringLocalizer.get("creator.version.checkbox.snapshots"));
+        chSnapshots.setOnAction(this::onCheckSnapshots);
+
         cbType.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.type"));
         cbType.getItems().addAll("Vanilla", "Fabric");
         cbType.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::updateLoaderChoice));
-        cbType.getSelectionModel().select(0);
+        cbType.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> ewType.showError(false));
 
         ewType.setErrorMessage("creator.version.label.error.type");
         ewType.getChildren().add(cbType);
 
         cbLoader.setPromptText(LauncherApplication.stringLocalizer.get("selector.loader.prompt"));
-        cbLoader.setVisible(false);
+        cbLoader.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> ewLoader.showError(false));
 
         ewLoader.setErrorMessage("creator.version.label.error.loader");
+        ewLoader.setVisible(false);
         ewLoader.getChildren().add(cbLoader);
 
         this.setPadding(new Insets(5));
@@ -94,7 +96,7 @@ public abstract class VersionSelectorElement extends StackPane {
 
     public abstract boolean isCreateReady();
 
-    protected VersionCreator getCreator() throws ComponentCreationException {
+    public VersionCreator getCreator() throws ComponentCreationException {
         if(!isCreateReady()) {
             throw new ComponentCreationException("Not ready to create version");
         }
@@ -193,7 +195,7 @@ public abstract class VersionSelectorElement extends StackPane {
         return container;
     }
 
-    void populateVersionChoice() {
+    protected void populateVersionChoice() {
         cbVersion.getItems().clear();
         cbVersion.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
         cbVersion.setDisable(true);
@@ -216,14 +218,13 @@ public abstract class VersionSelectorElement extends StackPane {
 
     protected void selectVersion() {}
 
-    private void updateLoaderChoice() {
-        cbLoader.setVisible(false);
+    protected void updateLoaderChoice() {
+        ewLoader.setVisible(false);
         if(cbVersion.getValue() != null && "Fabric".equals(cbType.getValue())) {
-            cbLoader.setVisible(true);
             cbLoader.getItems().clear();
             cbLoader.setPromptText(LauncherApplication.stringLocalizer.get("creator.version.prompt.loading"));
             cbLoader.setDisable(true);
-            cbLoader.setVisible(true);
+            ewLoader.setVisible(true);
             new Thread(() -> {
                 try {
                     fabricVersions = FabricUtil.getFabricVersions(cbVersion.getValue().getId());

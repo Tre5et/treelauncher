@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.ui.generic;
 
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -18,8 +19,14 @@ public class ErrorWrapper extends VBox {
         if(show) {
             if(getChildren().contains(lbError)) return;
             getChildren().add(lbError);
+            for(Node child : getChildren()) {
+                child.getStyleClass().add("error");
+            }
         } else {
             getChildren().remove(lbError);
+            for(Node child : getChildren()) {
+                child.getStyleClass().remove("error");
+            }
         }
     }
 
@@ -30,5 +37,4 @@ public class ErrorWrapper extends VBox {
     public String getErrorMessage() {
         return lbError.getText();
     }
-
 }
