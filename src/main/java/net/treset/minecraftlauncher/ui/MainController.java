@@ -5,7 +5,6 @@ import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.ui.nav.NavbarElement;
 import net.treset.minecraftlauncher.ui.selector.*;
@@ -28,7 +27,6 @@ public class MainController extends GenericUiController {
     @FXML private ModsSelectorElement icModsController;
     @FXML private SettingsElement icSettingsController;
     @FXML private NavbarElement icNavbarController;
-    @FXML private PopupElement icPopupController;
 
     boolean locked = false;
 

@@ -20,6 +20,5 @@
         <fx:include fx:id="icMods" source="selector/ModsSelectorElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true" />
         <fx:include fx:id="icSettings" source="settings/SettingsElement.fxml" GridPane.rowIndex="1" GridPane.fillWidth="true" />
         <fx:include fx:id="icNavbar" source="nav/NavbarElement.fxml" GridPane.rowIndex="2" GridPane.fillWidth="true" />
-        <fx:include fx:id="icPopup" source="generic/PopupElement.fxml" GridPane.rowIndex="2" GridPane.fillWidth="true" />
     </GridPane>
 </StackPane>
