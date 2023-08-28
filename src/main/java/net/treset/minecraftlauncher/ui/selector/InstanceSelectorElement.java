@@ -37,7 +37,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     @FXML private ButtonBox<Settings.InstanceDataSortType> cbSort;
     @FXML private InstanceManagerElement icDetailsController;
     @FXML private ActionBar abComponent;
-    @FXML private ComponentChangerElement icComponentChangerController;
+    @FXML private ComponentChangerElement ccChanger;
     @FXML private VersionChangerElement icVersionChangerController;
     @FXML private InstanceSettingsElement icInstanceSettingsController;
 
@@ -80,7 +80,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     protected void reloadComponents() {
         super.reloadComponents();
         icDetailsController.setVisible(false);
-        icComponentChangerController.setVisible(false);
+        ccChanger.setVisible(false);
         icVersionChangerController.setVisible(false);
         icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
@@ -96,7 +96,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     private void onSelected(InstanceData instanceData, boolean selected) {
         icDetailsController.clearSelection();
-        icComponentChangerController.setVisible(false);
+        ccChanger.setVisible(false);
         icVersionChangerController.setVisible(false);
         icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
@@ -140,7 +140,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     }
 
     private void onComponentSelected(boolean selected, InstanceManagerElement.SelectedType type) {
-        icComponentChangerController.setVisible(false);
+        ccChanger.setVisible(false);
         icVersionChangerController.setVisible(false);
         icInstanceSettingsController.setVisible(false);
         abComponent.setDisable(true);
@@ -182,10 +182,10 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + type);
             }
-            icComponentChangerController.init(manifests, currentManifest, this::onComponentChanged, this::allowChange);
+            ccChanger.init(manifests, currentManifest, this::onComponentChanged, this::allowChange);
             abComponent.setLabel(label);
             abComponent.setDisable(false);
-            icComponentChangerController.setVisible(true);
+            ccChanger.setVisible(true);
         }
     }
 
@@ -376,7 +376,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         icDetailsController.setVisible(false);
         abComponent.clearLabel();
         abComponent.setDisable(true);
-        icComponentChangerController.setVisible(false);
+        ccChanger.setVisible(false);
         icVersionChangerController.setVisible(false);
 
         cbSort.setOnSelectionChanged((observable, oldValue, newValue) -> {

@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
 <?import net.treset.minecraftlauncher.ui.generic.ButtonBox?>
+<?import net.treset.minecraftlauncher.ui.generic.ComponentChangerElement?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.InstanceSelectorElement">
     <SplitPane dividerPositions="0.33, 0.66" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <AnchorPane minWidth="-Infinity" styleClass="element">
@@ -38,7 +39,7 @@
                            onFolder="#onComponentFolder"
                 />
                 <AnchorPane>
-                    <fx:include fx:id="icComponentChanger" source="/fxml/generic/ComponentChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <ComponentChangerElement fx:id="ccChanger" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     <fx:include fx:id="icVersionChanger" source="/fxml/generic/VersionChangerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     <fx:include fx:id="icInstanceSettings" source="/fxml/manager/InstanceSettingsElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                 </AnchorPane>

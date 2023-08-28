@@ -1,64 +1,70 @@
 package net.treset.minecraftlauncher.ui.generic;
 
-import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.ui.cellfactory.ManifestListCellFactory;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ComponentChangerElement extends UiElement {
-    @FXML private AnchorPane rootPane;
-    @FXML private ComboBox<String> cbChange;
-    @FXML private Button btChange;
+public class ComponentChangerElement extends HBox {
+    private final ComboBox<LauncherManifest> cbChange = new ComboBox<>();
+    private final IconButton btChange = new IconButton();
 
     private List<LauncherManifest> components;
     private LauncherManifest currentComponent;
     private Consumer<LauncherManifest> changeCallback;
     private Supplier<Boolean> changeGetter;
 
+    public ComponentChangerElement() {
+        cbChange.setPromptText("There should be something here...");
+        cbChange.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
+        cbChange.setCellFactory(new ManifestListCellFactory());
+        cbChange.setButtonCell(new ManifestListCellFactory().call(null));
+        setHgrow(cbChange, Priority.ALWAYS);
+
+        btChange.getStyleClass().addAll("sync", "highlight");
+        btChange.setIconSize(32);
+        btChange.setTooltipText(LauncherApplication.stringLocalizer.get("selector.change.tooltip"));
+        btChange.setOnAction(this::onChange);
+
+        this.setPadding(new Insets(5, 15, 15, 15));
+        this.setSpacing(5);
+        this.setAlignment(Pos.CENTER_LEFT);
+        this.getChildren().addAll(cbChange, btChange);
+    }
+
     public void init(List<LauncherManifest> components, LauncherManifest currentComponent, Consumer<LauncherManifest> changeCallback, Supplier<Boolean> changeGetter) {
         this.components = components;
         this.currentComponent = currentComponent;
         this.changeCallback = changeCallback;
         this.changeGetter = changeGetter;
-        cbChange.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onSelectionChanged));
+
+        cbChange.getItems().clear();
+        cbChange.getItems().addAll(components);
+        cbChange.getSelectionModel().select(currentComponent);
     }
 
-    private void onSelectionChanged() {
-        btChange.setDisable(cbChange.getSelectionModel().getSelectedItem() == null || cbChange.getSelectionModel().getSelectedItem().equals(currentComponent.getName()));
+    private void onSelectionChanged(ObservableValue<? extends LauncherManifest> observable, LauncherManifest oldValue, LauncherManifest newValue) {
+        btChange.setDisable(newValue == null || newValue.equals(currentComponent));
     }
 
     @FXML
-    private void onChange() {
-        if(changeGetter.get() && cbChange.getSelectionModel().getSelectedItem() != null && !cbChange.getSelectionModel().getSelectedItem().equals(currentComponent.getName())) {
-            currentComponent = components.stream().filter(manifest -> manifest.getName().equals(cbChange.getSelectionModel().getSelectedItem())).findFirst().orElse(null);
+    private void onChange(ActionEvent event) {
+        if(changeGetter.get() && cbChange.getSelectionModel().getSelectedItem() != null && !cbChange.getSelectionModel().getSelectedItem().equals(currentComponent)) {
+            currentComponent = cbChange.getSelectionModel().getSelectedItem();
             changeCallback.accept(currentComponent);
-            onSelectionChanged();
+            btChange.setDisable(true);
         }
-    }
-
-
-    @Override
-    public void beforeShow(Stage stage) {
-        cbChange.getItems().clear();
-        cbChange.getItems().addAll(components.stream().map(LauncherManifest::getName).toList());
-        cbChange.getSelectionModel().select(currentComponent.getName());
-    }
-
-    @Override
-    public void afterShow(Stage stage) {
-    }
-
-    @Override
-    public void setRootVisible(boolean visible) {
-        rootPane.setVisible(visible);
     }
 
     public LauncherManifest getCurrentComponent() {
