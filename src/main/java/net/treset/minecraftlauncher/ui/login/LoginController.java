@@ -44,7 +44,7 @@ public class LoginController extends GenericUiController {
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         LauncherApplication.setPopupConsumer(this::showPopup);
-        LauncherApplication.setCloseCallback(() -> !chRemember.isDisabled());
+        LauncherApplication.setCloseCallback(() -> !chRemember.isDisabled() || !btLogin.isDisabled());
         icTitlebarController.beforeShow(stage);
     }
 
