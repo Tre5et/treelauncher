@@ -5,6 +5,7 @@
 <?import net.treset.minecraftlauncher.ui.generic.CreateSelectable?>
 <?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
 
+<?import net.treset.minecraftlauncher.ui.create.OptionsCreatorElement?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.OptionsSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
         <AnchorPane minWidth="-Infinity" styleClass="element">
@@ -27,7 +28,7 @@
                            onDelete="#onDelete"
                 />
                 <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER">
-                    <fx:include fx:id="icCreator" source="/fxml/create/OptionsCreatorElement.fxml" />
+                    <OptionsCreatorElement fx:id="crCreator" allowUse="false" />
                     <Button onMouseClicked="#onCreate" text="%creator.button.create" />
                 </VBox>
             </VBox>

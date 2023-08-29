@@ -6,8 +6,8 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
+import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import org.apache.logging.log4j.LogManager;
@@ -47,8 +47,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
     private static final Logger LOGGER = LogManager.getLogger(ManifestSelectorElement.class);
 
-    @FXML
-    protected FolderContentContainer ccDetails;
+    @FXML protected FolderContentContainer ccDetails;
 
     protected ManifestContentProvider currentProvider = null;
 

@@ -3,8 +3,6 @@ package net.treset.minecraftlauncher.ui.create;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -14,6 +12,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.InstanceCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.ui.generic.ErrorWrapper;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
@@ -28,15 +27,14 @@ public class InstanceCreatorElement extends UiElement {
 
     @FXML private HBox rootPane;
     @FXML private ScrollPane spContainer;
-    @FXML private TextField nameInput;
-    @FXML private Label lbNameError;
-    @FXML private VersionCreatorElement vcCreator;
-    @FXML private SavesCreatorElement icSavesCreatorController;
-    @FXML private ResourcepacksCreatorElement icResourcepacksCreatorController;
-    @FXML private OptionsCreatorElement icOptionsCreatorController;
-    @FXML private ModsCreatorElement icModsCreatorController;
+    @FXML private TextField tfName;
+    @FXML private ErrorWrapper ewName;
+    @FXML private VersionCreatorElement crVersion;
+    @FXML private SavesCreatorElement crSaves;
+    @FXML private ResourcepacksCreatorElement crResourcepacks;
+    @FXML private OptionsCreatorElement crOptions;
+    @FXML private ModsCreatorElement crMods;
     @FXML private VBox modsContainer;
-    @FXML private Button btCreate;
     private LauncherFiles launcherFiles;
     private boolean modsActive = true;
 
@@ -55,23 +53,23 @@ public class InstanceCreatorElement extends UiElement {
 
     @FXML
     private void onCreate() {
-        icModsCreatorController.setGameVersion(vcCreator.getGameVersion());
-        icModsCreatorController.setModsType(vcCreator.getVersionType());
+        crMods.setGameVersion(crVersion.getGameVersion());
+        crMods.setModsType(crVersion.getVersionType());
         if(checkCreateReady() && setLock(true)) {
             InstanceCreator creator;
             try {
                 creator = new InstanceCreator(
-                        nameInput.getText(),
+                        tfName.getText(),
                         launcherFiles.getLauncherDetails().getTypeConversion(),
                         launcherFiles.getInstanceManifest(),
                         List.of(),
                         List.of(),
                         List.of(),
-                        modsActive ? icModsCreatorController.getCreator() : null,
-                        icOptionsCreatorController.getCreator(),
-                        icResourcepacksCreatorController.getCreator(),
-                        icSavesCreatorController.getCreator(),
-                        vcCreator.getCreator()
+                        modsActive ? crMods.getCreator() : null,
+                        crOptions.getCreator(),
+                        crResourcepacks.getCreator(),
+                        crSaves.getCreator(),
+                        crVersion.getCreator()
                 );
                 creator.setStatusCallback(this::onCreateStatusChanged);
             } catch (ComponentCreationException e) {
@@ -94,8 +92,8 @@ public class InstanceCreatorElement extends UiElement {
 
         } else {
             showError(true);
-            icModsCreatorController.setGameVersion(null);
-            icModsCreatorController.setModsType(null);
+            crMods.setGameVersion(null);
+            crMods.setModsType(null);
         }
     }
 
@@ -151,18 +149,14 @@ public class InstanceCreatorElement extends UiElement {
         } catch (FileLoadException e) {
             LauncherApplication.displaySevereError(e);
         }
-        lbNameError.setVisible(false);
-        nameInput.getStyleClass().remove("error");
-        nameInput.setText("");
-        vcCreator.init(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
-        icSavesCreatorController.setPrerequisites(launcherFiles.getSavesComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getSavesManifest(), launcherFiles.getGameDetailsManifest());
-        icResourcepacksCreatorController.setPrerequisites(launcherFiles.getResourcepackComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getResourcepackManifest());
-        icOptionsCreatorController.setPrerequisites(launcherFiles.getOptionsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getOptionsManifest());
-        icModsCreatorController.setPrerequisites(launcherFiles.getModsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getModsManifest(), launcherFiles.getGameDetailsManifest());
-        icSavesCreatorController.beforeShow(stage);
-        icResourcepacksCreatorController.beforeShow(stage);
-        icOptionsCreatorController.beforeShow(stage);
-        icModsCreatorController.beforeShow(stage);
+        ewName.showError(false);
+        tfName.getStyleClass().remove("error");
+        tfName.setText("");
+        crVersion.init(launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getVersionManifest(), launcherFiles, LauncherApplication.config.BASE_DIR + launcherFiles.getLauncherDetails().getLibrariesDir(), this::onModsChange);
+        crSaves.init(launcherFiles.getSavesComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getSavesManifest(), launcherFiles.getGameDetailsManifest());
+        crResourcepacks.init(launcherFiles.getResourcepackComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getResourcepackManifest());
+        crOptions.init(launcherFiles.getOptionsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getOptionsManifest());
+        crMods.init(launcherFiles.getModsComponents(), launcherFiles.getLauncherDetails().getTypeConversion(), launcherFiles.getModsManifest(), launcherFiles.getGameDetailsManifest());
         onModsChange(false);
     }
 
@@ -175,22 +169,21 @@ public class InstanceCreatorElement extends UiElement {
     }
 
     public void showError(boolean show) {
-        lbNameError.setVisible(false);
-        nameInput.getStyleClass().remove("error");
-        if(show && nameInput.getText().isEmpty()) {
-            lbNameError.setVisible(true);
-            nameInput.getStyleClass().add("error");
+        ewName.showError(false);
+        tfName.getStyleClass().remove("error");
+        if(show && tfName.getText().isEmpty()) {
+            ewName.showError(true);
         }
-        vcCreator.showError(show);
-        icSavesCreatorController.showError(show);
-        icResourcepacksCreatorController.showError(show);
-        icOptionsCreatorController.showError(show);
+        crVersion.showError(show);
+        crSaves.showError(show);
+        crOptions.showError(show);
+        crResourcepacks.showError(show);
         if(modsActive)
-            icModsCreatorController.showError(show);
+            crMods.showError(show);
     }
 
     public boolean checkCreateReady() {
-        return !nameInput.getText().isEmpty() && vcCreator.isCreateReady() && icSavesCreatorController.checkCreateReady() && icResourcepacksCreatorController.checkCreateReady() && icOptionsCreatorController.checkCreateReady() && (!modsActive || icModsCreatorController.checkCreateReady());
+        return !tfName.getText().isEmpty() && crVersion.isCreateReady() && crSaves.isCreateReady() && crResourcepacks.isCreateReady() && crOptions.isCreateReady() && (!modsActive || crMods.isCreateReady());
     }
 
     public void onModsChange(boolean active) {

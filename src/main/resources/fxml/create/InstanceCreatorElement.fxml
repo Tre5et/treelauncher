@@ -4,6 +4,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import net.treset.minecraftlauncher.ui.create.VersionCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.create.SavesCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.create.ResourcepacksCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.create.OptionsCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.create.ModsCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.generic.ErrorWrapper?>
 <HBox fx:id="rootPane" styleClass="element-root" alignment="TOP_CENTER" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.create.InstanceCreatorElement">
     <AnchorPane minWidth="-Infinity">
         <ScrollPane fx:id="spContainer" styleClass="element" minWidth="-Infinity" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
@@ -23,51 +28,50 @@
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.instance"/>
                     </HBox>
-                    <HBox alignment="CENTER_LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <TextField fx:id="nameInput" promptText="%creator.prompt.name" />
+                    <ErrorWrapper fx:id="ewName" errorMessage="%creator.label.error.name" >
+                        <TextField fx:id="tfName" promptText="%creator.prompt.name" />
                         <padding>
-                            <Insets left="10.0" top="10.0" />
+                            <Insets topRightBottomLeft="10" />
                         </padding>
-                    </HBox>
-                    <Label fx:id="lbNameError" styleClass="error" text="%creator.label.error.name" visible="false" />
+                    </ErrorWrapper>
                 </VBox>
 
                 <VBox GridPane.columnIndex="1">
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.version"/>
                     </HBox>
-                    <VersionCreatorElement fx:id="vcCreator" layoutType="VERTICAL" />
+                    <VersionCreatorElement fx:id="crVersion" layoutType="VERTICAL" />
                 </VBox>
 
                 <VBox GridPane.columnIndex="2">
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.saves"/>
                     </HBox>
-                    <fx:include fx:id="icSavesCreator" source="SavesCreatorElement.fxml" />
+                    <SavesCreatorElement fx:id="crSaves" />
                 </VBox>
 
                 <VBox GridPane.rowIndex="1">
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.resourcepacks"/>
                     </HBox>
-                    <fx:include fx:id="icResourcepacksCreator" source="ResourcepacksCreatorElement.fxml" />
+                    <ResourcepacksCreatorElement fx:id="crResourcepacks" />
                 </VBox>
 
                 <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.options"/>
                     </HBox>
-                    <fx:include fx:id="icOptionsCreator" source="OptionsCreatorElement.fxml" />
+                    <OptionsCreatorElement fx:id="crOptions" />
                 </VBox>
 
                 <VBox fx:id="modsContainer" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <HBox alignment="CENTER_LEFT" styleClass="title-container">
                         <Label styleClass="title" text="%creator.instance.label.mods"/>
                     </HBox>
-                    <fx:include fx:id="icModsCreator" source="ModsCreatorElement.fxml" />
+                    <ModsCreatorElement fx:id="crMods" />
                 </VBox>
 
-                <Button fx:id="btCreate" onAction="#onCreate" text="%creator.button.create" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.fillWidth="true" GridPane.rowIndex="3" GridPane.halignment="CENTER" />
+                <Button onAction="#onCreate" text="%creator.button.create" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.fillWidth="true" GridPane.rowIndex="3" GridPane.halignment="CENTER" />
             </GridPane>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

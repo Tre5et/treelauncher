@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.ui.generic;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import net.treset.minecraftlauncher.LauncherApplication;
 
@@ -19,13 +20,23 @@ public class ErrorWrapper extends VBox {
         if(show) {
             if(getChildren().contains(lbError)) return;
             getChildren().add(lbError);
-            for(Node child : getChildren()) {
-                child.getStyleClass().add("error");
-            }
         } else {
             getChildren().remove(lbError);
-            for(Node child : getChildren()) {
-                child.getStyleClass().remove("error");
+        }
+
+        setErrorRecursive(this, show);
+    }
+
+    private void setErrorRecursive(Pane pane, boolean show) {
+        for(Node child : pane.getChildren()) {
+            if(child instanceof Pane) {
+                setErrorRecursive((Pane) child, show);
+            } else {
+                if(show) {
+                    child.getStyleClass().add("error");
+                } else {
+                    child.getStyleClass().remove("error");
+                }
             }
         }
     }

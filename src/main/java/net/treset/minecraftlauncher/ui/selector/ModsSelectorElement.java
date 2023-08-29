@@ -11,7 +11,6 @@ import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.ModsCreatorElement;
 import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
 import net.treset.minecraftlauncher.util.FileUtil;
-import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.GameResourceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,9 +23,6 @@ import java.util.function.Supplier;
 
 public class ModsSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(ModsSelectorElement.class);
-
-    @FXML
-    private ModsCreatorElement icCreatorController;
     @FXML
     private ModsManagerElement icManagerController;
 
@@ -35,11 +31,7 @@ public class ModsSelectorElement extends ManifestSelectorElement {
     @Override
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
-        icCreatorController.enableUse(false);
-        icCreatorController.init(this, lockSetter, lockGetter);
-        icCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
-        icCreatorController.enableVersionSelect(true);
-        icCreatorController.setModsType("fabric");
+        ((ModsCreatorElement) crCreator).setModsType("fabric");
         icManagerController.init(this, lockSetter, lockGetter);
         icManagerController.setVisible(false);
     }
@@ -47,14 +39,13 @@ public class ModsSelectorElement extends ManifestSelectorElement {
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
-        icCreatorController.beforeShow(stage);
         icManagerController.setVisible(false);
     }
 
     @Override
-    public void afterShow(Stage stage) {
-        super.afterShow(stage);
-        icCreatorController.afterShow(stage);
+    protected void reloadComponents() {
+        super.reloadComponents();
+        ((ModsCreatorElement) crCreator).init(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
     }
 
     @Override
@@ -62,21 +53,6 @@ public class ModsSelectorElement extends ManifestSelectorElement {
         super.onSelectCreate();
         if (!getLock()) {
             icManagerController.setVisible(false);
-        }
-    }
-
-    @FXML
-    @Override
-    protected void onCreate() {
-        if (icCreatorController.checkCreateReady()) {
-            try {
-                icCreatorController.getCreator().getId();
-            } catch (ComponentCreationException e) {
-                LauncherApplication.displayError(e);
-            }
-            reloadComponents();
-        } else {
-            icCreatorController.showError(true);
         }
     }
 
@@ -93,7 +69,6 @@ public class ModsSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            icCreatorController.setPrerequisites(files.getModsComponents(), files.getLauncherDetails().getTypeConversion(), files.getModsManifest(), files.getGameDetailsManifest());
             try {
                 FileUtil.deleteDir(new File(currentMods.getKey().getDirectory()));
             } catch (IOException e) {

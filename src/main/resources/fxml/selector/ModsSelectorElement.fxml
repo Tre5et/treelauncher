@@ -8,6 +8,7 @@
 <?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
 <?import net.treset.minecraftlauncher.ui.generic.CreateSelectable?>
 
+<?import net.treset.minecraftlauncher.ui.create.ModsCreatorElement?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ModsSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
         <AnchorPane styleClass="element">
@@ -31,7 +32,7 @@
                 />
                 <AnchorPane VBox.vgrow="ALWAYS">
                     <VBox fx:id="vbCreate" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-                        <fx:include fx:id="icCreator" source="/fxml/create/ModsCreatorElement.fxml" />
+                        <ModsCreatorElement fx:id="crCreator" allowUse="false" selectVersion="true" />
                         <Button onMouseClicked="#onCreate" text="%creator.button.create" />
                     </VBox>
                     <fx:include fx:id="icManager" source="/fxml/manager/ModsManagerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />

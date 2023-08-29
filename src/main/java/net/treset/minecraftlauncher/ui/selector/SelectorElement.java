@@ -9,10 +9,12 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.ui.create.CreatorElement;
 import net.treset.minecraftlauncher.ui.generic.ActionBar;
 import net.treset.minecraftlauncher.ui.generic.CreateSelectable;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 
 import java.util.List;
@@ -25,6 +27,7 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
     @FXML protected ActionBar abMain;
     @FXML protected CreateSelectable csCreate;
     @FXML protected VBox vbCreate;
+    @FXML protected CreatorElement crCreator;
 
     protected LauncherFiles files;
     protected boolean createSelected = false;
@@ -84,10 +87,24 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
         if(vbCreate != null) {
             vbCreate.setVisible(visible);
         }
+        if(crCreator != null) {
+            crCreator.clear();
+        }
     }
 
     @FXML
-    protected abstract void onCreate();
+    protected void onCreate() {
+        if(crCreator.isCreateReady()) {
+            try {
+                crCreator.create();
+            } catch (ComponentCreationException e) {
+                LauncherApplication.displayError(e);
+            }
+            reloadComponents();
+        } else {
+            crCreator.showError(true);
+        }
+    }
 
     @FXML
     protected abstract void onFolder();

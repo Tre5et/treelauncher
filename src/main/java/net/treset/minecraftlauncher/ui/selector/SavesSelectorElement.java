@@ -3,7 +3,6 @@ package net.treset.minecraftlauncher.ui.selector;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
@@ -18,7 +17,6 @@ import net.treset.minecraftlauncher.ui.generic.lists.SavesContentContainer;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.QuickPlayData;
-import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
 import org.apache.logging.log4j.LogManager;
@@ -33,8 +31,6 @@ import java.util.function.Supplier;
 public class SavesSelectorElement extends ManifestSelectorElement {
     private static final Logger LOGGER = LogManager.getLogger(SavesSelectorElement.class);
 
-    @FXML private SavesCreatorElement icCreatorController;
-
     @FXML
     private void onSelect(MouseEvent event) {
         abMain.setShowPlay(((ContentElement)event.getSource()).isSelected());
@@ -44,36 +40,6 @@ public class SavesSelectorElement extends ManifestSelectorElement {
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         abMain.setShowPlay(false);
-        icCreatorController.enableUse(false);
-        icCreatorController.init(this, lockSetter, lockGetter);
-        icCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
-    }
-
-
-    @Override
-    public void beforeShow(Stage stage) {
-        super.beforeShow(stage);
-        icCreatorController.beforeShow(stage);
-    }
-
-    @Override
-    public void afterShow(Stage stage) {
-        super.afterShow(stage);
-        icCreatorController.afterShow(stage);
-    }
-
-    @Override
-    protected void onCreate() {
-        if(icCreatorController.checkCreateReady()) {
-            try {
-                icCreatorController.getCreator().getId();
-            } catch (ComponentCreationException e) {
-                LauncherApplication.displayError(e);
-            }
-            reloadComponents();
-        } else {
-            icCreatorController.showError(true);
-        }
     }
 
     @Override
@@ -91,6 +57,7 @@ public class SavesSelectorElement extends ManifestSelectorElement {
     @Override
     protected void reloadComponents() {
         super.reloadComponents();
+        ((SavesCreatorElement) crCreator).init(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
         Platform.runLater(() -> abMain.setShowPlay(false));
     }
 
@@ -210,7 +177,6 @@ public class SavesSelectorElement extends ManifestSelectorElement {
                 LauncherApplication.displayError(e);
                 return;
             }
-            icCreatorController.setPrerequisites(files.getSavesComponents(), files.getLauncherDetails().getTypeConversion(), files.getSavesManifest(), files.getGameDetailsManifest());
             try {
                 FileUtil.deleteDir(new File(getManifest().getDirectory()));
             } catch (IOException e) {
