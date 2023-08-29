@@ -6,13 +6,33 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
-<VBox fx:id="root" alignment="TOP_CENTER" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement">
+<?import javafx.scene.control.ListView?>
+<?import net.treset.minecraftlauncher.ui.generic.IconButton?>
+<VBox fx:id="root" alignment="TOP_CENTER" spacing="20" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement">
     <padding>
         <Insets top="10" left="20" right="20" bottom="10"/>
     </padding>
-    <Label text="%instances.settings.label.memory" />
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <Slider fx:id="slMemory" min="256" minorTickCount="0" showTickLabels="true" showTickMarks="true" HBox.hgrow="ALWAYS" />
-        <TextField fx:id="tfMemory" maxWidth="80" />
+    <VBox>
+        <Label text="%instances.settings.label.memory" />
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Slider fx:id="slMemory" min="256" minorTickCount="0" showTickLabels="true" showTickMarks="true" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="tfMemory" maxWidth="80" />
+        </HBox>
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="5">
+        <Label text="%instances.settings.label.resolution" />
+        <TextField fx:id="tfWidth" maxWidth="60" />
+        <Label text="x"/>
+        <TextField fx:id="tfHeight" maxWidth="60" />
     </HBox>
+
+    <VBox spacing="3">
+        <Label text="%instances.settings.label.arguments" />
+        <ListView fx:id="lvArguments" prefHeight="200" />
+        <HBox>
+            <IconButton onAction="#onAdd" styleClass="plus" iconSize="20" />
+            <IconButton onAction="#onRemove" styleClass="delete, neutral" iconSize="20" />
+        </HBox>
+    </VBox>
 </VBox>

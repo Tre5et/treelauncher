@@ -1,0 +1,29 @@
+.list-view {
+    -fx-background-color: -fx-background-secondary;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: -fx-primary-300;
+}
+
+.list-view > .virtual-flow {
+    -fx-background-color: -fx-background-secondary;
+}
+
+.list-view > .virtual-flow > .clipped-container {
+    -fx-background-color: -fx-background-secondary;
+}
+
+.list-view > .virtual-flow > .clipped-container > .sheet {
+    -fx-background-color: -fx-background-secondary;
+}
+
+.list-view > .virtual-flow > .clipped-container > .sheet > .cell.indexed-cell.list-cell {
+    -fx-background-color: -fx-background-secondary;
+    -fx-cursor: hand;
+}
+
+.list-view > .virtual-flow > .clipped-container > .sheet > .cell.indexed-cell.list-cell:filled:selected {
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 3px;
+    -fx-border-color: -fx-primary-600;
+}

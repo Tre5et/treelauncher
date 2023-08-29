@@ -10,6 +10,7 @@
     -fx-border-color: -fx-primary-400;
     -fx-border-radius: 10px;
     -fx-translate-y: 10px;
+    -fx-cursor: hand;
 }
 
 .slider > .axis {

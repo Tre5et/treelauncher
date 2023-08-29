@@ -109,3 +109,7 @@
 .settings {
     -fx-icon-code: bi-gear;
 }
+
+.plus {
+    -fx-icon-code: bi-plus;
+}
