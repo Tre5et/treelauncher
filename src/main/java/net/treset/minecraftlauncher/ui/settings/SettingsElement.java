@@ -251,7 +251,10 @@ public class SettingsElement extends UiElement {
                                 new PopupElement.PopupButton(
                                         PopupElement.ButtonType.POSITIVE,
                                         "settings.update.restart",
-                                        event -> Platform.exit()
+                                        event -> {
+                                            LauncherApplication.setRestartAfterUpdate(true);
+                                            Platform.exit();
+                                        }
                                 )
                         )
                 )

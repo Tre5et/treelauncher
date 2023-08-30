@@ -35,6 +35,8 @@ public class LauncherApplication extends Application {
     public static LauncherUpdater launcherUpdater;
     public static Stage primaryStage;
 
+    private static boolean restartAfterUpdate = false;
+
     private static Consumer<PopupElement> popupConsumer;
     private static Supplier<Boolean> closeCallback;
 
@@ -162,6 +164,10 @@ public class LauncherApplication extends Application {
         });
     }
 
+    public static void setRestartAfterUpdate(boolean restartAfterUpdate) {
+        LauncherApplication.restartAfterUpdate = restartAfterUpdate;
+    }
+
     @Override
     public void stop() throws Exception {
         try {
@@ -181,6 +187,27 @@ public class LauncherApplication extends Application {
 
     private void startUpdater() throws IOException {
         ProcessBuilder pb = new ProcessBuilder(FormatUtil.absoluteFilePath(System.getProperty("java.home"), "bin", "java"), "-jar", "app/updater.jar");
+        if(restartAfterUpdate) {
+            if(new File("TreeLauncher.exe").exists()) {
+                LOGGER.info("TreeLauncher found, using it to restart");
+                pb.command().add("TreeLauncher");
+            } else {
+                LOGGER.warn("TreeLauncher not found, searching alternative file");
+                File[] files = new File(".").listFiles();
+                if(files == null) {
+                    LOGGER.error("Failed to list files!");
+                } else {
+                    for(File file : files) {
+                        if(file.getName().endsWith(".exe")) {
+                            LOGGER.info("Found alternative file: " + file.getName());
+                            pb.command().add(file.getName().substring(0, file.getName().length() - 4));
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
         pb.start();
     }
 }
