@@ -1,4 +1,9 @@
 .list-view {
+    -fx-list-hover: -fx-primary-700;
+    -fx-list-selected: -fx-primary-900;
+}
+
+.list-view {
     -fx-background-color: -fx-background-secondary;
     -fx-border-width: 1.5px;
     -fx-border-radius: 5px;
@@ -23,7 +28,9 @@
 }
 
 .list-view > .virtual-flow > .clipped-container > .sheet > .cell.indexed-cell.list-cell:filled:selected {
-    -fx-border-width: 1.5px;
-    -fx-border-radius: 3px;
-    -fx-border-color: -fx-primary-600;
+    -fx-background-color: -fx-list-selected;
+}
+
+.list-view > .virtual-flow > .clipped-container > .sheet > .cell.indexed-cell.list-cell:hover {
+    -fx-background-color: -fx-list-hover;
 }

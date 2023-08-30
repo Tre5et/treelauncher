@@ -7,7 +7,6 @@
     -fx-combobox-background: -fx-combobox-default;
     -fx-combobox-border: -fx-combobox-border-default;
     -fx-combobox-arrow: -fx-text;
-    -fx-combobox-list-background: -fx-combobox-list-default;
 }
 
 .combo-box {
@@ -37,10 +36,6 @@
 .combo-box > .combo-box-popup > .list-view  .list-cell {
     -fx-text-fill: -fx-text;
     -fx-background-color: -fx-combobox-background;
-}
-
-.combo-box > .combo-box-popup > .list-view .list-cell:hover {
-    -fx-combobox-background: -fx-combobox-list-hover;
 }
 
 .combo-box:disabled {

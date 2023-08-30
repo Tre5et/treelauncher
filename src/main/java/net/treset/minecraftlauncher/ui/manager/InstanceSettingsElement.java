@@ -186,6 +186,9 @@ public class InstanceSettingsElement extends UiElement {
     }
 
     public void save() {
+        if(instanceData == null) {
+            return;
+        }
         saveMemory();
         saveResolution();
         saveArguments();
