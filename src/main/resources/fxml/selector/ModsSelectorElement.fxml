@@ -11,8 +11,8 @@
 <?import net.treset.minecraftlauncher.ui.create.ModsCreatorElement?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ModsSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
-        <AnchorPane styleClass="element">
-            <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <StackPane styleClass="element">
+            <VBox alignment="TOP_CENTER" >
                 <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
                     <Label styleClass="title" text="%mods.label.title" />
                 </VBox>
@@ -21,23 +21,23 @@
                 </ScrollPane>
                 <CreateSelectable fx:id="csCreate" onMouseClicked="#onSelectCreate" />
             </VBox>
-        </AnchorPane>
-        <AnchorPane minWidth="-Infinity" styleClass="element">
-            <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        </StackPane>
+        <StackPane styleClass="element">
+            <VBox alignment="TOP_CENTER" >
                 <ActionBar fx:id="abMain"
                            defaultLabel="%components.label.details.title"
                            onFolder="#onFolder"
                            onEdit="#onEdit"
                            onDelete="#onDelete"
                 />
-                <AnchorPane VBox.vgrow="ALWAYS">
-                    <VBox fx:id="vbCreate" alignment="TOP_CENTER" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                <StackPane VBox.vgrow="ALWAYS">
+                    <VBox fx:id="vbCreate" alignment="TOP_CENTER" visible="false" >
                         <ModsCreatorElement fx:id="crCreator" allowUse="false" selectVersion="true" />
                         <Button onMouseClicked="#onCreate" text="%creator.button.create" />
                     </VBox>
-                    <fx:include fx:id="icManager" source="/fxml/manager/ModsManagerElement.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
-                </AnchorPane>
+                    <fx:include fx:id="icManager" source="/fxml/manager/ModsManagerElement.fxml" />
+                </StackPane>
             </VBox>
-        </AnchorPane>
+        </StackPane>
     </SplitPane>
 </AnchorPane>

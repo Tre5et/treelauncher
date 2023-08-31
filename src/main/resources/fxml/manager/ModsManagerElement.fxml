@@ -35,7 +35,8 @@
             <CheckBox fx:id="chSnapshots" onMouseClicked="#onCheckSnapshots" text="%creator.version.checkbox.snapshots" />
             <IconButton fx:id="btChange" styleClass="sync, highlight" iconSize="32" onAction="#onChange" tooltipText="%changer.tooltip.change" />
         </HBox>
-        <ButtonElement text="%manager.components.label.settings" iconClass="settings" onMouseClicked="#onSettings" />
+        <ButtonElement text="%manager.components.label.settings" iconClass="settings" onMouseClicked="#onSettings" noMargin="true" >
+        </ButtonElement>
     </VBox>
     <fx:include fx:id="icModSearch" minWidth="-Infinity" source="ModsSearchElement.fxml" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
     <ComponentManagerElement fx:id="maComponent" onBack="#onSettingsBack" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />

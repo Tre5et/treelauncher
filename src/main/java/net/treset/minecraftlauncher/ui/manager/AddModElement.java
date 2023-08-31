@@ -1,7 +1,6 @@
 package net.treset.minecraftlauncher.ui.manager;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
@@ -15,6 +14,7 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.ModUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
+import net.treset.minecraftlauncher.ui.generic.ErrorWrapper;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
 import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
 
@@ -27,14 +27,14 @@ import java.util.List;
 public class AddModElement extends UiElement {
     @FXML private AnchorPane rootPane;
     @FXML private TextField tfName;
-    @FXML private TextField tfPath;
-    @FXML private Label lbFileError;
+    @FXML private TextField tfFile;
+    @FXML private ErrorWrapper ewFile;
     @FXML private TextField tfVersion;
-    @FXML private Label lbVersionError;
+    @FXML private ErrorWrapper ewVersion;
     @FXML private TextField tfModrinth;
-    @FXML private Label lbModrinthError;
+    @FXML private ErrorWrapper ewModrinth;
     @FXML private TextField tfCurseforge;
-    @FXML private Label lbCurseforgeError;
+    @FXML private ErrorWrapper ewCurseforge;
 
     private Pair<LauncherManifest, LauncherModsDetails> details;
     private ChangeEvent<LauncherMod, ModContentElement> searchChangeCallback;
@@ -42,6 +42,11 @@ public class AddModElement extends UiElement {
     public void init(Pair<LauncherManifest, LauncherModsDetails> details, ChangeEvent<LauncherMod, ModContentElement> searchChangeCallback) {
         this.details = details;
         this.searchChangeCallback = searchChangeCallback;
+
+        this.tfFile.textProperty().addListener(((observable, oldValue, newValue) -> ewFile.showError(false)));
+        this.tfVersion.textProperty().addListener(((observable, oldValue, newValue) -> ewVersion.showError(false)));
+        this.tfModrinth.textProperty().addListener(((observable, oldValue, newValue) -> ewModrinth.showError(false)));
+        this.tfCurseforge.textProperty().addListener(((observable, oldValue, newValue) -> ewCurseforge.showError(false)));
     }
 
     @FXML
@@ -51,7 +56,7 @@ public class AddModElement extends UiElement {
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File chosen = fileChooser.showOpenDialog(LauncherApplication.primaryStage);
         if(chosen != null && chosen.isFile()) {
-            tfPath.setText(chosen.getAbsolutePath());
+            tfFile.setText(chosen.getAbsolutePath());
         }
     }
 
@@ -62,8 +67,6 @@ public class AddModElement extends UiElement {
 
     @FXML
     private void onAdd() {
-        lbFileError.setVisible(false);
-        tfPath.getStyleClass().remove("error");
         if(!isComplete()) {
             displayError();
             return;
@@ -73,7 +76,7 @@ public class AddModElement extends UiElement {
     }
 
     private void moveModFile() {
-        File modFile = new File(tfPath.getText());
+        File modFile = new File(tfFile.getText());
         String fileName = modFile.getName();
         String name = tfName.getText().isEmpty() ? fileName.substring(0, fileName.length() - 4) : tfName.getText();
         List<LauncherModDownload> downloads = getDownloads();
@@ -165,34 +168,14 @@ public class AddModElement extends UiElement {
     }
 
     public void displayError() {
-        tfVersion.getStyleClass().remove("error");
-        lbVersionError.setVisible(false);
-        tfPath.getStyleClass().remove("error");
-        lbFileError.setVisible(false);
-        tfModrinth.getStyleClass().remove("error");
-        lbModrinthError.setVisible(false);
-        tfCurseforge.getStyleClass().remove("error");
-        lbCurseforgeError.setVisible(false);
-        if (tfVersion.getText().isEmpty()) {
-            tfVersion.getStyleClass().add("error");
-            lbVersionError.setVisible(true);
-        }
-        if (tfPath.getText().isEmpty() || !tfPath.getText().endsWith(".jar") || !new File(tfPath.getText()).isFile()) {
-            tfPath.getStyleClass().add("error");
-            lbFileError.setVisible(true);
-        }
-        if(!modrinthValid()) {
-            tfModrinth.getStyleClass().add("error");
-            lbModrinthError.setVisible(true);
-        }
-        if(!curseforgeValid()) {
-            tfCurseforge.getStyleClass().add("error");
-            lbCurseforgeError.setVisible(true);
-        }
+        ewFile.showError(tfFile.getText().isEmpty() || !tfFile.getText().endsWith(".jar") || !new File(tfFile.getText()).isFile());
+        ewVersion.showError(tfVersion.getText().isEmpty());
+        ewModrinth.showError(!modrinthValid());
+        ewCurseforge.showError(!curseforgeValid());
     }
 
     public boolean isComplete() {
-        return !tfVersion.getText().isEmpty() && !tfPath.getText().isEmpty() && tfPath.getText().endsWith(".jar") && new File(tfPath.getText()).isFile() && modrinthValid() && curseforgeValid();
+        return !tfVersion.getText().isEmpty() && !tfFile.getText().isEmpty() && tfFile.getText().endsWith(".jar") && new File(tfFile.getText()).isFile() && modrinthValid() && curseforgeValid();
     }
 
     @Override
@@ -203,18 +186,14 @@ public class AddModElement extends UiElement {
     @Override
     public void beforeShow(Stage stage) {
         tfName.clear();
-        tfPath.clear();
+        tfFile.clear();
         tfVersion.clear();
         tfModrinth.clear();
         tfCurseforge.clear();
-        tfPath.getStyleClass().remove("error");
-        lbFileError.setVisible(false);
-        tfVersion.getStyleClass().remove("error");
-        lbVersionError.setVisible(false);
-        tfModrinth.getStyleClass().remove("error");
-        lbModrinthError.setVisible(false);
-        tfCurseforge.getStyleClass().remove("error");
-        lbCurseforgeError.setVisible(false);
+        ewFile.showError(false);
+        ewVersion.showError(false);
+        ewModrinth.showError(false);
+        ewCurseforge.showError(false);
     }
 
     @Override

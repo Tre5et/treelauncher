@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import net.treset.minecraftlauncher.ui.generic.ErrorWrapper?>
 <?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 <AnchorPane fx:id="rootPane" visible="false" styleClass="element" xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -12,18 +13,21 @@
             <Insets topRightBottomLeft="10.0" />
         </padding>
         <TextField fx:id="tfName" promptText="%manager.mods.add.prompt.name" />
-        <Label visible="false" styleClass="error" text="Placeholder" />
+        <ErrorWrapper fx:id="ewFile" errorMessage="%manager.mods.add.error.file">
         <HBox alignment="CENTER_LEFT">
-            <TextField fx:id="tfPath" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="tfFile" promptText="%manager.mods.add.prompt.file" HBox.hgrow="ALWAYS" />
             <IconButton styleClass="file-code" iconSize="28" onAction="#onFileSelector" tooltipText="%settings.tooltip.select" />
         </HBox>
-        <Label fx:id="lbFileError" visible="false" styleClass="error" text="%manager.mods.add.error.file" />
-        <TextField fx:id="tfVersion" promptText="%manager.mods.add.prompt.version" />
-        <Label fx:id="lbVersionError" visible="false" styleClass="error" text="%manager.mods.add.error.version" />
-        <TextField fx:id="tfModrinth" promptText="%manager.mods.add.prompt.modrinth" />
-        <Label fx:id="lbModrinthError" visible="false" styleClass="error" text="%manager.mods.add.error.modrinth" />
-        <TextField fx:id="tfCurseforge" promptText="%manager.mods.add.prompt.curseforge" />
-        <Label fx:id="lbCurseforgeError" visible="false" styleClass="error" text="%manager.mods.add.error.curseforge" />
+        </ErrorWrapper>
+        <ErrorWrapper fx:id="ewVersion" errorMessage="%manager.mods.add.error.version">
+            <TextField fx:id="tfVersion" promptText="%manager.mods.add.prompt.version" />
+        </ErrorWrapper>
+        <ErrorWrapper fx:id="ewModrinth" errorMessage="%manager.mods.add.error.modrinth">
+            <TextField fx:id="tfModrinth" promptText="%manager.mods.add.prompt.modrinth" />
+        </ErrorWrapper>
+        <ErrorWrapper fx:id="ewCurseforge" errorMessage="%manager.mods.add.error.curseforge">
+            <TextField fx:id="tfCurseforge" promptText="%manager.mods.add.prompt.curseforge" />
+        </ErrorWrapper>
         <HBox spacing="10">
             <Button styleClass="neutral" text="%manager.mods.add.button.cancel" onAction="#onCancel" />
             <Button text="%manager.mods.add.button.add" onAction="#onAdd" />

@@ -23,10 +23,14 @@ public class ButtonElement extends HBox {
     private String iconClass;
     private String text;
 
+    private boolean noMargin = false;
+
     public ButtonElement() {
+        getStylesheets().add("/css/generic/ButtonElement.css");
+
         VBox.setVgrow(this, Priority.NEVER);
         setAlignment(Pos.CENTER_LEFT);
-        getStyleClass().add("create-container");
+        getStyleClass().add("button-container");
         VBox.setMargin(this, new Insets(10));
         setCursor(Cursor.HAND);
         setSpacing(10);
@@ -66,5 +70,18 @@ public class ButtonElement extends HBox {
     public void setText(String text) {
         this.text = text;
         label.setText(LauncherApplication.stringLocalizer.get(text));
+    }
+
+    public boolean isNoMargin() {
+        return noMargin;
+    }
+
+    public void setNoMargin(boolean noMargin) {
+        this.noMargin = noMargin;
+        if(noMargin) {
+            VBox.setMargin(this, new Insets(0));
+        } else {
+            VBox.setMargin(this, new Insets(10));
+        }
     }
 }

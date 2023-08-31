@@ -8,50 +8,50 @@
 <?import net.treset.minecraftlauncher.ui.generic.IconButton?>
 <AnchorPane fx:id="rootPane" styleClass="element-root" stylesheets="@/css/settings/SettingsElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.settings.SettingsElement">
     <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="element" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <VBox alignment="TOP_CENTER" spacing="20">
-                <HBox alignment="CENTER" styleClass="title-container">
-                    <Label styleClass="title" text="%settings.title" />
-                    <VBox.margin>
-                       <Insets bottom="15.0" />
-                    </VBox.margin>
+        <VBox alignment="TOP_CENTER" spacing="20">
+            <HBox alignment="CENTER" styleClass="title-container">
+                <Label styleClass="title" text="%settings.title" />
+                <VBox.margin>
+                   <Insets bottom="15.0" />
+                </VBox.margin>
+            </HBox>
+            <VBox alignment="TOP_CENTER">
+                <HBox alignment="CENTER" spacing="5">
+                    <Label text="%settings.label.language" />
+                    <ComboBox fx:id="cbLanguage"/>
                 </HBox>
-                <VBox alignment="TOP_CENTER">
-                    <HBox alignment="CENTER" spacing="5">
-                        <Label text="%settings.label.language" />
-                        <ComboBox fx:id="cbLanguage"/>
-                    </HBox>
-                    <Label fx:id="lbLanguage" styleClass="hint" text="%settings.label.restart" visible="false" />
-                </VBox>
-                <VBox alignment="TOP_CENTER">
-                    <Label text="%settings.label.filepath" />
-                    <HBox alignment="CENTER">
-                        <TextField fx:id="tfPath" alignment="CENTER_RIGHT" text="ERROR LOADING CURRENT PATH!" />
-                        <IconButton styleClass="neutral, folder-open" iconSize="28" onAction="#onFileSelector" tooltipText="%settings.tooltip.select" />
-                    </HBox>
-                    <CheckBox fx:id="cbRemove" selected="true" text="%settings.label.path.remove" />
-                    <Button onAction="#onPathApply" text="%settings.button.path.apply" />
-                </VBox>
-                <VBox alignment="TOP_CENTER" spacing="2">
-                    <Label text="%settings.label.user" />
-                    <Label fx:id="lbUsername" styleClass="username" text="Error getting name" />
-                    <ImageView fx:id="ivSkin"/>
-                    <Label fx:id="lbUuid" styleClass="hint" text="Error getting uuid" />
-                    <Button onAction="#onLogout" styleClass="negative" text="%settings.button.logout">
-                        <VBox.margin>
-                            <Insets top="10.0" />
-                        </VBox.margin>
-                    </Button>
-                </VBox>
-                <VBox alignment="TOP_CENTER">
-                    <Label styleClass="name" text="%launcher.name" />
-                    <HBox alignment="CENTER">
-                        <Label styleClass="hint" text="%settings.version.version" />
-                        <Label styleClass="hint" text="%launcher.version" />
-                    </HBox>
-                    <IconButton styleClass="highlight, update" iconSize="32" onAction="#onUpdate" tooltipText="%settings.tooltip.update" />
-                    <Label fx:id="lbUpdate" styleClass="update-available-label" visible="false" text="%settings.version.available" />
-                    <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSource" tooltipText="%settings.tooltip.source" />
-                </VBox>
+                <Label fx:id="lbLanguage" styleClass="hint" text="%settings.label.restart" visible="false" />
             </VBox>
+            <VBox alignment="TOP_CENTER">
+                <Label text="%settings.label.filepath" />
+                <HBox alignment="CENTER">
+                    <TextField fx:id="tfPath" alignment="CENTER_RIGHT" text="ERROR LOADING CURRENT PATH!" />
+                    <IconButton styleClass="neutral, folder-open" iconSize="28" onAction="#onFileSelector" tooltipText="%settings.tooltip.select" />
+                </HBox>
+                <CheckBox fx:id="cbRemove" selected="true" text="%settings.label.path.remove" />
+                <Button onAction="#onPathApply" text="%settings.button.path.apply" />
+            </VBox>
+            <VBox alignment="TOP_CENTER" spacing="2">
+                <Label text="%settings.label.user" />
+                <Label fx:id="lbUsername" styleClass="username" text="Error getting name" />
+                <ImageView fx:id="ivSkin"/>
+                <Label fx:id="lbUuid" styleClass="hint" text="Error getting uuid" />
+                <Button onAction="#onLogout" styleClass="negative" text="%settings.button.logout">
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </Button>
+            </VBox>
+            <VBox alignment="TOP_CENTER">
+                <Label styleClass="name" text="%launcher.name" />
+                <HBox alignment="CENTER">
+                    <Label styleClass="hint" text="%settings.version.version" />
+                    <Label styleClass="hint" text="%launcher.version" />
+                </HBox>
+                <IconButton styleClass="highlight, update" iconSize="32" onAction="#onUpdate" tooltipText="%settings.tooltip.update" />
+                <Label fx:id="lbUpdate" styleClass="update-available-label" visible="false" text="%settings.version.available" />
+                <IconButton styleClass="neutral, github" iconSize="28" onAction="#onSource" tooltipText="%settings.tooltip.source" />
+            </VBox>
+        </VBox>
     </ScrollPane>
 </AnchorPane>
