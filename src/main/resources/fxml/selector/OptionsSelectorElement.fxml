@@ -6,10 +6,11 @@
 <?import net.treset.minecraftlauncher.ui.generic.ActionBar?>
 
 <?import net.treset.minecraftlauncher.ui.create.OptionsCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.OptionsSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
-        <AnchorPane minWidth="-Infinity" styleClass="element">
-            <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <StackPane minWidth="-Infinity" styleClass="element">
+            <VBox alignment="TOP_CENTER" minWidth="-Infinity" >
                 <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
                     <Label styleClass="title" text="%selector.options.label.title" />
                 </VBox>
@@ -18,20 +19,23 @@
                 </ScrollPane>
                 <CreateSelectable fx:id="csCreate" onMouseClicked="#onSelectCreate" />
             </VBox>
-        </AnchorPane>
-        <AnchorPane minWidth="-Infinity" styleClass="element">
-            <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        </StackPane>
+        <StackPane minWidth="-Infinity" styleClass="element">
+            <VBox alignment="TOP_CENTER" minWidth="-Infinity" >
                 <ActionBar fx:id="abMain"
                            defaultLabel="%components.label.details.title"
                            onFolder="#onFolder"
                            onEdit="#onEdit"
                            onDelete="#onDelete"
                 />
-                <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER">
-                    <OptionsCreatorElement fx:id="crCreator" allowUse="false" />
-                    <Button onMouseClicked="#onCreate" text="%creator.button.create" />
-                </VBox>
+                <StackPane>
+                    <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER">
+                        <OptionsCreatorElement fx:id="crCreator" allowUse="false" />
+                        <Button onMouseClicked="#onCreate" text="%creator.button.create" />
+                    </VBox>
+                    <ComponentManagerElement fx:id="maComponent" visible="false" />
+                </StackPane>
             </VBox>
-        </AnchorPane>
+        </StackPane>
     </SplitPane>
 </AnchorPane>

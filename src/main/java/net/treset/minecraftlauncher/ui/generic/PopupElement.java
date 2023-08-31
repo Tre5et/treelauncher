@@ -113,6 +113,9 @@ public class PopupElement extends GridPane {
         public T getSelected() {
             return comboBox.getSelectionModel().getSelectedItem();
         }
+        public int getSelectedIndex() {
+            return comboBox.getSelectionModel().getSelectedIndex();
+        }
 
         public void select(T value) {
             comboBox.getSelectionModel().select(value);
@@ -134,8 +137,8 @@ public class PopupElement extends GridPane {
     }
 
     public interface PopupControl {
-        public Control getControl();
-        public void setDisabled(boolean disabled);
+        Control getControl();
+        void setDisabled(boolean disabled);
     }
 
     private final VBox vbContainer = new VBox();

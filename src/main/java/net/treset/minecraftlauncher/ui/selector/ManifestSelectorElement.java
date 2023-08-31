@@ -6,8 +6,10 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.ui.generic.ButtonElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
+import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import org.apache.logging.log4j.LogManager;
@@ -48,8 +50,25 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     private static final Logger LOGGER = LogManager.getLogger(ManifestSelectorElement.class);
 
     @FXML protected FolderContentContainer ccDetails;
+    @FXML protected ComponentManagerElement maComponent;
+    @FXML protected ButtonElement btSettings;
+    @FXML protected ComponentManagerElement maComponentSecondary;
 
     protected ManifestContentProvider currentProvider = null;
+
+    @FXML
+    private void onSettings() {
+        if(maComponentSecondary != null) {
+            maComponentSecondary.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void onSettingsBack() {
+        if(maComponentSecondary != null) {
+            maComponentSecondary.setVisible(false);
+        }
+    }
 
     @Override
     protected String getCurrentUsedBy() {
@@ -86,6 +105,15 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         if(ccDetails != null) {
             ccDetails.setVisible(selected);
         }
+        if(maComponent != null) {
+            maComponent.setVisible(selected);
+        }
+        if(btSettings != null) {
+            btSettings.setVisible(selected);
+        }
+        if(maComponentSecondary != null) {
+            maComponentSecondary.setVisible(false);
+        }
         if(selected) {
             deselectAll();
             currentProvider = contentProvider;
@@ -96,6 +124,16 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
             abMain.setLabel(contentProvider.getManifest().getName());
             if(ccDetails != null) {
                 ccDetails.setFolder(new File(contentProvider.getManifest().getDirectory()));
+            }
+            if(maComponent != null) {
+                maComponent.init(contentProvider.getManifest());
+                maComponent.setVisible(true);
+            }
+            if(btSettings != null) {
+                btSettings.setVisible(true);
+            }
+            if(maComponentSecondary != null) {
+                maComponentSecondary.init(contentProvider.getManifest());
             }
         } else {
             currentProvider = null;
@@ -113,6 +151,9 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         super.onSelectCreate();
         if(ccDetails != null) {
             ccDetails.setVisible(false);
+        }
+        if(maComponent != null) {
+            maComponent.setVisible(false);
         }
     }
 

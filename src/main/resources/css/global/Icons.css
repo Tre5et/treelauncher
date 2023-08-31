@@ -58,6 +58,10 @@
     -fx-icon-code: bi-caret-left-fill;
 }
 
+.file {
+    -fx-icon-code: bi-file-earmark;
+}
+
 .file-code {
     -fx-icon-code: bi-file-earmark-code;
 }

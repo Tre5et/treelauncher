@@ -90,6 +90,18 @@ public class FormatUtil {
         return items.stream().map(FormatUtil::toRegex).toList();
     }
 
+    public static String fromRegex(String item) {
+        return item.replaceAll("\\\\\\\\", "\\\\").replaceAll("\\\\\\.", ".").replaceAll("^\\^", "").replaceAll("\\$$", "");
+    }
+
+    public static List<String> fromRegex(String... items) {
+        return Arrays.stream(items).map(FormatUtil::fromRegex).toList();
+    }
+
+    public static List<String> fromRegex(List<String> items) {
+        return items.stream().map(FormatUtil::fromRegex).toList();
+    }
+
     public static String formatSeconds(long seconds) {
         if (seconds < 60) {
             return seconds + LauncherApplication.stringLocalizer.get("suffix.seconds");

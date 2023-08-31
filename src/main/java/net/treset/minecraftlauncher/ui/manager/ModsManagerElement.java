@@ -49,6 +49,7 @@ public class ModsManagerElement extends UiElement {
     @FXML private CheckBox chSnapshots;
     @FXML private Button btChange;
     @FXML private ModsSearchElement icModSearchController;
+    @FXML private ComponentManagerElement maComponent;
 
     private final ModManagerChangeCallback changeCallback = new ModManagerChangeCallback();
     private Pair<LauncherManifest, LauncherModsDetails> details;
@@ -135,6 +136,16 @@ public class ModsManagerElement extends UiElement {
         currentModsContainer.getChildren().addAll(elements);
     }
 
+    @FXML
+    private void onSettings() {
+        maComponent.setVisible(true);
+    }
+
+    @FXML
+    private void onSettingsBack() {
+        maComponent.setVisible(false);
+    }
+
     private void onVersionChangeAccepted(ActionEvent event) {
         LauncherApplication.setPopup(null);
         details.getValue().setModsVersion(cbVersion.getSelectionModel().getSelectedItem());
@@ -176,6 +187,8 @@ public class ModsManagerElement extends UiElement {
         cbVersion.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onVersionSelected));
         vbCurrentMods.setVisible(true);
         icModSearchController.setVisible(false);
+        maComponent.setVisible(false);
+        maComponent.init(details.getKey());
     }
 
     private void reloadMods() {

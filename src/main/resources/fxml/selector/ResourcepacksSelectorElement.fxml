@@ -7,10 +7,12 @@
 
 <?import net.treset.minecraftlauncher.ui.generic.lists.ResourcepacksContentContainer?>
 <?import net.treset.minecraftlauncher.ui.create.ResourcepacksCreatorElement?>
+<?import net.treset.minecraftlauncher.ui.generic.ButtonElement?>
+<?import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement?>
 <AnchorPane fx:id="rootPane" stylesheets="@/css/generic/SelectorElement.css" visible="false" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.selector.ResourcepacksSelectorElement" >
     <SplitPane dividerPositions="0.45" styleClass="element-root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" >
-        <AnchorPane minWidth="-Infinity" styleClass="element">
-            <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <StackPane styleClass="element">
+            <VBox alignment="TOP_CENTER" minWidth="-Infinity" >
                 <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
                     <Label styleClass="title" text="%selector.resourcepacks.label.title" />
                 </VBox>
@@ -20,23 +22,27 @@
                 </ScrollPane>
                 <CreateSelectable fx:id="csCreate" onMouseClicked="#onSelectCreate" />
             </VBox>
-        </AnchorPane>
-        <AnchorPane minWidth="-Infinity" styleClass="element">
-            <VBox alignment="TOP_CENTER" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        </StackPane>
+        <StackPane styleClass="element">
+            <VBox alignment="TOP_CENTER" >
                 <ActionBar fx:id="abMain"
                            defaultLabel="%components.label.details.title"
                            onFolder="#onFolder"
                            onEdit="#onEdit"
                            onDelete="#onDelete"
                 />
-                <AnchorPane>
-                    <ResourcepacksContentContainer fx:id="ccDetails" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                    <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <StackPane VBox.vgrow="ALWAYS">
+                    <VBox>
+                        <ResourcepacksContentContainer fx:id="ccDetails" visible="false" VBox.vgrow="ALWAYS"/>
+                        <ButtonElement fx:id="btSettings" text="%manager.components.label.settings" iconClass="settings" onMouseClicked="#onSettings" visible="false" />
+                    </VBox>
+                    <VBox fx:id="vbCreate" visible="false" alignment="TOP_CENTER" >
                         <ResourcepacksCreatorElement fx:id="crCreator" allowUse="false" />
                         <Button onMouseClicked="#onCreate" text="%creator.button.create" />
                     </VBox>
-                </AnchorPane>
+                    <ComponentManagerElement fx:id="maComponentSecondary" onBack="#onSettingsBack" visible="false" />
+                </StackPane>
             </VBox>
-        </AnchorPane>
+        </StackPane>
     </SplitPane>
 </AnchorPane>
