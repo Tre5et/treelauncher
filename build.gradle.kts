@@ -9,7 +9,7 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.5.0"
+val version = "0.6.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
@@ -17,23 +17,25 @@ val mcVersionLoaderVersion = "1.2.2"
 val log4jVersion = "2.20.0"
 val ikonliVersion = "12.3.1"
 
-checkVersion()
+updateVersion()
 
-fun checkVersion() {
+fun updateVersion() {
     val stringFile= File("src/main/resources/lang/strings.properties")
     val content = stringFile.readLines()
     var matches = false
+    var newContent = ""
     for(line in content) {
         if (line.startsWith("launcher.version=")) {
-            if (line.substringAfter("launcher.version=").startsWith(version)) {
-                matches = true
-                break
-            }
+            matches = true
+            newContent += "launcher.version=$version\n"
+        } else {
+            newContent += line + "\n"
         }
     }
     if(!matches) {
-        throw Exception("Version in strings.properties does not match version in build.gradle.kts")
+        throw Exception("Version in strings.properties not found")
     }
+    stringFile.writeText(newContent)
 }
 
 repositories {

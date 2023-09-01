@@ -1,0 +1,28 @@
+{
+  "version": "0.5.0",
+  "requires": ">0.3.0",
+  "files": [
+    {
+      "remove": "app/minecraft-launcher-all.jar",
+      "update": "app/minecraft-launcher-all.jar",
+      "url": "https://github.com/Tre5et/treelauncher/releases/download/v0.6.0-beta/TreeLauncher-0.6.0.jar"
+    }
+  ],
+  "changes": [
+    "Added QuickPlay System for worlds and servers from components",
+    "Added Instance Settings screen to manage memory, resolution and java arguments",
+    "Added Component Settings screen to manage included files",
+    "Added sort options to mods manager",
+    "Input fields with errors now hide the error once the input is changed",
+    "After an update the option to close the launcher was replaced with the option to restart",
+    "Adjusted the in-game strings to display the instance name more prominently",
+    "Closing the launcher with a close request (pressing the x button) is now unavailable if unsafe (while an instance is running or login is in progress)"
+  ],
+  "fixes": [
+    "The default language now matches the system language",
+    "Mod Update Selectors now save their values over restarts",
+    "Improved Popup System to make it more reliable",
+    "Improved several UI elements to make them consistent, faster and more reliable"
+  ],
+  "updaterUrl": "https://github.com/Tre5et/treelauncher/raw/v0.6.0-beta/app/updater.jar"
+}
