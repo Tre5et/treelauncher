@@ -33,7 +33,8 @@ public class Settings extends GenericJsonParsable {
     }
 
     public enum LauncherModSortType {
-        NAME(new LauncherModNameComparator());
+        NAME(new LauncherModNameComparator()),
+        DISABLED_NAME(new LauncherModDisabledNameComparator());
 
         private final Comparator<LauncherMod> comparator;
         LauncherModSortType(Comparator<LauncherMod> comparator) {
