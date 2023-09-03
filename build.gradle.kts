@@ -79,7 +79,7 @@ javafx {
     modules("javafx.controls", "javafx.fxml", "javafx.web")
 }
 
-val javaLocation = System.getProperty("java.home")
+val javaHome = System.getProperty("java.home")
 
 val buildDir = "./build/libs"
 val jpackageDir = "./jpackage"
@@ -91,7 +91,7 @@ task("copyJar", Copy::class) {
 }
 
 tasks.jpackage {
-    dependsOn("copyJar")
+    dependsOn("copyJar", "makeRuntime")
 
     input = "$jpackageDir/jars"
     destination = "$jpackageDir/dist"
@@ -99,7 +99,7 @@ tasks.jpackage {
     appName = "TreeLauncher"
     appVersion = version
     vendor = "treset"
-    runtimeImage = javaLocation
+    runtimeImage = "$distDir/res/runtime"
     mainJar = "minecraft-launcher-all.jar"
     icon = "src/main/resources/img/icon.ico"
     mainClass = mainClassName
@@ -136,6 +136,10 @@ task("createUpdateFiles", Exec::class) {
     commandLine("updateConverter\\node", "updateConverter\\index.js")
 }
 
+task("makeRuntime", Exec::class) {
+    commandLine("$javaHome\\bin\\jlink", "--module-path", "$javaHome\\jmods", "--add-modules", "ALL-MODULE-PATH", "--output", "$distDir\\res\\runtime")
+}
+
 task("cleanDist", Delete::class) {
     delete("$distDir/res")
 }
@@ -145,12 +149,8 @@ task("copyAppData", Copy::class) {
     from("$buildDir/minecraft-launcher-all.jar", "./app/updater.jar").into("$distDir/res/app")
 }
 
-task("copyRuntime", Copy::class) {
-    from(javaLocation).into("$distDir/res/runtime")
-}
-
 task("copyDistRes", Copy::class) {
-    dependsOn("cleanDist", "copyAppData", "copyRuntime")
+    dependsOn("cleanDist", "copyAppData", "makeRuntime")
     from("distRes/run.bat").into("$distDir/res")
 }
 
