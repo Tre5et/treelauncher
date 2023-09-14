@@ -421,6 +421,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "base64",
+ "once_cell",
  "serde",
  "serde_json",
 ]
