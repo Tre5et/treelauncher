@@ -13,7 +13,7 @@ val version = "0.6.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
-val mcVersionLoaderVersion = "1.2.2"
+val mcVersionLoaderVersion = "1.3.1"
 val log4jVersion = "2.20.0"
 val ikonliVersion = "12.3.1"
 
@@ -36,6 +36,23 @@ fun updateVersion() {
         throw Exception("Version in strings.properties not found")
     }
     stringFile.writeText(newContent)
+
+    val configFile = File("src/main/java/net/treset/minecraftlauncher/config/Config.java")
+    val configContent = configFile.readLines()
+    var configMatches = false
+    var newConfigContent = ""
+    for(line in configContent) {
+        if (line.contains("MODRINTH_USER_AGENT")) {
+            configMatches = true
+            newConfigContent += "    public final String MODRINTH_USER_AGENT = \"TreSet/treelauncher/v$version\";\n"
+        } else {
+            newConfigContent += line + "\n"
+        }
+    }
+    if(!configMatches) {
+        throw Exception("Version in Config.java not found")
+    }
+    configFile.writeText(newConfigContent)
 }
 
 repositories {
