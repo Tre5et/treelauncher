@@ -343,7 +343,7 @@ pub fn get_details(base_path: String) -> Result<ComponentDetails, HttpResponse> 
     let versions= serde_json::from_str(&versions.unwrap());
     if versions.is_err() {
         return Err(HttpResponse::InternalServerError()
-            .body(format!("Unable to parse version file!")));
+            .body(format!("Unable to parse version file! Error: {e}", e = versions.err().unwrap())));
     }
     return Ok(versions.unwrap());
 }
