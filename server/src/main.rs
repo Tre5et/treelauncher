@@ -19,9 +19,12 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
+            .service(service::new)
+            .service(service::get)
             .service(service::get_file)
             .service(service::post_file)
             .service(service::complete)
+            .service(service::hash)
     })
     .bind("0.0.0.0:9090")?
     .run()
