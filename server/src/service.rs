@@ -56,7 +56,7 @@ pub async fn new(req: HttpRequest) -> HttpResponse {
     let result = fs::create_dir_all(prefix);
     if result.is_err() {
         return HttpResponse::InternalServerError()
-            .body(format!("Unable to create parent directories! Error: {}", result.err().unwrap()));
+            .body(format!("Unable to create directories! Error: {}", result.err().unwrap()));
     }
     let result = fs::File::create(file);
     if result.is_err() {
@@ -66,7 +66,7 @@ pub async fn new(req: HttpRequest) -> HttpResponse {
     let result = fs::write(details_path, serde_json::to_string(&content).unwrap());
     if result.is_err() {
         return HttpResponse::InternalServerError()
-            .body(format!("Unable to write version file! Error: {}", result.err().unwrap()));
+            .body(format!("Unable to write file! Error: {}", result.err().unwrap()));
     }
 
     return HttpResponse::Ok().finish();
@@ -145,7 +145,7 @@ pub async fn complete(req: HttpRequest) -> HttpResponse {
     let result = fs::write(details_path, serde_json::to_string(&content).unwrap());
     if result.is_err() {
         return HttpResponse::InternalServerError()
-            .body(format!("Unable to write version file! Error: {}", result.err().unwrap()));
+            .body(format!("Unable to write details file! Error: {}", result.err().unwrap()));
     }
 
     return HttpResponse::Ok().body(format!("{v}", v = version));
@@ -195,7 +195,7 @@ pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
     let file_response = serde_json::from_str(body.as_str());
     if file_response.is_err() {
         return HttpResponse::BadRequest()
-            .body(format!("Invalid file response! Error: {}", file_response.err().unwrap()));
+            .body(format!("Invalid file request! Error: {}", file_response.err().unwrap()));
     }
     let file_request: FileData = file_response.unwrap();
     let path = format!("{b}/{p}", b = base_path, p = file_request.path);
@@ -272,7 +272,7 @@ pub async fn hash(req: HttpRequest, body: String) -> HttpResponse {
     let hash_request = serde_json::from_str(body.as_str());
     if hash_request.is_err() {
         return HttpResponse::BadRequest()
-            .body(format!("Invalid file response! Error: {}", hash_request.err().unwrap()));
+            .body(format!("Invalid hash request! Error: {}", hash_request.err().unwrap()));
     }
     let hash_request: Vec<String> = hash_request.unwrap();
 
@@ -333,12 +333,12 @@ pub fn get_details(base_path: String) -> Result<ComponentDetails, HttpResponse> 
     let file: &Path = Path::new(path.as_str());
     if !file.is_file() {
         return Err(HttpResponse::InternalServerError()
-            .body(format!("Unable to find version file!")));
+            .body(format!("Unable to find details file!")));
     }
     let versions = fs::read_to_string(file);
     if versions.is_err() {
         return Err(HttpResponse::InternalServerError()
-            .body(format!("Unable to read version file!")));
+            .body(format!("Unable to read details file! Error: {e}", e = versions.err().unwrap())));
     }
     let versions= serde_json::from_str(&versions.unwrap());
     if versions.is_err() {

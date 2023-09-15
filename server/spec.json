@@ -1,0 +1,302 @@
+{
+  "enums": [
+    {
+      "name": "ComponentType",
+      "values": [
+        "instance",
+        "saves",
+        "resourcepacks",
+        "options",
+        "mods"
+      ]
+    }
+  ],
+
+  "routes": [
+    {
+      "route": "/new/{component_type}/{id}",
+      "method": "GET",
+      "responses": [
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "unable to parse id",
+          "status": 400,
+          "body": "Invalid id!"
+        },
+        {
+          "condition": "component of type component_type with name id already exists",
+          "status": 400,
+          "body": "Component already exists!"
+        },
+        {
+          "condition": "directories of component weren't created",
+          "status": 500,
+          "body": "Unable to create directories! Error: {error}"
+        },
+        {
+          "condition": "unable to create component details file",
+          "status": 500,
+          "body": "Unable to create details file! Error: {error}"
+        },
+        {
+          "condition": "failed to write contents to file",
+          "status": 500,
+          "body": "Unable to write file! Error: {error}"
+        },
+        {
+          "condition": "component created successfully",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/get/{component_type}/{id}/{version}",
+      "method": "GET",
+      "response": [
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "unable to parse id",
+          "status": 400,
+          "body": "Invalid id!"
+        },
+        {
+          "condition": "component of type component_type with name id doesn't exist",
+          "status": 400,
+          "body": "Component doesn't exist! Try /new/{component_type}/{id} to create it."
+        },
+        {
+          "condition": "version isn't of type int or doesn't exist",
+          "status": 400,
+          "body": "Invalid version!"
+        },
+        {
+          "condition": "component details file doesn't exist",
+          "status": 500,
+          "body": "Unable to read details file!"
+        },
+        {
+          "condition": "failed to read component details file",
+          "status": 500,
+          "body": "Unable to read details file! Error: {error}"
+        },
+        {
+          "condition": "failed to parse component details file",
+          "status": 500,
+          "body": "Unable to parse details file! Error: {error}"
+        },
+        {
+          "condition": "default",
+          "status": 200,
+          "json": {
+            "version": "{latest version: Integer}",
+            "difference": "{files that changed between version and latest version: String[]}"
+          }
+        }
+      ]
+    },
+    {
+      "route": "/complete/{component_type}/{id}",
+      "method": "GET",
+      "response": [
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "unable to parse id",
+          "status": 400,
+          "body": "Invalid id!"
+        },
+        {
+          "condition": "component of type component_type with name id doesn't exist",
+          "status": 400,
+          "body": "Component doesn't exist! Try /new/{component_type}/{id} to create it."
+        },
+        {
+          "condition": "component details file doesn't exist",
+          "status": 500,
+          "body": "Unable to read details file!"
+        },
+        {
+          "condition": "failed to read component details file",
+          "status": 500,
+          "body": "Unable to read details file! Error: {error}"
+        },
+        {
+          "condition": "failed to parse component details file",
+          "status": 500,
+          "body": "Unable to parse details file! Error: {error}"
+        },
+        {
+          "condition": "unable to write to details file",
+          "status": 500,
+          "body": "Unable to write to details file! Error: {error}"
+        },
+        {
+          "condition": "new version was successfully created and written to details file",
+          "status": 200,
+          "body": "{version_number: Integer}"
+        }
+      ]
+    },
+    {
+      "route": "/file/{component_type}/{id}/{file_path:.*}",
+      "method": "GET",
+      "response": [
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "unable to parse id",
+          "status": 400,
+          "body": "Invalid id!"
+        },
+        {
+          "condition": "component of type component_type with name id doesn't exist",
+          "status": 400,
+          "body": "Component doesn't exist! Try /new/{component_type}/{id} to create it."
+        },
+        {
+          "condition": "failed to read file",
+          "status": 500,
+          "body": "Unable to read file! Error: {error}"
+        },
+        {
+          "condition": "file doesn't exist",
+          "status": 200,
+          "json": {
+            "path": "",
+            "content": ""
+          }
+        },
+        {
+          "condition": "file exists",
+          "status": 200,
+          "json": {
+            "path": "file_path",
+            "content": "{file_content: base64 String}"
+          }
+        }
+      ]
+    },
+    {
+      "route": "/file/{component_type}/{id}",
+      "method": "POST",
+      "request": {
+        "json": {
+          "path": "{file path: String}",
+          "content": "{base64 encoded file content if file should be created or updated or empty string if file should be deleted: String}"
+        }
+      },
+      "response": [
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "unable to parse id",
+          "status": 400,
+          "body": "Invalid id!"
+        },
+        {
+          "condition": "component of type component_type with name id doesn't exist",
+          "status": 400,
+          "body": "Component doesn't exist! Try /new/{component_type}/{id} to create it."
+        },
+        {
+          "condition": "request is malformed",
+          "status": 400,
+          "body": "Invalid file request! Error: {error}"
+        },
+        {
+          "condition": "content is not empty failed to create parent directories for file",
+          "status": 500,
+          "body": "Unable to create parent directories! Error: {error}"
+        },
+        {
+          "condition": "content is not empty failed to create file",
+          "status": 500,
+          "body": "Unable to create file! Error: {error}"
+        },
+        {
+          "condition": "content is not empty and failed to write to file",
+          "status": 500,
+          "body": "Unable to write to file! Error: {error}"
+        },
+        {
+          "condition": "content is empty and failed to remove file",
+          "status": 500,
+          "body": "Unable to remove file! Error: {error}"
+        },
+        {
+          "condition": "component details file doesn't exist",
+          "status": 500,
+          "body": "Unable to read details file!"
+        },
+        {
+          "condition": "failed to read component details file",
+          "status": 500,
+          "body": "Unable to read details file! Error: {error}"
+        },
+        {
+          "condition": "failed to parse component details file",
+          "status": 500,
+          "body": "Unable to parse details file! Error: {error}"
+        },
+        {
+          "condition": "unable to write to details file",
+          "status": 500,
+          "body": "Unable to write to details file! Error: {error}"
+        },
+        {
+          "condition": "file was successfully created/updated/deleted and change was successfully written to details file",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/hash/{component_type}/{id}",
+      "method": "POST",
+      "request": "{list of file paths to hash: String[]}",
+      "response": [
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "unable to parse id",
+          "status": 400,
+          "body": "Invalid id!"
+        },
+        {
+          "condition": "component of type component_type with name id doesn't exist",
+          "status": 400,
+          "body": "Component doesn't exist! Try /new/{component_type}/{id} to create it."
+        },
+        {
+          "condition": "request is malformed",
+          "status": 400,
+          "body": "Invalid hash request! Error: {error}"
+        },
+        {
+          "condition": "default",
+          "status": 200,
+          "body": "{list of file hashes in the same order as requested, if file doesn't exist hash is empty string: String[]}"
+        }
+      ]
+    }
+  ]
+}
