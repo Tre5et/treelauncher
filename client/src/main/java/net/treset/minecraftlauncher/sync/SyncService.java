@@ -23,9 +23,14 @@ public class SyncService {
     }
 
     public void testConnection() throws IOException {
-        Pair<Integer, String> result = HttpUtil.get(this.syncUrl + ":" + this.syncPort + "/test", List.of(new Pair<>("Auth-Key", this.syncKey)));
-        if(result.getKey() != 200) {
-            throw new IOException("The server returned an error code:\nStatusCode: " + result.getKey() + ", Message: " + result.getValue());
+        Pair<HttpUtil.HttpStatusCode, String> result;
+        try {
+            result = HttpUtil.get(this.syncUrl + ":" + this.syncPort + "/test", List.of(new Pair<>("Auth-Key", this.syncKey)));
+        } catch (IOException e) {
+            throw new IOException("Failed to connect to the sync server.\nError: " + e);
+        }
+        if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
+            throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && !result.getValue().isBlank() ? "\nMessage: " + result.getValue() : ""));
         }
     }
 }
