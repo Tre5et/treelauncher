@@ -19,6 +19,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
+            .service(service::test)
             .service(service::new)
             .service(service::get)
             .service(service::get_file)

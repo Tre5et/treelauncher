@@ -30,6 +30,15 @@ pub struct ComponentDetails {
     versions: Vec<ComponentVersion>
 }
 
+#[get("/test")]
+pub async fn test(req: HttpRequest) -> HttpResponse {
+    let key_header = req.headers().get("auth-key");
+    if key_header.is_none() || key_header.unwrap() != &get_auth_key() {
+        return HttpResponse::Forbidden().finish();
+    }
+    return HttpResponse::Ok().finish();
+}
+
 #[get("/new/{component_type}/{id}")]
 pub async fn new(req: HttpRequest) -> HttpResponse {
     let result = check_prerequisites(req, false);
