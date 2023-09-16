@@ -39,7 +39,7 @@
                     <TextField fx:id="tfSyncPort" prefWidth="60" promptText="%settings.prompt.sync.port" />
                 </HBox>
                 <HBox alignment="CENTER" spacing="5">
-                    <Label text="%settings.label.sync.key" />
+                    <Label text="%settings.label.sync.key" style="-fx-font-size: 10pt" />
                     <TextField fx:id="tfSyncKey" promptText="%settings.prompt.sync.key" />
                 </HBox>
                 <Button text="%settings.button.sync.test" onAction="#onSyncTest" />
