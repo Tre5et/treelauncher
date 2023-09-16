@@ -78,7 +78,7 @@ pub async fn new(req: HttpRequest) -> HttpResponse {
             .body(format!("Unable to write file! Error: {}", result.err().unwrap()));
     }
 
-    return HttpResponse::Ok().finish();
+    return HttpResponse::Created().finish();
 }
 
 #[get("/get/{component_type}/{id}/{version}")]
@@ -157,7 +157,7 @@ pub async fn complete(req: HttpRequest) -> HttpResponse {
             .body(format!("Unable to write details file! Error: {}", result.err().unwrap()));
     }
 
-    return HttpResponse::Ok().body(format!("{v}", v = version));
+    return HttpResponse::Created().body(format!("{v}", v = version));
 }
 
 #[get("/file/{component_type}/{id}/{file_path:.*}")]
@@ -228,7 +228,7 @@ pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
             return HttpResponse::InternalServerError()
                 .body(format!("Unable to remove file! Error: {}", result.err().unwrap()));
         }
-        return HttpResponse::Ok().finish();
+        return HttpResponse::Created().finish();
     }
 
     let content = base64::engine::general_purpose::STANDARD.decode(file_request.content.as_bytes()).unwrap();
@@ -267,7 +267,7 @@ pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
         }
     }
 
-    return HttpResponse::Ok().finish();
+    return HttpResponse::Created().finish();
 }
 
 #[post("/hash/{component_type}/{id}")]
