@@ -54,6 +54,9 @@ public class Settings extends GenericJsonParsable {
     private transient File file;
 
     private StringLocalizer.Language language;
+    private String syncUrl;
+    private String syncPort;
+    private String syncKey;
     private InstanceDataSortType instanceSortType = InstanceDataSortType.NAME;
     private boolean instanceSortReverse = false;
     private LauncherModSortType modSortType = LauncherModSortType.NAME;
@@ -81,6 +84,30 @@ public class Settings extends GenericJsonParsable {
 
     public void setLanguage(StringLocalizer.Language language) {
         this.language = language;
+    }
+
+    public String getSyncUrl() {
+        return syncUrl;
+    }
+
+    public void setSyncUrl(String syncUrl) {
+        this.syncUrl = syncUrl;
+    }
+
+    public String getSyncPort() {
+        return syncPort;
+    }
+
+    public void setSyncPort(String syncPort) {
+        this.syncPort = syncPort;
+    }
+
+    public String getSyncKey() {
+        return syncKey;
+    }
+
+    public void setSyncKey(String syncKey) {
+        this.syncKey = syncKey;
     }
 
     public InstanceDataSortType getInstanceSortType() {

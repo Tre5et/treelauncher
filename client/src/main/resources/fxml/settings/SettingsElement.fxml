@@ -31,6 +31,18 @@
                 <CheckBox fx:id="cbRemove" selected="true" text="%settings.label.path.remove" />
                 <Button onAction="#onPathApply" text="%settings.button.path.apply" />
             </VBox>
+            <VBox alignment="TOP_CENTER" spacing="3">
+                <Label text="%settings.label.sync" />
+                <HBox alignment="CENTER" spacing="5">
+                    <TextField fx:id="tfSyncUrl" promptText="%settings.prompt.sync.url" />
+                    <Label text=":" />
+                    <TextField fx:id="tfSyncPort" prefWidth="60" promptText="%settings.prompt.sync.port" />
+                </HBox>
+                <HBox alignment="CENTER" spacing="5">
+                    <Label text="%settings.label.sync.key" />
+                    <TextField fx:id="tfSyncKey" promptText="%settings.prompt.sync.key" />
+                </HBox>
+            </VBox>
             <VBox alignment="TOP_CENTER" spacing="2">
                 <Label text="%settings.label.user" />
                 <Label fx:id="lbUsername" styleClass="username" text="Error getting name" />

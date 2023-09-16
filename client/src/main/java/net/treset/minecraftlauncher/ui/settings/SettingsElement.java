@@ -32,6 +32,9 @@ public class SettingsElement extends UiElement {
     @FXML private Label lbLanguage;
     @FXML private TextField tfPath;
     @FXML private CheckBox cbRemove;
+    @FXML private TextField tfSyncUrl;
+    @FXML private TextField tfSyncPort;
+    @FXML private TextField tfSyncKey;
     @FXML private Label lbUsername;
     @FXML private Label lbUuid;
     @FXML private ImageView ivSkin;
@@ -47,6 +50,16 @@ public class SettingsElement extends UiElement {
         cbLanguage.getSelectionModel().select(LauncherApplication.stringLocalizer.getLanguage());
 
         cbLanguage.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onLanguageComboBoxChanged));
+
+        tfPath.setText(LauncherApplication.config.BASE_DIR);
+
+        tfSyncUrl.setText(LauncherApplication.settings.getSyncUrl());
+        tfSyncPort.setText(LauncherApplication.settings.getSyncPort());
+        tfSyncKey.setText(LauncherApplication.settings.getSyncKey());
+
+        tfSyncUrl.textProperty().addListener((observable, oldValue, newValue) -> LauncherApplication.settings.setSyncUrl(newValue.isBlank() ? null : newValue));
+        tfSyncPort.textProperty().addListener((observable, oldValue, newValue) -> LauncherApplication.settings.setSyncPort(newValue.isBlank() ? null : newValue));
+        tfSyncKey.textProperty().addListener((observable, oldValue, newValue) -> LauncherApplication.settings.setSyncKey(newValue.isBlank() ? null : newValue));
 
         lbUsername.setText(LauncherApplication.userAuth.getMinecraftUser().name());
         lbUuid.setText(LauncherApplication.userAuth.getMinecraftUser().uuid());
@@ -315,7 +328,6 @@ public class SettingsElement extends UiElement {
 
     @Override
     public void beforeShow(Stage stage) {
-        tfPath.setText(LauncherApplication.config.BASE_DIR);
         new Thread(this::checkUpdate).start();
     }
 
