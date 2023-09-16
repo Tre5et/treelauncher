@@ -42,6 +42,7 @@
                     <Label text="%settings.label.sync.key" />
                     <TextField fx:id="tfSyncKey" promptText="%settings.prompt.sync.key" />
                 </HBox>
+                <Button text="%settings.button.sync.test" onAction="#onSyncTest" />
             </VBox>
             <VBox alignment="TOP_CENTER" spacing="2">
                 <Label text="%settings.label.user" />

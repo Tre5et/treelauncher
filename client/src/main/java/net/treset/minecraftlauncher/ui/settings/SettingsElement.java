@@ -15,6 +15,7 @@ import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
+import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
@@ -77,6 +78,41 @@ public class SettingsElement extends UiElement {
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);
         }
+    }
+
+    @FXML
+    private void onSyncTest() {
+        SyncService service = new SyncService();
+        try {
+            service.testConnection();
+        } catch (IOException e) {
+            LauncherApplication.setPopup(new PopupElement(
+                    PopupElement.PopupType.ERROR,
+                    "settings.popup.sync.failure",
+                    e.getMessage(),
+                    List.of(
+                            new PopupElement.PopupButton(
+                                    PopupElement.ButtonType.POSITIVE,
+                                    "settings.popup.sync.close",
+                                    event -> LauncherApplication.setPopup(null)
+                            )
+                    )
+            ));
+            return;
+        }
+
+        LauncherApplication.setPopup(new PopupElement(
+                PopupElement.PopupType.SUCCESS,
+                "settings.popup.sync.success",
+                null,
+                List.of(
+                        new PopupElement.PopupButton(
+                                PopupElement.ButtonType.POSITIVE,
+                                "settings.popup.sync.close",
+                                event -> LauncherApplication.setPopup(null)
+                        )
+                )
+        ));
     }
 
     @FXML
