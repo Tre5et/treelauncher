@@ -117,3 +117,7 @@
 .plus {
     -fx-icon-code: bi-plus;
 }
+
+.upload {
+    -fx-icon-code: bi-cloud-upload;
+}

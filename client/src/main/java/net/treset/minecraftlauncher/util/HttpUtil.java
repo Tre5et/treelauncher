@@ -118,7 +118,7 @@ public class HttpUtil {
 
     private static HttpClient client = HttpClient.newHttpClient();
 
-    public static Pair<HttpStatusCode, String> get(String url, List<Pair<String, String>> headers) throws IOException {
+    public static Pair<HttpStatusCode, byte[]> get(String url, List<Pair<String, String>> headers) throws IOException {
         HttpClient client = getHttpClient();
 
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
@@ -131,14 +131,20 @@ public class HttpUtil {
         return makeRequest(client, request);
     }
 
-    public static Pair<HttpStatusCode, String> post(String url, List<Pair<String, String>> headers, String data) throws IOException {
+    public static Pair<HttpStatusCode, byte[]> post(String url, List<Pair<String, String>> headers, byte[] data) throws IOException {
+        return post(url, headers, "application/octet-stream", data);
+    }
+
+
+    public static Pair<HttpStatusCode, byte[]> post(String url, List<Pair<String, String>> headers, String contentType, byte[] data) throws IOException {
         HttpClient client = getHttpClient();
 
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .uri(URI.create(url));
+                .uri(URI.create(url))
+                .header("Content-Type", contentType);
         headers.forEach((pair) -> requestBuilder.header(pair.getKey(), pair.getValue()));
         HttpRequest request = requestBuilder
-                .POST(HttpRequest.BodyPublishers.ofString(data))
+                .POST(HttpRequest.BodyPublishers.ofByteArray(data))
                 .build();
 
         return makeRequest(client, request);
@@ -151,10 +157,10 @@ public class HttpUtil {
         return client;
     }
 
-    private static Pair<HttpStatusCode, String> makeRequest(HttpClient client, HttpRequest request) throws IOException {
-        HttpResponse<String> response;
+    private static Pair<HttpStatusCode, byte[]> makeRequest(HttpClient client, HttpRequest request) throws IOException {
+        HttpResponse<byte[]> response;
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
         } catch (InterruptedException e) {
             throw new IOException("The request was interrupted", e);
         }

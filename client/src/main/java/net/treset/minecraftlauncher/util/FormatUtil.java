@@ -4,7 +4,10 @@ import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.minecraftlauncher.LauncherApplication;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -137,5 +140,17 @@ public class FormatUtil {
             }
         }
         return costs[b.length()];
+    }
+
+    public static String hashFile(File file) throws IOException {
+        return hash(FileUtil.readFile(file.getAbsolutePath()));
+    }
+
+    public static String urlEncode(String string) {
+        return URLEncoder.encode(string, StandardCharsets.UTF_8);
+    }
+
+    public static String urlDecode(String string) {
+        return java.net.URLDecoder.decode(string, StandardCharsets.UTF_8);
     }
 }

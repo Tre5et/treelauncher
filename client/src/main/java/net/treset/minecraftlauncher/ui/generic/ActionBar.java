@@ -13,17 +13,20 @@ public class ActionBar extends HBox {
     private final IconButton btEdit = new IconButton();
     private final IconButton btFolder = new IconButton();
     private final IconButton btDelete = new IconButton();
+    private final IconButton btSync = new IconButton();
     private final Label lbTitle = new Label();
 
     private boolean showPlay = false;
     private boolean showEdit = true;
     private boolean showFolder = true;
     private boolean showDelete = true;
+    private boolean showSync = false;
     private String defaultLabel = "menu.label";
     private EventHandler<ActionEvent> onPlay;
     private EventHandler<ActionEvent> onEdit;
     private EventHandler<ActionEvent> onFolder;
     private EventHandler<ActionEvent> onDelete;
+    private EventHandler<ActionEvent> onSync;
 
     public ActionBar() {
         getStyleClass().add("title-container");
@@ -46,6 +49,10 @@ public class ActionBar extends HBox {
         btDelete.getStyleClass().add("delete");
         btDelete.getStyleClass().add("negative");
         btDelete.setTooltipText(LauncherApplication.stringLocalizer.get("menu.tooltip.delete"));
+        btSync.setIconSize(36);
+        btSync.getStyleClass().add("upload");
+        btSync.getStyleClass().add("neutral");
+        btSync.setTooltipText(LauncherApplication.stringLocalizer.get("menu.tooltip.sync"));
         lbTitle.getStyleClass().add("title");
         setLabel(defaultLabel);
         updateButtons();
@@ -84,6 +91,15 @@ public class ActionBar extends HBox {
 
     public void setShowDelete(boolean showDelete) {
         this.showDelete = showDelete;
+        updateButtons();
+    }
+
+    public boolean isShowSync() {
+        return showSync;
+    }
+
+    public void setShowSync(boolean showSync) {
+        this.showSync = showSync;
         updateButtons();
     }
 
@@ -134,6 +150,15 @@ public class ActionBar extends HBox {
         btDelete.setOnAction(onDelete);
     }
 
+    public EventHandler<ActionEvent> getOnSync() {
+        return onSync;
+    }
+
+    public void setOnSync(EventHandler<ActionEvent> onSync) {
+        this.onSync = onSync;
+        btSync.setOnAction(onSync);
+    }
+
     public void setLabel(String label) {
         lbTitle.setText(LauncherApplication.stringLocalizer.get(label));
     }
@@ -156,6 +181,9 @@ public class ActionBar extends HBox {
         }
         if(showDelete) {
             getChildren().add(btDelete);
+        }
+        if(showSync) {
+            getChildren().add(btSync);
         }
     }
 }

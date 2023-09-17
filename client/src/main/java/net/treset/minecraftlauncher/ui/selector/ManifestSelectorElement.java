@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.ui.selector;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -7,10 +8,12 @@ import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.ButtonElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,7 +104,79 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
     protected abstract List<LauncherManifest> getComponents();
 
+
+    PopupElement popup = null;
+    private void upload(ManifestContentProvider contentProvider) {
+        popup = new PopupElement("Syncing", "Syncing the component, please wait...");
+        LauncherApplication.setPopup(popup);
+        new Thread(() -> {
+            try {
+                SyncUtil.uploadComponent(contentProvider.getManifest(), this::onStatusChange);
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+                LauncherApplication.setPopup(null);
+                return;
+            }
+            LauncherApplication.setPopup(new PopupElement(
+                    PopupElement.PopupType.SUCCESS,
+                    "sync.popup.complete",
+                    null,
+                    List.of(
+                        new PopupElement.PopupButton(
+                            PopupElement.ButtonType.POSITIVE,
+                            "sync.popup.complete.close",
+                            (e) -> LauncherApplication.setPopup(null)
+                        )
+                    )
+            ));
+            popup = null;
+            reloadComponents();
+        }).start();
+    }
+
+    private void onDownload(ManifestContentProvider contentProvider) {
+        popup = new PopupElement("Syncing", "Syncing the component, please wait...");
+        LauncherApplication.setPopup(popup);
+        new Thread(() -> {
+            try {
+                SyncUtil.update(contentProvider.getManifest(), this::onStatusChange);
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+                LauncherApplication.setPopup(null);
+                return;
+            }
+            LauncherApplication.setPopup(new PopupElement(
+                    PopupElement.PopupType.SUCCESS,
+                    "sync.popup.complete",
+                    null,
+                    List.of(
+                            new PopupElement.PopupButton(
+                                    PopupElement.ButtonType.POSITIVE,
+                                    "sync.popup.complete.close",
+                                    (e) -> LauncherApplication.setPopup(null)
+                            )
+                    )
+            ));
+            popup = null;
+            reloadComponents();
+        }).start();
+    }
+
+    private void onStatusChange(SyncUtil.SyncStatus status) {
+        if(popup != null) {
+            Platform.runLater(() -> popup.setMessage(status.getStep().getTranslationKey() + (status.getStatus() == null ? "" : "\n" + status.getStatus().getCurrentFile() + " (" + status.getStatus().getCurrentAmount() + "/" + status.getStatus().getTotalAmount() + ")")));
+        }
+    }
+
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
+        if(!SyncUtil.isSyncing(contentProvider.getManifest())) {
+            abMain.setShowSync(true);
+            abMain.setOnSync((e) -> upload(contentProvider));
+        } else {
+            abMain.setShowSync(true);
+            abMain.setOnSync((e) -> onDownload(contentProvider));
+        }
+
         if(ccDetails != null) {
             ccDetails.setVisible(selected);
         }

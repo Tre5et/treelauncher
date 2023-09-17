@@ -18,6 +18,14 @@ public class FileUtil {
         return Files.readString(filePath);
     }
 
+    public static byte[] readFile(String path) throws IOException {
+        Path filePath = Paths.get(path);
+        if(!filePath.toFile().isFile()) {
+            throw new IOException("Unable to load file: doesn't exist: path=" + path);
+        }
+        return Files.readAllBytes(filePath);
+    }
+
     public static void copyContents(String srcDir, String dstDir, Function<String, Boolean> copyChecker, StandardCopyOption... options) throws IOException {
         File src = new File(srcDir);
         if(!src.isDirectory()) {
@@ -95,6 +103,14 @@ public class FileUtil {
 
     public static void writeFile(String path, String content) throws IOException {
         Files.writeString(Paths.get(path), content);
+    }
+
+    public static void writeFile(String path, byte[] content) throws IOException {
+        Files.write(Paths.get(path), content);
+    }
+
+    public static void deleteFile(String path) throws IOException {
+        Files.delete(Paths.get(path));
     }
 
     public static boolean isDirEmpty(File dir) throws IOException {
