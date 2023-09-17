@@ -53,6 +53,7 @@ public class FormatUtil {
     public static String absoluteDirPath(String... parts) {
         StringBuilder path = new StringBuilder();
         for(String part : parts) {
+            if(part == null) continue;
             path.append(part);
             if(!part.endsWith(File.separator) && !part.endsWith("/") && !part.endsWith("\\"))
                 path.append(File.separator);
@@ -143,7 +144,20 @@ public class FormatUtil {
     }
 
     public static String hashFile(File file) throws IOException {
-        return hash(FileUtil.readFile(file.getAbsolutePath()));
+        byte[] content = FileUtil.readFile(file.getAbsolutePath());
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e); // this doesn't happen
+        }
+
+        byte[] encrypted = md.digest(content);
+        StringBuilder encryptedString = new StringBuilder(new BigInteger(1, encrypted).toString(16));
+        for(int i = encryptedString.length(); i < 32; i++) {
+            encryptedString.insert(0, "0");
+        }
+        return encryptedString.toString();
     }
 
     public static String urlEncode(String string) {

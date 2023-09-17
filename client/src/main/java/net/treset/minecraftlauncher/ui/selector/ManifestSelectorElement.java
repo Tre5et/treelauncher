@@ -106,7 +106,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
 
     PopupElement popup = null;
-    private void upload(ManifestContentProvider contentProvider) {
+    private void onUpload(ManifestContentProvider contentProvider) {
         popup = new PopupElement("Syncing", "Syncing the component, please wait...");
         LauncherApplication.setPopup(popup);
         new Thread(() -> {
@@ -139,7 +139,35 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         LauncherApplication.setPopup(popup);
         new Thread(() -> {
             try {
-                SyncUtil.update(contentProvider.getManifest(), this::onStatusChange);
+                SyncUtil.updateComponent(contentProvider.getManifest(), this::onStatusChange);
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+                LauncherApplication.setPopup(null);
+                return;
+            }
+            LauncherApplication.setPopup(new PopupElement(
+                    PopupElement.PopupType.SUCCESS,
+                    "sync.popup.complete",
+                    null,
+                    List.of(
+                            new PopupElement.PopupButton(
+                                    PopupElement.ButtonType.POSITIVE,
+                                    "sync.popup.complete.close",
+                                    (e) -> LauncherApplication.setPopup(null)
+                            )
+                    )
+            ));
+            popup = null;
+            reloadComponents();
+        }).start();
+    }
+
+    private void onSync(ManifestContentProvider contentProvider) {
+        popup = new PopupElement("Syncing", "Syncing the component, please wait...");
+        LauncherApplication.setPopup(popup);
+        new Thread(() -> {
+            try {
+                SyncUtil.syncComponent(contentProvider.getManifest(), this::onStatusChange);
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 LauncherApplication.setPopup(null);
@@ -171,10 +199,10 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
         if(!SyncUtil.isSyncing(contentProvider.getManifest())) {
             abMain.setShowSync(true);
-            abMain.setOnSync((e) -> upload(contentProvider));
+            abMain.setOnSync((e) -> onUpload(contentProvider));
         } else {
             abMain.setShowSync(true);
-            abMain.setOnSync((e) -> onDownload(contentProvider));
+            abMain.setOnSync((e) -> onSync(contentProvider));
         }
 
         if(ccDetails != null) {

@@ -71,7 +71,7 @@ public class SyncUtil {
         statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
     }
 
-    public static void update(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
+    public static void updateComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
         File syncFile = new File(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
         if(!syncFile.exists()) {
             throw new IOException("Sync file not found");
@@ -98,6 +98,87 @@ public class SyncUtil {
         updateSyncFile(component, response.getVersion());
         LOGGER.debug("Update complete");
         statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
+    }
+
+    public static void syncComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
+        statusConsumer.accept(new SyncStatus(SyncStep.COLLECTING, null));
+        File syncFile = new File(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
+        String componentData = FileUtil.loadFile(syncFile.getPath());
+        ComponentData data = ComponentData.fromJson(componentData);
+        ComponentData newData = getComponentData(component, data.getVersion());
+        List<String> difference = compareHashes(new ComponentData.HashEntry("", data.getHashTree()), new ComponentData.HashEntry("", newData.getHashTree()), null);
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, null));
+        SyncService syncService = new SyncService();
+        int index = 0;
+        for(String path : difference) {
+            index++;
+            statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(index, difference.size(), path, false)));
+            LOGGER.debug("Difference: " + path);
+            File file = new File(FormatUtil.absoluteFilePath(component.getDirectory(), path));
+            byte[] content;
+            if(file.isFile()) {
+                content = FileUtil.readFile(file.getPath());
+            } else {
+                content = new byte[]{};
+            }
+            syncService.uploadFile(convertType(component.getType()), component.getId(), path, content);
+        }
+        int version = syncService.complete(convertType(component.getType()), component.getId());
+        newData.setVersion(version);
+        newData.writeToFile(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
+        statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
+    }
+
+    private static List<String> compareHashes(ComponentData.HashEntry oldEntry, ComponentData.HashEntry newEntry, String path) {
+        ArrayList<String> difference = new ArrayList<>();
+        if(oldEntry.getChildren() == null && newEntry.getChildren() == null) {
+            if(!oldEntry.getHash().equals(newEntry.getHash())) {
+                LOGGER.debug("Adding changed file: " + path);
+                difference.add(path);
+            }
+        } else if(oldEntry.getChildren() != null && newEntry.getChildren() != null) {
+            int j = 0;
+            for(int i = 0; i < oldEntry.getChildren().size(); i++) {
+                boolean found = false;
+                for(int k = j; k < newEntry.getChildren().size(); k++) {
+                    if(oldEntry.getChildren().get(i).getPath().equals(newEntry.getChildren().get(k).getPath())) {
+                        found = true;
+                        for(int l = j; l < k; l++) {
+                            LOGGER.debug("Adding added file: " + path + "/" + newEntry.getChildren().get(l).getPath());
+                            difference.addAll(getAllChildren(newEntry.getChildren().get(l), FormatUtil.absoluteFilePath(path, newEntry.getChildren().get(l).getPath())));
+                        }
+                        difference.addAll(compareHashes(oldEntry.getChildren().get(i), newEntry.getChildren().get(k), FormatUtil.absoluteFilePath(path, oldEntry.getChildren().get(i).getPath())));
+                        j = k+1;
+                        break;
+                    }
+                }
+                if(!found) {
+                    LOGGER.debug("Adding deleted file: " + oldEntry.getChildren().get(i).getPath());
+                    difference.addAll(getAllChildren(oldEntry.getChildren().get(i), FormatUtil.absoluteFilePath(path,  oldEntry.getChildren().get(i).getPath())));
+                }
+            }
+        } else if(oldEntry.getChildren() == null) {
+            LOGGER.debug("Adding file that became folder: " + newEntry.getPath());
+            difference.add(oldEntry.getPath());
+            difference.addAll(getAllChildren(newEntry, path));
+        } else {
+            LOGGER.debug("Adding folder that became file: " + newEntry.getPath());
+            difference.addAll(getAllChildren(oldEntry, path));
+            difference.add(newEntry.getPath());
+        }
+        return difference;
+    }
+
+    private static List<String> getAllChildren(ComponentData.HashEntry entry, String path) {
+        ArrayList<String> children = new ArrayList<>();
+        if(entry.getChildren() == null) {
+            children.add(path);
+        } else {
+            for(ComponentData.HashEntry child : entry.getChildren()) {
+                children.addAll(getAllChildren(child, FormatUtil.absoluteFilePath(path, child.getPath())));
+            }
+        }
+        return children;
     }
 
     public static boolean isSyncing(LauncherManifest component) {
@@ -141,14 +222,18 @@ public class SyncUtil {
     }
 
     private static ComponentData updateSyncFile(LauncherManifest component, int version) throws IOException {
-        LOGGER.debug("Updating sync file for component: " + component.getId());
+        ComponentData data = getComponentData(component, version);
+        data.writeToFile(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
+        return data;
+    }
+
+    private static ComponentData getComponentData(LauncherManifest component, int version) throws IOException {
+        LOGGER.debug("Collecting component data for component: " + component.getId());
         long startTime = System.currentTimeMillis();
         File componentDir = new File(component.getDirectory());
         Pair<Integer, List<ComponentData.HashEntry>> result = hashDirectoryContents(componentDir, 0);
-        ComponentData data = new ComponentData(version, result.getKey(), result.getValue());
-        data.writeToFile(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
-        LOGGER.debug("Sync file updated in " + (System.currentTimeMillis() - startTime) + "ms");
-        return data;
+        LOGGER.debug("Component data collected in " + (System.currentTimeMillis() - startTime) + "ms");
+        return new ComponentData(version, result.getKey(), result.getValue());
     }
 
     private static Pair<Integer, List<ComponentData.HashEntry>> hashDirectoryContents(File dir, Integer fileAmount) throws IOException {
