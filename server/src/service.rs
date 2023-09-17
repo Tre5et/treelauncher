@@ -1,8 +1,8 @@
 use std::fs;
+use bytes::Bytes;
 use std::path::Path;
 use actix_web::{get, HttpResponse, HttpRequest, post};
 use actix_web::http::header::ContentType;
-use base64::Engine;
 use serde::{Serialize, Deserialize};
 use crate::component_type::ComponentType;
 use crate::get_auth_key;
@@ -30,6 +30,18 @@ pub struct ComponentDetails {
     versions: Vec<ComponentVersion>
 }
 
+macro_rules! check_prerequisites {
+    ($req:expr) => {
+        check_prerequisites($req, true, None)
+    };
+    ($req:expr, $check_existing:expr) => {
+        check_prerequisites($req, $check_existing, None)
+    };
+    ($req:expr, $check_existing:expr, $content_type:expr) => {
+        check_prerequisites($req, $check_existing, Some($content_type))
+    };
+}
+
 #[get("/test")]
 pub async fn test(req: HttpRequest) -> HttpResponse {
     let key_header = req.headers().get("auth-key");
@@ -41,7 +53,7 @@ pub async fn test(req: HttpRequest) -> HttpResponse {
 
 #[get("/new/{component_type}/{id}")]
 pub async fn new(req: HttpRequest) -> HttpResponse {
-    let result = check_prerequisites(req, false);
+    let result = check_prerequisites!(req, false);
     if result.is_err() {
         return result.err().unwrap();
     }
@@ -84,7 +96,7 @@ pub async fn new(req: HttpRequest) -> HttpResponse {
 #[get("/get/{component_type}/{id}/{version}")]
 pub async fn get(req: HttpRequest) -> HttpResponse {
     let version = req.match_info().query("version").parse::<u32>();
-    let result = check_prerequisites(req, false);
+    let result = check_prerequisites!(req, false);
     if result.is_err() {
         return result.err().unwrap();
     }
@@ -128,7 +140,7 @@ pub async fn get(req: HttpRequest) -> HttpResponse {
 
 #[get("/complete/{component_type}/{id}")]
 pub async fn complete(req: HttpRequest) -> HttpResponse {
-    let result = check_prerequisites(req, true);
+    let result = check_prerequisites!(req);
     if result.is_err() {
         return result.err().unwrap();
     }
@@ -163,7 +175,7 @@ pub async fn complete(req: HttpRequest) -> HttpResponse {
 #[get("/file/{component_type}/{id}/{file_path:.*}")]
 pub async fn get_file(req: HttpRequest) -> HttpResponse {
     let file_path = req.match_info().query("file_path").parse::<String>().unwrap_or("".to_string());
-    let result = check_prerequisites(req, true);
+    let result = check_prerequisites!(req);
     if result.is_err() {
         return result.err().unwrap();
     }
@@ -171,44 +183,46 @@ pub async fn get_file(req: HttpRequest) -> HttpResponse {
     let path = format!("{b}/{p}", b = base_path, p = file_path);
     let file: &Path = Path::new(path.as_str());
     if !file.is_file() {
-        return HttpResponse::Ok()
-            .content_type(ContentType::json())
-            .json(FileData {
-                path: "".to_string(),
-                content: "".to_string()
-            });
+        return HttpResponse::NoContent().body("File doesn't exist!");
     }
     let read_file = fs::read(file);
     if read_file.is_err() {
         return HttpResponse::InternalServerError()
             .body(format!("Unable to read file! Error: {}", read_file.err().unwrap()));
     }
-    let content = base64::engine::general_purpose::STANDARD.encode(read_file.unwrap());
+    let content = read_file.unwrap();
     return HttpResponse::Ok()
-        .content_type(ContentType::json())
-        .json(FileData {
-            path: file_path,
-            content
-        })
+        .content_type(ContentType::octet_stream())
+        .body(content);
 }
 
-#[post("file/{component_type}/{id}")]
-pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
-    let result = check_prerequisites(req, true);
+#[post("file/{component_type}/{id}/{file_path:.*}")]
+pub async fn post_file(req: HttpRequest, body: Bytes) -> HttpResponse {
+    let file_path = req.match_info().query("file_path").parse::<String>();
+    if file_path.is_err() {
+        return HttpResponse::BadRequest()
+            .body(format!("Invalid file path!"));
+    }
+    let file_path = file_path.unwrap();
+    let result = check_prerequisites!(req, true, "application/octet-stream");
     if result.is_err() {
         return result.err().unwrap();
     }
     let base_path = result.unwrap();
     let details_path: String = format!("{p}/details.sync", p = base_path);
 
-    let file_response = serde_json::from_str(body.as_str());
-    if file_response.is_err() {
-        return HttpResponse::BadRequest()
-            .body(format!("Invalid file request! Error: {}", file_response.err().unwrap()));
-    }
-    let file_request: FileData = file_response.unwrap();
-    let path = format!("{b}/{p}", b = base_path, p = file_request.path);
+    let path = format!("{b}/{p}", b = base_path, p = file_path.as_str());
     let file: &Path = Path::new(path.as_str());
+    if body.is_empty() {
+        if file.is_file() {
+            let result = fs::remove_file(file);
+            if result.is_err() {
+                return HttpResponse::InternalServerError()
+                    .body(format!("Unable to remove file! Error: {}", result.err().unwrap()));
+            }
+        }
+        return HttpResponse::Created().finish();
+    }
     if !file.is_file() {
         let prefix = file.parent().unwrap();
         let result = fs::create_dir_all(prefix);
@@ -222,17 +236,8 @@ pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
                 .body(format!("Unable to create file! Error: {}", result.err().unwrap()));
         }
     }
-    if file_request.content.is_empty() {
-        let result = fs::remove_file(file);
-        if result.is_err() {
-            return HttpResponse::InternalServerError()
-                .body(format!("Unable to remove file! Error: {}", result.err().unwrap()));
-        }
-        return HttpResponse::Created().finish();
-    }
 
-    let content = base64::engine::general_purpose::STANDARD.decode(file_request.content.as_bytes()).unwrap();
-    let result = fs::write(file, content);
+    let result = fs::write(file, body);
     if result.is_err() {
         return HttpResponse::InternalServerError()
             .body(format!("Unable to write file! Error: {}", result.err().unwrap()));
@@ -245,8 +250,8 @@ pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
     let details = details.unwrap();
     let version = details.versions.get(details.versions.len() - 1).unwrap();
     let mut difference = version.difference.clone();
-    if !difference.iter().any(|e| &file_request.path == e) {
-        difference.push(file_request.path);
+    if !difference.iter().any(|e| &file_path == e) {
+        difference.push(file_path);
 
         let new_version = ComponentVersion {
             version: version.version,
@@ -272,7 +277,7 @@ pub async fn post_file(req: HttpRequest, body: String) -> HttpResponse {
 
 #[post("/hash/{component_type}/{id}")]
 pub async fn hash(req: HttpRequest, body: String) -> HttpResponse {
-    let result = check_prerequisites(req, true);
+    let result = check_prerequisites!(req);
     if result.is_err() {
         return result.err().unwrap();
     }
@@ -307,12 +312,20 @@ pub async fn hash(req: HttpRequest, body: String) -> HttpResponse {
         .json(response);
 }
 
-pub fn check_prerequisites(req: HttpRequest, check_existing: bool) -> Result<String, HttpResponse> {
+pub fn check_prerequisites(req: HttpRequest, check_existing: bool, content_type: Option<&str>) -> Result<String, HttpResponse> {
     let key_header = req.headers().get("auth-key");
     if key_header.is_none() || key_header.unwrap() != &get_auth_key() {
         return Err(HttpResponse::Forbidden().finish());
     }
 
+    if content_type.is_some() {
+        let content_type = content_type.unwrap();
+        let content_type_header = req.headers().get("content-type");
+        if content_type_header.is_none() || content_type_header.unwrap() != content_type {
+            return Err(HttpResponse::BadRequest()
+                .body(format!("Invalid content type! Please use {c}", c = content_type)));
+        }
+    }
     let component_type = req.match_info().query("component_type").parse::<ComponentType>();
     if component_type.is_err() {
         return Err(HttpResponse::BadRequest()

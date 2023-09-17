@@ -174,30 +174,24 @@
         },
         {
           "condition": "file doesn't exist",
-          "status": 200,
-          "json": {
-            "path": "",
-            "content": ""
-          }
+          "status": 204,
+          "body": "File doesn't exist!"
         },
         {
           "condition": "file exists",
           "status": 200,
           "json": {
             "path": "file_path",
-            "content": "{file_content: base64 String}"
+            "content": "{file_content: Bytes}"
           }
         }
       ]
     },
     {
-      "route": "/file/{component_type}/{id}",
+      "route": "/file/{component_type}/{id}/{file_path:.*}",
       "method": "POST",
       "request": {
-        "json": {
-          "path": "{file path: String}",
-          "content": "{base64 encoded file content if file should be created or updated or empty string if file should be deleted: String}"
-        }
+        "content": "{file_content: Bytes}"
       },
       "response": [
         {
