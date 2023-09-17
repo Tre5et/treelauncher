@@ -218,6 +218,15 @@ pub async fn post_file(req: HttpRequest, body: Bytes) -> HttpResponse {
             return HttpResponse::Created().finish();
         }
         let result = fs::remove_file(file);
+        let mut parent = file.parent().unwrap();
+        while parent.read_dir().unwrap().next().is_none() {
+            let result = fs::remove_dir(parent);
+            if result.is_err() {
+                return HttpResponse::InternalServerError()
+                    .body(format!("Unable to remove parent directory! Error: {}", result.err().unwrap()));
+            }
+            parent = parent.parent().unwrap();
+        }
         if result.is_err() {
             return HttpResponse::InternalServerError()
                 .body(format!("Unable to remove file! Error: {}", result.err().unwrap()));
