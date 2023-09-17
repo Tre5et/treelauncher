@@ -214,33 +214,33 @@ pub async fn post_file(req: HttpRequest, body: Bytes) -> HttpResponse {
     let path = format!("{b}/{p}", b = base_path, p = file_path.as_str());
     let file: &Path = Path::new(path.as_str());
     if body.is_empty() {
-        if file.is_file() {
-            let result = fs::remove_file(file);
+        if !file.is_file() {
+            return HttpResponse::Created().finish();
+        }
+        let result = fs::remove_file(file);
+        if result.is_err() {
+            return HttpResponse::InternalServerError()
+                .body(format!("Unable to remove file! Error: {}", result.err().unwrap()));
+        }
+    } else {
+        if !file.is_file() {
+            let prefix = file.parent().unwrap();
+            let result = fs::create_dir_all(prefix);
             if result.is_err() {
                 return HttpResponse::InternalServerError()
-                    .body(format!("Unable to remove file! Error: {}", result.err().unwrap()));
+                    .body(format!("Unable to create parent directories! Error: {}", result.err().unwrap()));
+            }
+            let result = fs::File::create(file);
+            if result.is_err() {
+                return HttpResponse::InternalServerError()
+                    .body(format!("Unable to create file! Error: {}", result.err().unwrap()));
             }
         }
-        return HttpResponse::Created().finish();
-    }
-    if !file.is_file() {
-        let prefix = file.parent().unwrap();
-        let result = fs::create_dir_all(prefix);
+        let result = fs::write(file, body);
         if result.is_err() {
             return HttpResponse::InternalServerError()
-                .body(format!("Unable to create parent directories! Error: {}", result.err().unwrap()));
+                .body(format!("Unable to write file! Error: {}", result.err().unwrap()));
         }
-        let result = fs::File::create(file);
-        if result.is_err() {
-            return HttpResponse::InternalServerError()
-                .body(format!("Unable to create file! Error: {}", result.err().unwrap()));
-        }
-    }
-
-    let result = fs::write(file, body);
-    if result.is_err() {
-        return HttpResponse::InternalServerError()
-            .body(format!("Unable to write file! Error: {}", result.err().unwrap()));
     }
 
     let details = get_details(base_path);
