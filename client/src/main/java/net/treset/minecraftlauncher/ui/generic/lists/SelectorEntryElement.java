@@ -3,10 +3,13 @@ package net.treset.minecraftlauncher.ui.generic.lists;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class SelectorEntryElement<E extends SelectorEntryElement.ContentProvider> extends StackPane {
     public interface ContentProvider {
@@ -19,13 +22,15 @@ public class SelectorEntryElement<E extends SelectorEntryElement.ContentProvider
     private BiConsumer<E, Boolean> selectionListener;
 
     protected final VBox vbContainer = new VBox();
+    protected final HBox hbTitle = new HBox();
     protected final Label lbTitle = new Label();
     protected final Label lbDetails = new Label();
+    protected final FontIcon icSync = new FontIcon();
 
     private boolean locked = false;
 
 
-    public SelectorEntryElement(E contentProvider, BiConsumer<E, Boolean> selectionListener) {
+    public SelectorEntryElement(E contentProvider, BiConsumer<E, Boolean> selectionListener, Supplier<Boolean> syncStatus) {
         this.selectionListener = selectionListener;
         setContentProvider(contentProvider);
 
@@ -35,11 +40,21 @@ public class SelectorEntryElement<E extends SelectorEntryElement.ContentProvider
 
         lbDetails.getStyleClass().add("element-details");
 
+        icSync.getStyleClass().addAll("icon", "sync");
+        icSync.setIconSize(24);
+
+        hbTitle.setAlignment(Pos.CENTER);
+        hbTitle.setSpacing(10);
+        hbTitle.getChildren().add(lbTitle);
+
         vbContainer.getStyleClass().add("element-container");
         vbContainer.setAlignment(Pos.CENTER);
         vbContainer.setOnMouseClicked(event -> onClick());
         vbContainer.setCursor(Cursor.HAND);
-        vbContainer.getChildren().addAll(lbTitle, lbDetails);
+        if(syncStatus != null && syncStatus.get()) {
+            hbTitle.getChildren().add(icSync);
+        }
+        vbContainer.getChildren().addAll(hbTitle, lbDetails);
 
         this.getStyleClass().add("element-root");
         this.getChildren().add(vbContainer);

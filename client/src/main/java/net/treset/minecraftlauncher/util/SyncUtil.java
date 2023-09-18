@@ -71,7 +71,7 @@ public class SyncUtil {
         statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
     }
 
-    public static void updateComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
+    public static void syncComponentFromServer(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
         File syncFile = new File(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
         if(!syncFile.exists()) {
             throw new IOException("Sync file not found");
@@ -100,7 +100,7 @@ public class SyncUtil {
         statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
     }
 
-    public static void syncComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
+    public static void syncComponentToServer(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
         statusConsumer.accept(new SyncStatus(SyncStep.COLLECTING, null));
         File syncFile = new File(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
         String componentData = FileUtil.loadFile(syncFile.getPath());
@@ -195,8 +195,9 @@ public class SyncUtil {
             if(content.length == 0 && new File(FormatUtil.absoluteFilePath(basePath, path)).exists()) {
                 LOGGER.debug("Deleting file: " + path);
                 FileUtil.deleteFile(FormatUtil.absoluteFilePath(basePath, path));
+            } else {
+                FileUtil.writeFile(FormatUtil.absoluteFilePath(basePath, path), content);
             }
-            FileUtil.writeFile(FormatUtil.absoluteFilePath(basePath, path), content);
         }
     }
 
