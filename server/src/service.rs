@@ -4,7 +4,6 @@ use std::path::Path;
 use actix_web::{get, HttpResponse, HttpRequest, post};
 use actix_web::http::header::ContentType;
 use serde::{Serialize, Deserialize};
-use sha256::Sha256Digest;
 use crate::component_type::ComponentType;
 use crate::get_auth_key;
 
@@ -419,7 +418,7 @@ pub fn check_prerequisites(req: HttpRequest, check_existing: bool, check_id: boo
         return Err(HttpResponse::BadRequest()
             .body(format!("Invalid component type!")));
     }
-    if(!check_id) {
+    if !check_id {
         return Ok(format!("data/{t}", t = component_type.unwrap()));
     }
     let id = req.match_info().query("id").parse::<String>();
