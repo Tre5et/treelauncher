@@ -38,6 +38,7 @@ async fn main() -> std::io::Result<()> {
                 .limit(1024 * 1024 * 1024 * 10)
             )
             .service(service::test)
+            .service(service::all)
             .service(service::new)
             .service(service::get)
             .service(service::get_file)

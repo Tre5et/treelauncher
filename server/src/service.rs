@@ -4,6 +4,7 @@ use std::path::Path;
 use actix_web::{get, HttpResponse, HttpRequest, post};
 use actix_web::http::header::ContentType;
 use serde::{Serialize, Deserialize};
+use sha256::Sha256Digest;
 use crate::component_type::ComponentType;
 use crate::get_auth_key;
 
@@ -30,15 +31,24 @@ pub struct ComponentDetails {
     versions: Vec<ComponentVersion>
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct Component {
+    id: String,
+    name: String
+}
+
 macro_rules! check_prerequisites {
     ($req:expr) => {
-        check_prerequisites($req, true, None)
+        check_prerequisites($req, true, true, None)
     };
     ($req:expr, $check_existing:expr) => {
-        check_prerequisites($req, $check_existing, None)
+        check_prerequisites($req, $check_existing, true, None)
     };
-    ($req:expr, $check_existing:expr, $content_type:expr) => {
-        check_prerequisites($req, $check_existing, Some($content_type))
+    ($req:expr, $check_existing:expr, $check_id:expr) => {
+        check_prerequisites($req, $check_existing, $check_id, None)
+    };
+    ($req:expr, $check_existing:expr, $check_id:expr, $content_type:expr) => {
+        check_prerequisites($req, $check_existing, $check_id, Some($content_type))
     };
 }
 
@@ -49,6 +59,76 @@ pub async fn test(req: HttpRequest) -> HttpResponse {
         return HttpResponse::Forbidden().finish();
     }
     return HttpResponse::Ok().finish();
+}
+
+#[get("/all/{component_type}")]
+pub async fn all(req: HttpRequest) -> HttpResponse {
+    let result = check_prerequisites!(req, false, false);
+    if result.is_err() {
+        return result.err().unwrap();
+    }
+    let base_path = result.unwrap();
+    let path: &Path = Path::new(base_path.as_str());
+    let children = path.read_dir();
+    if children.is_err() {
+        return HttpResponse::Ok()
+            .content_type(ContentType::json())
+            .json(Vec::<u8>::new());
+    }
+    let children = children.unwrap();
+    let mut components: Vec<Component> = Vec::new();
+    for child in children {
+        if child.is_err() {
+            return HttpResponse::InternalServerError()
+                .body(format!("Unable to read child! Error: {}", child.err().unwrap()));
+        }
+        let child = child.unwrap();
+        let child_path = child.path();
+        let component_files = child_path.read_dir();
+        if component_files.is_err() {
+            components.push(Component {
+                id: child.file_name().into_string().unwrap(),
+                name: "".to_string()
+            });
+            continue;
+        }
+        let component_files = component_files.unwrap();
+        let mut found = false;
+        for file in component_files {
+            if file.is_err() {
+                continue;
+            }
+            let file = file.unwrap();
+            if file.file_name() != "manifest.json" {
+                continue;
+            }
+            let content = fs::read_to_string(file.path());
+            if content.is_err() {
+                break;
+            }
+            let content = content.unwrap();
+            if content.contains("\"name\":") {
+                let string_after = content.split("\"name\":").collect::<Vec<&str>>()[1];
+                let name = string_after.split("\"").collect::<Vec<&str>>()[1];
+                components.push(Component {
+                    id: child.file_name().into_string().unwrap(),
+                    name: name.to_string()
+                });
+                found = true;
+                break;
+            }
+
+        }
+        if !found {
+            components.push(Component {
+                id: child.file_name().into_string().unwrap(),
+                name: "".to_string()
+            });
+        }
+    }
+    return HttpResponse::Ok()
+        .content_type(ContentType::json())
+        .json(components);
 }
 
 #[get("/new/{component_type}/{id}")]
@@ -204,7 +284,7 @@ pub async fn post_file(req: HttpRequest, body: Bytes) -> HttpResponse {
             .body(format!("Invalid file path!"));
     }
     let file_path = file_path.unwrap();
-    let result = check_prerequisites!(req, true, "application/octet-stream");
+    let result = check_prerequisites!(req, true, true, "application/octet-stream");
     if result.is_err() {
         return result.err().unwrap();
     }
@@ -321,7 +401,7 @@ pub async fn hash(req: HttpRequest, body: String) -> HttpResponse {
         .json(response);
 }
 
-pub fn check_prerequisites(req: HttpRequest, check_existing: bool, content_type: Option<&str>) -> Result<String, HttpResponse> {
+pub fn check_prerequisites(req: HttpRequest, check_existing: bool, check_id: bool, content_type: Option<&str>) -> Result<String, HttpResponse> {
     let key_header = req.headers().get("auth-key");
     if key_header.is_none() || key_header.unwrap() != &get_auth_key() {
         return Err(HttpResponse::Forbidden().finish());
@@ -339,6 +419,9 @@ pub fn check_prerequisites(req: HttpRequest, check_existing: bool, content_type:
     if component_type.is_err() {
         return Err(HttpResponse::BadRequest()
             .body(format!("Invalid component type!")));
+    }
+    if(!check_id) {
+        return Ok(format!("data/{t}", t = component_type.unwrap()));
     }
     let id = req.match_info().query("id").parse::<String>();
     if id.is_err() {
