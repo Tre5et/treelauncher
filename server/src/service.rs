@@ -61,8 +61,8 @@ pub async fn test(req: HttpRequest) -> HttpResponse {
     return HttpResponse::Ok().finish();
 }
 
-#[get("/all/{component_type}")]
-pub async fn all(req: HttpRequest) -> HttpResponse {
+#[get("/list/{component_type}")]
+pub async fn list(req: HttpRequest) -> HttpResponse {
     let result = check_prerequisites!(req, false, false);
     if result.is_err() {
         return result.err().unwrap();
@@ -79,8 +79,7 @@ pub async fn all(req: HttpRequest) -> HttpResponse {
     let mut components: Vec<Component> = Vec::new();
     for child in children {
         if child.is_err() {
-            return HttpResponse::InternalServerError()
-                .body(format!("Unable to read child! Error: {}", child.err().unwrap()));
+            continue;
         }
         let child = child.unwrap();
         let child_path = child.path();

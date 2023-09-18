@@ -14,9 +14,53 @@
 
   "routes": [
     {
+      "route": "/test",
+      "method": "GET",
+      "response": [
+        {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
+        {
+          "condition": "default",
+          "status": 200,
+          "body": "Hello World!"
+        }
+      ]
+    },
+    {
+      "route": "/list/{component_type}",
+      "method": "GET",
+      "responses": [
+        {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
+        {
+          "condition": "component_type not one of ComponentType",
+          "status": 400,
+          "body": "Invalid component type!"
+        },
+        {
+          "condition": "default",
+          "status": 200,
+          "json": [
+            {
+              "id": "id of the available component: String",
+              "name": "name of the available component able to be automatically parsed, else empty string: String"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "route": "/new/{component_type}/{id}",
       "method": "GET",
       "responses": [
+        {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
         {
           "condition": "component_type not one of ComponentType",
           "status": 400,
@@ -57,6 +101,10 @@
       "route": "/get/{component_type}/{id}/{version}",
       "method": "GET",
       "response": [
+        {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
         {
           "condition": "component_type not one of ComponentType",
           "status": 400,
@@ -107,6 +155,10 @@
       "method": "GET",
       "response": [
         {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
+        {
           "condition": "component_type not one of ComponentType",
           "status": 400,
           "body": "Invalid component type!"
@@ -153,6 +205,10 @@
       "method": "GET",
       "response": [
         {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
+        {
           "condition": "component_type not one of ComponentType",
           "status": 400,
           "body": "Invalid component type!"
@@ -194,6 +250,10 @@
         "content": "{file_content: Bytes}"
       },
       "response": [
+        {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
         {
           "condition": "component_type not one of ComponentType",
           "status": 400,
@@ -265,6 +325,10 @@
       "method": "POST",
       "request": "{list of file paths to hash: String[]}",
       "response": [
+        {
+          "condition": "auth-key is incorrect or missing",
+          "status": 403
+        },
         {
           "condition": "component_type not one of ComponentType",
           "status": 400,
