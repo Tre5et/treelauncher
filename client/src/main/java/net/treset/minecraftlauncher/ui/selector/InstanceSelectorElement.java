@@ -87,6 +87,11 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         abComponent.setDisable(true);
     }
 
+    @Override
+    protected void onDownload(ActionEvent event) {
+        // TODO
+    }
+
     @FXML
     private void onSort() {
         cbSort.toggleReverse();

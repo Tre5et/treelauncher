@@ -5,6 +5,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.util.DownloadStatus;
 import net.treset.minecraftlauncher.sync.ComponentData;
+import net.treset.minecraftlauncher.sync.ComponentList;
 import net.treset.minecraftlauncher.sync.GetResponse;
 import net.treset.minecraftlauncher.sync.SyncService;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -51,6 +53,26 @@ public class SyncUtil {
         public String getTranslationKey() {
             return translationKey;
         }
+    }
+
+    public static ComponentList getAvailableComponents(LauncherManifestType type) throws IOException {
+        SyncService service = new SyncService();
+        return service.getAvailable(convertType(type));
+    }
+
+    public static void downloadComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
+        File dir = new File(component.getDirectory());
+        if(!dir.exists()) {
+            Files.createDirectories(dir.toPath());
+        }
+        statusConsumer.accept(new SyncStatus(SyncStep.COLLECTING, null));
+        GetResponse response = new SyncService().get(convertType(component.getType()), component.getId(), 0);
+        LOGGER.debug("Downloading component: version=" + response.getVersion());
+        statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, null));
+        getFiles(component.getDirectory(), response.getDifference(), convertType(component.getType()), component.getId(), statusConsumer);
+        LOGGER.debug("Download complete");
+        updateSyncFile(component, response.getVersion());
+        statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
     }
 
     public static void uploadComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
@@ -187,15 +209,24 @@ public class SyncUtil {
 
     private static void getFiles(String basePath, List<String> difference, String type, String id, Consumer<SyncStatus> statusConsumer) throws IOException {
         SyncService service = new SyncService();
+        int amount = 0;
         for(String path : difference) {
             path = FormatUtil.urlDecode(path);
             LOGGER.debug("Downloading file: " + path);
-            statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(0, difference.size(), path, false)));
+            statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(++amount, difference.size(), path, false)));
             byte[] content = service.downloadFile(type, id, path);
-            if(content.length == 0 && new File(FormatUtil.absoluteFilePath(basePath, path)).exists()) {
+            File file = new File(FormatUtil.absoluteFilePath(basePath, path));
+            if(content.length == 0 && file.exists()) {
                 LOGGER.debug("Deleting file: " + path);
                 FileUtil.deleteFile(FormatUtil.absoluteFilePath(basePath, path));
             } else {
+                if(!file.isFile())  {
+                    if(file.isDirectory()) {
+                        FileUtil.deleteDir(file);
+                    }
+                    Files.createDirectories(file.toPath().getParent());
+                    Files.createFile(file.toPath());
+                }
                 FileUtil.writeFile(FormatUtil.absoluteFilePath(basePath, path), content);
             }
         }

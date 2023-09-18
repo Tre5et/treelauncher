@@ -27,6 +27,17 @@ public class SyncService {
         get("/test");
     }
 
+    public ComponentList getAvailable(String type) throws IOException {
+        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("/list/" + type);
+        ComponentList response;
+        try {
+            response = ComponentList.fromJson(new String(result.getValue()));
+        } catch(Exception e) {
+            throw new IOException("Failed to parse the response from the server.\nError: " + e);
+        }
+        return response;
+    }
+
     public void newComponent(String type, String id) throws IOException {
         get("/new/" + type + "/" + id);
     }

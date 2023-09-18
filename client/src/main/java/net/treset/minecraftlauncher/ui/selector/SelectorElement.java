@@ -1,8 +1,10 @@
 package net.treset.minecraftlauncher.ui.selector;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -12,6 +14,7 @@ import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.create.CreatorElement;
 import net.treset.minecraftlauncher.ui.generic.ActionBar;
 import net.treset.minecraftlauncher.ui.generic.CreateSelectable;
+import net.treset.minecraftlauncher.ui.generic.IconButton;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
@@ -23,6 +26,8 @@ import java.util.function.Supplier;
 
 public abstract class SelectorElement<E extends SelectorEntryElement<? extends SelectorEntryElement.ContentProvider>> extends UiElement {
     @FXML protected AnchorPane rootPane;
+    @FXML protected HBox hbTitle;
+    protected IconButton btDownload = new IconButton();
     @FXML protected VBox vbElements;
     @FXML protected ActionBar abMain;
     @FXML protected CreateSelectable csCreate;
@@ -42,6 +47,10 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
         } catch (FileLoadException e) {
             LauncherApplication.displaySevereError(e);
         }
+
+        btDownload.getStyleClass().add("download");
+        btDownload.setIconSize(28);
+        btDownload.setOnAction(this::onDownload);
     }
 
     protected void reloadComponents() {
@@ -64,6 +73,8 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
             vbElements.getChildren().addAll(elements);
         });
     }
+
+    protected abstract void onDownload(ActionEvent event);
 
     @FXML protected void onSelectCreate() {
         if(!getLock()) {
@@ -212,6 +223,10 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
 
     @Override
     public void beforeShow(Stage stage) {
+        hbTitle.getChildren().remove(btDownload);
+        if(LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncKey() != null) {
+            hbTitle.getChildren().add(btDownload);
+        }
         reloadComponents();
     }
 

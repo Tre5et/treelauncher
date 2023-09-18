@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.ui.generic;
 
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -123,6 +124,10 @@ public class PopupElement extends GridPane {
 
         public void select(int index) {
             comboBox.getSelectionModel().select(index);
+        }
+
+        public void addOnSelectionChanged(ChangeListener<? super T> onChange) {
+            comboBox.getSelectionModel().selectedItemProperty().addListener(onChange);
         }
 
         @Override

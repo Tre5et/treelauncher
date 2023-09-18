@@ -14,7 +14,9 @@
         <StackPane styleClass="element">
             <VBox alignment="TOP_CENTER" >
                 <VBox alignment="TOP_CENTER" styleClass="title-container" VBox.vgrow="NEVER">
-                    <Label styleClass="title" text="%mods.label.title" />
+                    <HBox fx:id="hbTitle" alignment="CENTER">
+                        <Label styleClass="title" text="%mods.label.title" />
+                    </HBox>
                 </VBox>
                 <ScrollPane fitToWidth="true" minHeight="10.0" VBox.vgrow="ALWAYS">
                     <VBox fx:id="vbElements" alignment="TOP_CENTER" />

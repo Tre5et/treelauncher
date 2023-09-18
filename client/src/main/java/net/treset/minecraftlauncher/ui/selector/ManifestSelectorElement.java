@@ -1,12 +1,16 @@
 package net.treset.minecraftlauncher.ui.selector;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.sync.ComponentList;
 import net.treset.minecraftlauncher.ui.generic.ButtonElement;
+import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement;
@@ -22,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ManifestSelectorElement extends SelectorElement<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> {
     public static class ManifestContentProvider implements SelectorEntryElement.ContentProvider {
@@ -56,6 +61,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     @FXML protected ButtonElement btSettings;
     @FXML protected ComponentManagerElement maComponentSecondary;
 
+
     protected ManifestContentProvider currentProvider = null;
 
     @FXML
@@ -71,6 +77,114 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
             maComponentSecondary.setVisible(false);
         }
     }
+
+    @Override
+    protected void onDownload(ActionEvent event) {
+        ComponentList list;
+        try {
+            list = SyncUtil.getAvailableComponents(getBaseManifestType());
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+            return;
+        }
+
+        List<ComponentList.Entry> entries = list.getEntries().stream()
+                .filter(e -> getComponents().stream()
+                        .noneMatch(c -> c.getId().equals(e.getId())))
+                .toList();
+
+        if(entries.isEmpty()) {
+            LauncherApplication.setPopup(
+                    new PopupElement(
+                            PopupElement.PopupType.NONE,
+                            "sync.popup.download.none.title",
+                            null,
+                            List.of(
+                                    new PopupElement.PopupButton(
+                                            PopupElement.ButtonType.POSITIVE,
+                                            "sync.popup.download.none.close",
+                                            (e) -> LauncherApplication.setPopup(null)
+                                    )
+                            )
+
+                    )
+            );
+            return;
+        }
+
+        PopupElement.PopupComboBox<ComponentList.Entry> cb = new PopupElement.PopupComboBox<>(entries);
+
+        PopupElement.PopupButton button = new PopupElement.PopupButton(
+                PopupElement.ButtonType.POSITIVE,
+                "sync.popup.download.confirm",
+                (ae) -> completeDownload(ae, cb)
+        );
+        button.setDisabled(true);
+
+        cb.addOnSelectionChanged((e, o, n) -> {
+            button.setDisabled(n == null);
+        });
+
+        LauncherApplication.setPopup(new PopupElement(
+                PopupElement.PopupType.NONE,
+                "sync.popup.download.title",
+                "sync.popup.download.message",
+                List.of(cb),
+                List.of(new PopupElement.PopupButton(
+                                PopupElement.ButtonType.NEGATIVE,
+                                "sync.popup.download.cancel",
+                                event1 -> LauncherApplication.setPopup(null)
+                        ),
+                        button
+                )
+        ));
+    }
+
+    protected void completeDownload(ActionEvent event, PopupElement.PopupComboBox<ComponentList.Entry> comboBox) {
+        LauncherManifest fakeManifest = new LauncherManifest(
+                getStringFromType(getBaseManifestType()),
+                files.getLauncherDetails().getTypeConversion(),
+                comboBox.getSelected().getId(),
+                null,
+                null,
+                null,
+                null,
+                null
+
+        );
+        fakeManifest.setDirectory(FormatUtil.absoluteFilePath(getBaseManifest().getDirectory(), getBaseManifest().getPrefix() + "_" + fakeManifest.getId()));
+
+        FileSyncHelper<LauncherManifest> helper = new FileSyncHelper<>(
+                fakeManifest,
+                SyncUtil::downloadComponent
+        );
+        helper.run(() -> {
+            ArrayList<String> components = new ArrayList<>(getBaseManifest().getComponents());
+            components.add(fakeManifest.getId());
+            getBaseManifest().setComponents(components);
+            String outFile = FormatUtil.absoluteFilePath(getBaseManifest().getDirectory(), getBaseManifest().getType() == LauncherManifestType.MODS ? files.getGameDetailsManifest().getComponents().get(0) : getBaseManifest().getType() == LauncherManifestType.SAVES ? files.getGameDetailsManifest().getComponents().get(0) : LauncherApplication.config.MANIFEST_FILE_NAME);
+            try {
+                getBaseManifest().writeToFile(outFile);
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+            }
+            LauncherApplication.setPopup(null);
+            reloadComponents();
+        });
+    }
+
+    private String getStringFromType(LauncherManifestType type) {
+        for (Map.Entry<String, LauncherManifestType> e: files.getLauncherDetails().getTypeConversion().entrySet()) {
+            if(e.getValue() == type) {
+                return e.getKey();
+            }
+        }
+        throw new IllegalStateException("Unable to find string for type " + type);
+    }
+
+    protected abstract LauncherManifestType getBaseManifestType();
+
+    protected abstract LauncherManifest getBaseManifest();
 
     @Override
     protected String getCurrentUsedBy() {
@@ -104,7 +218,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected abstract List<LauncherManifest> getComponents();
 
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
-        if(!SyncUtil.isSyncing(contentProvider.getManifest())) {
+        if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(contentProvider.getManifest())) {
             abMain.setShowSync(true);
             abMain.setOnSync((e) -> new FileSyncHelper<>(contentProvider.getManifest(), SyncUtil::uploadComponent).run(this::reloadComponents));
         } else {
