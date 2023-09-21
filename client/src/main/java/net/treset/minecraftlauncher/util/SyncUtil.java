@@ -1,21 +1,35 @@
 package net.treset.minecraftlauncher.util;
 
 import javafx.util.Pair;
+import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.fabric.FabricProfile;
+import net.treset.mc_version_loader.fabric.FabricUtil;
+import net.treset.mc_version_loader.fabric.FabricVersionDetails;
+import net.treset.mc_version_loader.json.JsonUtils;
+import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
+import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
+import net.treset.mc_version_loader.minecraft.MinecraftUtil;
+import net.treset.mc_version_loader.minecraft.MinecraftVersion;
+import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
 import net.treset.mc_version_loader.util.DownloadStatus;
+import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.creation.VersionCreator;
+import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.sync.ComponentData;
 import net.treset.minecraftlauncher.sync.ComponentList;
 import net.treset.minecraftlauncher.sync.GetResponse;
 import net.treset.minecraftlauncher.sync.SyncService;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class SyncUtil {
@@ -44,6 +58,7 @@ public class SyncUtil {
         COLLECTING("sync.status.collecting"),
         UPLOADING("sync.status.uploading"),
         DOWNLOADING("sync.status.downloading"),
+        CREATING("sync.status.creating"),
         FINISHED("sync.status.finished");
         private final String translationKey;
         SyncStep(String translationKey) {
@@ -149,6 +164,270 @@ public class SyncUtil {
         newData.setVersion(version);
         newData.writeToFile(FormatUtil.absoluteFilePath(component.getDirectory(), "data.sync"));
         statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
+    }
+
+    public static void syncInstanceToServer(InstanceData instance, Consumer<SyncStatus> statusConsumer) throws IOException {
+        statusConsumer.accept(new SyncStatus(SyncStep.COLLECTING, null));
+        if(isSyncing(instance.getInstance().getKey())) {
+            updateInstance(instance, statusConsumer);
+        } else {
+            uploadInstance(instance, statusConsumer);
+        }
+        if(!isSyncing(instance.getResourcepacksComponent())) {
+            uploadComponent(instance.getResourcepacksComponent(), statusConsumer);
+        }
+        if(instance.getModsComponent() != null && !isSyncing(instance.getModsComponent().getKey())) {
+            uploadComponent(instance.getModsComponent().getKey(), statusConsumer);
+        }
+        if(!isSyncing(instance.getOptionsComponent())) {
+            uploadComponent(instance.getOptionsComponent(), statusConsumer);
+        }
+        if(!isSyncing(instance.getSavesComponent())) {
+            uploadComponent(instance.getSavesComponent(), statusConsumer);
+        }
+        statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
+    }
+
+    public static void syncInstanceFromServer(InstanceData instance, LauncherFiles files, Consumer<SyncStatus> statusConsumer) throws IOException, FileDownloadException, ComponentCreationException {
+        statusConsumer.accept(new SyncStatus(SyncStep.COLLECTING, null));
+        SyncService service = new SyncService();
+
+        // TODO: download included files
+        File syncFile = new File(FormatUtil.absoluteFilePath(instance.getInstance().getKey().getDirectory(), "data.sync"));
+        String componentData = FileUtil.loadFile(syncFile.getPath());
+        ComponentData data = ComponentData.fromJson(componentData);
+        GetResponse instanceResponse = service.get("instance", instance.getInstance().getKey().getId(), data.getVersion());
+        if(instanceResponse.getVersion() == data.getVersion()) {
+            LOGGER.debug("Instance is up to date");
+            statusConsumer.accept(new SyncStatus(SyncStep.FINISHED, null));
+            return;
+        }
+
+        statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(1, 2, "instance.json", false)));
+        byte[] instanceContent = service.downloadFile("instance", instance.getInstance().getKey().getId(), "instance.json");
+        String instanceJson = new String(instanceContent);
+        LauncherInstanceDetails instanceDetails = JsonUtils.getGson().fromJson(instanceJson, LauncherInstanceDetails.class);
+        statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(2, 2, "version.json", false)));
+        byte[] versionContent = service.downloadFile("instance", instance.getInstance().getKey().getId(), "version.json");
+        String versionJson = new String(versionContent);
+        LauncherVersionDetails versionDetails = JsonUtils.getGson().fromJson(versionJson, LauncherVersionDetails.class);
+        syncContents(instance.getInstance().getValue(), instance.getVersionComponents().get(0).getValue(), instance.getInstance().getKey().getTypeConversion(), instanceDetails, versionDetails, files, statusConsumer);
+    }
+
+    public static void downloadInstance(String id, LauncherFiles files, Consumer<SyncStatus> statusConsumer) throws IOException, ComponentCreationException, FileDownloadException {
+        statusConsumer.accept(new SyncStatus(SyncStep.COLLECTING, null));
+        SyncService service = new SyncService();
+
+        GetResponse instanceResponse = service.get("instance", id, 0);
+
+        // TODO: download included files
+        statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(1, 3, LauncherApplication.config.MANIFEST_FILE_NAME, false)));
+        byte[] manifestContent = service.downloadFile("instance", id, LauncherApplication.config.MANIFEST_FILE_NAME);
+        String manifestJson = new String(manifestContent);
+        LauncherManifest manifest = JsonUtils.getGson().fromJson(manifestJson, LauncherManifest.class);
+        statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(2, 3, "instance.json", false)));
+        byte[] instanceContent = service.downloadFile("instance", id, "instance.json");
+        String instanceJson = new String(instanceContent);
+        LauncherInstanceDetails instanceDetails = JsonUtils.getGson().fromJson(instanceJson, LauncherInstanceDetails.class);
+        statusConsumer.accept(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(3, 3, "version.json", false)));
+        byte[] versionContent = service.downloadFile("instance", id, "version.json");
+        String versionJson = new String(versionContent);
+        LauncherVersionDetails versionDetails = JsonUtils.getGson().fromJson(versionJson, LauncherVersionDetails.class);
+
+        LauncherInstanceDetails newDetails = new LauncherInstanceDetails(
+                instanceDetails.getFeatures(),
+                instanceDetails.getIgnoredFiles(),
+                instanceDetails.getJvm_arguments(),
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        syncContents(
+                newDetails,
+                new LauncherVersionDetails(
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                files.getLauncherDetails().getTypeConversion(),
+                instanceDetails,
+                versionDetails,
+                files,
+                statusConsumer
+        );
+        // TODO: create
+    }
+
+    private static void syncContents(LauncherInstanceDetails instance, LauncherVersionDetails versionDetails, Map<String, LauncherManifestType> typeConversion, LauncherInstanceDetails newInstance, LauncherVersionDetails newVersion, LauncherFiles files, Consumer<SyncStatus> statusConsumer) throws IOException, FileDownloadException, ComponentCreationException {
+        instance.setIgnoredFiles(newInstance.getIgnoredFiles());
+        instance.setJvm_arguments(newInstance.getJvm_arguments());
+        if(files.getSavesManifest().getComponents().contains(newInstance.getSavesComponent())) {
+            instance.setSavesComponent(newInstance.getSavesComponent());
+        } else {
+            LauncherManifest fakeManifest = new LauncherManifest(
+                    FormatUtil.getStringFromType(LauncherManifestType.SAVES_COMPONENT, files.getLauncherDetails().getTypeConversion()),
+                    files.getLauncherDetails().getTypeConversion(),
+                    newInstance.getSavesComponent(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+
+            );
+            fakeManifest.setDirectory(FormatUtil.absoluteFilePath(files.getSavesManifest().getDirectory(), files.getSavesManifest().getPrefix() + "_" + newInstance.getSavesComponent()));
+            downloadComponent(fakeManifest, statusConsumer);
+            instance.setSavesComponent(fakeManifest.getId());
+        }
+        if(files.getOptionsManifest().getComponents().contains(newInstance.getOptionsComponent())) {
+            instance.setOptionsComponent(newInstance.getOptionsComponent());
+        } else {
+            LauncherManifest fakeManifest = new LauncherManifest(
+                    FormatUtil.getStringFromType(LauncherManifestType.OPTIONS_COMPONENT, files.getLauncherDetails().getTypeConversion()),
+                    files.getLauncherDetails().getTypeConversion(),
+                    newInstance.getOptionsComponent(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            fakeManifest.setDirectory(FormatUtil.absoluteFilePath(files.getOptionsManifest().getDirectory(), files.getOptionsManifest().getPrefix() + "_" + newInstance.getOptionsComponent()));
+            downloadComponent(fakeManifest, statusConsumer);
+            instance.setOptionsComponent(fakeManifest.getId());
+        }
+        if(files.getResourcepackManifest().getComponents().contains(newInstance.getResourcepacksComponent())) {
+            instance.setResourcepacksComponent(newInstance.getResourcepacksComponent());
+        } else {
+            LauncherManifest fakeManifest = new LauncherManifest(
+                    FormatUtil.getStringFromType(LauncherManifestType.RESOURCEPACKS_COMPONENT, files.getLauncherDetails().getTypeConversion()),
+                    files.getLauncherDetails().getTypeConversion(),
+                    newInstance.getResourcepacksComponent(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            fakeManifest.setDirectory(FormatUtil.absoluteFilePath(files.getResourcepackManifest().getDirectory(), files.getResourcepackManifest().getPrefix() + "_" + newInstance.getResourcepacksComponent()));
+            downloadComponent(fakeManifest, statusConsumer);
+            instance.setResourcepacksComponent(fakeManifest.getId());
+        }
+        if(newInstance.getModsComponent() != null) {
+            if(files.getModsManifest().getComponents().contains(newInstance.getModsComponent())) {
+                instance.setModsComponent(newInstance.getModsComponent());
+            } else {
+                LauncherManifest fakeManifest = new LauncherManifest(
+                        FormatUtil.getStringFromType(LauncherManifestType.MODS_COMPONENT, files.getLauncherDetails().getTypeConversion()),
+                        files.getLauncherDetails().getTypeConversion(),
+                        newInstance.getModsComponent(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+                fakeManifest.setDirectory(FormatUtil.absoluteFilePath(files.getModsManifest().getDirectory(), files.getModsManifest().getPrefix() + "_" + newInstance.getModsComponent()));
+                downloadComponent(fakeManifest, statusConsumer);
+                instance.setModsComponent(fakeManifest.getId());
+            }
+        }
+
+        if(!Objects.equals(versionDetails.getVersionId(), newVersion.getVersionId())) {
+            statusConsumer.accept(new SyncStatus(SyncStep.CREATING, null));
+            Optional<MinecraftVersion> version = MinecraftUtil.getReleases().stream().filter(e -> e.getId().equals(newVersion.getVersionId())).findFirst();
+            if(version.isEmpty()) {
+                throw new FileDownloadException("Failed to find version: " + newVersion.getVersionId());
+            }
+            MinecraftVersionDetails details = MinecraftUtil.getVersionDetails(version.get().getUrl());
+            VersionCreator creator;
+            if(Objects.equals(newVersion.getVersionType(), "vanilla")) {
+                creator = new VersionCreator(
+                        typeConversion,
+                        files.getVersionManifest(),
+                        details,
+                        files,
+                        FormatUtil.absoluteDirPath(LauncherApplication.config.BASE_DIR, files.getLauncherDetails().getLibrariesDir())
+                );
+            } else {
+                FabricVersionDetails fabricDetails = FabricUtil.getFabricVersionDetails(newVersion.getVersionNumber(), newVersion.getLoaderVersion());
+                FabricProfile profile = FabricUtil.getFabricProfile(newVersion.getVersionNumber(), newVersion.getLoaderVersion());
+                creator = new VersionCreator(
+                        typeConversion,
+                        files.getVersionManifest(),
+                        fabricDetails,
+                        profile,
+                        files,
+                        FormatUtil.absoluteDirPath(LauncherApplication.config.BASE_DIR, files.getLauncherDetails().getLibrariesDir())
+                );
+            }
+            creator.setStatusCallback((status) -> {
+                statusConsumer.accept(new SyncStatus(SyncStep.CREATING, status.getDownloadStatus()));
+            });
+            String id = creator.createComponent();
+            instance.setVersionComponent(id);
+        }
+    }
+
+    private static void uploadInstance(InstanceData instance, Consumer<SyncStatus> statusConsumer) throws IOException {
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, null));
+        SyncService service = new SyncService();
+        service.newComponent("instance", instance.getInstance().getKey().getId());
+        updateInstance(instance, statusConsumer);
+    }
+
+    private static void updateInstance(InstanceData instance, Consumer<SyncStatus> statusConsumer) throws IOException {
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, null));
+        SyncService service = new SyncService();
+        LauncherInstanceDetails newDetails = new LauncherInstanceDetails(
+                null,
+                instance.getInstance().getValue().getIgnoredFiles(),
+                instance.getInstance().getValue().getJvm_arguments(),
+                instance.getInstance().getValue().getModsComponent(),
+                instance.getInstance().getValue().getOptionsComponent(),
+                instance.getInstance().getValue().getResourcepacksComponent(),
+                instance.getInstance().getValue().getSavesComponent(),
+                null
+        );
+        LauncherVersionDetails versionDetails = new LauncherVersionDetails(
+                instance.getVersionComponents().get(0).getValue().getVersionNumber(),
+                instance.getVersionComponents().get(0).getValue().getVersionType(),
+                instance.getVersionComponents().get(0).getValue().getLoaderVersion(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(1, 3, LauncherApplication.config.MANIFEST_FILE_NAME, false)));
+        service.uploadFile("instance", instance.getInstance().getKey().getId(), LauncherApplication.config.MANIFEST_FILE_NAME, FileUtil.readFile(FormatUtil.absoluteFilePath(instance.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME)));
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(2, 3, "instance.json", false)));
+        service.uploadFile("instance", instance.getInstance().getKey().getId(), "instance.json", JsonUtils.getGson().toJson(newDetails).getBytes());
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(3, 3, "version.json", false)));
+        service.uploadFile("instance", instance.getInstance().getKey().getId(), "version.json", JsonUtils.getGson().toJson(versionDetails).getBytes());
+
+        // TODO: upload Included Files
+
+        int versionNumber = service.complete("instance", instance.getInstance().getKey().getId());
+        ComponentData data = new ComponentData(versionNumber, 3, null);
+        data.writeToFile(FormatUtil.absoluteFilePath(instance.getInstance().getKey().getDirectory(), "data.sync"));
     }
 
     private static List<String> compareHashes(ComponentData.HashEntry oldEntry, ComponentData.HashEntry newEntry, String path) {

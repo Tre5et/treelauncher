@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public abstract class ManifestSelectorElement extends SelectorElement<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> {
     public static class ManifestContentProvider implements SelectorEntryElement.ContentProvider {
@@ -142,7 +141,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
 
     protected void completeDownload(ActionEvent event, PopupElement.PopupComboBox<ComponentList.Entry> comboBox) {
         LauncherManifest fakeManifest = new LauncherManifest(
-                getStringFromType(getBaseManifestType()),
+                FormatUtil.getStringFromType(getBaseManifestType(), files.getLauncherDetails().getTypeConversion()),
                 files.getLauncherDetails().getTypeConversion(),
                 comboBox.getSelected().getId(),
                 null,
@@ -171,15 +170,6 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
             LauncherApplication.setPopup(null);
             reloadComponents();
         });
-    }
-
-    private String getStringFromType(LauncherManifestType type) {
-        for (Map.Entry<String, LauncherManifestType> e: files.getLauncherDetails().getTypeConversion().entrySet()) {
-            if(e.getValue() == type) {
-                return e.getKey();
-            }
-        }
-        throw new IllegalStateException("Unable to find string for type " + type);
     }
 
     protected abstract LauncherManifestType getBaseManifestType();

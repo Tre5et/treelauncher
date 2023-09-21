@@ -19,9 +19,11 @@ import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
 import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,6 +103,14 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
 
     private void onSelected(InstanceData instanceData, boolean selected) {
+        if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(instanceData.getInstance().getKey())) {
+            abMain.setShowSync(true);
+            abMain.setOnSync((e) -> new FileSyncHelper<>(instanceData, SyncUtil::syncInstanceToServer).run(this::reloadComponents));
+        } else {
+            abMain.setShowSync(false);
+            abMain.setOnSync((e) -> {});
+        }
+
         icDetailsController.clearSelection();
         ccChanger.setVisible(false);
         vcChanger.setVisible(false);

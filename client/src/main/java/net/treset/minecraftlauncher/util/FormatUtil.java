@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.util;
 
 import net.treset.mc_version_loader.format.FormatUtils;
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class FormatUtil {
     public static boolean matchesAny(String test, List<String> patterns) {
@@ -158,6 +160,15 @@ public class FormatUtil {
             encryptedString.insert(0, "0");
         }
         return encryptedString.toString();
+    }
+
+    public static String getStringFromType(LauncherManifestType type, Map<String, LauncherManifestType> typeConversion) {
+        for (Map.Entry<String, LauncherManifestType> e: typeConversion.entrySet()) {
+            if(e.getValue() == type) {
+                return e.getKey();
+            }
+        }
+        throw new IllegalStateException("Unable to find string for type " + type);
     }
 
     public static String urlEncode(String string) {
