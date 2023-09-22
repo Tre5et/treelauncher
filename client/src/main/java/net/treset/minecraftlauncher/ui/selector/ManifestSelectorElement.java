@@ -9,6 +9,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.sync.ComponentList;
+import net.treset.minecraftlauncher.sync.ManifestSynchronizer;
 import net.treset.minecraftlauncher.ui.generic.ButtonElement;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
@@ -153,11 +154,13 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         );
         fakeManifest.setDirectory(FormatUtil.absoluteFilePath(getBaseManifest().getDirectory(), getBaseManifest().getPrefix() + "_" + fakeManifest.getId()));
 
-        FileSyncHelper<LauncherManifest> helper = new FileSyncHelper<>(
-                fakeManifest,
-                SyncUtil::downloadComponent
+        FileSyncHelper helper = new FileSyncHelper(
+                new ManifestSynchronizer(
+                        fakeManifest,
+                        (s) -> {}
+                )
         );
-        helper.run(() -> {
+        helper.download(() -> {
             ArrayList<String> components = new ArrayList<>(getBaseManifest().getComponents());
             components.add(fakeManifest.getId());
             getBaseManifest().setComponents(components);
@@ -210,10 +213,17 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
         if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(contentProvider.getManifest())) {
             abMain.setShowSync(true);
-            abMain.setOnSync((e) -> new FileSyncHelper<>(contentProvider.getManifest(), SyncUtil::uploadComponent).run(this::reloadComponents));
+            abMain.setOnSync((e) -> new FileSyncHelper(new ManifestSynchronizer(
+                    contentProvider.getManifest(),
+                    (s) -> {}
+            )).upload(this::reloadComponents));
         } else {
-            abMain.setShowSync(false);
-            abMain.setOnSync((e) -> {});
+            // TODO: change
+            abMain.setShowSync(true);
+            abMain.setOnSync((e) -> new FileSyncHelper(new ManifestSynchronizer(
+                    contentProvider.getManifest(),
+                    (s) -> {}
+            )).download(this::reloadComponents));
         }
 
         if(ccDetails != null) {

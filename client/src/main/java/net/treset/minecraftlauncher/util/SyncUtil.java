@@ -1,80 +1,36 @@
 package net.treset.minecraftlauncher.util;
 
-import javafx.util.Pair;
-import net.treset.mc_version_loader.exception.FileDownloadException;
-import net.treset.mc_version_loader.fabric.FabricProfile;
-import net.treset.mc_version_loader.fabric.FabricUtil;
-import net.treset.mc_version_loader.fabric.FabricVersionDetails;
-import net.treset.mc_version_loader.json.JsonUtils;
-import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
-import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
-import net.treset.mc_version_loader.minecraft.MinecraftUtil;
-import net.treset.mc_version_loader.minecraft.MinecraftVersion;
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
-import net.treset.mc_version_loader.util.DownloadStatus;
-import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.creation.VersionCreator;
-import net.treset.minecraftlauncher.data.InstanceData;
-import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.sync.ComponentData;
 import net.treset.minecraftlauncher.sync.ComponentList;
-import net.treset.minecraftlauncher.sync.GetResponse;
 import net.treset.minecraftlauncher.sync.SyncService;
-import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.function.Consumer;
 
 public class SyncUtil {
-    private static final Logger LOGGER = LogManager.getLogger(SyncUtil.class);
-
-    public static class SyncStatus {
-        private final SyncStep step;
-        private final DownloadStatus status;
-
-        public SyncStatus(SyncStep step, DownloadStatus status) {
-            this.step = step;
-            this.status = status;
-        }
-
-        public SyncStep getStep() {
-            return step;
-        }
-
-        public DownloadStatus getStatus() {
-            return status;
-        }
-    }
-
-    public enum SyncStep {
-        STARTING("sync.status.starting"),
-        COLLECTING("sync.status.collecting"),
-        UPLOADING("sync.status.uploading"),
-        DOWNLOADING("sync.status.downloading"),
-        CREATING("sync.status.creating"),
-        FINISHED("sync.status.finished");
-        private final String translationKey;
-        SyncStep(String translationKey) {
-            this.translationKey = translationKey;
-        }
-
-        public String getTranslationKey() {
-            return translationKey;
-        }
-    }
-
+    public static final String SYNC_FILENAME = "data.sync";
     public static ComponentList getAvailableComponents(LauncherManifestType type) throws IOException {
         SyncService service = new SyncService();
         return service.getAvailable(convertType(type));
     }
 
+    public static String convertType(LauncherManifestType type) {
+        return switch (type) {
+            case RESOURCEPACKS_COMPONENT -> "resourcepacks";
+            case MODS_COMPONENT -> "mods";
+            case OPTIONS_COMPONENT -> "options";
+            case SAVES_COMPONENT -> "saves";
+            case INSTANCE_COMPONENT -> "instance";
+            default -> "unknown";
+        };
+    }
+
+    public static boolean isSyncing(LauncherManifest manifest) {
+        return new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), SyncUtil.SYNC_FILENAME)).isFile();
+    }
+
+    /*
     public static void downloadComponent(LauncherManifest component, Consumer<SyncStatus> statusConsumer) throws IOException {
         File dir = new File(component.getDirectory());
         if(!dir.exists()) {
@@ -385,23 +341,21 @@ public class SyncUtil {
         statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, null));
         SyncService service = new SyncService();
         service.newComponent("instance", instance.getInstance().getKey().getId());
-        updateInstance(instance, statusConsumer);
+        uploadVersionFile(instance, statusConsumer);
+        uploadComponent(instance.getInstance().getKey(), statusConsumer);
+        uploadInstanceDependencies(instance, statusConsumer);
     }
 
     private static void updateInstance(InstanceData instance, Consumer<SyncStatus> statusConsumer) throws IOException {
         statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, null));
+        uploadVersionFile(instance, statusConsumer);
+        syncComponentToServer(instance.getInstance().getKey(), statusConsumer);
+        uploadIfNotSynced(instance.getSavesComponent(), statusConsumer);
+    }
+
+    private static void uploadVersionFile(InstanceData instance, Consumer<SyncStatus> statusConsumer) throws IOException {
         SyncService service = new SyncService();
-        LauncherInstanceDetails newDetails = new LauncherInstanceDetails(
-                null,
-                instance.getInstance().getValue().getIgnoredFiles(),
-                instance.getInstance().getValue().getJvm_arguments(),
-                instance.getInstance().getValue().getModsComponent(),
-                instance.getInstance().getValue().getOptionsComponent(),
-                instance.getInstance().getValue().getResourcepacksComponent(),
-                instance.getInstance().getValue().getSavesComponent(),
-                null
-        );
-        LauncherVersionDetails versionDetails = new LauncherVersionDetails(
+        LauncherVersionDetails details = new LauncherVersionDetails(
                 instance.getVersionComponents().get(0).getValue().getVersionNumber(),
                 instance.getVersionComponents().get(0).getValue().getVersionType(),
                 instance.getVersionComponents().get(0).getValue().getLoaderVersion(),
@@ -413,21 +367,26 @@ public class SyncUtil {
                 null,
                 null,
                 null,
-                null
+                instance.getVersionComponents().get(0).getValue().getVersionId()
         );
 
-        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(1, 3, LauncherApplication.config.MANIFEST_FILE_NAME, false)));
-        service.uploadFile("instance", instance.getInstance().getKey().getId(), LauncherApplication.config.MANIFEST_FILE_NAME, FileUtil.readFile(FormatUtil.absoluteFilePath(instance.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME)));
-        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(2, 3, "instance.json", false)));
-        service.uploadFile("instance", instance.getInstance().getKey().getId(), "instance.json", JsonUtils.getGson().toJson(newDetails).getBytes());
-        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(3, 3, "version.json", false)));
-        service.uploadFile("instance", instance.getInstance().getKey().getId(), "version.json", JsonUtils.getGson().toJson(versionDetails).getBytes());
+        statusConsumer.accept(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(0, 0, "version.json", false)));
+        service.uploadFile("instance", instance.getInstance().getKey().getId(), "version.json", JsonUtils.getGson().toJson(details).getBytes());
+    }
 
-        // TODO: upload Included Files
+    private static void uploadInstanceDependencies(InstanceData instance, Consumer<SyncStatus> statusConsumer) throws IOException {
+        uploadIfNotSynced(instance.getSavesComponent(), statusConsumer);
+        uploadIfNotSynced(instance.getOptionsComponent(), statusConsumer);
+        uploadIfNotSynced(instance.getResourcepacksComponent(), statusConsumer);
+        if(instance.getModsComponent() != null) {
+            uploadIfNotSynced(instance.getModsComponent().getKey(), statusConsumer);
+        }
+    }
 
-        int versionNumber = service.complete("instance", instance.getInstance().getKey().getId());
-        ComponentData data = new ComponentData(versionNumber, 3, null);
-        data.writeToFile(FormatUtil.absoluteFilePath(instance.getInstance().getKey().getDirectory(), "data.sync"));
+    private static void uploadIfNotSynced(LauncherManifest manifest, Consumer<SyncStatus> statusConsumer) throws IOException {
+        if(!isSyncing(manifest)) {
+            uploadComponent(manifest, statusConsumer);
+        }
     }
 
     private static List<String> compareHashes(ComponentData.HashEntry oldEntry, ComponentData.HashEntry newEntry, String path) {
@@ -573,5 +532,5 @@ public class SyncUtil {
             case INSTANCE_COMPONENT -> "instance";
             default -> "unknown";
         };
-    }
+    }*/
 }

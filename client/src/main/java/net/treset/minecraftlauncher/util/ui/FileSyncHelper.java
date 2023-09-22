@@ -2,59 +2,47 @@ package net.treset.minecraftlauncher.util.ui;
 
 import javafx.application.Platform;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.sync.FileSynchronizer;
 import net.treset.minecraftlauncher.ui.generic.PopupElement;
-import net.treset.minecraftlauncher.util.SyncUtil;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class FileSyncHelper<T> {
-    public T componentManifest;
-
-    private SyncAction<T> action;
-
-    public FileSyncHelper(T componentManifest, SyncAction<T> action) {
-        this.componentManifest = componentManifest;
-        this.action = action;
+public class FileSyncHelper {
+    private final FileSynchronizer synchronizer;
+    public FileSyncHelper(FileSynchronizer synchronizer) {
+        this.synchronizer = synchronizer;
     }
 
-    public void run(Runnable onDone) {
-        handlePopup(onDone);
+    public void upload(Runnable onDone) {
+        handlePopup(onDone, true);
     }
 
-    public T getComponentManifest() {
-        return componentManifest;
+    public void download(Runnable onDone) {
+        handlePopup(onDone, false);
     }
 
-    public void setComponentManifest(T componentManifest) {
-        this.componentManifest = componentManifest;
-    }
-
-    public SyncAction<T> getAction() {
-        return action;
-    }
-
-    public void setAction(SyncAction<T> action) {
-        this.action = action;
-    }
-
-    private void handlePopup(Runnable onDone) {
+    private void handlePopup(Runnable onDone, boolean upload) {
         PopupElement popup = new PopupElement(
                 PopupElement.PopupType.NONE,
                 "sync.popup.syncing",
                 null
         );
+        synchronizer.setCallback((status) -> {
+            StringBuilder message = new StringBuilder(LauncherApplication.stringLocalizer.get(status.getStep().getTranslationKey()));
+            if(status.getStatus() != null) {
+                message.append("\n").append(status.getStatus().getCurrentFile()).append("\n(").append(status.getStatus().getCurrentAmount()).append("/").append(status.getStatus().getTotalAmount()).append(")");
+            }
+            Platform.runLater(()-> popup.setMessage(message.toString()));
+        });
         LauncherApplication.setPopup(popup);
         new Thread(() -> {
             try {
-                action.run(componentManifest, (status) -> {
-                    StringBuilder message = new StringBuilder(LauncherApplication.stringLocalizer.get(status.getStep().getTranslationKey()));
-                    if(status.getStatus() != null) {
-                        message.append("\n").append(status.getStatus().getCurrentFile()).append("\n(").append(status.getStatus().getCurrentAmount()).append("/").append(status.getStatus().getTotalAmount()).append(")");
-                    }
-                    Platform.runLater(()-> popup.setMessage(message.toString()));
-                });
+                if(upload) {
+                    synchronizer.upload();
+                } else {
+                    synchronizer.download();
+                }
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 LauncherApplication.setPopup(null);
@@ -75,9 +63,5 @@ public class FileSyncHelper<T> {
             ));
             onDone.run();
         }).start();
-    }
-
-    public interface SyncAction<T> {
-        void run(T manifest, Consumer<SyncUtil.SyncStatus> statusCallback) throws IOException;
     }
 }

@@ -12,6 +12,7 @@ import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
+import net.treset.minecraftlauncher.sync.InstanceSynchronizer;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
@@ -105,7 +106,12 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     private void onSelected(InstanceData instanceData, boolean selected) {
         if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(instanceData.getInstance().getKey())) {
             abMain.setShowSync(true);
-            abMain.setOnSync((e) -> new FileSyncHelper<>(instanceData, SyncUtil::syncInstanceToServer).run(this::reloadComponents));
+            abMain.setOnSync((e) -> new FileSyncHelper(
+                    new InstanceSynchronizer(
+                            instanceData,
+                            (s) -> {}
+                    )
+            ).upload(this::reloadComponents));
         } else {
             abMain.setShowSync(false);
             abMain.setOnSync((e) -> {});
