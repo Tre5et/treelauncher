@@ -142,7 +142,11 @@ public class ResourceManager {
         LOGGER.debug("Adding included files: {}Id={}", manifest.getType(), manifest.getId());
         File includedFilesDir = new File(manifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
         if(!includedFilesDir.isDirectory()) {
-            throw new GameResourceException("Included files directory doesn't exist: manifestId=" + manifest.getId());
+            try {
+                Files.createDirectory(includedFilesDir.toPath());
+            } catch (IOException e) {
+                throw new GameResourceException("Unable to get included files: unable to create included files directory: manifestId=" + manifest.getId(), e);
+            }
         }
         File[] files = includedFilesDir.listFiles();
         if(files == null) {

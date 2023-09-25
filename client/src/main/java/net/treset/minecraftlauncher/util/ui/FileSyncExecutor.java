@@ -8,9 +8,9 @@ import net.treset.minecraftlauncher.ui.generic.PopupElement;
 import java.io.IOException;
 import java.util.List;
 
-public class FileSyncHelper {
+public class FileSyncExecutor {
     private final FileSynchronizer synchronizer;
-    public FileSyncHelper(FileSynchronizer synchronizer) {
+    public FileSyncExecutor(FileSynchronizer synchronizer) {
         this.synchronizer = synchronizer;
     }
 

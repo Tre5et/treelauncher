@@ -49,7 +49,7 @@ public abstract class FileSynchronizer {
 
     protected static final Logger LOGGER = LogManager.getLogger(FileSynchronizer.class);
 
-    private SyncCallback callback;
+    protected SyncCallback callback;
 
     public FileSynchronizer(SyncCallback callback) {
         this.callback = callback;

@@ -69,7 +69,7 @@ public class SyncService {
             throw new IOException("Failed to connect to the sync server.\nError: " + e);
         }
         if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
-            throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length == 0 ? "\nMessage: " + new String(result.getValue()) : ""));
+            throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length != 0 ? "\nMessage: " + new String(result.getValue()) : ""));
         }
         return result;
     }

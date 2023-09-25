@@ -2,7 +2,6 @@ package net.treset.minecraftlauncher.ui.selector;
 
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FileUtil;
 import org.apache.logging.log4j.LogManager;
@@ -54,10 +53,6 @@ public class OptionsSelectorElement extends ManifestSelectorElement {
     @Override
     protected List<LauncherManifest> getComponents() {
         return files.getOptionsComponents();
-    }
-
-    protected LauncherManifestType getBaseManifestType() {
-        return LauncherManifestType.OPTIONS_COMPONENT;
     }
 
     @Override

@@ -6,7 +6,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
@@ -187,11 +186,6 @@ public class SavesSelectorElement extends ManifestSelectorElement {
             setVisible(false);
             setVisible(true);
         }
-    }
-
-    @Override
-    protected LauncherManifestType getBaseManifestType() {
-        return LauncherManifestType.SAVES_COMPONENT;
     }
 
     @Override

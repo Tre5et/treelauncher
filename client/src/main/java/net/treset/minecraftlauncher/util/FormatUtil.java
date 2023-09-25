@@ -55,7 +55,7 @@ public class FormatUtil {
     public static String absoluteDirPath(String... parts) {
         StringBuilder path = new StringBuilder();
         for(String part : parts) {
-            if(part == null) continue;
+            if(part == null || part.isBlank()) continue;
             path.append(part);
             if(!part.endsWith(File.separator) && !part.endsWith("/") && !part.endsWith("\\"))
                 path.append(File.separator);
@@ -169,6 +169,30 @@ public class FormatUtil {
             }
         }
         throw new IllegalStateException("Unable to find string for type " + type);
+    }
+
+    public static LauncherManifestType getChildType(LauncherManifestType type) {
+        return switch (type) {
+            case INSTANCES -> LauncherManifestType.INSTANCE_COMPONENT;
+            case VERSIONS -> LauncherManifestType.VERSION_COMPONENT;
+            case SAVES -> LauncherManifestType.SAVES_COMPONENT;
+            case RESOURCEPACKS -> LauncherManifestType.RESOURCEPACKS_COMPONENT;
+            case MODS -> LauncherManifestType.MODS_COMPONENT;
+            case OPTIONS -> LauncherManifestType.OPTIONS_COMPONENT;
+            default -> throw new IllegalStateException("Unable to find child type for type " + type);
+        };
+    }
+
+    public static LauncherManifestType getParentType(LauncherManifestType type) {
+        return switch (type) {
+            case INSTANCE_COMPONENT -> LauncherManifestType.INSTANCES;
+            case VERSION_COMPONENT -> LauncherManifestType.VERSIONS;
+            case SAVES_COMPONENT -> LauncherManifestType.SAVES;
+            case RESOURCEPACKS_COMPONENT -> LauncherManifestType.RESOURCEPACKS;
+            case MODS_COMPONENT -> LauncherManifestType.MODS;
+            case OPTIONS_COMPONENT -> LauncherManifestType.OPTIONS;
+            default -> throw new IllegalStateException("Unable to find parent type for type " + type);
+        };
     }
 
     public static String urlEncode(String string) {

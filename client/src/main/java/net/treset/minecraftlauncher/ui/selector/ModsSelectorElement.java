@@ -5,7 +5,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
@@ -113,11 +112,6 @@ public class ModsSelectorElement extends ManifestSelectorElement {
             currentMods = null;
             icManagerController.setVisible(false);
         }
-    }
-
-    @Override
-    protected LauncherManifestType getBaseManifestType() {
-        return LauncherManifestType.MODS_COMPONENT;
     }
 
     @Override

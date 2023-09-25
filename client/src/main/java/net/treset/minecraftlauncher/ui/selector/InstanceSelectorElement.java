@@ -24,8 +24,9 @@ import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
-import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
+import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
+import net.treset.minecraftlauncher.util.ui.sort.FileSyncHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -92,7 +93,22 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     @Override
     protected void onDownload(ActionEvent event) {
-        // TODO
+        new FileSyncHelper(files.getInstanceManifest(), files.getInstanceComponents().stream().map(Pair::getKey).toList())
+                .showDownloadPopup((manifest) -> new FileSyncExecutor(
+                        new InstanceSynchronizer(
+                                new InstanceData(
+                                        null, null,
+                                        new Pair<>(manifest, new LauncherInstanceDetails(null, null, null, null, null, null, null, null)),
+                                        null, null, null, null, null, null, null, null, null, null, null, null
+                                ),
+                                files,
+                                (s) -> {
+                                }
+                        )
+                ).download(() -> {
+                    LauncherApplication.setPopup(null);
+                    reloadComponents();
+                }));
     }
 
     @FXML
@@ -106,15 +122,22 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     private void onSelected(InstanceData instanceData, boolean selected) {
         if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(instanceData.getInstance().getKey())) {
             abMain.setShowSync(true);
-            abMain.setOnSync((e) -> new FileSyncHelper(
+            abMain.setOnSync((e) -> new FileSyncExecutor(
                     new InstanceSynchronizer(
                             instanceData,
+                            files,
                             (s) -> {}
                     )
             ).upload(this::reloadComponents));
         } else {
-            abMain.setShowSync(false);
-            abMain.setOnSync((e) -> {});
+            abMain.setShowSync(true);
+            abMain.setOnSync((e) -> new FileSyncExecutor(
+                    new InstanceSynchronizer(
+                            instanceData,
+                            files,
+                            (s) -> {}
+                    )
+            ).download(this::reloadComponents));
         }
 
         icDetailsController.clearSelection();

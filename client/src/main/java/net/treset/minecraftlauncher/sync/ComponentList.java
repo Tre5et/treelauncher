@@ -26,7 +26,7 @@ public class ComponentList extends GenericJsonParsable {
 
         @Override
         public String toString() {
-            return (name.isBlank() ? LauncherApplication.stringLocalizer.get("sync.component.unknown") : name) + " (" + id.substring(0, 7) + "...)";
+            return (name.isBlank() ? LauncherApplication.stringLocalizer.get("sync.component.unknown") : name) + " (" + (id.length() > 8 ? id.substring(0, 7) : id) + "...)";
         }
     }
 

@@ -15,14 +15,14 @@ public class SyncUtil {
         return service.getAvailable(convertType(type));
     }
 
-    public static String convertType(LauncherManifestType type) {
+    public static String convertType(LauncherManifestType type) throws IOException {
         return switch (type) {
             case RESOURCEPACKS_COMPONENT -> "resourcepacks";
             case MODS_COMPONENT -> "mods";
             case OPTIONS_COMPONENT -> "options";
             case SAVES_COMPONENT -> "saves";
             case INSTANCE_COMPONENT -> "instance";
-            default -> "unknown";
+            default -> throw new IOException("Invalid type: " + type);
         };
     }
 

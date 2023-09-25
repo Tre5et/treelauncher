@@ -2,7 +2,10 @@ package net.treset.minecraftlauncher.sync;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.util.DownloadStatus;
+import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.SyncUtil;
@@ -15,10 +18,12 @@ import java.util.List;
 
 public class ManifestSynchronizer extends FileSynchronizer {
     private LauncherManifest manifest;
+    protected LauncherFiles files;
 
-    public ManifestSynchronizer(LauncherManifest manifest, SyncCallback callback) {
+    public ManifestSynchronizer(LauncherManifest manifest, LauncherFiles files, SyncCallback callback) {
         super(callback);
         this.manifest = manifest;
+        this.files = files;
     }
 
     @Override
@@ -78,6 +83,38 @@ public class ManifestSynchronizer extends FileSynchronizer {
         }
 
         downloadDifference(0);
+
+        LauncherManifest parent = getParentManifest();
+        LOGGER.debug("Adding component to parent manifest");
+        parent.getComponents().add(manifest.getId());
+        String fileName = LauncherApplication.config.MANIFEST_FILE_NAME;
+        if(manifest.getType() == LauncherManifestType.MODS_COMPONENT) {
+            fileName = files.getGameDetailsManifest().getComponents().get(0);
+        } else if(manifest.getType() == LauncherManifestType.SAVES_COMPONENT) {
+            fileName = files.getGameDetailsManifest().getComponents().get(1);
+        }
+        parent.writeToFile(FormatUtil.absoluteFilePath(parent.getDirectory(), fileName));
+    }
+
+    protected LauncherManifest getParentManifest() throws IOException {
+        switch(manifest.getType()) {
+            case SAVES_COMPONENT -> {
+                return files.getSavesManifest();
+            }
+            case MODS_COMPONENT -> {
+                return files.getModsManifest();
+            }
+            case RESOURCEPACKS_COMPONENT -> {
+                return files.getResourcepackManifest();
+            }
+            case OPTIONS_COMPONENT -> {
+                return files.getOptionsManifest();
+            }
+            case INSTANCE_COMPONENT ->  {
+                return files.getInstanceManifest();
+            }
+            default -> throw new IOException("Invalid component type");
+        }
     }
 
     protected void uploadAll(ComponentData data) throws IOException {
