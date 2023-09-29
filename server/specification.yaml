@@ -1,0 +1,400 @@
+openapi: 3.0.3
+info:
+  title: TreeLauncher File Sync Server
+  description: |-
+    Allows syncing files of TreeLauncher.
+  license:
+    name: GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 0.1.0
+paths:
+  /test:
+    get:
+      tags:
+        - test
+      summary: Test the connection
+      operationId: test
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+
+      responses:
+        '200':
+          description: Successful operation
+        '403':
+          description: Auth-Key is incorrect
+  /list/{componentType}:
+    get:
+      tags:
+       - list
+      summary: Get a list of all components of a type
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+           application/json:
+            schema:
+              $ref: '#/components/schemas/List'
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Invalid componentType
+          content:
+            string:
+             example: Invalid component type!
+  /new/{componentType}/{id}:
+    get:
+      tags:
+        - new
+      summary: Create a new Component
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: sha256
+          required: true
+      responses:
+        '200':
+          description: Successfull operation
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Bad parameters
+          content:
+            string:
+              example: Invalid id!
+        '500':
+          description: Server error
+          content:
+            string:
+             example: 'Unable to write file! Error: File already exists'
+             
+  /get/{componentType}/{id}/{version}:
+    get:
+      tags:
+        - get
+      summary: Get the changes from a certain version to the current version
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: sha256
+          required: true
+        - in: path
+          name: version
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+           application/json:
+            schema:
+              $ref: '#/components/schemas/Get'
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Bad parameters
+          content:
+            string:
+              example: Invalid version!
+        '500':
+          description: Server error
+          content:
+            string:
+              example: "Unable to read details file! Error: Doesn't exist"
+              
+  /complete/{componentType}/{id}:
+    get:
+      tags:
+        - complete
+      summary: Complete a version upload and advance the version number
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: sha256
+          required: true
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            integer:
+              example: 5
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Bad parameters
+          content:
+            string:
+              example: Invalid component type!
+        '500':
+          description: Server error
+          content:
+            string:
+              example: "Unable to write to details file! Error:  Used by another process"
+              
+  /file/{componentType}/{id}/{filePath}:
+    get:
+      tags:
+        - file
+      summary: Fetch the content of the specified file in the component
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: sha256
+          required: true
+        - in: path
+          name: filePath
+          schema:
+            type: string
+            format: file_path
+          required: true
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            application/octet-stream:
+              example: 0x48 0x65 0x6C 0x6C 0x6F 0x20 0x57 0x6F 0x72 0x6C 0x64 0x21
+        '204':
+          description: file doesn't exist
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Bad parameters
+          content:
+            string:
+              example: Component doesn't exist! Try /new/{component_type}/{id} to create it.
+        '500':
+          description: Server error
+          content:
+            string:
+              example: "Unable to read file! Error: Doesn't exists"
+    post:
+      tags:
+        - file
+      summary: Update, create or delete the specified file in the component
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: sha256
+          required: true
+        - in: path
+          name: filePath
+          schema:
+            type: string
+            format: file_path
+          required: true
+      requestBody:
+        description: File contents, File is deleted if null
+        required: false
+        content:
+          application/octet-stream:
+            example: 0x48 0x65 0x6C 0x6C 0x6F 0x20 0x57 0x6F 0x72 0x6C 0x64 0x21
+      responses:
+        '200':
+          description: Successfull operation
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Bad parameters
+          content:
+            string:
+              example: "Invalid file request! Error: Invalid contents"
+        '500':
+          description: Server error
+          content:
+            string:
+              example: "Unable to write to file! Error: Used by another process"
+              
+  /hash/{componentType}/{id}:
+    post:
+      tags:
+        - hash
+      summary: Hash multiple files at once
+      parameters:
+        - in: header
+          name: Auth-Key
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: componentType
+          schema:
+            type: string
+            enum:
+              - instance
+              - saves
+              - resourcepacks
+              - options
+              - mods
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: sha256
+          required: true
+      requestBody:
+        description: List of file paths to be hashed
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                example: path/file.txt
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: sha256
+                  example: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+        '403':
+          description: Auth-Key is incorrect
+        '400':
+          description: Bad parameters
+          content:
+            string:
+              example: "Invalid hash request! Error: Invalid format"
+      
+
+components:
+  schemas:
+    List:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            format: sha256
+            example: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+          name:
+            type: string
+            example: ComponentName
+    Get:
+      type: object
+      properties:
+        version:
+          type: integer
+          example: 5
+        difference:
+          type: array
+          items:
+            type: string
+            example: path/file.txt
+    
