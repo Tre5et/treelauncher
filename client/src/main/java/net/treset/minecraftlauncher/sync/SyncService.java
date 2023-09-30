@@ -63,11 +63,7 @@ public class SyncService {
 
     private Pair<HttpUtil.HttpStatusCode, byte[]> get(String route) throws IOException {
         Pair<HttpUtil.HttpStatusCode, byte[]> result;
-        try {
-            result = HttpUtil.get(this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)));
-        } catch(Exception e) {
-            throw new IOException("Failed to connect to the sync server.\nError: " + e);
-        }
+        result = HttpUtil.get(this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)));
         if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
             throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length != 0 ? "\nMessage: " + new String(result.getValue()) : ""));
         }
@@ -76,11 +72,7 @@ public class SyncService {
 
     private Pair<HttpUtil.HttpStatusCode, byte[]> post(String route, byte[] data) throws IOException {
         Pair<HttpUtil.HttpStatusCode, byte[]> result;
-        try {
-            result = HttpUtil.post(this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)), data);
-        } catch(Exception e) {
-            throw new IOException("Failed to connect to the sync server.\nError: " + e);
-        }
+        result = HttpUtil.post(this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)), data);
         if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
             throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length == 0 ? "\nMessage: " + new String(result.getValue()) : ""));
         }

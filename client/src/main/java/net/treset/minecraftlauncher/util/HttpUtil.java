@@ -163,6 +163,8 @@ public class HttpUtil {
             response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
         } catch (InterruptedException e) {
             throw new IOException("The request was interrupted", e);
+        } catch (Exception e) {
+            throw new IOException("Failed to connect to server", e);
         }
 
         return new Pair<>(HttpStatusCode.getById(response.statusCode()), response.body());

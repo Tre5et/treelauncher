@@ -89,7 +89,7 @@ public class SettingsElement extends UiElement {
             LauncherApplication.setPopup(new PopupElement(
                     PopupElement.PopupType.ERROR,
                     "settings.popup.sync.failure",
-                    e.getMessage(),
+                    e.getMessage() + (e.getCause() == null ? "" : "\n" + e.getCause().getMessage()),
                     List.of(
                             new PopupElement.PopupButton(
                                     PopupElement.ButtonType.POSITIVE,
