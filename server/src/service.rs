@@ -4,6 +4,7 @@ use std::path::Path;
 use actix_web::{get, HttpResponse, HttpRequest, post};
 use actix_web::http::header::ContentType;
 use serde::{Serialize, Deserialize};
+use urlencoding::decode;
 use crate::component_type::ComponentType;
 use crate::get_auth_key;
 
@@ -252,7 +253,19 @@ pub async fn complete(req: HttpRequest) -> HttpResponse {
 
 #[get("/file/{component_type}/{id}/{file_path:.*}")]
 pub async fn get_file(req: HttpRequest) -> HttpResponse {
-    let file_path = req.match_info().query("file_path").parse::<String>().unwrap_or("".to_string());
+    let file_path = req.match_info().query("file_path").parse::<String>();
+    if file_path.is_err() {
+        return HttpResponse::BadRequest()
+            .body(format!("Invalid file path!"));
+    }
+    let file_path = file_path.unwrap();
+    let file_path = decode(file_path.as_str());
+    if file_path.is_err() {
+        return HttpResponse::BadRequest()
+            .body(format!("Invalid file path!"));
+    }
+    let file_path = file_path.unwrap();
+    let file_path = file_path.replace("\\", "/");
     let result = check_prerequisites!(req);
     if result.is_err() {
         return result.err().unwrap();
@@ -282,6 +295,13 @@ pub async fn post_file(req: HttpRequest, body: Bytes) -> HttpResponse {
             .body(format!("Invalid file path!"));
     }
     let file_path = file_path.unwrap();
+    let file_path = decode(file_path.as_str());
+    if file_path.is_err() {
+        return HttpResponse::BadRequest()
+            .body(format!("Invalid file path!"));
+    }
+    let file_path = file_path.unwrap();
+    let file_path = file_path.replace("\\", "/");
     let result = check_prerequisites!(req, true, true, "application/octet-stream");
     if result.is_err() {
         return result.err().unwrap();
