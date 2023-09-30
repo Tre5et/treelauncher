@@ -65,7 +65,7 @@ public class SyncService {
         Pair<HttpUtil.HttpStatusCode, byte[]> result;
         try {
             result = HttpUtil.get(this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)));
-        } catch(IOException e) {
+        } catch(Exception e) {
             throw new IOException("Failed to connect to the sync server.\nError: " + e);
         }
         if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
@@ -78,7 +78,7 @@ public class SyncService {
         Pair<HttpUtil.HttpStatusCode, byte[]> result;
         try {
             result = HttpUtil.post(this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)), data);
-        } catch(IOException e) {
+        } catch(Exception e) {
             throw new IOException("Failed to connect to the sync server.\nError: " + e);
         }
         if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
