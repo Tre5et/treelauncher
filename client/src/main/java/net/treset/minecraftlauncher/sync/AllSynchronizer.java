@@ -1,15 +1,14 @@
 package net.treset.minecraftlauncher.sync;
 
 import javafx.util.Pair;
-import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class AllSynchronizer extends FileSynchronizer {
     private final LauncherFiles files;
@@ -21,71 +20,60 @@ public class AllSynchronizer extends FileSynchronizer {
 
     @Override
     public void upload() throws IOException {
-        for(Pair<LauncherManifest, LauncherInstanceDetails> details : files.getInstanceComponents()) {
-            if(!SyncUtil.isSyncing(details.getKey())) {
-                continue;
-            }
-            InstanceData data;
-            try {
-                data = InstanceData.of(details, files);
-            } catch (FileLoadException e) {
-                throw new IOException(e);
-            }
-            new InstanceSynchronizer(data, files, callback).upload();
-        }
-        for(LauncherManifest manifest : files.getSavesComponents()) {
-            uploadManifest(manifest);
-        }
-        for(LauncherManifest manifest : files.getResourcepackComponents()) {
-            uploadManifest(manifest);
-        }
-        for(LauncherManifest manifest : files.getOptionsComponents()) {
-            uploadManifest(manifest);
-        }
-        for(Pair<LauncherManifest, LauncherModsDetails> manifest : files.getModsComponents()) {
-            uploadManifest(manifest.getKey());
-        }
+        synchronize(true);
     }
 
     @Override
     public void download() throws IOException {
-        for(Pair<LauncherManifest, LauncherInstanceDetails> details : files.getInstanceComponents()) {
+        synchronize(false);
+    }
+
+    private void synchronize(boolean upload) throws IOException {
+        ArrayList<IOException> exceptions = new ArrayList<>();
+        files.getInstanceComponents().parallelStream().forEach((details) -> {
             if(!SyncUtil.isSyncing(details.getKey())) {
-                continue;
+                return;
             }
             InstanceData data;
             try {
                 data = InstanceData.of(details, files);
             } catch (FileLoadException e) {
-                throw new IOException(e);
+                exceptions.add(new IOException(e));
+                return;
             }
-            new InstanceSynchronizer(data, files, callback).download();
+            InstanceSynchronizer synchronizer = new InstanceSynchronizer(data, files, callback);
+            try {
+                if(upload) {
+                    synchronizer.upload();
+                } else {
+                    synchronizer.download();
+                }
+            } catch (IOException e) {
+                exceptions.add(e);
+            }
+        });
+        ArrayList<LauncherManifest> manifests = new ArrayList<>();
+        manifests.addAll(files.getSavesComponents());
+        manifests.addAll(files.getResourcepackComponents());
+        manifests.addAll(files.getOptionsComponents());
+        manifests.addAll(files.getModsComponents().stream().map(Pair::getKey).toList());
+        manifests.parallelStream().forEach((manifest) -> {
+            if(!SyncUtil.isSyncing(manifest)) {
+                return;
+            }
+            ManifestSynchronizer synchronizer = new ManifestSynchronizer(manifest, files, callback);
+            try {
+                if(upload) {
+                    synchronizer.upload();
+                } else {
+                    synchronizer.download();
+                }
+            } catch (IOException e) {
+                exceptions.add(e);
+            }
+        });
+        if(!exceptions.isEmpty()) {
+            throw exceptions.get(0);
         }
-        for(LauncherManifest manifest : files.getSavesComponents()) {
-            downloadManifest(manifest);
-        }
-        for(LauncherManifest manifest : files.getResourcepackComponents()) {
-            downloadManifest(manifest);
-        }
-        for(LauncherManifest manifest : files.getOptionsComponents()) {
-            downloadManifest(manifest);
-        }
-        for(Pair<LauncherManifest, LauncherModsDetails> manifest : files.getModsComponents()) {
-            downloadManifest(manifest.getKey());
-        }
-    }
-
-    private void uploadManifest(LauncherManifest manifest) throws IOException {
-        if(!SyncUtil.isSyncing(manifest)) {
-            return;
-        }
-        new ManifestSynchronizer(manifest, files, callback).upload();
-    }
-
-    private void downloadManifest(LauncherManifest manifest) throws IOException {
-        if(!SyncUtil.isSyncing(manifest)) {
-            return;
-        }
-        new ManifestSynchronizer(manifest, files, callback).download();
     }
 }
