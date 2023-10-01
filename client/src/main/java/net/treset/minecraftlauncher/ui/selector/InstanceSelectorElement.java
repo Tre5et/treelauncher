@@ -26,7 +26,7 @@ import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
-import net.treset.minecraftlauncher.util.ui.sort.FileSyncHelper;
+import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

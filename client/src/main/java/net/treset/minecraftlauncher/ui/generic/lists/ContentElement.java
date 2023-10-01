@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.ui.generic.lists;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -8,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import net.treset.minecraftlauncher.ui.generic.IconButton;
 
 public class ContentElement extends GridPane {
     protected final HBox iconContainer = new HBox();
@@ -16,10 +18,16 @@ public class ContentElement extends GridPane {
     protected final VBox contentContainer = new VBox();
     protected final Label title = new Label();
     protected final Label details = new Label();
+    protected final IconButton btDelete = new IconButton();
+    protected EventHandler<ActionEvent> onDelete;
 
     protected boolean selected = false;
 
     public ContentElement(Image icon, String title, String details, EventHandler<MouseEvent> onSelect) {
+        this(icon, title, details, null, onSelect);
+    }
+
+    public ContentElement(Image icon, String title, String details, EventHandler<ActionEvent> onDelete, EventHandler<MouseEvent> onSelect) {
         this.getStylesheets().add("css/generic/lists/ContentElement.css");
         this.getStyleClass().add("element-container");
 
@@ -57,6 +65,11 @@ public class ContentElement extends GridPane {
         this.contentContainer.setAlignment(Pos.CENTER_LEFT);
         this.contentContainer.setPrefWidth(100);
         this.add(this.contentContainer, 1, 0, 1, 3);
+
+        this.btDelete.getStyleClass().addAll("delete", "negative");
+        this.btDelete.setIconSize(28);
+
+        setOnDelete(onDelete);
 
     }
 
@@ -96,5 +109,19 @@ public class ContentElement extends GridPane {
 
     public String getDetails() {
         return this.details.getText();
+    }
+
+    public EventHandler<ActionEvent> getOnDelete() {
+        return onDelete;
+    }
+
+    public void setOnDelete(EventHandler<ActionEvent> onDelete) {
+        this.btDelete.setOnAction(onDelete);
+        if(this.onDelete == null && onDelete != null) {
+            this.add(this.btDelete, 2, 0);
+        } else if(onDelete == null) {
+            this.getChildren().remove(this.btDelete);
+        }
+        this.onDelete = onDelete;
     }
 }

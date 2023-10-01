@@ -139,6 +139,10 @@ public class ManifestSynchronizer extends FileSynchronizer {
     }
 
     protected void uploadDifference(List<String> difference) throws IOException {
+        if(difference.isEmpty()) {
+            LOGGER.debug("No difference found");
+            return;
+        }
         setStatus(new SyncStatus(SyncStep.UPLOADING, null));
         SyncService syncService = new SyncService();
         int index = 0;

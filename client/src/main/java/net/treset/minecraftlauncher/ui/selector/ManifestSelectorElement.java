@@ -16,7 +16,7 @@ import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
-import net.treset.minecraftlauncher.util.ui.sort.FileSyncHelper;
+import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

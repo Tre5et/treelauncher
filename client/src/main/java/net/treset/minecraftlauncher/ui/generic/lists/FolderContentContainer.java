@@ -15,7 +15,7 @@ public abstract class FolderContentContainer extends ScrollPane {
 
     protected final VBox container = new VBox();
 
-    private File folder = null;
+    protected File folder = null;
 
     private EventHandler<MouseEvent> onSelect = null;
 

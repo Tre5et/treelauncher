@@ -50,7 +50,9 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
         uploadDependency(instanceData.getSavesComponent());
         uploadDependency(instanceData.getResourcepacksComponent());
         uploadDependency(instanceData.getOptionsComponent());
-        uploadDependency(instanceData.getModsComponent().getKey());
+        if(instanceData.getModsComponent() != null) {
+            uploadDependency(instanceData.getModsComponent().getKey());
+        }
     }
 
     @Override
@@ -196,7 +198,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
         SyncService service = new SyncService();
         setStatus(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(0, 0, "version.json", false)));
         LauncherVersionDetails details = JsonUtils.getGson().fromJson(new String(service.downloadFile("instance", instanceData.getInstance().getKey().getId(), "version.json")), LauncherVersionDetails.class);
-        VersionCreator creator = null;
+        VersionCreator creator;
         if(instanceData.getVersionComponents() == null || !Objects.equals(details.getVersionId(), instanceData.getVersionComponents().get(0).getValue().getVersionId())) {
             if("vanilla".equals(details.getVersionType())) {
                 creator = getVanillaCreator(details);
@@ -220,20 +222,19 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
         }
         String url = version.get().getUrl();
         MinecraftVersionDetails versionDetails = MinecraftUtil.getVersionDetails(url);
-        VersionCreator creator = new VersionCreator(
+        return new VersionCreator(
                 instanceData.getInstance().getKey().getTypeConversion(),
                 files.getVersionManifest(),
                 versionDetails,
                 files,
                 FormatUtil.absoluteDirPath(files.getMainManifest().getDirectory(), files.getLauncherDetails().getLibrariesDir())
         );
-        return creator;
     }
 
     protected VersionCreator getFabricCreator(LauncherVersionDetails details) throws IOException, FileDownloadException {
         FabricVersionDetails version = FabricUtil.getFabricVersionDetails(details.getVersionNumber(), details.getLoaderVersion());
         FabricProfile profile = FabricUtil.getFabricProfile(details.getVersionNumber(), details.getLoaderVersion());
-        VersionCreator creator = new VersionCreator(
+        return new VersionCreator(
                 instanceData.getInstance().getKey().getTypeConversion(),
                 files.getVersionManifest(),
                 version,
@@ -241,7 +242,6 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
                 files,
                 FormatUtil.absoluteDirPath(files.getMainManifest().getDirectory(), files.getLauncherDetails().getLibrariesDir())
         );
-        return creator;
     }
 
     protected void uploadDependency(LauncherManifest manifest) throws IOException {

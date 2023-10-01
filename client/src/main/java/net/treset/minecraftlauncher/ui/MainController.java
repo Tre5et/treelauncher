@@ -3,6 +3,8 @@ package net.treset.minecraftlauncher.ui;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.data.LauncherFiles;
+import net.treset.minecraftlauncher.sync.AllSynchronizer;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
@@ -10,6 +12,8 @@ import net.treset.minecraftlauncher.ui.nav.NavbarElement;
 import net.treset.minecraftlauncher.ui.selector.*;
 import net.treset.minecraftlauncher.ui.settings.SettingsElement;
 import net.treset.minecraftlauncher.ui.title.TitlebarElement;
+import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +38,7 @@ public class MainController extends GenericUiController {
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         LauncherApplication.setPopupConsumer(this::showPopup);
-        LauncherApplication.setCloseCallback(() -> !getLocked());
+        LauncherApplication.setCloseCallback(this::onClose);
 
         icTitlebarController.init(this, this::setLocked, this::getLocked);
         icTitlebarController.beforeShow(stage);
@@ -56,6 +60,20 @@ public class MainController extends GenericUiController {
         super.afterShow(stage);
         icTitlebarController.afterShow(stage);
         icNavbarController.afterShow(stage);
+
+        new Thread(() -> {
+            LauncherFiles files;
+            try {
+                files = new LauncherFiles();
+                files.reloadAll();
+            } catch (FileLoadException e) {
+                LauncherApplication.displaySevereError(e);
+                return;
+            }
+            new FileSyncExecutor(
+                    new AllSynchronizer(files, (s) -> {})
+            ).download(() -> LauncherApplication.setPopup(null));
+        }).start();
     }
 
     @Override
@@ -139,5 +157,21 @@ public class MainController extends GenericUiController {
             LOGGER.error("Failed to open login screen", e);
             getStage().close();
         }
+    }
+
+    private boolean onClose() {
+        if(getLocked()) return false;
+        LauncherFiles files;
+        try {
+            files = new LauncherFiles();
+            files.reloadAll();
+        } catch (FileLoadException e) {
+            LauncherApplication.displaySevereError(e);
+            return false;
+        }
+        new FileSyncExecutor(
+                new AllSynchronizer(files, (s) -> {})
+        ).upload(() -> LauncherApplication.setPopup(null));
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.util.ui.sort;
+package net.treset.minecraftlauncher.util.ui;
 
 import javafx.event.ActionEvent;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
