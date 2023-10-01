@@ -140,7 +140,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
                     contentProvider.getManifest(),
                     files,
                     (s) -> {}
-            )).download(this::reloadComponents));
+            )).upload(this::reloadComponents));
         }
 
         if(ccDetails != null) {

@@ -287,26 +287,55 @@ public class ManifestSynchronizer extends FileSynchronizer {
         LOGGER.debug("Collecting component data for component: " + manifest.getId());
         long startTime = System.currentTimeMillis();
         File componentDir = new File(manifest.getDirectory());
-        Pair<Integer, List<ComponentData.HashEntry>> result = hashDirectoryContents(componentDir, 0);
+        resetCount();
+        List<ComponentData.HashEntry> result = hashDirectoryContents(componentDir);
         LOGGER.debug("Component data collected in " + (System.currentTimeMillis() - startTime) + "ms");
-        return new ComponentData(version, result.getKey(), result.getValue());
+        return new ComponentData(version, resetCount(), result);
     }
 
-    protected Pair<Integer, List<ComponentData.HashEntry>> hashDirectoryContents(File dir, Integer fileAmount) throws IOException {
+    protected List<ComponentData.HashEntry> hashDirectoryContents(File dir) throws IOException {
         File[] children = dir.listFiles((dir1, name) -> !name.equals("data.sync") && !name.equals(".included_files_old"));
-        if(children == null) return new Pair<>(fileAmount, List.of());
+        if(children == null) return List.of();
+        ArrayList<Pair<File, Integer>> files = new ArrayList<>();
         ArrayList<ComponentData.HashEntry> hashTree = new ArrayList<>();
-        for(File file : children) {
-            if(file.isDirectory()) {
-                Pair<Integer, List<ComponentData.HashEntry>> result = hashDirectoryContents(file, fileAmount);
-                fileAmount = result.getKey();
-                hashTree.add(new ComponentData.HashEntry(file.getName(), result.getValue()));
-            } else if(file.isFile()) {
-                fileAmount++;
-                hashTree.add(new ComponentData.HashEntry(file.getName(), FormatUtil.hashFile(file)));
-            }
+        for(int i = 0; i < children.length; i++) {
+            files.add(new Pair<>(children[i], i));
+            hashTree.add(null);
         }
-        return new Pair<>(fileAmount, hashTree);
+        ArrayList<IOException> exceptions = new ArrayList<>();
+        files.parallelStream().forEach((file) -> {
+            if(file.getKey().isDirectory()) {
+                List<ComponentData.HashEntry> result;
+                try {
+                    result = hashDirectoryContents(file.getKey());
+                } catch (IOException e) {
+                    exceptions.add(e);
+                    return;
+                }
+                hashTree.set(file.getValue(), new ComponentData.HashEntry(file.getKey().getName(), result));
+            } else if(file.getKey().isFile()) {
+                addCount(1);
+                try {
+                    hashTree.set(file.getValue(), new ComponentData.HashEntry(file.getKey().getName(), FormatUtil.hashFile(file.getKey())));
+                } catch (IOException e) {
+                    exceptions.add(e);
+                }
+            }
+        });
+        if(!exceptions.isEmpty()) {
+            throw exceptions.get(0);
+        }
+        return hashTree;
+    }
+
+    private int count = 0;
+    protected void addCount(int amount) {
+        this.count += amount;
+    }
+    protected int resetCount() {
+        int count = this.count;
+        this.count = 0;
+        return count;
     }
 
     public LauncherManifest getManifest() {
