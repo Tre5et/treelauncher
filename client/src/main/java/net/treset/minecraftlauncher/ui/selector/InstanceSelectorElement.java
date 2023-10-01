@@ -120,7 +120,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
 
     private void onSelected(InstanceData instanceData, boolean selected) {
-        if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(instanceData.getInstance().getKey())) {
+        if(LauncherApplication.settings.hasSyncData() && !SyncUtil.isSyncing(instanceData.getInstance().getKey())) {
             abMain.setShowSync(true);
             abMain.setOnSync((e) -> new FileSyncExecutor(
                     new InstanceSynchronizer(
@@ -130,14 +130,8 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
                     )
             ).upload(this::reloadComponents));
         } else {
-            abMain.setShowSync(true);
-            abMain.setOnSync((e) -> new FileSyncExecutor(
-                    new InstanceSynchronizer(
-                            instanceData,
-                            files,
-                            (s) -> {}
-                    )
-            ).download(this::reloadComponents));
+            abMain.setShowSync(false);
+            abMain.setOnSync((e) -> {});
         }
 
         icDetailsController.clearSelection();

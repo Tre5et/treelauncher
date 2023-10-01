@@ -86,6 +86,10 @@ public class Settings extends GenericJsonParsable {
         this.language = language;
     }
 
+    public boolean hasSyncData() {
+        return syncUrl != null && syncPort != null && syncKey != null;
+    }
+
     public String getSyncUrl() {
         return syncUrl;
     }

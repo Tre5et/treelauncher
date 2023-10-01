@@ -61,19 +61,22 @@ public class MainController extends GenericUiController {
         icTitlebarController.afterShow(stage);
         icNavbarController.afterShow(stage);
 
-        new Thread(() -> {
-            LauncherFiles files;
-            try {
-                files = new LauncherFiles();
-                files.reloadAll();
-            } catch (FileLoadException e) {
-                LauncherApplication.displaySevereError(e);
-                return;
-            }
-            new FileSyncExecutor(
-                    new AllSynchronizer(files, (s) -> {})
-            ).download(() -> LauncherApplication.setPopup(null));
-        }).start();
+        if(LauncherApplication.settings.hasSyncData()) {
+            new Thread(() -> {
+                LauncherFiles files;
+                try {
+                    files = new LauncherFiles();
+                    files.reloadAll();
+                } catch (FileLoadException e) {
+                    LauncherApplication.displaySevereError(e);
+                    return;
+                }
+                new FileSyncExecutor(
+                        new AllSynchronizer(files, (s) -> {
+                        })
+                ).download(() -> LauncherApplication.setPopup(null));
+            }).start();
+        }
     }
 
     @Override
@@ -161,17 +164,20 @@ public class MainController extends GenericUiController {
 
     private boolean onClose() {
         if(getLocked()) return false;
-        LauncherFiles files;
-        try {
-            files = new LauncherFiles();
-            files.reloadAll();
-        } catch (FileLoadException e) {
-            LauncherApplication.displaySevereError(e);
-            return false;
+        if(LauncherApplication.settings.hasSyncData()) {
+            LauncherFiles files;
+            try {
+                files = new LauncherFiles();
+                files.reloadAll();
+            } catch (FileLoadException e) {
+                LauncherApplication.displaySevereError(e);
+                return false;
+            }
+            new FileSyncExecutor(
+                    new AllSynchronizer(files, (s) -> {
+                    })
+            ).upload(() -> LauncherApplication.setPopup(null));
         }
-        new FileSyncExecutor(
-                new AllSynchronizer(files, (s) -> {})
-        ).upload(() -> LauncherApplication.setPopup(null));
         return true;
     }
 }

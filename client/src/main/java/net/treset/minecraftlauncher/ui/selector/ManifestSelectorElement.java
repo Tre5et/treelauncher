@@ -126,7 +126,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected abstract List<LauncherManifest> getComponents();
 
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
-        if(LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncKey() != null && !SyncUtil.isSyncing(contentProvider.getManifest())) {
+        if(LauncherApplication.settings.hasSyncData() && !SyncUtil.isSyncing(contentProvider.getManifest())) {
             abMain.setShowSync(true);
             abMain.setOnSync((e) -> new FileSyncExecutor(new ManifestSynchronizer(
                     contentProvider.getManifest(),
@@ -134,13 +134,8 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
                     (s) -> {}
             )).upload(this::reloadComponents));
         } else {
-            // TODO: change
-            abMain.setShowSync(true);
-            abMain.setOnSync((e) -> new FileSyncExecutor(new ManifestSynchronizer(
-                    contentProvider.getManifest(),
-                    files,
-                    (s) -> {}
-            )).upload(this::reloadComponents));
+            abMain.setShowSync(false);
+            abMain.setOnSync((e) -> {});
         }
 
         if(ccDetails != null) {

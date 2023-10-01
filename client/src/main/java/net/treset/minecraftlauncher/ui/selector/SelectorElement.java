@@ -224,7 +224,7 @@ public abstract class SelectorElement<E extends SelectorEntryElement<? extends S
     @Override
     public void beforeShow(Stage stage) {
         hbTitle.getChildren().remove(btDownload);
-        if(LauncherApplication.settings.getSyncUrl() != null && LauncherApplication.settings.getSyncPort() != null && LauncherApplication.settings.getSyncKey() != null) {
+        if(LauncherApplication.settings.hasSyncData()) {
             hbTitle.getChildren().add(btDownload);
         }
         reloadComponents();
