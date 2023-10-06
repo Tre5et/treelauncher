@@ -157,13 +157,13 @@ public class LauncherApplication extends Application {
 
     public static void displayError(Exception e) {
         LOGGER.warn("An error occurred", e);
-        Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.message", e)).show());
+        Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.message", e + (e.getCause()==null ? "": "\n" + e.getCause().getMessage()))).show());
     }
 
     public static void displaySevereError(Exception e) {
         LOGGER.error("A SEVERE ERROR OCCURRED", e);
         Platform.runLater(() -> {
-            new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.severe.message", e)).showAndWait();
+            new Alert(Alert.AlertType.ERROR, LauncherApplication.stringLocalizer.getFormatted("error.severe.message", e + (e.getCause()==null ? "": "\n" + e.getCause().getMessage()))).showAndWait();
             System.exit(-1);
         });
     }
