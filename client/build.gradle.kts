@@ -9,7 +9,7 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.6.0"
+val version = "0.7.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
@@ -100,10 +100,11 @@ val javaHome = System.getProperty("java.home")
 
 val buildDir = "./build/libs"
 val jpackageDir = "./jpackage"
+val distDir = "./dist"
 
 task("copyJar", Copy::class) {
     dependsOn("shadowJar")
-    from("$buildDir/minecraft-launcher-all.jar").into("$jpackageDir/jars")
+    from("$buildDir/treelauncher-client-all.jar").into("$jpackageDir/jars")
     from("./app/updater.jar").into("$jpackageDir/jars")
 }
 
@@ -117,7 +118,7 @@ tasks.jpackage {
     appVersion = version
     vendor = "treset"
     runtimeImage = "$distDir/res/runtime"
-    mainJar = "minecraft-launcher-all.jar"
+    mainJar = "treelauncher-client-all.jar"
     icon = "src/main/resources/img/icon.ico"
     mainClass = mainClassName
 
@@ -132,8 +133,6 @@ tasks.jpackage {
         winUpgradeUuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
     }
 }
-
-val distDir = "./dist"
 
 task("createUpdateFiles", Exec::class) {
     val files = File("versionManifests").listFiles()
@@ -163,7 +162,7 @@ task("cleanDist", Delete::class) {
 
 task("copyAppData", Copy::class) {
     dependsOn("shadowJar")
-    from("$buildDir/minecraft-launcher-all.jar", "./app/updater.jar").into("$distDir/res/app")
+    from("$buildDir/treelauncher-client-all.jar", "./app/updater.jar").into("$distDir/res/app")
 }
 
 task("copyDistRes", Copy::class) {
@@ -178,8 +177,8 @@ task("copyJpackage", Copy::class) {
 
 task("copyShadowJar", Copy::class) {
     dependsOn("shadowJar")
-    from("$buildDir/minecraft-launcher-all.jar").into("$distDir/$version")
-    rename("minecraft-launcher-all.jar", "TreeLauncher-$version.jar")
+    from("$buildDir/treelauncher-client-all.jar").into("$distDir/$version")
+    rename("treelauncher-client-all.jar", "TreeLauncher-$version.jar")
 }
 
 task("createDist", Zip::class) {

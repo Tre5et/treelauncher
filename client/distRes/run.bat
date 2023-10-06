@@ -1,1 +1,1 @@
-.\runtime\bin\java -jar app\minecraft-launcher-all.jar
+.\runtime\bin\java -jar app\treelauncher-client-all.jar
