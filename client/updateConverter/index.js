@@ -56,6 +56,7 @@ function convert() {
         console.log("creating file " + creating.version);
         var new_version = undefined;
         var updater_url = undefined;
+        var update_info = "";
         var files_3 = [];
         for (var j = i + 1; j < updates.length; j++) {
             var current = updates[j];
@@ -65,6 +66,9 @@ function convert() {
             new_version = current.version;
             if (current.updaterUrl) {
                 updater_url = current.updaterUrl;
+            }
+            if (current.updateInfo) {
+                update_info += current.updateInfo;
             }
             if (!current.files) {
                 continue;
@@ -87,7 +91,7 @@ function convert() {
                 }
             }
         }
-        var update = new Update_1.Update(new_version != undefined, new_version, undefined, new_version ? files_3 : undefined, new_version ? updater_url : undefined);
+        var update = new Update_1.Update(new_version != undefined, new_version, undefined, new_version ? files_3 : undefined, new_version ? updater_url : undefined, update_info.length == 0 ? update_info : undefined);
         console.log(update);
         fs.writeFileSync(output + "/" + updates[i].version, JSON.stringify(update));
     }
@@ -111,6 +115,10 @@ function create_md(update) {
             md += " - " + fix + "\n";
         }
         md += "\n";
+    }
+    if (update.updateInfo) {
+        md += "**Additional Information:**\n\n";
+        md += update.updateInfo;
     }
     fs.writeFileSync(output + "/changes-" + update.version + ".md", md);
 }

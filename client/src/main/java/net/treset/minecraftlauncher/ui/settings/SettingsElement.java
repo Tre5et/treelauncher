@@ -268,7 +268,8 @@ public class SettingsElement extends UiElement {
                 new PopupElement(
                         PopupElement.PopupType.NONE,
                         "settings.update.available.title",
-                        LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.launcherUpdater.getUpdateVersion()),
+                        LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.launcherUpdater.getUpdateVersion())
+                            + (LauncherApplication.launcherUpdater.getUpdateInfo() == null ? "" : "\n\n" + LauncherApplication.launcherUpdater.getUpdateInfo()),
                         List.of(
                                 new PopupElement.PopupButton(
                                         PopupElement.ButtonType.NEGATIVE,

@@ -100,4 +100,8 @@ public class LauncherUpdater {
     public UpdateData getUpdateData() {
         return updateData;
     }
+
+    public String getUpdateInfo() {
+        return updateData.getUpdateInfo();
+    }
 }

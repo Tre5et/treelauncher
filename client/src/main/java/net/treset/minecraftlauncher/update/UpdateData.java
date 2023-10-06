@@ -9,6 +9,7 @@ public class UpdateData {
     private String version;
     private List<UpdateFile> files;
     private String updaterUrl;
+    private String updateInfo;
 
     public UpdateData(boolean available, String version, List<UpdateFile> files, String updaterUrl) {
         this.available = available;
@@ -47,6 +48,14 @@ public class UpdateData {
 
     public void setUpdaterUrl(String updaterUrl) {
         this.updaterUrl = updaterUrl;
+    }
+
+    public String getUpdateInfo() {
+        return updateInfo;
+    }
+
+    public void setUpdateInfo(String updateInfo) {
+        this.updateInfo = updateInfo;
     }
 
     public String toJson() {
