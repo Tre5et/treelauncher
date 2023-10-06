@@ -1,0 +1,27 @@
+{
+  "version": "0.7.0",
+  "requires": ">0.3.0",
+  "files": [
+    {
+      "remove": "app/minecraft-launcher-all.jar",
+      "update": "app/treelauncher-client-all.jar",
+      "url": "https://github.com/Tre5et/treelauncher/releases/download/v0.7.0-beta/TreeLauncher-0.7.0.jar"
+    }
+  ],
+  "changes": [
+    "Added Option to synchronize with a remote server",
+    "To do this build the file-sync-server from the server directory",
+    "Copy the file-sync-server on a server",
+    "Copy the config file to the server and adjust the values",
+    "Run the file-sync-server (make sure the port you configured is open)",
+    "In options, set the sync url, port and Access-Key",
+    "Click the upload button with a component selected to upload it to the server",
+    "Click the download button in a launcher tab to download uploaded components",
+    "Added additional info to update process"
+  ],
+  "fixes": [
+    "Changed how the launcher authenticates itself with curseforge and modrinth",
+    "Changed error dialog to include more details on the error"
+  ],
+  "updateInfo": "IMPORTANT:\nThis update will break any previous installed version. To fix it, change the following:\n- In `app/launcher.conf`, change the `update_url` field to `https://raw.githubusercontent.com/Tre5et/treelauncher/main/client/update/`\n- In `app/TreeLauncher.cfg`, change the field `app.classpath` to `$APPDIR\\treelauncher-client-all.jar`"
+}
