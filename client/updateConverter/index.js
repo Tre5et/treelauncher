@@ -68,7 +68,7 @@ function convert() {
                 updater_url = current.updaterUrl;
             }
             if (current.updateInfo) {
-                update_info += current.updateInfo;
+                update_info += current.updateInfo + "\n";
             }
             if (!current.files) {
                 continue;
@@ -91,7 +91,7 @@ function convert() {
                 }
             }
         }
-        var update = new Update_1.Update(new_version != undefined, new_version, undefined, new_version ? files_3 : undefined, new_version ? updater_url : undefined, update_info.length == 0 ? update_info : undefined);
+        var update = new Update_1.Update(new_version != undefined, new_version, undefined, new_version ? files_3 : undefined, new_version ? updater_url : undefined, update_info.length > 0 ? update_info : undefined);
         console.log(update);
         fs.writeFileSync(output + "/" + updates[i].version, JSON.stringify(update));
     }
