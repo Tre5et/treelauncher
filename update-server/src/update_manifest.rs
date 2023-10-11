@@ -3,10 +3,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateManifest {
-    pub id: String,
+    pub id: Option<String>,
     pub requires: Option<String>,
-    pub changes: Vec<ChangeElement>,
-    pub message: Option<String>
+    pub changes: Option<Vec<ChangeElement>>,
+    pub message: Option<String>,
+    pub latest: Option<bool>
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

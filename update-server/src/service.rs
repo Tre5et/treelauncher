@@ -32,24 +32,32 @@ pub async fn update(req: HttpRequest) -> HttpResponse {
     let mut version_id = String::new();
     let mut changes: Vec<ChangeElement> = Vec::new();
     let mut message = String::new();
+    let mut latest = false;
     for v in version_file {
-        let version: VersionReq = VersionReq::parse(v.id.as_str()).unwrap();
+        let version_str = v.id.unwrap();
+        let version: VersionReq = VersionReq::parse(version_str.as_str()).unwrap();
         if !found && version.matches(&input_version) {
             found = true;
+            latest = true;
         } else if found {
             let requires = v.requires;
             if requires.is_some() {
                 let requires = VersionReq::parse(requires.unwrap().as_str()).unwrap();
                 if !requires.matches(&input_version) {
+                    latest = false;
                     continue;
                 }
             }
-            version_id = v.id;
-            for c in v.changes {
+            version_id = version_str;
+            latest = true;
+            for c in v.changes.unwrap() {
                 let mut dealt_with = false;
                 for o in changes.clone() {
                     let c_copy = c.clone();
                     if o.path == c.path {
+                        if c.mode == UpdateMode::DELETE {
+                            changes.retain(|x| x.path != c.path);
+                        }
                         if o.mode != UpdateMode::FILE || c.mode != UpdateMode::FILE {
                             changes.push(c_copy);
                         }
@@ -71,15 +79,24 @@ pub async fn update(req: HttpRequest) -> HttpResponse {
         return HttpResponse::BadRequest().body("Version not found!");
     }
     if version_id.is_empty() {
-        return HttpResponse::NoContent().finish();
+        return HttpResponse::Ok().json(
+            UpdateManifest {
+                id: None,
+                requires: None,
+                changes: None,
+                message: None,
+                latest: Some(latest)
+            }
+        );
     }
 
     return HttpResponse::Ok().json(
         UpdateManifest {
-            id: version_id,
+            id: Some(version_id),
             requires: None,
-            changes,
-            message: if message.is_empty() { None } else { Some(message) }
+            changes: Some(changes),
+            message: if message.is_empty() { None } else { Some(message) },
+            latest: Some(latest)
         }
     );
 }

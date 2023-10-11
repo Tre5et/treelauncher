@@ -40,8 +40,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Update'
-        '201':
-          description: No update available
         '400':
           description: Invalid version
           content:
@@ -60,9 +58,11 @@ components:
       properties:
         id:
           type: string
-          description: The available version
+          required: true
+          description: The available version. If null, no version is available.
         changes:
           type: array
+          required: false
           description: The content of the update
           items:
             type: object
@@ -79,8 +79,8 @@ components:
                   - line
                 description: >
                   Mode in which to change the file:
-                    * `file` - Download the file and create it at the given path or replace the existing one at the given path. If `updater` is false the operation should be done by the launcher. Otherwise the operation should be delegated to the updater.
-                    * `delete` - Delete the file at the given path. If `updater` is false the operation should be done by the launcher. Otherwise the operation should be delegated to the updater.
+                    * `file` - Download the file and create it at the given path or replace the existing one at the given path. If `updater` is false or null the operation should be done by the launcher. Otherwise the launcher should download the file but the updater should add or replace it to the target path.
+                    * `delete` - Delete the file at the given path. If `updater` is false or null the operation should be done by the launcher. Otherwise the operation should be delegated to the updater.
                     * `regex` - Replace the regex group found by `pattern` with the given `value`. `meta` specifies which group to replace. If `meta` is less than zero or null, all occurrences should be replaced. If `value` is null this should be treated as an empty string. 
                     * `line` - Add a line in the file with the given value. `meta` specifies the new zero based index that the line should have. If `value` is null, the new line should be empty. If `meta` is null, the line should be create at the start of the file. If `meta` is negative, the lines should be counted from the end, where -1 would crate a new line at the end of the file. If `replace` is true the line specified in meta should be replaced. In this case, if `value` is not given the line should be removed.
               elements:
@@ -109,3 +109,6 @@ components:
           type: string
           required: false
           description: The message for the update
+        latest:
+          type: boolean
+          description: Whether this is the latest version or a newer version exists but the installed version of the launcher cannot update to it
