@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: TreeLauncher Update Server
+  description: |-
+    Allows getting updates and news for TreeLauncher.
+  license:
+    name: GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 0.1.0
+paths:
+  /test:
+    get:
+      tags:
+        - test
+      summary: Test the connection
+      operationId: test
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            string:
+              example: 'OK'
+  /update/{version}:
+    get:
+      tags:
+        - update
+      summary: Get the update for the given version
+      operationId: update
+      parameters:
+        - name: version
+          in: path
+          description: The current launcher version
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Update'
+        '201':
+          description: No update available
+        '400':
+          description: Invalid version
+          content:
+            string:
+              example: 'Invalid version!'
+        '500':
+          description: Failed to get update data
+          content:
+            string:
+              example: 'Unable to read versions file!'
+
+components:
+  schemas:
+    Update:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The available version
+        changes:
+          type: array
+          description: The content of the update
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: The path of the file to update
+              mode:
+                type: string
+                enum:
+                  - file
+                  - delete
+                  - regex
+                  - line
+                description: >
+                  Mode in which to change the file:
+                    * `file` - Download the file and create it at the given path or replace the existing one at the given path. If `updater` is false the operation should be done by the launcher. Otherwise the operation should be delegated to the updater.
+                    * `delete` - Delete the file at the given path. If `updater` is false the operation should be done by the launcher. Otherwise the operation should be delegated to the updater.
+                    * `regex` - Replace the regex group found by `pattern` with the given `value`. `meta` specifies which group to replace. If `meta` is less than zero or null, all occurrences should be replaced. If `value` is null this should be treated as an empty string. 
+                    * `line` - Add a line in the file with the given value. `meta` specifies the new zero based index that the line should have. If `value` is null, the new line should be empty. If `meta` is null, the line should be create at the start of the file. If `meta` is negative, the lines should be counted from the end, where -1 would crate a new line at the end of the file. If `replace` is true the line specified in meta should be replaced. In this case, if `value` is not given the line should be removed.
+              elements:
+                type: array
+                required: false
+                description: The elements to change. If mode is `file` or `delete` this should be null. If mode is `regex` this should be an array with the regex and the value to replace with. If mode is `line` this should be an array with the value to add and a boolean indicating whether to replace the line or not.
+                items:
+                  type: object
+                  properties:
+                    pattern:
+                      type: string
+                      required: true
+                      description: The regex pattern to find replacement groups
+                    value:
+                      type: string
+                      required: false
+                      description: The new value
+                    meta:
+                      type: integer
+                      required: false
+                    replace:
+                      type: boolean
+                      required: false
+                      description: Whether to replace the line or create a new one
+        message:
+          type: string
+          required: false
+          description: The message for the update
