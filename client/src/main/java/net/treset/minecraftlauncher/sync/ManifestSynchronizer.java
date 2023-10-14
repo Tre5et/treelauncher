@@ -256,7 +256,11 @@ public class ManifestSynchronizer extends FileSynchronizer {
         String basePath = manifest.getDirectory();
         int amount = 0;
         for(String path : difference) {
-            path = FormatUtil.urlDecode(path);
+            try {
+                path = FormatUtil.urlDecode(path);
+            } catch (FormatUtil.FormatException e) {
+                LOGGER.warn("Unable to decode filepath: " + path + ", this may be due to no url encoding being used, continuing with possibly encoded path, error: " + e);
+            }
             LOGGER.debug("Downloading file: " + path);
             setStatus(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(++amount, difference.size(), path, false)));
             byte[] content = service.downloadFile(type, manifest.getId(), path);

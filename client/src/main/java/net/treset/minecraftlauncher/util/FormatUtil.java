@@ -7,6 +7,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -17,6 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 public class FormatUtil {
+    public static class FormatException extends Exception {
+        public FormatException(String message) {
+            super(message);
+        }
+        public FormatException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
     public static boolean matchesAny(String test, List<String> patterns) {
         if(patterns == null) return false;
         for(String pattern : patterns) {
@@ -199,7 +209,11 @@ public class FormatUtil {
         return URLEncoder.encode(string, StandardCharsets.UTF_8);
     }
 
-    public static String urlDecode(String string) {
-        return java.net.URLDecoder.decode(string, StandardCharsets.UTF_8);
+    public static String urlDecode(String string) throws FormatException {
+        try {
+            return URLDecoder.decode(string, StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw new FormatException("Invalid URL encoding", e);
+        }
     }
 }
