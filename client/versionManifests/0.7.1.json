@@ -1,0 +1,17 @@
+{
+  "version": "0.7.1",
+  "requires": ">0.3.0",
+  "files": [
+    {
+      "remove": "app/treelauncher-client-all.jar",
+      "update": "app/treelauncher-client-all.jar",
+      "url": "https://github.com/Tre5et/treelauncher/releases/download/v0.7.1-beta/TreeLauncher-0.7.1.jar"
+    }
+  ],
+  "changes": [
+  ],
+  "fixes": [
+    "Fixed an issue downloading synced components"
+  ],
+  "updateInfo": "Fix for an issue with component synchronization"
+}
