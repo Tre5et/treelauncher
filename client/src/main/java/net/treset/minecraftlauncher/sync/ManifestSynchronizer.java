@@ -265,9 +265,15 @@ public class ManifestSynchronizer extends FileSynchronizer {
             setStatus(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(++amount, difference.size(), path, false)));
             byte[] content = service.downloadFile(type, manifest.getId(), path);
             File file = new File(FormatUtil.absoluteFilePath(basePath, path));
-            if(content.length == 0 && file.exists()) {
-                LOGGER.debug("Deleting file: " + path);
-                FileUtil.deleteFile(FormatUtil.absoluteFilePath(basePath, path));
+            if(content.length == 0) {
+                if(file.isFile()) {
+                    LOGGER.debug("Deleting file: " + path);
+                    FileUtil.deleteFile(FormatUtil.absoluteFilePath(basePath, path));
+                }
+                if(file.isDirectory()) {
+                    LOGGER.debug("Deleting directory: " + path);
+                    FileUtil.deleteDir(file);
+                }
             } else {
                 if(!file.isFile())  {
                     if(file.isDirectory()) {
