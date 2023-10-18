@@ -195,6 +195,10 @@ components:
                       type: boolean
                       required: false
                       description: Whether to replace the line or create a new one
+              updater:
+                type: boolean
+                required: false
+                description: Whether the operation should be done by the updater or the launcher
         message:
           type: string
           required: false
