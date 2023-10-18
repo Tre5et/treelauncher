@@ -21,7 +21,7 @@ import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.ButtonBox;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
 import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
 import org.apache.logging.log4j.LogManager;

@@ -120,6 +120,7 @@ public class NavbarElement extends UiElement {
     }
 
     private void checkUpdate() {
+        /* TODO: enable
         if(LauncherApplication.launcherUpdater == null) {
             try {
                 LauncherApplication.launcherUpdater = new LauncherUpdater();
@@ -131,6 +132,7 @@ public class NavbarElement extends UiElement {
         if(LauncherApplication.launcherUpdater.getUpdateVersion() != null) {
             Platform.runLater(() -> ciUpdate.setVisible(true));
         }
+        */
     }
 
     public Function<MainController.Component, Boolean> getComponentActivator() {

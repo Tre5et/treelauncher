@@ -3,7 +3,7 @@ package net.treset.minecraftlauncher.util.ui;
 import javafx.application.Platform;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.sync.FileSynchronizer;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 
 import java.io.IOException;
 import java.util.List;

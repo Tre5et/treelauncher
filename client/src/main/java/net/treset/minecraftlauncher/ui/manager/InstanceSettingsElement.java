@@ -15,7 +15,7 @@ import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
 
 import java.io.BufferedReader;

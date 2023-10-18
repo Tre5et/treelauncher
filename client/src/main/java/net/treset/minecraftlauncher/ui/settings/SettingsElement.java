@@ -18,7 +18,7 @@ import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.ImageUtil;
 import net.treset.minecraftlauncher.util.UiUtil;

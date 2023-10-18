@@ -16,6 +16,7 @@ import net.treset.minecraftlauncher.sync.InstanceSynchronizer;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.CreationStatus;

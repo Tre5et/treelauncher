@@ -15,7 +15,7 @@ import net.treset.minecraftlauncher.ui.create.CreatorElement;
 import net.treset.minecraftlauncher.ui.generic.ActionBar;
 import net.treset.minecraftlauncher.ui.generic.CreateSelectable;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;

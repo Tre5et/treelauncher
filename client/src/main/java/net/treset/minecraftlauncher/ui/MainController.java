@@ -8,17 +8,20 @@ import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.sync.AllSynchronizer;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.ui.nav.NavbarElement;
 import net.treset.minecraftlauncher.ui.selector.*;
 import net.treset.minecraftlauncher.ui.settings.SettingsElement;
 import net.treset.minecraftlauncher.ui.title.TitlebarElement;
+import net.treset.minecraftlauncher.update.UpdateService;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainController extends GenericUiController {
     private static final Logger LOGGER = LogManager.getLogger(MainController.class);
@@ -61,6 +64,32 @@ public class MainController extends GenericUiController {
         super.afterShow(stage);
         icTitlebarController.afterShow(stage);
         icNavbarController.afterShow(stage);
+
+        new Thread(() -> {
+            try {
+                String result = new UpdateService().news();
+                if(result != null && !result.isEmpty()) {
+                    LauncherApplication.setPopup(
+                            new PopupElement(
+                                    PopupElement.PopupType.NONE,
+                                    LauncherApplication.stringLocalizer.get("launcher.news.title"),
+                                    result,
+                                    null,
+                                    List.of(
+                                            new PopupElement.PopupButton(
+                                                    PopupElement.ButtonType.POSITIVE,
+                                                    LauncherApplication.stringLocalizer.get("launcher.news.close"),
+                                                    (a) -> LauncherApplication.setPopup(null)
+                                                    )
+                                            ),
+                                    true
+                            )
+                    );
+                }
+            } catch (IOException e) {
+                LauncherApplication.displayError(e);
+            }
+        }).start();
 
         if(LauncherApplication.settings.hasSyncData()) {
             new Thread(() -> {

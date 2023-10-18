@@ -11,7 +11,7 @@ import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
 import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.FileInitializer;

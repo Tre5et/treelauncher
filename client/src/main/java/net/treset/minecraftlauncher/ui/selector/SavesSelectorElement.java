@@ -11,7 +11,7 @@ import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.SavesCreatorElement;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ContentElement;
 import net.treset.minecraftlauncher.ui.generic.lists.SavesContentContainer;
 import net.treset.minecraftlauncher.util.FileUtil;

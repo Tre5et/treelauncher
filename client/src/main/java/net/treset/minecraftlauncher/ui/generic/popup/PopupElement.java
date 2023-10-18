@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.ui.generic;
+package net.treset.minecraftlauncher.ui.generic.popup;
 
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
@@ -148,24 +148,29 @@ public class PopupElement extends GridPane {
 
     private final VBox vbContainer = new VBox();
     private Label lbTitle;
-    private Label lbMessage;
+    private TextDisplay tdMessage;
     private VBox vbControls;
     private HBox hbButtons;
     private Label lbError;
+    private boolean html;
 
     public PopupElement(String title, String message) {
-        this(PopupType.NONE, title, message, null, null);
+        this(PopupType.NONE, title, message, null, null, false);
     }
 
     public PopupElement(PopupType type, String title, String message) {
-        this(type, title, message, null, null);
+        this(type, title, message, null, null, false);
     }
 
     public PopupElement(PopupType type, String title, String message, List<PopupButton> buttons) {
-        this(type, title, message, null, buttons);
+        this(type, title, message, null, buttons, false);
     }
 
     public PopupElement(PopupType type, String title, String message, List<PopupControl> controls, List<PopupButton> buttons) {
+        this(type, title, message, controls, buttons, false);
+    }
+
+    public PopupElement(PopupType type, String title, String message, List<PopupControl> controls, List<PopupButton> buttons, boolean html) {
         this.getStylesheets().add("/css/generic/PopupElement.css");
         this.getStyleClass().add("popup-background");
         ColumnConstraints c1 = new ColumnConstraints();
@@ -188,6 +193,7 @@ public class PopupElement extends GridPane {
         setMessage(message);
         setControls(controls);
         setButtons(buttons);
+        setHtml(html);
 
         vbContainer.getStyleClass().add("popup-container");
 
@@ -215,15 +221,15 @@ public class PopupElement extends GridPane {
     }
 
     public void setMessage(String message) {
-        if(lbMessage == null && message != null) {
-            lbMessage = new Label(LauncherApplication.stringLocalizer.get(message));
-            lbMessage.getStyleClass().add("message");
-            vbContainer.getChildren().add(lbTitle == null ? 0 : 1, lbMessage);
+        if(tdMessage == null && message != null) {
+            tdMessage = new TextDisplay(LauncherApplication.stringLocalizer.get(message), html);
+            tdMessage.getStyleClasses().add("message");
+            vbContainer.getChildren().add(lbTitle == null ? 0 : 1, tdMessage);
         } else if(message == null) {
-            vbContainer.getChildren().remove(lbMessage);
-            lbMessage = null;
+            vbContainer.getChildren().remove(tdMessage);
+            tdMessage = null;
         } else {
-            lbMessage.setText(LauncherApplication.stringLocalizer.get(message));
+            tdMessage.setText(LauncherApplication.stringLocalizer.get(message));
         }
     }
 
@@ -290,6 +296,17 @@ public class PopupElement extends GridPane {
             case SUCCESS -> vbContainer.getStyleClass().add("success");
             case WARNING -> vbContainer.getStyleClass().add("warning");
             case ERROR -> vbContainer.getStyleClass().add("error");
+        }
+    }
+
+    public boolean isHtml() {
+        return html;
+    }
+
+    public void setHtml(boolean html) {
+        this.html = html;
+        if(tdMessage != null) {
+            tdMessage.setHtml(html);
         }
     }
 }

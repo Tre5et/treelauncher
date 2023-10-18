@@ -3,7 +3,7 @@ package net.treset.minecraftlauncher.ui.base;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import net.treset.minecraftlauncher.ui.generic.PopupElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.util.UiUtil;
 
 import java.io.IOException;
