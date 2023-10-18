@@ -5,6 +5,7 @@ use once_cell::sync::OnceCell;
 
 mod service;
 mod update_manifest;
+mod news;
 
 static DATA_DIR: OnceCell<String> = OnceCell::new();
 static PORT: OnceCell<u32> = OnceCell::new();
@@ -35,6 +36,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(service::test)
             .service(service::update)
+            .service(service::news)
+            .service(service::version_news)
     })
     .bind(format!("0.0.0.0:{p}", p = PORT.get().expect("Port not set!")))?
     .run()

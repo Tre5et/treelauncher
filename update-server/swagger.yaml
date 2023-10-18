@@ -50,6 +50,56 @@ paths:
           content:
             string:
               example: 'Unable to read versions file!'
+  /news:
+    get:
+      tags:
+        - news
+      summary: Get generic news
+      operationId: news
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/html:
+              example: '<h1>News</h1><p>Some news</p>'
+        '201':
+          description: No news available
+        '500':
+          description: Failed to get news data
+          content:
+            string:
+              example: 'Unable to read news file!'
+  /news/{version}:
+    get:
+      tags:
+        - news
+      summary: Get the news for a given version
+      operationId: news
+      parameters:
+        - name: version
+          in: path
+          description: The current launcher version
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/html:
+              example: '<h1>News</h1><p>Some news</p>'
+        '201':
+          description: No news available
+        '400':
+          description: Invalid version
+          content:
+            string:
+              example: 'Invalid version!'
+        '500':
+          description: Failed to get news data
+          content:
+            string:
+              example: 'Unable to read news file!'
 
 components:
   schemas:
