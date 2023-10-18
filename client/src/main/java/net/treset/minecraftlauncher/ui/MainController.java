@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.ui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -162,9 +163,13 @@ public class MainController extends GenericUiController {
         }
     }
 
+    private boolean autoSynced = false;
     private boolean onClose() {
-        if(getLocked()) return false;
-        if(LauncherApplication.settings.hasSyncData()) {
+        if(getLocked()) {
+            autoSynced = false;
+            return false;
+        }
+        if(!autoSynced && LauncherApplication.settings.hasSyncData()) {
             LauncherFiles files;
             try {
                 files = new LauncherFiles();
@@ -174,9 +179,12 @@ public class MainController extends GenericUiController {
                 return false;
             }
             new FileSyncExecutor(
-                    new AllSynchronizer(files, (s) -> {
-                    })
-            ).upload(() -> LauncherApplication.setPopup(null));
+                    new AllSynchronizer(files, (s) -> {})
+            ).upload(() -> {
+                autoSynced = true;
+                Platform.runLater(() -> LauncherApplication.primaryStage.close());
+            });
+            return false;
         }
         return true;
     }
