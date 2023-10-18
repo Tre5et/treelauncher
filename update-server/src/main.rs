@@ -1,9 +1,11 @@
+extern crate core;
+
 use std::fs;
 use std::path::Path;
 use actix_web::{App, HttpServer};
 use once_cell::sync::OnceCell;
 
-mod service;
+mod update;
 mod update_manifest;
 mod news;
 
@@ -34,10 +36,11 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
-            .service(service::test)
-            .service(service::update)
-            .service(service::news)
-            .service(service::version_news)
+            .service(update::test)
+            .service(update::update)
+            .service(update::file)
+            .service(news::news)
+            .service(news::version_news)
     })
     .bind(format!("0.0.0.0:{p}", p = PORT.get().expect("Port not set!")))?
     .run()
