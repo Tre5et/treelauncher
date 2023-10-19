@@ -4,7 +4,6 @@ import javafx.util.Pair;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.HttpService;
-import net.treset.minecraftlauncher.util.HttpUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +22,7 @@ public class SyncService extends HttpService {
     }
 
     public ComponentList getAvailable(String type) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("/list/" + type);
+        Pair<HttpStatusCode, byte[]> result = get("/list/" + type);
         ComponentList response;
         try {
             response = ComponentList.fromJson(new String(result.getValue()));
@@ -42,17 +41,17 @@ public class SyncService extends HttpService {
     }
 
     public int complete(String type, String id) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("/complete/" + type + "/" + id);
+        Pair<HttpStatusCode, byte[]> result = get("/complete/" + type + "/" + id);
         return Integer.parseInt(new String(result.getValue()));
     }
 
     public GetResponse get(String type, String id, int version) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("/get/" + type + "/" + id + "/" + version);
+        Pair<HttpStatusCode, byte[]> result = get("/get/" + type + "/" + id + "/" + version);
         return GetResponse.fromJson(new String(result.getValue()));
     }
 
     public byte[] downloadFile(String type, String id, String path) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("/file/" + type + "/" + id + "/" + FormatUtil.urlEncode(path));
-        return result.getKey() == HttpUtil.HttpStatusCode.NO_CONTENT ? new byte[]{} : result.getValue();
+        Pair<HttpStatusCode, byte[]> result = get("/file/" + type + "/" + id + "/" + FormatUtil.urlEncode(path));
+        return result.getKey() == HttpStatusCode.NO_CONTENT ? new byte[]{} : result.getValue();
     }
 }

@@ -3,7 +3,6 @@ package net.treset.minecraftlauncher.update;
 import javafx.util.Pair;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.HttpService;
-import net.treset.minecraftlauncher.util.HttpUtil;
 
 import java.io.IOException;
 
@@ -13,7 +12,7 @@ public class UpdateService extends HttpService {
     }
 
     public Update update() throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("update/" + LauncherApplication.stringLocalizer.get("launcher.version"));
+        Pair<HttpStatusCode, byte[]> result = get("update/" + LauncherApplication.stringLocalizer.get("launcher.version"));
         String response = new String(result.getValue());
         try {
             return Update.fromJson(response);
@@ -23,7 +22,7 @@ public class UpdateService extends HttpService {
     }
 
     public byte[] file(String version, String file) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result = get("file/" + version + "/" + file);
+        Pair<HttpStatusCode, byte[]> result = get("file/" + version + "/" + file);
         return result.getValue();
     }
 }

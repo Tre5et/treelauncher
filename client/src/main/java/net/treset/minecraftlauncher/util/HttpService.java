@@ -22,18 +22,19 @@ public class HttpService {
         this.headers = headers;
     }
 
-    protected Pair<HttpUtil.HttpStatusCode, byte[]> get(String route) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result;
-        result = get(baseUrl + "/" + route, headers);
-        if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
-            throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length != 0 ? "\nMessage: " + new String(result.getValue()) : ""));
-        }
-        return result;
+    protected Pair<HttpStatusCode, byte[]> get(String route) throws IOException {
+        return evaluateStatus(get(baseUrl + "/" + route, headers));
     }
 
-    protected Pair<HttpUtil.HttpStatusCode, byte[]> post(String route, byte[] data) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result;
-        result = post(baseUrl + "/" + route, headers, data);
+    protected Pair<HttpStatusCode, byte[]> post(String route, byte[] data) throws IOException {
+        return evaluateStatus(post(baseUrl + "/" + route, headers, data));
+    }
+
+    protected Pair<HttpStatusCode, byte[]> post(String route, String contentType, byte[] data) throws IOException {
+        return evaluateStatus(post(baseUrl + "/" + route, headers, contentType, data));
+    }
+
+    private Pair<HttpStatusCode, byte[]> evaluateStatus(Pair<HttpStatusCode, byte[]> result) throws IOException {
         if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
             throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length == 0 ? "\nMessage: " + new String(result.getValue()) : ""));
         }
@@ -49,7 +50,7 @@ public class HttpService {
         return client;
     }
 
-    private Pair<HttpUtil.HttpStatusCode, byte[]> get(String url, List<Pair<String, String>> headers) throws IOException {
+    private Pair<HttpStatusCode, byte[]> get(String url, List<Pair<String, String>> headers) throws IOException {
         HttpClient client = getHttpClient();
 
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
@@ -62,12 +63,12 @@ public class HttpService {
         return makeRequest(client, request);
     }
 
-    private Pair<HttpUtil.HttpStatusCode, byte[]> post(String url, List<Pair<String, String>> headers, byte[] data) throws IOException {
+    private Pair<HttpStatusCode, byte[]> post(String url, List<Pair<String, String>> headers, byte[] data) throws IOException {
         return post(url, headers, "application/octet-stream", data);
     }
 
 
-    private Pair<HttpUtil.HttpStatusCode, byte[]> post(String url, List<Pair<String, String>> headers, String contentType, byte[] data) throws IOException {
+    private Pair<HttpStatusCode, byte[]> post(String url, List<Pair<String, String>> headers, String contentType, byte[] data) throws IOException {
         HttpClient client = getHttpClient();
 
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
@@ -81,7 +82,7 @@ public class HttpService {
         return makeRequest(client, request);
     }
 
-    private Pair<HttpUtil.HttpStatusCode, byte[]> makeRequest(HttpClient client, HttpRequest request) throws IOException {
+    private Pair<HttpStatusCode, byte[]> makeRequest(HttpClient client, HttpRequest request) throws IOException {
         HttpResponse<byte[]> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
@@ -91,7 +92,7 @@ public class HttpService {
             throw new IOException("Failed to connect to server", e);
         }
 
-        return new Pair<>(HttpUtil.HttpStatusCode.getById(response.statusCode()), response.body());
+        return new Pair<>(HttpStatusCode.getById(response.statusCode()), response.body());
     }
 
     public enum HttpStatusCode {
