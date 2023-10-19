@@ -213,10 +213,32 @@ components:
       type: object
       properties:
         important:
-          type: string
+          type: array
           required: false
           description: Important news
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                required: true
+                description: The title of the news
+              content:
+                type: string
+                required: false
+                description: HTML content of the news
         other:
-          type: string
+          type: array
           required: false
           description: Other news
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                required: true
+                description: The title of the news
+              content:
+                type: string
+                required: false
+                description: HTML content of the news

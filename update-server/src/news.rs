@@ -7,14 +7,21 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 struct News {
     version: Option<String>,
-    content: String,
+    title: String,
+    content: Option<String>,
     important: Option<bool>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+struct NewsOut {
+    title: String,
+    content: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct NewsContent {
-    important: Option<String>,
-    other: Option<String>
+    important: Option<Vec<NewsOut>>,
+    other: Option<Vec<NewsOut>>
 }
 
 #[get("/news")]
@@ -42,8 +49,8 @@ fn get_news(version: Option<Version>) -> HttpResponse {
         return all_news.unwrap_err();
     }
     let all_news = all_news.unwrap();
-    let mut important = String::new();
-    let mut other = String::new();
+    let mut important: Vec<NewsOut> = Vec::new();
+    let mut other: Vec<NewsOut> = Vec::new();
     for n in all_news {
         if n.version.is_some() {
             if version.is_none() {
@@ -58,9 +65,15 @@ fn get_news(version: Option<Version>) -> HttpResponse {
             }
         }
         if n.important.is_some() && n.important.unwrap() {
-            important = format!("{}\n{}", important, n.content);
+            important.push(NewsOut {
+                title: n.title,
+                content: n.content
+            })
         } else {
-            other = format!("{}\n{}", other, n.content);
+            other.push(NewsOut {
+                title: n.title,
+                content: n.content
+            });
         }
     }
 
