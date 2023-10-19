@@ -5,9 +5,16 @@ use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct News {
-    pub version: Option<String>,
-    pub content: String
+struct News {
+    version: Option<String>,
+    content: String,
+    important: Option<bool>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct NewsContent {
+    important: Option<String>,
+    other: Option<String>
 }
 
 #[get("/news")]
@@ -35,7 +42,8 @@ fn get_news(version: Option<Version>) -> HttpResponse {
         return all_news.unwrap_err();
     }
     let all_news = all_news.unwrap();
-    let mut news_string = String::new();
+    let mut important = String::new();
+    let mut other = String::new();
     for n in all_news {
         if n.version.is_some() {
             if version.is_none() {
@@ -49,13 +57,19 @@ fn get_news(version: Option<Version>) -> HttpResponse {
                 continue;
             }
         }
-        news_string = format!("{}\n{}", news_string, n.content);
+        if n.important.is_some() && n.important.unwrap() {
+            important = format!("{}\n{}", important, n.content);
+        } else {
+            other = format!("{}\n{}", other, n.content);
+        }
     }
 
-    if news_string.is_empty() {
-        return HttpResponse::NoContent().finish();
-    }
-    return HttpResponse::Ok().body(news_string);
+    return HttpResponse::Ok().json(
+        NewsContent {
+            important: if important.is_empty() { None } else { Some(important) },
+            other: if other.is_empty() { None } else { Some(other) }
+        }
+    );
 }
 
 fn read_news_file() -> Result<Vec<News>, HttpResponse> {

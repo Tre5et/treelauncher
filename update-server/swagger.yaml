@@ -100,8 +100,9 @@ paths:
         '200':
           description: Successful operation
           content:
-            text/html:
-              example: '<h1>News</h1><p>Some news</p>'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/News'
         '201':
           description: No news available
         '500':
@@ -126,8 +127,9 @@ paths:
         '200':
           description: Successful operation
           content:
-            text/html:
-              example: '<h1>News</h1><p>Some news</p>'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/News'
         '201':
           description: No news available
         '400':
@@ -206,3 +208,15 @@ components:
         latest:
           type: boolean
           description: Whether this is the latest version or a newer version exists but the installed version of the launcher cannot update to it
+
+    News:
+      type: object
+      properties:
+        important:
+          type: string
+          required: false
+          description: Important news
+        other:
+          type: string
+          required: false
+          description: Other news
