@@ -54,7 +54,7 @@ public class TextDisplay extends StackPane {
                 WebView webView = new WebView();
                 webView.getStyleClass().addAll(styleClasses);
                 webView.getEngine().loadContent(
-                        "<body style=\"background:#202020; color:white; font-family:sans-serif\">" +
+                        "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Exo+2\"><body style=\"background:#202020; color:white; font-family:'Exo 2', sans-serif; text-align: center\">" +
                         text +
                         "</body>"
                 );

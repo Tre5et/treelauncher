@@ -3,20 +3,15 @@ package net.treset.minecraftlauncher.sync;
 import javafx.util.Pair;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.HttpService;
 import net.treset.minecraftlauncher.util.HttpUtil;
 
 import java.io.IOException;
 import java.util.List;
 
-public class SyncService {
-    private final String syncUrl;
-    private final String syncPort;
-    private final String syncKey;
-
+public class SyncService extends HttpService {
     public SyncService(String syncUrl, String syncPort, String syncKey) {
-        this.syncUrl = syncUrl;
-        this.syncPort = syncPort;
-        this.syncKey = syncKey;
+        super("http://" + syncUrl + ":" + syncPort, List.of(new Pair<>("Auth-Key", syncKey)));
     }
 
     public SyncService() {
@@ -59,23 +54,5 @@ public class SyncService {
     public byte[] downloadFile(String type, String id, String path) throws IOException {
         Pair<HttpUtil.HttpStatusCode, byte[]> result = get("/file/" + type + "/" + id + "/" + FormatUtil.urlEncode(path));
         return result.getKey() == HttpUtil.HttpStatusCode.NO_CONTENT ? new byte[]{} : result.getValue();
-    }
-
-    private Pair<HttpUtil.HttpStatusCode, byte[]> get(String route) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result;
-        result = HttpUtil.get("http://" + this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)));
-        if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
-            throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length != 0 ? "\nMessage: " + new String(result.getValue()) : ""));
-        }
-        return result;
-    }
-
-    private Pair<HttpUtil.HttpStatusCode, byte[]> post(String route, byte[] data) throws IOException {
-        Pair<HttpUtil.HttpStatusCode, byte[]> result;
-        result = HttpUtil.post("http://" + this.syncUrl + ":" + this.syncPort + route, List.of(new Pair<>("Auth-Key", this.syncKey)), data);
-        if(result.getKey().getCode() < 200 || result.getKey().getCode() >= 300) {
-            throw new IOException("The server returned an error code.\nStatus: " + result.getKey() + (result.getValue() != null && result.getValue().length == 0 ? "\nMessage: " + new String(result.getValue()) : ""));
-        }
-        return result;
     }
 }

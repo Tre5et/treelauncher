@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
+import net.treset.minecraftlauncher.news.News;
+import net.treset.minecraftlauncher.news.NewsService;
 import net.treset.minecraftlauncher.sync.AllSynchronizer;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
 import net.treset.minecraftlauncher.ui.create.InstanceCreatorElement;
@@ -14,7 +16,6 @@ import net.treset.minecraftlauncher.ui.nav.NavbarElement;
 import net.treset.minecraftlauncher.ui.selector.*;
 import net.treset.minecraftlauncher.ui.settings.SettingsElement;
 import net.treset.minecraftlauncher.ui.title.TitlebarElement;
-import net.treset.minecraftlauncher.update.UpdateService;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import org.apache.logging.log4j.LogManager;
@@ -67,18 +68,24 @@ public class MainController extends GenericUiController {
 
         new Thread(() -> {
             try {
-                String result = new UpdateService().news();
-                if(result != null && !result.isEmpty()) {
+                News result = new NewsService().news();
+                if(result != null && result.getImportant() != null && !result.getImportant().isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for(News.NewsElement element : result.getImportant()) {
+                        sb.append("<h1>").append(element.getTitle()).append("</h1>");
+                        sb.append(element.getContent());
+                    }
+
                     LauncherApplication.setPopup(
                             new PopupElement(
                                     PopupElement.PopupType.NONE,
-                                    LauncherApplication.stringLocalizer.get("launcher.news.title"),
-                                    result,
+                                    LauncherApplication.stringLocalizer.get("news.important.title"),
+                                    sb.toString(),
                                     null,
                                     List.of(
                                             new PopupElement.PopupButton(
                                                     PopupElement.ButtonType.POSITIVE,
-                                                    LauncherApplication.stringLocalizer.get("launcher.news.close"),
+                                                    LauncherApplication.stringLocalizer.get("news.close"),
                                                     (a) -> LauncherApplication.setPopup(null)
                                                     )
                                             ),
