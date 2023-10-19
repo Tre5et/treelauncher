@@ -4,12 +4,18 @@ use actix_web::{get, HttpRequest, HttpResponse};
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct News {
     version: Option<String>,
-    title: String,
-    content: Option<String>,
+    title: Vec<LocalItem>,
+    content: Option<Vec<LocalItem>>,
     important: Option<bool>
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct LocalItem {
+    locale: String,
+    content: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -24,12 +30,16 @@ struct NewsContent {
     other: Option<Vec<NewsOut>>
 }
 
-#[get("/news")]
-pub async fn news() -> HttpResponse {
-    return get_news(None);
+#[get("/news/{locale}")]
+pub async fn news(req: HttpRequest) -> HttpResponse {
+    let locale = req.match_info().get("locale");
+    if locale.is_none() {
+        return HttpResponse::BadRequest().body("Locale not specified!");
+    }
+    return get_news(None, Some(locale.unwrap().to_string()));
 }
 
-#[get("/news/{version}")]
+#[get("/news/{version}/{locale}")]
 pub async fn version_news(req: HttpRequest) -> HttpResponse {
     let input_version = req.match_info().get("version");
     if input_version.is_some() {
@@ -40,10 +50,14 @@ pub async fn version_news(req: HttpRequest) -> HttpResponse {
         }
     }
     let input_version = if input_version.is_some() { Some(Version::parse(input_version.unwrap()).unwrap()) } else { None };
-    return get_news(input_version);
+    let locale = req.match_info().get("locale");
+    if locale.is_none() {
+        return HttpResponse::BadRequest().body("Locale not specified!");
+    }
+    return get_news(input_version, Some(locale.unwrap().to_string()));
 }
 
-fn get_news(version: Option<Version>) -> HttpResponse {
+fn get_news(version: Option<Version>, locale: Option<String>) -> HttpResponse {
     let all_news = read_news_file();
     if all_news.is_err() {
         return all_news.unwrap_err();
@@ -64,15 +78,31 @@ fn get_news(version: Option<Version>) -> HttpResponse {
                 continue;
             }
         }
+        let title = n.title.clone().iter()
+            .find(|x| x.locale == locale.clone().unwrap_or("en-us".to_string()))
+            .unwrap_or(n.title.get(0).unwrap())
+            .clone().content;
+        let content = if n.content.is_some()
+            {
+                Some(
+                    n.content.clone().unwrap().iter()
+                    .find(|x| x.locale == locale.clone().unwrap_or("en-us".to_string()))
+                    .unwrap_or(n.content.unwrap().get(0).unwrap())
+                    .clone().content
+                )
+            } else {
+                None
+            };
+
         if n.important.is_some() && n.important.unwrap() {
             important.push(NewsOut {
-                title: n.title,
-                content: n.content
+                title,
+                content
             })
         } else {
             other.push(NewsOut {
-                title: n.title,
-                content: n.content
+                title,
+                content
             });
         }
     }

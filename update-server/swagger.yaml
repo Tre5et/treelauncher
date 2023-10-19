@@ -90,12 +90,19 @@ paths:
           content:
               string:
                   example: 'Unable to read file!'
-  /news:
+  /news/{locale}:
     get:
       tags:
         - news
       summary: Get generic news
       operationId: news
+      parameters:
+        - name: locale
+          in: path
+          description: Locale to get the news in
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successful operation
@@ -110,7 +117,7 @@ paths:
           content:
             string:
               example: 'Unable to read news file!'
-  /news/{version}:
+  /news/{version}/{locale}:
     get:
       tags:
         - news
@@ -121,6 +128,12 @@ paths:
           in: path
           description: The current launcher version
           required: false
+          schema:
+            type: string
+        - name: locale
+          in: path
+          description: Locale to get the news in
+          required: true
           schema:
             type: string
       responses:
