@@ -5,7 +5,7 @@ import javafx.scene.control.Label;
 import net.treset.mc_version_loader.saves.Save;
 import net.treset.mc_version_loader.saves.Server;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.util.ImageUtil;
+import net.treset.minecraftlauncher.util.LauncherImage;
 import net.treset.minecraftlauncher.util.QuickPlayData;
 
 import java.io.File;
@@ -21,7 +21,7 @@ public class SavesContentContainer extends FolderContentContainer {
     protected ContentElement createElement(File file) {
         try {
             Save save = Save.from(file);
-            return new ContentElement(save.getImage() == null ? null : ImageUtil.getImage(save.getImage()), save.getName(), save.getFileName(), this::onSelect);
+            return new ContentElement(save.getImage() == null ? null : new LauncherImage(save.getImage()), save.getName(), save.getFileName(), this::onSelect);
         } catch (IOException e) {
             return null;
         }
@@ -55,7 +55,7 @@ public class SavesContentContainer extends FolderContentContainer {
         this.serverElements.clear();
         for(Server server: servers) {
             ContentElement element = new ContentElement(
-                    server.getImage() == null ? null : ImageUtil.getImage(server.getImage()),
+                    server.getImage() == null ? null : new LauncherImage(server.getImage()),
                     server.getName(),
                     server.getIp(),
                     this::onSelect

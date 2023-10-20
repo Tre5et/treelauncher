@@ -20,7 +20,6 @@ import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
-import net.treset.minecraftlauncher.util.ImageUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 
 import java.io.File;
@@ -73,7 +72,7 @@ public class SettingsElement extends UiElement {
             return;
         }
         try {
-            Image profileImage = ImageUtil.rescale(LauncherApplication.userAuth.getUserIcon(), 6);
+            Image profileImage = LauncherApplication.userAuth.getUserIcon().getScaled(6);
             Platform.runLater(() -> ivSkin.setImage(profileImage));
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);

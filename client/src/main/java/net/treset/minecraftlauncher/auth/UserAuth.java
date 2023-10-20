@@ -17,7 +17,7 @@ import net.treset.mc_version_loader.mojang.MinecraftProfileProperty;
 import net.treset.mc_version_loader.mojang.MinecraftProfileTextures;
 import net.treset.mc_version_loader.mojang.MojangUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.util.ImageUtil;
+import net.treset.minecraftlauncher.util.LauncherImage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -187,9 +187,9 @@ public class UserAuth {
         return loggedIn;
     }
 
-    private Image userIcon;
+    private LauncherImage userIcon;
 
-    public Image getUserIcon() throws FileDownloadException {
+    public LauncherImage getUserIcon() throws FileDownloadException {
         if(userIcon == null) {
             userIcon = loadUserIcon();
         }
@@ -199,7 +199,7 @@ public class UserAuth {
     private static final int[] headBaseUVWH = new int[]{8, 8, 8, 8};
     private static final int[] headTopUVWH = new int[]{40, 8, 8, 8};
 
-    public Image loadUserIcon() throws FileDownloadException {
+    public LauncherImage loadUserIcon() throws FileDownloadException {
         MinecraftProfile profile = MojangUtil.getMinecraftProfile(minecraftUser.uuid());
         if(profile.getProperties() == null || profile.getProperties().isEmpty()) {
             throw new FileDownloadException("No properties found for user " + minecraftUser.name());
@@ -208,10 +208,10 @@ public class UserAuth {
         if(textures == null) {
             throw new FileDownloadException("No textures found for user " + minecraftUser.name());
         }
-        Image texture;
+        LauncherImage texture;
         try {
             BufferedImage img = ImageIO.read(new URL(textures.getTextures().getSKIN().getUrl()));
-            texture = ImageUtil.getImage(img);
+            texture = new LauncherImage(img);
         } catch (IOException e) {
             throw new FileDownloadException("Failed to download skin for user " + minecraftUser.name(), e);
         }
@@ -219,6 +219,6 @@ public class UserAuth {
         Image top = new WritableImage(texture.getPixelReader(), headTopUVWH[0], headTopUVWH[1], headTopUVWH[2], headTopUVWH[3]);
         Image base = new WritableImage(texture.getPixelReader(), headBaseUVWH[0], headBaseUVWH[1], headBaseUVWH[2], headBaseUVWH[3]);
 
-        return ImageUtil.combine(base, top);
+        return new LauncherImage(base, top);
     }
 }

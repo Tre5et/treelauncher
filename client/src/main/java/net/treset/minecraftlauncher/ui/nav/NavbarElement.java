@@ -12,8 +12,6 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
-import net.treset.minecraftlauncher.update.LauncherUpdater;
-import net.treset.minecraftlauncher.util.ImageUtil;
 
 import java.util.function.Function;
 
@@ -110,7 +108,7 @@ public class NavbarElement extends UiElement {
     private void setProfileImage() {
         if(LauncherApplication.userAuth.isLoggedIn()) {
             try {
-                Image profileImage = ImageUtil.rescale(LauncherApplication.userAuth.getUserIcon(), 4);
+                Image profileImage = LauncherApplication.userAuth.getUserIcon().getScaled(4);
                 Platform.runLater(() -> this.ivProfile.setImage(profileImage));
 
             } catch (FileDownloadException e) {
