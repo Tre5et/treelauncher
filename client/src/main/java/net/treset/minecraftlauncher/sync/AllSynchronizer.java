@@ -4,7 +4,6 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class AllSynchronizer extends FileSynchronizer {
     private void synchronize(boolean upload) throws IOException {
         ArrayList<IOException> exceptions = new ArrayList<>();
         files.getInstanceComponents().parallelStream().forEach((details) -> {
-            if(!SyncUtil.isSyncing(details.getKey())) {
+            if(!SyncService.isSyncing(details.getKey())) {
                 return;
             }
             InstanceData data;
@@ -58,7 +57,7 @@ public class AllSynchronizer extends FileSynchronizer {
         manifests.addAll(files.getOptionsComponents());
         manifests.addAll(files.getModsComponents().stream().map(Pair::getKey).toList());
         manifests.parallelStream().forEach((manifest) -> {
-            if(!SyncUtil.isSyncing(manifest)) {
+            if(!SyncService.isSyncing(manifest)) {
                 return;
             }
             ManifestSynchronizer synchronizer = new ManifestSynchronizer(manifest, files, callback);

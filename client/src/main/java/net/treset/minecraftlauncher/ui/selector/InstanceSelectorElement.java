@@ -13,6 +13,7 @@ import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.sync.InstanceSynchronizer;
+import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.generic.*;
 import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
@@ -21,7 +22,6 @@ import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.FormatUtil;
-import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
@@ -121,7 +121,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
 
     private void onSelected(InstanceData instanceData, boolean selected) {
-        if(LauncherApplication.settings.hasSyncData() && !SyncUtil.isSyncing(instanceData.getInstance().getKey())) {
+        if(LauncherApplication.settings.hasSyncData() && !SyncService.isSyncing(instanceData.getInstance().getKey())) {
             abMain.setShowSync(true);
             abMain.setOnSync((e) -> new FileSyncExecutor(
                     new InstanceSynchronizer(

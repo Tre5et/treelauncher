@@ -1,10 +1,13 @@
 package net.treset.minecraftlauncher.sync;
 
 import javafx.util.Pair;
+import net.treset.mc_version_loader.launcher.LauncherManifest;
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.HttpService;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,6 +18,21 @@ public class SyncService extends HttpService {
 
     public SyncService() {
         this(LauncherApplication.settings.getSyncUrl(), LauncherApplication.settings.getSyncPort(), LauncherApplication.settings.getSyncKey());
+    }
+
+    public static boolean isSyncing(LauncherManifest manifest) {
+        return new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME)).isFile();
+    }
+
+    public static String convertType(LauncherManifestType type) throws IOException {
+        return switch (type) {
+            case RESOURCEPACKS_COMPONENT -> "resourcepacks";
+            case MODS_COMPONENT -> "mods";
+            case OPTIONS_COMPONENT -> "options";
+            case SAVES_COMPONENT -> "saves";
+            case INSTANCE_COMPONENT -> "instance";
+            default -> throw new IOException("Invalid type: " + type);
+        };
     }
 
     public void testConnection() throws IOException {

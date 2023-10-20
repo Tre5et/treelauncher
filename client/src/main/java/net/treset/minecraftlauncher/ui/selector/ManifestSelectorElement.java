@@ -8,12 +8,12 @@ import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.sync.ManifestSynchronizer;
+import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.generic.ButtonElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
-import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
@@ -116,7 +116,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected List<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> getElements() {
         ArrayList<SelectorEntryElement<ManifestSelectorElement.ManifestContentProvider>> elements = new ArrayList<>();
         for(LauncherManifest manifest: getComponents()) {
-            elements.add(new SelectorEntryElement<>(new ManifestContentProvider(manifest), this::onSelected, () -> SyncUtil.isSyncing(manifest)));
+            elements.add(new SelectorEntryElement<>(new ManifestContentProvider(manifest), this::onSelected, () -> SyncService.isSyncing(manifest)));
         }
         return elements.stream()
             .sorted(Comparator.comparing(a -> a.getContentProvider().getTitle()))
@@ -126,7 +126,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
     protected abstract List<LauncherManifest> getComponents();
 
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
-        if(LauncherApplication.settings.hasSyncData() && !SyncUtil.isSyncing(contentProvider.getManifest())) {
+        if(LauncherApplication.settings.hasSyncData() && !SyncService.isSyncing(contentProvider.getManifest())) {
             abMain.setShowSync(true);
             abMain.setOnSync((e) -> new FileSyncExecutor(new ManifestSynchronizer(
                     contentProvider.getManifest(),

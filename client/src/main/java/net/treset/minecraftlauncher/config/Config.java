@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Config {
     public String BASE_DIR;
+    public final String SYNC_FILENAME = "data.sync";
     public final String SPECIAL_FILES_FOLDER;
     public final String LOG_PATH;
     public final File AUTH_FILE;

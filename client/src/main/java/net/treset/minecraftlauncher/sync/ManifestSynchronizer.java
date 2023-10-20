@@ -8,7 +8,6 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
-import net.treset.minecraftlauncher.util.SyncUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     @Override
     public void upload() throws IOException {
-        if(SyncUtil.isSyncing(manifest)) {
+        if(SyncService.isSyncing(manifest)) {
             uploadExisting();
         } else {
             uploadNew();
@@ -38,7 +37,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     @Override
     public void download() throws IOException {
-        if(SyncUtil.isSyncing(manifest)) {
+        if(SyncService.isSyncing(manifest)) {
             downloadExisting();
         } else {
             downloadNew();
@@ -62,7 +61,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
         ComponentData data = updateSyncFile(0);
         setStatus(new SyncStatus(SyncStep.UPLOADING, null));
         SyncService service = new SyncService();
-        service.newComponent(SyncUtil.convertType(manifest.getType()), manifest.getId());
+        service.newComponent(SyncService.convertType(manifest.getType()), manifest.getId());
         uploadAll(data);
         LOGGER.debug("Completing upload...");
         int version = completeUpload(data);
@@ -119,7 +118,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     protected void uploadAll(ComponentData data) throws IOException {
         SyncService service = new SyncService();
-        uploadDirectory(data.getHashTree(), SyncUtil.convertType(manifest.getType()), manifest.getId(), manifest.getDirectory(), "", 0, data.getFileAmount(), service);
+        uploadDirectory(data.getHashTree(), SyncService.convertType(manifest.getType()), manifest.getId(), manifest.getDirectory(), "", 0, data.getFileAmount(), service);
     }
 
     protected Integer uploadDirectory(List<ComponentData.HashEntry> entries, String type, String id, String basePath, String filePath, Integer currentAmount, Integer totalAmount, SyncService service) throws IOException {
@@ -157,14 +156,14 @@ public class ManifestSynchronizer extends FileSynchronizer {
             } else {
                 content = new byte[]{};
             }
-            syncService.uploadFile(SyncUtil.convertType(manifest.getType()), manifest.getId(), path, content);
+            syncService.uploadFile(SyncService.convertType(manifest.getType()), manifest.getId(), path, content);
         }
     }
 
     protected int completeUpload(ComponentData newData) throws IOException {
-        int version = new SyncService().complete(SyncUtil.convertType(manifest.getType()), manifest.getId());
+        int version = new SyncService().complete(SyncService.convertType(manifest.getType()), manifest.getId());
         newData.setVersion(version);
-        newData.writeToFile(FormatUtil.absoluteFilePath(manifest.getDirectory(), SyncUtil.SYNC_FILENAME));
+        newData.writeToFile(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME));
         return version;
     }
 
@@ -221,7 +220,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
     }
 
     protected ComponentData getCurrentComponentData() throws IOException {
-        File syncFile = new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), SyncUtil.SYNC_FILENAME));
+        File syncFile = new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME));
         if(!syncFile.exists()) {
             throw new IOException("Sync file not found");
         }
@@ -231,7 +230,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     protected void downloadDifference(int currentVersion) throws IOException {
         setStatus(new SyncStatus(SyncStep.COLLECTING, null));
-        GetResponse response = new SyncService().get(SyncUtil.convertType(manifest.getType()), manifest.getId(), currentVersion);
+        GetResponse response = new SyncService().get(SyncService.convertType(manifest.getType()), manifest.getId(), currentVersion);
         if(response.getVersion() == currentVersion) {
             LOGGER.debug("Component is up to date");
             setStatus(new SyncStatus(SyncStep.FINISHED, null));
@@ -252,7 +251,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     protected void downloadFiles(List<String> difference) throws IOException {
         SyncService service = new SyncService();
-        String type = SyncUtil.convertType(manifest.getType());
+        String type = SyncService.convertType(manifest.getType());
         String basePath = manifest.getDirectory();
         int amount = 0;
         for(String path : difference) {
@@ -289,7 +288,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     protected ComponentData updateSyncFile(int version) throws IOException {
         ComponentData data = calculateComponentData(version);
-        data.writeToFile(FormatUtil.absoluteFilePath(manifest.getDirectory(), SyncUtil.SYNC_FILENAME));
+        data.writeToFile(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME));
         return data;
     }
 

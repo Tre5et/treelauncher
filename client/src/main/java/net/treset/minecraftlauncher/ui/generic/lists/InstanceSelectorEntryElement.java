@@ -5,8 +5,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import net.treset.minecraftlauncher.data.InstanceData;
+import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.util.FormatUtil;
-import net.treset.minecraftlauncher.util.SyncUtil;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.BiConsumer;
@@ -44,7 +44,7 @@ public class InstanceSelectorEntryElement extends SelectorEntryElement<InstanceS
     private final Label lbTime = new Label();
 
     public InstanceSelectorEntryElement(InstanceData data, BiConsumer<InstanceData, Boolean> selectionListener) {
-        super(new InstanceDataContentProvider(data), (dataProvider, select) -> selectionListener.accept(dataProvider.getData(), select), () -> SyncUtil.isSyncing(data.getInstance().getKey()));
+        super(new InstanceDataContentProvider(data), (dataProvider, select) -> selectionListener.accept(dataProvider.getData(), select), () -> SyncService.isSyncing(data.getInstance().getKey()));
         this.instanceData = data;
         updateTime();
 

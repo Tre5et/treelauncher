@@ -4,9 +4,9 @@ import javafx.event.ActionEvent;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.sync.ComponentList;
+import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
-import net.treset.minecraftlauncher.util.SyncUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +24,7 @@ public class FileSyncHelper {
     public void showDownloadPopup(Consumer<LauncherManifest> onDone) {
         ComponentList list;
         try {
-            list = SyncUtil.getAvailableComponents(FormatUtil.getChildType(baseManifest.getType()));
+            list = new SyncService().getAvailable(SyncService.convertType(FormatUtil.getChildType(baseManifest.getType())));
         } catch (IOException e) {
             LauncherApplication.displayError(e);
             return;

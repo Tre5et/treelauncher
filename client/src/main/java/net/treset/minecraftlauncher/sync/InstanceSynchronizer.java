@@ -19,7 +19,6 @@ import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.FormatUtil;
-import net.treset.minecraftlauncher.util.SyncUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 
 import java.io.IOException;
@@ -245,7 +244,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
     }
 
     protected void uploadDependency(LauncherManifest manifest) throws IOException {
-        if(manifest != null && (updateEverything || !SyncUtil.isSyncing(manifest))) {
+        if(manifest != null && (updateEverything || !SyncService.isSyncing(manifest))) {
             ManifestSynchronizer synchronizer = new ManifestSynchronizer(manifest, files, callback);
             synchronizer.upload();
         }
