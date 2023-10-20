@@ -4,7 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.string.PatternString;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class IncludedFilesListCellFactory implements Callback<ListView<String>, ListCell<String>> {
@@ -20,7 +20,7 @@ public class IncludedFilesListCellFactory implements Callback<ListView<String>, 
                     setGraphic(null);
                 } else {
                     setPadding(new Insets(3, 0, 3, 0));
-                    item = FormatUtil.fromRegex(item);
+                    item = PatternString.decode(item);
                     FontIcon icon = new FontIcon();
                     icon.setIconSize(24);
                     icon.getStyleClass().add("icon");

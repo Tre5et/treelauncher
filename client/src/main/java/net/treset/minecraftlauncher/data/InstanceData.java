@@ -6,6 +6,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +33,7 @@ public class InstanceData {
     String librariesDir;
     String modsPrefix;
     String savesPrefix;
-    List<String> gameDataExcludedFiles;
+    List<PatternString> gameDataExcludedFiles;
 
     public static InstanceData of(Pair<LauncherManifest, LauncherInstanceDetails> instance, LauncherFiles files) throws FileLoadException {
         try {
@@ -128,12 +129,12 @@ public class InstanceData {
             }
         }
 
-        ArrayList<String> gameDataExcludedFiles = new ArrayList<>();
+        ArrayList<PatternString> gameDataExcludedFiles = new ArrayList<>();
         for(String c : files.getGameDetailsManifest().getComponents()) {
-            gameDataExcludedFiles.add(FormatUtil.toRegexPattern(c));
+            gameDataExcludedFiles.add(new PatternString(c));
         }
-        gameDataExcludedFiles.add(FormatUtil.toRegexPattern(files.getModsManifest().getPrefix()) + ".*");
-        gameDataExcludedFiles.add(FormatUtil.toRegexPattern(files.getSavesManifest().getPrefix()) + ".*");
+        gameDataExcludedFiles.add(new PatternString(files.getModsManifest().getPrefix() + ".*"));
+        gameDataExcludedFiles.add(new PatternString(files.getSavesManifest().getPrefix() + ".*"));
 
         return new InstanceData(
                 files.getLauncherDetails(),
@@ -154,7 +155,7 @@ public class InstanceData {
         );
     }
 
-    public InstanceData(LauncherDetails launcherDetails, String launcherDetailsFile, Pair<LauncherManifest, LauncherInstanceDetails> instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents, LauncherManifest javaComponent, LauncherManifest optionsComponent, LauncherManifest resourcepacksComponent, LauncherManifest savesComponent, Pair<LauncherManifest, LauncherModsDetails> modsComponent, String gameDataDir, String assetsDir, String librariesDir, String modsPrefix, String savesPrefix, List<String> gameDataExcludedFiles) {
+    public InstanceData(LauncherDetails launcherDetails, String launcherDetailsFile, Pair<LauncherManifest, LauncherInstanceDetails> instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents, LauncherManifest javaComponent, LauncherManifest optionsComponent, LauncherManifest resourcepacksComponent, LauncherManifest savesComponent, Pair<LauncherManifest, LauncherModsDetails> modsComponent, String gameDataDir, String assetsDir, String librariesDir, String modsPrefix, String savesPrefix, List<PatternString> gameDataExcludedFiles) {
         this.launcherDetails = launcherDetails;
         this.launcherDetailsFile = launcherDetailsFile;
         this.instance = instance;
@@ -293,11 +294,11 @@ public class InstanceData {
         this.savesPrefix = savesPrefix;
     }
 
-    public List<String> getGameDataExcludedFiles() {
+    public List<PatternString> getGameDataExcludedFiles() {
         return gameDataExcludedFiles;
     }
 
-    public void setGameDataExcludedFiles(List<String> gameDataExcludedFiles) {
+    public void setGameDataExcludedFiles(List<PatternString> gameDataExcludedFiles) {
         this.gameDataExcludedFiles = gameDataExcludedFiles;
     }
 

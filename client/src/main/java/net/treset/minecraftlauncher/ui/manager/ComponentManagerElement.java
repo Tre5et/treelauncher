@@ -12,6 +12,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.string.PatternString;
 import net.treset.minecraftlauncher.util.ui.cellfactory.IncludedFilesListCellFactory;
 
 import java.io.IOException;
@@ -111,7 +112,7 @@ public class ComponentManagerElement extends VBox {
                                     if(cbType.getSelectedIndex() == 1) {
                                         file = FormatUtil.absoluteDirPath(file);
                                     }
-                                    lvIncluded.getItems().add(FormatUtil.toRegex(file));
+                                    lvIncluded.getItems().add(new PatternString(file).toString());
                                     save();
                                     LauncherApplication.setPopup(null);
                                 }

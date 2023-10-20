@@ -1,6 +1,5 @@
 package net.treset.minecraftlauncher.util;
 
-import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 
@@ -25,18 +24,6 @@ public class FormatUtil {
         public FormatException(String message, Throwable cause) {
             super(message, cause);
         }
-    }
-
-    public static boolean matchesAny(String test, List<String> patterns) {
-        if(patterns == null) return false;
-        for(String pattern : patterns) {
-            if(FormatUtils.matches(test, pattern)) return true;
-        }
-        return false;
-    }
-
-    public static String toRegexPattern(String source) {
-        return source.replaceAll("\\.", "\\\\.");
     }
 
     public static String hash(Object source) {
@@ -88,71 +75,6 @@ public class FormatUtil {
         ArrayList<String> partsList = new ArrayList<>(Arrays.asList(parts));
         partsList.add(0, LauncherApplication.config.BASE_DIR);
         return absoluteFilePath(partsList.toArray(String[]::new));
-    }
-
-    // \ -> \\; . -> \.; [.*;.+;.?] unchanged; no .* at start / end -> ^ / $
-    public static String toRegex(String source) {
-        String pattern = source.replaceAll("\\\\", "\\\\\\\\").replaceAll("(?<=^|[^\\\\])\\.(?=[^*+?]|$)", "\\\\.");
-        if(!pattern.startsWith(".*")) pattern = "^" + pattern;
-        if(!pattern.endsWith(".*")) pattern += "$";
-        return pattern;
-    }
-
-    public static List<String> toRegex(String... items) {
-        return Arrays.stream(items).map(FormatUtil::toRegex).toList();
-    }
-
-    public static List<String> toRegex(List<String> items) {
-        return items.stream().map(FormatUtil::toRegex).toList();
-    }
-
-    public static String fromRegex(String item) {
-        return item.replaceAll("\\\\\\\\", "\\\\").replaceAll("\\\\\\.", ".").replaceAll("^\\^", "").replaceAll("\\$$", "");
-    }
-
-    public static List<String> fromRegex(String... items) {
-        return Arrays.stream(items).map(FormatUtil::fromRegex).toList();
-    }
-
-    public static List<String> fromRegex(List<String> items) {
-        return items.stream().map(FormatUtil::fromRegex).toList();
-    }
-
-    public static String formatSeconds(long seconds) {
-        if (seconds < 60) {
-            return seconds + LauncherApplication.stringLocalizer.get("suffix.seconds");
-        } else if (seconds < 60 * 60) {
-            return (seconds / 60) + LauncherApplication.stringLocalizer.get("suffix.minutes");
-        } else if (seconds < 60 * 60 * 10) {
-            return (seconds / 3600) + LauncherApplication.stringLocalizer.get("suffix.hours") + " " + ((seconds % 3600) / 60) + LauncherApplication.stringLocalizer.get("suffix.minutes");
-        } else if (seconds < 60 * 60 * 24) {
-            return (seconds / 3600) + LauncherApplication.stringLocalizer.get("suffix.hours");
-        } else if (seconds < 60 * 60 * 24 * 10) {
-            return (seconds / (3600 * 24)) + LauncherApplication.stringLocalizer.get("suffix.days") + " " + ((seconds % (3600 * 24)) / 3600) + LauncherApplication.stringLocalizer.get("suffix.hours");
-        }
-        else {
-            return (seconds / (3600 * 24)) + "d ";
-        }
-    }
-
-    public static int distance(String a, String b) {
-        a = a.toLowerCase();
-        b = b.toLowerCase();
-        // i == 0
-        int [] costs = new int [b.length() + 1];
-        for (int j = 0; j < costs.length; j++)
-            costs[j] = j;
-        for (int i = 1; i <= a.length(); i++) {
-            // j == 0; nw = lev(i - 1, j)
-            costs[0] = i;
-            int nw = i - 1;
-            for (int j = 1; j <= b.length(); j++) {
-                int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]), a.charAt(i - 1) == b.charAt(j - 1) ? nw : nw + 1);
-                nw = costs[j];
-                costs[j] = cj;
-            }
-        }
-        return costs[b.length()];
     }
 
     public static String hashFile(File file) throws IOException {

@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.sync.SyncService;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.string.TimeString;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.BiConsumer;
@@ -68,7 +68,7 @@ public class InstanceSelectorEntryElement extends SelectorEntryElement<InstanceS
     }
 
     public void setTime(long seconds) {
-        lbTime.setText(FormatUtil.formatSeconds(seconds));
+        lbTime.setText(new TimeString(seconds).get());
     }
 
     public InstanceData getInstanceData() {

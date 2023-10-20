@@ -7,6 +7,7 @@ import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.GameResourceException;
+import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -220,7 +221,7 @@ public class ResourceManager {
         LOGGER.debug("Removing excluded files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
         List<File> toRemove = new ArrayList<>();
         for(File f : files) {
-            if(f.getName().equals(LauncherApplication.config.MANIFEST_FILE_NAME) || FormatUtil.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
+            if(f.getName().equals(LauncherApplication.config.MANIFEST_FILE_NAME) || PatternString.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
                 LOGGER.debug("Removing excluded file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 toRemove.add(f);
             }
@@ -314,7 +315,7 @@ public class ResourceManager {
         }
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
-            if(FormatUtil.matchesAny(f.getName(), instanceData.getInstance().getValue().getIgnoredFiles())) {
+            if(PatternString.matchesAny(f.getName(), instanceData.getInstance().getValue().getIgnoredFiles().stream().map(p -> new PatternString(p, true)).toList())) {
                 LOGGER.debug("Deleting ignored file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 try {
                     if(f.isDirectory()) {

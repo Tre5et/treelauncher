@@ -21,7 +21,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
 import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.string.FormatString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -103,7 +103,7 @@ public class ModsSearchElement extends UiElement {
         }
         List<ModContentElement> elements = results.parallelStream()
                 .map(m -> new ModContentElement(m, details.getValue().getModsVersion(), changeCallback, details))
-                .sorted((e1, e2) -> (int)Math.rint(FormatUtil.distance(tfSearch.getText(), e1.getModData().getName()) - FormatUtil.distance(tfSearch.getText(), e2.getModData().getName()) + Math.log10((double) e2.getModData().getDownloadsCount() / e1.getModData().getDownloadsCount())))
+                .sorted((e1, e2) -> (int)Math.rint(FormatString.distance(tfSearch.getText(), e1.getModData().getName()) - FormatString.distance(tfSearch.getText(), e2.getModData().getName()) + Math.log10((double) e2.getModData().getDownloadsCount() / e1.getModData().getDownloadsCount())))
                 .toList();
         elements.forEach(e -> e.setLauncherMod(getLocalMod(e.getModData())));
 

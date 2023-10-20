@@ -4,6 +4,7 @@ import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,7 @@ import java.util.function.Consumer;
 public class InstanceCreator extends GenericComponentCreator {
     private static final Logger LOGGER = LogManager.getLogger(InstanceCreator.class);
 
-    private final List<String> ignoredFiles;
+    private final List<PatternString> ignoredFiles;
     private final List<LauncherLaunchArgument> jvmArguments;
     private final List<LauncherFeature> features;
     private final ModsCreator modsCreator;
@@ -25,7 +26,7 @@ public class InstanceCreator extends GenericComponentCreator {
     private final SavesCreator savesCreator;
     private final VersionCreator versionCreator;
 
-    public InstanceCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, List<String> ignoredFiles, List<LauncherLaunchArgument> jvmArguments, List<LauncherFeature> features, ModsCreator modsCreator, OptionsCreator optionsCreator, ResourcepackCreator resourcepackCreator, SavesCreator savesCreator, VersionCreator versionCreator) {
+    public InstanceCreator(String name, Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, List<PatternString> ignoredFiles, List<LauncherLaunchArgument> jvmArguments, List<LauncherFeature> features, ModsCreator modsCreator, OptionsCreator optionsCreator, ResourcepackCreator resourcepackCreator, SavesCreator savesCreator, VersionCreator versionCreator) {
         super(LauncherManifestType.INSTANCE_COMPONENT, null, null, name, typeConversion, LauncherApplication.config.INSTANCE_DEFAULT_INCLUDED_FILES, LauncherApplication.config.INSTANCE_DEFAULT_DETAILS, componentsManifest);
         this.ignoredFiles = ignoredFiles;
         this.jvmArguments = jvmArguments;
@@ -51,7 +52,7 @@ public class InstanceCreator extends GenericComponentCreator {
         ArrayList<LauncherFeature> features = new ArrayList<>(this.features);
         features.addAll(LauncherApplication.config.INSTANCE_DEFAULT_FEATURES);
 
-        ArrayList<String> ignoredFiles = new ArrayList<>(this.ignoredFiles);
+        ArrayList<PatternString> ignoredFiles = new ArrayList<>(this.ignoredFiles);
         ignoredFiles.addAll(LauncherApplication.config.INSTANCE_DEFAULT_IGNORED_FILES);
 
         ArrayList<LauncherLaunchArgument> jvmArguments = new ArrayList<>(this.jvmArguments);
@@ -59,7 +60,7 @@ public class InstanceCreator extends GenericComponentCreator {
 
         LauncherInstanceDetails details = new LauncherInstanceDetails(
                 features,
-                ignoredFiles,
+                ignoredFiles.stream().map(PatternString::get).toList(),
                 jvmArguments,
                 null, null, null, null, null);
 

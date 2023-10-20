@@ -7,6 +7,7 @@ import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,14 +27,14 @@ public abstract class GenericComponentCreator implements ComponentCreator {
     private LauncherManifest inheritsFrom;
     private String name;
     private Map<String, LauncherManifestType> typeConversion;
-    private List<String> includedFiles;
+    private List<PatternString> includedFiles;
     private String details;
     private LauncherManifest componentsManifest;
     private LauncherManifest newManifest;
     private Consumer<CreationStatus> statusCallback;
     private CreationStatus defaultStatus;
 
-    public GenericComponentCreator(LauncherManifestType type, LauncherManifest uses, LauncherManifest inheritsFrom, String name, Map<String, LauncherManifestType> typeConversion, List<String> includedFiles, String details, LauncherManifest componentsManifest) {
+    public GenericComponentCreator(LauncherManifestType type, LauncherManifest uses, LauncherManifest inheritsFrom, String name, Map<String, LauncherManifestType> typeConversion, List<PatternString> includedFiles, String details, LauncherManifest componentsManifest) {
         this.type = type;
         this.uses = uses;
         this.inheritsFrom = inheritsFrom;
@@ -74,7 +75,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         if(manifestType == null) {
             throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: invalid parameters");
         }
-        newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles, null);
+        newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles.stream().map(PatternString::get).toList(), null);
         newManifest.setId(FormatUtil.hash(newManifest));
         try {
             writeNewManifest();
@@ -242,7 +243,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         return typeConversion;
     }
 
-    public List<String> getIncludedFiles() {
+    public List<PatternString> getIncludedFiles() {
         return includedFiles;
     }
 
@@ -270,7 +271,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         this.typeConversion = typeConversion;
     }
 
-    public void setIncludedFiles(List<String> includedFiles) {
+    public void setIncludedFiles(List<PatternString> includedFiles) {
         this.includedFiles = includedFiles;
     }
 
