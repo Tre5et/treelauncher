@@ -20,7 +20,7 @@ import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
-import net.treset.minecraftlauncher.util.UiUtil;
+import net.treset.minecraftlauncher.util.string.UrlString;
 
 import java.io.File;
 import java.io.IOException;
@@ -198,7 +198,7 @@ public class SettingsElement extends UiElement {
     @FXML
     private void onSource() {
         try {
-            UiUtil.openBrowser(LauncherApplication.stringLocalizer.get("url.source"));
+            UrlString.of(LauncherApplication.stringLocalizer.get("url.source")).openInBrowser();
         } catch(Exception e) {
             LauncherApplication.displayError(e);
         }

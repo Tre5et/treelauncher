@@ -13,7 +13,6 @@ import net.treset.minecraftlauncher.ui.generic.ButtonElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement;
-import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
@@ -206,7 +205,11 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         if(currentProvider == null) {
             LOGGER.warn("No element selected");
         }
-        UiUtil.openFolder(LauncherFile.of(currentProvider.getManifest().getDirectory()));
+        try {
+            LauncherFile.of(currentProvider.getManifest().getDirectory()).open();
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
     }
 
     @Override

@@ -24,7 +24,6 @@ import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.CreationStatus;
-import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
@@ -375,17 +374,25 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
 
     @FXML
     private void onComponentFolder() {
-        switch (icDetailsController.getCurrentSelected()) {
-            case SAVES -> UiUtil.openFolder(LauncherFile.of(currentInstance.getSavesComponent().getDirectory()));
-            case RESOURCEPACKS -> UiUtil.openFolder(LauncherFile.of(currentInstance.getResourcepacksComponent().getDirectory()));
-            case OPTIONS -> UiUtil.openFolder(LauncherFile.of(currentInstance.getOptionsComponent().getDirectory()));
-            case MODS -> UiUtil.openFolder(LauncherFile.of(currentInstance.getModsComponent().getKey().getDirectory()));
+        try {
+            switch (icDetailsController.getCurrentSelected()) {
+                case SAVES -> LauncherFile.of(currentInstance.getSavesComponent().getDirectory()).open();
+                case RESOURCEPACKS -> LauncherFile.of(currentInstance.getResourcepacksComponent().getDirectory()).open();
+                case OPTIONS -> LauncherFile.of(currentInstance.getOptionsComponent().getDirectory()).open();
+                case MODS -> LauncherFile.of(currentInstance.getModsComponent().getKey().getDirectory()).open();
+            }
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
         }
     }
 
     @FXML
     protected void onFolder() {
-        UiUtil.openFolder(LauncherFile.of(currentInstance.getInstance().getKey().getDirectory()));
+        try {
+            LauncherFile.of(currentInstance.getInstance().getKey().getDirectory()).open();
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
     }
 
     @Override

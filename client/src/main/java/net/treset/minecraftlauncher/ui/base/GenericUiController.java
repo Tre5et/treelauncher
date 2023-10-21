@@ -1,12 +1,16 @@
 package net.treset.minecraftlauncher.ui.base;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
-import net.treset.minecraftlauncher.util.UiUtil;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class GenericUiController implements UiController {
     @FXML private StackPane root;
@@ -46,10 +50,32 @@ public class GenericUiController implements UiController {
     }
 
     public static <T extends GenericUiController> T showOnStage(Stage stage, String fxml, String title) throws IOException {
-        T controller = UiUtil.loadFxmlOnStage(fxml, stage, title);
+        T controller = loadFxmlOnStage(fxml, stage, title);
         controller.beforeShow(stage);
         stage.show();
         controller.afterShow(stage);
         return controller;
+    }
+
+    public static <T extends UiController> T loadFxmlOnStage(String fxmlPath, Stage stage, String title, Object... args) throws IOException {
+        FXMLLoader loader = getFXMLLoader(fxmlPath);
+        Parent root = loadFXML(loader);
+
+        stage.setTitle(LauncherApplication.stringLocalizer.getFormatted(title, args));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        return loader.getController();
+    }
+
+    public static FXMLLoader getFXMLLoader(String fxmlPath) {
+        FXMLLoader loader = new FXMLLoader();
+        URL xmlUrl = UiController.class.getResource("/fxml/" + fxmlPath + ".fxml");
+        loader.setLocation(xmlUrl);
+        loader.setResources(LauncherApplication.stringLocalizer.getStringBundle());
+        return loader;
+    }
+
+    public static <T> T loadFXML(FXMLLoader fxmlLoader) throws IOException {
+        return fxmlLoader.load();
     }
 }

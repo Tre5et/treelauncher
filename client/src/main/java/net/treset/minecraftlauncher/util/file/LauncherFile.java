@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.util.file;
 import net.treset.mc_version_loader.json.JsonParsable;
 import net.treset.minecraftlauncher.LauncherApplication;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -148,6 +149,13 @@ public class LauncherFile extends File {
             encryptedString.insert(0, "0");
         }
         return encryptedString.toString();
+    }
+
+    public void open() throws IOException {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.OPEN)) {
+            desktop.open(this);
+        }
     }
 
     public static LauncherFile of(String... parts) {

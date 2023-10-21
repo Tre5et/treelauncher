@@ -19,8 +19,8 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.mc_version_loader.mods.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
-import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
+import net.treset.minecraftlauncher.util.string.UrlString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -443,10 +443,10 @@ public class ModContentElement extends ContentElement {
     }
 
     private void onOpen(ActionEvent actionEvent) {
-        String url = getUrl();
+        UrlString url = getUrl();
         if(url != null) {
             try {
-                UiUtil.openBrowser(url);
+                url.openInBrowser();
             } catch (Exception e) {
                 LauncherApplication.displayError(e);
             }
@@ -457,11 +457,11 @@ public class ModContentElement extends ContentElement {
         btInstall.setDisable(newValue == null || launcherMod != null && newValue.equals(currentVersion));
     }
 
-    public String getUrl() {
+    public UrlString getUrl() {
         if(launcherMod != null && launcherMod.getUrl() != null) {
-            return launcherMod.getUrl();
+            return UrlString.of(launcherMod.getUrl());
         } else if(modData != null && modData.getUrl() != null) {
-            return modData.getUrl();
+            return UrlString.of(modData.getUrl());
         }
         return null;
     }
