@@ -11,6 +11,7 @@ import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.exception.GameCommandException;
 import net.treset.minecraftlauncher.util.exception.GameLaunchException;
 import net.treset.minecraftlauncher.util.exception.GameResourceException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,7 +77,7 @@ public class GameLauncher {
 
         files.getLauncherDetails().setActiveInstance(instance.getInstance().getKey().getId());
         try {
-            files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails());
+            LauncherFile.of(files.getMainManifest().getDirectory(), files.getMainManifest().getDetails()).write(files.getLauncherDetails());
         } catch (IOException e) {
             throw new GameLaunchException("Unable to launch game: unable to write launcher details", e);
         }
@@ -166,7 +167,7 @@ public class GameLauncher {
         }
         files.getLauncherDetails().setActiveInstance(null);
         try {
-            files.getLauncherDetails().writeToFile(files.getMainManifest().getDirectory() + files.getMainManifest().getDetails());
+            LauncherFile.of(files.getMainManifest().getDirectory(), files.getMainManifest().getDetails()).write(files.getLauncherDetails());
         } catch (IOException e) {
             throw new GameLaunchException("Unable to abort launch correctly: failed to write launcher details");
         }

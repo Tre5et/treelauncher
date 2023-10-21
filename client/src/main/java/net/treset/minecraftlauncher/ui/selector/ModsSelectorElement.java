@@ -10,12 +10,11 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.ModsCreatorElement;
 import net.treset.minecraftlauncher.ui.manager.ModsManagerElement;
-import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.exception.GameResourceException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
@@ -64,13 +63,13 @@ public class ModsSelectorElement extends ManifestSelectorElement {
                 return;
             }
             try {
-                files.getModsManifest().writeToFile(files.getModsManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(0));
+                LauncherFile.of(files.getModsManifest().getDirectory(), files.getGameDetailsManifest().getComponents().get(0)).write(files.getModsManifest());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 return;
             }
             try {
-                FileUtil.deleteDir(new File(currentMods.getKey().getDirectory()));
+                LauncherFile.of(currentMods.getKey().getDirectory()).remove();
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 return;

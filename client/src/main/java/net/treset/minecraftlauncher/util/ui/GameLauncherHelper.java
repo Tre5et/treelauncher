@@ -4,9 +4,9 @@ import javafx.application.Platform;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.GameLaunchException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -107,7 +107,7 @@ public class GameLauncherHelper  {
                                 new PopupElement.PopupButton(
                                         PopupElement.ButtonType.POSITIVE,
                                         "selector.instance.game.crash.reports",
-                                        event -> UiUtil.openFolder(FormatUtil.absoluteDirPath(gameLauncher.getInstance().getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
+                                        event -> UiUtil.openFolder(LauncherFile.of(gameLauncher.getInstance().getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, "crash-reports"))
                                 )
                         )
                 )

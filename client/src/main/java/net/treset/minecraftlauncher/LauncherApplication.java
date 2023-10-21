@@ -15,7 +15,7 @@ import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
 import net.treset.minecraftlauncher.util.FileInitializer;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,8 +56,8 @@ public class LauncherApplication extends Application {
         ModUtil.setCurseforgeApiKey(config.CURSEFORGE_API_KEY);
 
         try {
-            if(!new File(config.BASE_DIR).exists() || !GlobalConfigLoader.manifestExists(new File(config.BASE_DIR))) {
-                new FileInitializer(new File(config.BASE_DIR)).create();
+            if(!config.BASE_DIR.exists() || !GlobalConfigLoader.hasMainMainfest(config.BASE_DIR)) {
+                new FileInitializer(config.BASE_DIR).create();
             }
         } catch (IOException e) {
             LOGGER.error("Failed to initialize directory structure!", e);
@@ -114,7 +114,7 @@ public class LauncherApplication extends Application {
     }
 
     private static void loadSettings() throws IOException {
-        File settingsFile = new File(FormatUtil.absoluteFilePath(config.BASE_DIR, config.SETTINGS_FILE_NAME));
+        LauncherFile settingsFile = LauncherFile.of(config.BASE_DIR, config.SETTINGS_FILE_NAME);
         if(!settingsFile.exists()) {
             settings = new Settings(settingsFile);
             settings.save();
@@ -190,7 +190,7 @@ public class LauncherApplication extends Application {
     }
 
     private void startUpdater() throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(FormatUtil.absoluteFilePath(System.getProperty("java.home"), "bin", "java"), "-jar", "app/updater.jar");
+        ProcessBuilder pb = new ProcessBuilder(LauncherFile.of(System.getProperty("java.home"), "bin", "java").getPath(), "-jar", "app/updater.jar");
         if(restartAfterUpdate) {
             if(new File("TreeLauncher.exe").exists()) {
                 LOGGER.info("TreeLauncher found, using it to restart");

@@ -14,6 +14,7 @@ import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -36,7 +37,7 @@ public class VersionChangerElement extends VersionSelectorElement {
         GridPane.setRowSpan(btChange, 2);
     }
 
-    public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, String librariesDir, LauncherManifest versionManifest, Consumer<VersionCreator> changeCallback, Consumer<Exception> changeFailCallback) {
+    public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, LauncherFile librariesDir, LauncherManifest versionManifest, Consumer<VersionCreator> changeCallback, Consumer<Exception> changeFailCallback) {
         super.init(launcherFiles, typeConversion, librariesDir, versionManifest);
 
         this.changeCallback = changeCallback;

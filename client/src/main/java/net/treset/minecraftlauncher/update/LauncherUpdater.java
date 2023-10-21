@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.update;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.util.FileUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,7 +83,7 @@ public class LauncherUpdater {
     }
 
     public void writeFile() throws IOException {
-        net.treset.minecraftlauncher.util.FileUtil.writeFile("update.json", updateContent);
+        LauncherFile.of("update.json").write(updateContent);
     }
 
     public boolean deleteUpdateFiles() {

@@ -4,6 +4,7 @@ import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,7 +81,7 @@ public class InstanceCreator extends GenericComponentCreator {
         setStatus(new CreationStatus(CreationStatus.DownloadStep.FINISHING, null));
 
         try {
-            details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails());
+            LauncherFile.of(getNewManifest().getDirectory(), getNewManifest().getDetails()).write(details);
         } catch (IOException e) {
             attemptCleanup();
             throw new ComponentCreationException("Failed to create instance component: failed to write details to file", e);

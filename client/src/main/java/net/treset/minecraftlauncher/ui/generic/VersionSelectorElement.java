@@ -23,6 +23,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public abstract class VersionSelectorElement extends StackPane {
 
     protected Map<String, LauncherManifestType> typeConversion;
     protected LauncherFiles launcherFiles;
-    protected String librariesDir;
+    protected LauncherFile librariesDir;
     protected LauncherManifest versionManifest;
 
     protected LayoutType layoutType;
@@ -83,7 +84,7 @@ public abstract class VersionSelectorElement extends StackPane {
         this.setPadding(new Insets(5));
     }
 
-    public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, String librariesDir, LauncherManifest versionManifest) {
+    public void init(LauncherFiles launcherFiles, Map<String, LauncherManifestType> typeConversion, LauncherFile librariesDir, LauncherManifest versionManifest) {
         this.typeConversion = typeConversion;
         this.launcherFiles = launcherFiles;
         this.librariesDir = librariesDir;

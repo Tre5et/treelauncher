@@ -3,6 +3,7 @@ package net.treset.minecraftlauncher.util;
 import net.treset.mc_version_loader.json.JsonParsable;
 import net.treset.mc_version_loader.launcher.LauncherDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,11 +14,11 @@ import java.util.List;
 public class FileInitializer {
     private static final Logger LOGGER = LogManager.getLogger(FileInitializer.class);
 
-    private final File directory;
+    private final LauncherFile directory;
     private final List<File> dirs;
     private final List<InitializingManifest> files;
 
-    public FileInitializer(File directory) throws IllegalArgumentException {
+    public FileInitializer(LauncherFile directory) throws IllegalArgumentException {
         if(directory == null || !directory.isDirectory() && !directory.mkdirs()) {
             throw new IllegalArgumentException("Cannot create directory");
         }
@@ -72,9 +73,9 @@ public class FileInitializer {
     }
 
     public void create() throws IOException {
-        LOGGER.info("Creating default files: directory=" + directory.getAbsolutePath());
+        LOGGER.info("Creating default files: directory=" + directory);
 
-        if(!directory.isDirectory() || !FileUtil.isDirEmpty(directory)) {
+        if(!directory.isDirectory() || !directory.isDirEmpty()) {
             throw new IOException("Directory is not empty");
         }
 
@@ -93,12 +94,12 @@ public class FileInitializer {
     }
 
     private void removeUpdaterFromClasspath() {
-        File cfg = new File("app/TreeLauncher.cfg");
+        LauncherFile cfg = LauncherFile.of("app", "TreeLauncher.cfg");
         if(cfg.exists()) {
             try {
-                String content = FileUtil.loadFile(cfg.getPath());
+                String content = cfg.readString();
                 content = content.replace("app.classpath=$APPDIR\\updater.jar", "");
-                FileUtil.writeFile(cfg.getPath(), content);
+                cfg.write(content);
             } catch(IOException e) {
                 LOGGER.error("Failed to remove updater classpath", e);
             }
@@ -106,16 +107,16 @@ public class FileInitializer {
     }
 
     public class InitializingManifest {
-        private final File fileName;
+        private final LauncherFile file;
         private final JsonParsable manifest;
 
-        public InitializingManifest(File fileName, JsonParsable manifest) {
-            this.fileName = fileName;
+        public InitializingManifest(LauncherFile file, JsonParsable manifest) {
+            this.file = file;
             this.manifest = manifest;
         }
 
         public InitializingManifest(JsonParsable manifest, String... path) {
-            this(new File(directory, FormatUtil.absoluteFilePath(path)), manifest);
+            this(LauncherFile.of(directory, path), manifest);
         }
 
         public InitializingManifest(String type, String prefix, List<String> components, String... path) {
@@ -127,7 +128,7 @@ public class FileInitializer {
         }
 
         public void make() throws IOException {
-            manifest.writeToFile(fileName.getAbsolutePath());
+            file.write(manifest);
         }
     }
 }

@@ -3,11 +3,10 @@ package net.treset.minecraftlauncher.ui.selector;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,13 +27,13 @@ public class OptionsSelectorElement extends ManifestSelectorElement {
                 return;
             }
             try {
-                files.getOptionsManifest().writeToFile(files.getOptionsManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+                LauncherFile.of(files.getOptionsManifest().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(files.getOptionsManifest());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 return;
             }
             try {
-                FileUtil.deleteDir(new File(currentProvider.getManifest().getDirectory()));
+                LauncherFile.of(currentProvider.getManifest().getDirectory()).remove();
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 return;

@@ -11,13 +11,12 @@ import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.create.SavesCreatorElement;
-import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ContentElement;
 import net.treset.minecraftlauncher.ui.generic.lists.SavesContentContainer;
-import net.treset.minecraftlauncher.util.FileUtil;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.util.QuickPlayData;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +45,7 @@ public class SavesSelectorElement extends ManifestSelectorElement {
     protected void onSelected(ManifestContentProvider contentProvider, boolean selected) {
         super.onSelected(contentProvider, selected);
         abMain.setShowPlay(false);
-        File serversDatFile = new File(FormatUtil.absoluteFilePath(contentProvider.getManifest().getDirectory(), ".included_files", "servers.dat"));
+        File serversDatFile = LauncherFile.of(contentProvider.getManifest().getDirectory(), ".included_files", "servers.dat");
         if(serversDatFile.exists()) {
             ((SavesContentContainer)ccDetails).setServersFile(serversDatFile);
         } else {
@@ -172,13 +171,13 @@ public class SavesSelectorElement extends ManifestSelectorElement {
                 return;
             }
             try {
-                files.getSavesManifest().writeToFile(files.getSavesManifest().getDirectory() + files.getGameDetailsManifest().getComponents().get(1));
+                LauncherFile.of(files.getSavesManifest().getDirectory(), files.getGameDetailsManifest().getComponents().get(1)).write(files.getSavesManifest());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 return;
             }
             try {
-                FileUtil.deleteDir(new File(getManifest().getDirectory()));
+                LauncherFile.of(getManifest().getDirectory()).remove();
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }

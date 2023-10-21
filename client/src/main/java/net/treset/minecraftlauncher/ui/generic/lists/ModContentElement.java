@@ -20,12 +20,12 @@ import net.treset.mc_version_loader.mods.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
 import net.treset.minecraftlauncher.util.UiUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -248,10 +248,10 @@ public class ModContentElement extends ContentElement {
         if(enable == enabled) {
             return;
         }
-        File modFile = new File(componentManifest.getDirectory() + launcherMod.getFileName() + (enable ? ".disabled" : ""));
-        File newFile = new File(componentManifest.getDirectory(), launcherMod.getFileName() + (enable ? "" : ".disabled"));
+        LauncherFile modFile = LauncherFile.of(componentManifest.getDirectory(), launcherMod.getFileName() + (enable ? ".disabled" : ""));
+        LauncherFile newFile = LauncherFile.of(componentManifest.getDirectory(), launcherMod.getFileName() + (enable ? "" : ".disabled"));
         try {
-            Files.move(modFile.toPath(), newFile.toPath());
+            modFile.moveTo(newFile);
         } catch(IOException e) {
             LauncherApplication.displayError(e);
         }
@@ -261,9 +261,9 @@ public class ModContentElement extends ContentElement {
     }
 
     public void delete() {
-        File oldFile = new File(componentManifest.getDirectory() + launcherMod.getFileName() + (isEnabled() ? "" : ".disabled"));
+        LauncherFile oldFile = LauncherFile.of(componentManifest.getDirectory(), launcherMod.getFileName() + (isEnabled() ? "" : ".disabled"));
         try {
-            Files.delete(oldFile.toPath());
+            oldFile.remove();
         } catch (IOException e) {
             LauncherApplication.displayError(e);
             return;
@@ -282,10 +282,12 @@ public class ModContentElement extends ContentElement {
         setInstalling(true);
         new Thread(() -> {
             if (launcherMod != null) {
-                File oldFile = new File(componentManifest.getDirectory() + launcherMod.getFileName() + (launcherMod.isEnabled() ? "" : ".disabled"));
+                LauncherFile oldFile = LauncherFile.of(componentManifest.getDirectory(), launcherMod.getFileName() + (launcherMod.isEnabled() ? "" : ".disabled"));
                 LOGGER.debug("Deleting old mod file: name={}", oldFile.getName());
                 if (oldFile.exists()) {
-                    if(!oldFile.delete()) {
+                    try {
+                        oldFile.remove();
+                    } catch (IOException e) {
                         LOGGER.warn("Failed to delete old mod file: name={}", oldFile.getName());
                         Platform.runLater(() -> {
                             setInstalling(false);

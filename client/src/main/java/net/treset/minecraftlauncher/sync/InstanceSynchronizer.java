@@ -20,6 +20,7 @@ import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
             }
         }
         if(detailsFileName != null) {
-            instanceData.getInstance().getValue().writeToFile(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), detailsFileName));
+            LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), detailsFileName).write(instanceData.getInstance().getValue());
             newDifference.remove(detailsFileName);
         }
         super.downloadFiles(newDifference);
@@ -133,7 +134,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
         SyncService service = new SyncService();
         byte[] out = service.downloadFile("instance", instanceData.getInstance().getKey().getId(), LauncherApplication.config.MANIFEST_FILE_NAME);
         LauncherManifest manifest = JsonUtils.getGson().fromJson(new String(out), LauncherManifest.class);
-        manifest.writeToFile(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
+        LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(manifest);
         return manifest.getDetails();
     }
 
@@ -185,7 +186,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
                         null,
                         null
                 );
-                fakeManifest.setDirectory(FormatUtil.absoluteDirPath(parentManifest.getDirectory(), parentManifest.getPrefix() + "_" + id));
+                fakeManifest.setDirectory(LauncherFile.of(parentManifest.getDirectory(), parentManifest.getPrefix() + "_" + id).getPath());
                 ManifestSynchronizer synchronizer = new ManifestSynchronizer(fakeManifest, files, callback);
                 synchronizer.download();
             }
@@ -226,7 +227,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
                 files.getVersionManifest(),
                 versionDetails,
                 files,
-                FormatUtil.absoluteDirPath(files.getMainManifest().getDirectory(), files.getLauncherDetails().getLibrariesDir())
+                LauncherFile.of(files.getMainManifest().getDirectory(), files.getLauncherDetails().getLibrariesDir())
         );
     }
 
@@ -239,7 +240,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
                 version,
                 profile,
                 files,
-                FormatUtil.absoluteDirPath(files.getMainManifest().getDirectory(), files.getLauncherDetails().getLibrariesDir())
+                LauncherFile.of(files.getMainManifest().getDirectory(), files.getLauncherDetails().getLibrariesDir())
         );
     }
 
@@ -268,7 +269,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
 
         SyncService service = new SyncService();
         setStatus(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(0, 0, "version.json", false)));
-        service.uploadFile("instance", instanceData.getInstance().getKey().getId(), "version.json", JsonUtils.getGson().toJson(details).getBytes());
+        service.uploadFile("instance", instanceData.getInstance().getKey().getId(), "version.json", details.toJson().getBytes());
     }
 
     public InstanceData getInstanceData() {

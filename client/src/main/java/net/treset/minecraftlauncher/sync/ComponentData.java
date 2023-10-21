@@ -2,7 +2,6 @@ package net.treset.minecraftlauncher.sync;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
 
-import java.io.IOException;
 import java.util.List;
 
 public class ComponentData extends GenericJsonParsable {
@@ -49,10 +48,6 @@ public class ComponentData extends GenericJsonParsable {
         this.version = version;
         this.fileAmount = fileAmount;
         this.hashTree = hashTree;
-    }
-
-    public void writeToFile(String filePath) throws IOException {
-        super.writeToFile(filePath);
     }
 
     public int getVersion() {

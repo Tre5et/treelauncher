@@ -9,14 +9,14 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.mc_version_loader.launcher.LauncherFeature;
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
+import net.treset.minecraftlauncher.util.string.PatternString;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -167,10 +167,11 @@ public class InstanceSettingsElement extends UiElement {
         }
 
         try {
-            String regex = "MaxHeapSize\\s*=\\s?(\\d+)";
-            String result = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec(FormatUtil.absoluteFilePath(instanceData.getJavaComponent().getDirectory(), "bin", "java") + " -XX:+PrintFlagsFinal -version | findstr HeapSize").getInputStream())).lines().collect(Collectors.joining(" "));
-            if(FormatUtils.matches(result, regex)) {
-                return (int)(Long.parseLong(FormatUtils.firstGroup(result, regex)) / 1024 / 1024);
+            PatternString regex = new PatternString("MaxHeapSize\\s*=\\s?(\\d+)", true);
+            String result = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec(LauncherFile.of(instanceData.getJavaComponent().getDirectory(), "bin", "java").getPath() + " -XX:+PrintFlagsFinal -version | findstr HeapSize").getInputStream())).lines().collect(Collectors.joining(" "));
+            String match = regex.firstGroup(result);
+            if(match != null) {
+                return (int)(Long.parseLong(match) / 1024 / 1024);
             }
             LauncherApplication.displayError(new Exception("Could not determine default java memory"));
         } catch (IOException e) {
@@ -206,7 +207,7 @@ public class InstanceSettingsElement extends UiElement {
             newArguments.add(new LauncherLaunchArgument("-Xms" + newMemory + "m", null, null, null, null));
             instanceData.getInstance().getValue().setJvm_arguments(newArguments);
             try {
-                instanceData.getInstance().getValue().writeToFile(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()));
+                LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()).write(instanceData.getInstance().getValue());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }
@@ -225,7 +226,7 @@ public class InstanceSettingsElement extends UiElement {
         newFeatures.add(new LauncherFeature("resolution_y", tfHeight.getText().replace(" px", "")));
         instanceData.getInstance().getValue().setFeatures(newFeatures);
         try {
-            instanceData.getInstance().getValue().writeToFile(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()));
+            LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()).write(instanceData.getInstance().getValue());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
@@ -242,7 +243,7 @@ public class InstanceSettingsElement extends UiElement {
         }
         instanceData.getInstance().getValue().setJvm_arguments(arguments);
         try {
-            instanceData.getInstance().getValue().writeToFile(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()));
+            LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()).write(instanceData.getInstance().getValue());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }

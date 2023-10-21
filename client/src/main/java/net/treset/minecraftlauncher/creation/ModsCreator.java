@@ -7,6 +7,7 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,7 +55,7 @@ public class ModsCreator extends GenericComponentCreator {
         }
         LauncherModsDetails details = new LauncherModsDetails(modsType, modsVersion, List.of());
         try {
-            details.writeToFile(getNewManifest().getDirectory() + LauncherApplication.config.MODS_DEFAULT_DETAILS);
+            LauncherFile.of(getNewManifest().getDirectory(), LauncherApplication.config.MODS_DEFAULT_DETAILS).write(details);
         } catch (IOException e) {
             attemptCleanup();
             throw new ComponentCreationException("Failed to create mods component: failed to write details", e);

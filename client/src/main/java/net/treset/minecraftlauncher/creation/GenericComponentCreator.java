@@ -4,14 +4,13 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.CreationStatus;
-import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
-import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -75,7 +74,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         if(manifestType == null) {
             throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: invalid parameters");
         }
-        newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles.stream().map(PatternString::get).toList(), null);
+        newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles == null ? null : includedFiles.stream().map(PatternString::get).toList(), null);
         newManifest.setId(FormatUtil.hash(newManifest));
         try {
             writeNewManifest();
@@ -128,7 +127,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             throw new ComponentCreationException("Unable to copy files: invalid parameters");
         }
         try {
-            FileUtil.copyContents(oldManifest.getDirectory(), newManifest.getDirectory(), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING);
+            LauncherFile.of(oldManifest.getDirectory()).copyTo(LauncherFile.of(newManifest.getDirectory()), (filename) -> !filename.equals(LauncherApplication.config.MANIFEST_FILE_NAME), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ComponentCreationException("Unable to copy files: unable to copy files", e);
         }
@@ -139,9 +138,9 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         if(!isValid() || newManifest == null) {
             throw new ComponentCreationException("Unable to write manifest: invalid parameters");
         }
-        newManifest.setDirectory(FormatUtil.absoluteDirPath(componentsManifest.getDirectory(), componentsManifest.getPrefix() + "_" + newManifest.getId()));
+        newManifest.setDirectory(LauncherFile.of(componentsManifest.getDirectory(), componentsManifest.getPrefix() + "_" + newManifest.getId()).getPath());
         try {
-            newManifest.writeToFile(newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+            LauncherFile.of(newManifest.getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(newManifest);
         } catch (IOException e) {
             throw new ComponentCreationException("Unable to write manifest: unable to write manifest to file: id=" + newManifest.getId() + ", path=" + newManifest.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME, e);
         }
@@ -149,13 +148,13 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         components.add(newManifest.getId());
         componentsManifest.setComponents(components);
         try {
-            componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName());
+            LauncherFile.of(componentsManifest.getDirectory(), getParentManifestFileName()).write(componentsManifest);
         } catch (IOException e) {
             throw new ComponentCreationException("Unable to write manifest: unable to write parent manifest to file: id=" + newManifest.getId() + ", path=" + componentsManifest.getDirectory() + getParentManifestFileName(), e);
         }
         if(newManifest.getIncludedFiles() != null) {
             try {
-                FileUtil.createDir(newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
+                LauncherFile.of(newManifest.getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR).createDir();
             } catch (IOException e) {
                 throw new ComponentCreationException("Unable to write manifest: unable to create included files directory: id=" + newManifest.getId() + ", path=" + newManifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
             }
@@ -167,10 +166,10 @@ public abstract class GenericComponentCreator implements ComponentCreator {
         LOGGER.debug("Attempting cleanup");
         boolean success = true;
         if(newManifest != null && newManifest.getDirectory() != null) {
-            File directory = new File(newManifest.getDirectory());
+            LauncherFile directory = LauncherFile.of(newManifest.getDirectory());
             if(directory.isDirectory()) {
                 try{
-                    FileUtil.deleteDir(directory);
+                    directory.remove();
                     LOGGER.debug("Cleaned up manifest: path={}", newManifest.getDirectory());
                 } catch (IOException e) {
                     LOGGER.warn("Unable to cleanup: unable to delete directory: continuing: path={}", newManifest.getDirectory());
@@ -183,7 +182,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             components.remove(newManifest.getId());
             componentsManifest.setComponents(components);
             try {
-                componentsManifest.writeToFile(componentsManifest.getDirectory() + getParentManifestFileName());
+                LauncherFile.of(componentsManifest.getDirectory(), getParentManifestFileName()).write(componentsManifest);
                 LOGGER.debug("Cleaned up parent manifest: id={}", newManifest.getId());
             } catch (IOException e) {
                 LOGGER.warn("Unable to cleanup: unable to write parent manifest to file: continuing: id={}, path={}", newManifest.getId(), componentsManifest.getDirectory() + getParentManifestFileName());

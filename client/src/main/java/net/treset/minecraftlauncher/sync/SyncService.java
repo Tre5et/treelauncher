@@ -6,8 +6,8 @@ import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.HttpService;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class SyncService extends HttpService {
     }
 
     public static boolean isSyncing(LauncherManifest manifest) {
-        return new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME)).isFile();
+        return LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME).isFile();
     }
 
     public static String convertType(LauncherManifestType type) throws IOException {

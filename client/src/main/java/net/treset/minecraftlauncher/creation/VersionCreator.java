@@ -19,6 +19,7 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.util.CreationStatus;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,8 +36,8 @@ public class VersionCreator extends GenericComponentCreator {
     FabricVersionDetails fabricVersion;
     FabricProfile fabricProfile;
     LauncherFiles files;
-    String librariesDir;
-    public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, MinecraftVersionDetails mcVersion, LauncherFiles files, String librariesDir) {
+    LauncherFile librariesDir;
+    public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, MinecraftVersionDetails mcVersion, LauncherFiles files, LauncherFile librariesDir) {
         super(LauncherManifestType.VERSION_COMPONENT, null, null, mcVersion.getId(), typeConversion, null, LauncherApplication.config.VERSION_DEFAULT_DETAILS, componentsManifest);
         this.mcVersion = mcVersion;
         this.files = files;
@@ -44,7 +45,7 @@ public class VersionCreator extends GenericComponentCreator {
         setDefaultStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION, null));
     }
 
-    public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, FabricVersionDetails fabricVersion, FabricProfile fabricProfile, LauncherFiles files, String librariesDir) {
+    public VersionCreator(Map<String, LauncherManifestType> typeConversion, LauncherManifest componentsManifest, FabricVersionDetails fabricVersion, FabricProfile fabricProfile, LauncherFiles files, LauncherFile librariesDir) {
         super(LauncherManifestType.VERSION_COMPONENT, null, null, fabricProfile.getId(), typeConversion, null, LauncherApplication.config.VERSION_DEFAULT_DETAILS, componentsManifest);
         this.fabricVersion = fabricVersion;
         this.fabricProfile = fabricProfile;
@@ -147,7 +148,7 @@ public class VersionCreator extends GenericComponentCreator {
                 }
 
                 try {
-                    details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails());
+                    LauncherFile.of(getNewManifest().getDirectory(), getNewManifest().getDetails()).write(details);
                 } catch (IOException e) {
                     throw new ComponentCreationException("Unable to create fabric version: failed to write version details: versionId=" + fabricProfile.getInheritsFrom(), e);
                 }
@@ -178,15 +179,18 @@ public class VersionCreator extends GenericComponentCreator {
         if(fabricProfile.getLibraries() == null) {
             throw new ComponentCreationException("Unable to add fabric libraries: no libraries");
         }
-        File baseDir = new File(librariesDir);
-        if(!baseDir.isDirectory() && !baseDir.mkdirs()) {
-            throw new ComponentCreationException("Unable to add fabric libraries: failed to create libraries directory: path=" + librariesDir);
+        if(!librariesDir.isDirectory()) {
+            try {
+                librariesDir.createDir();
+            } catch (IOException e) {
+                throw new ComponentCreationException("Unable to add fabric libraries: failed to create libraries directory: path=" + librariesDir, e);
+            }
         }
         List<FabricLibrary> clientLibs = new ArrayList<>(fabricProfile.getLibraries()).stream().filter(f -> !FormatUtils.matches(f.getName(), ":fabric-loader:")).toList();
 
         List<String> libs;
         try {
-            libs = FabricUtil.downloadFabricLibraries(baseDir, clientLibs, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
+            libs = FabricUtil.downloadFabricLibraries(librariesDir, clientLibs, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add fabric libraries: failed to download libraries", e);
         }
@@ -232,7 +236,7 @@ public class VersionCreator extends GenericComponentCreator {
         }
 
         try {
-            details.writeToFile(getNewManifest().getDirectory() + getNewManifest().getDetails());
+            LauncherFile.of(getNewManifest().getDirectory(), getNewManifest().getDetails()).write(details);
         } catch (IOException e) {
             attemptCleanup();
             throw new ComponentCreationException("Unable to write version details to file", e);
@@ -254,7 +258,7 @@ public class VersionCreator extends GenericComponentCreator {
         if(index.getObjects() == null || index.getObjects().isEmpty()) {
             throw new ComponentCreationException("Unable to download assets: invalid index contents");
         }
-        File baseDir = new File(LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getAssetsDir());
+        LauncherFile baseDir = LauncherFile.of(LauncherApplication.config.BASE_DIR, files.getLauncherDetails().getAssetsDir());
         try {
             AssetsUtil.downloadAssets(baseDir, index, assetIndexUrl, false, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, status)));
         } catch (FileDownloadException e) {
@@ -291,14 +295,17 @@ public class VersionCreator extends GenericComponentCreator {
         if(mcVersion.getLibraries() == null) {
             throw new ComponentCreationException("Unable to add libraries: libraries is null");
         }
-        File baseDir = new File(librariesDir);
-        if(!baseDir.isDirectory()) {
-            throw new ComponentCreationException("Unable to add libraries: libraries dir is not a directory: dir=" + librariesDir);
+        if(!librariesDir.isDirectory()) {
+            try {
+                librariesDir.createDir();
+            } catch (IOException e) {
+                throw new ComponentCreationException("Unable to add libraries: failed to create libraries directory: path=" + librariesDir, e);
+            }
         }
 
         List<String> result;
         try {
-            result = MinecraftUtil.downloadVersionLibraries(mcVersion.getLibraries(), baseDir, List.of(), status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
+            result = MinecraftUtil.downloadVersionLibraries(mcVersion.getLibraries(), librariesDir, List.of(), status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add libraries: failed to download libraries", e);
         }

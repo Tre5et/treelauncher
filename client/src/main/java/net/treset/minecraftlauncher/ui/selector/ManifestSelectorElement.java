@@ -13,8 +13,8 @@ import net.treset.minecraftlauncher.ui.generic.ButtonElement;
 import net.treset.minecraftlauncher.ui.generic.lists.FolderContentContainer;
 import net.treset.minecraftlauncher.ui.generic.lists.SelectorEntryElement;
 import net.treset.minecraftlauncher.ui.manager.ComponentManagerElement;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
 import org.apache.logging.log4j.LogManager;
@@ -206,7 +206,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         if(currentProvider == null) {
             LOGGER.warn("No element selected");
         }
-        UiUtil.openFolder(currentProvider.getManifest().getDirectory());
+        UiUtil.openFolder(LauncherFile.of(currentProvider.getManifest().getDirectory()));
     }
 
     @Override
@@ -222,7 +222,7 @@ public abstract class ManifestSelectorElement extends SelectorElement<SelectorEn
         }
         getManifest().setName(newName);
         try {
-            getManifest().writeToFile(FormatUtil.absoluteFilePath(currentProvider.getManifest().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
+            LauncherFile.of(currentProvider.getManifest().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(getManifest());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }

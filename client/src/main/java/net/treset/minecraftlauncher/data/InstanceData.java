@@ -3,14 +3,12 @@ package net.treset.minecraftlauncher.data;
 import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.util.FileUtil;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +18,7 @@ public class InstanceData {
     private static final Logger LOGGER = LogManager.getLogger(InstanceData.class);
 
     private LauncherDetails launcherDetails;
-    private String launcherDetailsFile;
+    private LauncherFile launcherDetailsFile;
     private Pair<LauncherManifest, LauncherInstanceDetails> instance;
     private List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents;
     private LauncherManifest javaComponent;
@@ -28,9 +26,9 @@ public class InstanceData {
     LauncherManifest resourcepacksComponent;
     LauncherManifest savesComponent;
     Pair<LauncherManifest, LauncherModsDetails> modsComponent;
-    String gameDataDir;
-    String assetsDir;
-    String librariesDir;
+    LauncherFile gameDataDir;
+    LauncherFile assetsDir;
+    LauncherFile librariesDir;
     String modsPrefix;
     String savesPrefix;
     List<PatternString> gameDataExcludedFiles;
@@ -138,7 +136,7 @@ public class InstanceData {
 
         return new InstanceData(
                 files.getLauncherDetails(),
-                files.getMainManifest().getDirectory() + files.getMainManifest().getDetails(),
+                LauncherFile.of(files.getMainManifest().getDirectory(), files.getMainManifest().getDetails()),
                 instance,
                 versionComponents,
                 javaComponent,
@@ -146,16 +144,16 @@ public class InstanceData {
                 resourcepacksComponent,
                 savesComponent,
                 modsComponent,
-                FormatUtil.relativeDirPath(files.getLauncherDetails().getGamedataDir()),
-                FormatUtil.relativeDirPath(files.getLauncherDetails().getAssetsDir()),
-                FormatUtil.relativeDirPath(files.getLauncherDetails().getLibrariesDir()),
+                LauncherFile.ofRelative(files.getLauncherDetails().getGamedataDir()),
+                LauncherFile.ofRelative(files.getLauncherDetails().getAssetsDir()),
+                LauncherFile.ofRelative(files.getLauncherDetails().getLibrariesDir()),
                 files.getModsManifest().getPrefix(),
                 files.getSavesManifest().getPrefix(),
                 gameDataExcludedFiles
         );
     }
 
-    public InstanceData(LauncherDetails launcherDetails, String launcherDetailsFile, Pair<LauncherManifest, LauncherInstanceDetails> instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents, LauncherManifest javaComponent, LauncherManifest optionsComponent, LauncherManifest resourcepacksComponent, LauncherManifest savesComponent, Pair<LauncherManifest, LauncherModsDetails> modsComponent, String gameDataDir, String assetsDir, String librariesDir, String modsPrefix, String savesPrefix, List<PatternString> gameDataExcludedFiles) {
+    public InstanceData(LauncherDetails launcherDetails, LauncherFile launcherDetailsFile, Pair<LauncherManifest, LauncherInstanceDetails> instance, List<Pair<LauncherManifest, LauncherVersionDetails>> versionComponents, LauncherManifest javaComponent, LauncherManifest optionsComponent, LauncherManifest resourcepacksComponent, LauncherManifest savesComponent, Pair<LauncherManifest, LauncherModsDetails> modsComponent, LauncherFile gameDataDir, LauncherFile assetsDir, LauncherFile librariesDir, String modsPrefix, String savesPrefix, List<PatternString> gameDataExcludedFiles) {
         this.launcherDetails = launcherDetails;
         this.launcherDetailsFile = launcherDetailsFile;
         this.instance = instance;
@@ -176,7 +174,7 @@ public class InstanceData {
     public void setActive(boolean active) throws IOException {
         launcherDetails.setActiveInstance(active ? instance.getKey().getId()  : null);
         try {
-            launcherDetails.writeToFile(launcherDetailsFile);
+            launcherDetailsFile.write(launcherDetails);
         } catch (IOException e) {
             throw new IOException("Unable to set instance active: unable to write launcher details", e);
         }
@@ -187,12 +185,12 @@ public class InstanceData {
             throw new IOException("Unable to delete instance: unable to remove instance from launcher manifest");
         }
         try {
-            files.getInstanceManifest().writeToFile(files.getInstanceManifest().getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+            LauncherFile.of(files.getInstanceManifest().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(files.getInstanceManifest());
         } catch (IOException e) {
             throw new IOException("Unable to delete instance: unable to write launcher manifest", e);
         }
         try {
-            FileUtil.deleteDir(new File(instance.getKey().getDirectory()));
+            LauncherFile.of(instance.getKey().getDirectory()).remove();
         } catch (IOException e) {
             throw new IOException("Unable to delete instance: unable to delete instance directory", e);
         }
@@ -254,27 +252,27 @@ public class InstanceData {
         this.modsComponent = modsComponent;
     }
 
-    public String getGameDataDir() {
+    public LauncherFile getGameDataDir() {
         return gameDataDir;
     }
 
-    public void setGameDataDir(String gameDataDir) {
+    public void setGameDataDir(LauncherFile gameDataDir) {
         this.gameDataDir = gameDataDir;
     }
 
-    public String getAssetsDir() {
+    public LauncherFile getAssetsDir() {
         return assetsDir;
     }
 
-    public void setAssetsDir(String assetsDir) {
+    public void setAssetsDir(LauncherFile assetsDir) {
         this.assetsDir = assetsDir;
     }
 
-    public String getLibrariesDir() {
+    public LauncherFile getLibrariesDir() {
         return librariesDir;
     }
 
-    public void setLibrariesDir(String librariesDir) {
+    public void setLibrariesDir(LauncherFile librariesDir) {
         this.librariesDir = librariesDir;
     }
 
@@ -310,11 +308,11 @@ public class InstanceData {
         this.launcherDetails = launcherDetails;
     }
 
-    public String getLauncherDetailsFile() {
+    public LauncherFile getLauncherDetailsFile() {
         return launcherDetailsFile;
     }
 
-    public void setLauncherDetailsFile(String launcherDetailsFile) {
+    public void setLauncherDetailsFile(LauncherFile launcherDetailsFile) {
         this.launcherDetailsFile = launcherDetailsFile;
     }
 }

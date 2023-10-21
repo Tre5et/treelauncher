@@ -6,6 +6,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.data.LauncherFiles;
 import net.treset.minecraftlauncher.ui.generic.VersionSelectorElement;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -14,7 +15,7 @@ public class VersionCreatorElement extends VersionSelectorElement {
 
     private Consumer<Boolean> modsActivateCallback;
 
-    public void init(Map<String, LauncherManifestType> typeConversion, LauncherManifest versionManifest, LauncherFiles launcherFiles, String librariesDir, Consumer<Boolean> modsActivateCallback) {
+    public void init(Map<String, LauncherManifestType> typeConversion, LauncherManifest versionManifest, LauncherFiles launcherFiles, LauncherFile librariesDir, Consumer<Boolean> modsActivateCallback) {
         super.init(launcherFiles, typeConversion, librariesDir, versionManifest);
 
         this.modsActivateCallback = modsActivateCallback;

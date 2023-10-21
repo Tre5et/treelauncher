@@ -4,8 +4,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
-import net.treset.minecraftlauncher.util.FileUtil;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,17 +15,17 @@ import java.nio.file.StandardCopyOption;
 public class GlobalConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger(GlobalConfigLoader.class);
 
-    private static final String filePath = FormatUtil.absoluteFilePath("app", "launcher.conf");
+    private static final LauncherFile file = LauncherFile.of("app", "launcher.conf");
 
     public static Config loadConfig() throws IllegalStateException, IOException {
-        if(!new File(filePath).exists()) {
+        if(!file.exists()) {
             LOGGER.info("No config found, creating default");
-            FileUtil.writeFile(filePath,
+            file.write(
                     "path=data" + System.lineSeparator()
-                    + "update_url=https://raw.githubusercontent.com/Tre5et/treelauncher/main/client/update/"
+                            + "update_url=https://raw.githubusercontent.com/Tre5et/treelauncher/main/client/update/"
             );
         }
-        String contents = FileUtil.loadFile(filePath);
+        String contents = file.readString();
         if(contents == null) {
             throw new IllegalStateException("Unable to load launcher.conf");
         }
@@ -51,7 +50,7 @@ public class GlobalConfigLoader {
     }
 
     public static void updateLanguage(StringLocalizer.Language language) throws IOException {
-        String contents = FileUtil.loadFile(filePath);
+        String contents = file.readString();
         String[] lines = contents.split("\n");
         StringBuilder newContents = new StringBuilder();
         boolean found = false;
@@ -67,35 +66,37 @@ public class GlobalConfigLoader {
             newContents.append("language=").append(language.name()).append("\n");
         }
 
-        FileUtil.writeFile(filePath, newContents.toString());
+        file.write(newContents.toString());
     }
 
     public static void updatePath(File path, boolean removeOld) throws IOException {
-        LOGGER.info("Updating path: path={}, removeOld={}", path.getAbsolutePath(), removeOld);
-        if(!path.isDirectory()) {
+        LauncherFile dstDir = LauncherFile.of(path);
+        LOGGER.info("Updating path: path={}, removeOld={}", dstDir.getAbsolutePath(), removeOld);
+
+        if(!dstDir.isDirectory()) {
             throw new IOException("Path is not a directory");
         }
-        if(FileUtil.isChildOf(new File(LauncherApplication.config.BASE_DIR), path)) {
+        if(LauncherApplication.config.BASE_DIR.isChildOf(dstDir)) {
             throw new IOException("Path is a child of the current directory");
         }
 
-        String contents = FileUtil.loadFile(filePath);
+        String contents = file.readString();
         String[] lines = contents.split("\n");
         StringBuilder newContents = new StringBuilder();
         for(String line : lines) {
             if(line.startsWith("path=")) {
-                newContents.append("path=").append(path.getAbsolutePath()).append("/").append("\n");
+                newContents.append("path=").append(dstDir.getAbsolutePath()).append("/").append("\n");
                 break;
             } else {
                 newContents.append(line).append("\n");
             }
         }
 
-        if(FileUtil.isDirEmpty(path)) {
+        if(dstDir.isDirEmpty()) {
             LOGGER.debug("Copying files to new directory");
-            FileUtil.copyDirectory(LauncherApplication.config.BASE_DIR, path.getAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+            LauncherApplication.config.BASE_DIR.copyTo(dstDir, StandardCopyOption.REPLACE_EXISTING);
         } else {
-            if(!manifestExists(path)) {
+            if(!hasMainMainfest(dstDir)) {
                 throw new IOException("Directory is not empty and doesn't contain manifest file");
             }
 
@@ -103,21 +104,23 @@ public class GlobalConfigLoader {
         }
 
         LOGGER.debug("Updating config");
-        String oldPath = LauncherApplication.config.BASE_DIR;
-        LauncherApplication.config.BASE_DIR = path.getAbsolutePath() + "/";
-        FileUtil.writeFile(filePath, newContents.toString());
+        LauncherFile oldPath = LauncherApplication.config.BASE_DIR;
+        LauncherApplication.config.BASE_DIR = dstDir;
+        file.write(newContents.toString());
 
         if(removeOld) {
             LOGGER.debug("Removing old directory");
-            FileUtil.deleteDir(new File(oldPath));
+            oldPath.remove();
         }
     }
 
-    public static boolean manifestExists(File path) throws IOException {
-        if(!FileUtil.dirContains(path, LauncherApplication.config.MANIFEST_FILE_NAME)) {
+    public static boolean hasMainMainfest(LauncherFile path) {
+        String contents;
+        try {
+            contents = LauncherFile.of(path, LauncherApplication.config.MANIFEST_FILE_NAME).readString();
+        } catch (IOException e) {
             return false;
         }
-        String contents = FileUtil.loadFile(FormatUtil.absoluteFilePath(path.getAbsolutePath(), LauncherApplication.config.MANIFEST_FILE_NAME));
         if(contents == null || contents.isBlank()) {
             return false;
         }

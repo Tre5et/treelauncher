@@ -8,13 +8,12 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.QuickPlayData;
 import net.treset.minecraftlauncher.util.exception.GameCommandException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +64,7 @@ public class CommandBuilder {
         List<String> libraries = new ArrayList<>();
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             for(String l : v.getValue().getLibraries()) {
-                libraries.add(instanceData.getLibrariesDir() + l);
+                libraries.add(LauncherFile.of(instanceData.getLibrariesDir().getAbsolutePath(), l).getAbsolutePath());
             }
         }
         if(libraries.isEmpty()) {
@@ -75,7 +74,7 @@ public class CommandBuilder {
             if(v.getValue().getMainFile() == null ||v.getValue().getMainFile().isBlank()) {
                 throw new GameCommandException("Unable to create start command: unable to determine main file: version=" + v.getKey().getId());
             }
-            libraries.add(v.getKey().getDirectory() + v.getValue().getMainFile());
+            libraries.add(LauncherFile.of(v.getKey().getDirectory(), v.getValue().getMainFile()).getAbsolutePath());
         }
 
         String resX = null;
@@ -89,22 +88,22 @@ public class CommandBuilder {
             }
         }
 
-        File gameDir = new File(instanceData.getGameDataDir());
+        LauncherFile gameDir = instanceData.getGameDataDir();
         if(!gameDir.isDirectory()) {
             throw new GameCommandException("Unable to create start command: game directory is not a directory: directory=" + gameDir.getAbsolutePath());
         }
 
         processBuilder.directory(gameDir);
         processBuilder.command(new ArrayList<>());
-        processBuilder.command().add(FormatUtil.absoluteFilePath(instanceData.getJavaComponent().getDirectory(), "bin", "java"));
+        processBuilder.command().add(LauncherFile.of(instanceData.getJavaComponent().getDirectory(), "bin", "java").getPath());
         try {
-            appendArguments(processBuilder, instanceData.getInstance().getValue().getJvm_arguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, resX, resY, quickPlayData);
+            appendArguments(processBuilder, instanceData.getInstance().getValue().getJvm_arguments(), instanceData, minecraftUser, instanceData.getGameDataDir().getAbsolutePath(), instanceData.getAssetsDir().getAbsolutePath(), assetsIndex, libraries, resX, resY, quickPlayData);
         } catch(GameCommandException e) {
             throw new GameCommandException("Unable to create start command: unable to append instance jvm arguments: version=" + instanceData.getInstance().getKey().getId(), e);
         }
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             try {
-                appendArguments(processBuilder, v.getValue().getJvmArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, resX, resY, quickPlayData);
+                appendArguments(processBuilder, v.getValue().getJvmArguments(), instanceData, minecraftUser, instanceData.getGameDataDir().getAbsolutePath(), instanceData.getAssetsDir().getAbsolutePath(), assetsIndex, libraries, resX, resY, quickPlayData);
             } catch(GameCommandException e) {
                 throw new GameCommandException("Unable to create start command: unable to append jvm arguments: version=" + v.getKey().getId(), e);
             }
@@ -112,7 +111,7 @@ public class CommandBuilder {
         processBuilder.command().add(mainClass);
         for(Pair<LauncherManifest, LauncherVersionDetails> v : instanceData.getVersionComponents()) {
             try {
-                appendArguments(processBuilder, v.getValue().getGameArguments(), instanceData, minecraftUser, instanceData.getGameDataDir(), instanceData.getAssetsDir(), assetsIndex, libraries, resX, resY, quickPlayData);
+                appendArguments(processBuilder, v.getValue().getGameArguments(), instanceData, minecraftUser, instanceData.getGameDataDir().getAbsolutePath(), instanceData.getAssetsDir().getAbsolutePath(), assetsIndex, libraries, resX, resY, quickPlayData);
             } catch(GameCommandException e) {
                 throw new GameCommandException("Unable to create start command: unable to append game arguments: version=" + v.getKey().getId(), e);
             }

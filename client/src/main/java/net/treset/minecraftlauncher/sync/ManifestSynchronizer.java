@@ -6,8 +6,8 @@ import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.util.DownloadStatus;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.util.FileUtil;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +92,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
         } else if(manifest.getType() == LauncherManifestType.SAVES_COMPONENT) {
             fileName = files.getGameDetailsManifest().getComponents().get(1);
         }
-        parent.writeToFile(FormatUtil.absoluteFilePath(parent.getDirectory(), fileName));
+        LauncherFile.of(parent.getDirectory(), fileName).write(parent);
     }
 
     protected LauncherManifest getParentManifest() throws IOException {
@@ -127,11 +127,11 @@ public class ManifestSynchronizer extends FileSynchronizer {
                 LOGGER.debug("Uploading file: " + child.getPath());
                 currentAmount++;
                 setStatus(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(currentAmount, totalAmount, child.getPath(), false)));
-                File file = new File(FormatUtil.absoluteFilePath(basePath, filePath, child.getPath()));
-                byte[] content = FileUtil.readFile(file.getPath());
-                service.uploadFile(type, id, FormatUtil.absoluteFilePath(filePath, child.getPath()), content);
+                LauncherFile file = LauncherFile.of(basePath, filePath, child.getPath());
+                byte[] content = file.read();
+                service.uploadFile(type, id, file.getPath(), content);
             } else {
-                currentAmount = uploadDirectory(child.getChildren(), type, id, basePath, FormatUtil.absoluteDirPath(filePath + child.getPath()), currentAmount, totalAmount, service);
+                currentAmount = uploadDirectory(child.getChildren(), type, id, basePath, LauncherFile.of(filePath, child.getPath()).getPath(), currentAmount, totalAmount, service);
             }
         }
         return currentAmount;
@@ -149,10 +149,10 @@ public class ManifestSynchronizer extends FileSynchronizer {
             index++;
             setStatus(new SyncStatus(SyncStep.UPLOADING, new DownloadStatus(index, difference.size(), path, false)));
             LOGGER.debug("Difference: " + path);
-            File file = new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), path));
+            LauncherFile file = LauncherFile.of(manifest.getDirectory(), path);
             byte[] content;
             if(file.isFile()) {
-                content = FileUtil.readFile(file.getPath());
+                content = file.read();
             } else {
                 content = new byte[]{};
             }
@@ -163,16 +163,16 @@ public class ManifestSynchronizer extends FileSynchronizer {
     protected int completeUpload(ComponentData newData) throws IOException {
         int version = new SyncService().complete(SyncService.convertType(manifest.getType()), manifest.getId());
         newData.setVersion(version);
-        newData.writeToFile(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME));
+        LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME).write(newData);
         return version;
     }
 
-    protected List<String> compareHashes(ComponentData.HashEntry oldEntry, ComponentData.HashEntry newEntry, String path) {
+    protected List<String> compareHashes(ComponentData.HashEntry oldEntry, ComponentData.HashEntry newEntry, LauncherFile path) {
         ArrayList<String> difference = new ArrayList<>();
         if(oldEntry.getChildren() == null && newEntry.getChildren() == null) {
             if(!oldEntry.getHash().equals(newEntry.getHash())) {
                 LOGGER.debug("Adding changed file: " + path);
-                difference.add(path);
+                difference.add(path.getPath());
             }
         } else if(oldEntry.getChildren() != null && newEntry.getChildren() != null) {
             int j = 0;
@@ -183,16 +183,16 @@ public class ManifestSynchronizer extends FileSynchronizer {
                         found = true;
                         for(int l = j; l < k; l++) {
                             LOGGER.debug("Adding added file: " + path + "/" + newEntry.getChildren().get(l).getPath());
-                            difference.addAll(getAllChildren(newEntry.getChildren().get(l), FormatUtil.absoluteFilePath(path, newEntry.getChildren().get(l).getPath())));
+                            difference.addAll(getAllChildren(newEntry.getChildren().get(l), LauncherFile.of(path, newEntry.getChildren().get(l).getPath())));
                         }
-                        difference.addAll(compareHashes(oldEntry.getChildren().get(i), newEntry.getChildren().get(k), FormatUtil.absoluteFilePath(path, oldEntry.getChildren().get(i).getPath())));
+                        difference.addAll(compareHashes(oldEntry.getChildren().get(i), newEntry.getChildren().get(k), LauncherFile.of(path, oldEntry.getChildren().get(i).getPath())));
                         j = k+1;
                         break;
                     }
                 }
                 if(!found) {
                     LOGGER.debug("Adding deleted file: " + oldEntry.getChildren().get(i).getPath());
-                    difference.addAll(getAllChildren(oldEntry.getChildren().get(i), FormatUtil.absoluteFilePath(path,  oldEntry.getChildren().get(i).getPath())));
+                    difference.addAll(getAllChildren(oldEntry.getChildren().get(i), LauncherFile.of(path,  oldEntry.getChildren().get(i).getPath())));
                 }
             }
         } else if(oldEntry.getChildren() == null) {
@@ -207,24 +207,24 @@ public class ManifestSynchronizer extends FileSynchronizer {
         return difference;
     }
 
-    protected List<String> getAllChildren(ComponentData.HashEntry entry, String path) {
+    protected List<String> getAllChildren(ComponentData.HashEntry entry, LauncherFile path) {
         ArrayList<String> children = new ArrayList<>();
         if(entry.getChildren() == null) {
-            children.add(path);
+            children.add(path.getPath());
         } else {
             for(ComponentData.HashEntry child : entry.getChildren()) {
-                children.addAll(getAllChildren(child, FormatUtil.absoluteFilePath(path, child.getPath())));
+                children.addAll(getAllChildren(child, LauncherFile.of(path, child.getPath())));
             }
         }
         return children;
     }
 
     protected ComponentData getCurrentComponentData() throws IOException {
-        File syncFile = new File(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME));
+        LauncherFile syncFile = LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME);
         if(!syncFile.exists()) {
             throw new IOException("Sync file not found");
         }
-        String componentData = FileUtil.loadFile(syncFile.getPath());
+        String componentData = syncFile.readString();
         return ComponentData.fromJson(componentData);
     }
 
@@ -263,32 +263,27 @@ public class ManifestSynchronizer extends FileSynchronizer {
             LOGGER.debug("Downloading file: " + path);
             setStatus(new SyncStatus(SyncStep.DOWNLOADING, new DownloadStatus(++amount, difference.size(), path, false)));
             byte[] content = service.downloadFile(type, manifest.getId(), path);
-            File file = new File(FormatUtil.absoluteFilePath(basePath, path));
+            LauncherFile file = LauncherFile.of(basePath, path);
             if(content.length == 0) {
                 if(file.isFile()) {
-                    LOGGER.debug("Deleting file: " + path);
-                    FileUtil.deleteFile(FormatUtil.absoluteFilePath(basePath, path));
-                }
-                if(file.isDirectory()) {
-                    LOGGER.debug("Deleting directory: " + path);
-                    FileUtil.deleteDir(file);
+                    LOGGER.debug("Deleting file or dir: " + path);
+                    file.remove();
                 }
             } else {
                 if(!file.isFile())  {
                     if(file.isDirectory()) {
-                        FileUtil.deleteDir(file);
+                        file.remove();
                     }
-                    Files.createDirectories(file.toPath().getParent());
-                    Files.createFile(file.toPath());
+                    file.createFile();
                 }
-                FileUtil.writeFile(FormatUtil.absoluteFilePath(basePath, path), content);
+                file.write(content);
             }
         }
     }
 
     protected ComponentData updateSyncFile(int version) throws IOException {
         ComponentData data = calculateComponentData(version);
-        data.writeToFile(FormatUtil.absoluteFilePath(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME));
+        LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME).write(data);
         return data;
     }
 
@@ -325,7 +320,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
             } else if(file.getKey().isFile()) {
                 addCount(1);
                 try {
-                    hashTree.set(file.getValue(), new ComponentData.HashEntry(file.getKey().getName(), FormatUtil.hashFile(file.getKey())));
+                    hashTree.set(file.getValue(), new ComponentData.HashEntry(file.getKey().getName(), LauncherFile.of(file.getKey()).hash()));
                 } catch (IOException e) {
                     exceptions.add(e);
                 }

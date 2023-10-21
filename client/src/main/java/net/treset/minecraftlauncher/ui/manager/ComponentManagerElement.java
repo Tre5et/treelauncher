@@ -11,7 +11,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
-import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.string.PatternString;
 import net.treset.minecraftlauncher.util.ui.cellfactory.IncludedFilesListCellFactory;
 
@@ -73,7 +73,7 @@ public class ComponentManagerElement extends VBox {
         component.getIncludedFiles().addAll(lvIncluded.getItems());
 
         try {
-            component.writeToFile(component.getDirectory() + LauncherApplication.config.MANIFEST_FILE_NAME);
+            LauncherFile.of(component.getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(component);
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
@@ -110,7 +110,7 @@ public class ComponentManagerElement extends VBox {
                                 (e) -> {
                                     String file = tfFile.getText();
                                     if(cbType.getSelectedIndex() == 1) {
-                                        file = FormatUtil.absoluteDirPath(file);
+                                        file += "/";
                                     }
                                     lvIncluded.getItems().add(new PatternString(file).toString());
                                     save();

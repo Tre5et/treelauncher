@@ -21,9 +21,10 @@ import net.treset.minecraftlauncher.config.Settings;
 import net.treset.minecraftlauncher.ui.base.UiController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.ButtonBox;
-import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
 import net.treset.minecraftlauncher.ui.generic.lists.ModContentElement;
+import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -150,7 +151,7 @@ public class ModsManagerElement extends UiElement {
         LauncherApplication.setPopup(null);
         details.getValue().setModsVersion(cbVersion.getSelectionModel().getSelectedItem());
         try {
-            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+            LauncherFile.of(details.getKey().getDirectory(), details.getKey().getDetails()).write(details.getValue());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
@@ -248,7 +249,7 @@ public class ModsManagerElement extends UiElement {
 
     private void writeModList() {
         try {
-            details.getValue().writeToFile(details.getKey().getDirectory() + details.getKey().getDetails());
+            LauncherFile.of(details.getKey().getDirectory(), details.getKey().getDetails()).write(details.getValue());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }

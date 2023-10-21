@@ -46,11 +46,11 @@ public class UiUtil {
         }
     }
 
-    public static void openFolder(String path) {
+    public static void openFolder(File path) {
         Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
         if (desktop != null && desktop.isSupported(Desktop.Action.OPEN)) {
             try {
-                desktop.open(new File(path));
+                desktop.open(path);
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }

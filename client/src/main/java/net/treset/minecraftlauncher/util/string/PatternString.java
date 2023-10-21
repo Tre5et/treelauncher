@@ -2,6 +2,8 @@ package net.treset.minecraftlauncher.util.string;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PatternString extends FormatString {
     private String pattern;
@@ -18,6 +20,15 @@ public class PatternString extends FormatString {
             if(!pattern.startsWith(".*")) pattern = "^" + pattern;
             if(!pattern.endsWith(".*")) pattern += "$";
         }
+    }
+
+    public String firstGroup(String test) {
+        if(test == null) return null;
+        Matcher matcher = Pattern.compile(get()).matcher(test);
+        if(matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     public boolean matches(String test) {

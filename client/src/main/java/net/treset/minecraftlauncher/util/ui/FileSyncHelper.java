@@ -7,6 +7,7 @@ import net.treset.minecraftlauncher.sync.ComponentList;
 import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.util.FormatUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -92,7 +93,7 @@ public class FileSyncHelper {
                 null
 
         );
-        tempManifest.setDirectory(FormatUtil.absoluteFilePath(baseManifest.getDirectory(), baseManifest.getPrefix() + "_" + tempManifest.getId()));
+        tempManifest.setDirectory(LauncherFile.of(baseManifest.getDirectory(), baseManifest.getPrefix() + "_" + tempManifest.getId()).getPath());
         onDone.accept(tempManifest);
     }
 }

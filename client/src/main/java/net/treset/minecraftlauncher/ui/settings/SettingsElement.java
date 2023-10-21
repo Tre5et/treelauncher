@@ -51,7 +51,7 @@ public class SettingsElement extends UiElement {
 
         cbLanguage.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(this::onLanguageComboBoxChanged));
 
-        tfPath.setText(LauncherApplication.config.BASE_DIR);
+        tfPath.setText(LauncherApplication.config.BASE_DIR.getAbsolutePath());
 
         tfSyncUrl.setText(LauncherApplication.settings.getSyncUrl());
         tfSyncPort.setText(LauncherApplication.settings.getSyncPort());

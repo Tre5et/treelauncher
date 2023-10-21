@@ -1,20 +1,16 @@
 package net.treset.minecraftlauncher.launching;
 
-import net.treset.mc_version_loader.format.FormatUtils;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.InstanceData;
-import net.treset.minecraftlauncher.util.FileUtil;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.GameResourceException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.string.PatternString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,7 +49,7 @@ public class ResourceManager {
             throw new IOException("Unable to set last played time: instance details are null");
         }
         instanceData.getInstance().getValue().setLastPlayedTime(LocalDateTime.now());
-        instanceData.getInstance().getValue().writeToFile(instanceData.getInstance().getKey().getDirectory() + instanceData.getInstance().getKey().getDetails());
+        LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()).write(instanceData.getInstance().getValue());
         LOGGER.debug("Set last played time: instance={}", instanceData.getInstance().getKey().getId());
     }
 
@@ -64,7 +60,7 @@ public class ResourceManager {
         }
         long oldTime = instanceData.getInstance().getValue().getTotalTime();
         instanceData.getInstance().getValue().setTotalTime(oldTime + duration);
-        instanceData.getInstance().getValue().writeToFile(instanceData.getInstance().getKey().getDirectory() + instanceData.getInstance().getKey().getDetails());
+        LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), instanceData.getInstance().getKey().getDetails()).write(instanceData.getInstance().getValue());
         LOGGER.debug("Added play duration: instance={}, duration={}, totalTime={}", instanceData.getInstance().getKey().getId(), duration, instanceData.getInstance().getValue().getTotalTime());
     }
 
@@ -73,7 +69,7 @@ public class ResourceManager {
             LOGGER.debug("Cleaning up game files: instance={}", instanceData.getInstance().getKey().getId());
             try {
                 undoRenameComponents();
-                ArrayList<File> gameDataFilesList = getGameDataFiles();
+                ArrayList<LauncherFile> gameDataFilesList = getGameDataFiles();
                 removeExcludedFiles(gameDataFilesList);
                 removeIncludedFiles(List.of(instanceData.getSavesComponent()), gameDataFilesList);
                 if (instanceData.getModsComponent() != null) {
@@ -100,19 +96,19 @@ public class ResourceManager {
     private void renameComponents() throws GameResourceException {
         LOGGER.debug("Renaming components: instance={}", instanceData.getInstance().getKey().getId());
         try {
-            Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(instanceData.getGameDataDir() + "saves"), StandardCopyOption.ATOMIC_MOVE);
+            LauncherFile.of(instanceData.getSavesComponent().getDirectory()).moveTo(LauncherFile.of(instanceData.getGameDataDir(), "saves"), StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             throw new GameResourceException("Unable to rename saves file", e);
         }
-        instanceData.getSavesComponent().setDirectory(FormatUtil.absoluteDirPath(instanceData.getGameDataDir(), "saves"));
+        instanceData.getSavesComponent().setDirectory(LauncherFile.of(instanceData.getGameDataDir(), "saves").getPath());
 
         if(instanceData.getModsComponent() != null) {
             try {
-                Files.move(Path.of(instanceData.getModsComponent().getKey().getDirectory()), Path.of(instanceData.getGameDataDir() + "mods"), StandardCopyOption.ATOMIC_MOVE);
+                LauncherFile.of(instanceData.getModsComponent().getKey().getDirectory()).moveTo(LauncherFile.of(instanceData.getGameDataDir(), "mods"), StandardCopyOption.ATOMIC_MOVE);
             } catch (IOException e) {
                 throw new GameResourceException("Unable to rename mods file", e);
             }
-            instanceData.getModsComponent().getKey().setDirectory(FormatUtil.absoluteDirPath(instanceData.getGameDataDir(), "mods"));
+            instanceData.getModsComponent().getKey().setDirectory(LauncherFile.of(instanceData.getGameDataDir(), "mods").getPath());
         }
     }
 
@@ -141,10 +137,10 @@ public class ResourceManager {
             throw new GameResourceException("Unable to get included files: unmet requirements");
         }
         LOGGER.debug("Adding included files: {}Id={}", manifest.getType(), manifest.getId());
-        File includedFilesDir = new File(manifest.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
+        LauncherFile includedFilesDir = LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR);
         if(!includedFilesDir.isDirectory()) {
             try {
-                Files.createDirectory(includedFilesDir.toPath());
+                includedFilesDir.createDir();
             } catch (IOException e) {
                 throw new GameResourceException("Unable to get included files: unable to create included files directory: manifestId=" + manifest.getId(), e);
             }
@@ -157,19 +153,12 @@ public class ResourceManager {
         List<IOException> exceptionQueue = new ArrayList<>();
         for(File f : files) {
             LOGGER.debug("Adding included file: manifestId={}, file={}", manifest.getId(), f.getName());
-            if(f.isFile()) {
+            if(f.isFile() || f.isDirectory()) {
                 try {
-                    Files.copy(Path.of(f.getPath()), Path.of(instanceData.getGameDataDir() + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    LauncherFile.of(f).copyTo(LauncherFile.of(instanceData.getGameDataDir(), f.getName()), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     exceptionQueue.add(e);
-                }
-            }
-            else if(f.isDirectory()) {
-                try {
-                    FileUtil.copyDirectory(f.getPath(), instanceData.getGameDataDir() + f.getName(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    exceptionQueue.add(e);
-                    LOGGER.warn("Unable to move included files: unable to copy directory: manifestId=" + manifest.getId());
+                    LOGGER.warn("Unable to move included files: unable to copy file: manifestId=" + manifest.getId());
                 }
             } else {
                 exceptionQueue.add(new IOException("Included files directory contains invalid file type: manifestId=" + manifest.getId()));
@@ -184,26 +173,26 @@ public class ResourceManager {
     private void undoRenameComponents() throws GameResourceException {
         LOGGER.debug("Undoing component renames: instance={}", instanceData.getInstance().getKey().getId());
         try {
-            Files.move(Path.of(instanceData.getSavesComponent().getDirectory()), Path.of(instanceData.getGameDataDir() + instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId()));
+            LauncherFile.of(instanceData.getSavesComponent().getDirectory()).moveTo(LauncherFile.of(instanceData.getGameDataDir(), instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId()));
         } catch (IOException e) {
             throw new GameResourceException("Unable to cleanup launch resources: rename saves file failed", e);
         }
-        instanceData.getSavesComponent().setDirectory(FormatUtil.absoluteDirPath(instanceData.getGameDataDir(), instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId()));
+        instanceData.getSavesComponent().setDirectory(LauncherFile.of(instanceData.getGameDataDir(), instanceData.getSavesPrefix() + "_" + instanceData.getSavesComponent().getId()).getPath());
 
         if(instanceData.getModsComponent() != null) {
             try {
-                Files.move(Path.of(instanceData.getModsComponent().getKey().getDirectory()), Path.of(instanceData.getGameDataDir() + instanceData.getModsPrefix() + "_" + instanceData.getModsComponent().getKey().getId()));
+                LauncherFile.of(instanceData.getModsComponent().getKey().getDirectory()).moveTo(LauncherFile.of(instanceData.getGameDataDir(), instanceData.getModsPrefix() + "_" + instanceData.getModsComponent().getKey().getId()));
             } catch (IOException e) {
                 throw new GameResourceException("Unable to cleanup launch resources: rename mods file failed", e);
             }
-            instanceData.getModsComponent().getKey().setDirectory(instanceData.getGameDataDir() + instanceData.getModsPrefix() + "_" + instanceData.getModsComponent().getKey().getId() + "/");
+            instanceData.getModsComponent().getKey().setDirectory(LauncherFile.of(instanceData.getGameDataDir(), instanceData.getModsPrefix() + "_" + instanceData.getModsComponent().getKey().getId()).getPath());
         }
         LOGGER.debug("Undid component renames: instance={}", instanceData.getInstance().getKey().getId());
     }
 
-    private ArrayList<File> getGameDataFiles() throws GameResourceException {
+    private ArrayList<LauncherFile> getGameDataFiles() throws GameResourceException {
         LOGGER.debug("Getting game data files: instance={}", instanceData.getInstance().getKey().getId());
-        File gameDataDir = new File(instanceData.getGameDataDir());
+        LauncherFile gameDataDir = instanceData.getGameDataDir();
         if(!gameDataDir.isDirectory()) {
             throw new GameResourceException("Unable to cleanup launch resources: game data directory not found");
         }
@@ -214,13 +203,13 @@ public class ResourceManager {
         }
 
         LOGGER.debug("Got game data files: instance={}", instanceData.getInstance().getKey().getId());
-        return new ArrayList<>(Arrays.asList(gameDataFiles));
+        return new ArrayList<>(Arrays.stream(gameDataFiles).map(LauncherFile::of).toList());
     }
 
-    private void removeExcludedFiles(ArrayList<File> files) {
+    private void removeExcludedFiles(ArrayList<LauncherFile> files) {
         LOGGER.debug("Removing excluded files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
-        List<File> toRemove = new ArrayList<>();
-        for(File f : files) {
+        List<LauncherFile> toRemove = new ArrayList<>();
+        for(LauncherFile f : files) {
             if(f.getName().equals(LauncherApplication.config.MANIFEST_FILE_NAME) || PatternString.matchesAny(f.getName(), instanceData.getGameDataExcludedFiles())) {
                 LOGGER.debug("Removing excluded file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 toRemove.add(f);
@@ -230,7 +219,7 @@ public class ResourceManager {
         LOGGER.debug("Removed excluded files: instance={}", instanceData.getInstance().getKey().getId());
     }
 
-    private void removeIncludedFiles(List<LauncherManifest> components, ArrayList<File> files) throws GameResourceException {
+    private void removeIncludedFiles(List<LauncherManifest> components, ArrayList<LauncherFile> files) throws GameResourceException {
         LOGGER.debug("Removing included files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
         List<GameResourceException> exceptionQueue = new ArrayList<>();
         for(LauncherManifest component : components) {
@@ -252,33 +241,35 @@ public class ResourceManager {
         LOGGER.debug("Removed included files: instance={}", instanceData.getInstance().getKey().getId());
     }
 
-    private void removeIncludedFiles(LauncherManifest component, ArrayList<File> files) throws GameResourceException {
+    private void removeIncludedFiles(LauncherManifest component, ArrayList<LauncherFile> files) throws GameResourceException {
         LOGGER.debug("Removing included files: {}Id={}, includedFiles={}, files={}", component.getType(), component.getId(), component.getIncludedFiles(), files);
-        File includedFilesDir = new File(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
-        File oldIncludedFilesDir = new File(includedFilesDir.getAbsolutePath() + "_old");
+        LauncherFile includedFilesDir = LauncherFile.of(component.getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR);
+        LauncherFile oldIncludedFilesDir = LauncherFile.of(component.getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR + "_old");
         if(includedFilesDir.exists()) {
             try {
                 if(oldIncludedFilesDir.exists()) {
-                    FileUtil.deleteDir(oldIncludedFilesDir);
+                    oldIncludedFilesDir.remove();
                 }
-                Files.move(includedFilesDir.toPath(), oldIncludedFilesDir.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                includedFilesDir.moveTo(oldIncludedFilesDir, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new GameResourceException("Unable to remove included files: unable to move included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId(), e);
             }
         }
-        if(!includedFilesDir.mkdirs()) {
+        try {
+            includedFilesDir.createDir();
+        } catch (IOException e) {
             throw new GameResourceException("Unable to remove included files: unable to create included files directory: component_type=" + component.getType().name().toLowerCase() + " component=" + component.getId());
         }
-        List<File> toRemove = new ArrayList<>();
+        List<LauncherFile> toRemove = new ArrayList<>();
         List<IOException> exceptionQueue = new ArrayList<>();
-        for(File f : files) {
-            String fName = f.isDirectory() ? FormatUtil.absoluteDirPath(f.getName()): FormatUtil.absoluteFilePath(f.getName());
+        for(LauncherFile f : files) {
+            String fName = f.isDirectory() ? f.getName() + "/": f.getName();
             boolean found = false;
             for(String i : component.getIncludedFiles()) {
-                if(FormatUtils.matches(fName, i)) {
+                if(new PatternString(i).matches(fName)) {
                     LOGGER.debug("Removing included file: manifestId={}, file={}, matches={}", component.getId(), fName, i);
                     try {
-                        Files.move(Path.of(f.getPath()), Path.of(component.getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR + "/" + f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                        f.moveTo(LauncherFile.of(component.getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, f.getName()), StandardCopyOption.REPLACE_EXISTING);
                         found = true;
                     } catch (IOException e) {
                         exceptionQueue.add(e);
@@ -300,12 +291,12 @@ public class ResourceManager {
         LOGGER.debug("Removed included files: manifestId={}", component.getId());
     }
 
-    private void removeRemainingFiles(ArrayList<File> files) throws GameResourceException {
+    private void removeRemainingFiles(ArrayList<LauncherFile> files) throws GameResourceException {
         LOGGER.debug("Removing remaining files: instance={}, files={}", instanceData.getInstance().getKey().getId(), files);
-        File includedFilesDir = new File(instanceData.getInstance().getKey().getDirectory() + LauncherApplication.config.INCLUDED_FILES_DIR);
+        LauncherFile includedFilesDir = LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR);
         if(includedFilesDir.exists()) {
             try {
-                FileUtil.deleteDir(includedFilesDir);
+                includedFilesDir.remove();
             } catch (IOException e) {
                 throw new GameResourceException("Unable to cleanup launch resources: unable to delete instance included files directory", e);
             }
@@ -314,15 +305,11 @@ public class ResourceManager {
             throw new GameResourceException("Unable to cleanup launch resources: unable to create instance included files directory");
         }
         List<IOException> exceptionQueue = new ArrayList<>();
-        for(File f : files) {
+        for(LauncherFile f : files) {
             if(PatternString.matchesAny(f.getName(), instanceData.getInstance().getValue().getIgnoredFiles().stream().map(p -> new PatternString(p, true)).toList())) {
                 LOGGER.debug("Deleting ignored file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 try {
-                    if(f.isDirectory()) {
-                        FileUtil.deleteDir(f);
-                    } else {
-                        Files.delete(Path.of(f.getPath()));
-                    }
+                    f.remove();
                 } catch (IOException e) {
                     exceptionQueue.add(e);
                     LOGGER.warn("Unable to cleanup launch resources: unable to delete non-included file: " + f.getName());
@@ -331,7 +318,7 @@ public class ResourceManager {
             else {
                 LOGGER.debug("Moving non-included file: instance={}, file={}", instanceData.getInstance().getKey().getId(), f.getName());
                 try {
-                    Files.move(Path.of(f.getPath()), Path.of(FormatUtil.absoluteFilePath(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR , f.getName())), StandardCopyOption.REPLACE_EXISTING);
+                    f.moveTo(LauncherFile.of(instanceData.getInstance().getKey().getDirectory(), LauncherApplication.config.INCLUDED_FILES_DIR, f.getName()), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     exceptionQueue.add(e);
                     LOGGER.warn("Unable to cleanup launch resources: unable to move non-included file: " + f.getName());

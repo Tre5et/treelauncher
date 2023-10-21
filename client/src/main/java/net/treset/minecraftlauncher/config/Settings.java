@@ -4,10 +4,9 @@ import net.treset.mc_version_loader.json.GenericJsonParsable;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
-import net.treset.minecraftlauncher.util.FileUtil;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.ui.sort.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 
@@ -51,7 +50,7 @@ public class Settings extends GenericJsonParsable {
         }
     }
 
-    private transient File file;
+    private transient LauncherFile file;
 
     private StringLocalizer.Language language;
     private String syncUrl;
@@ -65,16 +64,16 @@ public class Settings extends GenericJsonParsable {
     private boolean modsEnable = false;
     private boolean modsDisable = false;
 
-    public Settings(File file) {
+    public Settings(LauncherFile file) {
         this.file = file;
         this.language = StringLocalizer.getSystemLanguage();
     }
 
-    public File getFile() {
+    public LauncherFile getFile() {
         return file;
     }
 
-    public void setFile(File file) {
+    public void setFile(LauncherFile file) {
         this.file = file;
     }
 
@@ -170,19 +169,16 @@ public class Settings extends GenericJsonParsable {
         this.modsDisable = modsDisable;
     }
 
-    @Override
-    public void writeToFile(String filePath) throws IOException {
-        super.writeToFile(filePath);
-    }
-
     public void save() throws IOException {
-        super.writeToFile(file.getAbsolutePath());
+        file.write(this);
     }
 
-    public static Settings load(File file) throws IOException {
-        String json;
-        json = FileUtil.loadFile(file.getAbsolutePath());
-        Settings result = fromJson(json, Settings.class);
+    public static Settings fromJson(String json) {
+        return fromJson(json, Settings.class);
+    }
+
+    public static Settings load(LauncherFile file) throws IOException {
+        Settings result = fromJson(file.readString());
         result.setFile(file);
         return result;
     }

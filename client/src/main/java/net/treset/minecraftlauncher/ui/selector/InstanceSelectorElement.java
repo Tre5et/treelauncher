@@ -15,19 +15,22 @@ import net.treset.minecraftlauncher.launching.GameLauncher;
 import net.treset.minecraftlauncher.sync.InstanceSynchronizer;
 import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.base.UiController;
-import net.treset.minecraftlauncher.ui.generic.*;
+import net.treset.minecraftlauncher.ui.generic.ActionBar;
+import net.treset.minecraftlauncher.ui.generic.ButtonBox;
+import net.treset.minecraftlauncher.ui.generic.ComponentChangerElement;
+import net.treset.minecraftlauncher.ui.generic.VersionChangerElement;
 import net.treset.minecraftlauncher.ui.generic.lists.InstanceSelectorEntryElement;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceManagerElement;
 import net.treset.minecraftlauncher.ui.manager.InstanceSettingsElement;
 import net.treset.minecraftlauncher.util.CreationStatus;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.UiUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
-import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
 import net.treset.minecraftlauncher.util.ui.FileSyncHelper;
+import net.treset.minecraftlauncher.util.ui.GameLauncherHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -53,7 +56,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     public void init(UiController parent, Function<Boolean, Boolean> lockSetter, Supplier<Boolean> lockGetter) {
         super.init(parent, lockSetter, lockGetter);
         icDetailsController.init(this::onComponentSelected);
-        vcChanger.init(files, files.getLauncherDetails().getTypeConversion(), LauncherApplication.config.BASE_DIR + files.getLauncherDetails().getLibrariesDir(), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
+        vcChanger.init(files, files.getLauncherDetails().getTypeConversion(), LauncherFile.ofRelative(files.getLauncherDetails().getLibrariesDir()), files.getVersionManifest(), this::onVersionChange, this::onVersionChangeFailed);
 
         cbSort.setItems(Settings.InstanceDataSortType.values());
         cbSort.select(LauncherApplication.settings.getInstanceSortType());
@@ -241,7 +244,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
             case MODS -> currentInstance.getInstance().getValue().setModsComponent(manifest.getId());
         }
         try {
-            currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
+            LauncherFile.of(currentInstance.getInstance().getKey().getDirectory(), currentInstance.getInstance().getKey().getDetails()).write(currentInstance.getInstance().getValue());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }
@@ -328,7 +331,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
             }
             currentInstance.getInstance().getValue().setVersionComponent(versionId);
             try {
-                currentInstance.getInstance().getValue().writeToFile(currentInstance.getInstance().getKey().getDirectory() + currentInstance.getInstance().getKey().getDetails());
+                LauncherFile.of(currentInstance.getInstance().getKey().getDirectory(), currentInstance.getInstance().getKey().getDetails()).write(currentInstance.getInstance().getValue());
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
             }
@@ -373,16 +376,16 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
     @FXML
     private void onComponentFolder() {
         switch (icDetailsController.getCurrentSelected()) {
-            case SAVES -> UiUtil.openFolder(currentInstance.getSavesComponent().getDirectory());
-            case RESOURCEPACKS -> UiUtil.openFolder(currentInstance.getResourcepacksComponent().getDirectory());
-            case OPTIONS -> UiUtil.openFolder(currentInstance.getOptionsComponent().getDirectory());
-            case MODS -> UiUtil.openFolder(currentInstance.getModsComponent().getKey().getDirectory());
+            case SAVES -> UiUtil.openFolder(LauncherFile.of(currentInstance.getSavesComponent().getDirectory()));
+            case RESOURCEPACKS -> UiUtil.openFolder(LauncherFile.of(currentInstance.getResourcepacksComponent().getDirectory()));
+            case OPTIONS -> UiUtil.openFolder(LauncherFile.of(currentInstance.getOptionsComponent().getDirectory()));
+            case MODS -> UiUtil.openFolder(LauncherFile.of(currentInstance.getModsComponent().getKey().getDirectory()));
         }
     }
 
     @FXML
     protected void onFolder() {
-        UiUtil.openFolder(currentInstance.getInstance().getKey().getDirectory());
+        UiUtil.openFolder(LauncherFile.of(currentInstance.getInstance().getKey().getDirectory()));
     }
 
     @Override
@@ -398,7 +401,7 @@ public class InstanceSelectorElement extends SelectorElement<InstanceSelectorEnt
         }
         currentInstance.getInstance().getKey().setName(newName);
         try {
-            currentInstance.getInstance().getKey().writeToFile(FormatUtil.absoluteFilePath(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME));
+            LauncherFile.of(currentInstance.getInstance().getKey().getDirectory(), LauncherApplication.config.MANIFEST_FILE_NAME).write(currentInstance.getInstance().getKey());
         } catch (IOException e) {
             LauncherApplication.displayError(e);
         }

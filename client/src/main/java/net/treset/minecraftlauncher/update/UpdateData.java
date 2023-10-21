@@ -1,10 +1,10 @@
 package net.treset.minecraftlauncher.update;
 
-import com.google.gson.Gson;
+import net.treset.mc_version_loader.json.GenericJsonParsable;
 
 import java.util.List;
 
-public class UpdateData {
+public class UpdateData extends GenericJsonParsable {
     private boolean available;
     private String version;
     private List<UpdateFile> files;
@@ -58,11 +58,8 @@ public class UpdateData {
         this.updateInfo = updateInfo;
     }
 
-    public String toJson() {
-        return new Gson().toJson(this);
-    }
 
     public static UpdateData fromJson(String json) {
-        return new Gson().fromJson(json, UpdateData.class);
+        return fromJson(json, UpdateData.class);
     }
 }
