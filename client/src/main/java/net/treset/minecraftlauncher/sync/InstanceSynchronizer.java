@@ -18,7 +18,6 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
 
@@ -177,7 +176,7 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
                 }
             } else {
                 LauncherManifest fakeManifest = new LauncherManifest(
-                        FormatUtil.getStringFromType(type, files.getLauncherDetails().getTypeConversion()),
+                        getStringFromType(type, files.getLauncherDetails().getTypeConversion()),
                         files.getLauncherDetails().getTypeConversion(),
                         id,
                         null,

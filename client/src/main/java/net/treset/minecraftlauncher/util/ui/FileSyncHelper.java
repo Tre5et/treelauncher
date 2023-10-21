@@ -4,9 +4,9 @@ import javafx.event.ActionEvent;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.sync.ComponentList;
+import net.treset.minecraftlauncher.sync.FileSynchronizer;
 import net.treset.minecraftlauncher.sync.SyncService;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class FileSyncHelper {
     public void showDownloadPopup(Consumer<LauncherManifest> onDone) {
         ComponentList list;
         try {
-            list = new SyncService().getAvailable(SyncService.convertType(FormatUtil.getChildType(baseManifest.getType())));
+            list = new SyncService().getAvailable(SyncService.convertType(FileSynchronizer.getChildType(baseManifest.getType())));
         } catch (IOException e) {
             LauncherApplication.displayError(e);
             return;
@@ -83,7 +83,7 @@ public class FileSyncHelper {
 
     private void completeDownload(ActionEvent event, PopupElement.PopupComboBox<ComponentList.Entry> comboBox, Consumer<LauncherManifest> onDone) {
         LauncherManifest tempManifest = new LauncherManifest(
-                FormatUtil.getStringFromType(FormatUtil.getChildType(baseManifest.getType()), baseManifest.getTypeConversion()),
+                FileSynchronizer.getStringFromType(FileSynchronizer.getChildType(baseManifest.getType()), baseManifest.getTypeConversion()),
                 baseManifest.getTypeConversion(),
                 comboBox.getSelected().getId(),
                 null,

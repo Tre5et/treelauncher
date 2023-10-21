@@ -4,9 +4,9 @@ import javafx.util.Pair;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.HttpService;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
+import net.treset.minecraftlauncher.util.string.UrlString;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,7 +55,7 @@ public class SyncService extends HttpService {
     }
 
     public void uploadFile(String type, String id, String path, byte[] content) throws IOException {
-        post("/file/" + type + "/" + id + "/" + FormatUtil.urlEncode(path), content);
+        post("/file/" + type + "/" + id + "/" + UrlString.encoded(path), content);
     }
 
     public int complete(String type, String id) throws IOException {
@@ -69,7 +69,7 @@ public class SyncService extends HttpService {
     }
 
     public byte[] downloadFile(String type, String id, String path) throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("/file/" + type + "/" + id + "/" + FormatUtil.urlEncode(path));
+        Pair<HttpStatusCode, byte[]> result = get("/file/" + type + "/" + id + "/" + UrlString.encoded(path));
         return result.getKey() == HttpStatusCode.NO_CONTENT ? new byte[]{} : result.getValue();
     }
 }

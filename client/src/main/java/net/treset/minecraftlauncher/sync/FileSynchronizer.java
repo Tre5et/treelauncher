@@ -1,10 +1,12 @@
 package net.treset.minecraftlauncher.sync;
 
+import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.util.DownloadStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Map;
 
 public abstract class FileSynchronizer {
     public interface SyncCallback {
@@ -70,6 +72,27 @@ public abstract class FileSynchronizer {
     }
 
     public abstract void upload() throws IOException;
+
     public abstract void download() throws IOException;
 
+    public static String getStringFromType(LauncherManifestType type, Map<String, LauncherManifestType> typeConversion) {
+        for (Map.Entry<String, LauncherManifestType> e: typeConversion.entrySet()) {
+            if(e.getValue() == type) {
+                return e.getKey();
+            }
+        }
+        throw new IllegalStateException("Unable to find string for type " + type);
+    }
+
+    public static LauncherManifestType getChildType(LauncherManifestType type) {
+        return switch (type) {
+            case INSTANCES -> LauncherManifestType.INSTANCE_COMPONENT;
+            case VERSIONS -> LauncherManifestType.VERSION_COMPONENT;
+            case SAVES -> LauncherManifestType.SAVES_COMPONENT;
+            case RESOURCEPACKS -> LauncherManifestType.RESOURCEPACKS_COMPONENT;
+            case MODS -> LauncherManifestType.MODS_COMPONENT;
+            case OPTIONS -> LauncherManifestType.OPTIONS_COMPONENT;
+            default -> throw new IllegalStateException("Unable to find child type for type " + type);
+        };
+    }
 }

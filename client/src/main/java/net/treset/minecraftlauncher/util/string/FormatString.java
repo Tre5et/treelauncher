@@ -19,11 +19,25 @@ public abstract class FormatString {
         return costs[b.length()];
     }
 
-    public abstract String get();
+    public abstract String get() throws FormatException;
 
     @Override
     public String toString() {
-        return get();
+        try {
+            return get();
+        } catch (FormatException e) {
+            return "";
+        }
+    }
+
+    public static class FormatException extends Exception {
+        public FormatException(String message) {
+            super(message);
+        }
+
+        public FormatException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 
 }

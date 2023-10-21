@@ -12,7 +12,6 @@ import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.VersionCreator;
 import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
 
@@ -81,14 +80,14 @@ public class VersionChangerElement extends VersionSelectorElement {
     @Override
     protected void selectVersion() {
         if(currentVersion != null) {
-            cbVersion.getSelectionModel().select(FormatUtil.indexInList(vanillaVersions.stream().map(MinecraftVersion::getId).toList(), currentVersion.getVersionNumber()));
+            cbVersion.getSelectionModel().select(vanillaVersions.stream().map(MinecraftVersion::getId).toList().indexOf(currentVersion.getVersionNumber()));
         }
     }
 
     @Override
     protected void selectLoader() {
         if(currentVersion != null) {
-            cbLoader.getSelectionModel().select(FormatUtil.indexInList(fabricVersions.stream().map((v) -> v.getLoader().getVersion()).toList(), currentVersion.getLoaderVersion()));
+            cbLoader.getSelectionModel().select(fabricVersions.stream().map((v) -> v.getLoader().getVersion()).toList().indexOf(currentVersion.getLoaderVersion()));
         }
     }
 

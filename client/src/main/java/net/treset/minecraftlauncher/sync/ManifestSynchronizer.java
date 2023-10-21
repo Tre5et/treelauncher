@@ -6,8 +6,9 @@ import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.util.DownloadStatus;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
+import net.treset.minecraftlauncher.util.string.FormatString;
+import net.treset.minecraftlauncher.util.string.UrlString;
 
 import java.io.File;
 import java.io.IOException;
@@ -256,8 +257,8 @@ public class ManifestSynchronizer extends FileSynchronizer {
         int amount = 0;
         for(String path : difference) {
             try {
-                path = FormatUtil.urlDecode(path);
-            } catch (FormatUtil.FormatException e) {
+                path = UrlString.decoded(path).get();
+            } catch (FormatString.FormatException e) {
                 LOGGER.warn("Unable to decode filepath: " + path + ", this may be due to no url encoding being used, continuing with possibly encoded path, error: " + e);
             }
             LOGGER.debug("Downloading file: " + path);

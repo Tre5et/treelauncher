@@ -4,7 +4,6 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.CreationStatus;
-import net.treset.minecraftlauncher.util.FormatUtil;
 import net.treset.minecraftlauncher.util.exception.ComponentCreationException;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
 import net.treset.minecraftlauncher.util.string.PatternString;
@@ -12,7 +11,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             throw new ComponentCreationException("Unable to create " + type.toString().toLowerCase() + " component: invalid parameters");
         }
         newManifest = new LauncherManifest(manifestType, typeConversion, null, details, null, name, includedFiles == null ? null : includedFiles.stream().map(PatternString::get).toList(), null);
-        newManifest.setId(FormatUtil.hash(newManifest));
+        newManifest.setId(hash(newManifest));
         try {
             writeNewManifest();
         } catch (ComponentCreationException e) {
@@ -103,7 +105,7 @@ public abstract class GenericComponentCreator implements ComponentCreator {
             throw new ComponentCreationException("Unable to inherit " + type.toString().toLowerCase() + " component: unable to get manifest type");
         }
         newManifest = new LauncherManifest(manifestType, inheritsFrom.getTypeConversion(), null, inheritsFrom.getDetails(), inheritsFrom.getPrefix(), name, inheritsFrom.getIncludedFiles(), inheritsFrom.getComponents());
-        newManifest.setId(FormatUtil.hash(newManifest));
+        newManifest.setId(hash(newManifest));
         try {
             writeNewManifest();
         } catch (ComponentCreationException e){
@@ -302,5 +304,21 @@ public abstract class GenericComponentCreator implements ComponentCreator {
 
     public CreationStatus getDefaultStatus() {
         return defaultStatus;
+    }
+
+    public static String hash(Object source) {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e); // this doesn't happen
+        }
+
+        byte[] encrypted = md.digest((source.toString() + System.nanoTime()).getBytes());
+        StringBuilder encryptedString = new StringBuilder(new BigInteger(1, encrypted).toString(16));
+        for(int i = encryptedString.length(); i < 32; i++) {
+            encryptedString.insert(0, "0");
+        }
+        return encryptedString.toString();
     }
 }
