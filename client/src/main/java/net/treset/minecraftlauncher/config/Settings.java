@@ -9,6 +9,7 @@ import net.treset.minecraftlauncher.util.ui.sort.*;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.List;
 
 public class Settings extends GenericJsonParsable {
     public enum InstanceDataSortType {
@@ -63,6 +64,7 @@ public class Settings extends GenericJsonParsable {
     private boolean modsUpdate = true;
     private boolean modsEnable = false;
     private boolean modsDisable = false;
+    private List<String> acknowledgedNews = List.of();
 
     public Settings(LauncherFile file) {
         this.file = file;
@@ -167,6 +169,14 @@ public class Settings extends GenericJsonParsable {
 
     public void setModsDisable(boolean modsDisable) {
         this.modsDisable = modsDisable;
+    }
+
+    public List<String> getAcknowledgedNews() {
+        return acknowledgedNews;
+    }
+
+    public void setAcknowledgedNews(List<String> acknowledgedNews) {
+        this.acknowledgedNews = acknowledgedNews;
     }
 
     public void save() throws IOException {

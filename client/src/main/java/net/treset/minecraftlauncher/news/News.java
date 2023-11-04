@@ -8,10 +8,12 @@ public class News extends GenericJsonParsable {
     public static class NewsElement {
         private String title;
         private String content;
+        private String id;
 
-        public NewsElement(String title, String content) {
+        public NewsElement(String title, String content, String id) {
             this.title = title;
             this.content = content;
+            this.id = id;
         }
 
         public String getTitle() {
@@ -28,6 +30,14 @@ public class News extends GenericJsonParsable {
 
         public void setContent(String content) {
             this.content = content;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
     }
     private List<NewsElement> important;

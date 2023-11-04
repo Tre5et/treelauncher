@@ -66,37 +66,7 @@ public class MainController extends GenericUiController {
         icTitlebarController.afterShow(stage);
         icNavbarController.afterShow(stage);
 
-        new Thread(() -> {
-            try {
-                News result = new NewsService().news();
-                if(result != null && result.getImportant() != null && !result.getImportant().isEmpty()) {
-                    StringBuilder sb = new StringBuilder();
-                    for(News.NewsElement element : result.getImportant()) {
-                        sb.append("<h1>").append(element.getTitle()).append("</h1>");
-                        sb.append(element.getContent());
-                    }
-
-                    LauncherApplication.setPopup(
-                            new PopupElement(
-                                    PopupElement.PopupType.NONE,
-                                    LauncherApplication.stringLocalizer.get("news.important.title"),
-                                    sb.toString(),
-                                    null,
-                                    List.of(
-                                            new PopupElement.PopupButton(
-                                                    PopupElement.ButtonType.POSITIVE,
-                                                    LauncherApplication.stringLocalizer.get("news.close"),
-                                                    (a) -> LauncherApplication.setPopup(null)
-                                                    )
-                                            ),
-                                    true
-                            )
-                    );
-                }
-            } catch (IOException e) {
-                LauncherApplication.displayError(e);
-            }
-        }).start();
+        new Thread(this::showNews).start();
 
         if(LauncherApplication.settings.hasSyncData()) {
             new Thread(() -> {
@@ -223,5 +193,44 @@ public class MainController extends GenericUiController {
             return false;
         }
         return true;
+    }
+
+    private void showNews() {
+        try {
+            News result = new NewsService().news();
+            if(result.getImportant() == null) {
+                return;
+            }
+            List<News.NewsElement> news = result.getImportant().stream().filter((e) -> LauncherApplication.settings.getAcknowledgedNews() == null || !LauncherApplication.settings.getAcknowledgedNews().contains(e.getId())).toList();
+            if(!news.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for(News.NewsElement element : news) {
+                    sb.append("<h1>").append(element.getTitle()).append("</h1>");
+                    sb.append(element.getContent() == null ? "" : element.getContent());
+                }
+
+                LauncherApplication.setPopup(
+                        new PopupElement(
+                                PopupElement.PopupType.NONE,
+                                LauncherApplication.stringLocalizer.get("news.important.title"),
+                                sb.toString(),
+                                null,
+                                List.of(
+                                        new PopupElement.PopupButton(
+                                                PopupElement.ButtonType.POSITIVE,
+                                                LauncherApplication.stringLocalizer.get("news.close"),
+                                                (a) -> {
+                                                    LauncherApplication.settings.setAcknowledgedNews(result.getImportant().stream().map(News.NewsElement::getId).toList());
+                                                    LauncherApplication.setPopup(null);
+                                                }
+                                        )
+                                ),
+                                true
+                        )
+                );
+            }
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
     }
 }
