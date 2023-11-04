@@ -8,9 +8,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import net.treset.minecraftlauncher.ui.generic.IconButton?>
-<StackPane fx:id="root" prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"       fx:controller="net.treset.minecraftlauncher.ui.login.LoginController">
+<?import net.treset.minecraftlauncher.ui.generic.Titlebar?>
+<StackPane fx:id="root" prefHeight="850.0" prefWidth="1600.0" stylesheets="@/css/global/Global.css,@/css/login/LoginScreen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.treset.minecraftlauncher.ui.login.LoginController">
     <VBox alignment="TOP_CENTER" >
-        <fx:include fx:id="icTitlebar" source="/fxml/title/TitlebarElement.fxml" VBox.vgrow="NEVER"/>
+        <Titlebar fx:id="tbTile" VBox.vgrow="NEVER"/>
         <SplitPane dividerPositions="0.26057906458797325" styleClass="element-root"
                    VBox.vgrow="ALWAYS">
             <VBox alignment="CENTER" spacing="10" nodeOrientation="LEFT_TO_RIGHT" styleClass="element">

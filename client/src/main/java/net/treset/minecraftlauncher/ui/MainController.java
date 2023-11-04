@@ -15,7 +15,6 @@ import net.treset.minecraftlauncher.ui.login.LoginController;
 import net.treset.minecraftlauncher.ui.nav.NavbarElement;
 import net.treset.minecraftlauncher.ui.selector.*;
 import net.treset.minecraftlauncher.ui.settings.SettingsElement;
-import net.treset.minecraftlauncher.ui.title.TitlebarElement;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
 import net.treset.minecraftlauncher.util.ui.FileSyncExecutor;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +26,6 @@ import java.util.List;
 public class MainController extends GenericUiController {
     private static final Logger LOGGER = LogManager.getLogger(MainController.class);
 
-    @FXML private TitlebarElement icTitlebarController;
     @FXML private InstanceSelectorElement icInstancesController;
     @FXML private InstanceCreatorElement icCreatorController;
     @FXML private SavesSelectorElement icSavesController;
@@ -39,14 +37,14 @@ public class MainController extends GenericUiController {
 
     boolean locked = false;
 
+    private News news;
+
     @Override
     public void beforeShow(Stage stage) {
         super.beforeShow(stage);
         LauncherApplication.setPopupConsumer(this::showPopup);
         LauncherApplication.setCloseCallback(this::onClose);
 
-        icTitlebarController.init(this, this::setLocked, this::getLocked);
-        icTitlebarController.beforeShow(stage);
         icNavbarController.init(this, this::setLocked, this::getLocked);
         icNavbarController.setComponentActivator(this::activate);
         icNavbarController.beforeShow(stage);
@@ -63,10 +61,9 @@ public class MainController extends GenericUiController {
     @Override
     public void afterShow(Stage stage) {
         super.afterShow(stage);
-        icTitlebarController.afterShow(stage);
         icNavbarController.afterShow(stage);
 
-        new Thread(this::showNews).start();
+        new Thread(() -> this.showImportantNews(false)).start();
 
         if(LauncherApplication.settings.hasSyncData()) {
             new Thread(() -> {
@@ -89,6 +86,11 @@ public class MainController extends GenericUiController {
     @Override
     public void triggerHomeAction() {
         activate(Component.INSTANCE_SELECTOR);
+    }
+
+    @FXML
+    private void onNews() {
+        new Thread(this::showNews).start();
     }
 
     public static MainController showOnStage(Stage stage) throws IOException {
@@ -197,16 +199,76 @@ public class MainController extends GenericUiController {
 
     private void showNews() {
         try {
-            News result = new NewsService().news();
-            if(result.getImportant() == null) {
-                return;
+            if (news == null) {
+                news = new NewsService().news();
             }
-            List<News.NewsElement> news = result.getImportant().stream().filter((e) -> LauncherApplication.settings.getAcknowledgedNews() == null || !LauncherApplication.settings.getAcknowledgedNews().contains(e.getId())).toList();
-            if(!news.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-                for(News.NewsElement element : news) {
+            List<News.NewsElement> importantNews = news.getImportant();
+            if(importantNews == null) {
+                importantNews = List.of();
+            }
+            List<News.NewsElement> otherNews = news.getOther();
+            if(otherNews == null) {
+                otherNews = List.of();
+            }
+
+            if(!importantNews.isEmpty() || !otherNews.isEmpty()) {
+                StringBuilder sb = new StringBuilder("<hr/>");
+                for(News.NewsElement element : importantNews) {
                     sb.append("<h1>").append(element.getTitle()).append("</h1>");
                     sb.append(element.getContent() == null ? "" : element.getContent());
+                    sb.append("<hr/>");
+                }
+                sb.append("<hr/>");
+                for(News.NewsElement element : otherNews) {
+                    sb.append("<h2>").append(element.getTitle()).append("</h2>");
+                    sb.append(element.getContent() == null ? "" : element.getContent());
+                    sb.append("<hr/>");
+                }
+
+                LauncherApplication.setPopup(
+                        new PopupElement(
+                                PopupElement.PopupType.NONE,
+                                LauncherApplication.stringLocalizer.get("news.title"),
+                                sb.toString(),
+                                null,
+                                List.of(
+                                        new PopupElement.PopupButton(
+                                                PopupElement.ButtonType.POSITIVE,
+                                                LauncherApplication.stringLocalizer.get("news.close"),
+                                                (a) -> {
+                                                    LauncherApplication.settings.setAcknowledgedNews(news.getImportant().stream().map(News.NewsElement::getId).toList());
+                                                    LauncherApplication.setPopup(null);
+                                                }
+                                        )
+                                ),
+                                true
+                        )
+                );
+            }
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
+    }
+
+    private void showImportantNews(boolean ignoreAcknowledged) {
+        try {
+            if(news == null) {
+                news = new NewsService().news();
+            }
+            if(news.getImportant() == null) {
+                return;
+            }
+            List<News.NewsElement> importantNews = news.getImportant();
+            if(!ignoreAcknowledged) {
+                importantNews = importantNews.stream().filter((e) -> LauncherApplication.settings.getAcknowledgedNews() == null || !LauncherApplication.settings.getAcknowledgedNews().contains(e.getId())).toList();
+            }
+            if(!importantNews.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("<hr/>");
+                for(News.NewsElement element : importantNews) {
+                    sb.append("<h1>").append(element.getTitle()).append("</h1>");
+                    sb.append(element.getContent() == null ? "" : element.getContent());
+                    sb.append("<hr/>");
                 }
 
                 LauncherApplication.setPopup(
@@ -220,7 +282,7 @@ public class MainController extends GenericUiController {
                                                 PopupElement.ButtonType.POSITIVE,
                                                 LauncherApplication.stringLocalizer.get("news.close"),
                                                 (a) -> {
-                                                    LauncherApplication.settings.setAcknowledgedNews(result.getImportant().stream().map(News.NewsElement::getId).toList());
+                                                    LauncherApplication.settings.setAcknowledgedNews(news.getImportant().stream().map(News.NewsElement::getId).toList());
                                                     LauncherApplication.setPopup(null);
                                                 }
                                         )

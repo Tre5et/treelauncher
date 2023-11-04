@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
-import net.treset.minecraftlauncher.ui.title.TitlebarElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,7 +18,6 @@ import java.io.IOException;
 public class LoginController extends GenericUiController {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
-    @FXML private TitlebarElement icTitlebarController;
     @FXML private Button btLogin;
     @FXML private CheckBox chRemember;
     @FXML private Button btContinue;
@@ -45,7 +43,6 @@ public class LoginController extends GenericUiController {
         super.beforeShow(stage);
         LauncherApplication.setPopupConsumer(this::showPopup);
         LauncherApplication.setCloseCallback(() -> !chRemember.isDisabled() || !btLogin.isDisabled());
-        icTitlebarController.beforeShow(stage);
     }
 
     @Override
@@ -56,7 +53,6 @@ public class LoginController extends GenericUiController {
             lbStatus.setText(LauncherApplication.stringLocalizer.get("login.label.authenticating"));
             new Thread(() -> LauncherApplication.userAuth.authenticateFromFile(this::onAutoLoginDone)).start();
         }
-        icTitlebarController.afterShow(stage);
     }
 
     private void triggerLogin(boolean remember) {

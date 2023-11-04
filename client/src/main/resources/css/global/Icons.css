@@ -121,3 +121,7 @@
 .upload {
     -fx-icon-code: bi-cloud-upload;
 }
+
+.news {
+    -fx-icon-code: bi-newspaper;
+}
