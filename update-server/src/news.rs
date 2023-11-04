@@ -21,7 +21,8 @@ struct LocalItem {
 #[derive(Serialize, Deserialize, Debug)]
 struct NewsOut {
     title: String,
-    content: Option<String>
+    content: Option<String>,
+    id: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -84,15 +85,23 @@ fn get_news(version: Option<Version>, locale: Option<String>) -> HttpResponse {
             content = Some(get_local_item(n.content.unwrap(), locale.clone()));
         }
 
+        let id: String;
+        if content.is_some() {
+            id = format!("{:x}",  md5::compute(format!("{}{}", title, content.clone().unwrap())));
+        } else {
+            id = format!("{:x}", md5::compute(title.clone()));
+        }
         if n.important.is_some() && n.important.unwrap() {
             important.push(NewsOut {
                 title,
-                content
+                content,
+                id
             })
         } else {
             other.push(NewsOut {
                 title,
-                content
+                content,
+                id
             });
         }
     }

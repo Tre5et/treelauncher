@@ -240,6 +240,10 @@ components:
                 type: string
                 required: false
                 description: HTML content of the news
+              id:
+                type: string
+                required: true
+                description: A unique id for the news
         other:
           type: array
           required: false
@@ -255,3 +259,7 @@ components:
                 type: string
                 required: false
                 description: HTML content of the news
+              id:
+                type: string
+                required: true
+                description: A unique id for the news
