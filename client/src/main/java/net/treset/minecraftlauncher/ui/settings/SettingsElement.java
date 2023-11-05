@@ -20,6 +20,7 @@ import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 import net.treset.minecraftlauncher.update.LauncherUpdater;
+import net.treset.minecraftlauncher.update.Update;
 import net.treset.minecraftlauncher.util.string.UrlString;
 
 import java.io.File;
@@ -224,21 +225,28 @@ public class SettingsElement extends UiElement {
 
         new Thread(() -> {
             if(LauncherApplication.launcherUpdater == null) {
-                try {
-                    LauncherApplication.launcherUpdater = new LauncherUpdater();
-                } catch (FileDownloadException e) {
-                    LauncherApplication.displayError(e);
-                    LauncherApplication.setPopup(null);
-                    return;
-                }
+                LauncherApplication.launcherUpdater = new LauncherUpdater();
+            }
+
+            Update update;
+            try {
+                update = LauncherApplication.launcherUpdater.getUpdate();
+            } catch (IOException e) {
+                this.cancelUpdate();
+                LauncherApplication.displayError(e);
+                return;
             }
 
             if(canceled) {
                 return;
             }
 
-            if(LauncherApplication.launcherUpdater.getUpdateVersion() == null) {
-                Platform.runLater(this::showUpdateLatest);
+            if(update.getId() == null) {
+                if(update.isLatest()) {
+                    Platform.runLater(this::showUpdateLatest);
+                } else {
+                    Platform.runLater(this::showUpdateUnavailable);
+                }
             } else {
                 Platform.runLater(this::showUpdateAvailable);
             }
@@ -262,27 +270,49 @@ public class SettingsElement extends UiElement {
         );
     }
 
-    private void showUpdateAvailable() {
+    private void showUpdateUnavailable() {
         LauncherApplication.setPopup(
                 new PopupElement(
-                        PopupElement.PopupType.NONE,
-                        "settings.update.available.title",
-                        LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.launcherUpdater.getUpdateVersion())
-                            + (LauncherApplication.launcherUpdater.getUpdateInfo() == null ? "" : "\n\n" + LauncherApplication.launcherUpdater.getUpdateInfo()),
+                        PopupElement.PopupType.WARNING,
+                        "settings.update.unavailable.title",
+                        LauncherApplication.stringLocalizer.getFormatted("settings.update.unavailable.message"),
                         List.of(
                                 new PopupElement.PopupButton(
-                                        PopupElement.ButtonType.NEGATIVE,
-                                        "settings.update.cancel",
-                                        event -> LauncherApplication.setPopup(null)
-                                ),
-                                new PopupElement.PopupButton(
                                         PopupElement.ButtonType.POSITIVE,
-                                        "settings.update.download",
-                                        event -> downloadUpdate()
+                                        "settings.update.close",
+                                        event -> LauncherApplication.setPopup(null)
                                 )
                         )
                 )
         );
+    }
+
+    private void showUpdateAvailable() {
+        try {
+            Update update = LauncherApplication.launcherUpdater.getUpdate();
+            LauncherApplication.setPopup(
+                    new PopupElement(
+                            PopupElement.PopupType.NONE,
+                            "settings.update.available.title",
+                            LauncherApplication.stringLocalizer.getFormatted("settings.update.available.message", LauncherApplication.stringLocalizer.get("launcher.version"), update.getId())
+                                    + (update.getMessage() == null ? "" : "\n\n" + update.getMessage()),
+                            List.of(
+                                    new PopupElement.PopupButton(
+                                            PopupElement.ButtonType.NEGATIVE,
+                                            "settings.update.cancel",
+                                            event -> LauncherApplication.setPopup(null)
+                                    ),
+                                    new PopupElement.PopupButton(
+                                            PopupElement.ButtonType.POSITIVE,
+                                            "settings.update.download",
+                                            event -> downloadUpdate()
+                                    )
+                            )
+                    )
+            );
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
+        }
     }
 
     private void showUpdateSuccess() {
@@ -317,21 +347,12 @@ public class SettingsElement extends UiElement {
         );
         LauncherApplication.setPopup(popup);
 
-        int total = LauncherApplication.launcherUpdater.getFileCount();
 
         new Thread(() -> {
             try {
-                LauncherApplication.launcherUpdater.downloadFiles(
-                        (amount, file) -> Platform.runLater(() -> popup.setMessage(LauncherApplication.stringLocalizer.getFormatted("settings.update.downloading.message", file, amount, total)))
+                LauncherApplication.launcherUpdater.executeUpdate(
+                        (amount, total, file) -> Platform.runLater(() -> popup.setMessage(LauncherApplication.stringLocalizer.getFormatted("settings.update.downloading.message", file, amount, total)))
                 );
-            } catch (FileDownloadException e) {
-                LauncherApplication.displayError(e);
-                LauncherApplication.setPopup(null);
-                return;
-            }
-
-            try {
-                LauncherApplication.launcherUpdater.writeFile();
             } catch (IOException e) {
                 LauncherApplication.displayError(e);
                 LauncherApplication.setPopup(null);
@@ -350,15 +371,15 @@ public class SettingsElement extends UiElement {
 
     private void checkUpdate() {
         if(LauncherApplication.launcherUpdater == null) {
-            try {
-                LauncherApplication.launcherUpdater = new LauncherUpdater();
-            } catch (FileDownloadException e) {
-                LauncherApplication.displayError(e);
-                return;
-            }
+            LauncherApplication.launcherUpdater = new LauncherUpdater();
         }
-        if(LauncherApplication.launcherUpdater.getUpdateVersion() != null) {
-            Platform.runLater(() -> lbUpdate.setVisible(true));
+        try {
+            Update update = LauncherApplication.launcherUpdater.getUpdate();
+            if(!update.isLatest()) {
+                Platform.runLater(() -> lbUpdate.setVisible(true));
+            }
+        } catch (IOException e) {
+            LauncherApplication.displayError(e);
         }
     }
 

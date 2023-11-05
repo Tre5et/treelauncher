@@ -95,7 +95,7 @@ public class LauncherFile extends File {
 
     public void createFile() throws IOException {
         if(!exists()) {
-            Files.createDirectories(toPath().getParent());
+            Files.createDirectories(getAbsoluteFile().getParentFile().toPath());
             Files.createFile(toPath());
         }
     }

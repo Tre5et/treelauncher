@@ -12,6 +12,8 @@ import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.IconButton;
+import net.treset.minecraftlauncher.update.LauncherUpdater;
+import net.treset.minecraftlauncher.update.Update;
 
 import java.util.function.Function;
 
@@ -118,19 +120,17 @@ public class NavbarElement extends UiElement {
     }
 
     private void checkUpdate() {
-        /* TODO: enable
         if(LauncherApplication.launcherUpdater == null) {
-            try {
-                LauncherApplication.launcherUpdater = new LauncherUpdater();
-            } catch (FileDownloadException e) {
-                LauncherApplication.displayError(e);
-                return;
+            LauncherApplication.launcherUpdater = new LauncherUpdater();
+        }
+        try {
+            Update update = LauncherApplication.launcherUpdater.getUpdate();
+            if(!update.isLatest()) {
+                Platform.runLater(() -> ciUpdate.setVisible(true));
             }
+        } catch (Exception e) {
+            LauncherApplication.displayError(e);
         }
-        if(LauncherApplication.launcherUpdater.getUpdateVersion() != null) {
-            Platform.runLater(() -> ciUpdate.setVisible(true));
-        }
-        */
     }
 
     public Function<MainController.Component, Boolean> getComponentActivator() {

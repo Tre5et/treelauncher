@@ -1,108 +1,134 @@
 package net.treset.minecraftlauncher.update;
 
-import net.treset.mc_version_loader.exception.FileDownloadException;
-import net.treset.mc_version_loader.util.FileUtil;
-import net.treset.minecraftlauncher.LauncherApplication;
+import net.treset.mc_version_loader.json.JsonUtils;
 import net.treset.minecraftlauncher.util.file.LauncherFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.TriConsumer;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
 
 public class LauncherUpdater {
-    private final String updateContent;
-    private final UpdateData updateData;
+    private static final Logger LOGGER = LogManager.getLogger(LauncherUpdater.class);
 
-    public LauncherUpdater() throws FileDownloadException {
-        updateContent = FileUtil.getStringFromUrl(LauncherApplication.config.UPDATE_URL + LauncherApplication.stringLocalizer.get("launcher.version"));
-        try {
-            updateData = UpdateData.fromJson(updateContent);
-        } catch (Exception e) {
-            throw new FileDownloadException("Failed to parse update data", e);
+    private final UpdateService updateService = new UpdateService();
+    private Update update;
+
+    public Update getUpdate() throws IOException {
+        if(update == null) {
+            return fetchUpdate();
         }
+        return update;
     }
 
-    public String getUpdateVersion() {
-        if(!updateData.isAvailable()) {
-            return null;
+    public Update fetchUpdate() throws IOException {
+        update = updateService.update();
+        return update;
+    }
+
+    public void executeUpdate(TriConsumer<Integer, Integer, String> changeCallback) throws IOException {
+        changeCallback.accept(0, 0, "Checking for updates...");
+        if(update == null) {
+            fetchUpdate();
         }
-        return updateData.getVersion();
-    }
+        if(update.getId() == null) {
+            throw new IOException("No Update available");
+        }
+        int total = update.getChanges().size();
+        int current = 0;
+        changeCallback.accept(current, total, "Downloading files...");
 
-    public int getFileCount() {
-        return updateData.getFiles().stream().filter(file -> file.getUpdate() != null).toArray().length + (updateData.getUpdaterUrl() == null ? 0 : 1);
-    }
+        ArrayList<Update.Change> updaterChanges = new ArrayList<>();
+        ArrayList<Exception> exceptions = new ArrayList<>();
+        ArrayList<LauncherFile> backedUpFiles = new ArrayList<>();
 
-    public void downloadFiles(BiConsumer<Integer, String> changeCallback) throws FileDownloadException {
-        int count = 0;
-        for(UpdateFile file : updateData.getFiles()) {
-            if(file.getUpdate() == null) {
-                continue;
-            }
-            changeCallback.accept(++count, file.getUpdate());
-            URL url;
-            try {
-                url = new URL(file.getUrl());
-            } catch (Exception e) {
-                deleteUpdateFiles();
-                throw new FileDownloadException("Failed to parse url=" + file.getUrl(), e);
-            }
-            try {
-                FileUtil.downloadFile(url, new File(file.getUpdate() + ".update"));
-            } catch (FileDownloadException e) {
-                deleteUpdateFiles();
-                throw e;
+        for(Update.Change change : update.getChanges()) {
+            changeCallback.accept(++current, total, change.getPath());
+            LauncherFile targetFile = LauncherFile.of(change.getPath());
+            LauncherFile updateFile = LauncherFile.of(change.getPath() + ".up");
+            LauncherFile backupFile = LauncherFile.of(change.getPath() + ".bak");
+            switch(change.getMode()) {
+                case FILE:
+                    try {
+                        LOGGER.debug("Downloading file: " + change.getPath());
+                        updateFile.write(updateService.file(update.getId(), change.getPath()));
+                    } catch (IOException e) {
+                        exceptions.add(e);
+                    }
+                    if(change.isUpdater()) {
+                        LOGGER.debug("Delegating file to updater: " + change.getPath());
+                        updaterChanges.add(change);
+                    } else {
+                        LOGGER.debug("Moving file to target: " + change.getPath());
+                        try {
+                            if(targetFile.isFile()) {
+                                targetFile.moveTo(backupFile);
+                                backedUpFiles.add(backupFile);
+                            }
+                            updateFile.moveTo(targetFile);
+                        } catch (IOException e) {
+                            exceptions.add(e);
+                        }
+                    }
+                    break;
+                case DELETE:
+                    if(change.isUpdater()) {
+                        LOGGER.debug("Delegating file to updater: " + change.getPath());
+                        updaterChanges.add(change);
+                    } else {
+                        LOGGER.debug("Deleting file: " + change.getPath());
+                        try {
+                            if(targetFile.isFile()) {
+                                targetFile.moveTo(backupFile);
+                                backedUpFiles.add(backupFile);
+                            } else {
+                                LOGGER.warn("File to delete does not exist: " + targetFile);
+                            }
+                        } catch (IOException e) {
+                            exceptions.add(e);
+                        }
+                    }
+                    break;
+                default:
+                    LOGGER.debug("Delegating file to updater: " + change.getPath());
+                    updaterChanges.add(change);
+                    break;
             }
         }
-        if(updateData.getUpdaterUrl() != null) {
-            changeCallback.accept(++count, "app/updater.jar");
-            URL url;
-            try {
-                url = new URL(updateData.getUpdaterUrl());
-            } catch (Exception e) {
-                deleteUpdateFiles();
-                throw new FileDownloadException("Failed to parse url=" + updateData.getUpdaterUrl(), e);
-            }
-            try {
-                FileUtil.downloadFile(url, new File("app/updater.jar.update"));
-            } catch (FileDownloadException e) {
-                deleteUpdateFiles();
-                throw e;
-            }
 
-            try {
-                Files.delete(new File("app/updater.jar").toPath());
-                Files.move(new File("app/updater.jar.update").toPath(), new File("app/updater.jar").toPath());
-            } catch (IOException e) {
-                deleteUpdateFiles();
-                throw new FileDownloadException("Failed to move updater.jar.update to updater.jar", e);
-            }
-        }
-    }
-
-    public void writeFile() throws IOException {
-        LauncherFile.of("update.json").write(updateContent);
-    }
-
-    public boolean deleteUpdateFiles() {
-        boolean success = true;
-        for(UpdateFile file : updateData.getFiles()) {
-            File updateFile = new File(file.getUpdate() + ".update");
-            if(updateFile.exists()) {
-                if(!updateFile.delete()) {
-                    success = false;
+        if(!exceptions.isEmpty()) {
+            LOGGER.debug("Update failed. Reverting changes");
+            changeCallback.accept(0, 0, "Update Failed. Reverting changes...");
+            for(LauncherFile file : backedUpFiles) {
+                LOGGER.debug("Reverting file: " + file);
+                try {
+                    file.moveTo(LauncherFile.of(file.getPath().substring(0, file.getPath().length() - 4)));
+                } catch (IOException e) {
+                    throw new IOException("Failed to revert changes", e);
                 }
             }
+            throw new IOException("Failed to update the launcher", exceptions.get(0));
         }
-        return success;
-    }
-    public UpdateData getUpdateData() {
-        return updateData;
-    }
 
-    public String getUpdateInfo() {
-        return updateData.getUpdateInfo();
+        LOGGER.debug("Removing backed up files");
+        for(LauncherFile file: backedUpFiles) {
+            try {
+                file.remove();
+            } catch (IOException ignored) {}
+        }
+
+        LOGGER.debug("Writing updater file");
+        changeCallback.accept(total, total, "Writing updater file...");
+
+        LauncherFile updaterFile = LauncherFile.ofRelative("update.json");
+        try {
+            updaterFile.write(
+                    JsonUtils.getGson().toJson(updaterChanges)
+            );
+        } catch (IOException e) {
+            throw new IOException("Failed to write updater file", e);
+        }
+
     }
 }
