@@ -6,7 +6,7 @@ import java.io.IOException
 data class UpdateChange(
     val path: String,
     val mode: Mode,
-    val elements: List<Element>
+    val elements: List<Element>?
 )
 
 enum class Mode {
@@ -17,10 +17,10 @@ enum class Mode {
 }
 
 data class Element(
-    val pattern: String,
-    val value: String,
-    val meta: Int,
-    val replace: Boolean
+    val pattern: String?,
+    val value: String?,
+    val meta: Int?,
+    val replace: Boolean?
 )
 
 lateinit var update: List<UpdateChange>
