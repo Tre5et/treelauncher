@@ -35,6 +35,6 @@ fun readUpdate() {
     try {
         update = Gson().fromJson(json, Array<UpdateChange>::class.java).toList()
     } catch (e: JsonSyntaxException) {
-        throw IOException("Unexpected json syntax")
+        throw IOException("Unexpected json syntax: $e")
     }
 }

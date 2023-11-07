@@ -11,6 +11,8 @@ fun main() {
         readUpdate()
     } catch (e: IOException) {
         println(e)
+        File("updater.json").writeText(Gson().toJson(UpdaterStatus(Status.ERROR, "Failed to read update file.", listOf(e))))
+        return
     }
 
     try {
@@ -22,8 +24,6 @@ fun main() {
 }
 
 fun executeUpdate() : UpdaterStatus {
-    //TODO: Test
-
     val backedUpFiles = mutableListOf<File>()
     val exceptions = mutableListOf<Exception>()
 
@@ -35,6 +35,7 @@ fun executeUpdate() : UpdaterStatus {
             var exception: Exception? = null
             do {
                 try {
+                    println("Backing up file: ${target.path}")
                     Files.move(target.toPath(), backupFile.toPath())
                     backedUpFiles.add(backupFile)
                 } catch (e: AccessDeniedException) {
@@ -69,6 +70,11 @@ fun executeUpdate() : UpdaterStatus {
                 println("Deleting file: ${target.path}")
             }
             Mode.REGEX -> {
+                if(!backupFile.isFile) {
+                    println("File regex content not found: ${backupFile.path}")
+                    exceptions.add(IOException("Backup File not found: ${backupFile.path}"))
+                    continue
+                }
                 try {
                     var content = backupFile.readText()
                     change.elements?.let { elements ->
@@ -78,17 +84,25 @@ fun executeUpdate() : UpdaterStatus {
                                     if (element.replace == true) {
                                         "Replacing"
                                     } else "Changing"
-                                } regex ${element.pattern} group ${element.meta} to ${element.value}"
+                                } regex ${element.pattern} match ${element.meta} to ${element.value}"
                             )
-                            val index = element.meta ?: -1
+
                             val regex = Regex(element.pattern ?: "")
-                            content = if(index < 0) {
-                                regex.replace(content, element.value ?: "")
+                            if(element.meta == null) {
+                                content = regex.replace(content, element.value ?: "")
                             } else {
-                                regex.replace(content) {
-                                    if(index < it.groupValues.size) {
-                                        it.groupValues[index].replace(element.pattern ?: "", element.value ?: "")
+                                val index = if(element.meta >= 0) {
+                                    element.meta
+                                } else {
+                                    (regex.findAll(content).count() + element.meta)
+                                }
+                                var currentIndex = 0
+                                content = regex.replace(content) {
+                                    if(currentIndex == index) {
+                                        currentIndex++
+                                        element.value ?: ""
                                     } else {
+                                        currentIndex++
                                         it.value
                                     }
                                 }
@@ -103,6 +117,11 @@ fun executeUpdate() : UpdaterStatus {
                 }
             }
             Mode.LINE -> {
+                if(!backupFile.isFile) {
+                    println("File line content not found: ${backupFile.path}")
+                    exceptions.add(IOException("Backup File not found: ${backupFile.path}"))
+                    continue
+                }
                 try {
                     val lines = ArrayList<String>(backupFile.readLines())
                     change.elements?.let {
@@ -116,19 +135,26 @@ fun executeUpdate() : UpdaterStatus {
                             )
                             val line = element.meta?.let {
                                 if (element.meta < 0) {
-                                    (lines.size + element.meta).coerceAtLeast(0)
+                                    (lines.size + element.meta + if(element.replace == true) 0 else 1)
                                 } else {
                                     element.meta
                                 }
                             } ?: 0
-                            while (line >= lines.size) {
+                            if(line < 0) {
+                                continue
+                            }
+                            while (line > lines.size) {
                                 lines.add("")
                             }
                             if (element.replace == true) {
                                 if (element.value == null) {
                                     lines.removeAt(line)
                                 } else {
-                                    lines[line] = element.value
+                                    if(line == lines.size) {
+                                        lines.add(element.value)
+                                    } else {
+                                        lines[line] = element.value
+                                    }
                                 }
                             } else {
                                 lines.add(line, element.value ?: "")
@@ -175,10 +201,17 @@ fun executeUpdate() : UpdaterStatus {
             exceptions.add(e)
         }
     }
+    try {
+        Files.delete(File("update.json").toPath())
+    } catch (e: IOException) {
+        deleteSuccess = false
+        println("Failed to delete update.json: $e")
+        exceptions.add(e)
+    }
 
     return if(deleteSuccess) {
         UpdaterStatus(Status.SUCCESS)
     } else {
-        UpdaterStatus(Status.WARNING, "Update successful, but failed to delete backup files.", exceptions)
+        UpdaterStatus(Status.WARNING, "Update successful, but failed to unneeded files.", exceptions)
     }
 }
