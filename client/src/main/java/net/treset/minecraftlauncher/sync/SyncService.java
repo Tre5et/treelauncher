@@ -36,11 +36,11 @@ public class SyncService extends HttpService {
     }
 
     public void testConnection() throws IOException {
-        get("/test");
+        get("test");
     }
 
     public ComponentList getAvailable(String type) throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("/list/" + type);
+        Pair<HttpStatusCode, byte[]> result = get("list", type);
         ComponentList response;
         try {
             response = ComponentList.fromJson(new String(result.getValue()));
@@ -51,25 +51,25 @@ public class SyncService extends HttpService {
     }
 
     public void newComponent(String type, String id) throws IOException {
-        get("/new/" + type + "/" + id);
+        get("new", type, id);
     }
 
     public void uploadFile(String type, String id, String path, byte[] content) throws IOException {
-        post("/file/" + type + "/" + id + "/" + UrlString.encoded(path), content);
+        post(content, "file", type, id, UrlString.encoded(path));
     }
 
     public int complete(String type, String id) throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("/complete/" + type + "/" + id);
+        Pair<HttpStatusCode, byte[]> result = get("complete", type, id);
         return Integer.parseInt(new String(result.getValue()));
     }
 
     public GetResponse get(String type, String id, int version) throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("/get/" + type + "/" + id + "/" + version);
+        Pair<HttpStatusCode, byte[]> result = get("get", type, id, version);
         return GetResponse.fromJson(new String(result.getValue()));
     }
 
     public byte[] downloadFile(String type, String id, String path) throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("/file/" + type + "/" + id + "/" + UrlString.encoded(path));
+        Pair<HttpStatusCode, byte[]> result = get("file", type, id, UrlString.encoded(path));
         return result.getKey() == HttpStatusCode.NO_CONTENT ? new byte[]{} : result.getValue();
     }
 }

@@ -1,12 +1,14 @@
 package net.treset.minecraftlauncher.util;
 
 import javafx.util.Pair;
+import org.apache.logging.log4j.util.Strings;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.List;
 
 public class HttpService {
@@ -22,16 +24,16 @@ public class HttpService {
         this.headers = headers;
     }
 
-    protected Pair<HttpStatusCode, byte[]> get(String route) throws IOException {
-        return evaluateStatus(get(baseUrl + "/" + route, headers));
+    protected Pair<HttpStatusCode, byte[]> get(Object... route) throws IOException {
+        return evaluateStatus(get(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers));
     }
 
-    protected Pair<HttpStatusCode, byte[]> post(String route, byte[] data) throws IOException {
-        return evaluateStatus(post(baseUrl + "/" + route, headers, data));
+    protected Pair<HttpStatusCode, byte[]> post(byte[] data, Object... route) throws IOException {
+        return evaluateStatus(post(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers, data));
     }
 
-    protected Pair<HttpStatusCode, byte[]> post(String route, String contentType, byte[] data) throws IOException {
-        return evaluateStatus(post(baseUrl + "/" + route, headers, contentType, data));
+    protected Pair<HttpStatusCode, byte[]> post(String contentType, byte[] data, Object... route) throws IOException {
+        return evaluateStatus(post(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers, contentType, data));
     }
 
     private Pair<HttpStatusCode, byte[]> evaluateStatus(Pair<HttpStatusCode, byte[]> result) throws IOException {

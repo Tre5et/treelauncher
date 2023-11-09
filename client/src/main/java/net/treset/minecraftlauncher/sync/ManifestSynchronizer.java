@@ -49,7 +49,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
         setStatus(new SyncStatus(SyncStep.COLLECTING, null));
         ComponentData currentData = getCurrentComponentData();
         ComponentData newData = calculateComponentData(currentData.getVersion());
-        List<String> difference = compareHashes(new ComponentData.HashEntry("", currentData.getHashTree()), new ComponentData.HashEntry("", newData.getHashTree()), null);
+        List<String> difference = compareHashes(new ComponentData.HashEntry("", currentData.getHashTree()), new ComponentData.HashEntry("", newData.getHashTree()), LauncherFile.of("./"));
         uploadDifference(difference);
         completeUpload(newData);
         setStatus(new SyncStatus(SyncStep.FINISHED, null));
@@ -59,7 +59,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
         setStatus(new SyncStatus(SyncStep.STARTING, null));
         LOGGER.debug("Sync file not found, creating new sync file");
         setStatus(new SyncStatus(SyncStep.COLLECTING, null));
-        ComponentData data = updateSyncFile(0);
+        ComponentData data = calculateComponentData(0);
         setStatus(new SyncStatus(SyncStep.UPLOADING, null));
         SyncService service = new SyncService();
         service.newComponent(SyncService.convertType(manifest.getType()), manifest.getId());
@@ -164,7 +164,7 @@ public class ManifestSynchronizer extends FileSynchronizer {
     protected int completeUpload(ComponentData newData) throws IOException {
         int version = new SyncService().complete(SyncService.convertType(manifest.getType()), manifest.getId());
         newData.setVersion(version);
-        LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME).write(newData);
+        getSyncFile().write(newData);
         return version;
     }
 
@@ -284,8 +284,12 @@ public class ManifestSynchronizer extends FileSynchronizer {
 
     protected ComponentData updateSyncFile(int version) throws IOException {
         ComponentData data = calculateComponentData(version);
-        LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME).write(data);
+        getSyncFile().write(data);
         return data;
+    }
+
+    protected LauncherFile getSyncFile() {
+        return LauncherFile.of(manifest.getDirectory(), LauncherApplication.config.SYNC_FILENAME);
     }
 
     protected ComponentData calculateComponentData(int version) throws IOException {

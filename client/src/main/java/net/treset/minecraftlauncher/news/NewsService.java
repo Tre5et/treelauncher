@@ -13,7 +13,7 @@ public class NewsService extends HttpService {
     }
 
     public News news() throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("news/" + LauncherApplication.stringLocalizer.get("launcher.version") + "/" + StringLocalizer.getLocale(LauncherApplication.stringLocalizer.getLanguage()));
+        Pair<HttpStatusCode, byte[]> result = get("news", LauncherApplication.stringLocalizer.get("launcher.version"), StringLocalizer.getLocale(LauncherApplication.stringLocalizer.getLanguage()).toString());
         String response = new String(result.getValue());
         try {
             return News.fromJson(response);
