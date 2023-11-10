@@ -1,14 +1,18 @@
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
+package net.treset.treelauncher.updater
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.IOException
 
+@Serializable
 data class UpdateChange(
     val path: String,
     val mode: Mode,
-    val elements: List<Element>?
+    val elements: List<Element>? = null
 )
 
+@Serializable
 enum class Mode {
     FILE,
     DELETE,
@@ -16,11 +20,12 @@ enum class Mode {
     LINE
 }
 
+@Serializable
 data class Element(
-    val pattern: String?,
-    val value: String?,
-    val meta: Int?,
-    val replace: Boolean?
+    val pattern: String? = null,
+    val value: String? = null,
+    val meta: Int? = null,
+    val replace: Boolean? = null
 )
 
 lateinit var update: List<UpdateChange>
@@ -33,8 +38,8 @@ fun readUpdate() {
     }
     val json = file.readText()
     try {
-        update = Gson().fromJson(json, Array<UpdateChange>::class.java).toList()
-    } catch (e: JsonSyntaxException) {
+        update = Json.decodeFromString<Array<UpdateChange>>(json).toList()
+    } catch (e: Exception) {
         throw IOException("Unexpected json syntax: $e")
     }
 }
