@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
         readUpdate()
     } catch (e: IOException) {
         println(e)
-        File("updater.json").writeText(Json.encodeToString(UpdaterStatus(Status.FAILURE, "Failed to read update file.", listOf(e.toString()))))
+        File("updater.json").writeText(Json.encodeToString(UpdaterStatus(Status.FAILURE, "Failed to read update file.", listOf(e.stackTraceToString()))))
         closeGui()
         return
     }
@@ -127,16 +127,16 @@ fun executeUpdate() : UpdaterStatus {
 
     if(exceptions.isNotEmpty()) {
         return if(restore(backedUpFiles, exceptions)) {
-            UpdaterStatus(Status.FAILURE, "One or more updates failed.", exceptions.map { it.toString() })
+            UpdaterStatus(Status.FAILURE, "One or more updates failed.", exceptions.map { it.stackTraceToString() })
         } else {
-            UpdaterStatus(Status.FATAL, "One or more updates failed.", exceptions.map { it.toString() })
+            UpdaterStatus(Status.FATAL, "One or more updates failed.", exceptions.map { it.stackTraceToString() })
         }
     }
 
     return if(deleteBackup(backedUpFiles, exceptions)) {
         UpdaterStatus(Status.SUCCESS)
     } else {
-        UpdaterStatus(Status.WARNING, "Update successful, but failed to unneeded files.", exceptions.map { it.toString() })
+        UpdaterStatus(Status.WARNING, "Update successful, but failed to unneeded files.", exceptions.map { it.stackTraceToString() })
     }
 }
 
