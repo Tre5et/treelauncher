@@ -19,7 +19,6 @@ import net.treset.minecraftlauncher.util.file.LauncherFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -179,39 +178,13 @@ public class LauncherApplication extends Application {
         } catch (IOException e) {
             displayError(e);
         }
-        if(new File("update.json").exists()) {
+        if(launcherUpdater != null) {
             try {
-                startUpdater();
+                launcherUpdater.startUpdater(restartAfterUpdate);
             } catch (IOException e) {
                 displayError(e);
             }
         }
         super.stop();
-    }
-
-    private void startUpdater() throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(LauncherFile.of(System.getProperty("java.home"), "bin", "java").getPath(), "-jar", "app/updater.jar");
-        if(restartAfterUpdate) {
-            if(new File("TreeLauncher.exe").exists()) {
-                LOGGER.info("TreeLauncher found, using it to restart");
-                pb.command().add("TreeLauncher");
-            } else {
-                LOGGER.warn("TreeLauncher not found, searching alternative file");
-                File[] files = new File(".").listFiles();
-                if(files == null) {
-                    LOGGER.error("Failed to list files!");
-                } else {
-                    for(File file : files) {
-                        if(file.getName().endsWith(".exe")) {
-                            LOGGER.info("Found alternative file: " + file.getName());
-                            pb.command().add(file.getName().substring(0, file.getName().length() - 4));
-                            break;
-                        }
-                    }
-                }
-
-            }
-        }
-        pb.start();
     }
 }

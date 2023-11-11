@@ -15,6 +15,8 @@ public class LauncherUpdater {
     private final UpdateService updateService = new UpdateService();
     private Update update;
 
+    private boolean readyToUpdate = false;
+
     public Update getUpdate() throws IOException {
         if(update == null) {
             return fetchUpdate();
@@ -126,9 +128,41 @@ public class LauncherUpdater {
             updaterFile.write(
                     JsonUtils.getGson().toJson(updaterChanges)
             );
+            readyToUpdate = true;
         } catch (IOException e) {
             throw new IOException("Failed to write updater file", e);
         }
+    }
 
+    public void startUpdater(boolean restart) throws IOException {
+        if(!readyToUpdate) {
+            return;
+        }
+
+        LOGGER.info("Starting updater...");
+
+        ProcessBuilder pb = new ProcessBuilder(LauncherFile.of(System.getProperty("java.home"), "bin", "java").getPath(), "-jar", "app/updater.jar");
+        if(restart) {
+            pb.command().add("-gui");
+            if(new LauncherFile("TreeLauncher.exe").isFile()) {
+                LOGGER.info("Restarting TreeLauncher.exe after update");
+                pb.command().add("-rTreeLauncher.exe");
+            } else {
+                LOGGER.warn("TreeLauncher.exe not found to restart, searching alternative file...");
+                LauncherFile[] files = new LauncherFile(".").listFiles();
+                if(files == null) {
+                    LOGGER.error("Failed to list files!");
+                } else {
+                    for(LauncherFile file : files) {
+                        if(file.getName().endsWith(".exe")) {
+                            LOGGER.info("Restarting alternative file " + file.getName() + " after update");
+                            pb.command().add(file.getName());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        pb.start();
     }
 }
