@@ -125,7 +125,7 @@ public class NavbarElement extends UiElement {
         }
         try {
             Update update = LauncherApplication.launcherUpdater.getUpdate();
-            if(!update.isLatest()) {
+            if(update.getId() != null) {
                 Platform.runLater(() -> ciUpdate.setVisible(true));
             }
         } catch (Exception e) {

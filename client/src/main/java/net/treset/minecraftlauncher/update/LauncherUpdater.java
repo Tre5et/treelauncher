@@ -123,7 +123,7 @@ public class LauncherUpdater {
         LOGGER.debug("Writing updater file");
         changeCallback.accept(total, total, "Writing updater file...");
 
-        LauncherFile updaterFile = LauncherFile.ofRelative("update.json");
+        LauncherFile updaterFile = LauncherFile.of("update.json");
         try {
             updaterFile.write(
                     JsonUtils.getGson().toJson(updaterChanges)
@@ -156,7 +156,7 @@ public class LauncherUpdater {
                     for(LauncherFile file : files) {
                         if(file.getName().endsWith(".exe")) {
                             LOGGER.info("Restarting alternative file " + file.getName() + " after update");
-                            pb.command().add(file.getName());
+                            pb.command().add("-r" + file.getName());
                             break;
                         }
                     }
