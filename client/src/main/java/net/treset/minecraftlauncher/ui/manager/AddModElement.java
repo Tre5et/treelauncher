@@ -11,7 +11,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModDownload;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
-import net.treset.mc_version_loader.mods.ModUtil;
+import net.treset.mc_version_loader.mods.MinecraftMods;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.ErrorWrapper;
@@ -116,7 +116,7 @@ public class AddModElement extends UiElement {
     private boolean modrinthValid() {
         if(!tfModrinth.getText().isEmpty()) {
             try {
-                return ModUtil.checkModrinthValid(tfModrinth.getText());
+                return MinecraftMods.checkModrinthValid(tfModrinth.getText());
             } catch (FileDownloadException e) {
                 return false;
             }
@@ -128,7 +128,7 @@ public class AddModElement extends UiElement {
         if(!tfCurseforge.getText().isEmpty()) {
             if(!tfCurseforge.getText().matches("[0-9]+")) return false;
             try {
-                return ModUtil.checkCurseforgeValid(Integer.parseInt(tfCurseforge.getText()));
+                return MinecraftMods.checkCurseforgeValid(Integer.parseInt(tfCurseforge.getText()));
             } catch (FileDownloadException e) {
                 return false;
             }
@@ -139,12 +139,12 @@ public class AddModElement extends UiElement {
     private String getIconUrl() {
         if(!tfModrinth.getText().isEmpty()) {
             try {
-                return ModUtil.getModrinthMod(tfModrinth.getText()).getIconUrl();
+                return MinecraftMods.getModrinthMod(tfModrinth.getText()).getIconUrl();
             } catch (FileDownloadException ignored) {}
         }
         if(!tfCurseforge.getText().isEmpty()) {
             try {
-                return ModUtil.getCurseforgeMod(Integer.parseInt(tfCurseforge.getText())).getIconUrl();
+                return MinecraftMods.getCurseforgeMod(Integer.parseInt(tfCurseforge.getText())).getIconUrl();
             } catch (FileDownloadException ignored) {}
         }
         return null;

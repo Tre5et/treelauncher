@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.update;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.minecraftlauncher.ui.generic.popup.PopupElement;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class UpdaterStatus extends GenericJsonParsable {
         this.exceptions = exceptions;
     }
 
-    public static UpdaterStatus fromJson(String json) {
+    public static UpdaterStatus fromJson(String json) throws SerializationException {
         return fromJson(json, UpdaterStatus.class);
     }
 

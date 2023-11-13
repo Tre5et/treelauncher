@@ -11,7 +11,7 @@ import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
-import net.treset.mc_version_loader.minecraft.MinecraftUtil;
+import net.treset.mc_version_loader.minecraft.MinecraftGame;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.creation.ModsCreator;
@@ -170,7 +170,7 @@ public class ModsCreatorElement extends CreatorElement {
         new Thread(() -> {
             List<MinecraftVersion> minecraftVersions;
             try {
-                minecraftVersions = chSnapshots.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases();
+                minecraftVersions = chSnapshots.isSelected() ? MinecraftGame.getVersions() : MinecraftGame.getReleases();
             } catch (FileDownloadException e) {
                 LauncherApplication.displayError(e);
                 return;

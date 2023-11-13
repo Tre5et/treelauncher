@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.sync;
 
 import javafx.util.Pair;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.util.DownloadStatus;
@@ -226,7 +227,11 @@ public class ManifestSynchronizer extends FileSynchronizer {
             throw new IOException("Sync file not found");
         }
         String componentData = syncFile.readString();
-        return ComponentData.fromJson(componentData);
+        try {
+            return ComponentData.fromJson(componentData);
+        } catch (SerializationException e) {
+            throw new IOException("Failed to parse sync file", e);
+        }
     }
 
     protected void downloadDifference(int currentVersion) throws IOException {

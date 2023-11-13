@@ -11,12 +11,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.fabric.FabricLoader;
 import net.treset.mc_version_loader.fabric.FabricProfile;
-import net.treset.mc_version_loader.fabric.FabricUtil;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
-import net.treset.mc_version_loader.minecraft.MinecraftUtil;
+import net.treset.mc_version_loader.minecraft.MinecraftGame;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -108,7 +108,7 @@ public abstract class VersionSelectorElement extends StackPane {
             }
             MinecraftVersionDetails details;
             try {
-                details = MinecraftUtil.getVersionDetails(version.getUrl());
+                details = MinecraftGame.getVersionDetails(version.getUrl());
             } catch (FileDownloadException e) {
                 throw new ComponentCreationException("Could not get Minecraft version details", e);
             }
@@ -120,7 +120,7 @@ public abstract class VersionSelectorElement extends StackPane {
             }
             FabricProfile profile;
             try {
-                profile = FabricUtil.getFabricProfile(cbVersion.getValue().getId(), details.getLoader().getVersion());
+                profile = FabricLoader.getFabricProfile(cbVersion.getValue().getId(), details.getLoader().getVersion());
             } catch (FileDownloadException e) {
                 throw new ComponentCreationException("Could not get Fabric profile", e);
             }
@@ -203,7 +203,7 @@ public abstract class VersionSelectorElement extends StackPane {
         updateLoaderChoice();
         new Thread(() -> {
             try {
-                vanillaVersions = chSnapshots.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases();
+                vanillaVersions = chSnapshots.isSelected() ? MinecraftGame.getVersions() : MinecraftGame.getReleases();
             } catch (FileDownloadException e) {
                 LauncherApplication.displayError(e);
                 return;
@@ -228,7 +228,7 @@ public abstract class VersionSelectorElement extends StackPane {
             ewLoader.setVisible(true);
             new Thread(() -> {
                 try {
-                    fabricVersions = FabricUtil.getFabricVersions(cbVersion.getValue().getId());
+                    fabricVersions = FabricLoader.getFabricVersions(cbVersion.getValue().getId());
                 } catch (FileDownloadException e) {
                     LauncherApplication.displayError(e);
                     return;

@@ -2,13 +2,14 @@ package net.treset.minecraftlauncher.creation;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.assets.AssetIndex;
-import net.treset.mc_version_loader.assets.AssetsUtil;
+import net.treset.mc_version_loader.assets.MinecraftAssets;
 import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.fabric.FabricLibrary;
+import net.treset.mc_version_loader.fabric.FabricLoader;
 import net.treset.mc_version_loader.fabric.FabricProfile;
-import net.treset.mc_version_loader.fabric.FabricUtil;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
 import net.treset.mc_version_loader.format.FormatUtils;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
@@ -101,7 +102,7 @@ public class VersionCreator extends GenericComponentCreator {
         }
         List<MinecraftVersion> versions;
         try {
-            versions = MinecraftUtil.getVersions();
+            versions = MinecraftGame.getVersions();
         } catch(FileDownloadException e) {
             throw new ComponentCreationException("Unable to create fabric version: failed to get mc versions", e);
         }
@@ -113,7 +114,12 @@ public class VersionCreator extends GenericComponentCreator {
                 } catch (FileDownloadException e) {
                     throw new ComponentCreationException("Unable to create fabric version: failed to download mc version details: versionId=" + fabricProfile.getInheritsFrom(), e);
                 }
-                VersionCreator mcCreator = new VersionCreator(getTypeConversion(), getComponentsManifest(), MinecraftVersionDetails.fromJson(mcJson), files, librariesDir);
+                VersionCreator mcCreator;
+                try {
+                    mcCreator = new VersionCreator(getTypeConversion(), getComponentsManifest(), MinecraftVersionDetails.fromJson(mcJson), files, librariesDir);
+                } catch (SerializationException e) {
+                    throw new ComponentCreationException("Unable to create fabric version: failed to parse mc version details: versionId=" + fabricProfile.getInheritsFrom(), e);
+                }
                 mcCreator.setStatusCallback(getStatusCallback());
                 String dependsId;
                 try {
@@ -166,7 +172,7 @@ public class VersionCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Unable to add fabric file: base dir is not a directory");
         }
         try {
-            FabricUtil.downloadFabricLoader(baseDir, fabricVersion.getLoader());
+            FabricLoader.downloadFabricLoader(baseDir, fabricVersion.getLoader());
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add fabric file: failed to download fabric loader", e);
         }
@@ -190,7 +196,7 @@ public class VersionCreator extends GenericComponentCreator {
 
         List<String> libs;
         try {
-            libs = FabricUtil.downloadFabricLibraries(librariesDir, clientLibs, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
+            libs = FabricLoader.downloadFabricLibraries(librariesDir, clientLibs, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add fabric libraries: failed to download libraries", e);
         }
@@ -251,7 +257,7 @@ public class VersionCreator extends GenericComponentCreator {
         String assetIndexUrl = mcVersion.getAssetIndex().getUrl();
         AssetIndex index;
         try {
-            index = AssetsUtil.getAssetIndex(assetIndexUrl);
+            index = MinecraftAssets.getAssetIndex(assetIndexUrl);
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to download assets: failed to download asset index", e);
         }
@@ -260,7 +266,7 @@ public class VersionCreator extends GenericComponentCreator {
         }
         LauncherFile baseDir = LauncherFile.of(LauncherApplication.config.BASE_DIR, files.getLauncherDetails().getAssetsDir());
         try {
-            AssetsUtil.downloadAssets(baseDir, index, assetIndexUrl, false, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, status)));
+            MinecraftAssets.downloadAssets(baseDir, index, assetIndexUrl, false, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to download assets: failed to download assets", e);
         }
@@ -305,7 +311,7 @@ public class VersionCreator extends GenericComponentCreator {
 
         List<String> result;
         try {
-            result = MinecraftUtil.downloadVersionLibraries(mcVersion.getLibraries(), librariesDir, List.of(), status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
+            result = MinecraftGame.downloadVersionLibraries(mcVersion.getLibraries(), librariesDir, List.of(), status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Unable to add libraries: failed to download libraries", e);
         }
@@ -320,7 +326,7 @@ public class VersionCreator extends GenericComponentCreator {
             throw new ComponentCreationException("Unable to add file: base dir is not a directory: dir=" + getNewManifest().getDirectory());
         }
         try {
-            MinecraftUtil.downloadVersionDownload(mcVersion.getDownloads().getClient(), baseDir);
+            MinecraftGame.downloadVersionDownload(mcVersion.getDownloads().getClient(), baseDir);
         } catch (FileDownloadException e){
             throw new ComponentCreationException("Unable to add file: Failed to download client: url=" + mcVersion.getDownloads().getClient().getUrl(), e);
         }

@@ -14,7 +14,7 @@ import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
-import net.treset.mc_version_loader.minecraft.MinecraftUtil;
+import net.treset.mc_version_loader.minecraft.MinecraftGame;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.config.Settings;
@@ -215,7 +215,7 @@ public class ModsManagerElement extends UiElement {
         cbVersion.getSelectionModel().select(0);
         new Thread(() -> {
             try {
-                List <String> names = (chSnapshots.isSelected() ? MinecraftUtil.getVersions() : MinecraftUtil.getReleases()).stream()
+                List <String> names = (chSnapshots.isSelected() ? MinecraftGame.getVersions() : MinecraftGame.getReleases()).stream()
                         .map(MinecraftVersion::getId)
                         .filter(s -> !s.equals(details.getValue().getModsVersion()))
                         .toList();

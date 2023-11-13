@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import net.treset.mc_version_loader.mods.ModUtil;
+import net.treset.mc_version_loader.mods.MinecraftMods;
 import net.treset.minecraftlauncher.auth.UserAuth;
 import net.treset.minecraftlauncher.config.Config;
 import net.treset.minecraftlauncher.config.GlobalConfigLoader;
@@ -51,8 +51,8 @@ public class LauncherApplication extends Application {
             return;
         }
 
-        ModUtil.setModrinthUserAgent(config.MODRINTH_USER_AGENT);
-        ModUtil.setCurseforgeApiKey(config.CURSEFORGE_API_KEY);
+        MinecraftMods.setModrinthUserAgent(config.MODRINTH_USER_AGENT);
+        MinecraftMods.setCurseforgeApiKey(config.CURSEFORGE_API_KEY);
 
         try {
             if(!config.BASE_DIR.exists() || !GlobalConfigLoader.hasMainMainfest(config.BASE_DIR)) {

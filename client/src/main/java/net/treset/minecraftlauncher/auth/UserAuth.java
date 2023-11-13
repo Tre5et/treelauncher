@@ -12,10 +12,11 @@ import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
 import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.mojang.MinecraftProfile;
 import net.treset.mc_version_loader.mojang.MinecraftProfileProperty;
 import net.treset.mc_version_loader.mojang.MinecraftProfileTextures;
-import net.treset.mc_version_loader.mojang.MojangUtil;
+import net.treset.mc_version_loader.mojang.MojangData;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.LauncherImage;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +26,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -200,11 +200,23 @@ public class UserAuth {
     private static final int[] headTopUVWH = new int[]{40, 8, 8, 8};
 
     public LauncherImage loadUserIcon() throws FileDownloadException {
-        MinecraftProfile profile = MojangUtil.getMinecraftProfile(minecraftUser.uuid());
+        MinecraftProfile profile = MojangData.getMinecraftProfile(minecraftUser.uuid());
         if(profile.getProperties() == null || profile.getProperties().isEmpty()) {
             throw new FileDownloadException("No properties found for user " + minecraftUser.name());
         }
-        MinecraftProfileTextures textures = profile.getProperties().stream().map(MinecraftProfileProperty::getTextures).filter(Objects::nonNull).findFirst().orElse(null);
+
+        MinecraftProfileTextures textures = null;
+        for(MinecraftProfileProperty property : profile.getProperties()) {
+            try {
+                textures = property.getTextures();
+            } catch (SerializationException e) {
+                throw new FileDownloadException("Failed to deserialize textures for user " + minecraftUser.name(), e);
+            }
+            if(textures != null) {
+                break;
+            }
+        }
+
         if(textures == null) {
             throw new FileDownloadException("No textures found for user " + minecraftUser.name());
         }

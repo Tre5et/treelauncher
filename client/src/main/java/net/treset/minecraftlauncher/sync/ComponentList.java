@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.sync;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.minecraftlauncher.LauncherApplication;
 
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class ComponentList extends GenericJsonParsable {
         }
     }
 
-    public static ComponentList fromJson(String json) {
+    public static ComponentList fromJson(String json) throws SerializationException {
         Entry[] entries = GenericJsonParsable.fromJson(json, Entry[].class);
         return new ComponentList(Arrays.asList(entries));
     }

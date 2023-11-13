@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.update;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 
 import java.util.List;
 
@@ -148,7 +149,7 @@ public class Update extends GenericJsonParsable {
         this.latest = latest;
     }
 
-    public static Update fromJson(String json) {
+    public static Update fromJson(String json) throws SerializationException {
         return fromJson(json, Update.class);
     }
 }

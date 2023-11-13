@@ -29,7 +29,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
 
         JavaRuntimes java;
         try {
-            java = JavaUtil.getJavaRuntimes();
+            java = MinecraftJava.getJavaRuntimes();
         } catch (FileDownloadException e) {
             attemptCleanup();
             throw new ComponentCreationException("Failed to create java component: failed to download java runtime json", e);
@@ -70,7 +70,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
 
         List<JavaFile> files;
         try {
-            files = JavaUtil.getJavaFile(release.getManifest().getUrl());
+            files = MinecraftJava.getJavaFiles(release.getManifest().getUrl());
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Failed to create java component: failed to download java file manifest", e);
         }
@@ -78,7 +78,7 @@ public class JavaComponentCreator extends GenericComponentCreator {
         File baseDir = new File(getNewManifest().getDirectory());
 
         try {
-            JavaUtil.downloadJavaFiles(baseDir, files, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.JAVA, status)));
+            MinecraftJava.downloadJavaFiles(baseDir, files, status -> setStatus(new CreationStatus(CreationStatus.DownloadStep.JAVA, status)));
         } catch (FileDownloadException e) {
             throw new ComponentCreationException("Failed to create java component: failed to download java files", e);
         }

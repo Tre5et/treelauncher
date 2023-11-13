@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.config;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.minecraftlauncher.data.InstanceData;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
@@ -183,12 +184,17 @@ public class Settings extends GenericJsonParsable {
         file.write(this);
     }
 
-    public static Settings fromJson(String json) {
+    public static Settings fromJson(String json) throws SerializationException {
         return fromJson(json, Settings.class);
     }
 
     public static Settings load(LauncherFile file) throws IOException {
-        Settings result = fromJson(file.readString());
+        Settings result;
+        try {
+            result = fromJson(file.readString());
+        } catch (SerializationException e) {
+            throw new IOException("Failed to load settings", e);
+        }
         result.setFile(file);
         return result;
     }

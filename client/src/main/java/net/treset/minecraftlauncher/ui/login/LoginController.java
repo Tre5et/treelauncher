@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.MainController;
 import net.treset.minecraftlauncher.ui.base.GenericUiController;
@@ -116,7 +117,12 @@ public class LoginController extends GenericUiController {
             return true;
         }
 
-        UpdaterStatus status = UpdaterStatus.fromJson(updaterFile.readString());
+        UpdaterStatus status;
+        try {
+            status = UpdaterStatus.fromJson(updaterFile.readString());
+        } catch (SerializationException e) {
+            throw new IOException("Failed to read updater status", e);
+        }
 
         if(status.getExceptions() != null) {
             LOGGER.warn("Exceptions occurred during update: " + status.getMessage());

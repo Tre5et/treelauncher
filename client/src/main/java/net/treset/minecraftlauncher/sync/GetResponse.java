@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.sync;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class GetResponse extends GenericJsonParsable {
         this.difference = difference;
     }
 
-    public static GetResponse fromJson(String json) {
+    public static GetResponse fromJson(String json) throws SerializationException {
         return GenericJsonParsable.fromJson(json, GetResponse.class);
     }
 }

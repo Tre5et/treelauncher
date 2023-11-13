@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.news;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class News extends GenericJsonParsable {
         this.other = other;
     }
 
-    public static News fromJson(String json) {
+    public static News fromJson(String json) throws SerializationException {
         return fromJson(json, News.class);
     }
 

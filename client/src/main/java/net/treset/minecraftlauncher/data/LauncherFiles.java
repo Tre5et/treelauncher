@@ -2,6 +2,7 @@ package net.treset.minecraftlauncher.data;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.launcher.*;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.util.exception.FileLoadException;
@@ -73,7 +74,11 @@ public class LauncherFiles {
             throw new FileLoadException("Unable to load launcher manifest: file error", e);
         }
 
-        mainManifest = LauncherManifest.fromJson(versionFile);
+        try {
+            mainManifest = LauncherManifest.fromJson(versionFile);
+        } catch (SerializationException e) {
+            throw new FileLoadException("Unable to load launcher manifest: json error", e);
+        }
         if(mainManifest == null || mainManifest.getType() != LauncherManifestType.LAUNCHER) {
             mainManifest = null;
             throw new FileLoadException("Unable to load launcher manifest: incorrect contents");
@@ -97,7 +102,11 @@ public class LauncherFiles {
             throw new FileLoadException("Unable to load launcher details: file error", e);
         }
 
-        this.launcherDetails = LauncherDetails.fromJson(detailsFile);
+        try {
+            this.launcherDetails = LauncherDetails.fromJson(detailsFile);
+        } catch (SerializationException e) {
+            throw new FileLoadException("Unable to load launcher details: json error", e);
+        }
         if(this.launcherDetails == null || this.launcherDetails.getVersionDir() == null || this.launcherDetails.getVersionType() == null|| this.launcherDetails.getVersionComponentType() == null|| this.launcherDetails.getSavesType() == null || this.launcherDetails.getSavesComponentType() == null || this.launcherDetails.getResourcepacksType() == null|| this.launcherDetails.getResourcepacksComponentType() == null|| this.launcherDetails.getResourcepacksDir() == null || this.launcherDetails.getAssetsDir() == null|| this.launcherDetails.getGamedataDir() == null|| this.launcherDetails.getGamedataType() == null || this.launcherDetails.getInstancesDir() == null|| this.launcherDetails.getInstanceComponentType() == null|| this.launcherDetails.getInstancesType() == null || this.launcherDetails.getJavaComponentType() == null|| this.launcherDetails.getJavasDir() == null || this.launcherDetails.getJavasType() == null || this.launcherDetails.getLibrariesDir() == null|| this.launcherDetails.getModsComponentType() == null || this.launcherDetails.getModsType() == null || this.launcherDetails.getOptionsDir() == null || this.launcherDetails.getOptionsComponentType() == null || this.launcherDetails.getOptionsType() == null || this.launcherDetails.getSavesComponentType() == null|| this.launcherDetails.getSavesType() == null) {
             this.launcherDetails = null;
             throw new FileLoadException("Unable to load launcher details: incorrect contents");
@@ -243,7 +252,12 @@ public class LauncherFiles {
         if(versionFile == null) {
             throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " manifest: file error");
         }
-        LauncherManifest out = LauncherManifest.fromJson(versionFile, getLauncherDetails().getTypeConversion());
+        LauncherManifest out;
+        try {
+            out = LauncherManifest.fromJson(versionFile, getLauncherDetails().getTypeConversion());
+        } catch (SerializationException e) {
+            throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " manifest: json error", e);
+        }
         if(out == null || out.getType() != expectedType) {
             throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " manifest: incorrect contents");
         }
@@ -282,7 +296,12 @@ public class LauncherFiles {
             return;
         }
 
-        LauncherManifest manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
+        LauncherManifest manifest;
+        try {
+            manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
+        } catch (SerializationException e) {
+            throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " component: json error: id=" + expectedId, e);
+        }
         if(manifest == null || manifest.getType() == null || manifest.getType() != expectedType || manifest.getId() == null || !manifest.getId().equals(expectedId)) {
             if(fallbackPath == null) {
                 throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + expectedId);
@@ -333,7 +352,12 @@ public class LauncherFiles {
             return;
         }
 
-        LauncherManifest manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
+        LauncherManifest manifest;
+        try {
+            manifest = LauncherManifest.fromJson(manifestFile, getLauncherDetails().getTypeConversion());
+        } catch (SerializationException e) {
+            throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " component: json error: id=" + expectedId, e);
+        }
         if(manifest == null || manifest.getType() == null || manifest.getType() != expectedType || manifest.getId() == null || !manifest.getId().equals(expectedId) || manifest.getDetails() == null) {
             if(fallbackPath == null) {
                 throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " component: incorrect contents: id=" + expectedId);
@@ -353,7 +377,12 @@ public class LauncherFiles {
             LOGGER.debug("Falling back to fallback path loading " +  expectedType.name().toLowerCase() + " component id=" + expectedId);
             addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId);
         }
-        T details = GenericJsonParsable.fromJson(detailsFile, targetClass);
+        T details;
+        try {
+            details = GenericJsonParsable.fromJson(detailsFile, targetClass);
+        } catch (SerializationException e) {
+            throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " component details: json error: id=" + expectedId, e);
+        }
         if(details == null) {
             if(fallbackPath == null) {
                 throw new FileLoadException("Unable to load " + expectedType.name().toLowerCase() + " component details: incorrect contents: id=" + expectedId);

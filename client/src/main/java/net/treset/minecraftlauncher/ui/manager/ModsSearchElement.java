@@ -15,8 +15,8 @@ import net.treset.mc_version_loader.exception.FileDownloadException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherMod;
 import net.treset.mc_version_loader.launcher.LauncherModsDetails;
+import net.treset.mc_version_loader.mods.MinecraftMods;
 import net.treset.mc_version_loader.mods.ModData;
-import net.treset.mc_version_loader.mods.ModUtil;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.ui.base.UiElement;
 import net.treset.minecraftlauncher.ui.generic.lists.ChangeEvent;
@@ -96,7 +96,7 @@ public class ModsSearchElement extends UiElement {
     private void populateResults() {
         List<ModData> results;
         try {
-            results = ModUtil.searchCombinedMods(tfSearch.getText(), gameVersion, loaderType, 20, 0);
+            results = MinecraftMods.searchCombinedMods(tfSearch.getText(), gameVersion, loaderType, 20, 0);
         } catch (FileDownloadException e) {
             LOGGER.error("Failed to search for mods", e);
             return;

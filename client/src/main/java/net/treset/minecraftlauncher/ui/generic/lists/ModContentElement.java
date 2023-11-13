@@ -323,11 +323,12 @@ public class ModContentElement extends ContentElement {
         LOGGER.debug("Downloading mod file: name={}", versionData.getName());
         LauncherMod newMod;
         try {
-            newMod = ModUtil.downloadModFile(versionData, new File(componentManifest.getDirectory()), enabled);
+            newMod = MinecraftMods.downloadModFile(versionData, new File(componentManifest.getDirectory()));
         } catch (FileDownloadException e) {
             LauncherApplication.displayError(e);
             return List.of();
         }
+        newMod.setEnabled(enabled);
 
         ArrayList<LauncherMod> mods = new ArrayList<>();
         mods.add(newMod);

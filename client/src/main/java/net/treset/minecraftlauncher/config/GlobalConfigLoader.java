@@ -1,5 +1,6 @@
 package net.treset.minecraftlauncher.config;
 
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -124,7 +125,12 @@ public class GlobalConfigLoader {
         if(contents == null || contents.isBlank()) {
             return false;
         }
-        LauncherManifest manifest = LauncherManifest.fromJson(contents);
+        LauncherManifest manifest;
+        try {
+            manifest = LauncherManifest.fromJson(contents);
+        } catch (SerializationException e) {
+            return false;
+        }
         return manifest != null && manifest.getType() == LauncherManifestType.LAUNCHER;
     }
 }

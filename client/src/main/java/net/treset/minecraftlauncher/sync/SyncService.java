@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.sync;
 
 import javafx.util.Pair;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.minecraftlauncher.LauncherApplication;
@@ -65,7 +66,11 @@ public class SyncService extends HttpService {
 
     public GetResponse get(String type, String id, int version) throws IOException {
         Pair<HttpStatusCode, byte[]> result = get("get", type, id, version);
-        return GetResponse.fromJson(new String(result.getValue()));
+        try {
+            return GetResponse.fromJson(new String(result.getValue()));
+        } catch (SerializationException e) {
+            throw new IOException("Failed to parse the response from the server.\nError: " + e);
+        }
     }
 
     public byte[] downloadFile(String type, String id, String path) throws IOException {

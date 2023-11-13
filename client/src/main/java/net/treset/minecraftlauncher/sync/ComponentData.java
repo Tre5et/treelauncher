@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.sync;
 
 import net.treset.mc_version_loader.json.GenericJsonParsable;
+import net.treset.mc_version_loader.json.SerializationException;
 
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class ComponentData extends GenericJsonParsable {
         this.hashTree = hashTree;
     }
 
-    public static ComponentData fromJson(String json) {
+    public static ComponentData fromJson(String json) throws SerializationException {
         return fromJson(json, ComponentData.class);
     }
 }

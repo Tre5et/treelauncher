@@ -1,6 +1,7 @@
 package net.treset.minecraftlauncher.news;
 
 import javafx.util.Pair;
+import net.treset.mc_version_loader.json.SerializationException;
 import net.treset.minecraftlauncher.LauncherApplication;
 import net.treset.minecraftlauncher.resources.localization.StringLocalizer;
 import net.treset.minecraftlauncher.util.HttpService;
@@ -17,7 +18,7 @@ public class NewsService extends HttpService {
         String response = new String(result.getValue());
         try {
             return News.fromJson(response);
-        } catch(Exception e) {
+        } catch(SerializationException e) {
             throw new IOException("Failed to parse the response from the server.\nError: " + e);
         }
     }

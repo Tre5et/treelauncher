@@ -2,15 +2,15 @@ package net.treset.minecraftlauncher.sync;
 
 import javafx.util.Pair;
 import net.treset.mc_version_loader.exception.FileDownloadException;
+import net.treset.mc_version_loader.fabric.FabricLoader;
 import net.treset.mc_version_loader.fabric.FabricProfile;
-import net.treset.mc_version_loader.fabric.FabricUtil;
 import net.treset.mc_version_loader.fabric.FabricVersionDetails;
 import net.treset.mc_version_loader.json.JsonUtils;
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails;
 import net.treset.mc_version_loader.launcher.LauncherManifest;
 import net.treset.mc_version_loader.launcher.LauncherManifestType;
 import net.treset.mc_version_loader.launcher.LauncherVersionDetails;
-import net.treset.mc_version_loader.minecraft.MinecraftUtil;
+import net.treset.mc_version_loader.minecraft.MinecraftGame;
 import net.treset.mc_version_loader.minecraft.MinecraftVersion;
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails;
 import net.treset.mc_version_loader.util.DownloadStatus;
@@ -213,14 +213,14 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
     }
 
     protected VersionCreator getVanillaCreator(LauncherVersionDetails details) throws IOException, FileDownloadException {
-        Optional<MinecraftVersion> version = MinecraftUtil.getReleases().stream()
+        Optional<MinecraftVersion> version = MinecraftGame.getReleases().stream()
                 .filter(v -> v.getId().equals(details.getVersionId()) || v.getId().equals(details.getVersionNumber()))
                 .findFirst();
         if(version.isEmpty()) {
             throw new IOException("Failed to find version: " + details.getVersionId());
         }
         String url = version.get().getUrl();
-        MinecraftVersionDetails versionDetails = MinecraftUtil.getVersionDetails(url);
+        MinecraftVersionDetails versionDetails = MinecraftGame.getVersionDetails(url);
         return new VersionCreator(
                 instanceData.getInstance().getKey().getTypeConversion(),
                 files.getVersionManifest(),
@@ -231,8 +231,8 @@ public class InstanceSynchronizer extends ManifestSynchronizer {
     }
 
     protected VersionCreator getFabricCreator(LauncherVersionDetails details) throws IOException, FileDownloadException {
-        FabricVersionDetails version = FabricUtil.getFabricVersionDetails(details.getVersionNumber(), details.getLoaderVersion());
-        FabricProfile profile = FabricUtil.getFabricProfile(details.getVersionNumber(), details.getLoaderVersion());
+        FabricVersionDetails version = FabricLoader.getFabricVersionDetails(details.getVersionNumber(), details.getLoaderVersion());
+        FabricProfile profile = FabricLoader.getFabricProfile(details.getVersionNumber(), details.getLoaderVersion());
         return new VersionCreator(
                 instanceData.getInstance().getKey().getTypeConversion(),
                 files.getVersionManifest(),
