@@ -7,6 +7,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Files
+import java.nio.file.FileSystemException
 import javax.swing.JFrame
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -28,6 +29,7 @@ fun main(args: Array<String>) {
     } catch (e: IOException) {
         println(e)
         File("updater.json").writeText(Json.encodeToString(UpdaterStatus(Status.FAILURE, "Failed to read update file.", listOf(e.stackTraceToString()))))
+        restartApplication()
         closeGui()
         return
     }
@@ -60,23 +62,27 @@ fun openGui() {
     }
 
     val label = JTextArea("Starting updater...\n\r")
-    label.setBounds(0, 0, 600, 300)
+    label.setBounds(0, 0, 600, 260)
+
+    val scrollPane = JScrollPane(label)
+    scrollPane.setSize(600, 260)
+
     System.setOut(PrintStream(object : OutputStream() {
         @Throws(IOException::class)
         override fun write(b: Int) {
             val c = b.toChar()
             label.text += c
+            scrollPane.verticalScrollBar.setValue(scrollPane.verticalScrollBar.maximum)
         }
     }))
 
-
-    frame = JFrame("Updater")
-    frame?.let {
+    frame = JFrame("TreeLauncher Updater").also {
         it.setSize(600, 300)
         it.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
+        it.isAlwaysOnTop = true
         it.layout = null
 
-        it.add(JScrollPane(label))
+        it.add(scrollPane)
 
         it.isVisible = true
     }
@@ -144,15 +150,21 @@ fun executeUpdate() : UpdaterStatus {
 fun backupFile(file: File, backupFile: File): Boolean {
     if(file.isFile) {
         var exception: Exception?
+        var waitAttempts = 0
         do {
             try {
                 println("Backing up file: ${file.path}")
                 Files.move(file.toPath(), backupFile.toPath())
                 exception = null
-            } catch (e: AccessDeniedException) {
+            } catch (e: FileSystemException) {
+                if(waitAttempts > 60) {
+                    println("Failed to backup file: Waited too long for access: ${file.path}: $e")
+                    throw e
+                }
                 println("Waiting for access to file: ${file.path}, trying again in 1 second")
-                Thread.sleep(1000)
+                waitAttempts++
                 exception = e
+                Thread.sleep(1000)
                 continue
             } catch (e: IOException) {
                 println("Failed to backup file: ${file.path}: $e")

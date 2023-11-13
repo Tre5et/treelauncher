@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "net.treset"
-version = "0.0.1"
+version = "1.0.0"
 
 repositories {
     mavenCentral()

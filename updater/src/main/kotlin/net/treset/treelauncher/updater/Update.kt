@@ -9,7 +9,8 @@ import java.io.IOException
 data class UpdateChange(
     val path: String,
     val mode: Mode,
-    val elements: List<Element>? = null
+    val elements: List<Element>? = null,
+    val updater: Boolean? = null
 )
 
 @Serializable
