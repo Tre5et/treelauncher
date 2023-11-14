@@ -13,7 +13,7 @@ public class StringLocalizer {
 
     public StringLocalizer(Language language) {
         this.language = language != null ? language : getSystemLanguage();
-        stringBundle = ResourceBundle.getBundle("lang.strings", getLocale(this.language));
+        stringBundle = ResourceBundle.getBundle("lang.strings", this.language.locale);
     }
 
     public String get(String property) {
@@ -49,16 +49,22 @@ public class StringLocalizer {
     }
 
     public enum Language {
-        ENGLISH("language.english"),
-        GERMAN("language.german");
+        ENGLISH("language.english", Locale.ENGLISH),
+        GERMAN("language.german", Locale.GERMAN);
 
         private final String name;
-        Language(String name) {
+        private final Locale locale;
+        Language(String name, Locale locale) {
             this.name = name;
+            this.locale = locale;
         }
 
         public String getName() {
             return LauncherApplication.stringLocalizer.get(name);
+        }
+
+        public Locale getLocale() {
+            return locale;
         }
 
         @Override
@@ -79,12 +85,5 @@ public class StringLocalizer {
                 return Language.ENGLISH;
             }
         }
-    }
-
-    public static Locale getLocale(Language language) {
-        if(language.equals(Language.GERMAN)) {
-            return Locale.GERMAN;
-        }
-        return Locale.ENGLISH;
     }
 }

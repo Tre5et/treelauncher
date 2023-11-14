@@ -12,7 +12,7 @@ public class UpdateService extends HttpService {
     }
 
     public Update update() throws IOException {
-        Pair<HttpStatusCode, byte[]> result = get("update", LauncherApplication.stringLocalizer.get("launcher.version"));
+        Pair<HttpStatusCode, byte[]> result = get("update", LauncherApplication.stringLocalizer.get("launcher.version"), LauncherApplication.stringLocalizer.getLanguage().getLocale());
         String response = new String(result.getValue());
         try {
             return Update.fromJson(response);
