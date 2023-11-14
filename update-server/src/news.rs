@@ -3,6 +3,7 @@ use std::path::Path;
 use actix_web::{get, HttpRequest, HttpResponse};
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
+use crate::LocalItem;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct News {
@@ -10,12 +11,6 @@ struct News {
     title: Vec<LocalItem>,
     content: Option<Vec<LocalItem>>,
     important: Option<bool>
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-struct LocalItem {
-    locale: String,
-    content: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -79,10 +74,10 @@ fn get_news(version: Option<Version>, locale: Option<String>) -> HttpResponse {
                 continue;
             }
         }
-        let title= get_local_item(n.title.clone(), locale.clone());
+        let title= crate::get_local_item(n.title.clone(), locale.clone());
         let mut content = None;
         if n.content.is_some() {
-            content = Some(get_local_item(n.content.unwrap(), locale.clone()));
+            content = Some(crate::get_local_item(n.content.unwrap(), locale.clone()));
         }
 
         let id: String;
@@ -112,25 +107,6 @@ fn get_news(version: Option<Version>, locale: Option<String>) -> HttpResponse {
             other: if other.is_empty() { None } else { Some(other) }
         }
     );
-}
-
-fn get_local_item(items: Vec<LocalItem>, locale: Option<String>) -> String {
-    let mut result = items.get(0).unwrap().clone().content;
-    if locale.is_none() {
-        return result;
-    }
-    let locale = locale.unwrap();
-    for i in items {
-        let target = locale.split("-").collect::<Vec<&str>>();
-        let language = i.locale.split("-").collect::<Vec<&str>>();
-        if language.get(0) == target.get(0) {
-            result = i.content;
-            if target.len() == 1 || language.get(1) == target.get(1) {
-                break;
-            }
-        }
-    }
-    return result;
 }
 
 fn read_news_file() -> Result<Vec<News>, HttpResponse> {

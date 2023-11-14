@@ -1,10 +1,18 @@
 use std::ffi::c_int;
 use serde::{Deserialize, Serialize};
+use crate::LocalItem;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateManifest {
     pub id: Option<String>,
     pub requires: Option<String>,
+    pub changes: Option<Vec<ChangeElement>>,
+    pub message: Option<Vec<LocalItem>>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateResult {
+    pub id: Option<String>,
     pub changes: Option<Vec<ChangeElement>>,
     pub message: Option<String>,
     pub latest: Option<bool>

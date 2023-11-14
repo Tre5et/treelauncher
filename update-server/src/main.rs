@@ -4,6 +4,7 @@ use std::fs;
 use std::path::Path;
 use actix_web::{App, HttpServer};
 use once_cell::sync::OnceCell;
+use serde::{Deserialize, Serialize};
 
 mod update;
 mod update_manifest;
@@ -38,6 +39,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(update::test)
             .service(update::update)
+            .service(update::update_locale)
             .service(update::file)
             .service(news::news)
             .service(news::version_news)
@@ -49,4 +51,29 @@ async fn main() -> std::io::Result<()> {
 
 pub fn get_data_dir() -> String {
     return DATA_DIR.get().expect("Data dir not set!").clone();
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct LocalItem {
+    pub locale: String,
+    pub content: String
+}
+
+pub fn get_local_item(items: Vec<LocalItem>, locale: Option<String>) -> String {
+    let mut result = items.get(0).unwrap().clone().content;
+    if locale.is_none() {
+        return result;
+    }
+    let locale = locale.unwrap();
+    for i in items {
+        let target = locale.split("-").collect::<Vec<&str>>();
+        let language = i.locale.split("-").collect::<Vec<&str>>();
+        if language.get(0) == target.get(0) {
+            result = i.content;
+            if target.len() == 1 || language.get(1) == target.get(1) {
+                break;
+            }
+        }
+    }
+    return result;
 }

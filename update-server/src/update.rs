@@ -4,7 +4,8 @@ use actix_web::{get, HttpRequest, HttpResponse};
 use actix_web::http::header::ContentType;
 use urlencoding::decode;
 use semver::{Version, VersionReq};
-use crate::update_manifest::{ChangeElement, UpdateManifest, UpdateMode};
+use crate::get_local_item;
+use crate::update_manifest::{ChangeElement, UpdateManifest, UpdateMode, UpdateResult};
 
 #[get("/test")]
 pub async fn test() -> HttpResponse {
@@ -13,6 +14,15 @@ pub async fn test() -> HttpResponse {
 
 #[get("/update/{version}")]
 pub async fn update(req: HttpRequest) -> HttpResponse {
+    return get_update(req);
+}
+
+#[get("/update/{version}/{locale}")]
+pub async fn update_locale(req: HttpRequest) -> HttpResponse {
+    return get_update(req);
+}
+
+pub fn get_update(req: HttpRequest) -> HttpResponse {
     let input_version = req.match_info().get("version");
     if input_version.is_none() {
         return HttpResponse::BadRequest().body("Version not specified!");
@@ -23,6 +33,8 @@ pub async fn update(req: HttpRequest) -> HttpResponse {
         return HttpResponse::BadRequest().body("Invalid version!");
     }
     let input_version = input_version.unwrap();
+    let locale = req.match_info().get("locale");
+    let locale = if locale.is_some() { Some(locale.unwrap().to_string()) } else { None };
 
     let version_file = read_version_file();
     if version_file.is_err() {
@@ -72,8 +84,7 @@ pub async fn update(req: HttpRequest) -> HttpResponse {
                 }
             }
             if v.message.is_some() {
-                let new_line = v.message.unwrap().replace("{v}", version_id.as_str());
-                message = format!("{}\n{}", message, new_line);
+                message = format!("{}\n{}", message, get_local_item(v.message.unwrap(), locale.clone()).replace("{v}", version_id.as_str()));
             }
         }
     }
@@ -82,9 +93,8 @@ pub async fn update(req: HttpRequest) -> HttpResponse {
     }
     if version_id.is_empty() {
         return HttpResponse::Ok().json(
-            UpdateManifest {
+            UpdateResult {
                 id: None,
-                requires: None,
                 changes: None,
                 message: None,
                 latest: Some(latest)
@@ -93,9 +103,8 @@ pub async fn update(req: HttpRequest) -> HttpResponse {
     }
 
     return HttpResponse::Ok().json(
-        UpdateManifest {
+        UpdateResult {
             id: Some(version_id),
-            requires: None,
             changes: Some(changes),
             message: if message.is_empty() { None } else { Some(message) },
             latest: Some(latest)
