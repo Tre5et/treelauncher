@@ -64,7 +64,7 @@ pub fn get_update(req: HttpRequest) -> HttpResponse {
             }
             version_id = version_str;
             latest = true;
-            for c in v.changes.unwrap() {
+            for c in v.changes.unwrap_or_else(|| Vec::new()) {
                 let mut dealt_with = false;
                 for o in changes.clone() {
                     let c_copy = c.clone();
@@ -84,7 +84,13 @@ pub fn get_update(req: HttpRequest) -> HttpResponse {
                 }
             }
             if v.message.is_some() {
-                message = format!("{}\n{}", message, get_local_item(v.message.unwrap(), locale.clone()).replace("{v}", version_id.as_str()));
+                let new_message = get_local_item(v.message.unwrap(), locale.clone());
+                if message.is_empty() {
+                    message = new_message;
+                }
+                else {
+                    message = format!("{}\n{}", message, new_message);
+                }
             }
         }
     }
