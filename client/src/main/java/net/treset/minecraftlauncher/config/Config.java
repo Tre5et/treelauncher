@@ -32,7 +32,7 @@ public class Config {
     public final List<LauncherLaunchArgument> FABRIC_DEFAULT_GAME_ARGUMENTS = List.of();
     public final List<LauncherLaunchArgument> FABRIC_DEFAULT_JVM_ARGUMENTS = List.of();
     public final String FABRIC_DEFAULT_CLIENT_FILENAME = "fabric-client.jar";
-    public final String MODRINTH_USER_AGENT = "TreSet/treelauncher/v0.7.2";
+    public final String MODRINTH_USER_AGENT = "TreSet/treelauncher/v1.0.0";
     public final String CURSEFORGE_API_KEY = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW";
     public final boolean DEBUG;
     public final String UPDATE_URL;

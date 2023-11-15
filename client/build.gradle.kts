@@ -9,7 +9,7 @@ plugins {
 }
 
 val group = "net.treset"
-val version = "0.7.2"
+val version = "1.0.0"
 val mainClassName = "net.treset.minecraftlauncher.Main"
 
 val mcAuthenticatorVersion = "3.0.5"
