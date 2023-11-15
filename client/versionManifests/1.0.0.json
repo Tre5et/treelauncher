@@ -8,7 +8,7 @@
       "url": "https://github.com/Tre5et/treelauncher/releases/download/v1.0.0/TreeLauncher-1.0.0.jar"
     }
   ],
-  "updaterUrl": "https://github.com/Tre5et/treelauncher/raw/v1.0.0/app/updater.jar",
+  "updaterUrl": "https://github.com/Tre5et/treelauncher/raw/v1.0.0/client/app/updater.jar",
   "changes": [
     "Added a news system",
     "Reworked the update system to support more update operations and be safer",
