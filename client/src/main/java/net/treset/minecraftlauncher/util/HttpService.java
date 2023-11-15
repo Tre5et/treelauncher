@@ -25,15 +25,27 @@ public class HttpService {
     }
 
     protected Pair<HttpStatusCode, byte[]> get(Object... route) throws IOException {
-        return evaluateStatus(get(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers));
+        try {
+            return evaluateStatus(get(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers));
+        } catch(IOException e) {
+            throw new IOException("Failed to connect to server: " + baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), e);
+        }
     }
 
     protected Pair<HttpStatusCode, byte[]> post(byte[] data, Object... route) throws IOException {
-        return evaluateStatus(post(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers, data));
+        try {
+            return evaluateStatus(post(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers, data));
+        } catch(IOException e) {
+            throw new IOException("Failed to connect to server: " + baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), e);
+        }
     }
 
     protected Pair<HttpStatusCode, byte[]> post(String contentType, byte[] data, Object... route) throws IOException {
-        return evaluateStatus(post(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers, contentType, data));
+        try {
+            return evaluateStatus(post(baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), headers, contentType, data));
+        } catch(IOException e) {
+            throw new IOException("Failed to connect to server: " + baseUrl + "/" + Strings.join(Arrays.asList(route), '/'), e);
+        }
     }
 
     private Pair<HttpStatusCode, byte[]> evaluateStatus(Pair<HttpStatusCode, byte[]> result) throws IOException {
