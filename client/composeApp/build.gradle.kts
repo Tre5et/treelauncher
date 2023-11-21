@@ -26,9 +26,14 @@ kotlin {
             implementation("com.google.code.gson:gson:2.10.1")
             implementation("net.treset:mc-version-loader:2.0.0")
             implementation("net.hycrafthd:minecraft_authenticator:3.0.5")
+
+            implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+            implementation("org.slf4j:slf4j-api:2.0.9")
+            implementation("ch.qos.logback:logback-classic:1.4.11")
         }
     }
 }
+
 
 compose.desktop {
     application {
@@ -41,3 +46,5 @@ compose.desktop {
         }
     }
 }
+
+
