@@ -201,7 +201,7 @@ class LauncherFile(pathname: String?) : File(pathname) {
             return of(file, launcherFile.path)
         }
 
-        fun ofRelative(vararg parts: String): LauncherFile {
+        fun ofData(vararg parts: String): LauncherFile {
             return of(appConfig().BASE_DIR, *parts)
         }
     }

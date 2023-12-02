@@ -27,7 +27,7 @@ abstract class GenericComponentCreator(
     var componentsManifest: LauncherManifest?
 ) : ComponentCreator {
     protected var newManifest: LauncherManifest? = null
-    protected var statusCallback: Consumer<CreationStatus>? = null
+    open var statusCallback: (CreationStatus) -> Unit = {}
     protected var defaultStatus: CreationStatus? = null
 
     @get:Throws(ComponentCreationException::class)
@@ -191,7 +191,7 @@ abstract class GenericComponentCreator(
         }
     }
 
-    protected open fun attemptCleanup(): Boolean {
+    open fun attemptCleanup(): Boolean {
         LOGGER.debug { "Attempting cleanup" }
         var success = true
         newManifest?.let {
@@ -254,7 +254,7 @@ abstract class GenericComponentCreator(
         }?: false
 
     fun setStatus(status: CreationStatus) {
-        statusCallback?.accept(status)
+        statusCallback(status)
     }
 
     companion object {

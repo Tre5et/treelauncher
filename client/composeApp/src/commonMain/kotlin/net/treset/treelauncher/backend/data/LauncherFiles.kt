@@ -11,23 +11,57 @@ import java.io.IOException
 import java.util.*
 
 class LauncherFiles {
-    private var mainManifest: LauncherManifest? = null
-    private var launcherDetails: LauncherDetails? = null
-    private var gameDetailsManifest: LauncherManifest? = null
-    private var modsManifest: LauncherManifest? = null
-    private var modsComponents: List<Pair<LauncherManifest, LauncherModsDetails>?>? = null
-    private var savesManifest: LauncherManifest? = null
-    private var savesComponents: List<LauncherManifest?>? = null
-    private var instanceManifest: LauncherManifest? = null
-    private var instanceComponents: List<Pair<LauncherManifest, LauncherInstanceDetails>?>? = null
-    private var javaManifest: LauncherManifest? = null
-    private var javaComponents: List<LauncherManifest?>? = null
-    private var optionsManifest: LauncherManifest? = null
-    private var optionsComponents: List<LauncherManifest?>? = null
-    private var resourcepackManifest: LauncherManifest? = null
-    private var resourcepackComponents: List<LauncherManifest?>? = null
-    private var versionManifest: LauncherManifest? = null
-    private var versionComponents: List<Pair<LauncherManifest, LauncherVersionDetails>?>? = null
+    private var _mainManifest: LauncherManifest? = null
+    val mainManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _mainManifest?: throw FileLoadException("Unable to load launcher manifest: main file not loaded")
+    private var _launcherDetails: LauncherDetails? = null
+    val launcherDetails: LauncherDetails
+        @Throws(FileLoadException::class) get() = _launcherDetails?: throw FileLoadException("Unable to load launcher details: details not loaded")
+    private var _gameDetailsManifest: LauncherManifest? = null
+    val gameDetailsManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _gameDetailsManifest?: throw FileLoadException("Unable to load launcher details: game details not loaded")
+    private var _modsManifest: LauncherManifest? = null
+    val modsManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _modsManifest?: throw FileLoadException("Unable to load launcher details: mods manifest not loaded")
+    private var _modsComponents: List<Pair<LauncherManifest, LauncherModsDetails>?>? = null
+    val modsComponents: List<Pair<LauncherManifest, LauncherModsDetails>?>
+        @Throws(FileLoadException::class) get() = _modsComponents?: throw FileLoadException("Unable to load launcher details: mods components not loaded")
+    private var _savesManifest: LauncherManifest? = null
+    val savesManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _savesManifest?: throw FileLoadException("Unable to load launcher details: saves manifest not loaded")
+    private var _savesComponents: List<LauncherManifest?>? = null
+    val savesComponents: List<LauncherManifest?>
+        @Throws(FileLoadException::class) get() = _savesComponents?: throw FileLoadException("Unable to load launcher details: saves components not loaded")
+    private var _instanceManifest: LauncherManifest? = null
+    val instanceManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _instanceManifest?: throw FileLoadException("Unable to load launcher details: instance manifest not loaded")
+    private var _instanceComponents: List<Pair<LauncherManifest, LauncherInstanceDetails>?>? = null
+    val instanceComponents: List<Pair<LauncherManifest, LauncherInstanceDetails>?>
+        @Throws(FileLoadException::class) get() = _instanceComponents?: throw FileLoadException("Unable to load launcher details: instance components not loaded")
+    private var _javaManifest: LauncherManifest? = null
+    val javaManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _javaManifest?: throw FileLoadException("Unable to load launcher details: java manifest not loaded")
+    private var _javaComponents: List<LauncherManifest?>? = null
+    val javaComponents: List<LauncherManifest?>
+        @Throws(FileLoadException::class) get() = _javaComponents?: throw FileLoadException("Unable to load launcher details: java components not loaded")
+    private var _optionsManifest: LauncherManifest? = null
+    val optionsManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _optionsManifest?: throw FileLoadException("Unable to load launcher details: options manifest not loaded")
+    private var _optionsComponents: List<LauncherManifest?>? = null
+    val optionsComponents: List<LauncherManifest?>
+        @Throws(FileLoadException::class) get() = _optionsComponents?: throw FileLoadException("Unable to load launcher details: options components not loaded")
+    private var _resourcepackManifest: LauncherManifest? = null
+    val resourcepackManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _resourcepackManifest?: throw FileLoadException("Unable to load launcher details: resourcepack manifest not loaded")
+    private var _resourcepackComponents: List<LauncherManifest?>? = null
+    val resourcepackComponents: List<LauncherManifest?>
+        @Throws(FileLoadException::class) get() = _resourcepackComponents?: throw FileLoadException("Unable to load launcher details: resourcepack components not loaded")
+    private var _versionManifest: LauncherManifest? = null
+    val versionManifest: LauncherManifest
+        @Throws(FileLoadException::class) get() = _versionManifest?: throw FileLoadException("Unable to load launcher details: version manifest not loaded")
+    private var _versionComponents: List<Pair<LauncherManifest, LauncherVersionDetails>>? = null
+    val versionComponents: List<Pair<LauncherManifest, LauncherVersionDetails>>
+        @Throws(FileLoadException::class) get() = _versionComponents?: throw FileLoadException("Unable to load launcher details: version components not loaded")
 
     init {
         reloadMainManifest()
@@ -56,10 +90,6 @@ class LauncherFiles {
         reloadVersionComponents()
     }
 
-    fun getMainManifest(): LauncherManifest? {
-        return mainManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadMainManifest() {
         val versionFile: String = try {
@@ -68,7 +98,7 @@ class LauncherFiles {
             throw FileLoadException("Unable to load launcher manifest: file error", e)
         }
 
-        mainManifest = try {
+        _mainManifest = try {
             LauncherManifest.fromJson(versionFile)
         } catch (e: SerializationException) {
             throw FileLoadException("Unable to load launcher manifest: json error", e)
@@ -82,13 +112,9 @@ class LauncherFiles {
         }
     }
 
-    fun getLauncherDetails(): LauncherDetails? {
-        return launcherDetails
-    }
-
     @Throws(FileLoadException::class)
     fun reloadLauncherDetails() {
-        mainManifest?.let {
+        _mainManifest?.let {
             it.details?: throw FileLoadException("Unable to load launcher details: invalid main file")
 
             val detailsFile: String = try {
@@ -97,7 +123,7 @@ class LauncherFiles {
                 throw FileLoadException("Unable to load launcher details: file error", e)
             }
 
-            launcherDetails = try {
+            _launcherDetails = try {
                 LauncherDetails.fromJson(detailsFile)
             } catch (e: SerializationException) {
                 throw FileLoadException("Unable to load launcher details: json error", e)
@@ -112,206 +138,145 @@ class LauncherFiles {
         }?: throw FileLoadException("Unable to load launcher details: invalid main file")
     }
 
-    fun getGameDetailsManifest(): LauncherManifest? {
-        return gameDetailsManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadGameDetailsManifest() {
-        gameDetailsManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load game details manifest: invalid configuration")),
+        _gameDetailsManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load game details manifest: invalid configuration")),
             LauncherManifestType.GAME
         )
     }
 
-    fun getModsManifest(): LauncherManifest? {
-        return modsManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadModsManifest() {
-        modsManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods manifest: invalid configuration")),
-            gameDetailsManifest?.components?.get(0)?: throw FileLoadException("Unable to load mods manifest: invalid configuration"),
+        _modsManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods manifest: invalid configuration")),
+            _gameDetailsManifest?.components?.get(0)?: throw FileLoadException("Unable to load mods manifest: invalid configuration"),
             LauncherManifestType.MODS
         )
     }
 
-    fun getModsComponents(): List<Pair<LauncherManifest, LauncherModsDetails>?>? {
-        return modsComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadModsComponents() {
-        modsComponents = reloadComponents(
-            modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
+        _modsComponents = reloadComponents(
+            _modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
             LauncherManifestType.MODS_COMPONENT,
             LauncherModsDetails::class.java,
-            LauncherFile.ofRelative(
-                launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration"),
+            LauncherFile.ofData(
+                _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration"),
                 "mods"
             )
         )
     }
 
-    fun getSavesManifest(): LauncherManifest? {
-        return savesManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadSavesManifest() {
-        savesManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration")),
-            gameDetailsManifest?.components?.get(1)?: throw FileLoadException("Unable to load saves manifest: invalid configuration"),
+        _savesManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration")),
+            _gameDetailsManifest?.components?.get(1)?: throw FileLoadException("Unable to load saves manifest: invalid configuration"),
             LauncherManifestType.SAVES
         )
     }
 
-    fun getSavesComponents(): List<LauncherManifest?>? {
-        return savesComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadSavesComponents() {
-        savesComponents = reloadComponents(
-            savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration")),
+        _savesComponents = reloadComponents(
+            _savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration")),
             LauncherManifestType.SAVES_COMPONENT,
-            LauncherFile.ofRelative(
-                launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration"),
+            LauncherFile.ofData(
+                _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration"),
                 "saves"
             )
         )
     }
 
-    fun getInstanceManifest(): LauncherManifest? {
-        return instanceManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadInstanceManifest() {
-        instanceManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance manifest: invalid configuration")),
+        _instanceManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance manifest: invalid configuration")),
             LauncherManifestType.INSTANCES
         )
     }
 
-    fun getInstanceComponents(): List<Pair<LauncherManifest, LauncherInstanceDetails>?>? {
-        return instanceComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadInstanceComponents() {
-        instanceComponents = reloadComponents(
-            instanceManifest?: throw FileLoadException("Unable to load instance components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance components: invalid configuration")),
+        _instanceComponents = reloadComponents(
+            _instanceManifest?: throw FileLoadException("Unable to load instance components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance components: invalid configuration")),
             LauncherManifestType.INSTANCE_COMPONENT,
             LauncherInstanceDetails::class.java,
             null
         )
     }
 
-    fun getJavaManifest(): LauncherManifest? {
-        return javaManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadJavaManifest() {
-        javaManifest =
+        _javaManifest =
             reloadManifest(
-                LauncherFile.ofRelative(launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java manifest: invalid configuration")),
+                LauncherFile.ofData(_launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java manifest: invalid configuration")),
                 LauncherManifestType.JAVAS
             )
     }
 
-    fun getJavaComponents(): List<LauncherManifest?>? {
-        return javaComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadJavaComponents() {
-        javaComponents = reloadComponents(
-            javaManifest?: throw FileLoadException("Unable to load java components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java components: invalid configuration")),
+        _javaComponents = reloadComponents(
+            _javaManifest?: throw FileLoadException("Unable to load java components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java components: invalid configuration")),
             LauncherManifestType.JAVA_COMPONENT,
             null
         )
     }
 
-    fun getOptionsManifest(): LauncherManifest? {
-        return optionsManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadOptionsManifest() {
-        optionsManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options manifest: invalid configuration")),
+        _optionsManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options manifest: invalid configuration")),
             LauncherManifestType.OPTIONS
         )
     }
 
-    fun getOptionsComponents(): List<LauncherManifest?>? {
-        return optionsComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadOptionsComponents() {
-        optionsComponents = reloadComponents(
-            optionsManifest?: throw FileLoadException("Unable to load options components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options components: invalid configuration")),
+        _optionsComponents = reloadComponents(
+            _optionsManifest?: throw FileLoadException("Unable to load options components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options components: invalid configuration")),
             LauncherManifestType.OPTIONS_COMPONENT,
             null
         )
     }
 
-    fun getResourcepackManifest(): LauncherManifest? {
-        return resourcepackManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadResourcepackManifest() {
-        resourcepackManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.resourcepacksDir ?: throw FileLoadException("Unable to load resourcepack manifest: invalid configuration")),
+        _resourcepackManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.resourcepacksDir ?: throw FileLoadException("Unable to load resourcepack manifest: invalid configuration")),
             LauncherManifestType.RESOURCEPACKS
         )
     }
 
-    fun getResourcepackComponents(): List<LauncherManifest?>? {
-        return resourcepackComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadResourcepackComponents() {
-        resourcepackComponents = reloadComponents(
-            resourcepackManifest?: throw FileLoadException("Unable to load resourcepack components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.resourcepacksDir?: throw FileLoadException("Unable to load resourcepack components: invalid configuration")),
+        _resourcepackComponents = reloadComponents(
+            _resourcepackManifest?: throw FileLoadException("Unable to load resourcepack components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.resourcepacksDir?: throw FileLoadException("Unable to load resourcepack components: invalid configuration")),
             LauncherManifestType.RESOURCEPACKS_COMPONENT,
             null
         )
     }
-
-    fun getVersionManifest(): LauncherManifest? {
-        return versionManifest
-    }
-
     @Throws(FileLoadException::class)
     fun reloadVersionManifest() {
-        versionManifest = reloadManifest(
-            LauncherFile.ofRelative(launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version manifest: invalid configuration")),
+        _versionManifest = reloadManifest(
+            LauncherFile.ofData(_launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version manifest: invalid configuration")),
             LauncherManifestType.VERSIONS
         )
     }
 
-    fun getVersionComponents(): List<Pair<LauncherManifest, LauncherVersionDetails>?>? {
-        return versionComponents
-    }
-
     @Throws(FileLoadException::class)
     fun reloadVersionComponents() {
-        versionComponents = reloadComponents(
-            versionManifest?: throw FileLoadException("Unable to load version components: invalid configuration"),
-            LauncherFile.ofRelative(launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version components: invalid configuration")),
+        _versionComponents = reloadComponents(
+            _versionManifest?: throw FileLoadException("Unable to load version components: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version components: invalid configuration")),
             LauncherManifestType.VERSION_COMPONENT,
             LauncherVersionDetails::class.java,
             null
@@ -331,7 +296,7 @@ class LauncherFiles {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: file error", e)
         }
         val out: LauncherManifest = try {
-            LauncherManifest.fromJson(versionFile, getLauncherDetails()?.typeConversion ?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: invalid configuration"))
+            LauncherManifest.fromJson(versionFile, launcherDetails.typeConversion ?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: invalid configuration"))
         } catch (e: SerializationException) {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: json error", e)
         }
@@ -404,7 +369,7 @@ class LauncherFiles {
             return
         }
         val manifest: LauncherManifest = try {
-            LauncherManifest.fromJson(manifestFile, launcherDetails?.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
+            LauncherManifest.fromJson(manifestFile, _launcherDetails?.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
         } catch (e: SerializationException) {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: json error: id=$expectedId", e)
         }
@@ -491,7 +456,7 @@ class LauncherFiles {
             return
         }
         val manifest: LauncherManifest = try {
-            LauncherManifest.fromJson(manifestFile, getLauncherDetails()?.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
+            LauncherManifest.fromJson(manifestFile, launcherDetails.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
         } catch (e: SerializationException) {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: json error: id=$expectedId, e")
         }
