@@ -1,122 +1,95 @@
-package net.treset.minecraftlauncher.launching;
+package net.treset.treelauncher.backend.launching
 
-import net.treset.minecraftlauncher.util.exception.GameResourceException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.treelauncher.backend.util.exception.GameResourceException
+import java.io.IOException
+import java.util.*
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.function.Consumer;
+class GameListener(
+    val gameProcess: Process,
+    val resourceManager: ResourceManager,
+    private val exitCallbacks: Array<(String?) -> Unit>
+) {
+    var isValid = false
+        private set
+    var isRunning = false
+        private set
+    var isExited = false
+        private set
+    var exitCode = -1
+        private set
+    private var playStart: Long = 0
 
-public class GameListener {
-    private static final Logger LOGGER = LogManager.getLogger(GameListener.class);
-
-    private final Process gameProcess;
-    private final ResourceManager resourceManager;
-    private final List<Consumer<String>> exitCallbacks;
-    private boolean valid = false;
-    private boolean running = false;
-    private boolean exited = false;
-    private int exitCode = -1;
-    private long playStart;
-
-    public GameListener(Process gameProcess, ResourceManager resourceManager, List<Consumer<String>> exitCallbacks) {
-        this.gameProcess = gameProcess;
-        this.resourceManager = resourceManager;
-        this.exitCallbacks = exitCallbacks;
-        this.valid = true;
+    init {
+        isValid = true
     }
 
-    public void start() {
-        playStart = System.currentTimeMillis();
-        Thread t = new Thread(this::listenToGameOutput, "GameListener");
-        t.start();
+    fun start() {
+        playStart = System.currentTimeMillis()
+        val t = Thread({ listenToGameOutput() }, "GameListener")
+        t.start()
     }
 
-    private void listenToGameOutput() {
-        running = true;
-        LOGGER.info("Listening to game process: pid={}", gameProcess.pid());
-        try(BufferedReader reader = gameProcess.inputReader()) {
-            reader.lines().iterator().forEachRemaining(value -> LOGGER.debug("Game: " + value));
-        } catch (IOException e) {
-            LOGGER.debug("Game output forwarding failed: pid={}", gameProcess.pid(), e);
-        }
-
+    private fun listenToGameOutput() {
+        isRunning = true
+        LOGGER.info { "Listening to game process: pid=${gameProcess.pid()}" }
         try {
-            gameProcess.waitFor();
-        } catch (InterruptedException e) {
-            LOGGER.warn("Game listener interrupted: pid={}", gameProcess.pid(), e);
-            valid = false;
-            return;
+            gameProcess.inputReader().use { reader ->
+                reader.lines().iterator().forEachRemaining { value: String -> LOGGER.debug { "Game: $value" } }
+            }
+        } catch (e: IOException) {
+            LOGGER.debug(e) { "Game output forwarding failed: pid=${gameProcess.pid()}" }
         }
-
-        onGameExit();
-    }
-
-    private void onGameExit() {
-        running = false;
-        exitCode = gameProcess.exitValue();
-        String error = null;
-        if(gameProcess.exitValue() != 0) {
-            try (BufferedReader reader = gameProcess.errorReader()) {
-                StringJoiner out = new StringJoiner("\n");
-                reader.lines().iterator().forEachRemaining(out::add);
-                LOGGER.warn("Game process exited with non-zero code: code={}, pid={}, error={}", gameProcess.exitValue(), gameProcess.pid(), out);
-                error = out.toString();
-            } catch (IOException e) {
-                LOGGER.warn("Game process exited with non-zero code: pid={}, error=unable to read error stream",gameProcess.pid(), e);
-                error = "Unable to read error stream";
+        while (gameProcess.isAlive) {
+            try {
+                gameProcess.waitFor()
+            } catch (e: InterruptedException) {
+                LOGGER.warn(e) { "Game listener interrupted, restarting: pid=${gameProcess.pid()}" }
+                isValid = false
             }
         }
-        else {
-            LOGGER.info("Game exited");
-        }
-        exited = true;
+        onGameExit()
+    }
 
-        try {
-            resourceManager.addPlayDuration((System.currentTimeMillis() - playStart) / 1000);
-        } catch (IOException e) {
-            LOGGER.error("Unable to add play duration to statistics: duration={}, pid={}", (System.currentTimeMillis() - playStart) / 1000, gameProcess.pid(), e);
-            error = "Unable to add play duration to statistics";
-        }
-
-        try {
-            resourceManager.cleanupGameFiles();
-        } catch (GameResourceException e) {
-            LOGGER.error("Unable to clean up game files after exit: pid={}", gameProcess.pid(), e);
-            error = "Unable to clean up game files";
-        }
-
-        if(exitCallbacks != null) {
-            for (Consumer<String> c : exitCallbacks) {
-                c.accept(error);
+    private fun onGameExit() {
+        isRunning = false
+        exitCode = gameProcess.exitValue()
+        var error: String? = null
+        if (exitCode != 0) {
+            try {
+                gameProcess.errorReader().use { reader ->
+                    val out = StringJoiner("\n")
+                    reader.lines().iterator().forEachRemaining { newElement: String? -> out.add(newElement) }
+                    LOGGER.warn { "Game process exited with non-zero code: code=${exitCode}, pid=${gameProcess.pid()}, error=${out}" }
+                    error = out.toString()
+                }
+            } catch (e: IOException) {
+                LOGGER.warn(e) { "Game process exited with non-zero code: pid=${gameProcess.pid()}, error=unable to read error stream" }
+                error = "Unable to read error stream"
             }
+        } else {
+            LOGGER.info { "Game exited" }
+        }
+        isExited = true
+        val playDuration = (System.currentTimeMillis() - playStart) / 1000
+        try {
+            resourceManager.addPlayDuration(playDuration)
+        } catch (e: IOException) {
+            LOGGER.error(e) { "Unable to add play duration to statistics: duration=$playDuration, pid=${gameProcess.pid()}" }
+            error = "Unable to add play duration to statistics"
+        }
+        try {
+            resourceManager.cleanupGameFiles()
+        } catch (e: GameResourceException) {
+            LOGGER.error(e) { "Unable to clean up game files after exit: pid=${gameProcess.pid()}" }
+            error = "Unable to clean up game files"
+        }
+        for (c in exitCallbacks) {
+            c(error)
         }
     }
 
-    public Process getGameProcess() {
-        return gameProcess;
-    }
-
-    public ResourceManager getResourceManager() {
-        return resourceManager;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public boolean isRunning() {
-        return running;
-    }
-
-    public boolean isExited() {
-        return exited;
-    }
-
-    public int getExitCode() {
-        return exitCode;
+    companion object {
+        private val LOGGER = KotlinLogging.logger {}
     }
 }

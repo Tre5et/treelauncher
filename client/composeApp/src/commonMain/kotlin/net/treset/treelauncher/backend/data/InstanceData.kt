@@ -12,7 +12,7 @@ class InstanceData(
     var launcherDetails: LauncherDetails,
     var launcherDetailsFile: LauncherFile,
     var instance: Pair<LauncherManifest, LauncherInstanceDetails>,
-    var versionComponents: List<Pair<LauncherManifest, LauncherVersionDetails>?>,
+    var versionComponents: Array<Pair<LauncherManifest, LauncherVersionDetails>>,
     var javaComponent: LauncherManifest,
     var optionsComponent: LauncherManifest,
     var resourcepacksComponent: LauncherManifest,
@@ -23,7 +23,7 @@ class InstanceData(
     var librariesDir: LauncherFile,
     var modsPrefix: String,
     var savesPrefix: String,
-    var gameDataExcludedFiles: List<PatternString>
+    var gameDataExcludedFiles: Array<PatternString>
 ) {
     @Throws(IOException::class)
     fun setActive(active: Boolean) {
@@ -97,7 +97,7 @@ class InstanceData(
                 for (v in versionComponents) {
                     if (v.second.java != null && v.second.java.isNotBlank()) {
                         for (j in files.javaComponents) {
-                            if (j?.id == v.second.java) {
+                            if (j.id == v.second.java) {
                                 javaComponent = j
                                 break
                             }
@@ -109,7 +109,7 @@ class InstanceData(
 
             var optionsComponent: LauncherManifest? = null
             for (o in files.optionsComponents) {
-                if (o?.id == instance.second.optionsComponent) {
+                if (o.id == instance.second.optionsComponent) {
                     optionsComponent = o
                     break
                 }
@@ -118,7 +118,7 @@ class InstanceData(
 
             var resourcepacksComponent: LauncherManifest? = null
             for (r in files.resourcepackComponents) {
-                if (r?.id == instance.second.resourcepacksComponent) {
+                if (r.id == instance.second.resourcepacksComponent) {
                     resourcepacksComponent = r
                     break
                 }
@@ -127,7 +127,7 @@ class InstanceData(
 
             var savesComponent: LauncherManifest? = null
             for (s in files.savesComponents) {
-                if (s?.id == instance.second.savesComponent) {
+                if (s.id == instance.second.savesComponent) {
                     savesComponent = s
                     break
                 }
@@ -137,7 +137,7 @@ class InstanceData(
             var modsComponent: Pair<LauncherManifest, LauncherModsDetails>? = null
             if (instance.second.modsComponent != null && instance.second.modsComponent.isNotBlank()) {
                 for (m in files.modsComponents) {
-                    if (m?.first?.id == instance.second.modsComponent) {
+                    if (m.first.id == instance.second.modsComponent) {
                         modsComponent = m
                         break
                     }
@@ -159,7 +159,7 @@ class InstanceData(
                     files.mainManifest.details
                 ),
                 instance,
-                versionComponents,
+                versionComponents.toTypedArray(),
                 javaComponent,
                 optionsComponent,
                 resourcepacksComponent,
@@ -170,7 +170,7 @@ class InstanceData(
                 LauncherFile.ofData(files.launcherDetails.librariesDir),
                 files.modsManifest.prefix,
                 files.savesManifest.prefix,
-                gameDataExcludedFiles
+                gameDataExcludedFiles.toTypedArray()
             )
         }
     }

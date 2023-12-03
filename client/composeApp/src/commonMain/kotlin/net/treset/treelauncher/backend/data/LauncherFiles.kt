@@ -23,44 +23,44 @@ class LauncherFiles {
     private var _modsManifest: LauncherManifest? = null
     val modsManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _modsManifest?: throw FileLoadException("Unable to load launcher details: mods manifest not loaded")
-    private var _modsComponents: List<Pair<LauncherManifest, LauncherModsDetails>?>? = null
-    val modsComponents: List<Pair<LauncherManifest, LauncherModsDetails>?>
+    private var _modsComponents: Array<Pair<LauncherManifest, LauncherModsDetails>>? = null
+    val modsComponents: Array<Pair<LauncherManifest, LauncherModsDetails>>
         @Throws(FileLoadException::class) get() = _modsComponents?: throw FileLoadException("Unable to load launcher details: mods components not loaded")
     private var _savesManifest: LauncherManifest? = null
     val savesManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _savesManifest?: throw FileLoadException("Unable to load launcher details: saves manifest not loaded")
-    private var _savesComponents: List<LauncherManifest?>? = null
-    val savesComponents: List<LauncherManifest?>
+    private var _savesComponents: Array<LauncherManifest>? = null
+    val savesComponents: Array<LauncherManifest>
         @Throws(FileLoadException::class) get() = _savesComponents?: throw FileLoadException("Unable to load launcher details: saves components not loaded")
     private var _instanceManifest: LauncherManifest? = null
     val instanceManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _instanceManifest?: throw FileLoadException("Unable to load launcher details: instance manifest not loaded")
-    private var _instanceComponents: List<Pair<LauncherManifest, LauncherInstanceDetails>?>? = null
-    val instanceComponents: List<Pair<LauncherManifest, LauncherInstanceDetails>?>
+    private var _instanceComponents: Array<Pair<LauncherManifest, LauncherInstanceDetails>>? = null
+    val instanceComponents: Array<Pair<LauncherManifest, LauncherInstanceDetails>>
         @Throws(FileLoadException::class) get() = _instanceComponents?: throw FileLoadException("Unable to load launcher details: instance components not loaded")
     private var _javaManifest: LauncherManifest? = null
     val javaManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _javaManifest?: throw FileLoadException("Unable to load launcher details: java manifest not loaded")
-    private var _javaComponents: List<LauncherManifest?>? = null
-    val javaComponents: List<LauncherManifest?>
+    private var _javaComponents: Array<LauncherManifest>? = null
+    val javaComponents: Array<LauncherManifest>
         @Throws(FileLoadException::class) get() = _javaComponents?: throw FileLoadException("Unable to load launcher details: java components not loaded")
     private var _optionsManifest: LauncherManifest? = null
     val optionsManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _optionsManifest?: throw FileLoadException("Unable to load launcher details: options manifest not loaded")
-    private var _optionsComponents: List<LauncherManifest?>? = null
-    val optionsComponents: List<LauncherManifest?>
+    private var _optionsComponents: Array<LauncherManifest>? = null
+    val optionsComponents: Array<LauncherManifest>
         @Throws(FileLoadException::class) get() = _optionsComponents?: throw FileLoadException("Unable to load launcher details: options components not loaded")
     private var _resourcepackManifest: LauncherManifest? = null
     val resourcepackManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _resourcepackManifest?: throw FileLoadException("Unable to load launcher details: resourcepack manifest not loaded")
-    private var _resourcepackComponents: List<LauncherManifest?>? = null
-    val resourcepackComponents: List<LauncherManifest?>
+    private var _resourcepackComponents: Array<LauncherManifest>? = null
+    val resourcepackComponents: Array<LauncherManifest>
         @Throws(FileLoadException::class) get() = _resourcepackComponents?: throw FileLoadException("Unable to load launcher details: resourcepack components not loaded")
     private var _versionManifest: LauncherManifest? = null
     val versionManifest: LauncherManifest
         @Throws(FileLoadException::class) get() = _versionManifest?: throw FileLoadException("Unable to load launcher details: version manifest not loaded")
-    private var _versionComponents: List<Pair<LauncherManifest, LauncherVersionDetails>>? = null
-    val versionComponents: List<Pair<LauncherManifest, LauncherVersionDetails>>
+    private var _versionComponents: Array<Pair<LauncherManifest, LauncherVersionDetails>>? = null
+    val versionComponents: Array<Pair<LauncherManifest, LauncherVersionDetails>>
         @Throws(FileLoadException::class) get() = _versionComponents?: throw FileLoadException("Unable to load launcher details: version components not loaded")
 
     init {
@@ -314,7 +314,7 @@ class LauncherFiles {
         parentPath: LauncherFile,
         expectedType: LauncherManifestType,
         fallbackPath: LauncherFile?
-    ): List<LauncherManifest?> {
+    ): Array<LauncherManifest> {
         return reloadComponents(
             parentManifest,
             parentPath,
@@ -331,7 +331,7 @@ class LauncherFiles {
         filename: String,
         expectedType: LauncherManifestType,
         fallbackPath: LauncherFile?
-    ): List<LauncherManifest> {
+    ): Array<LauncherManifest> {
         val out: MutableList<LauncherManifest> = mutableListOf()
         for (c in parentManifest.components) {
             try {
@@ -348,7 +348,7 @@ class LauncherFiles {
             }
         }
         LOGGER.debug { "Loaded ${expectedType.name.lowercase(Locale.getDefault())} components" }
-        return out
+        return out.toTypedArray()
     }
 
     @Throws(FileLoadException::class)
@@ -390,7 +390,7 @@ class LauncherFiles {
         expectedType: LauncherManifestType,
         targetClass: Class<T>,
         fallbackPath: LauncherFile?
-    ): List<Pair<LauncherManifest, T>> {
+    ): Array<Pair<LauncherManifest, T>> {
         return reloadComponents(
             parentManifest,
             parentDir,
@@ -409,7 +409,7 @@ class LauncherFiles {
         expectedType: LauncherManifestType,
         targetClass: Class<T>,
         fallbackPath: LauncherFile?
-    ): List<Pair<LauncherManifest, T>> {
+    ): Array<Pair<LauncherManifest, T>> {
         if (parentManifest.prefix == null || parentManifest.components == null) {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} components: invalid configuration")
         }
@@ -434,7 +434,7 @@ class LauncherFiles {
             throw FileLoadException("Unable to load ${exceptionQueue.size} components: component error", exceptionQueue[0])
         }
         LOGGER.debug { "Loaded ${expectedType.name.lowercase(Locale.getDefault())} components" }
-        return out
+        return out.toTypedArray()
     }
 
     @Throws(FileLoadException::class)
