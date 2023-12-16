@@ -68,7 +68,22 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
                 throw IOException("Failed to load settings", e)
             }
             result.file = file
-            return result
+            setAppSettings(result)
+            return appSettings()
+        }
+
+        @Throws(IOException::class)
+        fun new(file: LauncherFile): Settings {
+            val result = Settings(file)
+            setAppSettings(result)
+            result.save()
+            return appSettings()
         }
     }
+}
+
+private lateinit var settings: Settings
+fun appSettings(): Settings = settings
+fun setAppSettings(_settings: Settings) {
+    settings = _settings
 }

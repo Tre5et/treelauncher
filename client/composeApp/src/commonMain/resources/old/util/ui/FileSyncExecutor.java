@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.util.ui;
+package old.util.ui;
 
 import javafx.application.Platform;
 import net.treset.minecraftlauncher.LauncherApplication;

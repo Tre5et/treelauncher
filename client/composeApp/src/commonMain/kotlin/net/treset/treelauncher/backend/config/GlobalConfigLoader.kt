@@ -5,7 +5,6 @@ import net.treset.mc_version_loader.json.SerializationException
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.localization.Language
 import java.io.File
 import java.io.IOException
 import java.nio.file.StandardCopyOption
@@ -35,7 +34,9 @@ class GlobalConfigLoader {
         }
         check(!(path.isNullOrBlank() || updateUrl.isNullOrBlank())) { "Invalid config: path=$path, updateUrl=$updateUrl" }
         LOGGER.info { "Loaded config: path=$path, debug=$debug" }
-        return Config(path, debug, updateUrl)
+        val config = Config(path, debug, updateUrl)
+        setAppConfig(config)
+        return config
     }
 
     @Throws(IOException::class)

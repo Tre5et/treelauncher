@@ -1,7 +1,6 @@
 package net.treset.treelauncher.backend.auth
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.hycrafthd.minecraft_authenticator.login.AuthenticationException
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile
 import net.hycrafthd.minecraft_authenticator.login.Authenticator
 import net.hycrafthd.minecraft_authenticator.login.User
@@ -16,7 +15,6 @@ import java.awt.image.BufferedImage
 import java.io.*
 import java.net.URL
 import java.util.function.Consumer
-import java.util.regex.Pattern
 import javax.imageio.ImageIO
 
 class UserAuth {
@@ -36,7 +34,7 @@ class UserAuth {
             return
         }
         //TODO: Show web view
-        Platform.runLater {
+        /*Platform.runLater {
             val stage = Stage()
             stage.setTitle(loginUrl)
             stage.setOnCloseRequest { e: WindowEvent? -> onWebCloseRequested(stage, doneCallback) }
@@ -53,7 +51,7 @@ class UserAuth {
             val webScene = Scene(webView)
             stage.setScene(webScene)
             stage.show()
-        }
+        }*/
     }
 
     fun authenticateFromFile(doneCallback: Consumer<Boolean?>) {
@@ -144,7 +142,7 @@ class UserAuth {
         return true
     }
 
-    fun onWebCloseRequested(stage: Stage, doneCallback: Consumer<Boolean?>) {
+    /*fun onWebCloseRequested(stage: Stage, doneCallback: Consumer<Boolean?>) {
         stage.close()
         LOGGER.warn { "Login window closed" }
         doneCallback.accept(false)
@@ -165,7 +163,7 @@ class UserAuth {
                 )
             }
         }
-    }
+    }*/
 
     private var userIcon: BufferedImage? = null
 

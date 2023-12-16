@@ -12,13 +12,13 @@ class UpdaterStatus(
     enum class Status(
         val popupTitle: () -> String,
         val popupMessage: () -> String,
-        val type: PopupElement.PopupType
+        val type: PopupType
     ) {
-        UPDATING({ strings().updater.status.updatingTitle() }, { strings().updater.status.updatingMessage() }, PopupElement.PopupType.ERROR),
-        SUCCESS({ strings().updater.status.successTitle() }, { strings().updater.status.successMessage() }, PopupElement.PopupType.SUCCESS),
-        WARNING({ strings().updater.status.warningTitle() }, { strings().updater.status.warningMessage() }, PopupElement.PopupType.WARNING),
-        FAILURE({ strings().updater.status.failureTitle() }, { strings().updater.status.failureMessage() }, PopupElement.PopupType.WARNING),
-        FATAL({ strings().updater.status.fatalTitle() }, { strings().updater.status.fatalMessage() }, PopupElement.PopupType.ERROR);
+        UPDATING({ strings().updater.status.updatingTitle() }, { strings().updater.status.updatingMessage() }, PopupType.ERROR),
+        SUCCESS({ strings().updater.status.successTitle() }, { strings().updater.status.successMessage() }, PopupType.SUCCESS),
+        WARNING({ strings().updater.status.warningTitle() }, { strings().updater.status.warningMessage() }, PopupType.WARNING),
+        FAILURE({ strings().updater.status.failureTitle() }, { strings().updater.status.failureMessage() }, PopupType.WARNING),
+        FATAL({ strings().updater.status.fatalTitle() }, { strings().updater.status.fatalMessage() }, PopupType.ERROR);
     }
 
     companion object {
@@ -27,4 +27,10 @@ class UpdaterStatus(
             return fromJson(json, UpdaterStatus::class.java)
         }
     }
+}
+
+enum class PopupType {
+    ERROR,
+    WARNING,
+    SUCCESS
 }

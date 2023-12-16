@@ -1,78 +1,75 @@
-package net.treset.minecraftlauncher.sync;
+package net.treset.treelauncher.backend.sync
 
-import javafx.util.Pair;
-import net.treset.mc_version_loader.launcher.LauncherManifest;
-import net.treset.minecraftlauncher.data.InstanceData;
-import net.treset.minecraftlauncher.data.LauncherFiles;
-import net.treset.minecraftlauncher.util.exception.FileLoadException;
+import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.util.exception.FileLoadException
+import java.io.IOException
 
-import java.io.IOException;
-import java.util.ArrayList;
+class AllSynchronizer(files: LauncherFiles, callback: SyncCallback?) : FileSynchronizer(callback) {
+    private val files: LauncherFiles
 
-public class AllSynchronizer extends FileSynchronizer {
-    private final LauncherFiles files;
-
-    public AllSynchronizer(LauncherFiles files, SyncCallback callback) {
-        super(callback);
-        this.files = files;
+    init {
+        this.files = files
     }
 
-    @Override
-    public void upload() throws IOException {
-        synchronize(true);
+    @Throws(IOException::class)
+    override fun upload() {
+        synchronize(true)
     }
 
-    @Override
-    public void download() throws IOException {
-        synchronize(false);
+    @Throws(IOException::class)
+    override fun download() {
+        synchronize(false)
     }
 
-    private void synchronize(boolean upload) throws IOException {
-        ArrayList<IOException> exceptions = new ArrayList<>();
-        files.getInstanceComponents().parallelStream().forEach((details) -> {
-            if(!SyncService.isSyncing(details.getKey())) {
-                return;
+    @Throws(IOException::class)
+    private fun synchronize(upload: Boolean) {
+        val exceptions: MutableList<IOException> = mutableListOf()
+        //TODO: Make parallel
+        files.instanceComponents.forEach { details ->
+            if (!SyncService.isSyncing(details.first)) {
+                return@forEach
             }
-            InstanceData data;
-            try {
-                data = InstanceData.of(details, files);
-            } catch (FileLoadException e) {
-                exceptions.add(new IOException(e));
-                return;
+            val data = try {
+                InstanceData.of(details, files)
+            } catch (e: FileLoadException) {
+                exceptions.add(IOException(e))
+                return@forEach
             }
-            InstanceSynchronizer synchronizer = new InstanceSynchronizer(data, files, callback);
+            val synchronizer = InstanceSynchronizer(data, files, callback)
             try {
-                if(upload) {
-                    synchronizer.upload();
+                if (upload) {
+                    synchronizer.upload()
                 } else {
-                    synchronizer.download();
+                    synchronizer.download()
                 }
-            } catch (IOException e) {
-                exceptions.add(e);
+            } catch (e: IOException) {
+                exceptions.add(e)
             }
-        });
-        ArrayList<LauncherManifest> manifests = new ArrayList<>();
-        manifests.addAll(files.getSavesComponents());
-        manifests.addAll(files.getResourcepackComponents());
-        manifests.addAll(files.getOptionsComponents());
-        manifests.addAll(files.getModsComponents().stream().map(Pair::getKey).toList());
-        manifests.parallelStream().forEach((manifest) -> {
-            if(!SyncService.isSyncing(manifest)) {
-                return;
+        }
+        val manifests: MutableList<LauncherManifest> = mutableListOf()
+        manifests.addAll(files.savesComponents)
+        manifests.addAll(files.resourcepackComponents)
+        manifests.addAll(files.optionsComponents)
+        manifests.addAll(files.modsComponents.map{it.first}.toList())
+        manifests.parallelStream().forEach { manifest: LauncherManifest ->
+            if (!SyncService.isSyncing(manifest)) {
+                return@forEach
             }
-            ManifestSynchronizer synchronizer = new ManifestSynchronizer(manifest, files, callback);
+            val synchronizer = ManifestSynchronizer(manifest, files, callback)
             try {
-                if(upload) {
-                    synchronizer.upload();
+                if (upload) {
+                    synchronizer.upload()
                 } else {
-                    synchronizer.download();
+                    synchronizer.download()
                 }
-            } catch (IOException e) {
-                exceptions.add(e);
+            } catch (e: IOException) {
+                exceptions.add(e)
             }
-        });
-        if(!exceptions.isEmpty()) {
-            throw exceptions.get(0);
+        }
+        if (exceptions.isNotEmpty()) {
+            throw exceptions[0]
         }
     }
 }

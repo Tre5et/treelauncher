@@ -1,6 +1,5 @@
 package net.treset.treelauncher.backend.util
 
-import jdk.internal.joptsimple.internal.Strings
 import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
@@ -10,32 +9,32 @@ import java.util.*
 
 open class HttpService @JvmOverloads constructor(
     private val baseUrl: String,
-    private val headers: List<Pair<String, String>> = listOf()
+    private val headers: Array<Pair<String, String>> = arrayOf()
 ) {
     @Throws(IOException::class)
     protected operator fun get(vararg route: Any): Pair<HttpStatusCode, ByteArray> {
         return try {
-            evaluateStatus(get(baseUrl + "/" + Strings.join(route.map { it.toString() }, "/"), headers))
+            evaluateStatus(get("$baseUrl/${route.joinToString(separator = "/")}", headers))
         } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${Strings.join(route.map { it.toString() }, "/")}", e)
+            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}}", e)
         }
     }
 
     @Throws(IOException::class)
     protected fun post(data: ByteArray, vararg route: Any): Pair<HttpStatusCode, ByteArray> {
         return try {
-            evaluateStatus(post(baseUrl + "/" + Strings.join(route.map { it.toString() }, "/"), headers, data))
+            evaluateStatus(post("$baseUrl/${route.joinToString(separator = "/")}", headers, data))
         } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${Strings.join(route.map { it.toString() }, "/")}", e)
+            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}", e)
         }
     }
 
     @Throws(IOException::class)
     protected fun post(contentType: String, data: ByteArray, vararg route: Any): Pair<HttpStatusCode, ByteArray> {
         return try {
-            evaluateStatus(post(baseUrl + "/" + Strings.join(route.map { it.toString() }, "/"), headers, contentType, data))
+            evaluateStatus(post("$baseUrl/${route.joinToString(separator = "/")}", headers, contentType, data))
         } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${Strings.join(route.map { it.toString() }, "/")}", e)
+            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}", e)
         }
     }
 
@@ -54,7 +53,7 @@ open class HttpService @JvmOverloads constructor(
         }
 
     @Throws(IOException::class)
-    private operator fun get(url: String, headers: List<Pair<String, String>>): Pair<HttpStatusCode, ByteArray> {
+    private operator fun get(url: String, headers: Array<Pair<String, String>>): Pair<HttpStatusCode, ByteArray> {
         val client = httpClient
         val requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(url))
@@ -73,14 +72,14 @@ open class HttpService @JvmOverloads constructor(
     @Throws(IOException::class)
     private fun post(
         url: String,
-        headers: List<Pair<String, String>>,
+        headers: Array<Pair<String, String>>,
         data: ByteArray
     ): Pair<HttpStatusCode, ByteArray> = post(url, headers, "application/octet-stream", data)
 
     @Throws(IOException::class)
     private fun post(
         url: String,
-        headers: List<Pair<String, String>>,
+        headers: Array<Pair<String, String>>,
         contentType: String,
         data: ByteArray
     ): Pair<HttpStatusCode, ByteArray> {

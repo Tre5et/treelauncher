@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.util.ui;
+package old.util.ui;
 
 import io.github.oshai.kotlinlogging.KotlinLogging;
 import javafx.application.Platform;

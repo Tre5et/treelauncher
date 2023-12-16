@@ -1,4 +1,4 @@
-package net.treset.minecraftlauncher.util.ui.cellfactory;
+package old.util.ui.cellfactory;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
