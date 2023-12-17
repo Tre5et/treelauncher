@@ -21,6 +21,7 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://raw.githubusercontent.com/Tre5et/maven/main/")
         }
+        maven("https://jogamp.org/deployment/maven")
     }
 }
 

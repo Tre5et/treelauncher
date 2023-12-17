@@ -150,13 +150,19 @@ open class Strings(
     data class Launcher(
         val name: () -> String,
         val slug: () -> String,
+        val status: Status,
         val version: () -> String
-    )
+    ) {
+        data class Status(
+            val preparing: (Int) -> String,
+            val restartRequired: () -> String
+        )
+    }
 
     data class Login(
         val button: () -> String,
         val label: Label,
-        val remember: () -> String,
+        val keepLoggedIn: () -> String,
         val title: () -> String
     ) {
         data class Label(

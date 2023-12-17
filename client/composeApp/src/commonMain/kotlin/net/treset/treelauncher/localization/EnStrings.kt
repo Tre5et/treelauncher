@@ -1,5 +1,7 @@
 package net.treset.treelauncher.localization
 
+import kotlin.math.roundToInt
+
 class EnStrings : Strings(
     Components(
         { "Create New" },
@@ -82,6 +84,10 @@ class EnStrings : Strings(
     Launcher(
         { "TreeLauncher" },
         { "treelauncher" },
+        Launcher.Status(
+            { progress -> "Performing first time setup... $progress%" },
+            { "Restart required. Please restart." }
+        ),
         { "1.0.0" }
     ),
     Login(

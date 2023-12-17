@@ -1,10 +1,8 @@
 package net.treset.treelauncher
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -16,8 +14,8 @@ import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.language
+import net.treset.treelauncher.login.LoginScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 import java.io.IOException
 import kotlin.system.exitProcess
 
@@ -25,20 +23,15 @@ import kotlin.system.exitProcess
 @Composable
 fun App() {
     MaterialTheme {
-        var greetingText by remember { mutableStateOf("Hello World!") }
-        var showImage by remember { mutableStateOf(false) }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = {
-                greetingText = "Compose: ${Greeting().greet()}"
-                showImage = !showImage
-            }) {
-                Text(greetingText)
-            }
-            AnimatedVisibility(showImage) {
-                Image(
-                    painterResource("compose-multiplatform.xml"),
-                    null
-                )
+        var isLoggedIn by remember { mutableStateOf(false) }
+        Column(
+            Modifier.fillMaxWidth().fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (isLoggedIn) {
+                Text("Logged in")
+            } else {
+                LoginScreen { isLoggedIn = true }
             }
         }
     }
@@ -102,4 +95,7 @@ class LauncherApp {
     companion object {
         private val LOGGER = KotlinLogging.logger {  }
     }
+
 }
+
+expect fun getPlatformName(): String

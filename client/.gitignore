@@ -16,3 +16,5 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 composeApp/data/
+composeApp/kcef-bundle/
+composeApp/cache/

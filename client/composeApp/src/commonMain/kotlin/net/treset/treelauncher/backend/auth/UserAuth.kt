@@ -14,7 +14,7 @@ import net.treset.treelauncher.backend.util.Images
 import java.awt.image.BufferedImage
 import java.io.*
 import java.net.URL
-import java.util.function.Consumer
+import java.util.regex.Pattern
 import javax.imageio.ImageIO
 
 class UserAuth {
@@ -26,13 +26,29 @@ class UserAuth {
     var minecraftUser: User? = null
         private set
 
-    fun authenticate(remember: Boolean, doneCallback: Consumer<Boolean?>) {
+    fun startAuthentication(remember: Boolean, doneCallback: (Boolean) -> Unit): String? {
+        if (isAuthenticating) {
+            LOGGER.warn { "Already authenticating" }
+            doneCallback(false)
+            return null
+        }
+        isAuthenticating = true
+        return if (hasFile()) {
+            authenticateFromFile(doneCallback)
+            null
+        } else {
+            authenticateFromUrl(remember, doneCallback)
+        }
+    }
+
+    fun authenticateFromUrl(remember: Boolean, doneCallback: (Boolean) -> Unit): String? {
         val loginUrl = Authenticator.microsoftLogin().toString()
         if (remember && !appConfig().AUTH_FILE.getParentFile().isDirectory() && !appConfig().AUTH_FILE.getParentFile().mkdirs()) {
-            LOGGER.error("Unable to create auth file directory")
-            doneCallback.accept(false)
-            return
+            LOGGER.error { "Unable to create auth file directory" }
+            doneCallback(false)
+            return null
         }
+        return loginUrl
         //TODO: Show web view
         /*Platform.runLater {
             val stage = Stage()
@@ -54,7 +70,37 @@ class UserAuth {
         }*/
     }
 
-    fun authenticateFromFile(doneCallback: Consumer<Boolean?>) {
+    fun checkUserUrl(
+        url: String?,
+        saveResults: Boolean,
+        doneCallback: (Boolean) -> Unit
+    ): Boolean {
+        url?.let { url ->
+            if (url.startsWith("https://login.live.com/oauth20_desktop.srf?code=")) {
+                val pattern = Pattern.compile("code=(.*)&")
+                val matcher = pattern.matcher(url)
+                return if (matcher.find()) {
+                    Thread {
+                        completeAuthentication(
+                            Authenticator.ofMicrosoft(matcher.group(1)).shouldAuthenticate().build(),
+                            saveResults,
+                            doneCallback
+                        )
+                    }.start()
+                    true
+                } else {
+                    false
+                }
+            }
+            return false
+        }
+        doneCallback(false)
+        isAuthenticating = false
+        return true
+
+    }
+
+    fun authenticateFromFile(doneCallback: (Boolean) -> Unit) {
         if (!appConfig().AUTH_FILE.isFile()) {
             return
         }
@@ -62,8 +108,8 @@ class UserAuth {
         try {
             authFileStream = FileInputStream(appConfig().AUTH_FILE)
         } catch (e: FileNotFoundException) {
-            LOGGER.error(e) { "${"Unable to open create input stream for auth file"}" }
-            doneCallback.accept(false)
+            LOGGER.error(e) { "Unable to open create input stream for auth file" }
+            doneCallback(false)
             return
         }
         val authenticationFile: AuthenticationFile
@@ -72,7 +118,7 @@ class UserAuth {
             authFileStream.close()
         } catch (e: IOException) {
             LOGGER.error(e) { "Unable to read auth file" }
-            doneCallback.accept(false)
+            doneCallback(false)
             return
         }
         completeAuthentication(Authenticator.of(authenticationFile).shouldAuthenticate().build(), true, doneCallback)
@@ -93,7 +139,7 @@ class UserAuth {
     private fun completeAuthentication(
         minecraftAuth: Authenticator,
         saveResults: Boolean,
-        doneCallback: Consumer<Boolean?>
+        doneCallback: (Boolean) -> Unit
     ) {
         try {
             minecraftAuth.run()
@@ -103,25 +149,25 @@ class UserAuth {
                 LOGGER.error { "Unable to write auth file" }
             }
             LOGGER.error(e) { "Unable to login" }
-            doneCallback.accept(false)
+            doneCallback(false)
             return
         }
         val resultFile: AuthenticationFile = minecraftAuth.getResultFile()
         if (saveResults && !writeToFile(resultFile)) {
             LOGGER.error { "Unable to write auth file" }
-            doneCallback.accept(false)
+            doneCallback(false)
             return
         }
         val optionalUser = minecraftAuth.getUser()
         if (optionalUser.isEmpty) {
             LOGGER.error { "User not present after login" }
-            doneCallback.accept(false)
+            doneCallback(false)
             return
         }
         minecraftUser = optionalUser.get()
         isLoggedIn = true
         isAuthenticating = false
-        doneCallback.accept(true)
+        doneCallback(true)
     }
 
     private fun writeToFile(file: AuthenticationFile): Boolean {
@@ -214,3 +260,6 @@ class UserAuth {
         private val headTopUVWH = intArrayOf(40, 8, 8, 8)
     }
 }
+
+private var userAuth = UserAuth()
+fun userAuth() = userAuth

@@ -30,6 +30,8 @@ kotlin {
             implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
             implementation("org.slf4j:slf4j-api:2.0.9")
             implementation("ch.qos.logback:logback-classic:1.4.11")
+
+            api("io.github.kevinnzou:compose-webview-multiplatform:1.7.8")
         }
     }
 }
@@ -43,6 +45,18 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "net.treset.treelauncher"
             packageVersion = "1.0.0"
+        }
+
+        jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED")
+
+        if (System.getProperty("os.name").contains("Mac")) {
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
+        }
+
+        buildTypes.release.proguard {
+            configurationFiles.from("compose-desktop.pro")
         }
     }
 }
