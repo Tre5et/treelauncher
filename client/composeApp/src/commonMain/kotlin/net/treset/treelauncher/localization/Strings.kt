@@ -1,5 +1,6 @@
 package net.treset.treelauncher.localization
 
+import com.multiplatform.webview.web.WebViewState
 import net.treset.treelauncher.backend.data.InstanceData
 import java.util.*
 
@@ -160,15 +161,15 @@ open class Strings(
     }
 
     data class Login(
+        val browserTitle: (WebViewState) -> String,
         val button: () -> String,
         val label: Label,
-        val keepLoggedIn: () -> String,
-        val title: () -> String
+        val keepLoggedIn: () -> String
     ) {
         data class Label(
             val authenticating: () -> String,
             val failure: () -> String,
-            val success: (name: String) -> String
+            val success: (name: String?) -> String
         )
     }
 

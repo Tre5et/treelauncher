@@ -1,8 +1,7 @@
 package net.treset.treelauncher
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -23,15 +22,12 @@ import kotlin.system.exitProcess
 @Composable
 fun App() {
     MaterialTheme {
-        var isLoggedIn by remember { mutableStateOf(false) }
         Column(
-            Modifier.fillMaxWidth().fillMaxHeight(),
+            Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoggedIn) {
-                Text("Logged in")
-            } else {
-                LoginScreen { isLoggedIn = true }
+            LoginScreen {
+                Text("App goes here")
             }
         }
     }
@@ -97,5 +93,3 @@ class LauncherApp {
     }
 
 }
-
-expect fun getPlatformName(): String

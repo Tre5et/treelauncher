@@ -1,7 +1,5 @@
 package net.treset.treelauncher.localization
 
-import kotlin.math.roundToInt
-
 class DeStrings : Strings(
     Components(
         { "Neu erstellen" },
@@ -91,14 +89,14 @@ class DeStrings : Strings(
         { "1.0.0" }
     ),
     Login(
+        { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
         { "Login mit Microsoft" },
         Login.Label(
             { "Einloggen..." },
             { "Login fehlgeschlagen. Bitte erneut versuchen!" },
-            { user -> "Willkommen, $user!" }
+            { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
         ),
-        { "Eingeloggt bleiben" },
-        { "Einloggen" }
+        { "Eingeloggt bleiben" }
     ),
     Manager(
         { "Änderung anwenden" },
