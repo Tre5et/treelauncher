@@ -2,11 +2,11 @@ package net.treset.treelauncher.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
@@ -14,6 +14,7 @@ import com.multiplatform.webview.web.rememberWebViewState
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.TextCheckBox
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.icons
 
 private enum class State(val actionAllowed: Boolean) {
     NOT_LOGGED_IN(true),
@@ -66,55 +67,60 @@ fun LoginScreen(
         }
     }
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier.padding(10.dp)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Button(
-                onClick = {
-                    startLogin(
-                        keepLoggedIn,
-                        { loginState = it },
-                        { browserUrl = it }
-                    )
-                },
-                enabled = loginState.actionAllowed
+            Column(
+                modifier = Modifier.padding(10.dp)
             ) {
-                Text(strings().login.button())
+                Button(
+                    onClick = {
+                        startLogin(
+                            keepLoggedIn,
+                            { loginState = it },
+                            { browserUrl = it }
+                        )
+                    },
+                    enabled = loginState.actionAllowed
+                ) {
+                    Text(strings().login.button())
+                }
+                TextCheckBox(
+                    text = strings().login.keepLoggedIn(),
+                    checked = keepLoggedIn,
+                    onCheckedChange = { keepLoggedIn = it },
+                    enabled = loginState.actionAllowed
+                )
             }
-            TextCheckBox(
-                text = strings().login.keepLoggedIn(),
-                checked = keepLoggedIn,
-                onCheckedChange = { keepLoggedIn = it },
-                enabled = loginState.actionAllowed
+
+            Text(
+                text = when (loginState) {
+                    State.NOT_LOGGED_IN -> ""
+                    State.AUTHENTICATING -> strings().login.label.authenticating()
+                    State.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                    State.FAILED -> strings().login.label.failure()
+                },
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
-
-        Text(
-            text = when(loginState) {
-                State.NOT_LOGGED_IN -> ""
-                State.AUTHENTICATING -> strings().login.label.authenticating()
-                State.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
-                State.FAILED -> strings().login.label.failure()
-            }
-        )
-
         Column(
             verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxHeight()
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.fillMaxSize().padding(10.dp)
         ) {
             if(loginState == State.LOGGED_IN) {
-                Button(
+                FloatingActionButton(
                     onClick = { showContent = true },
+                    shape = MaterialTheme.shapes.small,
                 ) {
                     Icon(
-                        Icons.Filled.PlayArrow,
+                        icons().PlayArrow,
                         "Continue"
                     )
                 }

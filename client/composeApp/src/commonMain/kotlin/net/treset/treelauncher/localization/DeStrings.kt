@@ -80,13 +80,10 @@ class DeStrings : Strings(
         { default -> "Deutsch${if (default) " (Systemsprache)" else ""}" }
     ),
     Launcher(
-        { "TreeLauncher" },
-        { "treelauncher" },
-        Launcher.Status(
+        status = Launcher.Status(
             { progress -> "Einmaliges Setup wird durchgeführt... $progress%" },
             { "Neustart erforderlich. Bitte neu starten." }
-        ),
-        { "1.0.0" }
+        )
     ),
     Login(
         { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },

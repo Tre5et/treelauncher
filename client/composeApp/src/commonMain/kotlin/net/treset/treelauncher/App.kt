@@ -14,6 +14,7 @@ import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.login.LoginScreen
+import net.treset.treelauncher.navigation.NavigationContainer
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import java.io.IOException
 import kotlin.system.exitProcess
@@ -27,7 +28,9 @@ fun App() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginScreen {
-                Text("App goes here")
+                NavigationContainer {
+                    Text("Main Content")
+                }
             }
         }
     }

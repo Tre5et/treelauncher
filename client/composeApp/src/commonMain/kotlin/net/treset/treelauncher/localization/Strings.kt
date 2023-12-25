@@ -149,10 +149,10 @@ open class Strings(
     )
 
     data class Launcher(
-        val name: () -> String,
-        val slug: () -> String,
+        val name: () -> String = { "TreeLauncher" },
+        val slug: () -> String = { "treelauncher" },
         val status: Status,
-        val version: () -> String
+        val version: () -> String = { "1.0.0" }
     ) {
         data class Status(
             val preparing: (Int) -> String,

@@ -12,9 +12,7 @@ class LauncherUpdater {
 
     @Throws(IOException::class)
     fun getUpdate(): Update {
-        return update?.let {
-            it
-        }?: fetchUpdate()
+        return update ?: fetchUpdate()
     }
 
     @Throws(IOException::class)
@@ -98,7 +96,7 @@ class LauncherUpdater {
                 LOGGER.debug { "Update failed. Reverting changes" }
                 changeCallback(0, 0, "Update Failed. Reverting changes...")
                 for (file in backedUpFiles) {
-                    LOGGER.debug("Reverting file: $file")
+                    LOGGER.debug { "Reverting file: $file" }
                     try {
                         file.moveTo(LauncherFile.of(file.path.substring(0, file.path.length - 4)))
                     } catch (e: IOException) {
@@ -133,7 +131,7 @@ class LauncherUpdater {
         if (!readyToUpdate) {
             return
         }
-        LOGGER.info("Starting updater...")
+        LOGGER.info { "Starting updater..." }
         val pb = ProcessBuilder(
             LauncherFile.of(System.getProperty("java.home"), "bin", "java").path,
             "-jar",
@@ -145,11 +143,11 @@ class LauncherUpdater {
                 LOGGER.info { "Restarting TreeLauncher.exe after update" }
                 pb.command().add("-rTreeLauncher.exe")
             } else {
-                LOGGER.warn("TreeLauncher.exe not found to restart, searching alternative file...")
+                LOGGER.warn { "TreeLauncher.exe not found to restart, searching alternative file..." }
                 val files: Array<LauncherFile> = LauncherFile(".").listFiles()
                 for (file in files) {
                     if (file.getName().endsWith(".exe")) {
-                        LOGGER.info { ("Restarting alternative file " + file.getName()).toString() + " after update" }
+                        LOGGER.info { "Restarting alternative file ${file.getName()} after update" }
                         pb.command().add("-r" + file.getName())
                         break
                     }
@@ -163,3 +161,6 @@ class LauncherUpdater {
         private val LOGGER = KotlinLogging.logger{}
     }
 }
+
+private val updater = LauncherUpdater()
+fun updater() = updater

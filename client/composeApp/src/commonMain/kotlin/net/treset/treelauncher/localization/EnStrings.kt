@@ -80,13 +80,10 @@ class EnStrings : Strings(
         { default -> "German${if (default) " (system language)" else ""}" }
     ),
     Launcher(
-        { "TreeLauncher" },
-        { "treelauncher" },
-        Launcher.Status(
+        status = Launcher.Status(
             { progress -> "Performing first time setup... $progress%" },
             { "Restart required. Please restart." }
-        ),
-        { "1.0.0" }
+        )
     ),
     Login(
         { state -> "Login: ${state.pageTitle ?: "Loading..."} (${state.lastLoadedUrl ?: "Getting url..."})" },
@@ -179,7 +176,7 @@ class EnStrings : Strings(
     ),
     Nav(
         { "Create Instance" },
-        { "Insances" },
+        { "Instances" },
         { "Mods Components" },
         { "Options Components" },
         { "Resourcepacks Components" },
