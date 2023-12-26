@@ -6,11 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +19,7 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.update.updater
+import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.icons
@@ -118,7 +116,8 @@ fun NavigationContainer(
 
                 NavigationButton(
                     NavigationState.SETTINGS,
-                    navigationState
+                    navigationState,
+                    //TODO: Fix overflow
                 ) { tint: Color ->
                     Icon(
                         icons().AccountBox,
@@ -126,30 +125,29 @@ fun NavigationContainer(
                         tint = tint,
                         modifier = Modifier.size(36.dp)
                     )
-                    Box {
-                        profileImage?.let {
-                            Image(
-                                it.toComposeImageBitmap(),
-                                contentDescription = strings().nav.settings(),
-                                contentScale = FixedScale(4f),
-                                filterQuality = FilterQuality.None,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(2.dp))
-                                    .border(2.dp, tint)
-                            )
-                        }
+                    profileImage?.let {
+                        Image(
+                            it.toComposeImageBitmap(),
+                            contentDescription = strings().nav.settings(),
+                            contentScale = FixedScale(4f),
+                            filterQuality = FilterQuality.None,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(2.dp))
+                                .border(2.dp, tint)
+                        )
+                    }
 
-                        if(updateAvailable) {
-                            Icon(
-                                icons().DownloadForOffline,
-                                contentDescription = "Update Available",
-                                modifier = Modifier
-                                    .offset(14.dp, 14.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White)
-                                    .border(2.dp, Color.White, CircleShape)
-                            )
-                        }
+                    if(updateAvailable) {
+                        Icon(
+                            icons().DownloadForOffline,
+                            tint = colors().primary,
+                            contentDescription = "Update Available",
+                            modifier = Modifier
+                                .offset(12.dp, 12.dp)
+                                .clip(CircleShape)
+                                .background(colors().background)
+                                .border(2.dp, colors().background, CircleShape)
+                        )
                     }
                 }
             }
@@ -161,12 +159,16 @@ fun NavigationContainer(
 private fun NavigationButton(
     targetState: NavigationState,
     currentState: MutableState<NavigationState>,
+    modifier: Modifier = Modifier,
     content: @Composable (Color) -> Unit
 ) {
-    IconButton(
+    IconButton (
         onClick = { currentState.value = targetState },
+        selected = targetState == currentState.value,
+        interactionTint = colors().primary,
+        modifier = modifier
     ) {
-        content(if(currentState.value == targetState) colors().primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)) //TODO: Color
+        content(it)
     }
 }
 
@@ -175,16 +177,18 @@ private fun NavigationButton(
     targetState: NavigationState,
     currentState: MutableState<NavigationState>,
     icon: ImageVector,
-    contentDescription: String = ""
+    contentDescription: String = "",
+    modifier: Modifier = Modifier
 ) {
     NavigationButton(
         targetState,
-        currentState
-    ) { tint: Color ->
-        Icon(
+        currentState,
+        modifier
+    ) {
+        Icon (
             icon,
             contentDescription = contentDescription,
-            tint = tint,
+            tint = it,
             modifier = Modifier.size(36.dp)
         )
     }

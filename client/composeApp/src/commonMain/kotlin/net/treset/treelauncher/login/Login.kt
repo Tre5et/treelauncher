@@ -1,7 +1,7 @@
 package net.treset.treelauncher.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
