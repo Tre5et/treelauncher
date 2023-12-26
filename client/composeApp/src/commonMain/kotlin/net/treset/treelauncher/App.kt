@@ -3,6 +3,7 @@ package net.treset.treelauncher
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,21 +16,24 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
-import org.jetbrains.compose.resources.ExperimentalResourceApi
+import net.treset.treelauncher.style.colors
 import java.io.IOException
 import kotlin.system.exitProcess
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun App() {
-    MaterialTheme {
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LoginScreen {
-                NavigationContainer {
-                    Text("Main Content")
+    MaterialTheme(
+        colors = colors()
+    ) {
+        Scaffold {
+            Column(
+                Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LoginScreen {
+                    NavigationContainer {
+                        Text("Main Content")
+                    }
                 }
             }
         }

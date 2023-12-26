@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.icons
 import java.awt.image.BufferedImage
 
@@ -165,7 +166,7 @@ private fun NavigationButton(
     IconButton(
         onClick = { currentState.value = targetState },
     ) {
-        content(if(currentState.value == targetState) Color.Red else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)) //TODO: Color
+        content(if(currentState.value == targetState) colors().primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)) //TODO: Color
     }
 }
 
