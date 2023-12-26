@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage
 
 enum class NavigationState {
     INSTANCES,
+    ADD,
     SAVES,
     RESSOURCE_PACKS,
     OPTIONS,
@@ -39,7 +40,7 @@ enum class NavigationState {
 fun NavigationContainer(
     content: @Composable (NavigationState) -> Unit
 ) {
-    var navigationState = remember { mutableStateOf(NavigationState.INSTANCES) }
+    val navigationState = remember { mutableStateOf(NavigationState.INSTANCES) }
     var profileImage: BufferedImage? by remember { mutableStateOf(null) }
     var updateAvailable by remember { mutableStateOf(false) }
 
@@ -71,6 +72,12 @@ fun NavigationContainer(
                     navigationState,
                     icons().Dashboard,
                     strings().nav.home()
+                )
+                NavigationButton(
+                    NavigationState.ADD,
+                    navigationState,
+                    icons().AddCircle,
+                    strings().nav.add()
                 )
             }
 
@@ -107,13 +114,15 @@ fun NavigationContainer(
             Row(
                 modifier = Modifier.padding(5.dp),
             ) {
-                IconButton(
-                    onClick = { navigationState.value = NavigationState.SETTINGS }
-                ) {
+
+                NavigationButton(
+                    NavigationState.SETTINGS,
+                    navigationState
+                ) { tint: Color ->
                     Icon(
                         icons().AccountBox,
                         contentDescription = strings().nav.settings(),
-                        tint = if(navigationState.value == NavigationState.SETTINGS) Color.Red else LocalContentColor.current.copy(alpha = LocalContentAlpha.current), //TODO: Color
+                        tint = tint,
                         modifier = Modifier.size(36.dp)
                     )
                     Box {
@@ -125,7 +134,7 @@ fun NavigationContainer(
                                 filterQuality = FilterQuality.None,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(2.dp))
-                                    .border(2.dp, if(navigationState.value == NavigationState.SETTINGS) Color.Red else Color.Transparent, RoundedCornerShape(2.dp)) //TODO: Color
+                                    .border(2.dp, tint)
                             )
                         }
 
@@ -151,16 +160,30 @@ fun NavigationContainer(
 private fun NavigationButton(
     targetState: NavigationState,
     currentState: MutableState<NavigationState>,
-    icon: ImageVector,
-    contentDescription: String = ""
+    content: @Composable (Color) -> Unit
 ) {
     IconButton(
         onClick = { currentState.value = targetState },
     ) {
+        content(if(currentState.value == targetState) Color.Red else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)) //TODO: Color
+    }
+}
+
+@Composable
+private fun NavigationButton(
+    targetState: NavigationState,
+    currentState: MutableState<NavigationState>,
+    icon: ImageVector,
+    contentDescription: String = ""
+) {
+    NavigationButton(
+        targetState,
+        currentState
+    ) { tint: Color ->
         Icon(
             icon,
             contentDescription = contentDescription,
-            tint = if(currentState.value == targetState) Color.Red else LocalContentColor.current.copy(alpha = LocalContentAlpha.current), //TODO: Color
+            tint = tint,
             modifier = Modifier.size(36.dp)
         )
     }
