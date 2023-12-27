@@ -2,7 +2,7 @@ package net.treset.treelauncher
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -16,7 +16,10 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
+import net.treset.treelauncher.navigation.NavigationState
+import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.colors
+import net.treset.treelauncher.style.typography
 import java.io.IOException
 import kotlin.system.exitProcess
 
@@ -24,6 +27,7 @@ import kotlin.system.exitProcess
 fun App() {
     MaterialTheme(
         colorScheme = colors(),
+        typography = typography()
     ) {
         Scaffold {
             Column(
@@ -32,7 +36,11 @@ fun App() {
             ) {
                 LoginScreen {
                     NavigationContainer {
-                        Text("Main Content")
+                        when(it) {
+                            NavigationState.SETTINGS -> Settings()
+
+                            else -> Text("TODO")
+                        }
                     }
                 }
             }

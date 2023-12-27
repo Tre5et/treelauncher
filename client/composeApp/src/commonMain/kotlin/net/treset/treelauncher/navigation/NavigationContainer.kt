@@ -54,11 +54,11 @@ fun NavigationContainer(
     }
 
     Column(
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.Top,
         modifier = Modifier.fillMaxSize()
     ) {
+        //TODO: Fix Content over Navigation
         content(navigationState.value)
-
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
