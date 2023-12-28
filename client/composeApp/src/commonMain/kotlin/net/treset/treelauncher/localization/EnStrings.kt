@@ -274,6 +274,7 @@ class EnStrings : Strings(
         )
     ),
     Settings(
+        { "Appearance" },
         { "Language:" },
         { "Logout" },
         Settings.Path(
@@ -293,12 +294,14 @@ class EnStrings : Strings(
             { "Test failed!" },
             { "Component Synchorization" },
             { "API-Key:"},
+            { "Key" },
             { "Port" },
             { "Test successfull!" },
             { "Test" },
             { "URL" }
         ),
         { "Settings" },
+        { "Theme:" },
         Settings.Update(
             { "Update Available!" },
             { current, new ->  "Update: v$current → v$new"},
@@ -319,7 +322,7 @@ class EnStrings : Strings(
             { "Not able to update." }
         ),
         { "Logged in as:" },
-        { version -> "Version: v$version" }
+        { "Version: v${strings().launcher.version()}" }
     ),
     Sorts(
         { "Name (Enabled first)" },
@@ -348,6 +351,11 @@ class EnStrings : Strings(
         ),
         { "Synchronizing Component..."},
         { "<Unknown Name>" }
+    ),
+    Theme(
+        { "Dark" },
+        { "Light" },
+        { "Match System" }
     ),
     Units(
         { "d" },

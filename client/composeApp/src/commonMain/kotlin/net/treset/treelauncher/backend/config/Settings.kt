@@ -8,6 +8,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.sort.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
+import net.treset.treelauncher.style.Theme
 import java.io.IOException
 
 class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
@@ -30,7 +31,8 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
         }
     }
 
-    var language: Language = language().appLanguage
+    var language: Language = language().systemLanguage
+    var theme: Theme = Theme.SYSTEM
     var syncUrl: String? = null
     var syncPort: String? = null
     var syncKey: String? = null

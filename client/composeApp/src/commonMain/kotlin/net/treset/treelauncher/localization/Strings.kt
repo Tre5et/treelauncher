@@ -1,12 +1,17 @@
 package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import java.util.*
 
-enum class Language(val locale: Locale, val strings: Strings, name: () -> String) {
+enum class Language(val locale: Locale, val strings: Strings, val displayName: () -> String) {
     ENGLISH(Locale.ENGLISH, EnStrings(), { strings().language.english(language().systemLanguage == ENGLISH) }),
     GERMAN(Locale.GERMAN, DeStrings(), { strings().language.german(language().systemLanguage == GERMAN) });
+
+    override fun toString(): String {
+        return this.displayName()
+    }
 }
 class LanguageInfo() {
     val systemLanguage: Language = when (Locale.getDefault(Locale.Category.DISPLAY).language) {
@@ -17,6 +22,7 @@ class LanguageInfo() {
     var appLanguage: Language = systemLanguage
         set(value) {
             field = value
+            appSettings().language = value
             strings = when(value) {
                 Language.ENGLISH -> EnStrings()
                 Language.GERMAN -> DeStrings()
@@ -49,6 +55,7 @@ open class Strings(
     val settings: Settings,
     val sorts: Sorts,
     val sync: Sync,
+    val theme: Theme,
     val units: Units,
     val updater: Updater
 ) {
@@ -398,6 +405,7 @@ open class Strings(
     }
 
     data class Settings(
+        val appearance: () -> String,
         val language: () -> String,
         val logout: () -> String,
         val path: Path,
@@ -406,9 +414,10 @@ open class Strings(
         val sourceTooltip: () -> String,
         val sync: Sync,
         val title: () -> String,
+        val theme: () -> String,
         val update: Update,
         val user: () -> String,
-        val version: (version: String) -> String
+        val version: () -> String
     ) {
         data class Path(
             val apply: () -> String,
@@ -425,6 +434,7 @@ open class Strings(
             val failure: () -> String,
             val title: () -> String,
             val key: () -> String,
+            val keyPlaceholder: () -> String,
             val port: () -> String,
             val success: () -> String,
             val test: () -> String,
@@ -485,6 +495,12 @@ open class Strings(
             val uploading: () -> String
         )
     }
+
+    data class Theme(
+        val dark: () -> String,
+        val light: () -> String,
+        val system: () -> String
+    )
 
     data class Units(
         val days: () -> String,

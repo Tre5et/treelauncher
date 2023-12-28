@@ -31,6 +31,12 @@ fun typography() = Typography(
         fontWeight = FontWeight.SemiBold,
         fontSize = 26.sp
     ),
+    titleSmall = TextStyle(
+        fontFamily = Exo2Font,
+        fontWeight = FontWeight.Normal,
+        fontStyle = FontStyle.Italic,
+        fontSize = 20.sp
+    ),
     bodyMedium = TextStyle(
         fontFamily = Exo2Font,
         fontWeight = FontWeight.Normal,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,17 +30,22 @@ fun App() {
         colorScheme = colors(),
         typography = typography()
     ) {
-        Scaffold {
-            Column(
-                Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LoginScreen {
-                    NavigationContainer {
-                        when(it) {
-                            NavigationState.SETTINGS -> Settings()
+        ProvideTextStyle(
+            MaterialTheme.typography.bodyMedium
+        ) {
 
-                            else -> Text("TODO")
+            Scaffold {
+                Column(
+                    Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LoginScreen {
+                        NavigationContainer {
+                            when (it) {
+                                NavigationState.SETTINGS -> Settings()
+
+                                else -> Text("TODO")
+                            }
                         }
                     }
                 }
@@ -52,6 +58,8 @@ fun onClose(): Boolean {
     //TODO: Prevent close
     //TODO: Sync
     //TODO: Update
+    appSettings().save()
+
     return true
 }
 

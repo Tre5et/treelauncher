@@ -12,7 +12,7 @@ import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import net.treset.treelauncher.backend.auth.userAuth
-import net.treset.treelauncher.generic.TextCheckBox
+import net.treset.treelauncher.generic.TitledCheckBox
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
@@ -90,7 +90,7 @@ fun LoginScreen(
                 ) {
                     Text(strings().login.button())
                 }
-                TextCheckBox(
+                TitledCheckBox(
                     text = strings().login.keepLoggedIn(),
                     checked = keepLoggedIn,
                     onCheckedChange = { keepLoggedIn = it },

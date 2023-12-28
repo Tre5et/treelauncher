@@ -6,27 +6,37 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import net.treset.treelauncher.backend.config.appSettings
+import net.treset.treelauncher.localization.strings
 
-enum class ColorMode(val isDark: @Composable () -> Boolean) {
-    DARK({ true }),
-    LIGHT({ false }),
-    SYSTEM({ isSystemInDarkTheme() })
+enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> String) {
+    DARK({ true }, { strings().theme.dark() }),
+    LIGHT({ false }, { strings().theme.light() }),
+    SYSTEM({ isSystemInDarkTheme() }, { strings().theme.system() });
+
+    override fun toString(): String {
+        return this.displayName()
+    }
 }
 
 private fun dark() = darkColorScheme(
     primary = Color.Green,
+    error = Color.Red
 )
 
 private fun light() = lightColorScheme(
     primary = Color.Green
 )
 
-private var color: ColorMode = ColorMode.SYSTEM
-fun colorMode() = color
-fun setColorMode(colorMode: ColorMode) { color = colorMode }
+private var currentTheme: Theme = appSettings().theme
+fun theme() = currentTheme
+fun setTheme(theme: Theme) {
+    currentTheme = theme
+    appSettings().theme = theme
+}
 
 @Composable
-fun colors(): ColorScheme = if(colorMode().isDark()) {
+fun colors(): ColorScheme = if(theme().isDark()) {
         dark()
     } else {
         light()
@@ -41,7 +51,7 @@ fun Color.hovered(isDark: Boolean): Color = this.copy(
     )
 
 @Composable
-fun Color.hovered(): Color = hovered(colorMode().isDark())
+fun Color.hovered(): Color = hovered(theme().isDark())
 
 private fun Float.toHover(isDark: Boolean): Float {
     return if(isDark) {
@@ -59,7 +69,7 @@ fun Color.pressed(isDark: Boolean): Color = this.copy(
     )
 
 @Composable
-fun Color.pressed(): Color = pressed(colorMode().isDark())
+fun Color.pressed(): Color = pressed(theme().isDark())
 
 private fun Float.toPressed(isDark: Boolean): Float {
     return if(isDark) {

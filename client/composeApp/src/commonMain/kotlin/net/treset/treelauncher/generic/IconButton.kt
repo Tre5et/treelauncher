@@ -6,13 +6,14 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.hovered
 import net.treset.treelauncher.style.pressed
 
@@ -23,10 +24,10 @@ fun IconButton(
     enabled: Boolean = true,
     selected: Boolean = false,
     highlighted: Boolean = false,
-    interactionTint: Color = colors().primary,
+    interactionTint: Color = MaterialTheme.colorScheme.primary,
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable (Color) -> Unit
+    content: @Composable () -> Unit
 ) {
     androidx.compose.material3.IconButton (
         onClick = onClick,
@@ -35,8 +36,7 @@ fun IconButton(
         colors = colors,
         interactionSource = interactionSource,
     ) {
-        content(
-            if(highlighted) {
+        val color = if(highlighted) {
                 if (selected) {
                     interactionTint
                 } else if (interactionSource.collectIsHoveredAsState().value) {
@@ -55,6 +55,11 @@ fun IconButton(
                     LocalContentColor.current
                 }
             }
-        )
+
+        CompositionLocalProvider(
+            LocalContentColor provides color
+        ) {
+            content()
+        }
     }
 }

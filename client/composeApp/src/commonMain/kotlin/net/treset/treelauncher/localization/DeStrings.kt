@@ -274,6 +274,7 @@ class DeStrings : Strings(
         )
     ),
     Settings(
+        { "Darstellung" },
         { "Sprache:" },
         { "Ausloggen" },
         Settings.Path(
@@ -293,12 +294,14 @@ class DeStrings : Strings(
             { "Test fehlgeschlagen!" },
             { "Komponentensynchronisation" },
             { "API-Schlüssel:"},
+            { "Schlüssel" },
             { "Port" },
             { "Test erfolgreich!" },
             { "Test" },
             { "URL" }
         ),
         { "Einstellungen" },
+        { "Farben:" },
         Settings.Update(
             { "Update verfügbar!" },
             { current, new ->  "Update: v$current → v$new"},
@@ -319,7 +322,7 @@ class DeStrings : Strings(
             { "Update kann nicht durchgeführt werden." }
         ),
         { "Eingeloggt als:" },
-        { version -> "Version: v$version" }
+        { "Version: v${strings().launcher.version()}" }
     ),
     Sorts(
         { "Name (Aktivierte zuerst)" },
@@ -348,6 +351,11 @@ class DeStrings : Strings(
         ),
         { "Komponente wird synchronisiert..."},
         { "<Unbekannter Name>" }
+    ),
+    Theme(
+        { "Dunkel" },
+        { "Hell" },
+        { "Systemeinstellung" }
     ),
     Units(
         { "t" },
