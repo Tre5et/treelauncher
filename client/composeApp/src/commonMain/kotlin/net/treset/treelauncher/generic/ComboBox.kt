@@ -44,14 +44,15 @@ fun <T> ComboBox(
             verticalAlignment = Alignment.CenterVertically,
             modifier = rowModifier
                 .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                .padding(start = 6.dp, top = 2.dp, bottom = 2.dp)
+                .padding(start = 6.dp, bottom = 3.dp)
         ) {
             Text(
                 displayString
             )
             Icon(
                 icons().ArrowDropDown,
-                "Open"
+                "Open",
+                modifier = Modifier.offset(y = 2.dp)
             )
         }
         DropdownMenu(

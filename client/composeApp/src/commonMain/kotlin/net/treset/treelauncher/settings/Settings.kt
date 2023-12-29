@@ -260,7 +260,8 @@ fun Settings() {
             ) {
                 Icon(
                     painter = painterResource("icons/github.svg"),
-                    contentDescription = "Link to Github Project"
+                    contentDescription = "Link to Github Project",
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }

@@ -78,3 +78,10 @@ private fun Float.toPressed(isDark: Boolean): Float {
         this - this / 3f
     }
 }
+
+fun Color.inverted(): Color = this.copy(
+    alpha = alpha,
+    red = 1 - red,
+    green = 1 - green,
+    blue = 1 - blue
+)

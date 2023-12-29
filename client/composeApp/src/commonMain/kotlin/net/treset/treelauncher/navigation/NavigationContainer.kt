@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -60,6 +59,7 @@ fun NavigationContainer(
         verticalArrangement = Arrangement.Bottom,
         modifier = Modifier.fillMaxSize().onSizeChanged { height = it.height }
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,11 +139,10 @@ fun NavigationContainer(
                         Image(
                             it.toComposeImageBitmap(),
                             contentDescription = strings().nav.settings(),
-                            contentScale = FixedScale(LocalDensity.current.density * 4f),
+                            contentScale = FixedScale(LocalDensity.current.density * 3.5f),
                             filterQuality = FilterQuality.None,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(2.dp))
-                                .border(2.dp, LocalContentColor.current)
                         )
                     }
 
@@ -177,7 +176,7 @@ private fun NavigationButton(
         onClick = { currentState.value = targetState },
         selected = targetState == currentState.value,
         interactionTint = MaterialTheme.colorScheme.primary,
-        modifier = modifier
+        modifier = modifier.aspectRatio(1f)
     ) {
         content()
     }
