@@ -26,6 +26,11 @@ val Exo2Font = FontFamily(
 )
 
 fun typography() = Typography(
+    titleLarge = TextStyle(
+        fontFamily = Exo2Font,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 32.sp
+    ),
     titleMedium = TextStyle(
         fontFamily = Exo2Font,
         fontWeight = FontWeight.SemiBold,

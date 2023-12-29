@@ -1,5 +1,7 @@
 package net.treset.treelauncher.generic
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -40,11 +42,23 @@ fun <T> ComboBox(
             Modifier.clickable(onClick = { expanded = true })
         } ?: Modifier
 
+        val borderColor by animateColorAsState(
+            if(expanded) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.secondary
+            }
+        )
+
+        val borderWidth by animateDpAsState(
+            if(expanded) { 2.dp } else { 1.dp }
+        )
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = rowModifier
-                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                .padding(start = 6.dp, bottom = 3.dp)
+                .border(borderWidth, borderColor, RoundedCornerShape(4.dp))
+                .padding(start = 12.dp, bottom = 9.dp, top = 6.dp, end = 6.dp)
         ) {
             Text(
                 displayString

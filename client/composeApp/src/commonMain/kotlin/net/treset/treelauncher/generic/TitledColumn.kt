@@ -2,6 +2,7 @@ package net.treset.treelauncher.generic
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,27 +19,34 @@ fun TitledColumn(
     title: String,
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal? = null,
-    content: @Composable () -> Unit
+    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment ?: Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
     ) {
-        Column {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                style = MaterialTheme.typography.titleLarge,
             )
             Divider(
                 color = MaterialTheme.colorScheme.primary,
-                thickness = 4.dp
+                thickness = 2.dp
             )
         }
-        content()
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment
+        ) {
+            this.content()
+        }
     }
 }

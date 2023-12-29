@@ -21,6 +21,7 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.string.UrlString
+import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.generic.TitledCheckBox
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.generic.TitledComboBox
@@ -93,11 +94,12 @@ fun Settings() {
             )
 
             var tfValue by remember { mutableStateOf(appConfig().BASE_DIR.absolutePath) }
-            TextField(
+            TextBox(
                 tfValue,
-                onValueChange = {
+                {
                     tfValue = it
-                }
+                },
+                showClear = false
             )
 
             var sbState by remember { mutableStateOf(true) }
@@ -139,20 +141,20 @@ fun Settings() {
                 Text(
                     "http://"
                 )
-                TextField(
+                TextBox(
                     tfUrl,
                     {
                         tfUrl = it
                     },
-                    placeholder = { Text(strings().settings.sync.url()) }
+                    placeholder = strings().settings.sync.url()
                 )
                 Text(":")
-                TextField(
+                TextBox(
                     tfPort,
                     {
                         tfPort = it
                     },
-                    placeholder = { Text(strings().settings.sync.port()) }
+                    placeholder = strings().settings.sync.port()
                 )
             }
 
@@ -163,12 +165,12 @@ fun Settings() {
                 Text(
                     strings().settings.sync.key()
                 )
-                TextField(
+                TextBox(
                     tfKey,
                     {
                         tfKey = it
                     },
-                    placeholder = { Text(strings().settings.sync.keyPlaceholder()) }
+                    placeholder = strings().settings.sync.keyPlaceholder()
                 )
             }
 
