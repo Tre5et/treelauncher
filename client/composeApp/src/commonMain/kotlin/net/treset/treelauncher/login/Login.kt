@@ -1,8 +1,8 @@
 package net.treset.treelauncher.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,12 +11,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
+import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.TitledCheckBox
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
-private enum class State(val actionAllowed: Boolean) {
+enum class LoginState(val actionAllowed: Boolean) {
     NOT_LOGGED_IN(true),
     AUTHENTICATING(false),
     LOGGED_IN(false),
@@ -25,10 +26,10 @@ private enum class State(val actionAllowed: Boolean) {
 
 @Composable
 fun LoginScreen(
-    content: @Composable () -> Unit
+    content: @Composable (LoginContext) -> Unit
 ) {
     var keepLoggedIn by remember { mutableStateOf(true) }
-    var loginState by remember { mutableStateOf(State.NOT_LOGGED_IN) }
+    var loginState by remember { mutableStateOf(LoginState.NOT_LOGGED_IN) }
     var browserUrl: String? by remember { mutableStateOf(null) }
     var showContent by remember { mutableStateOf(false) }
 
@@ -37,7 +38,7 @@ fun LoginScreen(
             startLogin(true,
                 {
                     loginState = it
-                    if(it == State.LOGGED_IN) {
+                    if(it == LoginState.LOGGED_IN) {
                         showContent = true
                     }
                 },
@@ -47,7 +48,16 @@ fun LoginScreen(
     }
 
     if(showContent) {
-        content()
+        content(
+            LoginContext(
+                loginState,
+                userAuth()
+            ) {
+                loginState = LoginState.NOT_LOGGED_IN
+                showContent = false
+                userAuth().logout()
+            }
+        )
         return
     }
 
@@ -56,9 +66,9 @@ fun LoginScreen(
             if(
                 userAuth().checkUserUrl(url, keepLoggedIn) {
                     loginState = if (it) {
-                        State.LOGGED_IN
+                        LoginState.LOGGED_IN
                     } else {
-                        State.FAILED
+                        LoginState.FAILED
                     }
                 }
             ) {
@@ -76,7 +86,10 @@ fun LoginScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Column(
-                modifier = Modifier.padding(10.dp)
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth(0.25f)
             ) {
                 Button(
                     onClick = {
@@ -86,7 +99,8 @@ fun LoginScreen(
                             { browserUrl = it }
                         )
                     },
-                    enabled = loginState.actionAllowed
+                    enabled = loginState.actionAllowed,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(strings().login.button())
                 }
@@ -100,10 +114,10 @@ fun LoginScreen(
 
             Text(
                 text = when (loginState) {
-                    State.NOT_LOGGED_IN -> ""
-                    State.AUTHENTICATING -> strings().login.label.authenticating()
-                    State.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
-                    State.FAILED -> strings().login.label.failure()
+                    LoginState.NOT_LOGGED_IN -> ""
+                    LoginState.AUTHENTICATING -> strings().login.label.authenticating()
+                    LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                    LoginState.FAILED -> strings().login.label.failure()
                 },
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -114,7 +128,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.fillMaxSize().padding(10.dp)
         ) {
-            if(loginState == State.LOGGED_IN) {
+            if(loginState == LoginState.LOGGED_IN) {
                 FloatingActionButton(
                     onClick = { showContent = true },
                     shape = MaterialTheme.shapes.small,
@@ -162,20 +176,26 @@ private fun LoginBrowserWindow(
 
 private fun startLogin(
     keepLoggedIn: Boolean,
-    onState: (State) -> Unit,
+    onState: (LoginState) -> Unit,
     onUrl: (String) -> Unit
 ) {
-    onState(State.AUTHENTICATING)
+    onState(LoginState.AUTHENTICATING)
     Thread {
         val url = userAuth().startAuthentication(keepLoggedIn) {
             onState(
                 if (it) {
-                    State.LOGGED_IN
+                    LoginState.LOGGED_IN
                 } else {
-                    State.FAILED
+                    LoginState.FAILED
                 }
             )
         }
         url?.let { onUrl(it) }
     }.start()
 }
+
+data class LoginContext(
+    val loginState: LoginState,
+    val userAuth: UserAuth,
+    val logout: () -> Unit
+)

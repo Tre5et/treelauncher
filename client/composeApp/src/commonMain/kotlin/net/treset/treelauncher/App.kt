@@ -39,10 +39,10 @@ fun App() {
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LoginScreen {
-                        NavigationContainer {
-                            when (it) {
-                                NavigationState.SETTINGS -> Settings()
+                    LoginScreen { loginContext ->
+                        NavigationContainer(loginContext) { navContext ->
+                            when (navContext.navigationState) {
+                                NavigationState.SETTINGS -> Settings(loginContext)
 
                                 else -> Text("TODO")
                             }

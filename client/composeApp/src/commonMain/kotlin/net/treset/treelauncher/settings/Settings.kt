@@ -28,6 +28,7 @@ import net.treset.treelauncher.generic.TitledComboBox
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.Theme
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.style.setTheme
@@ -36,7 +37,9 @@ import java.awt.image.BufferedImage
 
 
 @Composable
-fun Settings() {
+fun Settings(
+    loginContext: LoginContext
+) {
     var userImage: BufferedImage? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
@@ -213,9 +216,7 @@ fun Settings() {
                 style = MaterialTheme.typography.labelSmall
             )
             net.treset.treelauncher.generic.IconButton(
-                onClick = {
-                    //TODO: logout
-                },
+                onClick = loginContext.logout,
                 interactionTint = MaterialTheme.colorScheme.error,
                 highlighted = true
             ) {

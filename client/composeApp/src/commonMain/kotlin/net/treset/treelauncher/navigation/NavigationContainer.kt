@@ -19,10 +19,10 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
 import java.awt.image.BufferedImage
 
@@ -38,7 +38,8 @@ enum class NavigationState {
 
 @Composable
 fun NavigationContainer(
-    content: @Composable (NavigationState) -> Unit
+    loginContext: LoginContext,
+    content: @Composable (NavigationContext) -> Unit
 ) {
     val navigationState = remember { mutableStateOf(NavigationState.INSTANCES) }
     var profileImage: BufferedImage? by remember { mutableStateOf(null) }
@@ -46,7 +47,7 @@ fun NavigationContainer(
 
     LaunchedEffect(Unit) {
         Thread {
-            profileImage = userAuth().getUserIcon()
+            profileImage = loginContext.userAuth.getUserIcon()
         }.start()
 
         Thread {
@@ -65,7 +66,7 @@ fun NavigationContainer(
                 .fillMaxWidth()
                 .height(LocalDensity.current.run { height.toDp() } - 46.dp)
         ) {
-            content(navigationState.value)
+            content(NavigationContext(navigationState.value))
         }
 
         Row(
@@ -202,3 +203,7 @@ private fun NavigationButton(
         )
     }
 }
+
+data class NavigationContext(
+    var navigationState: NavigationState
+)
