@@ -281,9 +281,12 @@ class DeStrings : Strings(
             { "Anwenden" },
             { "Dateipfad wird geändert..." },
             { "Schließen" },
+            { "Dateipfad konnte nicht geändert werden" },
+            { e -> "Der folgende Fehler ist aufgetreten:\n$e" },
             { "Kein Ordner ausgewählt" },
             { "Dateien vom alten Ort entfernen" },
             { "Ordner auswählen" },
+            { "Dateipfad geändert" },
             { "Launcher Dateipfad"}
         ),
         { "Diese Einstellung wird nach dem Neustart angewendet" },

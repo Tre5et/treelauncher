@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException
 import java.util.*
 import java.util.function.Function
 
-class LauncherFile(pathname: String?) : File(pathname) {
+class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
     fun read(): ByteArray {
         if (!isFile()) throw IOException("File does not exist: $absolutePath")
@@ -44,7 +44,7 @@ class LauncherFile(pathname: String?) : File(pathname) {
             try {
                 Files.walk(Path.of(path)).use { stream ->
                     val exceptions: MutableList<IOException> = ArrayList()
-                    val sourceLength = absolutePath.length
+                    val sourceLength = path.length
                     stream.forEach { sourceF: Path ->
                         if (!copyChecker.apply(sourceF.fileName.toString()) || sourceF.toString() == absolutePath) {
                             return@forEach
@@ -177,10 +177,12 @@ class LauncherFile(pathname: String?) : File(pathname) {
         fun of(vararg parts: String): LauncherFile {
             val path = StringBuilder()
             for (i in parts.indices) {
-                if (parts[i] == null || parts[i]!!.isBlank()) continue
+                if (parts[i].isBlank()) continue
                 path.append(parts[i])
-                if (i != parts.size - 1 && !parts[i]!!.endsWith(separator) && !parts[i]!!
-                        .endsWith("/") && !parts[i]!!.endsWith("\\")
+                if (i != parts.size - 1
+                    && !parts[i].endsWith(separator)
+                    && !parts[i].endsWith("/")
+                    && !parts[i].endsWith("\\")
                 ) path.append(separator)
             }
             return LauncherFile(path.toString())

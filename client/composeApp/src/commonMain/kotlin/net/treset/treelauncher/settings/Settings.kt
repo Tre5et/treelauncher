@@ -17,14 +17,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.auth.userAuth
+import net.treset.treelauncher.backend.config.GlobalConfigLoader
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
+import net.treset.treelauncher.backend.sync.SyncService
 import net.treset.treelauncher.backend.update.updater
+import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.UrlString
-import net.treset.treelauncher.generic.TextBox
-import net.treset.treelauncher.generic.TitledCheckBox
-import net.treset.treelauncher.generic.TitledColumn
-import net.treset.treelauncher.generic.TitledComboBox
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
@@ -34,6 +34,7 @@ import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.style.setTheme
 import net.treset.treelauncher.style.theme
 import java.awt.image.BufferedImage
+import java.io.IOException
 
 
 @Composable
@@ -45,6 +46,8 @@ fun Settings(
     LaunchedEffect(Unit) {
         userImage = userAuth().getUserIcon()
     }
+
+    var popupContent: PopupData? by remember { mutableStateOf(null) }
 
     TitledColumn(
         title = strings().settings.title(),
@@ -105,18 +108,67 @@ fun Settings(
                 showClear = false
             )
 
-            var sbState by remember { mutableStateOf(true) }
+            var cbState by remember { mutableStateOf(true) }
             TitledCheckBox(
-                sbState,
+                cbState,
                 onCheckedChange = {
-                    sbState = it
+                    cbState = it
                 },
                 text = strings().settings.path.remove()
             )
 
             Button(
                 onClick = {
-                    //TODO: change
+                    val dir = LauncherFile.of(tfValue)
+
+                    if(!dir.isDirectory()) {
+                        popupContent = PopupData(
+                            type = PopupType.ERROR,
+                            titleRow = { Text(strings().settings.path.invalid()) },
+                            buttonRow = {
+                                Button(
+                                    onClick = { popupContent = null }
+                                ) {
+                                    Text(strings().settings.path.close())
+                                }
+                            }
+                        )
+                    } else {
+                        popupContent = PopupData(
+                            titleRow = { Text(strings().settings.path.changing()) }
+                        )
+
+                        Thread {
+                            try {
+                                GlobalConfigLoader().updatePath(dir, cbState)
+
+                                popupContent = PopupData(
+                                    type = PopupType.SUCCESS,
+                                    titleRow = { Text(strings().settings.path.success())},
+                                    buttonRow = {
+                                        Button(
+                                            onClick = { popupContent = null }
+                                        ) {
+                                            Text(strings().settings.path.close())
+                                        }
+                                    }
+                                )
+                            } catch(e: IOException) {
+                                popupContent = PopupData(
+                                    type = PopupType.ERROR,
+                                    titleRow = { Text(strings().settings.path.errorTitle()) },
+                                    content = { Text(strings().settings.path.errorMessage(e)) },
+                                    buttonRow = {
+                                        Button(
+                                            onClick = { popupContent = null }
+                                        ) {
+                                            Text(strings().settings.path.close())
+                                        }
+                                    }
+                                )
+                            }
+                        }.start()
+                    }
                 }
             ) {
                 Text(
@@ -179,10 +231,43 @@ fun Settings(
 
             Button(
                 onClick = {
-                    //TODO: Test
-                    appSettings().syncUrl = tfUrl
-                    appSettings().syncPort = tfPort
-                    appSettings().syncKey = tfKey
+                    try {
+                        SyncService(
+                            tfUrl,
+                            tfPort,
+                            tfKey
+                        ).testConnection()
+
+                        popupContent = PopupData(
+                            type = PopupType.SUCCESS,
+                            titleRow = { Text(strings().settings.sync.success()) },
+                            buttonRow = {
+                                Button(
+                                    onClick = { popupContent = null }
+                                ) {
+                                    Text(strings().settings.sync.close())
+                                }
+                            }
+                        )
+                        appSettings().syncUrl = tfUrl
+                        appSettings().syncPort = tfPort
+                        appSettings().syncKey = tfKey
+                    } catch(e: Exception) {
+                        popupContent = PopupData(
+                            type = PopupType.ERROR,
+                            titleRow = { Text(strings().settings.sync.failure()) },
+                            buttonRow = {
+                                Button(
+                                    onClick = { popupContent = null }
+                                ) {
+                                    Text(strings().settings.sync.close())
+                                }
+                            }
+                        )
+                        appSettings().syncUrl = null
+                        appSettings().syncPort = null
+                        appSettings().syncKey = null
+                    }
                 }
             ) {
                 Text(
@@ -215,7 +300,7 @@ fun Settings(
                 userAuth().minecraftUser?.uuid ?: "UNKNOWN UUID",
                 style = MaterialTheme.typography.labelSmall
             )
-            net.treset.treelauncher.generic.IconButton(
+            IconButton(
                 onClick = loginContext.logout,
                 interactionTint = MaterialTheme.colorScheme.error,
                 highlighted = true
@@ -240,7 +325,7 @@ fun Settings(
             )
 
             if(updater().getUpdate().latest == false) {
-                net.treset.treelauncher.generic.IconButton(
+                IconButton(
                     onClick = {
                         //TODO: Update
                     },
@@ -268,5 +353,9 @@ fun Settings(
                 )
             }
         }
+    }
+
+    popupContent?.let {
+        PopupOverlay(it)
     }
 }

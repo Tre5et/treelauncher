@@ -281,9 +281,12 @@ class EnStrings : Strings(
             { "Apply" },
             { "Changing path..." },
             { "Close" },
+            { "Failed to change path" },
+            { e -> "An error occured:\n$e"},
             { "No valid folder provided" },
             { "Remove files from old location" },
             { "Select a Folder" },
+            { "Successfully changed path" },
             { "Launcher Data Directory"}
         ),
         { "A restart is required for this to take effect" },

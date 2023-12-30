@@ -3,6 +3,7 @@ package net.treset.treelauncher.localization
 import com.multiplatform.webview.web.WebViewState
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import java.io.IOException
 import java.util.*
 
 enum class Language(val locale: Locale, val strings: Strings, val displayName: () -> String) {
@@ -423,9 +424,12 @@ open class Strings(
             val apply: () -> String,
             val changing: () -> String,
             val close: () -> String,
+            val errorTitle: () -> String,
+            val errorMessage: (IOException) -> String,
             val invalid: () -> String,
             val remove: () -> String,
             val select: () -> String,
+            val success: () -> String,
             val title: () -> String
         )
 
