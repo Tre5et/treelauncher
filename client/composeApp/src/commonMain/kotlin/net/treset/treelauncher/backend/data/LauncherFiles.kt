@@ -102,13 +102,12 @@ class LauncherFiles {
             LauncherManifest.fromJson(versionFile)
         } catch (e: SerializationException) {
             throw FileLoadException("Unable to load launcher manifest: json error", e)
-        }.let {
+        }.also {
             if (it == null || it.type != LauncherManifestType.LAUNCHER) {
                 throw FileLoadException("Unable to load launcher manifest: incorrect contents")
             }
             it.directory = appConfig().BASE_DIR.absolutePath
             LOGGER.debug { "Loaded launcher manifest" }
-            null
         }
     }
 
@@ -127,12 +126,11 @@ class LauncherFiles {
                 LauncherDetails.fromJson(detailsFile)
             } catch (e: SerializationException) {
                 throw FileLoadException("Unable to load launcher details: json error", e)
-            }.let { details ->
+            }.also { details ->
                 if (details.versionDir == null || details.versionType == null || details.versionComponentType == null || details.savesType == null || details.savesComponentType == null || details.resourcepacksType == null || details.resourcepacksComponentType == null || details.resourcepacksDir == null || details.assetsDir == null || details.gamedataDir == null || details.gamedataType == null || details.instancesDir == null || details.instanceComponentType == null || details.instancesType == null || details.javaComponentType == null || details.javasDir == null || details.javasType == null || details.librariesDir == null || details.modsComponentType == null || details.modsType == null || details.optionsDir == null || details.optionsComponentType == null || details.optionsType == null || details.savesComponentType == null || details.savesType == null) {
                     throw FileLoadException("Unable to load launcher details: incorrect contents")
                 }
                 LOGGER.debug { "Loaded launcher details" }
-                null
             }
 
         }?: throw FileLoadException("Unable to load launcher details: invalid main file")

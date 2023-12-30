@@ -40,7 +40,7 @@ fun TitledColumn(
             )
         }
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = verticalArrangement,

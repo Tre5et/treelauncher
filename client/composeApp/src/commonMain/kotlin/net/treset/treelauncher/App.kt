@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.treelauncher.backend.config.*
+import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
@@ -24,9 +26,18 @@ import net.treset.treelauncher.style.typography
 import java.io.IOException
 import kotlin.system.exitProcess
 
+data class AppContext(
+    val files: LauncherFiles
+)
+
 @Composable
 fun App() {
     app = LauncherApp()
+
+    val launcherFiles = remember { LauncherFiles() }
+    launcherFiles.reloadAll()
+
+    val appContext = AppContext(launcherFiles)
 
     MaterialTheme(
         colorScheme = colors(),
@@ -44,6 +55,7 @@ fun App() {
                     LoginScreen { loginContext ->
                         NavigationContainer(loginContext) { navContext ->
                             when (navContext.navigationState) {
+                                NavigationState.INSTANCES -> Instances(appContext)
                                 NavigationState.SETTINGS -> Settings(loginContext)
 
                                 else -> Text("TODO")
