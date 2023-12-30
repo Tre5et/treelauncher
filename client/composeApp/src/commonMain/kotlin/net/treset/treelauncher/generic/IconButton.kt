@@ -23,7 +23,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.style.hovered
-import net.treset.treelauncher.style.inverted
 import net.treset.treelauncher.style.pressed
 
 @Composable
@@ -40,7 +39,7 @@ fun IconButton(
     val foregroundColor by animateColorAsState(
         if(highlighted) {
             if (selected) {
-                LocalContentColor.current.inverted()
+                MaterialTheme.colorScheme.onPrimary
             } else if (interactionSource.collectIsHoveredAsState().value) {
                 interactionTint.pressed()
             } else {
@@ -50,7 +49,7 @@ fun IconButton(
             if (interactionSource.collectIsPressedAsState().value) {
                 interactionTint.pressed()
             } else if (selected) {
-                LocalContentColor.current.inverted()
+                MaterialTheme.colorScheme.onPrimary
             } else if (interactionSource.collectIsHoveredAsState().value) {
                 interactionTint.hovered()
             } else {

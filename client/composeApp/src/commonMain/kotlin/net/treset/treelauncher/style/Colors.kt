@@ -21,6 +21,9 @@ enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> S
 
 private fun dark() = darkColorScheme(
     primary = Color.Green,
+    onPrimary = Color.Black,
+    primaryContainer = Color(0xFF006600),
+    onPrimaryContainer = Color.White,
     error = Color.Red
 )
 

@@ -18,12 +18,13 @@ import androidx.compose.ui.unit.dp
 fun TitledColumn(
     title: String,
     modifier: Modifier = Modifier,
+    parentModifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = parentModifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
     ) {
         Column(
@@ -40,7 +41,7 @@ fun TitledColumn(
             )
         }
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = verticalArrangement,
