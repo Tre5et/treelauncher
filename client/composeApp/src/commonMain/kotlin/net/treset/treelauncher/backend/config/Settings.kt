@@ -47,6 +47,8 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsDisable = false
     var acknowledgedNews = listOf<String>()
 
+    private constructor() : this(LauncherFile("")) //constructor only for gson
+
     fun hasSyncData(): Boolean {
         return syncUrl != null && syncPort != null && syncKey != null
     }

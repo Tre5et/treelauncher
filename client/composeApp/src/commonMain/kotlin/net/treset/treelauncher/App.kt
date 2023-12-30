@@ -26,6 +26,8 @@ import kotlin.system.exitProcess
 
 @Composable
 fun App() {
+    app = LauncherApp()
+
     MaterialTheme(
         colorScheme = colors(),
         typography = typography()
@@ -63,7 +65,7 @@ fun onClose(): Boolean {
     return true
 }
 
-private var app = LauncherApp()
+private lateinit var app: LauncherApp
 class LauncherApp {
     init {
         //TODO: Configure Logger
