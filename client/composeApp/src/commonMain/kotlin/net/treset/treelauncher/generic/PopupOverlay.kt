@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 
 enum class PopupType(val accent: @Composable () -> Color) {
     NONE({ MaterialTheme.colorScheme.secondary }),
@@ -28,7 +29,9 @@ fun PopupOverlay(
     buttonRow: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit = {}
 ) {
-    Popup {
+    Popup(
+        properties = PopupProperties(focusable = true)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

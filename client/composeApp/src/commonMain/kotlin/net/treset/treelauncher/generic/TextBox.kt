@@ -1,5 +1,7 @@
 package net.treset.treelauncher.generic
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -16,9 +18,13 @@ fun TextBox(
     placeholder: String = "",
     enabled: Boolean = true,
     showClear: Boolean = true,
+    singleLine: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     var displayText by remember { mutableStateOf(text) }
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
 
     OutlinedTextField(
         value = text,
@@ -31,7 +37,7 @@ fun TextBox(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         trailingIcon = {
-            if (showClear && displayText.isNotEmpty()) {
+            if (showClear && isFocused && displayText.isNotEmpty()) {
                 IconButton(onClick = {
                     displayText = ""
                     onChange("")
@@ -43,6 +49,7 @@ fun TextBox(
                 }
             }
         },
-        singleLine = true
+        singleLine = singleLine,
+        interactionSource = interactionSource
     )
 }

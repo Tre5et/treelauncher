@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.InstanceDataSortType
+import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.GameLauncher
@@ -31,12 +32,20 @@ fun Instances(
     var sortReversed: Boolean by remember { mutableStateOf(appSettings().isInstanceSortReverse) }
 
     var popupContent: PopupData? by remember { mutableStateOf(null) }
+    var showRename by remember { mutableStateOf(false) }
 
     val reloadInstances = {
         appContext.files.reloadAll()
         selectedInstance = null
         instances = appContext.files.instanceComponents
             .map { InstanceData.of(it, appContext.files) }
+    }
+
+    val redrawSelected = {
+        selectedInstance?.let {
+            selectedInstance = null
+            selectedInstance = it
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -107,7 +116,7 @@ fun Instances(
                                 launchGame(
                                     launcher,
                                     { popupContent = it },
-                                    reloadInstances
+                                    { redrawSelected() }
                                 )
                             },
                             highlighted = true,
@@ -123,7 +132,7 @@ fun Instances(
                         Text(it.instance.first.name)
                         IconButton(
                             onClick = {
-                                //TODO: rename
+                                showRename = true
                             }
                         ) {
                             Icon(
@@ -155,6 +164,24 @@ fun Instances(
                                 modifier = Modifier.size(32.dp)
                             )
                         }
+                    }
+
+                    if(showRename) {
+                        RenamePopup(
+                            manifest = it.instance.first,
+                            editValid = { name -> name.isNotBlank() && name != it.instance.first.name },
+                            onDone = {name ->
+                                showRename = false
+                                name?.let { newName ->
+                                    it.instance.first.name = newName
+                                    LauncherFile.of(
+                                        it.instance.first.directory,
+                                        appConfig().MANIFEST_FILE_NAME
+                                    ).write(it.instance.first)
+                                    redrawSelected()
+                                }
+                            }
+                        )
                     }
                 }?: Text(strings().manager.instance.details.title())
             }
