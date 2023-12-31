@@ -55,7 +55,7 @@ fun App() {
                     LoginScreen { loginContext ->
                         NavigationContainer(loginContext) { navContext ->
                             when (navContext.navigationState) {
-                                NavigationState.INSTANCES -> Instances(appContext)
+                                NavigationState.INSTANCES -> Instances(appContext, loginContext)
                                 NavigationState.SETTINGS -> Settings(loginContext)
 
                                 else -> Text("TODO")

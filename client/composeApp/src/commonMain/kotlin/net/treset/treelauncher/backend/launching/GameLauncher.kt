@@ -13,38 +13,15 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class GameLauncher(
-    private val instance: InstanceData,
-    private val files: LauncherFiles,
-    private val minecraftUser: User,
-    private val quickPlayData: QuickPlayData?,
-    private val exitCallbacks: Array<(String?) -> Unit>
+    val instance: InstanceData,
+    val files: LauncherFiles,
+    val minecraftUser: User,
+    val quickPlayData: QuickPlayData? = null,
+    var exitCallbacks: Array<(String?) -> Unit> = arrayOf()
 ) {
     private var resourceManager: ResourceManager? = null
         private set
     var gameListener: GameListener? = null
-
-
-    constructor(
-        instance: InstanceData,
-        files: LauncherFiles,
-        minecraftUser: User,
-        quickPlayData: QuickPlayData?
-    ) : this(instance, files, minecraftUser, quickPlayData, arrayOf())
-
-    constructor(
-        instance: InstanceData,
-        files: LauncherFiles,
-        minecraftUser: User,
-        exitCallbacks: Array<(String?) -> Unit>
-    ) : this(instance, files, minecraftUser, null, exitCallbacks)
-
-    constructor(instance: InstanceData, files: LauncherFiles, minecraftUser: User) : this(
-        instance,
-        files,
-        minecraftUser,
-        null,
-        arrayOf()
-    )
 
     @Throws(GameLaunchException::class)
     fun launch(cleanupActiveInstance: Boolean, doneCallback: (Exception?) -> Unit) {

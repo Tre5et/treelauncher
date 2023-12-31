@@ -12,30 +12,38 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.InstanceDataSortType
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.generic.IconButton
-import net.treset.treelauncher.generic.SortBox
-import net.treset.treelauncher.generic.TitledColumn
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.launchGame
 
 @Composable
 fun Instances(
-    appContext: AppContext
+    appContext: AppContext,
+    loginContext: LoginContext
 ) {
     var selectedInstance: InstanceData? by remember { mutableStateOf(null) }
     var instances: List<InstanceData> by remember { mutableStateOf(emptyList()) }
     var selectedSort: InstanceDataSortType by remember { mutableStateOf(appSettings().instanceSortType) }
     var sortReversed: Boolean by remember { mutableStateOf(appSettings().isInstanceSortReverse) }
 
-    LaunchedEffect(Unit) {
+    var popupContent: PopupData? by remember { mutableStateOf(null) }
+
+    val reloadInstances = {
         appContext.files.reloadAll()
         selectedInstance = null
         instances = appContext.files.instanceComponents
             .map { InstanceData.of(it, appContext.files) }
     }
 
-    LaunchedEffect(selectedSort, sortReversed) {
+    LaunchedEffect(Unit) {
+        reloadInstances()
+    }
+
+    LaunchedEffect(instances, selectedSort, sortReversed) {
         val newInst = instances
             .sortedWith(selectedSort.comparator)
         instances = if(sortReversed) newInst.reversed() else newInst
@@ -91,7 +99,16 @@ fun Instances(
                     ) {
                         IconButton(
                             onClick = {
-                                //TODO: play
+                                val launcher = GameLauncher(
+                                    it,
+                                    appContext.files,
+                                    loginContext.userAuth.minecraftUser!!
+                                )
+                                launchGame(
+                                    launcher,
+                                    { popupContent = it },
+                                    reloadInstances
+                                )
                             },
                             highlighted = true,
                             modifier = Modifier.offset(y = (-10).dp)
@@ -146,6 +163,10 @@ fun Instances(
                 InstanceDetails(it)
             }
         }
+    }
+
+    popupContent?.let {
+        PopupOverlay(it)
     }
 }
 
