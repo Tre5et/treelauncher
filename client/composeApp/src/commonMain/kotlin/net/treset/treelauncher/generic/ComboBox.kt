@@ -10,6 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.style.icons
 
@@ -19,7 +21,8 @@ fun <T> ComboBox(
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
     loadingPlaceholder: String = "",
-    defaultSelected: T? = null
+    defaultSelected: T? = null,
+    decorated: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem: T? by remember { mutableStateOf(defaultSelected) }
@@ -32,15 +35,11 @@ fun <T> ComboBox(
         }.start()
     }
 
-
     Box(
-        modifier = Modifier.wrapContentSize(Alignment.TopStart),
+        modifier = Modifier
+            .wrapContentSize(Alignment.TopStart)
+            .pointerHoverIcon(PointerIcon.Hand),
     ) {
-
-        val rowModifier = actualItems?.let {
-            Modifier.clickable(onClick = { expanded = true })
-        } ?: Modifier
-
         val borderColor by animateColorAsState(
             if(expanded) {
                 MaterialTheme.colorScheme.primary
@@ -50,23 +49,35 @@ fun <T> ComboBox(
         )
 
         val borderWidth by animateDpAsState(
-            if(expanded) { 2.dp } else { 1.dp }
+            if(expanded) 2.dp else 1.dp
         )
+
+        val rowModifier = (actualItems?.let {
+            Modifier.clickable(onClick = { expanded = true })
+        } ?: Modifier).let {
+            if(decorated) {
+                it
+                    .border(borderWidth, borderColor, RoundedCornerShape(4.dp))
+                    .padding(start = 12.dp, bottom = 9.dp, top = 6.dp, end = 6.dp)
+            } else {
+                it
+            }
+        }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = rowModifier
-                .border(borderWidth, borderColor, RoundedCornerShape(4.dp))
-                .padding(start = 12.dp, bottom = 9.dp, top = 6.dp, end = 6.dp)
         ) {
             Text(
                 displayString
             )
-            Icon(
-                icons().comboBox,
-                "Open",
-                modifier = Modifier.offset(y = 2.dp)
-            )
+            if(decorated) {
+                Icon(
+                    icons().comboBox,
+                    "Open",
+                    modifier = Modifier.offset(y = 2.dp)
+                )
+            }
         }
         DropdownMenu(
             expanded = expanded,
@@ -95,12 +106,14 @@ fun <T> ComboBox(
     items: List<T>,
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
-    defaultSelected: T? = null
+    defaultSelected: T? = null,
+    decorated: Boolean = true
 ) = ComboBox(
     {items},
     onSelected,
     placeholder,
-    defaultSelected = defaultSelected
+    defaultSelected = defaultSelected,
+    decorated = decorated
 )
 
 @Composable
@@ -108,12 +121,14 @@ fun <T> ComboBox(
     items: List<T>,
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
-    defaultSelected: Int? = null
+    defaultSelected: Int? = null,
+    decorated: Boolean = true
 ) = ComboBox(
     items,
     onSelected,
     placeholder,
-    defaultSelected?.let{if(it >= 0 && it < items.size) items[it] else null }
+    defaultSelected?.let{if(it >= 0 && it < items.size) items[it] else null },
+    decorated
 )
 
 @Composable
@@ -122,7 +137,8 @@ fun <T> TitledComboBox(
     items: List<T>,
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
-    defaultSelected: T? = null
+    defaultSelected: T? = null,
+    decorated: Boolean = true
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -137,23 +153,9 @@ fun <T> TitledComboBox(
             items,
             onSelected,
             placeholder,
-            defaultSelected
+            defaultSelected,
+            decorated
         )
     }
 
 }
-
-@Composable
-fun <T> TitledComboBox(
-    title: String,
-    items: List<T>,
-    onSelected: (T) -> Unit = {},
-    placeholder: String = "",
-    defaultSelected: Int? = null
-) = TitledComboBox(
-    title,
-    items,
-    onSelected,
-    placeholder,
-    defaultSelected?.let{if(it >= 0 && it < items.size) items[it] else null }
-)

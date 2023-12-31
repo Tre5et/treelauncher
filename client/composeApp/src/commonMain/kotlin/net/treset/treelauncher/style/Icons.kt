@@ -25,4 +25,5 @@ class Icons {
     val logout = Icons.Rounded.Logout
     val update = Icons.Rounded.Download
     val gitHub = @Composable { painterResource("icons/github.svg") }
+    val sort = Icons.Rounded.SwapVert
 }

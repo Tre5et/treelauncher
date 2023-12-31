@@ -127,8 +127,7 @@ fun NavigationContainer(
 
                 NavigationButton(
                     NavigationState.SETTINGS,
-                    navigationState,
-                    //TODO: Fix overflow
+                    navigationState
                 ) {
                     Icon(
                         icons().settings,
