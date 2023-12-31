@@ -1,7 +1,6 @@
 package net.treset.treelauncher.generic
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -38,7 +37,7 @@ fun TextBox(
                     onChange("")
                 }) {
                     Icon(
-                        imageVector = icons().Close,
+                        imageVector = icons().clear,
                         contentDescription = "Clear"
                     )
                 }

@@ -1,7 +1,6 @@
 package net.treset.treelauncher.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -134,7 +133,7 @@ fun LoginScreen(
                     shape = MaterialTheme.shapes.small,
                 ) {
                     Icon(
-                        icons().PlayArrow,
+                        icons().start,
                         "Continue"
                     )
                 }

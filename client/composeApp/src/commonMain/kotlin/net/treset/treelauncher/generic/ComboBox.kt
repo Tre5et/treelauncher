@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -64,7 +63,7 @@ fun <T> ComboBox(
                 displayString
             )
             Icon(
-                icons().ArrowDropDown,
+                icons().comboBox,
                 "Open",
                 modifier = Modifier.offset(y = 2.dp)
             )

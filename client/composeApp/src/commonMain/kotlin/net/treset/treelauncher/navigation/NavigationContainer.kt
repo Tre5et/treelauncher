@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -23,7 +22,7 @@ import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
-import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.style.*
 import java.awt.image.BufferedImage
 
 enum class NavigationState {
@@ -81,13 +80,13 @@ fun NavigationContainer(
                 NavigationButton(
                     NavigationState.INSTANCES,
                     navigationState,
-                    icons().Dashboard,
+                    icons().instances,
                     strings().nav.home()
                 )
                 NavigationButton(
                     NavigationState.ADD,
                     navigationState,
-                    icons().AddCircle,
+                    icons().add,
                     strings().nav.add()
                 )
             }
@@ -99,25 +98,25 @@ fun NavigationContainer(
                 NavigationButton(
                     NavigationState.SAVES,
                     navigationState,
-                    icons().Save,
+                    icons().saves,
                     strings().nav.saves()
                 )
                 NavigationButton(
                     NavigationState.RESSOURCE_PACKS,
                     navigationState,
-                    icons().Inventory2,
+                    icons().resourcePacks,
                     strings().nav.resourcepacks()
                 )
                 NavigationButton(
                     NavigationState.OPTIONS,
                     navigationState,
-                    icons().Tune,
+                    icons().options,
                     strings().nav.options()
                 )
                 NavigationButton(
                     NavigationState.MODS,
                     navigationState,
-                    icons().Code,
+                    icons().mods,
                     strings().nav.mods()
                 )
             }
@@ -132,7 +131,7 @@ fun NavigationContainer(
                     //TODO: Fix overflow
                 ) {
                     Icon(
-                        icons().AccountBox,
+                        icons().settings,
                         contentDescription = strings().nav.settings(),
                         modifier = Modifier.size(36.dp)
                     )
@@ -149,7 +148,7 @@ fun NavigationContainer(
 
                     if (updateAvailable) {
                         Icon(
-                            icons().DownloadForOffline,
+                            icons().updateHint,
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = "Update Available",
                             modifier = Modifier

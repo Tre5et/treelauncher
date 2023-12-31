@@ -40,22 +40,31 @@ fun Instances(
                 InstanceButton(
                     instance = it,
                     selected = selectedInstance == it,
-                    onClick = {
-                        selectedInstance = if(selectedInstance == it) {
-                            null
-                        } else {
-                            it
-                        }
-                    }
+                    onClick = { selectedInstance = if(selectedInstance == it) null else it }
                 )
             }
         }
 
+
+
         TitledColumn(
             title = selectedInstance?.instance?.first?.name ?: strings().manager.instance.details.title(),
+            modifier = Modifier.padding(12.dp),
             parentModifier = Modifier.fillMaxWidth(1/2f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            InstanceDetails(selectedInstance ?: return@TitledColumn)
+            selectedInstance?.let {
+                InstanceDetails(it)
+            }
         }
     }
+}
+
+enum class InstanceDetails {
+    VERSION,
+    SAVES,
+    RESOURCE_PACKS,
+    OPTIONS,
+    MODS,
+    SETTINGS
 }

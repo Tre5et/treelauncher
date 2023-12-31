@@ -3,9 +3,10 @@ package net.treset.treelauncher.settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.rounded.Download
-import androidx.compose.material.icons.rounded.Logout
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +15,6 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.config.GlobalConfigLoader
@@ -306,7 +306,7 @@ fun Settings(
                 highlighted = true
             ) {
                 Icon(
-                    icons().Logout,
+                    icons().logout,
                     "Logout",
                     modifier = Modifier.size(30.dp)
                 )
@@ -332,7 +332,7 @@ fun Settings(
                     highlighted = true
                 ) {
                     Icon(
-                        icons().Download,
+                        icons().update,
                         "Download Update"
                     )
                 }
@@ -341,14 +341,14 @@ fun Settings(
                 )
             }
 
-            net.treset.treelauncher.generic.IconButton(
+            IconButton(
                 onClick = {
                     UrlString.of("https://github.com/Tre5et/treelauncher").openInBrowser()
                 }
             ) {
                 Icon(
-                    painter = painterResource("icons/github.svg"),
-                    contentDescription = "Link to Github Project",
+                    icons().gitHub(),
+                    "Link to Github Project",
                     modifier = Modifier.size(24.dp)
                 )
             }
