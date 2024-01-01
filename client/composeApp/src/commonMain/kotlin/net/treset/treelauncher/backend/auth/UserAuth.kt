@@ -75,10 +75,10 @@ class UserAuth {
         saveResults: Boolean,
         doneCallback: (Boolean) -> Unit
     ): Boolean {
-        url?.let { url ->
-            if (url.startsWith("https://login.live.com/oauth20_desktop.srf?code=")) {
+        url?.let {
+            if (it.startsWith("https://login.live.com/oauth20_desktop.srf?code=")) {
                 val pattern = Pattern.compile("code=(.*)&")
-                val matcher = pattern.matcher(url)
+                val matcher = pattern.matcher(it)
                 return if (matcher.find()) {
                     Thread {
                         completeAuthentication(
@@ -132,7 +132,7 @@ class UserAuth {
         isLoggedIn = false
         minecraftUser = null
         if (hasFile() && !appConfig().AUTH_FILE.delete()) {
-            LOGGER.error("Unable to delete auth file")
+            LOGGER.error { "Unable to delete auth file" }
         }
     }
 
@@ -150,18 +150,21 @@ class UserAuth {
             }
             LOGGER.error(e) { "Unable to login" }
             doneCallback(false)
+            isAuthenticating = false
             return
         }
         val resultFile: AuthenticationFile = minecraftAuth.getResultFile()
         if (saveResults && !writeToFile(resultFile)) {
             LOGGER.error { "Unable to write auth file" }
             doneCallback(false)
+            isAuthenticating = false
             return
         }
         val optionalUser = minecraftAuth.getUser()
         if (optionalUser.isEmpty) {
             LOGGER.error { "User not present after login" }
             doneCallback(false)
+            isAuthenticating = false
             return
         }
         minecraftUser = optionalUser.get()

@@ -24,11 +24,14 @@ private fun dark() = darkColorScheme(
     onPrimary = Color.Black,
     primaryContainer = Color(0xFF006600),
     onPrimaryContainer = Color.White,
-    error = Color.Red
+    error = Color.Red,
+    inversePrimary = Color.Yellow
 )
 
 private fun light() = lightColorScheme(
-    primary = Color.Green
+    primary = Color.Green,
+    error = Color.Red,
+    inversePrimary = Color.Yellow
 )
 
 private var currentTheme: Theme = appSettings().theme
@@ -81,10 +84,3 @@ private fun Float.toPressed(isDark: Boolean): Float {
         this - this / 3f
     }
 }
-
-fun Color.inverted(): Color = this.copy(
-    alpha = alpha,
-    red = 1 - red,
-    green = 1 - green,
-    blue = 1 - blue
-)
