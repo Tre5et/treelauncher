@@ -30,4 +30,5 @@ class Icons {
     val rename = Icons.Rounded.Edit
     val folder = Icons.Rounded.Folder
     val delete = Icons.Rounded.Delete
+    val change = Icons.Rounded.Sync
 }

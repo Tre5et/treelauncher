@@ -1,5 +1,7 @@
 package net.treset.treelauncher.localization
 
+import net.treset.treelauncher.instances.InstanceDetails
+
 class EnStrings : Strings(
     Components(
         { "Create New" },
@@ -108,23 +110,48 @@ class EnStrings : Strings(
             { "Component Settings" }
         ),
         Manager.Instance(
-            { "Enter Argument" },
-            { "Add Argument" },
-            { "Cancel" },
-            { "Add" },
-            { "JVM-Arguments" },
+            Manager.Instance.Change(
+                { "Close" },
+                { "Cancel" },
+                { "Changing Version..." },
+                { "I know what I'm doing, Change" },
+                { "There was an error changing version.\nPlease report this." },
+                { "This is likely to cause incompatibilities.\nIt is recommended to change versions by creating a new instance." },
+                { "Version Changed!" },
+                { "Select a component" },
+                { type, name ->
+                    when(type) {
+                        InstanceDetails.SAVES -> strings().manager.instance.details.saves()
+                        InstanceDetails.RESOURCE_PACKS -> strings().manager.instance.details.resourcepacks()
+                        InstanceDetails.OPTIONS -> strings().manager.instance.details.options()
+                        InstanceDetails.MODS -> strings().manager.instance.details.mods()
+                        InstanceDetails.VERSION-> strings().manager.instance.details.version()
+                        InstanceDetails.SETTINGS -> strings().manager.instance.details.settings()
+                    }.let { ts ->
+                        name?.let {
+                            "$ts: $name"
+                        } ?: ts
+                    }
+                }
+            ),
             Manager.Instance.Details(
-                { "Select an Instance" },
                 { "Version" },
                 { "Saves" },
                 { "Resourcepacks" },
                 { "Options" },
-                { "Mods" }
+                { "Mods" },
+                { "Settings" }
             ),
-            { "Instance Memory:" },
-            { "Resolution:" },
-            { "Instance Settings" },
-            { "Instances" }
+            Manager.Instance.Settings(
+                { "Enter Argument" },
+                { "Add Argument" },
+                { "Cancel" },
+                { "Add" },
+                { "JVM-Arguments" },
+                { "Instance Memory:" },
+                { "Resolution:" },
+                { "Instance Settings" }
+            )
         ),
         Manager.Mods(
             { "Add local mod" },
@@ -208,16 +235,6 @@ class EnStrings : Strings(
             )
         ),
         Selector.Instance(
-            Selector.Instance.Change(
-                { "Close" },
-                { "Cancel" },
-                { "Changing Version..." },
-                { "I know what I'm doing, Change" },
-                { "There was an error changing version.\nPlease report this." },
-                { "This is likely to cause incompatibilities.\nIt is recommended to change versions by creating a new instance." },
-                { "Version Changed!" },
-                { "Select a component" }
-            ),
             Selector.Instance.Delete(
                 { "Cancel" },
                 { "Delete" },
@@ -240,6 +257,7 @@ class EnStrings : Strings(
             { "Options Component" },
             { "Resourcepacks Component" },
             { "Saves Component" },
+            { "Instances" },
             { "Version" }
         ),
         Selector.Mods(

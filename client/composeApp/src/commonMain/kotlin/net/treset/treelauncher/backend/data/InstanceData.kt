@@ -25,6 +25,36 @@ class InstanceData(
     var savesPrefix: String,
     var gameDataExcludedFiles: Array<PatternString>
 ) {
+    @Throws(FileLoadException::class)
+    fun reloadVersionComponent(files: LauncherFiles) {
+        this.versionComponents = getVersionComponents(instance, files)
+    }
+
+    @Throws(FileLoadException::class)
+    fun reloadJavaComponent(files: LauncherFiles) {
+        this.javaComponent = getJavaComponent(versionComponents, files)
+    }
+
+    @Throws(FileLoadException::class)
+    fun reloadOptionsComponent(files: LauncherFiles) {
+        this.optionsComponent = getOptionsComponent(instance, files)
+    }
+
+    @Throws(FileLoadException::class)
+    fun reloadResourcepacksComponent(files: LauncherFiles) {
+        this.resourcepacksComponent = getResourcepacksComponent(instance, files)
+    }
+
+    @Throws(FileLoadException::class)
+    fun reloadSavesComponent(files: LauncherFiles) {
+        this.savesComponent = getSavesComponent(instance, files)
+    }
+
+    @Throws(FileLoadException::class)
+    fun reloadModsComponent(files: LauncherFiles) {
+        this.modsComponent = getModsComponent(instance, files)
+    }
+
     @Throws(IOException::class)
     fun setActive(active: Boolean) {
         launcherDetails.activeInstance = if (active) instance.first.id else null
@@ -65,6 +95,40 @@ class InstanceData(
             } catch (e: FileLoadException) {
                 throw FileLoadException("Failed to load instance data: file reload failed", e)
             }
+
+            val versionComponents = getVersionComponents(instance, files)
+
+            val gameDataExcludedFiles: ArrayList<PatternString> = ArrayList()
+            for (c in files.gameDetailsManifest.components) {
+                gameDataExcludedFiles.add(PatternString(c))
+            }
+            gameDataExcludedFiles.add(PatternString(files.modsManifest.prefix + ".*"))
+            gameDataExcludedFiles.add(PatternString(files.savesManifest.prefix + ".*"))
+
+            return InstanceData(
+                files.launcherDetails,
+                LauncherFile.of(
+                    files.mainManifest.directory,
+                    files.mainManifest.details
+                ),
+                instance,
+                versionComponents,
+                getJavaComponent(versionComponents, files),
+                getOptionsComponent(instance, files),
+                getResourcepacksComponent(instance, files),
+                getSavesComponent(instance, files),
+                getModsComponent(instance, files),
+                LauncherFile.ofData(files.launcherDetails.gamedataDir),
+                LauncherFile.ofData(files.launcherDetails.assetsDir),
+                LauncherFile.ofData(files.launcherDetails.librariesDir),
+                files.modsManifest.prefix,
+                files.savesManifest.prefix,
+                gameDataExcludedFiles.toTypedArray()
+            )
+        }
+
+        @Throws(FileLoadException::class)
+        private fun getVersionComponents(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): Array<Pair<LauncherManifest, LauncherVersionDetails>> {
             val versionComponents: MutableList<Pair<LauncherManifest, LauncherVersionDetails>> = mutableListOf()
 
             var firstComponent: Pair<LauncherManifest, LauncherVersionDetails>? = null
@@ -93,20 +157,29 @@ class InstanceData(
                 versionComponents.add(currentComponent)
             }
 
-            var javaComponent: LauncherManifest? = null
-                for (v in versionComponents) {
-                    if (v.second.java != null && v.second.java.isNotBlank()) {
-                        for (j in files.javaComponents) {
-                            if (j.id == v.second.java) {
-                                javaComponent = j
-                                break
-                            }
-                        }
-                        break
-                    }
-                }
-                javaComponent ?: throw FileLoadException("Failed to load instance data: unable to find suitable java component")
+            return versionComponents.toTypedArray()
+        }
 
+        @Throws(FileLoadException::class)
+        private fun getJavaComponent(versionComponents: Array<Pair<LauncherManifest, LauncherVersionDetails>>, files: LauncherFiles): LauncherManifest {
+            var javaComponent: LauncherManifest? = null
+            for (v in versionComponents) {
+                if (v.second.java != null && v.second.java.isNotBlank()) {
+                    for (j in files.javaComponents) {
+                        if (j.id == v.second.java) {
+                            javaComponent = j
+                            break
+                        }
+                    }
+                    break
+                }
+            }
+            javaComponent ?: throw FileLoadException("Failed to load instance data: unable to find suitable java component")
+            return javaComponent
+        }
+
+        @Throws(FileLoadException::class)
+        private fun getOptionsComponent(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): LauncherManifest {
             var optionsComponent: LauncherManifest? = null
             for (o in files.optionsComponents) {
                 if (o.id == instance.second.optionsComponent) {
@@ -115,7 +188,11 @@ class InstanceData(
                 }
             }
             optionsComponent ?: throw FileLoadException("Failed to load instance data: unable to find options component: optionsId=" + instance.second.optionsComponent)
+            return optionsComponent
+        }
 
+        @Throws(FileLoadException::class)
+        private fun getResourcepacksComponent(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): LauncherManifest {
             var resourcepacksComponent: LauncherManifest? = null
             for (r in files.resourcepackComponents) {
                 if (r.id == instance.second.resourcepacksComponent) {
@@ -124,7 +201,11 @@ class InstanceData(
                 }
             }
             resourcepacksComponent ?: throw FileLoadException("Failed to load instance data: unable to find resourcepacks component: resourcepacksId=" + instance.second.resourcepacksComponent)
+            return resourcepacksComponent
+        }
 
+        @Throws(FileLoadException::class)
+        private fun getSavesComponent(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): LauncherManifest {
             var savesComponent: LauncherManifest? = null
             for (s in files.savesComponents) {
                 if (s.id == instance.second.savesComponent) {
@@ -133,7 +214,11 @@ class InstanceData(
                 }
             }
             savesComponent ?: throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.second.savesComponent)
+            return savesComponent
+        }
 
+        @Throws(FileLoadException::class)
+        private fun getModsComponent(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): Pair<LauncherManifest, LauncherModsDetails>? {
             var modsComponent: Pair<LauncherManifest, LauncherModsDetails>? = null
             if (instance.second.modsComponent != null && instance.second.modsComponent.isNotBlank()) {
                 for (m in files.modsComponents) {
@@ -144,34 +229,7 @@ class InstanceData(
                 }
                 modsComponent ?: throw FileLoadException("Failed to load instance data: unable to find mods component: modsId=" + instance.second.modsComponent)
             }
-
-            val gameDataExcludedFiles: ArrayList<PatternString> = ArrayList()
-            for (c in files.gameDetailsManifest.components) {
-                gameDataExcludedFiles.add(PatternString(c))
-            }
-            gameDataExcludedFiles.add(PatternString(files.modsManifest.prefix + ".*"))
-            gameDataExcludedFiles.add(PatternString(files.savesManifest.prefix + ".*"))
-
-            return InstanceData(
-                files.launcherDetails,
-                LauncherFile.of(
-                    files.mainManifest.directory,
-                    files.mainManifest.details
-                ),
-                instance,
-                versionComponents.toTypedArray(),
-                javaComponent,
-                optionsComponent,
-                resourcepacksComponent,
-                savesComponent,
-                modsComponent,
-                LauncherFile.ofData(files.launcherDetails.gamedataDir),
-                LauncherFile.ofData(files.launcherDetails.assetsDir),
-                LauncherFile.ofData(files.launcherDetails.librariesDir),
-                files.modsManifest.prefix,
-                files.savesManifest.prefix,
-                gameDataExcludedFiles.toTypedArray()
-            )
+            return modsComponent
         }
     }
 }

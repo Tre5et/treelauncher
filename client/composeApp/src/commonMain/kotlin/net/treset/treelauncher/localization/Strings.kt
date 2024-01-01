@@ -3,6 +3,7 @@ package net.treset.treelauncher.localization
 import com.multiplatform.webview.web.WebViewState
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.instances.InstanceDetails
 import java.io.IOException
 import java.util.*
 
@@ -199,24 +200,40 @@ open class Strings(
         )
 
         data class Instance(
-            val argument: () -> String,
-            val argumentAdd: () -> String,
-            val argumentCancel: () -> String,
-            val argumentConfirm: () -> String,
-            val arguments: () -> String,
+            val change: Change,
             val details: Details,
-            val memory: () -> String,
-            val resolution: () -> String,
-            val settings: () -> String,
-            val title: () -> String
+            val settings: Settings
         ) {
-            data class Details(
+            data class Change(
+                val back: () -> String,
+                val cancel: () -> String,
+                val changing: () -> String,
+                val confirm: () -> String,
+                val failure: () -> String,
+                val message: () -> String,
+                val success: () -> String,
                 val title: () -> String,
+                val activeTitle: (InstanceDetails, String?) -> String
+            )
+
+            data class Details(
                 val version: () -> String,
                 val saves: () -> String,
                 val resourcepacks: () -> String,
                 val options: () -> String,
-                val mods: () -> String
+                val mods: () -> String,
+                val settings: () -> String
+            )
+
+            data class Settings(
+                val argument: () -> String,
+                val argumentAdd: () -> String,
+                val argumentCancel: () -> String,
+                val argumentConfirm: () -> String,
+                val arguments: () -> String,
+                val memory: () -> String,
+                val resolution: () -> String,
+                val title: () -> String,
             )
         }
 
@@ -363,30 +380,19 @@ open class Strings(
         }
 
         data class Instance(
-            val change: Change,
             val delete: Delete,
             val game: Game,
             val mods: () -> String,
             val options: () -> String,
             val resourcepacks: () -> String,
             val saves: () -> String,
+            val title: () -> String,
             val version: () -> String
         ) {
             data class Delete(
                 val cancel: () -> String,
                 val confirm: () -> String,
                 val message: () -> String,
-                val title: () -> String
-            )
-
-            data class Change(
-                val back: () -> String,
-                val cancel: () -> String,
-                val changing: () -> String,
-                val confirm: () -> String,
-                val failure: () -> String,
-                val message: () -> String,
-                val success: () -> String,
                 val title: () -> String
             )
 

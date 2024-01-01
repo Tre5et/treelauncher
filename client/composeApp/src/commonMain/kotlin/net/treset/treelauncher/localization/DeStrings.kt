@@ -1,5 +1,7 @@
 package net.treset.treelauncher.localization
 
+import net.treset.treelauncher.instances.InstanceDetails
+
 class DeStrings : Strings(
     Components(
         { "Neu erstellen" },
@@ -108,23 +110,48 @@ class DeStrings : Strings(
             { "Komponenteneinstellungen" }
         ),
         Manager.Instance(
-            { "Argument eingeben" },
-            { "Argument hinzufügen" },
-            { "Abbrechen" },
-            { "Hinzufügen" },
-            { "JVM-Argumente" },
+            Manager.Instance.Change(
+                { "Schließen" },
+                { "Abbrechen" },
+                { "Version wird geändert..." },
+                { "Ja, Version ändern" },
+                { "Ein Fehler beim Ändern der Version ist aufgetreten.\nDiesen Fehler bitte melden." },
+                { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
+                { "Version geändert!" },
+                { "Eine Komponente auswählen" },
+                { type, name ->
+                    when(type) {
+                        InstanceDetails.SAVES -> strings().manager.instance.details.saves()
+                        InstanceDetails.RESOURCE_PACKS -> strings().manager.instance.details.resourcepacks()
+                        InstanceDetails.OPTIONS -> strings().manager.instance.details.options()
+                        InstanceDetails.MODS -> strings().manager.instance.details.mods()
+                        InstanceDetails.VERSION-> strings().manager.instance.details.version()
+                        InstanceDetails.SETTINGS -> strings().manager.instance.details.settings()
+                    }.let { ts ->
+                        name?.let {
+                            "$ts: $name"
+                        } ?: ts
+                    }
+                }
+            ),
             Manager.Instance.Details(
-                { "Instanz auswählen" },
                 { "Version" },
                 { "Welten" },
                 { "Ressourcenpakete" },
                 { "Optionen" },
-                { "Mods" }
+                { "Mods" },
+                { "Einstellungen" }
             ),
-            { "Instanzspeicher:" },
-            { "Auflösung:" },
-            { "Instanzeinstellungen" },
-            { "Instanzen" }
+            Manager.Instance.Settings(
+                { "Argument eingeben" },
+                { "Argument hinzufügen" },
+                { "Abbrechen" },
+                { "Hinzufügen" },
+                { "JVM-Argumente" },
+                { "Instanzspeicher:" },
+                { "Auflösung:" },
+                { "Instanzeinstellungen" },
+            )
         ),
         Manager.Mods(
             { "Lokale mod hinzufügen" },
@@ -208,16 +235,6 @@ class DeStrings : Strings(
             )
         ),
         Selector.Instance(
-            Selector.Instance.Change(
-                { "Schließen" },
-                { "Abbrechen" },
-                { "Version wird geändert..." },
-                { "Ja, Version ändern" },
-                { "Ein Fehler beim Ändern der Version ist aufgetreten.\nDiesen Fehler bitte melden." },
-                { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
-                { "Version geändert!" },
-                { "Eine Komponente auswählen" }
-            ),
             Selector.Instance.Delete(
                 { "Abbrechen" },
                 { "Löschen" },
@@ -240,6 +257,7 @@ class DeStrings : Strings(
             { "Optionskomponente" },
             { "Ressourcenpaketkomponente" },
             { "Weltenkomponente" },
+            { "Instanzen" },
             { "Version" }
         ),
         Selector.Mods(

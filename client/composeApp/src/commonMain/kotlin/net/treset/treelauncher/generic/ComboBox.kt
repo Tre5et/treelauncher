@@ -22,17 +22,24 @@ fun <T> ComboBox(
     placeholder: String = "",
     loadingPlaceholder: String = "",
     defaultSelected: T? = null,
+    toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem: T? by remember { mutableStateOf(defaultSelected) }
     var actualItems: List<T>? by remember { mutableStateOf(null) }
-    val displayString = actualItems?.let{ selectedItem?.toString() ?: placeholder } ?: loadingPlaceholder
+    val displayString = actualItems?.let{ selectedItem?.toDisplayString() ?: placeholder } ?: loadingPlaceholder
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(items) {
         Thread {
             actualItems = items()
         }.start()
+
+        selectedItem = defaultSelected
+    }
+
+    LaunchedEffect(defaultSelected) {
+        selectedItem = defaultSelected
     }
 
     Box(
@@ -87,7 +94,7 @@ fun <T> ComboBox(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            i.toString()
+                            i.toDisplayString()
                         )
                     },
                     onClick = {
@@ -107,12 +114,14 @@ fun <T> ComboBox(
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
     defaultSelected: T? = null,
+    displayTransformer: T.() -> String = { toString() },
     decorated: Boolean = true
 ) = ComboBox(
     {items},
     onSelected,
     placeholder,
     defaultSelected = defaultSelected,
+    toDisplayString = displayTransformer,
     decorated = decorated
 )
 
@@ -122,12 +131,14 @@ fun <T> ComboBox(
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
     defaultSelected: Int? = null,
+    displayTransformer: T.() -> String = { toString() },
     decorated: Boolean = true
 ) = ComboBox(
     items,
     onSelected,
     placeholder,
     defaultSelected?.let{if(it >= 0 && it < items.size) items[it] else null },
+    displayTransformer,
     decorated
 )
 
@@ -138,6 +149,7 @@ fun <T> TitledComboBox(
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
     defaultSelected: T? = null,
+    displayTransformer: T.() -> String = { toString() },
     decorated: Boolean = true
 ) {
     Row(
@@ -154,6 +166,7 @@ fun <T> TitledComboBox(
             onSelected,
             placeholder,
             defaultSelected,
+            displayTransformer,
             decorated
         )
     }
