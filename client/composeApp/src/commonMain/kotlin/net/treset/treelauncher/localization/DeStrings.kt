@@ -143,10 +143,7 @@ class DeStrings : Strings(
                 { "Einstellungen" }
             ),
             Manager.Instance.Settings(
-                { "Argument eingeben" },
-                { "Argument hinzufügen" },
-                { "Abbrechen" },
-                { "Hinzufügen" },
+                { "Neues Argument eingeben" },
                 { "JVM-Argumente" },
                 { "Instanzspeicher:" },
                 { "Auflösung:" },
@@ -382,7 +379,11 @@ class DeStrings : Strings(
         { "t" },
         { "h" },
         { "m" },
-        { "s" }
+        { "s" },
+        { "mb" },
+        { "px" },
+        { "x" }
+
     ),
     Updater(
         { "Schließen" },

@@ -19,6 +19,8 @@ fun TextBox(
     enabled: Boolean = true,
     showClear: Boolean = true,
     singleLine: Boolean = true,
+    prefix: @Composable () -> Unit = {},
+    suffix: @Composable () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var displayText by remember { mutableStateOf(text) }
@@ -50,6 +52,8 @@ fun TextBox(
             }
         },
         singleLine = singleLine,
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        prefix = prefix,
+        suffix = suffix
     )
 }

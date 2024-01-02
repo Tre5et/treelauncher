@@ -226,10 +226,7 @@ open class Strings(
             )
 
             data class Settings(
-                val argument: () -> String,
                 val argumentAdd: () -> String,
-                val argumentCancel: () -> String,
-                val argumentConfirm: () -> String,
                 val arguments: () -> String,
                 val memory: () -> String,
                 val resolution: () -> String,
@@ -516,7 +513,10 @@ open class Strings(
         val days: () -> String,
         val hours: () -> String,
         val minutes: () -> String,
-        val seconds: () -> String
+        val seconds: () -> String,
+        val megabytes: () -> String,
+        val pixels: () -> String,
+        val resolutionBy: () -> String
     )
 
     data class Updater(

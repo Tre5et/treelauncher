@@ -171,12 +171,16 @@ fun InstanceDetails(
     }
 
     selectedDetails?.let {
-        InstanceComponentChanger(
-            instance = instance,
-            type = it,
-            appContext = appContext,
-            redrawSelected = redrawSelected
-        )
+        if(it == InstanceDetails.SAVES || it == InstanceDetails.OPTIONS || it == InstanceDetails.RESOURCE_PACKS || it == InstanceDetails.MODS) {
+            InstanceComponentChanger(
+                instance = instance,
+                type = it,
+                appContext = appContext,
+                redrawSelected = redrawSelected
+            )
+        } else if(it == InstanceDetails.SETTINGS) {
+            InstanceSettings(instance)
+        }
     }
 
     if(showRename) {

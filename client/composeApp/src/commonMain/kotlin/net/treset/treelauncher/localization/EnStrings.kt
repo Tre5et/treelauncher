@@ -143,10 +143,7 @@ class EnStrings : Strings(
                 { "Settings" }
             ),
             Manager.Instance.Settings(
-                { "Enter Argument" },
-                { "Add Argument" },
-                { "Cancel" },
-                { "Add" },
+                { "Enter new Argument" },
                 { "JVM-Arguments" },
                 { "Instance Memory:" },
                 { "Resolution:" },
@@ -382,7 +379,10 @@ class EnStrings : Strings(
         { "d" },
         { "h" },
         { "m" },
-        { "s" }
+        { "s" },
+        { "mb" },
+        { "px" },
+        { "x" }
     ),
     Updater(
         { "Close" },
