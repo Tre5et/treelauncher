@@ -1,6 +1,7 @@
 package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
+import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.instances.InstanceDetails
@@ -326,7 +327,7 @@ open class Strings(
                 val message: () -> String,
                 val title: () -> String,
                 val unableClose: () -> String,
-                val unableMessage: (instance: InstanceData) -> String,
+                val unableMessage: (instance: LauncherManifest) -> String,
                 val unableTitle: () -> String
             )
             data class Edit(

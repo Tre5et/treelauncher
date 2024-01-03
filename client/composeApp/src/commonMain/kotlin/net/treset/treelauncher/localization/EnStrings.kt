@@ -220,7 +220,7 @@ class EnStrings : Strings(
                 { "This action cannot be undone!\nAny data in this Component will be lost forever.\nThis Component is not currently used by any instance." },
                 { "You are about to delete this Component!" },
                 { "Close" },
-                { instance -> "It is used by the following instance: ${instance.instance.first.name}" },
+                { instance -> "It is used by the following instance: ${instance.name}" },
                 { "Unable to delete this component!" },
             ),
             Selector.Component.Edit(

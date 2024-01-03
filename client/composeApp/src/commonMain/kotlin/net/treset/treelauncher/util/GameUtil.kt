@@ -2,6 +2,7 @@ package net.treset.treelauncher.util
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.exception.GameLaunchException
@@ -21,6 +22,8 @@ fun launchGame(
         onExit
     )
 }
+
+private val LOGGER = KotlinLogging.logger { }
 
 class GameLaunchHelper(
     val launcher: GameLauncher,
@@ -77,6 +80,7 @@ class GameLaunchHelper(
                 ) }
             )
         )
+        LOGGER.error(e) { "Failed to launch game!" }
         onExit()
     }
 
@@ -88,6 +92,7 @@ class GameLaunchHelper(
             return
         }
         setPopup(null)
+        LOGGER.info { "Game exited normally!" }
         onExit()
     }
 
@@ -111,6 +116,7 @@ class GameLaunchHelper(
                 }
             )
         )
+        LOGGER.warn(GameLaunchException(error)) { "Game crashed!" }
         onExit()
     }
 }

@@ -220,7 +220,7 @@ class DeStrings : Strings(
                 { "Diese Aktion kann nicht rückgängig gemacht werden!\nDaten in dieser Komponente werden unwiderruflich gelöscht.\nDiese Komponente wird von keiner Instanz verwendet." },
                 { "Diese Komponente wirklich löschen?" },
                 { "Schließen" },
-                { instance -> "Sie wird von folgender Instanz verwendet: ${instance.instance.first.name}." },
+                { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
                 { "Diese Komponente kann nicht gelöscht werden!" },
             ),
             Selector.Component.Edit(

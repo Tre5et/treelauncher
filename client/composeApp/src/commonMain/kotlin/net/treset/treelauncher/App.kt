@@ -57,7 +57,7 @@ fun App() {
                         NavigationContainer(loginContext) { navContext ->
                             when (navContext.navigationState) {
                                 NavigationState.INSTANCES -> Instances(appContext, loginContext)
-                                NavigationState.SAVES -> Saves(appContext)
+                                NavigationState.SAVES -> Saves(appContext, loginContext)
                                 NavigationState.SETTINGS -> Settings(loginContext)
 
                                 else -> Text("TODO")
