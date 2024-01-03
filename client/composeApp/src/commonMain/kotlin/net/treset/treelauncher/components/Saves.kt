@@ -39,22 +39,20 @@ fun Saves(
     ) {component, redraw, reload ->
         var showRename by remember { mutableStateOf(false) }
 
-        var saves: List<Save> by remember { mutableStateOf(emptyList()) }
-        var servers: List<Server> by remember { mutableStateOf(emptyList()) }
+        var saves: List<Save> by remember(component) { mutableStateOf(emptyList()) }
+        var servers: List<Server> by remember(component) { mutableStateOf(emptyList()) }
 
-        var selectedSave: Save? by remember { mutableStateOf(null) }
-        var selectedServer: Server? by remember { mutableStateOf(null) }
+        var selectedSave: Save? by remember(component) { mutableStateOf(null) }
+        var selectedServer: Server? by remember(component) { mutableStateOf(null) }
+        var showSettings by remember(component) { mutableStateOf(false) }
 
-        var quickPlayData: QuickPlayData? by remember { mutableStateOf(null) }
+        var quickPlayData: QuickPlayData? by remember (component){ mutableStateOf(null) }
 
-        var showDelete by remember { mutableStateOf(false) }
+        var showDelete by remember(component) { mutableStateOf(false) }
 
-        var popupData: PopupData? by remember { mutableStateOf(null) }
+        var popupData: PopupData? by remember(component) { mutableStateOf(null) }
 
         LaunchedEffect(component) {
-            selectedSave = null
-            selectedServer = null
-
             saves = LauncherFile.of(component.directory).listFiles()
                 .filter { it.isDirectory }
                 .mapNotNull {
@@ -78,127 +76,160 @@ fun Saves(
             }
         }
 
-        TitledColumn(
-            headerContent = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+        if(showSettings) {
+            ComponentSettings(
+                component,
+                onClose = { showSettings = false }
+            )
+        } else {
+            TitledColumn(
+                headerContent = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        selectedSave?.let {
+                            IconButton(
+                                onClick = {
+                                    quickPlayData = QuickPlayData(
+                                        QuickPlayData.Type.WORLD,
+                                        it.fileName
+                                    )
+                                },
+                                highlighted = true,
+                                modifier = Modifier.offset(y = (-10).dp)
+                            ) {
+                                Icon(
+                                    icons().play,
+                                    "Play",
+                                    modifier = Modifier.size(46.dp)
+                                        .offset(y = 12.dp)
+                                )
+                            }
+                        }
+
+                        selectedServer?.let {
+                            IconButton(
+                                onClick = {
+                                    quickPlayData = QuickPlayData(
+                                        QuickPlayData.Type.SERVER,
+                                        it.ip
+                                    )
+                                },
+                                highlighted = true,
+                                modifier = Modifier.offset(y = (-10).dp)
+                            ) {
+                                Icon(
+                                    icons().play,
+                                    "Play",
+                                    modifier = Modifier.size(46.dp)
+                                        .offset(y = 12.dp)
+                                )
+                            }
+                        }
+
+                        Text(component.name)
+
+                        IconButton(
+                            onClick = {
+                                showRename = true
+                            }
+                        ) {
+                            Icon(
+                                icons().rename,
+                                "Rename",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                LauncherFile.of(component.directory).open()
+                            }
+                        ) {
+                            Icon(
+                                icons().folder,
+                                "Open Folder",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                showDelete = true
+                            },
+                            interactionTint = MaterialTheme.colorScheme.error
+                        ) {
+                            Icon(
+                                icons().delete,
+                                "Delete",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                },
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(12.dp)
+            ) {
+                if(saves.isNotEmpty()) {
+                    Text(
+                        strings().selector.saves.worlds(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    saves.forEach {
+                        SaveButton(
+                            it,
+                            selectedSave == it
+                        ) {
+                            selectedServer = null
+                            selectedSave = if(selectedSave == it) {
+                                null
+                            } else {
+                                it
+                            }
+                        }
+                    }
+                }
+                if(servers.isNotEmpty()) {
+                    Text(
+                        strings().selector.saves.servers(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    servers.forEach {
+                        ServerButton(
+                            it,
+                            selectedServer == it
+                        ) {
+                            selectedSave = null
+                            selectedServer = if(selectedServer == it) {
+                                null
+                            } else {
+                                it
+                            }
+                        }
+                    }
+                }
+                SelectorButton(
+                    selected = showSettings,
+                    onClick = { showSettings = true }
                 ) {
-                    selectedSave?.let {
-                        IconButton(
-                            onClick = {
-                                quickPlayData = QuickPlayData(
-                                    QuickPlayData.Type.WORLD,
-                                    it.fileName
-                                )
-                            },
-                            highlighted = true,
-                            modifier = Modifier.offset(y = (-10).dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = icons().settings,
+                            contentDescription = "Component Settings",
+                            modifier = Modifier.size(48.dp)
+                        )
+
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Icon(
-                                icons().play,
-                                "Play",
-                                modifier = Modifier.size(46.dp)
-                                    .offset(y = 12.dp)
+                            Text(
+                                strings().manager.component.settings(),
+                                style = MaterialTheme.typography.titleMedium
                             )
-                        }
-                    }
-
-                    selectedServer?.let {
-                        IconButton(
-                            onClick = {
-                                quickPlayData = QuickPlayData(
-                                    QuickPlayData.Type.SERVER,
-                                    it.ip
-                                )
-                            },
-                            highlighted = true,
-                            modifier = Modifier.offset(y = (-10).dp)
-                        ) {
-                            Icon(
-                                icons().play,
-                                "Play",
-                                modifier = Modifier.size(46.dp)
-                                    .offset(y = 12.dp)
-                            )
-                        }
-                    }
-
-                    Text(component.name)
-
-                    IconButton(
-                        onClick = {
-                            showRename = true
-                        }
-                    ) {
-                        Icon(
-                            icons().rename,
-                            "Rename",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                            LauncherFile.of(component.directory).open()
-                        }
-                    ) {
-                        Icon(
-                            icons().folder,
-                            "Open Folder",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                            showDelete = true
-                        },
-                        interactionTint = MaterialTheme.colorScheme.error
-                    ) {
-                        Icon(
-                            icons().delete,
-                            "Delete",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
-            },
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(12.dp)
-        ) {
-            if(saves.isNotEmpty()) {
-                Text(
-                    strings().selector.saves.worlds(),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                saves.forEach {
-                    SaveButton(
-                        it,
-                        selectedSave == it
-                    ) {
-                        selectedServer = null
-                        selectedSave = if(selectedSave == it) {
-                            null
-                        } else {
-                            it
-                        }
-                    }
-                }
-            }
-            if(servers.isNotEmpty()) {
-                Text(
-                    strings().selector.saves.servers(),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                servers.forEach {
-                    ServerButton(
-                        it,
-                        selectedServer == it
-                    ) {
-                        selectedSave = null
-                        selectedServer = if(selectedServer == it) {
-                            null
-                        } else {
-                            it
                         }
                     }
                 }

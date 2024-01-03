@@ -29,6 +29,8 @@ class Icons {
     val play = Icons.Rounded.PlayArrow
     val rename = Icons.Rounded.Edit
     val folder = Icons.Rounded.Folder
+    val file = Icons.Rounded.InsertDriveFile
     val delete = Icons.Rounded.Delete
     val change = Icons.Rounded.Sync
+    val back = Icons.Rounded.ArrowBack
 }
