@@ -92,7 +92,7 @@ fun InstanceComponentChanger(
                     selected = it
                 },
                 defaultSelected = selected,
-                displayTransformer = { name },
+                toDisplayString = { name },
             )
             IconButton(
                 onClick = {

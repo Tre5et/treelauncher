@@ -121,7 +121,7 @@ fun ComponentSettings(
                 onSelected = {
                     fileType = it
                 },
-                displayTransformer = { title }
+                toDisplayString = { title }
             )
 
             TextBox(

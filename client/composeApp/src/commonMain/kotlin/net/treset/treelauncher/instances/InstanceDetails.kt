@@ -178,6 +178,12 @@ fun InstanceDetails(
                 appContext = appContext,
                 redrawSelected = redrawSelected
             )
+        } else if(it == InstanceDetails.VERSION) {
+            InstanceVersionChanger(
+                instance = instance,
+                appContext = appContext,
+                redrawCurrent = redrawSelected
+            )
         } else if(it == InstanceDetails.SETTINGS) {
             InstanceSettings(instance)
         }

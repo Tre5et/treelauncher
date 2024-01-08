@@ -13,30 +13,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
 @Composable
 fun <T> ComboBox(
-    items: () -> List<T>,
+    items: List<T>,
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
-    loadingPlaceholder: String = "",
+    loading: Boolean = false,
+    loadingPlaceholder: String = strings().creator.version.loading(),
     defaultSelected: T? = null,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem: T? by remember { mutableStateOf(defaultSelected) }
-    var actualItems: List<T>? by remember { mutableStateOf(null) }
-    val displayString = actualItems?.let{ selectedItem?.toDisplayString() ?: placeholder } ?: loadingPlaceholder
-
-    LaunchedEffect(items) {
-        Thread {
-            actualItems = items()
-        }.start()
-
-        selectedItem = defaultSelected
-    }
+    val displayString = if(loading) loadingPlaceholder else selectedItem?.toDisplayString() ?: placeholder
 
     LaunchedEffect(defaultSelected) {
         selectedItem = defaultSelected
@@ -59,9 +52,11 @@ fun <T> ComboBox(
             if(expanded) 2.dp else 1.dp
         )
 
-        val rowModifier = (actualItems?.let {
+        val rowModifier = if(loading) {
+            Modifier
+        } else {
             Modifier.clickable(onClick = { expanded = true })
-        } ?: Modifier).let {
+        }.let {
             if(decorated) {
                 it
                     .border(borderWidth, borderColor, RoundedCornerShape(4.dp))
@@ -90,7 +85,7 @@ fun <T> ComboBox(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            actualItems?.forEach { i ->
+            items.forEach { i ->
                 DropdownMenuItem(
                     text = {
                         Text(
@@ -101,7 +96,8 @@ fun <T> ComboBox(
                         selectedItem = i
                         onSelected(i)
                         expanded = false
-                    }
+                    },
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 )
             }
         }
@@ -113,32 +109,19 @@ fun <T> ComboBox(
     items: List<T>,
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
-    defaultSelected: T? = null,
-    displayTransformer: T.() -> String = { toString() },
-    decorated: Boolean = true
-) = ComboBox(
-    {items},
-    onSelected,
-    placeholder,
-    defaultSelected = defaultSelected,
-    toDisplayString = displayTransformer,
-    decorated = decorated
-)
-
-@Composable
-fun <T> ComboBox(
-    items: List<T>,
-    onSelected: (T) -> Unit = {},
-    placeholder: String = "",
+    loading: Boolean = false,
+    loadingPlaceholder: String = strings().creator.version.loading(),
     defaultSelected: Int? = null,
-    displayTransformer: T.() -> String = { toString() },
+    toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true
 ) = ComboBox(
     items,
     onSelected,
     placeholder,
+    loading,
+    loadingPlaceholder,
     defaultSelected?.let{if(it >= 0 && it < items.size) items[it] else null },
-    displayTransformer,
+    toDisplayString,
     decorated
 )
 
@@ -147,9 +130,11 @@ fun <T> TitledComboBox(
     title: String,
     items: List<T>,
     onSelected: (T) -> Unit = {},
+    loading: Boolean = false,
+    loadingPlaceholder: String = strings().creator.version.loading(),
     placeholder: String = "",
     defaultSelected: T? = null,
-    displayTransformer: T.() -> String = { toString() },
+    toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true
 ) {
     Row(
@@ -165,10 +150,11 @@ fun <T> TitledComboBox(
             items,
             onSelected,
             placeholder,
+            loading,
+            loadingPlaceholder,
             defaultSelected,
-            displayTransformer,
+            toDisplayString,
             decorated
         )
     }
-
 }
