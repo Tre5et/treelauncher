@@ -3,22 +3,23 @@ package net.treset.treelauncher.generic
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.launcher.LauncherManifest
 
 @Composable
 fun SelectorButton(
@@ -50,6 +51,45 @@ fun SelectorButton(
             LocalContentColor provides contentColor
         ) {
             content()
+        }
+    }
+}
+
+@Composable
+fun SelectorButton(
+    title: String,
+    component: LauncherManifest? = null,
+    icon: ImageVector,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    SelectorButton(
+        selected = selected,
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                modifier = Modifier.size(48.dp)
+            )
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                component?.let {
+                    Text(it.name)
+                }
+            }
         }
     }
 }

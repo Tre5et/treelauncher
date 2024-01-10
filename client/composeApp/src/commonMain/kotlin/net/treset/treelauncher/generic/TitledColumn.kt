@@ -19,6 +19,7 @@ fun TitledColumn(
     parentModifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    scrollable: Boolean = true,
     headerContent: @Composable BoxScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -45,10 +46,16 @@ fun TitledColumn(
                 thickness = 2.dp
             )
         }
-        Column(
-            modifier = modifier
+        val columnModifier = if(scrollable) {
+            modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+        } else {
+            modifier.fillMaxSize()
+        }
+
+        Column(
+            modifier = columnModifier,
             verticalArrangement = verticalArrangement,
             horizontalAlignment = horizontalAlignment
         ) {
@@ -64,6 +71,7 @@ fun TitledColumn(
     parentModifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    scrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = TitledColumn(
     modifier = modifier,
@@ -71,6 +79,7 @@ fun TitledColumn(
     parentModifier = parentModifier,
     verticalArrangement = verticalArrangement,
     horizontalAlignment = horizontalAlignment,
+    scrollable = scrollable,
     headerContent = { Text(title) },
     content = content
 )

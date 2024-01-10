@@ -1,9 +1,9 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
@@ -11,13 +11,13 @@ import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
-import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
@@ -29,279 +29,201 @@ fun Saves(
     appContext: AppContext,
     loginContext: LoginContext
 ) {
+    var components by remember { mutableStateOf(appContext.files.savesComponents.sortedBy { it.name }) }
+
+    var selected: LauncherManifest? by remember { mutableStateOf(null) }
+
+    var saves: List<Save> by remember { mutableStateOf(emptyList()) }
+    var servers: List<Server> by remember { mutableStateOf(emptyList()) }
+
+    var selectedSave: Save? by remember(selected) { mutableStateOf(null) }
+    var selectedServer: Server? by remember(selected) { mutableStateOf(null) }
+
+    var popupData: PopupData? by remember { mutableStateOf(null) }
+
+    var quickPlayData: QuickPlayData? by remember(selected) { mutableStateOf(null) }
+
     Components(
         strings().selector.saves.title(),
-        appContext.files.savesComponents,
-        {
+        components,
+        appContext = appContext,
+        getCreator = { mode, name, existing ->
+            when(mode) {
+                CreationMode.NEW -> name?.let{
+                    SavesCreator(
+                        name,
+                        appContext.files.launcherDetails.typeConversion,
+                        appContext.files.savesManifest,
+                        appContext.files.gameDetailsManifest
+                    )
+                }
+
+                CreationMode.INHERIT -> name?.let{ existing?.let {
+                    SavesCreator(
+                        name,
+                        existing,
+                        appContext.files.savesManifest,
+                        appContext.files.gameDetailsManifest
+                    )
+                }}
+
+                CreationMode.USE -> existing?.let {
+                    SavesCreator(
+                        existing
+                    )
+                }
+            }
+        },
+        reload = {
             appContext.files.reloadSavesManifest()
             appContext.files.reloadSavesComponents()
-        }
-    ) {component, redraw, reload ->
-        var showRename by remember { mutableStateOf(false) }
+            components = appContext.files.savesComponents.sortedBy { it.name }
+        },
+        actionBarSpecial = {current, _, _ ->
 
-        var saves: List<Save> by remember(component) { mutableStateOf(emptyList()) }
-        var servers: List<Server> by remember(component) { mutableStateOf(emptyList()) }
-
-        var selectedSave: Save? by remember(component) { mutableStateOf(null) }
-        var selectedServer: Server? by remember(component) { mutableStateOf(null) }
-        var showSettings by remember(component) { mutableStateOf(false) }
-
-        var quickPlayData: QuickPlayData? by remember (component){ mutableStateOf(null) }
-
-        var showDelete by remember(component) { mutableStateOf(false) }
-
-        var popupData: PopupData? by remember(component) { mutableStateOf(null) }
-
-        LaunchedEffect(component) {
-            saves = LauncherFile.of(component.directory).listFiles()
-                .filter { it.isDirectory }
-                .mapNotNull {
-                    try {
-                        Save.from(it)
-                    } catch (e: IOException) {
-                        null
-                    }
+            selectedSave?.let {
+                IconButton(
+                    onClick = {
+                        quickPlayData = QuickPlayData(
+                            QuickPlayData.Type.WORLD,
+                            it.fileName
+                        )
+                    },
+                    highlighted = true,
+                    modifier = Modifier.offset(y = (-10).dp)
+                ) {
+                    Icon(
+                        icons().play,
+                        "Play",
+                        modifier = Modifier.size(46.dp)
+                            .offset(y = 12.dp)
+                    )
                 }
-                .sortedBy { it.name }
+            }
 
-            val serversFile = LauncherFile.of(component.directory, ".included_files", "servers.dat")
-            servers = if(serversFile.exists()) {
-                try {
-                    Server.from(serversFile)
-                } catch (e: IOException) {
+            selectedServer?.let {
+                IconButton(
+                    onClick = {
+                        quickPlayData = QuickPlayData(
+                            QuickPlayData.Type.SERVER,
+                            it.ip
+                        )
+                    },
+                    highlighted = true,
+                    modifier = Modifier.offset(y = (-10).dp)
+                ) {
+                    Icon(
+                        icons().play,
+                        "Play",
+                        modifier = Modifier.size(46.dp)
+                            .offset(y = 12.dp)
+                    )
+                }
+            }
+        },
+        detailsContent = { current, _, _ ->
+            LaunchedEffect(current) {
+                selected = current
+
+                saves = LauncherFile.of(current.directory).listFiles()
+                    .filter { it.isDirectory }
+                    .mapNotNull {
+                        try {
+                            Save.from(it)
+                        } catch (e: IOException) {
+                            null
+                        }
+                    }
+                    .sortedBy { it.name }
+
+                val serversFile = LauncherFile.of(current.directory, ".included_files", "servers.dat")
+                servers = if (serversFile.exists()) {
+                    try {
+                        Server.from(serversFile)
+                    } catch (e: IOException) {
+                        emptyList()
+                    }
+                } else {
                     emptyList()
                 }
-            } else {
-                emptyList()
             }
-        }
 
-        if(showSettings) {
-            ComponentSettings(
-                component,
-                onClose = { showSettings = false }
-            )
-        } else {
-            TitledColumn(
-                headerContent = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+            DisposableEffect(current) {
+                onDispose {
+                    selected = null
+                }
+            }
+
+            if (saves.isNotEmpty()) {
+                Text(
+                    strings().selector.saves.worlds(),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                saves.forEach {
+                    SaveButton(
+                        it,
+                        selectedSave == it
                     ) {
-                        selectedSave?.let {
-                            IconButton(
-                                onClick = {
-                                    quickPlayData = QuickPlayData(
-                                        QuickPlayData.Type.WORLD,
-                                        it.fileName
-                                    )
-                                },
-                                highlighted = true,
-                                modifier = Modifier.offset(y = (-10).dp)
-                            ) {
-                                Icon(
-                                    icons().play,
-                                    "Play",
-                                    modifier = Modifier.size(46.dp)
-                                        .offset(y = 12.dp)
-                                )
-                            }
-                        }
-
-                        selectedServer?.let {
-                            IconButton(
-                                onClick = {
-                                    quickPlayData = QuickPlayData(
-                                        QuickPlayData.Type.SERVER,
-                                        it.ip
-                                    )
-                                },
-                                highlighted = true,
-                                modifier = Modifier.offset(y = (-10).dp)
-                            ) {
-                                Icon(
-                                    icons().play,
-                                    "Play",
-                                    modifier = Modifier.size(46.dp)
-                                        .offset(y = 12.dp)
-                                )
-                            }
-                        }
-
-                        Text(component.name)
-
-                        IconButton(
-                            onClick = {
-                                showRename = true
-                            }
-                        ) {
-                            Icon(
-                                icons().rename,
-                                "Rename",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                LauncherFile.of(component.directory).open()
-                            }
-                        ) {
-                            Icon(
-                                icons().folder,
-                                "Open Folder",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                showDelete = true
-                            },
-                            interactionTint = MaterialTheme.colorScheme.error
-                        ) {
-                            Icon(
-                                icons().delete,
-                                "Delete",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
-                },
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(12.dp)
-            ) {
-                if(saves.isNotEmpty()) {
-                    Text(
-                        strings().selector.saves.worlds(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    saves.forEach {
-                        SaveButton(
-                            it,
-                            selectedSave == it
-                        ) {
-                            selectedServer = null
-                            selectedSave = if(selectedSave == it) {
-                                null
-                            } else {
-                                it
-                            }
+                        selectedServer = null
+                        selectedSave = if (selectedSave == it) {
+                            null
+                        } else {
+                            it
                         }
                     }
                 }
-                if(servers.isNotEmpty()) {
-                    Text(
-                        strings().selector.saves.servers(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    servers.forEach {
-                        ServerButton(
-                            it,
-                            selectedServer == it
-                        ) {
-                            selectedSave = null
-                            selectedServer = if(selectedServer == it) {
-                                null
-                            } else {
-                                it
-                            }
+            }
+            if (servers.isNotEmpty()) {
+                Text(
+                    strings().selector.saves.servers(),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                servers.forEach {
+                    ServerButton(
+                        it,
+                        selectedServer == it
+                    ) {
+                        selectedSave = null
+                        selectedServer = if (selectedServer == it) {
+                            null
+                        } else {
+                            it
                         }
                     }
                 }
-                SelectorButton(
-                    selected = showSettings,
-                    onClick = { showSettings = true }
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = icons().settings,
-                            contentDescription = "Component Settings",
-                            modifier = Modifier.size(48.dp)
+            }
+
+            quickPlayData?.let {
+                PlayPopup(
+                    component = current,
+                    quickPlayData = it,
+                    appContext = appContext,
+                    onClose = { quickPlayData = null },
+                    onConfirm = { playData, instance ->
+                        val instanceData = InstanceData.of(instance, appContext.files)
+
+                        val launcher = GameLauncher(
+                            instanceData,
+                            appContext.files,
+                            loginContext.userAuth.minecraftUser!!,
+                            playData
                         )
 
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                strings().manager.component.settings(),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        }
+                        quickPlayData = null
+
+                        launchGame(
+                            launcher,
+                            { pd -> popupData = pd },
+                            { }
+                        )
                     }
-                }
+                )
             }
         }
+    )
 
-        if(showRename) {
-            RenamePopup(
-                manifest = component,
-                editValid = { name -> name.isNotBlank() && name != component.name },
-                onDone = {name ->
-                    showRename = false
-                    name?.let { newName ->
-                        component.name = newName
-                        LauncherFile.of(
-                            component.directory,
-                            appConfig().MANIFEST_FILE_NAME
-                        ).write(component)
-                        redraw()
-                    }
-                }
-            )
-        }
-
-        if(showDelete) {
-            DeletePopup(
-                component = component,
-                appContext = appContext,
-                checkHasComponent = { details -> details.savesComponent == component.id }   ,
-                onClose = { showDelete = false },
-                onConfirm = {
-                    appContext.files.savesManifest.components.remove(component.id)
-                    LauncherFile.of(
-                        appContext.files.savesManifest.directory,
-                        appContext.files.gameDetailsManifest.components[1]
-                    ).write(appContext.files.savesManifest)
-                    LauncherFile.of(component.directory).remove()
-                    reload()
-                }
-            )
-        }
-
-        quickPlayData?.let {
-            PlayPopup(
-                component = component,
-                quickPlayData = it,
-                appContext = appContext,
-                onClose = { quickPlayData = null },
-                onConfirm = { playData, instance ->
-                    val instanceData = InstanceData.of(instance, appContext.files)
-
-                    val launcher = GameLauncher(
-                        instanceData,
-                        appContext.files,
-                        loginContext.userAuth.minecraftUser!!,
-                        playData
-                    )
-
-                    quickPlayData = null
-
-                    launchGame(
-                        launcher,
-                        { pd -> popupData = pd },
-                        {  }
-                    )
-                }
-            )
-        }
-
-        popupData?.let {
-            PopupOverlay(it)
-        }
+    popupData?.let {
+        PopupOverlay(it)
     }
 }
 

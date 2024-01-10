@@ -24,7 +24,7 @@ class SavesCreator : GenericComponentCreator {
         componentsManifest
     ) {
         this.gameManifest = gameManifest
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
+        defaultStatus = CreationStatus(CreationStatus.DownloadStep.SAVES, null)
     }
 
     constructor(
@@ -34,7 +34,7 @@ class SavesCreator : GenericComponentCreator {
         gameManifest: LauncherManifest
     ) : super(LauncherManifestType.SAVES_COMPONENT, null, inheritsFrom, name, null, null, null, componentsManifest) {
         this.gameManifest = gameManifest
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
+        defaultStatus = CreationStatus(CreationStatus.DownloadStep.SAVES, null)
     }
 
     constructor(uses: LauncherManifest) : super(

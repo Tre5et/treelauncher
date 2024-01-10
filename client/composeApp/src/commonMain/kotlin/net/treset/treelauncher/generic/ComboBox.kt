@@ -25,9 +25,10 @@ fun <T> ComboBox(
     loadingPlaceholder: String = strings().creator.version.loading(),
     defaultSelected: T? = null,
     toDisplayString: T.() -> String = { toString() },
-    decorated: Boolean = true
+    decorated: Boolean = true,
+    enabled: Boolean = true
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember(enabled) { mutableStateOf(false) }
     var selectedItem: T? by remember { mutableStateOf(defaultSelected) }
     val displayString = if(loading) loadingPlaceholder else selectedItem?.toDisplayString() ?: placeholder
 
@@ -41,18 +42,26 @@ fun <T> ComboBox(
             .pointerHoverIcon(PointerIcon.Hand),
     ) {
         val borderColor by animateColorAsState(
-            if(expanded) {
-                MaterialTheme.colorScheme.primary
+            if(enabled) {
+                if (expanded) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.secondary
+                }
             } else {
-                MaterialTheme.colorScheme.secondary
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f)
             }
         )
 
-        val borderWidth by animateDpAsState(
-            if(expanded) 2.dp else 1.dp
+        val textColor by animateColorAsState(
+            if(enabled) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f)
         )
 
-        val rowModifier = if(loading) {
+        val borderWidth by animateDpAsState(
+            if(expanded && enabled) 2.dp else 1.dp
+        )
+
+        val rowModifier = if(loading || !enabled) {
             Modifier
         } else {
             Modifier.clickable(onClick = { expanded = true })
@@ -71,7 +80,8 @@ fun <T> ComboBox(
             modifier = rowModifier
         ) {
             Text(
-                displayString
+                displayString,
+                color = textColor
             )
             if(decorated) {
                 Icon(

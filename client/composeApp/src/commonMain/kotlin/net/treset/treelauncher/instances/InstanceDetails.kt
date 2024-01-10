@@ -112,7 +112,7 @@ fun InstanceDetails(
                 }
         }
     ) {
-        InstanceComponentButton(
+        SelectorButton(
             title = strings().manager.instance.details.version(),
             component = instance.versionComponents[0].first,
             icon = icons().version,
@@ -121,7 +121,7 @@ fun InstanceDetails(
                 selectedDetails = if (selectedDetails == InstanceDetails.VERSION) null else InstanceDetails.VERSION
             }
         )
-        InstanceComponentButton(
+        SelectorButton(
             title = strings().manager.instance.details.saves(),
             component = instance.savesComponent,
             icon = icons().saves,
@@ -130,7 +130,7 @@ fun InstanceDetails(
                 selectedDetails = if (selectedDetails == InstanceDetails.SAVES) null else InstanceDetails.SAVES
             }
         )
-        InstanceComponentButton(
+        SelectorButton(
             title = strings().manager.instance.details.resourcepacks(),
             component = instance.resourcepacksComponent,
             icon = icons().resourcePacks,
@@ -140,7 +140,7 @@ fun InstanceDetails(
                     if (selectedDetails == InstanceDetails.RESOURCE_PACKS) null else InstanceDetails.RESOURCE_PACKS
             }
         )
-        InstanceComponentButton(
+        SelectorButton(
             title = strings().manager.instance.details.options(),
             component = instance.optionsComponent,
             icon = icons().options,
@@ -150,7 +150,7 @@ fun InstanceDetails(
             }
         )
         instance.modsComponent?.let { modsComponent ->
-            InstanceComponentButton(
+            SelectorButton(
                 title = strings().manager.instance.details.mods(),
                 component = modsComponent.first,
                 icon = icons().mods,
@@ -160,7 +160,7 @@ fun InstanceDetails(
                 }
             )
         }
-        InstanceComponentButton(
+        SelectorButton(
             title = strings().manager.instance.details.settings(),
             icon = icons().settings,
             selected = selectedDetails == InstanceDetails.SETTINGS,

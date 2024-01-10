@@ -80,7 +80,7 @@ fun InstanceVersionChanger(
                         }
                         Thread {
                             val id = try {
-                                it.createComponent()
+                                it.execute()
                             } catch(e: ComponentCreationException) {
                                 LOGGER.error(e) { "Failed to create Version" }
                                 showFailed = e

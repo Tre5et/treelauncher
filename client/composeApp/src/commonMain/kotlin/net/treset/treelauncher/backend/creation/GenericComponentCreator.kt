@@ -14,7 +14,6 @@ import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import java.util.function.Consumer
 
 abstract class GenericComponentCreator(
     var type: LauncherManifestType,
@@ -32,27 +31,30 @@ abstract class GenericComponentCreator(
 
     @get:Throws(ComponentCreationException::class)
     override val id: String
-        get() {
-            defaultStatus?.let {
-                setStatus(it)
-            }
-            uses?.let {
-                return useComponent()
-            }
-            if (name == null) {
-                throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: invalid parameters")
-            }
-            return if (inheritsFrom != null) {
-                inheritComponent()
-            } else createComponent()
-        }
+        get() = execute()
 
     @Throws(ComponentCreationException::class)
-    open fun createComponent(): String {
+    fun execute(): String {
+        defaultStatus?.let {
+            setStatus(it)
+        }
+        uses?.let {
+            return useComponent()
+        }
+        if (name == null) {
+            throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: invalid parameters")
+        }
+        return if (inheritsFrom != null) {
+            inheritComponent()
+        } else createComponent()
+    }
+
+    @Throws(ComponentCreationException::class)
+    protected open fun createComponent(): String {
         val manifestType = try {
             getManifestType(type, typeConversion?: throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: invalid parameters"))
         } catch (e: IllegalArgumentException) {
-            throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: unable to get manifest type", e);
+            throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: unable to get manifest type", e)
         }
         LauncherManifest(
             manifestType,
@@ -72,24 +74,24 @@ abstract class GenericComponentCreator(
                 attemptCleanup()
                 throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: unable to write manifest", e)
             }
-            LOGGER.debug("Created ${type.toString().lowercase(Locale.getDefault())} component: id=${it.id}")
+            LOGGER.debug { "Created ${type.toString().lowercase(Locale.getDefault())} component: id=${it.id}" }
             return it.id
         }
     }
 
     @Throws(ComponentCreationException::class)
-    open fun useComponent(): String {
+    protected open fun useComponent(): String {
         uses?.let {
             if (it.type != type || it.id == null) {
                 throw ComponentCreationException("Unable to use ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
             }
-            LOGGER.debug("Using ${type.toString().lowercase(Locale.getDefault())} component: id=${it.id}")
+            LOGGER.debug { "Using ${type.toString().lowercase(Locale.getDefault())} component: id=${it.id}" }
             return it.id
         }?: throw ComponentCreationException("Unable to use ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
     }
 
     @Throws(ComponentCreationException::class)
-    open fun inheritComponent(): String {
+    protected open fun inheritComponent(): String {
         inheritsFrom?.let {
             if (it.type != type) {
                 throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
@@ -120,7 +122,7 @@ abstract class GenericComponentCreator(
                     attemptCleanup()
                     throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: unable to copy files: id=${manifest.id}", e)
                 }
-                LOGGER.debug("Inherited ${type.toString().lowercase(Locale.getDefault())} component: id=${manifest.id}")
+                LOGGER.debug { "Inherited ${type.toString().lowercase(Locale.getDefault())} component: id=${manifest.id}" }
                 return manifest.id
             }
         }?: throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")

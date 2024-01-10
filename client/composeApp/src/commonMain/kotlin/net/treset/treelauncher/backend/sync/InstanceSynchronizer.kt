@@ -20,7 +20,6 @@ import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 import java.util.*
-import java.util.function.Predicate
 
 class InstanceSynchronizer : ManifestSynchronizer {
     var instanceData: InstanceData
@@ -136,7 +135,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadDependency(id: String, type: LauncherManifestType): String? {
+    protected fun downloadDependency(id: String, type: LauncherManifestType): String {
         val parentManifest: LauncherManifest
         val otherComponents: Array<LauncherManifest>
         val currentManifest: LauncherManifest?
@@ -211,7 +210,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
                 throw IOException("Getting version returned unknown version type: ${details.versionType}")
             }
             creator.statusCallback = { status -> setStatus(SyncStatus(SyncStep.CREATING, status.downloadStatus)) }
-            val id: String = creator.createComponent()
+            val id: String = creator.execute()
             instanceData.instance.second.versionComponent = id
         }
     }
