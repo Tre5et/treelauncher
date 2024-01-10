@@ -20,14 +20,14 @@ import net.treset.treelauncher.backend.util.string.PatternString
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.TextBox
-import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
 @Composable
-fun ComponentSettings(
+fun ColumnScope.ComponentSettings(
     component: LauncherManifest,
-    onClose: () -> Unit
+    onClose: () -> Unit = {},
+    showBack: Boolean = true
 ) {
     var includedFiles: List<String> by remember { mutableStateOf(emptyList()) }
 
@@ -45,12 +45,7 @@ fun ComponentSettings(
         }
     }
 
-    TitledColumn(
-        title = strings().manager.component.settings(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(12.dp)
-    ) {
+    if(showBack) {
         IconButton(
             onClick = onClose,
             modifier = Modifier.align(Alignment.Start)
@@ -61,90 +56,90 @@ fun ComponentSettings(
                 modifier = Modifier.size(32.dp)
             )
         }
+    }
 
-        Text(
-            strings().manager.component.includedFiles(),
-            style = MaterialTheme.typography.titleMedium
-        )
+    Text(
+        strings().manager.component.includedFiles(),
+        style = MaterialTheme.typography.titleMedium
+    )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(12.dp)
-        ) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(12.dp)
+    ) {
 
-            includedFiles.forEach {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable {  }
-                        .pointerHoverIcon(PointerIcon.Hand)
-                        .padding(start = 8.dp)
-                        .padding(4.dp)
-                ) {
-                    Icon(
-                        if(PatternString.decode(it).endsWith("/")) icons().folder else icons().file,
-                        "File"
-                    )
-
-                    Text(PatternString.decode(it))
-
-                    IconButton(
-                        onClick = {
-                            includedFiles = includedFiles.filter { file -> file != it }
-                        },
-                        interactionTint = MaterialTheme.colorScheme.error
-                    ) {
-                        Icon(
-                            icons().delete,
-                            "Delete File",
-                        )
-                    }
-                }
-
-            }
-        }
-
-        var newArg by remember { mutableStateOf("") }
-        var fileType by remember { mutableStateOf(FileType.FILE) }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            ComboBox(
-                items = FileType.entries,
-                defaultSelected = fileType,
-                onSelected = {
-                    fileType = it
-                },
-                toDisplayString = { title }
-            )
-
-            TextBox(
-                text = newArg,
-                onChange = {
-                    newArg = it
-                },
-                placeholder = strings().manager.component.fileName(),
-            )
-
-            IconButton(
-                onClick = {
-                    includedFiles = includedFiles + PatternString("$newArg${if(fileType == FileType.FOLDER) "/" else ""}").get()
-                    newArg = ""
-                },
-                enabled = newArg.isNotBlank()
+        includedFiles.forEach {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable {  }
+                    .pointerHoverIcon(PointerIcon.Hand)
+                    .padding(start = 8.dp)
+                    .padding(4.dp)
             ) {
                 Icon(
-                    icons().add,
-                    "Add Argument",
-                    modifier = Modifier.size(32.dp)
+                    if(PatternString.decode(it).endsWith("/")) icons().folder else icons().file,
+                    "File"
                 )
+
+                Text(PatternString.decode(it))
+
+                IconButton(
+                    onClick = {
+                        includedFiles = includedFiles.filter { file -> file != it }
+                    },
+                    interactionTint = MaterialTheme.colorScheme.error
+                ) {
+                    Icon(
+                        icons().delete,
+                        "Delete File",
+                    )
+                }
             }
+
+        }
+    }
+
+    var newArg by remember { mutableStateOf("") }
+    var fileType by remember { mutableStateOf(FileType.FILE) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ComboBox(
+            items = FileType.entries,
+            defaultSelected = fileType,
+            onSelected = {
+                fileType = it
+            },
+            toDisplayString = { title }
+        )
+
+        TextBox(
+            text = newArg,
+            onChange = {
+                newArg = it
+            },
+            placeholder = strings().manager.component.fileName(),
+        )
+
+        IconButton(
+            onClick = {
+                includedFiles = includedFiles + PatternString("$newArg${if(fileType == FileType.FOLDER) "/" else ""}").get()
+                newArg = ""
+            },
+            enabled = newArg.isNotBlank()
+        ) {
+            Icon(
+                icons().add,
+                "Add Argument",
+                modifier = Modifier.size(32.dp)
+            )
         }
     }
 }

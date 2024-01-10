@@ -79,45 +79,46 @@ fun Saves(
             appContext.files.reloadSavesComponents()
             components = appContext.files.savesComponents.sortedBy { it.name }
         },
-        actionBarSpecial = {current, _, _ ->
-
-            selectedSave?.let {
-                IconButton(
-                    onClick = {
-                        quickPlayData = QuickPlayData(
-                            QuickPlayData.Type.WORLD,
-                            it.fileName
+        actionBarSpecial = { _, settingsShown, _, _ ->
+            if(!settingsShown) {
+                selectedSave?.let {
+                    IconButton(
+                        onClick = {
+                            quickPlayData = QuickPlayData(
+                                QuickPlayData.Type.WORLD,
+                                it.fileName
+                            )
+                        },
+                        highlighted = true,
+                        modifier = Modifier.offset(y = (-10).dp)
+                    ) {
+                        Icon(
+                            icons().play,
+                            "Play",
+                            modifier = Modifier.size(46.dp)
+                                .offset(y = 12.dp)
                         )
-                    },
-                    highlighted = true,
-                    modifier = Modifier.offset(y = (-10).dp)
-                ) {
-                    Icon(
-                        icons().play,
-                        "Play",
-                        modifier = Modifier.size(46.dp)
-                            .offset(y = 12.dp)
-                    )
+                    }
                 }
-            }
 
-            selectedServer?.let {
-                IconButton(
-                    onClick = {
-                        quickPlayData = QuickPlayData(
-                            QuickPlayData.Type.SERVER,
-                            it.ip
+                selectedServer?.let {
+                    IconButton(
+                        onClick = {
+                            quickPlayData = QuickPlayData(
+                                QuickPlayData.Type.SERVER,
+                                it.ip
+                            )
+                        },
+                        highlighted = true,
+                        modifier = Modifier.offset(y = (-10).dp)
+                    ) {
+                        Icon(
+                            icons().play,
+                            "Play",
+                            modifier = Modifier.size(46.dp)
+                                .offset(y = 12.dp)
                         )
-                    },
-                    highlighted = true,
-                    modifier = Modifier.offset(y = (-10).dp)
-                ) {
-                    Icon(
-                        icons().play,
-                        "Play",
-                        modifier = Modifier.size(46.dp)
-                            .offset(y = 12.dp)
-                    )
+                    }
                 }
             }
         },

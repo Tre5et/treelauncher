@@ -15,6 +15,7 @@ import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
@@ -58,6 +59,7 @@ fun App() {
                             when (navContext.navigationState) {
                                 NavigationState.INSTANCES -> Instances(appContext, loginContext)
                                 NavigationState.SAVES -> Saves(appContext, loginContext)
+                                NavigationState.RESSOURCE_PACKS -> Resourcepacks(appContext)
                                 NavigationState.SETTINGS -> Settings(loginContext)
 
                                 else -> Text("TODO")

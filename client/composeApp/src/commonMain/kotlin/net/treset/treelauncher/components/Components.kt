@@ -29,14 +29,16 @@ fun Components(
     reload: () -> Unit,
     actionBarSpecial: @Composable RowScope.(
         LauncherManifest,
+        Boolean,
         () -> Unit,
         () -> Unit
-    ) -> Unit,
+    ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
         LauncherManifest,
         () -> Unit,
         () -> Unit
-    ) -> Unit,
+    ) -> Unit = {_,_,_->},
+    settingsDefault: Boolean = false
 ) {
     var selected: LauncherManifest? by remember(components) { mutableStateOf(null) }
 
@@ -95,65 +97,67 @@ fun Components(
 
             var showDelete by remember { mutableStateOf(false) }
 
-            if (showSettings) {
-                ComponentSettings(
-                    it,
-                    onClose = { showSettings = false }
-                )
-            } else {
-                TitledColumn(
-                    headerContent = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            TitledColumn(
+                headerContent = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        actionBarSpecial(
+                            it,
+                            settingsDefault || showSettings,
+                            redrawSelected,
+                            reload
+                        )
+
+                        Text(it.name)
+
+                        IconButton(
+                            onClick = {
+                                showRename = true
+                            }
                         ) {
-                            actionBarSpecial(
-                                it,
-                                redrawSelected,
-                                reload
+                            Icon(
+                                icons().rename,
+                                "Rename",
+                                modifier = Modifier.size(32.dp)
                             )
-
-                            Text(it.name)
-
-                            IconButton(
-                                onClick = {
-                                    showRename = true
-                                }
-                            ) {
-                                Icon(
-                                    icons().rename,
-                                    "Rename",
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    LauncherFile.of(it.directory).open()
-                                }
-                            ) {
-                                Icon(
-                                    icons().folder,
-                                    "Open Folder",
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    showDelete = true
-                                },
-                                interactionTint = MaterialTheme.colorScheme.error
-                            ) {
-                                Icon(
-                                    icons().delete,
-                                    "Delete",
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
                         }
-                    },
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(12.dp)
-                ) {
+                        IconButton(
+                            onClick = {
+                                LauncherFile.of(it.directory).open()
+                            }
+                        ) {
+                            Icon(
+                                icons().folder,
+                                "Open Folder",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                showDelete = true
+                            },
+                            interactionTint = MaterialTheme.colorScheme.error
+                        ) {
+                            Icon(
+                                icons().delete,
+                                "Delete",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                },
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(12.dp)
+            ) {
+                if(settingsDefault || showSettings) {
+                    ComponentSettings(
+                        it,
+                        onClose = { showSettings = false },
+                        showBack = !settingsDefault
+                    )
+                } else {
                     detailsContent(
                         it,
                         redrawSelected,
@@ -166,7 +170,6 @@ fun Components(
                         selected = showSettings,
                         onClick = { showSettings = true }
                     )
-
                 }
             }
 
