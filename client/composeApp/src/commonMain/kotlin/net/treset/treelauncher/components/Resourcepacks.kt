@@ -36,11 +36,7 @@ fun Resourcepacks(
                         appContext.files.resourcepackManifest
                     )
                 }}
-                CreationMode.USE -> existing?.let {
-                    ResourcepackCreator(
-                        existing
-                    )
-                }
+                CreationMode.USE -> null
             }
         },
         reload = {

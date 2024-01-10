@@ -57,7 +57,6 @@ fun Saves(
                         appContext.files.gameDetailsManifest
                     )
                 }
-
                 CreationMode.INHERIT -> name?.let{ existing?.let {
                     SavesCreator(
                         name,
@@ -66,12 +65,7 @@ fun Saves(
                         appContext.files.gameDetailsManifest
                     )
                 }}
-
-                CreationMode.USE -> existing?.let {
-                    SavesCreator(
-                        existing
-                    )
-                }
+                CreationMode.USE -> null
             }
         },
         reload = {
