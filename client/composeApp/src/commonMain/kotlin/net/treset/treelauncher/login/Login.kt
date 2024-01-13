@@ -1,10 +1,15 @@
 package net.treset.treelauncher.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -12,6 +17,7 @@ import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
+import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.TitledCheckBox
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -131,6 +137,7 @@ fun LoginScreen(
                 FloatingActionButton(
                     onClick = { showContent = true },
                     shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 ) {
                     Icon(
                         icons().start,

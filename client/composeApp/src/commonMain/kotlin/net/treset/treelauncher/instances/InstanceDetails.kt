@@ -1,7 +1,10 @@
 package net.treset.treelauncher.instances
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -171,21 +174,25 @@ fun InstanceDetails(
     }
 
     selectedDetails?.let {
-        if(it == InstanceDetails.SAVES || it == InstanceDetails.OPTIONS || it == InstanceDetails.RESOURCE_PACKS || it == InstanceDetails.MODS) {
-            InstanceComponentChanger(
-                instance = instance,
-                type = it,
-                appContext = appContext,
-                redrawSelected = redrawSelected
-            )
-        } else if(it == InstanceDetails.VERSION) {
-            InstanceVersionChanger(
-                instance = instance,
-                appContext = appContext,
-                redrawCurrent = redrawSelected
-            )
-        } else if(it == InstanceDetails.SETTINGS) {
-            InstanceSettings(instance)
+        when (it) {
+            InstanceDetails.SAVES, InstanceDetails.OPTIONS, InstanceDetails.RESOURCE_PACKS, InstanceDetails.MODS -> {
+                InstanceComponentChanger(
+                    instance = instance,
+                    type = it,
+                    appContext = appContext,
+                    redrawSelected = redrawSelected
+                )
+            }
+            InstanceDetails.VERSION -> {
+                InstanceVersionChanger(
+                    instance = instance,
+                    appContext = appContext,
+                    redrawCurrent = redrawSelected
+                )
+            }
+            InstanceDetails.SETTINGS -> {
+                InstanceSettings(instance)
+            }
         }
     }
 

@@ -122,8 +122,8 @@ fun ComponentButton(
 fun ImageSelectorButton(
     selected: Boolean,
     onClick: () -> Unit,
-    image: ImageBitmap,
-    title: String,
+    image: ImageBitmap?,
+    title: String?,
     subtitle: String? = null
 ) {
     SelectorButton(
@@ -139,24 +139,29 @@ fun ImageSelectorButton(
         ) {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(6.dp))
                     .background(LocalContentColor.current)
                     .padding(4.dp)
+                    .size(72.dp)
             ) {
-                Image(
-                    image,
-                    "Icon",
-                    modifier = Modifier.size(72.dp)
-                )
+                image?.let {
+                    Image(
+                        it,
+                        "Icon",
+                        modifier = Modifier.size(72.dp)
+                    )
+                }
             }
 
             Column(
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                title?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
                 subtitle?.let {
                     Text(it)
                 }

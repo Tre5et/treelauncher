@@ -14,7 +14,7 @@ fun ServerButton(
     ImageSelectorButton(
         selected = selected,
         onClick = onClick,
-        image = server.image.toComposeImageBitmap(),
+        image = server.image?.toComposeImageBitmap(),
         title = server.name,
         subtitle = server.ip
     )
