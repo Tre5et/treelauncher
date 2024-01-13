@@ -264,12 +264,10 @@ class ResourceManager(instanceData: InstanceData) {
         val toRemove: MutableList<LauncherFile> = mutableListOf()
         val exceptionQueue: MutableList<IOException> = mutableListOf()
         for (f in files) {
-            val fName: String = if (f.isDirectory()) "${f.getName()}/" else f.getName()
-
-            if(PatternString.matchesAny(fName, currentFiles)) {
+            if(PatternString.matchesAny(f.getLauncherName(), currentFiles)) {
                 toRemove.add(f)
 
-                LOGGER.debug { "Moving file: $fName" }
+                LOGGER.debug { "Moving file: ${f.name}" }
                 try {
                     f.moveTo(LauncherFile.of(component.directory, appConfig().INCLUDED_FILES_DIR, f.getName()), StandardCopyOption.REPLACE_EXISTING)
                 } catch (e: IOException) {
