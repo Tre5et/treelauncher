@@ -34,6 +34,10 @@ kotlin {
 
             api("io.github.kevinnzou:compose-webview-multiplatform:1.6.0")
             implementation("me.friwi:jcefmaven:116.0.19.1")
+
+            implementation("org.jetbrains.jewel:jewel-int-ui-standalone:0.13.0")
+
+            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window:0.13.0")
         }
     }
 }

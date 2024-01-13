@@ -6,11 +6,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,7 +24,7 @@ import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
-import net.treset.treelauncher.style.*
+import net.treset.treelauncher.style.icons
 import java.awt.image.BufferedImage
 
 enum class NavigationState {
@@ -63,10 +65,16 @@ fun NavigationContainer(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(LocalDensity.current.run { height.toDp() } - 46.dp)
+                .height(LocalDensity.current.run { height.toDp() } - 51.dp)
         ) {
             content(NavigationContext(navigationState.value))
         }
+
+        Divider(
+            thickness = 1.dp,
+            color = Color(0xFF43454A),
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
