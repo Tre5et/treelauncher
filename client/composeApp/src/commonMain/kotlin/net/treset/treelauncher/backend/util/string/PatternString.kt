@@ -4,7 +4,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 class PatternString(original: String, keep: Boolean = false) : FormatString() {
-    private val pattern: String
+    private var pattern: String
 
     init {
         pattern =
@@ -31,6 +31,13 @@ class PatternString(original: String, keep: Boolean = false) : FormatString() {
 
     fun matches(test: String?): Boolean {
         return test?.matches(get().toRegex()) ?: false
+    }
+
+    fun changeDirectoryEnding(): PatternString {
+        if(pattern.endsWith("\\")) {
+            pattern = pattern.substring(0, pattern.length - 2) + "/"
+        }
+        return this
     }
 
     // \ -> \\; . -> \.; [.*;.+;.?] unchanged; no .* at start / end -> ^ / $

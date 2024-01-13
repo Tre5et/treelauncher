@@ -173,6 +173,10 @@ class LauncherFile(pathname: String) : File(pathname) {
         }
     }
 
+    fun getLauncherName(): String {
+        return if(isDirectory()) { "${name}/" } else { name }
+    }
+
     companion object {
         fun of(vararg parts: String): LauncherFile {
             val path = StringBuilder()

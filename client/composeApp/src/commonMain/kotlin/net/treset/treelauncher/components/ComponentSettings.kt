@@ -82,7 +82,9 @@ fun ColumnScope.ComponentSettings(
                     .padding(4.dp)
             ) {
                 Icon(
-                    if(PatternString.decode(it).endsWith("/")) icons().folder else icons().file,
+                    PatternString.decode(it).let {name ->
+                        if(name.endsWith("/") || name.endsWith("\\")) icons().folder else icons().file
+                    },
                     "File"
                 )
 
