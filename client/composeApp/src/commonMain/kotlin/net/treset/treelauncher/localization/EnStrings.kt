@@ -16,6 +16,7 @@ class EnStrings : Strings(
         { "No Component selected"},
         Creator.Instance(
             { "Instance" },
+            { "Mods" },
             Creator.Instance.Popup(
                 { "Back to Instances" },
                 { "Creating Instance..." },
@@ -23,10 +24,10 @@ class EnStrings : Strings(
                 { "Instance successfully created" },
                 { "Unknown instance creation status.\nPlease report this!" }
             ),
-            { "Saves" },
             { "Resourcepacks" },
+            { "Saves" },
+            { "Create Instance" },
             { "Options" },
-            { "Mods" },
             { "Version" },
 
         ),

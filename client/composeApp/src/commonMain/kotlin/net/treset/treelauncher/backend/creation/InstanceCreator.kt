@@ -13,14 +13,14 @@ class InstanceCreator(
     name: String?,
     typeConversion: Map<String, LauncherManifestType>?,
     componentsManifest: LauncherManifest?,
-    ignoredFiles: List<PatternString>,
-    jvmArguments: List<LauncherLaunchArgument>,
-    features: List<LauncherFeature>,
-    modsCreator: ModsCreator?,
-    optionsCreator: OptionsCreator,
-    resourcepackCreator: ResourcepackCreator,
-    savesCreator: SavesCreator,
-    versionCreator: VersionCreator
+    private val ignoredFiles: List<PatternString>,
+    private val jvmArguments: List<LauncherLaunchArgument>,
+    private val features: List<LauncherFeature>,
+    private val modsCreator: ModsCreator?,
+    private val optionsCreator: OptionsCreator,
+    private val resourcepackCreator: ResourcepackCreator,
+    private val savesCreator: SavesCreator,
+    private val versionCreator: VersionCreator
 ) : GenericComponentCreator(
     LauncherManifestType.INSTANCE_COMPONENT,
     null,
@@ -31,24 +31,8 @@ class InstanceCreator(
     appConfig().INSTANCE_DEFAULT_DETAILS,
     componentsManifest
 ) {
-    private val ignoredFiles: List<PatternString>
-    private val jvmArguments: List<LauncherLaunchArgument>
-    private val features: List<LauncherFeature>
-    private val modsCreator: ModsCreator?
-    private val optionsCreator: OptionsCreator
-    private val resourcepackCreator: ResourcepackCreator
-    private val savesCreator: SavesCreator
-    private val versionCreator: VersionCreator
 
     init {
-        this.ignoredFiles = ignoredFiles
-        this.jvmArguments = jvmArguments
-        this.features = features
-        this.modsCreator = modsCreator
-        this.optionsCreator = optionsCreator
-        this.resourcepackCreator = resourcepackCreator
-        this.savesCreator = savesCreator
-        this.versionCreator = versionCreator
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.STARTING, null)
     }
 
@@ -92,7 +76,7 @@ class InstanceCreator(
                     e
                 )
             }
-            LOGGER.debug("Created instance component: id={}", newManifest.id)
+            LOGGER.debug { "${"Created instance component: id={}"} ${newManifest.id}" }
         }?: {
             attemptCleanup()
             throw ComponentCreationException("Failed to create instance component: invalid data")
@@ -119,7 +103,7 @@ class InstanceCreator(
         success = success and savesCreator.attemptCleanup()
         success = success and versionCreator.attemptCleanup()
         success = success and resourcepackCreator.attemptCleanup()
-        LOGGER.debug("Attempted cleanup of instance component: success={}", success)
+        LOGGER.debug { "${"Attempted cleanup of instance component: success={}"} $success" }
         return success
     }
 

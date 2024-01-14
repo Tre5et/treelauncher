@@ -87,11 +87,12 @@ open class Strings(
     ) {
         data class Instance(
             val instance: () -> String,
-            val popup: Popup,
-            val saves: () -> String,
-            val resourcepacks: () -> String,
-            val options: () -> String,
             val mods: () -> String,
+            val popup: Popup,
+            val resourcepacks: () -> String,
+            val saves: () -> String,
+            val title: () -> String,
+            val options: () -> String,
             val version: () -> String
         ) {
             data class Popup(

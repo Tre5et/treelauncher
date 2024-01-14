@@ -16,6 +16,7 @@ class DeStrings : Strings(
         { "Keine Komponente ausgewählt."},
         Creator.Instance(
             { "Instanz" },
+            { "Mods" },
             Creator.Instance.Popup(
                 { "Zurück zu Instanzen" },
                 { "Instanz wird erstellt..." },
@@ -23,10 +24,10 @@ class DeStrings : Strings(
                 { "Erstellung abgeschlossen" },
                 { "Unbekannter Erstellungsstatus.\nDiesen Fehler bitte melden!" }
             ),
-            { "Welten" },
             { "Ressourcenpakete" },
+            { "Welten" },
+            { "Instanz erstellen" },
             { "Optionen" },
-            { "Mods" },
             { "Version" },
 
             ),

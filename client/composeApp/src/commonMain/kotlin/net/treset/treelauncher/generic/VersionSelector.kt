@@ -18,7 +18,7 @@ import net.treset.treelauncher.style.icons
 
 @Composable
 fun VersionSelector(
-    onDone: (VersionCreator) -> Unit,
+    onDone: (VersionCreator) -> Unit = {},
     appContext: AppContext,
     defaultVersionId: String? = null,
     defaultVersionType: VersionType = VersionType.VANILLA,
