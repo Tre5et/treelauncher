@@ -33,7 +33,7 @@ fun InstanceVersionChanger(
     var showFailed: Exception? by remember { mutableStateOf(null) }
 
     TitledColumn(
-        title = strings().manager.instance.change.activeTitle(InstanceDetails.SETTINGS, instance.versionComponents[0].first.name),
+        title = strings().manager.instance.change.activeTitle(InstanceDetails.VERSION, instance.versionComponents[0].first.name),
     ) {
 
         Row(
