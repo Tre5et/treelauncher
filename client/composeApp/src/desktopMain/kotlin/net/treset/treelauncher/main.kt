@@ -1,13 +1,15 @@
 package net.treset.treelauncher
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
@@ -21,18 +23,19 @@ import com.multiplatform.webview.web.Cef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.colors
+import net.treset.treelauncher.style.theme
+import net.treset.treelauncher.style.titleBar
 import net.treset.treelauncher.style.typography
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.intui.standalone.theme.darkThemeDefinition
+import org.jetbrains.jewel.intui.standalone.theme.lightThemeDefinition
 import org.jetbrains.jewel.intui.window.decoratedWindow
-import org.jetbrains.jewel.intui.window.styling.dark
 import org.jetbrains.jewel.ui.ComponentStyling
 import org.jetbrains.jewel.window.DecoratedWindow
 import org.jetbrains.jewel.window.TitleBar
 import org.jetbrains.jewel.window.newFullscreenControls
-import org.jetbrains.jewel.window.styling.TitleBarColors
-import org.jetbrains.jewel.window.styling.TitleBarStyle
 import java.awt.Toolkit
 import java.io.File
 import kotlin.math.max
@@ -41,20 +44,16 @@ import kotlin.math.roundToInt
 
 fun main() = application {
 
+    val app = remember { LauncherApp() }
+
     IntUiTheme(
-        theme = JewelTheme.darkThemeDefinition(),
+        theme = if(theme().isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition(),
         styling = ComponentStyling.decoratedWindow(
-            titleBarStyle = TitleBarStyle.dark(
-                    colors = TitleBarColors.dark(
-                        backgroundColor = Color(red = 28, green = 27, blue = 31),
-                        inactiveBackground = Color(red = 28, green = 27, blue = 31),
-                        borderColor = Color(0xFF43454A)
-                    )
-                )
+            titleBarStyle = titleBar()
         )
     ) {
         DecoratedWindow(
-            onCloseRequest = { if(onClose()) exitApplication() },
+            onCloseRequest = { onClose(::exitApplication) },
             title = strings().launcher.name(),
             state = rememberWindowState(
                 position = WindowPosition(Alignment.Center),
@@ -64,7 +63,7 @@ fun main() = application {
         ) {
             TitleBar(Modifier.newFullscreenControls()) {
                 CompositionLocalProvider(
-                    LocalContentColor provides Color.White
+                    LocalContentColor provides colors().onBackground
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center
@@ -100,13 +99,25 @@ fun main() = application {
                 }
             }
 
-            if (restartRequired) {
-                Text(text = strings().launcher.status.restartRequired())
-            } else {
-                if (initialized) {
-                    App()
-                } else if(downloading > 0) {
-                    Text(text = strings().launcher.status.preparing(downloading.roundToInt()))
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors().background)
+            ) {
+                if (restartRequired) {
+                    Text(
+                        text = strings().launcher.status.restartRequired(),
+                        color = colors().onBackground
+                    )
+                } else {
+                    if (initialized) {
+                        App(app)
+                    } else if(downloading > 0) {
+                        Text(
+                            text = strings().launcher.status.preparing(downloading.roundToInt()),
+                            color = colors().onBackground
+                        )
+                    }
                 }
             }
 

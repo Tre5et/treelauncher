@@ -34,8 +34,10 @@ data class AppContext(
 )
 
 @Composable
-fun App() {
-    app = LauncherApp()
+fun App(
+    launcherApp: LauncherApp
+) {
+    app = remember { launcherApp }
 
     val launcherFiles = remember { LauncherFiles() }
     launcherFiles.reloadAll()
@@ -74,16 +76,19 @@ fun App() {
     }
 }
 
-fun onClose(): Boolean {
+fun onClose(
+    exitApplication: () -> Unit
+) {
     //TODO: Prevent close
     //TODO: Sync
     //TODO: Update
     appSettings().save()
-
-    return true
+    exitApplication()
 }
 
 private lateinit var app: LauncherApp
+fun app() = app
+
 class LauncherApp {
     init {
         //TODO: Configure Logger

@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -72,7 +71,7 @@ fun NavigationContainer(
 
         Divider(
             thickness = 1.dp,
-            color = Color(0xFF43454A),
+            color = MaterialTheme.colorScheme.tertiary,
             modifier = Modifier.padding(bottom = 4.dp)
         )
 

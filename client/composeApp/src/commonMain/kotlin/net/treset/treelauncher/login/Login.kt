@@ -137,6 +137,8 @@ fun LoginScreen(
                 FloatingActionButton(
                     onClick = { showContent = true },
                     shape = MaterialTheme.shapes.small,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 ) {
                     Icon(
