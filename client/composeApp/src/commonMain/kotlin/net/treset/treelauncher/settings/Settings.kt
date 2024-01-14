@@ -46,6 +46,8 @@ fun Settings(
         userImage = userAuth().getUserIcon()
     }
 
+    var language by remember { mutableStateOf(language().appLanguage) }
+
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
     TitledColumn(
@@ -65,9 +67,10 @@ fun Settings(
                 strings().settings.language(),
                 items = Language.entries,
                 onSelected = {
+                    language = it
                     language().appLanguage = it
                 },
-                defaultSelected = language().appLanguage
+                defaultSelected = language
             )
 
             var restart by remember { mutableStateOf(false) }
