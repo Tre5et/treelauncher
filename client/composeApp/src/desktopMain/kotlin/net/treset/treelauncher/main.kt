@@ -59,7 +59,7 @@ fun main() = application {
                 position = WindowPosition(Alignment.Center),
                 size = DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.dp - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.dp - 100.dp))
             ),
-            icon = BitmapPainter(useResource("icon.png", ::loadImageBitmap)),
+            icon = BitmapPainter(useResource("icon_default.png", ::loadImageBitmap)),
         ) {
             TitleBar(Modifier.newFullscreenControls()) {
                 CompositionLocalProvider(
