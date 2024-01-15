@@ -116,9 +116,7 @@ fun ColumnScope.ComponentSettings(
         ComboBox(
             items = FileType.entries,
             defaultSelected = fileType,
-            onSelected = {
-                fileType = it
-            },
+            onSelected = { fileType = it },
             toDisplayString = { title }
         )
 

@@ -24,6 +24,7 @@ import net.treset.treelauncher.style.icons
 fun InstanceComponentChanger(
     instance: InstanceData,
     type: InstanceDetails,
+    allowUnselect: Boolean = false,
     appContext: AppContext,
     redrawSelected: () -> Unit
 ) {
@@ -91,37 +92,37 @@ fun InstanceComponentChanger(
                 onSelected = {
                     selected = it
                 },
+                allowUnselect = allowUnselect,
+                placeholder = strings().manager.instance.change.noComponent(),
                 defaultSelected = selected,
                 toDisplayString = { name },
             )
             IconButton(
                 onClick = {
-                    selected?.let {
-                        when(type) {
-                            InstanceDetails.SAVES -> {
-                                instance.instance.second.savesComponent = it.id
-                                instance.reloadSavesComponent(appContext.files)
-                            }
-                            InstanceDetails.RESOURCE_PACKS -> {
-                                instance.instance.second.resourcepacksComponent = it.id
-                                instance.reloadResourcepacksComponent(appContext.files)
-                            }
-                            InstanceDetails.OPTIONS -> {
-                                instance.instance.second.optionsComponent = it.id
-                                instance.reloadOptionsComponent(appContext.files)
-                            }
-                            InstanceDetails.MODS -> {
-                                instance.instance.second.modsComponent = it.id
-                                instance.reloadModsComponent(appContext.files)
-                            }
-                            else -> {}
+                    when(type) {
+                        InstanceDetails.SAVES -> {
+                            instance.instance.second.savesComponent = selected?.id
+                            instance.reloadSavesComponent(appContext.files)
                         }
-                        loadFirstSelected()
-                        LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
-                        redrawSelected()
+                        InstanceDetails.RESOURCE_PACKS -> {
+                            instance.instance.second.resourcepacksComponent = selected?.id
+                            instance.reloadResourcepacksComponent(appContext.files)
+                        }
+                        InstanceDetails.OPTIONS -> {
+                            instance.instance.second.optionsComponent = selected?.id
+                            instance.reloadOptionsComponent(appContext.files)
+                        }
+                        InstanceDetails.MODS -> {
+                            instance.instance.second.modsComponent = selected?.id
+                            instance.reloadModsComponent(appContext.files)
+                        }
+                        else -> {}
                     }
+                    loadFirstSelected()
+                    LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
+                    redrawSelected()
                 },
-                enabled = selected != null && selected != current
+                enabled = (allowUnselect || selected != null) && selected != current
             ) {
                 Icon(
                     icons().change,

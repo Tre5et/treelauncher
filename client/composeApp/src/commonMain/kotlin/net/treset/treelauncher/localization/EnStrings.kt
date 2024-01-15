@@ -119,6 +119,7 @@ class EnStrings : Strings(
                 { "I know what I'm doing, Change" },
                 { "There was an error changing version.\nPlease report this." },
                 { "This is likely to cause incompatibilities.\nIt is recommended to change versions by creating a new instance." },
+                { "No Component" },
                 { "Version Changed!" },
                 { "Select a component" },
                 { type, name ->

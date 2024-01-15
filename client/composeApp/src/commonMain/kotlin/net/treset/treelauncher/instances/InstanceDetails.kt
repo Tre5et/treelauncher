@@ -152,10 +152,10 @@ fun InstanceDetails(
                 selectedDetails = if (selectedDetails == InstanceDetails.OPTIONS) null else InstanceDetails.OPTIONS
             }
         )
-        instance.modsComponent?.let { modsComponent ->
+        if(instance.versionComponents.size > 1) { // Fabric
             SelectorButton(
                 title = strings().manager.instance.details.mods(),
-                component = modsComponent.first,
+                component = instance.modsComponent?.first,
                 icon = icons().mods,
                 selected = selectedDetails == InstanceDetails.MODS,
                 onClick = {
@@ -175,10 +175,19 @@ fun InstanceDetails(
 
     selectedDetails?.let {
         when (it) {
-            InstanceDetails.SAVES, InstanceDetails.OPTIONS, InstanceDetails.RESOURCE_PACKS, InstanceDetails.MODS -> {
+            InstanceDetails.SAVES, InstanceDetails.OPTIONS, InstanceDetails.RESOURCE_PACKS -> {
                 InstanceComponentChanger(
                     instance = instance,
                     type = it,
+                    appContext = appContext,
+                    redrawSelected = redrawSelected
+                )
+            }
+            InstanceDetails.MODS -> {
+                InstanceComponentChanger(
+                    instance = instance,
+                    type = it,
+                    allowUnselect = true,
                     appContext = appContext,
                     redrawSelected = redrawSelected
                 )

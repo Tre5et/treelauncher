@@ -19,11 +19,12 @@ import net.treset.treelauncher.style.icons
 @Composable
 fun <T> ComboBox(
     items: List<T>,
-    onSelected: (T) -> Unit = {},
+    onSelected: (T?) -> Unit = {},
     placeholder: String = "",
     loading: Boolean = false,
     loadingPlaceholder: String = strings().creator.version.loading(),
     defaultSelected: T? = null,
+    allowUnselect: Boolean,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
     enabled: Boolean = true
@@ -95,6 +96,21 @@ fun <T> ComboBox(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
+            if(allowUnselect) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            placeholder
+                        )
+                    },
+                    onClick = {
+                        selectedItem = null
+                        onSelected(null)
+                        expanded = false
+                    },
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
+                )
+            }
             items.forEach { i ->
                 DropdownMenuItem(
                     text = {
@@ -121,31 +137,36 @@ fun <T> ComboBox(
     placeholder: String = "",
     loading: Boolean = false,
     loadingPlaceholder: String = strings().creator.version.loading(),
-    defaultSelected: Int? = null,
+    defaultSelected: T? = null,
     toDisplayString: T.() -> String = { toString() },
-    decorated: Boolean = true
+    decorated: Boolean = true,
+    enabled: Boolean = true
 ) = ComboBox(
     items,
-    onSelected,
+    { onSelected(it!!) },
     placeholder,
     loading,
     loadingPlaceholder,
-    defaultSelected?.let{if(it >= 0 && it < items.size) items[it] else null },
-    toDisplayString,
-    decorated
+    allowUnselect = false,
+    defaultSelected = defaultSelected,
+    toDisplayString = toDisplayString,
+    decorated = decorated,
+    enabled = enabled
 )
 
 @Composable
 fun <T> TitledComboBox(
     title: String,
     items: List<T>,
-    onSelected: (T) -> Unit = {},
+    onSelected: (T?) -> Unit = {},
     loading: Boolean = false,
     loadingPlaceholder: String = strings().creator.version.loading(),
     placeholder: String = "",
     defaultSelected: T? = null,
+    allowUnselect: Boolean,
     toDisplayString: T.() -> String = { toString() },
-    decorated: Boolean = true
+    decorated: Boolean = true,
+    enabled: Boolean = true
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -163,8 +184,36 @@ fun <T> TitledComboBox(
             loading,
             loadingPlaceholder,
             defaultSelected,
+            allowUnselect,
             toDisplayString,
-            decorated
+            decorated,
+            enabled
         )
     }
 }
+
+@Composable
+fun <T> TitledComboBox(
+    title: String,
+    items: List<T>,
+    onSelected: (T) -> Unit = {},
+    loading: Boolean = false,
+    loadingPlaceholder: String = strings().creator.version.loading(),
+    placeholder: String = "",
+    defaultSelected: T? = null,
+    toDisplayString: T.() -> String = { toString() },
+    decorated: Boolean = true,
+    enabled: Boolean = true
+) = TitledComboBox(
+    title,
+    items,
+    { onSelected(it!!) },
+    loading,
+    loadingPlaceholder,
+    placeholder,
+    defaultSelected,
+    false,
+    toDisplayString,
+    decorated,
+    enabled
+)

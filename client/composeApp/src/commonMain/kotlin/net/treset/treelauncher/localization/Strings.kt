@@ -214,6 +214,7 @@ open class Strings(
                 val confirm: () -> String,
                 val failure: () -> String,
                 val message: () -> String,
+                val noComponent: () -> String,
                 val success: () -> String,
                 val title: () -> String,
                 val activeTitle: (InstanceDetails, String?) -> String

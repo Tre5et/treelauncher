@@ -119,6 +119,7 @@ class DeStrings : Strings(
                 { "Ja, Version ändern" },
                 { "Ein Fehler beim Ändern der Version ist aufgetreten.\nDiesen Fehler bitte melden." },
                 { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
+                { "Keine Komponente" },
                 { "Version geändert!" },
                 { "Eine Komponente auswählen" },
                 { type, name ->
