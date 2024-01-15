@@ -18,6 +18,7 @@ class EnStrings : Strings(
             { "Instance" },
             { "Mods" },
             Creator.Instance.Popup(
+                { "Close" },
                 { "Back to Instances" },
                 { "Creating Instance..." },
                 { "Instance Creation failed.\nPlease report this!" },

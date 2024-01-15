@@ -18,6 +18,7 @@ class DeStrings : Strings(
             { "Instanz" },
             { "Mods" },
             Creator.Instance.Popup(
+                { "Schließen" },
                 { "Zurück zu Instanzen" },
                 { "Instanz wird erstellt..." },
                 { "Erstellung fehlgeschlagen.\nDiesen Fehler bitte melden!" },

@@ -11,14 +11,49 @@ import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.generic.TitledRadioButton
 import net.treset.treelauncher.localization.strings
 
+class CreationState<T> (
+    val mode: CreationMode,
+    val name: String?,
+    val existing: T?
+) {
+    fun isValid(): Boolean = when(mode) {
+        CreationMode.NEW -> !name.isNullOrBlank()
+        CreationMode.INHERIT -> !name.isNullOrBlank() && existing != null
+        CreationMode.USE -> existing != null
+    }
+
+    companion object {
+        fun <T> of(
+            mode: CreationMode,
+            newName: String?,
+            inheritName: String?,
+            inheritSelected: T?,
+            useSelected: T?
+        ): CreationState<T> = CreationState(
+            mode,
+            when(mode) {
+                CreationMode.NEW -> newName?.ifBlank { null }
+                CreationMode.INHERIT -> inheritName?.ifBlank { null }
+                CreationMode.USE -> null
+            },
+            when(mode) {
+                CreationMode.NEW -> null
+                CreationMode.INHERIT -> inheritSelected
+                CreationMode.USE -> useSelected
+            }
+        )
+    }
+}
+
 @Composable
 fun <T> ComponentCreator(
     existing: List<T>,
     allowUse: Boolean = true,
     showCreate: Boolean = true,
     toDisplayString: T.() -> String = { toString() },
-    onCreate: (CreationMode, String?, T?) -> Unit = { _, _, _->}
-): () -> Triple<CreationMode, String?, T?> {
+    onCreate: (CreationState<T>) -> Unit = { _->},
+    setCurrentState: (CreationState<T>) -> Unit = {_->}
+) {
     var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
 
     var newName by remember(existing) { mutableStateOf("") }
@@ -27,6 +62,16 @@ fun <T> ComponentCreator(
     var inheritSelected: T? by remember(existing) { mutableStateOf(null) }
 
     var useSelected: T? by remember(existing) { mutableStateOf(null) }
+
+    setCurrentState(
+        CreationState.of(
+            mode,
+            newName,
+            inheritName,
+            inheritSelected,
+            useSelected
+        )
+    )
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -95,8 +140,14 @@ fun <T> ComponentCreator(
                     CreationMode.USE -> useSelected != null
                 },
                 onClick = {
-                    toTriple(mode, newName, inheritName, inheritSelected, useSelected).let {
-                        onCreate(it.first, it.second, it.third)
+                    CreationState.of(
+                        mode,
+                        newName,
+                        inheritName,
+                        inheritSelected,
+                        useSelected
+                    ).let {
+                        if(it.isValid()) onCreate(it)
                     }
                 }
             ) {
@@ -104,29 +155,7 @@ fun <T> ComponentCreator(
             }
         }
     }
-
-    return { toTriple(mode, newName, inheritName, inheritSelected, useSelected) }
 }
-
-private fun <T> toTriple(
-    mode: CreationMode,
-    newName: String,
-    inheritName: String,
-    inheritSelected: T?,
-    useSelected: T?
-): Triple<CreationMode, String?, T?> = Triple(
-    mode,
-    when(mode) {
-        CreationMode.NEW -> newName.ifBlank { null }
-        CreationMode.INHERIT -> inheritName.ifBlank { null }
-        CreationMode.USE -> null
-    },
-    when(mode) {
-        CreationMode.NEW -> null
-        CreationMode.INHERIT -> inheritSelected
-        CreationMode.USE -> useSelected
-    }
-)
 
 enum class CreationMode {
     NEW,

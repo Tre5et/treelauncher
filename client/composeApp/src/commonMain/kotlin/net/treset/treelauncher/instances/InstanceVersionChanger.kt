@@ -18,6 +18,7 @@ import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.creation.CreationPopup
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 

@@ -18,7 +18,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.components.Options
 import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
-import net.treset.treelauncher.create.Create
+import net.treset.treelauncher.creation.Create
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.login.LoginScreen
@@ -62,7 +62,7 @@ fun App(
                         NavigationContainer(loginContext) { navContext ->
                             when (navContext.navigationState) {
                                 NavigationState.INSTANCES -> Instances(appContext, loginContext)
-                                NavigationState.ADD -> Create(appContext)
+                                NavigationState.ADD -> Create(appContext, navContext)
                                 NavigationState.SAVES -> Saves(appContext, loginContext)
                                 NavigationState.RESSOURCE_PACKS -> Resourcepacks(appContext)
                                 NavigationState.OPTIONS -> Options(appContext)

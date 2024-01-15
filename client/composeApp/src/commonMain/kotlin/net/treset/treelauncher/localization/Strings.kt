@@ -97,6 +97,7 @@ open class Strings(
         ) {
             data class Popup(
                 val back: () -> String,
+                val backToInstances: () -> String,
                 val creating: () -> String,
                 val failure: () -> String,
                 val success: () -> String,

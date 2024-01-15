@@ -16,6 +16,7 @@ import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.ComponentCreator
 import net.treset.treelauncher.creation.CreationMode
+import net.treset.treelauncher.creation.CreationPopup
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -223,8 +224,8 @@ fun Components(
                 ComponentCreator(
                     existing = components.toList(),
                     toDisplayString = { name },
-                    onCreate = { mode, name, existing ->
-                        val creator = getCreator(mode, name, existing)
+                    onCreate = { state ->
+                        val creator = getCreator(state.mode, state.name, state.existing)
 
                         creator?.let { creation ->
                             creation.statusCallback = {

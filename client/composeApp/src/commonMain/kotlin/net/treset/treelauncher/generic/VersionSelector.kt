@@ -16,6 +16,17 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
+class VersionState(
+    val minecraftVersion: MinecraftVersion?,
+    val versionType: VersionType,
+    val fabricVersion: FabricVersionDetails?
+) {
+    fun isValid(): Boolean = when(versionType) {
+        VersionType.VANILLA -> minecraftVersion != null
+        VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
+    }
+}
+
 @Composable
 fun VersionSelector(
     onDone: (VersionCreator) -> Unit = {},
@@ -23,14 +34,17 @@ fun VersionSelector(
     defaultVersionId: String? = null,
     defaultVersionType: VersionType = VersionType.VANILLA,
     defaultFabricVersion: String? = null,
-    showChange: Boolean = true
-): () -> VersionCreator? {
+    showChange: Boolean = true,
+    setCurrentState: (VersionState) -> Unit = {_->}
+) {
     var showSnapshots by remember { mutableStateOf(false) }
     var minecraftVersions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
     var minecraftVersion: MinecraftVersion? by remember { mutableStateOf(null) }
     var versionType: VersionType by remember { mutableStateOf(defaultVersionType) }
     var fabricVersions: List<FabricVersionDetails> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
     var fabricVersion: FabricVersionDetails? by remember { mutableStateOf(null) }
+
+    setCurrentState(VersionState(minecraftVersion, versionType, fabricVersion))
 
     LaunchedEffect(showSnapshots) {
         minecraftVersions = if (showSnapshots) {
@@ -106,9 +120,7 @@ fun VersionSelector(
             IconButton(
                 onClick = {
                     getVersionCreator(
-                        minecraftVersion,
-                        versionType,
-                        fabricVersion,
+                        VersionState(minecraftVersion, versionType, fabricVersion),
                         appContext
                     )?.let {
                         onDone(it)
@@ -122,25 +134,14 @@ fun VersionSelector(
             }
         }
     }
-
-    return {
-        getVersionCreator(
-            minecraftVersion,
-            versionType,
-            fabricVersion,
-            appContext
-        )
-    }
 }
 
-private fun getVersionCreator(
-    minecraftVersion: MinecraftVersion?,
-    versionType: VersionType,
-    fabricVersion: FabricVersionDetails?,
+fun getVersionCreator(
+    versionState: VersionState,
     appContext: AppContext
 ): VersionCreator? {
-    minecraftVersion?.let { mcVersion ->
-        when(versionType) {
+    versionState.minecraftVersion?.let { mcVersion ->
+        when(versionState.versionType) {
             VersionType.VANILLA -> {
                 return VersionCreator(
                     appContext.files.launcherDetails.typeConversion,
@@ -151,7 +152,7 @@ private fun getVersionCreator(
                 )
             }
             VersionType.FABRIC -> {
-                fabricVersion?.let {
+                versionState.fabricVersion?.let {
                     return VersionCreator(
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.versionManifest,

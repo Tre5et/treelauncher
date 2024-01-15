@@ -66,7 +66,9 @@ fun NavigationContainer(
                 .fillMaxWidth()
                 .height(LocalDensity.current.run { height.toDp() } - 51.dp)
         ) {
-            content(NavigationContext(navigationState.value))
+            content(NavigationContext(
+                navigationState.value
+            ) { navigationState.value = it })
         }
 
         Divider(
@@ -210,5 +212,6 @@ private fun NavigationButton(
 }
 
 data class NavigationContext(
-    var navigationState: NavigationState
+    val navigationState: NavigationState,
+    val navigateTo: (NavigationState) -> Unit
 )
