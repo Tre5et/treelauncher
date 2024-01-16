@@ -90,7 +90,7 @@ fun NavigationContainer(
                     NavigationState.INSTANCES,
                     navigationState,
                     icons().instances,
-                    strings().nav.home()
+                    strings().nav.home(),
                 )
                 NavigationButton(
                     NavigationState.ADD,
@@ -178,13 +178,15 @@ private fun NavigationButton(
     targetState: NavigationState,
     currentState: MutableState<NavigationState>,
     modifier: Modifier = Modifier,
+    tooltip: String? = null,
     content: @Composable () -> Unit
 ) {
     IconButton (
         onClick = { currentState.value = targetState },
         selected = targetState == currentState.value,
         interactionTint = MaterialTheme.colorScheme.primary,
-        modifier = modifier.aspectRatio(1f)
+        modifier = modifier.aspectRatio(1f),
+        tooltip = tooltip
     ) {
         content()
     }
@@ -195,17 +197,18 @@ private fun NavigationButton(
     targetState: NavigationState,
     currentState: MutableState<NavigationState>,
     icon: ImageVector,
-    contentDescription: String = "",
+    tooltip: String = "",
     modifier: Modifier = Modifier
 ) {
     NavigationButton(
         targetState,
         currentState,
-        modifier
+        modifier,
+        tooltip
     ) {
         Icon (
             icon,
-            contentDescription = contentDescription,
+            contentDescription = tooltip,
             modifier = Modifier.size(36.dp)
         )
     }
