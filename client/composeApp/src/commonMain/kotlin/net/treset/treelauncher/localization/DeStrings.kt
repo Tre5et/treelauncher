@@ -66,6 +66,9 @@ class DeStrings : Strings(
             { "Version" }
         )
     ),
+    Changer(
+        { "Anwenden" }
+    ),
     Error(
         { "Akzeptieren" },
         { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
@@ -102,9 +105,9 @@ class DeStrings : Strings(
     Manager(
         { "Änderung anwenden" },
         Manager.Component(
-            { "Abbrechen" },
-            { "Hinzufügen" },
             { "Einbegriffene Datei hinzufügen" },
+            { "Zurück" },
+            { "Einbegriffene Datei entfernen" },
             { "Datei" },
             { "Dateiname eingeben" },
             { "Verzeichnis" },
@@ -146,8 +149,10 @@ class DeStrings : Strings(
                 { "Einstellungen" }
             ),
             Manager.Instance.Settings(
+                { "Argument hinzufügen" },
                 { "Neues Argument eingeben" },
                 { "JVM-Argumente" },
+                { "Argument entfernen" },
                 { "Instanzspeicher:" },
                 { "Auflösung:" },
                 { "Instanzeinstellungen" },
@@ -226,13 +231,14 @@ class DeStrings : Strings(
                 { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
                 { "Diese Komponente kann nicht gelöscht werden!" },
             ),
-            Selector.Component.Edit(
+            Selector.Component.Rename(
                 { "Abbrechen" },
                 { "Speichern" },
                 { "Kein neuer Name eingegeben" },
                 { "Neuer Name" },
                 { "Komponente umbenennen" }
-            )
+            ),
+            { "In Dateien öffnen" }
         ),
         Selector.Instance(
             Selector.Instance.Delete(
@@ -255,6 +261,7 @@ class DeStrings : Strings(
             ),
             { "Mods Komponente" },
             { "Optionskomponente" },
+            { "Instanz starten" },
             { "Ressourcenpaketkomponente" },
             { "Weltenkomponente" },
             { "Instanzen" },
@@ -278,6 +285,7 @@ class DeStrings : Strings(
         ),
         Selector.Saves(
             Selector.Saves.Play(
+                { "Welt starten" },
                 { "Abbrechen" },
                 { "In welcher Instanz soll diese Welt gestartet werden?" },
                 { "Welt starten" },
@@ -345,11 +353,14 @@ class DeStrings : Strings(
         { "Eingeloggt als:" },
         { "Version: v${strings().launcher.version()}" }
     ),
-    Sorts(
-        { "Name (Aktivierte zuerst)" },
-        { "Zuletzt gespielt" },
-        { "Name" },
-        { "Spielzeit" }
+    SortBox(
+        SortBox.Sort(
+            { "Name (Aktivierte zuerst)" },
+            { "Zuletzt gespielt" },
+            { "Name" },
+            { "Spielzeit" }
+        ),
+        { "Umkehren" }
     ),
     Sync(
         { "Komponente erfolgreich synchronisiert" },
@@ -372,6 +383,9 @@ class DeStrings : Strings(
         ),
         { "Komponente wird synchronisiert..."},
         { "<Unbekannter Name>" }
+    ),
+    TextBox(
+        { "Löschen" }
     ),
     Theme(
         { "Dunkel" },

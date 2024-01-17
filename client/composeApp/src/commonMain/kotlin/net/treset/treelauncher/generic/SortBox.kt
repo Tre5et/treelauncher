@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
 @Composable
@@ -38,7 +39,8 @@ fun <T> SortBox(
             )
             IconButton(
                 onClick = onReversed,
-                modifier = Modifier.rotate(rotation)
+                modifier = Modifier.rotate(rotation),
+                tooltip = strings().sortBox.reverse()
             ) {
                 Icon(
                     icons().sort,

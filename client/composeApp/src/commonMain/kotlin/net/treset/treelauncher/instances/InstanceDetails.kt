@@ -63,7 +63,8 @@ fun InstanceDetails(
                             )
                         },
                         highlighted = true,
-                        modifier = Modifier.offset(y = (-10).dp)
+                        modifier = Modifier.offset(y = (-10).dp),
+                        tooltip = strings().selector.instance.play()
                     ) {
                         Icon(
                             icons().play,
@@ -76,7 +77,8 @@ fun InstanceDetails(
                     IconButton(
                         onClick = {
                             showRename = true
-                        }
+                        },
+                        tooltip = strings().selector.component.rename.title()
                     ) {
                         Icon(
                             icons().rename,
@@ -87,7 +89,8 @@ fun InstanceDetails(
                     IconButton(
                         onClick = {
                             LauncherFile.of(instance.instance.first.directory).open()
-                        }
+                        },
+                        tooltip = strings().selector.component.openFolder()
                     ) {
                         Icon(
                             icons().folder,
@@ -104,7 +107,8 @@ fun InstanceDetails(
                                 { reloadInstances() }
                             )
                         },
-                        interactionTint = MaterialTheme.colorScheme.error
+                        interactionTint = MaterialTheme.colorScheme.error,
+                        tooltip = strings().selector.component.delete.title()
                     ) {
                         Icon(
                             icons().delete,

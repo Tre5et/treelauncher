@@ -8,5 +8,5 @@ class InstanceDetailsNameComparator : Comparator<InstanceData> {
         return e1.instance.first.name.compareTo(e2.instance.first.name)
     }
 
-    override fun toString(): String = strings().sorts.name()
+    override fun toString(): String = strings().sortBox.sort.name()
 }

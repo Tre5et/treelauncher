@@ -16,14 +16,14 @@ fun RenamePopup(
 
     var tfName: String by remember { mutableStateOf(manifest.name) }
     PopupOverlay(
-        titleRow = { Text(strings().selector.component.edit.title()) },
+        titleRow = { Text(strings().selector.component.rename.title()) },
         content = {
             TextBox(
                 tfName,
                 {
                     tfName = it
                 },
-                placeholder = strings().selector.component.edit.prompt()
+                placeholder = strings().selector.component.rename.prompt()
             )
         },
         buttonRow = {
@@ -35,7 +35,7 @@ fun RenamePopup(
                     containerColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text(strings().selector.component.edit.cancel())
+                Text(strings().selector.component.rename.cancel())
             }
             Button(
                 onClick = {
@@ -44,7 +44,7 @@ fun RenamePopup(
                 },
                 enabled = editValid(tfName)
             ) {
-                Text(strings().selector.component.edit.confirm())
+                Text(strings().selector.component.rename.confirm())
             }
         }
     )

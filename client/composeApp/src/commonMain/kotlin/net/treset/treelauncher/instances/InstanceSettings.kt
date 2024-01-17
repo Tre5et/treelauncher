@@ -173,7 +173,8 @@ fun InstanceSettings(
                             onClick = {
                                 args = args.filter { arg -> arg != it }
                             },
-                            interactionTint = MaterialTheme.colorScheme.error
+                            interactionTint = MaterialTheme.colorScheme.error,
+                            tooltip = strings().manager.instance.settings.deleteArgument()
                         ) {
                             Icon(
                                 icons().delete,
@@ -196,7 +197,7 @@ fun InstanceSettings(
                     onChange = {
                         newArg = it
                     },
-                    placeholder = strings().manager.instance.settings.argumentAdd(),
+                    placeholder = strings().manager.instance.settings.argumentPlaceholder(),
                 )
 
                 IconButton(
@@ -204,7 +205,8 @@ fun InstanceSettings(
                         args = args + LauncherLaunchArgument(newArg, null, null, null, null)
                         newArg = ""
                     },
-                    enabled = newArg.isNotBlank()
+                    enabled = newArg.isNotBlank(),
+                    tooltip = strings().manager.instance.settings.addArgument()
                 ) {
                     Icon(
                         icons().add,

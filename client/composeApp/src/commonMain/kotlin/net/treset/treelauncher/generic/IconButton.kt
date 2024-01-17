@@ -38,7 +38,7 @@ fun IconButton(
     content: @Composable () -> Unit
 ) {
     val foregroundColor by animateColorAsState(
-        if(highlighted) {
+        if (highlighted) {
             if (selected) {
                 MaterialTheme.colorScheme.onPrimary
             } else if (interactionSource.collectIsHoveredAsState().value) {
@@ -60,7 +60,7 @@ fun IconButton(
     )
 
     val backgroundColor by animateColorAsState(
-        if(selected) interactionTint else Color.Transparent,
+        if (selected) interactionTint else Color.Transparent,
         label = "BackgroundColor"
     )
 
@@ -69,28 +69,32 @@ fun IconButton(
         .background(backgroundColor)
         .padding(4.dp)
 
-    if(enabled) {
+    if (enabled) {
         newModifier = newModifier
             .pointerHoverIcon(PointerIcon.Hand)
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
     }
 
-    PlainTooltipBox( //TODO: update to compose 1.6 to work with hover
-        tooltip = {
-            tooltip?.let {
-                Text(it)
-            }
-        }
+    CompositionLocalProvider(
+        LocalContentColor provides foregroundColor
     ) {
-        Box(
-            modifier = newModifier.tooltipAnchor(),
+        tooltip?.let {
+            //TODO: update to compose 1.6 to work with hover
+            PlainTooltipBox(
+                tooltip = { Text(it) }
+            ) {
+                Box(
+                    modifier = newModifier.tooltipAnchor(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    content()
+                }
+            }
+        } ?: Box(
+            modifier = newModifier,
             contentAlignment = Alignment.Center
         ) {
-            CompositionLocalProvider(
-                LocalContentColor provides foregroundColor
-            ) {
-                content()
-            }
+            content()
         }
     }
 }

@@ -8,5 +8,5 @@ class LauncherModNameComparator : Comparator<LauncherMod> {
         return o1.name.compareTo(o2.name)
     }
 
-    override fun toString(): String = strings().sorts.name()
+    override fun toString(): String = strings().sortBox.sort.name()
 }

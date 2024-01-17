@@ -70,7 +70,8 @@ fun InstanceComponentChanger(
                         current?.let {
                             LauncherFile.of(it.directory).open()
                         }
-                    }
+                    },
+                    tooltip = strings().selector.component.openFolder()
                 ) {
                     Icon(
                         icons().folder,
@@ -122,7 +123,8 @@ fun InstanceComponentChanger(
                     LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
                     redrawSelected()
                 },
-                enabled = (allowUnselect || selected != null) && selected != current
+                enabled = (allowUnselect || selected != null) && selected != current,
+                tooltip = strings().changer.apply()
             ) {
                 Icon(
                     icons().change,

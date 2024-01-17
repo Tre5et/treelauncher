@@ -13,5 +13,5 @@ class LauncherModDisabledNameComparator : Comparator<LauncherMod> {
         } else 1
     }
 
-    override fun toString(): String = strings().sorts.enabledName()
+    override fun toString(): String = strings().sortBox.sort.enabledName()
 }

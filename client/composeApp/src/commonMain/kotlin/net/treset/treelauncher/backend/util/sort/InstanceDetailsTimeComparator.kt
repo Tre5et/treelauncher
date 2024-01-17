@@ -8,5 +8,5 @@ class InstanceDetailsTimeComparator : Comparator<InstanceData> {
         return (o2.instance.second.totalTime - o1.instance.second.totalTime).toInt()
     }
 
-    override fun toString(): String = strings().sorts.time()
+    override fun toString(): String = strings().sortBox.sort.time()
 }

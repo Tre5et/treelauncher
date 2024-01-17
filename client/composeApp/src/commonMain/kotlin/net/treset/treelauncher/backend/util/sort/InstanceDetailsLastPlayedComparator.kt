@@ -16,5 +16,5 @@ class InstanceDetailsLastPlayedComparator : Comparator<InstanceData> {
         } else o2.instance.second.lastPlayed.compareTo(o1.instance.second.lastPlayed)
     }
 
-    override fun toString(): String = strings().sorts.lastPlayed()
+    override fun toString(): String = strings().sortBox.sort.lastPlayed()
 }

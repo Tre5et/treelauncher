@@ -125,7 +125,8 @@ fun VersionSelector(
                     )?.let {
                         onDone(it)
                     }               },
-                enabled = minecraftVersion != null && (versionType == VersionType.VANILLA || fabricVersion != null)
+                enabled = minecraftVersion != null && (versionType == VersionType.VANILLA || fabricVersion != null),
+                tooltip = strings().changer.apply()
             ) {
                 Icon(
                     icons().change,

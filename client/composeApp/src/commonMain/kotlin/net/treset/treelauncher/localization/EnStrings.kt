@@ -66,6 +66,9 @@ class EnStrings : Strings(
             { "Version" }
         )
     ),
+    Changer(
+        { "Apply Change" }
+    ),
     Error(
         { "Acknowledge" },
         { message -> "Error:\n$message\nPlease report this error." },
@@ -102,9 +105,9 @@ class EnStrings : Strings(
     Manager(
         { "Apply Change" },
         Manager.Component(
-            { "Cancel" },
-            { "Add" },
-            { "Add included File" },
+            { "Add Included File" },
+            { "Back" },
+            { "Remove Included File" },
             { "File" },
             { "Enter Filename" },
             { "Folder" },
@@ -146,8 +149,10 @@ class EnStrings : Strings(
                 { "Settings" }
             ),
             Manager.Instance.Settings(
+                { "Add Argument" },
                 { "Enter new Argument" },
                 { "JVM-Arguments" },
+                { "Remove Argument" },
                 { "Instance Memory:" },
                 { "Resolution:" },
                 { "Instance Settings" }
@@ -226,13 +231,14 @@ class EnStrings : Strings(
                 { instance -> "It is used by the following instance: ${instance.name}" },
                 { "Unable to delete this component!" },
             ),
-            Selector.Component.Edit(
+            Selector.Component.Rename(
                 { "Cancel" },
                 { "Save" },
                 { "Not a valid name" },
                 { "New Name" },
                 { "Rename Component" }
-            )
+            ),
+            openFolder = { "Open Folder" }
         ),
         Selector.Instance(
             Selector.Instance.Delete(
@@ -255,6 +261,7 @@ class EnStrings : Strings(
             ),
             { "Mods Component" },
             { "Options Component" },
+            { "Start Instance" },
             { "Resourcepacks Component" },
             { "Saves Component" },
             { "Instances" },
@@ -278,6 +285,7 @@ class EnStrings : Strings(
         ),
         Selector.Saves(
             Selector.Saves.Play(
+                { "Start World" },
                 { "Cancel" },
                 { "Which instance should this world be launched in?" },
                 { "Start World" },
@@ -345,11 +353,14 @@ class EnStrings : Strings(
         { "Logged in as:" },
         { "Version: v${strings().launcher.version()}" }
     ),
-    Sorts(
-        { "Name (Enabled first)" },
-        { "Last Played" },
-        { "Name" },
-        {"Time Played" }
+    SortBox(
+        SortBox.Sort(
+            { "Name (Enabled first)" },
+            { "Last Played" },
+            { "Name" },
+            { "Time Played" }
+        ),
+        { "Reverse" }
     ),
     Sync(
         { "Successfully synchronized Component" },
@@ -372,6 +383,9 @@ class EnStrings : Strings(
         ),
         { "Synchronizing Component..."},
         { "<Unknown Name>" }
+    ),
+    TextBox(
+        { "Clear" }
     ),
     Theme(
         { "Dark" },

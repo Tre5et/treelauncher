@@ -87,7 +87,8 @@ fun Saves(
                             )
                         },
                         highlighted = true,
-                        modifier = Modifier.offset(y = (-10).dp)
+                        modifier = Modifier.offset(y = (-10).dp),
+                        tooltip = strings().selector.saves.play.button()
                     ) {
                         Icon(
                             icons().play,
@@ -107,7 +108,8 @@ fun Saves(
                             )
                         },
                         highlighted = true,
-                        modifier = Modifier.offset(y = (-10).dp)
+                        modifier = Modifier.offset(y = (-10).dp),
+                        tooltip = strings().selector.saves.play.button()
                     ) {
                         Icon(
                             icons().play,

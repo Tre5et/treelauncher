@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
 @Composable
@@ -40,10 +41,13 @@ fun TextBox(
         shape = RoundedCornerShape(8.dp),
         trailingIcon = {
             if (showClear && isFocused && displayText.isNotEmpty()) {
-                IconButton(onClick = {
-                    displayText = ""
-                    onChange("")
-                }) {
+                IconButton(
+                    onClick = {
+                        displayText = ""
+                        onChange("")
+                    },
+                    tooltip = strings().textBox.clear()
+                ) {
                     Icon(
                         imageVector = icons().clear,
                         contentDescription = "Clear"

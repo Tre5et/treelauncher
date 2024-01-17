@@ -116,7 +116,8 @@ fun Components(
                         IconButton(
                             onClick = {
                                 showRename = true
-                            }
+                            },
+                            tooltip = strings().selector.component.rename.title()
                         ) {
                             Icon(
                                 icons().rename,
@@ -127,7 +128,8 @@ fun Components(
                         IconButton(
                             onClick = {
                                 LauncherFile.of(it.directory).open()
-                            }
+                            },
+                            tooltip = strings().selector.component.openFolder()
                         ) {
                             Icon(
                                 icons().folder,
@@ -139,7 +141,8 @@ fun Components(
                             onClick = {
                                 showDelete = true
                             },
-                            interactionTint = MaterialTheme.colorScheme.error
+                            interactionTint = MaterialTheme.colorScheme.error,
+                            tooltip = strings().selector.component.delete.title()
                         ) {
                             Icon(
                                 icons().delete,

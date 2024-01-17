@@ -305,7 +305,8 @@ fun Settings(
             IconButton(
                 onClick = loginContext.logout,
                 interactionTint = MaterialTheme.colorScheme.error,
-                highlighted = true
+                highlighted = true,
+                tooltip = strings().settings.logout()
             ) {
                 Icon(
                     icons().logout,
@@ -331,7 +332,8 @@ fun Settings(
                     onClick = {
                         //TODO: Update
                     },
-                    highlighted = true
+                    highlighted = true,
+                    tooltip = strings().settings.update.tooltip()
                 ) {
                     Icon(
                         icons().update,
@@ -346,7 +348,8 @@ fun Settings(
             IconButton(
                 onClick = {
                     UrlString.of("https://github.com/Tre5et/treelauncher").openInBrowser()
-                }
+                },
+                tooltip = strings().settings.sourceTooltip()
             ) {
                 Icon(
                     icons().gitHub(),

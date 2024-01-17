@@ -45,6 +45,7 @@ fun strings() = strings
 open class Strings(
     val components: Components,
     val creator: Creator,
+    val changer: Changer,
     val error: Error,
     val game: Game,
     val language: Language,
@@ -56,8 +57,9 @@ open class Strings(
     val news: News,
     val selector: Selector,
     val settings: Settings,
-    val sorts: Sorts,
+    val sortBox: SortBox,
     val sync: Sync,
+    val textBox: TextBox,
     val theme: Theme,
     val units: Units,
     val updater: Updater
@@ -140,6 +142,10 @@ open class Strings(
         )
     }
 
+    data class Changer(
+        val apply: () -> String
+    )
+
     data class Error(
         val close: () -> String,
         val message: (message: String) -> String,
@@ -192,9 +198,9 @@ open class Strings(
         val mods: Mods
     ) {
         data class Component(
-            val addCancel: () -> String,
-            val addConfirm: () -> String,
-            val addTitle: () -> String,
+            val addFile: () -> String,
+            val back: () -> String,
+            val deleteFile: () -> String,
             val file: () -> String,
             val fileName: () -> String,
             val folder: () -> String,
@@ -230,8 +236,10 @@ open class Strings(
             )
 
             data class Settings(
-                val argumentAdd: () -> String,
+                val addArgument: () -> String,
+                val argumentPlaceholder: () -> String,
                 val arguments: () -> String,
+                val deleteArgument: () -> String,
                 val memory: () -> String,
                 val resolution: () -> String,
                 val title: () -> String,
@@ -322,7 +330,8 @@ open class Strings(
     ) {
         data class Component(
             val delete: Delete,
-            val edit: Edit
+            val rename: Rename,
+            val openFolder: () -> String,
         ) {
             data class Delete(
                 val cancel: () -> String,
@@ -333,7 +342,7 @@ open class Strings(
                 val unableMessage: (instance: LauncherManifest) -> String,
                 val unableTitle: () -> String
             )
-            data class Edit(
+            data class Rename(
                 val cancel: () -> String,
                 val confirm: () -> String,
                 val error: () -> String,
@@ -349,6 +358,7 @@ open class Strings(
             val worlds: () -> String
         ) {
             data class Play(
+                val button: () -> String,
                 val multipleClose: () -> String,
                 val multipleMessage: () -> String,
                 val multiplePlay: () -> String,
@@ -385,6 +395,7 @@ open class Strings(
             val game: Game,
             val mods: () -> String,
             val options: () -> String,
+            val play: () -> String,
             val resourcepacks: () -> String,
             val saves: () -> String,
             val title: () -> String,
@@ -473,12 +484,17 @@ open class Strings(
         )
     }
 
-    data class Sorts(
-        val enabledName: () -> String,
-        val lastPlayed: () -> String,
-        val name: () -> String,
-        val time: () -> String
-    )
+    data class SortBox(
+        val sort: Sort,
+        val reverse: () -> String,
+    ) {
+        data class Sort(
+            val enabledName: () -> String,
+            val lastPlayed: () -> String,
+            val name: () -> String,
+            val time: () -> String
+        )
+    }
 
     data class Sync(
         val complete: () -> String,
@@ -506,6 +522,10 @@ open class Strings(
             val uploading: () -> String
         )
     }
+
+    data class TextBox(
+        val clear: () -> String,
+    )
 
     data class Theme(
         val dark: () -> String,
