@@ -539,7 +539,25 @@ open class Strings(
         val seconds: () -> String,
         val megabytes: () -> String,
         val pixels: () -> String,
-        val resolutionBy: () -> String
+        val resolutionBy: () -> String,
+        val approxTime: (Long) -> String = { secs ->
+            if (secs < 60) {
+                "${secs}${strings().units.seconds()}"
+            } else if (secs < 60 * 60) {
+                "${secs / 60}${strings().units.minutes()}"
+            } else if (secs < 60 * 60 * 10) {
+                "${secs / 3600}${strings().units.hours()} ${secs % 3600 / 60}${strings().units.minutes()}"
+            } else if (secs < 60 * 60 * 24) {
+                "${secs / 3600}${strings().units.hours()}"
+            } else if (secs < 60 * 60 * 24 * 10) {
+                "${secs / (3600 * 24)}${strings().units.days()} ${secs % (3600 * 24) / 3600}${strings().units.hours()}"
+            } else {
+                "${secs / (3600 * 24)}${strings().units.days()}"
+            }
+        },
+        val accurateTime: (Long) -> String = { secs ->
+            "${secs/3600}:${(secs%3600/60).toString().padStart(2,'0')}:${(secs%60).toString().padStart(2,'0')}"
+        }
     )
 
     data class Updater(
