@@ -1,7 +1,6 @@
 package net.treset.treelauncher.generic
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -9,7 +8,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -40,9 +39,14 @@ fun PopupOverlay(
         ) {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(6.dp),
+                        spotColor = MaterialTheme.colorScheme.secondary
+                    )
+                    //.clip(RoundedCornerShape(6.dp))
                     .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .border(2.dp, type.accent(), RoundedCornerShape(6.dp))
+                    //.border(2.dp, type.accent(), RoundedCornerShape(6.dp))
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {

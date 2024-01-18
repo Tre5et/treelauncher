@@ -4,6 +4,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.localization.strings
 
@@ -23,7 +27,14 @@ fun RenamePopup(
                 {
                     tfName = it
                 },
-                placeholder = strings().selector.component.rename.prompt()
+                placeholder = strings().selector.component.rename.prompt(),
+                modifier = Modifier.onKeyEvent {
+                    if(it.key == Key.Enter && editValid(tfName)) {
+                        manifest.name = tfName
+                        onDone(tfName)
+                    }
+                    false
+                }
             )
         },
         buttonRow = {
