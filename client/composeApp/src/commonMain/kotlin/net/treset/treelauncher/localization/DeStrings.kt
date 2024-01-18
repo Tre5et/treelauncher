@@ -388,7 +388,7 @@ class DeStrings : Strings(
         system = { "Systemeinstellung" }
     ),
     units = Units(
-        days = { "t" },
+        days = { "d" },
         hours = { "h" },
         minutes = { "m" },
         seconds = { "s" },
