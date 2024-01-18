@@ -33,4 +33,5 @@ class Icons {
     val delete = Icons.Rounded.Delete
     val change = Icons.Rounded.Sync
     val back = Icons.Rounded.ArrowBack
+    val language = Icons.Rounded.Language
 }

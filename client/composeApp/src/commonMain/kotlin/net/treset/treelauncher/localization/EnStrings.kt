@@ -79,8 +79,7 @@ class EnStrings : Strings(
     ),
     game = Game(),
     language = Language(
-        english = { default ->  "English${if (default) " (system language)" else ""}" },
-        german = { default -> "German${if (default) " (system language)" else ""}" }
+        systemLanguage = { "system language" }
     ),
     launcher = Launcher(
         status = Launcher.Status(

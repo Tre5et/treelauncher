@@ -79,8 +79,7 @@ class DeStrings : Strings(
     ),
     game = Game(),
     language = Language(
-        english = { default -> "Englisch${if (default) " (Systemsprache)" else ""}" },
-        german = { default -> "Deutsch${if (default) " (Systemsprache)" else ""}" }
+        systemLanguage = { "Systemsprache" }
     ),
     launcher = Launcher(
         status = Launcher.Status(

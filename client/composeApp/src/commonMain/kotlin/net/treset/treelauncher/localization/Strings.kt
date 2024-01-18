@@ -162,8 +162,9 @@ open class Strings(
     )
 
     data class Language(
-        val english: (default: Boolean) -> String,
-        val german: (default: Boolean) -> String
+        val systemLanguage: () -> String,
+        val english: (default: Boolean) -> String = { default ->  "English${if (default) " (${strings().language.systemLanguage()})" else ""}" },
+        val german: (default: Boolean) -> String = { default ->  "Deutsch${if (default) " (${strings().language.systemLanguage()})" else ""}" }
     )
 
     data class Launcher(

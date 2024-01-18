@@ -18,7 +18,10 @@ import com.multiplatform.webview.web.rememberWebViewState
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.Button
+import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.TitledCheckBox
+import net.treset.treelauncher.localization.Language
+import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
@@ -37,6 +40,7 @@ fun LoginScreen(
     var loginState by remember { mutableStateOf(LoginState.NOT_LOGGED_IN) }
     var browserUrl: String? by remember { mutableStateOf(null) }
     var showContent by remember { mutableStateOf(false) }
+    var language by remember { mutableStateOf(language().appLanguage) }
 
     LaunchedEffect(Unit) {
         if(userAuth().hasFile()) {
@@ -107,7 +111,9 @@ fun LoginScreen(
                     enabled = loginState.actionAllowed,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(strings().login.button())
+                    key(language) {
+                        Text(strings().login.button())
+                    }
                 }
                 TitledCheckBox(
                     text = strings().login.keepLoggedIn(),
@@ -128,12 +134,36 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier.fillMaxSize().padding(10.dp)
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            if(loginState == LoginState.LOGGED_IN) {
+            Icon(
+                icons().language,
+                "Select Language"
+            )
+            ComboBox(
+                Language.entries,
+                onSelected = {
+                    language = it
+                    language().appLanguage = it
+                },
+                defaultSelected = language,
+                toDisplayString = { displayName() },
+                decorated = false
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(10.dp)
+        ) {
+            if (loginState == LoginState.LOGGED_IN) {
                 FloatingActionButton(
                     onClick = { showContent = true },
                     shape = MaterialTheme.shapes.small,
@@ -149,7 +179,6 @@ fun LoginScreen(
             }
         }
     }
-
 }
 
 @Composable
