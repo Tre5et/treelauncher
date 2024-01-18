@@ -556,7 +556,7 @@ open class Strings(
             }
         },
         val accurateTime: (Long) -> String = { secs ->
-            "${secs/3600}:${(secs%3600/60).toString().padStart(2,'0')}:${(secs%60).toString().padStart(2,'0')}"
+            "${secs/3600}:${(secs%3600/60).toString().padStart(2,'0')}'${(secs%60).toString().padStart(2,'0')}''"
         }
     )
 

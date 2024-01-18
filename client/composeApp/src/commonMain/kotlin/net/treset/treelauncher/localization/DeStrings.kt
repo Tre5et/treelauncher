@@ -395,7 +395,6 @@ class DeStrings : Strings(
         megabytes = { "mb" },
         pixels = { "px" },
         resolutionBy = { "x" }
-
     ),
     updater = Updater(
         close = { "Schließen" },
