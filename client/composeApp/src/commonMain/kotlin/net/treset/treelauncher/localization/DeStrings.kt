@@ -3,129 +3,124 @@ package net.treset.treelauncher.localization
 import net.treset.treelauncher.instances.InstanceDetails
 
 class DeStrings : Strings(
-    Components(
-        { "Neu erstellen" },
-        Components.Details (
-            { "Keine Komponente ausgewählt" }
+    components = Components(
+        create = { "Neu erstellen" },
+        details = Components.Details (
+            title = { "Keine Komponente ausgewählt" }
         )
     ),
-    Creator(
-        { "Erstellen" },
-        { "Komponente" },
-        { "Name darf nicht leer sein." },
-        { "Keine Komponente ausgewählt."},
-        Creator.Instance(
-            { "Instanz" },
-            { "Mods" },
-            Creator.Instance.Popup(
-                { "Schließen" },
-                { "Zurück zu Instanzen" },
-                { "Instanz wird erstellt..." },
-                { "Erstellung fehlgeschlagen.\nDiesen Fehler bitte melden!" },
-                { "Erstellung abgeschlossen" },
-                { "Unbekannter Erstellungsstatus.\nDiesen Fehler bitte melden!" }
+    creator = Creator(
+        buttonCreate = { "Erstellen" },
+        component = { "Komponente" },
+        errorName = { "Name darf nicht leer sein." },
+        errorSelect = { "Keine Komponente ausgewählt."},
+        instance = Creator.Instance(
+            instance = { "Instanz" },
+            mods = { "Mods" },
+            popup = Creator.Instance.Popup(
+                back = { "Schließen" },
+                backToInstances = { "Zurück zu Instanzen" },
+                creating = { "Instanz wird erstellt..." },
+                failure = { "Erstellung fehlgeschlagen.\nDiesen Fehler bitte melden!" },
+                success = { "Erstellung abgeschlossen" },
+                undefined = { "Unbekannter Erstellungsstatus.\nDiesen Fehler bitte melden!" }
             ),
-            { "Ressourcenpakete" },
-            { "Welten" },
-            { "Instanz erstellen" },
-            { "Optionen" },
-            { "Version" },
-
-            ),
-        Creator.Mods (
-            { "Version" }
+            resourcepacks = { "Ressourcenpakete" },
+            saves = { "Welten" },
+            title = { "Instanz erstellen" },
+            options = { "Optionen" },
+            version = { "Version" },
         ),
-        { "Name" },
-        { "Erstellen" },
-        { "Vorhandene Komponente verwenden" },
-        { "Vorhandene Komponente kopieren" },
-        Creator.Status(
-            { "Erstellung wird vorbereitet..." },
-            { "Mods Komponente wird erstellt..." },
-            { "Optionskomponente wirde erstellt..." },
-            { "Ressoucenpaketkomponente wird erstellt..." },
-            { "Werltenkomponente wird erstellt..." },
-            Creator.Status.Version(
-                { "Version wird erstellt..." },
-                { "Minecraft Version wird erstellt..." },
-                { "Assets werden heruntergeladen..." },
-                { "Bibliotheken werden heruntergeladen..." },
-                { "Fabric Version wird erstellt..." }
-            ),
-            { "Java Version wird heruntergeladen..." },
-            { "Erstellung wird abgeschlossen..." }
+        mods = Creator.Mods (
+            version = { "Version" }
         ),
-        Creator.Version(
-            { "Keine Version ausgewählt." },
-            { "Kein Versionstyp ausgewählt." },
-            { "Keine Fabric Version ausgewählt." },
-            { "Snapshots anzeigen" },
-            { "Fabric Version" },
-            { "Laden..." },
-            { "Versionstyp" },
-            { "Version" }
+        name = { "Name" },
+        radioCreate = { "Erstellen" },
+        radioUse = { "Vorhandene Komponente verwenden" },
+        radioInherit = { "Vorhandene Komponente kopieren" },
+        status = Creator.Status(
+            starting = { "Erstellung wird vorbereitet..." },
+            mods = { "Mods Komponente wird erstellt..." },
+            options = { "Optionskomponente wirde erstellt..." },
+            resourcepacks = { "Ressoucenpaketkomponente wird erstellt..." },
+            saves = { "Werltenkomponente wird erstellt..." },
+            version = Creator.Status.Version(
+                value = { "Version wird erstellt..." },
+                vanilla = { "Minecraft Version wird erstellt..." },
+                assets = { "Assets werden heruntergeladen..." },
+                libraries = { "Bibliotheken werden heruntergeladen..." },
+                fabric = { "Fabric Version wird erstellt..." }
+            ),
+            java = { "Java Version wird heruntergeladen..." },
+            finishing = { "Erstellung wird abgeschlossen..." }
+        ),
+        version = Creator.Version(
+            errorVersion = { "Keine Version ausgewählt." },
+            errorType = { "Kein Versionstyp ausgewählt." },
+            errorLoader = { "Keine Fabric Version ausgewählt." },
+            showSnapshots = { "Snapshots anzeigen" },
+            loader = { "Fabric Version" },
+            loading = { "Laden..." },
+            type = { "Versionstyp" },
+            version = { "Version" }
         )
     ),
-    Changer(
-        { "Anwenden" }
+    changer = Changer(
+        apply = { "Anwenden" }
     ),
-    Error(
-        { "Akzeptieren" },
-        { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
-        { "Ein Fehler ist aufgetreten!" },
-        { "Launcher schließen" },
-        { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
-        { "Ein kritischen Fehler ist aufgetreten!" },
-        { "Unbekannter Fehler" }
+    error = Error(
+        close = { "Akzeptieren" },
+        message = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
+        title = { "Ein Fehler ist aufgetreten!" },
+        severeClose = { "Launcher schließen" },
+        severeMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
+        severeTitle = { "Ein kritischen Fehler ist aufgetreten!" },
+        unknown = { "Unbekannter Fehler" }
     ),
-    Game(
-        { instance -> "${strings().launcher.slug()}:${strings().launcher.version()}:${instance.instance.first.id.substring(0,3)}...${instance.instance.first.id.substring(instance.instance.first.id.length - 2)}"},
-        { instance -> instance.instance.first.name }
+    game = Game(),
+    language = Language(
+        english = { default -> "Englisch${if (default) " (Systemsprache)" else ""}" },
+        german = { default -> "Deutsch${if (default) " (Systemsprache)" else ""}" }
     ),
-    Language(
-        { default -> "Englisch${if (default) " (Systemsprache)" else ""}" },
-        { default -> "Deutsch${if (default) " (Systemsprache)" else ""}" }
-    ),
-    Launcher(
+    launcher = Launcher(
         status = Launcher.Status(
-            { progress -> "Einmaliges Setup wird durchgeführt... $progress%" },
-            { "Neustart erforderlich. Bitte neu starten." }
+            preparing = { progress -> "Einmaliges Setup wird durchgeführt... $progress%" },
+            restartRequired = { "Neustart erforderlich. Bitte neu starten." }
         )
     ),
-    Login(
-        { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
-        { "Login mit Microsoft" },
-        Login.Label(
-            { "Einloggen..." },
-            { "Login fehlgeschlagen. Bitte erneut versuchen!" },
-            { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
+    login = Login(
+        browserTitle = { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
+        button = { "Login mit Microsoft" },
+        label = Login.Label(
+            authenticating = { "Einloggen..." },
+            failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
+            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
         ),
-        { "Eingeloggt bleiben" }
+        keepLoggedIn = { "Eingeloggt bleiben" }
     ),
-    Manager(
-        { "Änderung anwenden" },
-        Manager.Component(
-            { "Einbegriffene Datei hinzufügen" },
-            { "Zurück" },
-            { "Einbegriffene Datei entfernen" },
-            { "Datei" },
-            { "Dateiname eingeben" },
-            { "Verzeichnis" },
-            { "Einbegriffene Dateien:" },
-            { "Komponenteneinstellungen" }
+    manager = Manager(
+        component = Manager.Component(
+            addFile = { "Einbegriffene Datei hinzufügen" },
+            back = { "Zurück" },
+            deleteFile = { "Einbegriffene Datei entfernen" },
+            file = { "Datei" },
+            fileName = { "Dateiname eingeben" },
+            folder = { "Verzeichnis" },
+            includedFiles = { "Einbegriffene Dateien:" },
+            settings = { "Komponenteneinstellungen" }
         ),
-        Manager.Instance(
-            Manager.Instance.Change(
-                { "Schließen" },
-                { "Abbrechen" },
-                { "Version wird geändert..." },
-                { "Ja, Version ändern" },
-                { "Ein Fehler beim Ändern der Version ist aufgetreten.\nDiesen Fehler bitte melden." },
-                { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
-                { "Keine Komponente" },
-                { "Version geändert!" },
-                { "Eine Komponente auswählen" },
-                { type, name ->
+        instance = Manager.Instance(
+            change = Manager.Instance.Change(
+                back = { "Schließen" },
+                cancel = { "Abbrechen" },
+                changing = { "Version wird geändert..." },
+                confirm = { "Ja, Version ändern" },
+                failure = { "Ein Fehler beim Ändern der Version ist aufgetreten.\nDiesen Fehler bitte melden." },
+                message = { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
+                noComponent = { "Keine Komponente" },
+                success = { "Version geändert!" },
+                title = { "Eine Komponente auswählen" },
+                activeTitle = { type, name ->
                     when(type) {
                         InstanceDetails.SAVES -> strings().manager.instance.details.saves()
                         InstanceDetails.RESOURCE_PACKS -> strings().manager.instance.details.resourcepacks()
@@ -140,282 +135,282 @@ class DeStrings : Strings(
                     }
                 }
             ),
-            Manager.Instance.Details(
-                { "Version" },
-                { "Welten" },
-                { "Ressourcenpakete" },
-                { "Optionen" },
-                { "Mods" },
-                { "Einstellungen" }
+            details = Manager.Instance.Details(
+                version = { "Version" },
+                saves = { "Welten" },
+                resourcepacks = { "Ressourcenpakete" },
+                options = { "Optionen" },
+                mods = { "Mods" },
+                settings = { "Einstellungen" }
             ),
-            Manager.Instance.Settings(
-                { "Argument hinzufügen" },
-                { "Neues Argument eingeben" },
-                { "JVM-Argumente" },
-                { "Argument entfernen" },
-                { "Instanzspeicher:" },
-                { "Auflösung:" },
-                { "Instanzeinstellungen" },
+            settings = Manager.Instance.Settings(
+                addArgument = { "Argument hinzufügen" },
+                argumentPlaceholder = { "Neues Argument eingeben" },
+                arguments = { "JVM-Argumente" },
+                deleteArgument = { "Argument entfernen" },
+                memory = { "Instanzspeicher:" },
+                resolution = { "Auflösung:" },
+                title = { "Instanzeinstellungen" },
             )
         ),
-        Manager.Mods(
-            { "Lokale mod hinzufügen" },
-            Manager.Mods.Local(
-                { "Hinzufügen" },
-                { "Abbrechen" },
-                { "Curseforge Projekt ID" },
-                { "Ungültige Projekt ID" },
-                { "Datei" },
-                { "Keine Datei ausgewählt" },
-                { "Modrinth Projekt ID" },
-                { "Ungültige Projekt ID" },
-                { "Name" },
-                { "Version" },
-                { "Keine Version ausgewählt" }
+        mods = Manager.Mods(
+            add = { "Lokale mod hinzufügen" },
+            local = Manager.Mods.Local(
+                cancel = { "Abbrechen" },
+                confirm = { "Hinzufügen" },
+                curseforge = { "Curseforge Projekt ID" },
+                curseforgeError = { "Ungültige Projekt ID" },
+                file = { "Datei" },
+                fileError = { "Keine Datei ausgewählt" },
+                modrinth = { "Modrinth Projekt ID" },
+                modrinthError = { "Ungültige Projekt ID" },
+                name = { "Name" },
+                version = { "Version" },
+                versionError = { "Keine Version ausgewählt" }
             ),
-            Manager.Mods.Change(
-                { "Die Spielversion dieser Komponente wirklich wechseln?" },
-                { "Dadurch kann Kompatibilität mit den aktuellen Instanzen nicht gewährleistet werden.\n\nVersionswechsel sollten nur unmittelbar nach erstellen der Komponente durchgeführt werden." },
-                { "Ja, Version ändern" },
-                { "Abbrechen" }
+            change = Manager.Mods.Change(
+                title = { "Die Spielversion dieser Komponente wirklich wechseln?" },
+                message = { "Dadurch kann Kompatibilität mit den aktuellen Instanzen nicht gewährleistet werden.\n\nVersionswechsel sollten nur unmittelbar nach erstellen der Komponente durchgeführt werden." },
+                confirm = { "Ja, Version ändern" },
+                cancel = { "Abbrechen" }
             ),
-            { "Spielversion:" },
-            { "Aktuelle Mods" },
-            Manager.Mods.Search(
-                { "Mod hinzufügen" },
-                { "Zurück" },
-                { "Nach einer Mod suchen" },
-                { "Suchen" },
-                { "Mods werden gesucht..."},
-                { "Keine Mod mit passender Version gefunden." }
+            changeVersion = { "Spielversion:" },
+            current = { "Aktuelle Mods" },
+            search = Manager.Mods.Search(
+                add = { "Mod hinzufügen" },
+                back = { "Zurück" },
+                search = { "Nach einer Mod suchen" },
+                searchTooltip = { "Suchen" },
+                loading = { "Mods werden gesucht..."},
+                noResults = { "Keine Mod mit passender Version gefunden." }
             ),
-            Manager.Mods.Update(
-                { "Automatisch aktualisieren" },
-                { "Mods ohne passende Version deaktivieren" },
-                { "Deaktivierte Mods aktivieren"},
-                { "Nach Updates suchen" }
+            update = Manager.Mods.Update(
+                auto = { "Automatisch aktualisieren" },
+                disable = { "Mods ohne passende Version deaktivieren" },
+                enable = { "Deaktivierte Mods aktivieren"},
+                tooltip = { "Nach Updates suchen" }
             ),
-            { "Spielversion" }
+            version = { "Spielversion" }
         )
     ),
-    Menu(
-        { "Löschen" },
-        { "Umbenennen" },
-        { "Nichts ausgewählt" },
-        { "Im Dateiexplorer öffnen" },
-        { "Start" },
-        { "Komponente hochladen" }
+    menu = Menu(
+        delete = { "Löschen" },
+        rename = { "Umbenennen" },
+        noSelection = { "Nichts ausgewählt" },
+        folder = { "Im Dateiexplorer öffnen" },
+        play = { "Start" },
+        sync = { "Komponente hochladen" }
     ),
-    Nav(
-        { "Instanz erstellen" },
-        { "Instanzen" },
-        { "Mods Komponenten" },
-        { "Optionskomponenten" },
-        { "Ressourcenpaketkomponenten" },
-        { "Weltenkomponenten" },
-        { "Einstellungen" }
+    nav = Nav(
+        add = { "Instanz erstellen" },
+        home = { "Instanzen" },
+        mods = { "Mods Komponenten" },
+        options = { "Optionskomponenten" },
+        resourcepacks = { "Ressourcenpaketkomponenten" },
+        saves = { "Weltenkomponenten" },
+        settings = { "Einstellungen" }
     ),
-    News(
-        { "Schließen" },
-        { "Wichtige Neuigkeiten:" },
-        { "Neuigkeiten:"}
+    news = News(
+        close = { "Schließen" },
+        important = { "Wichtige Neuigkeiten:" },
+        other = { "Neuigkeiten:"}
     ),
-    Selector(
-        Selector.Component(
-            Selector.Component.Delete(
-                { "Abbrechen" },
-                { "Löschen" },
-                { "Diese Aktion kann nicht rückgängig gemacht werden!\nDaten in dieser Komponente werden unwiderruflich gelöscht.\nDiese Komponente wird von keiner Instanz verwendet." },
-                { "Diese Komponente wirklich löschen?" },
-                { "Schließen" },
-                { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
-                { "Diese Komponente kann nicht gelöscht werden!" },
+    selector = Selector(
+        component = Selector.Component(
+            delete = Selector.Component.Delete(
+                cancel = { "Abbrechen" },
+                confirm = { "Löschen" },
+                message = { "Diese Aktion kann nicht rückgängig gemacht werden!\nDaten in dieser Komponente werden unwiderruflich gelöscht.\nDiese Komponente wird von keiner Instanz verwendet." },
+                title = { "Diese Komponente wirklich löschen?" },
+                unableClose = { "Schließen" },
+                unableMessage = { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
+                unableTitle = { "Diese Komponente kann nicht gelöscht werden!" },
             ),
-            Selector.Component.Rename(
-                { "Abbrechen" },
-                { "Speichern" },
-                { "Kein neuer Name eingegeben" },
-                { "Neuer Name" },
-                { "Komponente umbenennen" }
+            rename = Selector.Component.Rename(
+                cancel = { "Abbrechen" },
+                confirm = { "Speichern" },
+                error = { "Kein neuer Name eingegeben" },
+                prompt = { "Neuer Name" },
+                title = { "Komponente umbenennen" }
             ),
-            { "In Dateien öffnen" }
+            openFolder = { "In Dateien öffnen" }
         ),
-        Selector.Instance(
-            Selector.Instance.Delete(
-                { "Abbrechen" },
-                { "Löschen" },
-                { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle verwendeten Komponenten bleiben bestehen." },
-                { "Diese Instanz wirklich löschen?" }
+        instance = Selector.Instance(
+            delete = Selector.Instance.Delete(
+                cancel = { "Abbrechen" },
+                confirm = { "Löschen" },
+                message = { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle verwendeten Komponenten bleiben bestehen." },
+                title = { "Diese Instanz wirklich löschen?" }
             ),
-            Selector.Instance.Game(
-                { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},
-                { "Spielstart fehlgeschlagen!" },
-                { "Das Spiel starten in Kürze." },
-                { "Spielressourcen werden vorbereitet..." },
-                { "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
-                { "Das Spiel läuft..." },
-                { "Schließen" },
-                { message -> "Fehler:\n$message\nDies wurde vermutlich nicht durch den Launcher verursacht." },
-                { "Absturzberichte öffnen" },
-                { "Das Spiel wurde unerwartet geschlossen" }
+            game = Selector.Instance.Game(
+                errorMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},
+                errorTitle ={ "Spielstart fehlgeschlagen!" },
+                preparingMessage = { "Das Spiel starten in Kürze." },
+                preparingTitle ={ "Spielressourcen werden vorbereitet..." },
+                runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
+                runningTitle = { "Das Spiel läuft..." },
+                crashClose = { "Schließen" },
+                crashMessage = { message -> "Fehler:\n$message\nDies wurde vermutlich nicht durch den Launcher verursacht." },
+                crashReports = { "Absturzberichte öffnen" },
+                crashTitle = { "Das Spiel wurde unerwartet geschlossen" }
             ),
-            { "Mods Komponente" },
-            { "Optionskomponente" },
-            { "Instanz starten" },
-            { "Ressourcenpaketkomponente" },
-            { "Weltenkomponente" },
-            { "Instanzen" },
-            { "Version" }
+            mods = { "Mods Komponente" },
+            options = { "Optionskomponente" },
+            play = { "Instanz starten" },
+            resourcepacks = { "Ressourcenpaketkomponente" },
+            saves = { "Weltenkomponente" },
+            title = { "Instanzen" },
+            version = { "Version" }
         ),
-        Selector.Mods(
-            Selector.Mods.Content(
-                { "Mod löschen" },
-                { "Mod deaktivieren" },
-                { "Mod aktivieren" },
-                { "Version installieren" },
-                { "Im Browser öffnen" }
+        mods = Selector.Mods(
+            content = Selector.Mods.Content(
+                delete = { "Mod löschen" },
+                disable = { "Mod deaktivieren" },
+                enable = { "Mod aktivieren" },
+                install = { "Version installieren" },
+                open = { "Im Browser öffnen" }
             ),
-            { "Mods" }
+            title = { "Mods" }
         ),
-        Selector.Options(
-            { "Optionen" }
+        options = Selector.Options(
+            title = { "Optionen" }
         ),
-        Selector.Resourcepacks(
-            { "Ressourcenpakete" }
+        resourcepacks = Selector.Resourcepacks(
+            title = { "Ressourcenpakete" }
         ),
-        Selector.Saves(
-            Selector.Saves.Play(
-                { "Welt starten" },
-                { "Abbrechen" },
-                { "In welcher Instanz soll diese Welt gestartet werden?" },
-                { "Welt starten" },
-                { "Mehrere Instanzen nutzen diese Komponente." },
-                { "Schließen" },
-                { "Schnellstart ist nur für Welten verfügbar, die von einer Instanz genutzt werden." },
-                { "Keine Instanz nutzt diese Komponente." }
+        saves = Selector.Saves(
+            play = Selector.Saves.Play(
+                button = { "Welt starten" },
+                multipleClose = { "Abbrechen" },
+                multipleMessage = { "In welcher Instanz soll diese Welt gestartet werden?" },
+                multiplePlay = { "Welt starten" },
+                multipleTitle = { "Mehrere Instanzen nutzen diese Komponente." },
+                noClose = { "Schließen" },
+                noMessage = { "Schnellstart ist nur für Welten verfügbar, die von einer Instanz genutzt werden." },
+                noTitle = { "Keine Instanz nutzt diese Komponente." }
             ),
-            { "Server:" },
-            { "Welten" },
-            { "Welten:"}
+            servers = { "Server:" },
+            title = { "Welten" },
+            worlds = { "Welten:"}
         )
     ),
-    Settings(
-        { "Darstellung" },
-        { "Sprache:" },
-        { "Ausloggen" },
-        Settings.Path(
-            { "Anwenden" },
-            { "Dateipfad wird geändert..." },
-            { "Schließen" },
-            { "Dateipfad konnte nicht geändert werden" },
-            { e -> "Der folgende Fehler ist aufgetreten:\n$e" },
-            { "Kein Ordner ausgewählt" },
-            { "Dateien vom alten Ort entfernen" },
-            { "Ordner auswählen" },
-            { "Dateipfad geändert" },
-            { "Launcher Dateipfad"}
+    settings = Settings(
+        appearance = { "Darstellung" },
+        language = { "Sprache:" },
+        logout = { "Ausloggen" },
+        path = Settings.Path(
+            apply = { "Anwenden" },
+            changing = { "Dateipfad wird geändert..." },
+            close = { "Schließen" },
+            errorTitle = { "Dateipfad konnte nicht geändert werden" },
+            errorMessage = { e -> "Der folgende Fehler ist aufgetreten:\n$e" },
+            invalid = { "Kein Ordner ausgewählt" },
+            remove = { "Dateien vom alten Ort entfernen" },
+            select = { "Ordner auswählen" },
+            success = { "Dateipfad geändert" },
+            title = { "Launcher Dateipfad"}
         ),
-        { "Diese Einstellung wird nach dem Neustart angewendet" },
-        { "Quellcode Repository" },
-        { "Quellcode Repository öffnen" },
-        Settings.Sync(
-            { "Schließen" },
-            { "Test fehlgeschlagen!" },
-            { "Komponentensynchronisation" },
-            { "API-Schlüssel:"},
-            { "Schlüssel" },
-            { "Port" },
-            { "Test erfolgreich!" },
-            { "Test" },
-            { "URL" }
+        restartRequired = { "Diese Einstellung wird nach dem Neustart angewendet" },
+        source = { "Quellcode Repository" },
+        sourceTooltip = { "Quellcode Repository öffnen" },
+        sync = Settings.Sync(
+            close = { "Schließen" },
+            failure = { "Test fehlgeschlagen!" },
+            title = { "Komponentensynchronisation" },
+            key = { "API-Schlüssel:"},
+            keyPlaceholder = { "Schlüssel" },
+            port = { "Port" },
+            success = { "Test erfolgreich!" },
+            test = { "Test" },
+            url = { "URL" }
         ),
-        { "Einstellungen" },
-        { "Farben:" },
-        Settings.Update(
-            { "Update verfügbar!" },
-            { current, new ->  "Update: v$current → v$new"},
-            { "Update verfügbar!" },
-            { "Abbrechen" },
-            { "Es wird nach Updates gesucht..." },
-            { "Schließen" },
-            { "Herunterladen" },
-            { file, current, total -> "$file ($current/$total)" },
-            { "Update wird heruntergeladen..." },
-            { version -> "Aktuelle Version: v$version" },
-            { "Der Launcher ist aktuell!" },
-            { "Der Launcher muss neugestartet werden um das Update anzuwenden." },
-            { "Jetzt Neustarten" },
-            { "Das Update wurde heruntergeladen." },
-            { "Nach Updates suchen" },
-            { "Ein Update ist verfügbar, aber der Launcher kann nicht automatisch aktualisiert werden.\nBitte online nach manueller Update-Anleitung suchen." },
-            { "Update kann nicht durchgeführt werden." }
+        title = { "Einstellungen" },
+        theme = { "Farben:" },
+        update = Settings.Update(
+            available = { "Update verfügbar!" },
+            availableMessage = { current, new ->  "Update: v$current → v$new"},
+            availableTitle = { "Update verfügbar!" },
+            cancel = { "Abbrechen" },
+            checkingTitle = { "Es wird nach Updates gesucht..." },
+            close = { "Schließen" },
+            download = { "Herunterladen" },
+            downloadingMessage = { file, current, total -> "$file ($current/$total)" },
+            downloadingTitle = { "Update wird heruntergeladen..." },
+            latestMessage = { version -> "Aktuelle Version: v$version" },
+            latestTitle = { "Der Launcher ist aktuell!" },
+            successMessage = { "Der Launcher muss neugestartet werden um das Update anzuwenden." },
+            successRestart = { "Jetzt Neustarten" },
+            successTitle = { "Das Update wurde heruntergeladen." },
+            tooltip = { "Nach Updates suchen" },
+            unavailableMessage = { "Ein Update ist verfügbar, aber der Launcher kann nicht automatisch aktualisiert werden.\nBitte online nach manueller Update-Anleitung suchen." },
+            unavailableTitle = { "Update kann nicht durchgeführt werden." }
         ),
-        { "Eingeloggt als:" },
-        { "Version: v${strings().launcher.version()}" }
+        user = { "Eingeloggt als:" },
+        version = { "Version: v${strings().launcher.version()}" }
     ),
-    SortBox(
-        SortBox.Sort(
-            { "Name (Aktivierte zuerst)" },
-            { "Zuletzt gespielt" },
-            { "Name" },
-            { "Spielzeit" }
+    sortBox = SortBox(
+        sort = SortBox.Sort(
+            enabledName = { "Name (Aktivierte zuerst)" },
+            lastPlayed = { "Zuletzt gespielt" },
+            name = { "Name" },
+            time = { "Spielzeit" }
         ),
-        { "Umkehren" }
+        reverse = { "Umkehren" }
     ),
-    Sync(
-        { "Komponente erfolgreich synchronisiert" },
-        { "Schließen" },
-        Sync.Download(
-            { "Abbrechen" },
-            { "Herunterladen" },
-            { "Komponente zum Herunterladen auswählen" },
-            { "Schließen" },
-            { "Keine neuen Komponenten verfügbar" },
-            { "Komponente heruntergeladen" }
+    sync = Sync(
+        complete = { "Komponente erfolgreich synchronisiert" },
+        completeClose = { "Schließen" },
+        download = Sync.Download(
+            cancel = { "Abbrechen" },
+            confirm = { "Herunterladen" },
+            message = { "Komponente zum Herunterladen auswählen" },
+            noneClose = { "Schließen" },
+            noneTitle = { "Keine neuen Komponenten verfügbar" },
+            title = { "Komponente heruntergeladen" }
         ),
-        Sync.Status(
-            { "Synchronisationsdaten werden gesammelt..." },
-            { "Benötigte Version wird heruntergeladen..." },
-            { "Dateien werden heruntergeladen..." },
-            { "Synchronisation abgeschlossen." },
-            { "Synchronisation wird gestartet..." },
-            { "Dateien werden hochgeladen..." }
+        status = Sync.Status(
+            collecting = { "Synchronisationsdaten werden gesammelt..." },
+            creating = { "Benötigte Version wird heruntergeladen..." },
+            downloading = { "Dateien werden heruntergeladen..." },
+            finished = { "Synchronisation abgeschlossen." },
+            starting = { "Synchronisation wird gestartet..." },
+            uploading = { "Dateien werden hochgeladen..." }
         ),
-        { "Komponente wird synchronisiert..."},
-        { "<Unbekannter Name>" }
+        syncing = { "Komponente wird synchronisiert..."},
+        unknown = { "<Unbekannter Name>" }
     ),
-    TextBox(
-        { "Löschen" }
+    textBox = TextBox(
+        clear = { "Löschen" }
     ),
-    Theme(
-        { "Dunkel" },
-        { "Hell" },
-        { "Systemeinstellung" }
+    theme = Theme(
+        dark = { "Dunkel" },
+        light = { "Hell" },
+        system = { "Systemeinstellung" }
     ),
-    Units(
-        { "t" },
-        { "h" },
-        { "m" },
-        { "s" },
-        { "mb" },
-        { "px" },
-        { "x" }
+    units = Units(
+        days = { "t" },
+        hours = { "h" },
+        minutes = { "m" },
+        seconds = { "s" },
+        megabytes = { "mb" },
+        pixels = { "px" },
+        resolutionBy = { "x" }
 
     ),
-    Updater(
-        { "Schließen" },
-        { "Launcher Schließen" },
-        Updater.Status(
-            { "Die vorherige Version wurde wiederhergestellt.\nDetails wurden in die Logs geschrieben.\nDiesen Fehler bitte melden." },
-            { "Update fehlgeschlagen." },
-            { "Der Launcher kann nicht weiter verwendet werden.\nDetails wurden in die Logs geschrieben.\nDiesen Fehler bitte melden und manuell beheben." },
-            { "Ein fataler Fehler ist während des Updates aufgetreten." },
-            { "Die neue Version wurde angewendet." },
-            { "Der Launcher wurde erfolgreich aktualisiert." },
-            { "Der Launcher kann nicht genutzt werden, während der Updater läuft.\nDen launcher schließen, um das Update fortzusetzen." },
-            { "Der Updater läuft noch." },
-            { "Das Löschen temporärer Update Ressourcen ist fehlgeschlagen.\nDas verursacht wahrscheinlich keine Fehler.\nDetails wurden in die Logs geschrieben." },
-            { "Der Launcher wurde aktualisiert." }
+    updater = Updater(
+        close = { "Schließen" },
+        quit = { "Launcher Schließen" },
+        status = Updater.Status(
+            failureMessage = { "Die vorherige Version wurde wiederhergestellt.\nDetails wurden in die Logs geschrieben.\nDiesen Fehler bitte melden." },
+            failureTitle = { "Update fehlgeschlagen." },
+            fatalMessage = { "Der Launcher kann nicht weiter verwendet werden.\nDetails wurden in die Logs geschrieben.\nDiesen Fehler bitte melden und manuell beheben." },
+            fatalTitle = { "Ein fataler Fehler ist während des Updates aufgetreten." },
+            successMessage = { "Die neue Version wurde angewendet." },
+            successTitle = { "Der Launcher wurde erfolgreich aktualisiert." },
+            updatingMessage = { "Der Launcher kann nicht genutzt werden, während der Updater läuft.\nDen launcher schließen, um das Update fortzusetzen." },
+            updatingTitle = { "Der Updater läuft noch." },
+            warningMessage = { "Das Löschen temporärer Update Ressourcen ist fehlgeschlagen.\nDas verursacht wahrscheinlich keine Fehler.\nDetails wurden in die Logs geschrieben." },
+            warningTitle = { "Der Launcher wurde aktualisiert." }
         )
     )
 )

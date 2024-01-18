@@ -86,7 +86,7 @@ fun Settings(
 
             if(restart) {
                 Text(
-                    strings().settings.restratRequired(),
+                    strings().settings.restartRequired(),
                     style = MaterialTheme.typography.labelMedium
                 )
             }

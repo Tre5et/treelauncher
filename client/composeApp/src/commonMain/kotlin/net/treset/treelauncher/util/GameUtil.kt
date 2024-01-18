@@ -111,7 +111,7 @@ class GameLaunchHelper(
                     )
                     Button(
                         onClick = { LauncherFile.of(launcher.instance.instance.first.directory, appConfig().INCLUDED_FILES_DIR, "crash-reports").open() },
-                        content = { Text(strings().selector.instance.game.crashReport()) }
+                        content = { Text(strings().selector.instance.game.crashReports()) }
                     )
                 }
             )

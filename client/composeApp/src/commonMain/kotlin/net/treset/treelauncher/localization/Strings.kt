@@ -157,8 +157,8 @@ open class Strings(
     )
 
     data class Game(
-        val versionName: (instance: InstanceData) -> String,
-        val versionType: (instance: InstanceData) -> String
+        val versionName: (instance: InstanceData) -> String = { instance -> "${strings().launcher.slug()}:${strings().launcher.version()}:${instance.instance.first.id.substring(0,3)}...${instance.instance.first.id.substring(instance.instance.first.id.length - 2)}"},
+        val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.first.name }
     )
 
     data class Language(
@@ -192,7 +192,6 @@ open class Strings(
     }
 
     data class Manager(
-        val changeApply: () -> String,
         val component: Component,
         val instance: Instance,
         val mods: Mods
@@ -297,7 +296,7 @@ open class Strings(
 
     data class Menu(
         val delete: () -> String,
-        val edit: () -> String,
+        val rename: () -> String,
         val noSelection: () -> String,
         val folder: () -> String,
         val play: () -> String,
@@ -316,8 +315,8 @@ open class Strings(
 
     data class News(
         val close: () -> String,
-        val importantTitle: () -> String,
-        val title: () -> String
+        val important: () -> String,
+        val other: () -> String
     )
 
     data class Selector(
@@ -351,45 +350,6 @@ open class Strings(
             )
         }
 
-        data class Saves(
-            val play: Play,
-            val servers: () -> String,
-            val title: () -> String,
-            val worlds: () -> String
-        ) {
-            data class Play(
-                val button: () -> String,
-                val multipleClose: () -> String,
-                val multipleMessage: () -> String,
-                val multiplePlay: () -> String,
-                val multipleTitle: () -> String,
-                val noClose: () -> String,
-                val noMessage: () -> String,
-                val noTitle: () -> String
-            )
-        }
-
-        data class Resourcepacks(
-            val title: () -> String
-        )
-
-        data class Options(
-            val title: () -> String
-        )
-
-        data class Mods(
-            val content: Content,
-            val title: () -> String
-        ) {
-            data class Content(
-                val delete: () -> String,
-                val disable: () -> String,
-                val enable: () -> String,
-                val install: () -> String,
-                val open: () -> String
-            )
-        }
-
         data class Instance(
             val delete: Delete,
             val game: Game,
@@ -407,7 +367,6 @@ open class Strings(
                 val message: () -> String,
                 val title: () -> String
             )
-
             data class Game(
                 val errorMessage: (message: String) -> String,
                 val errorTitle: () -> String,
@@ -417,8 +376,48 @@ open class Strings(
                 val runningTitle: () -> String,
                 val crashClose: () -> String,
                 val crashMessage: (message: String) -> String,
-                val crashReport: () -> String,
+                val crashReports: () -> String,
                 val crashTitle: () -> String
+            )
+
+        }
+
+        data class Mods(
+            val content: Content,
+            val title: () -> String
+        ) {
+            data class Content(
+                val delete: () -> String,
+                val disable: () -> String,
+                val enable: () -> String,
+                val install: () -> String,
+                val open: () -> String
+            )
+        }
+
+        data class Options(
+            val title: () -> String
+        )
+
+        data class Resourcepacks(
+            val title: () -> String
+        )
+
+        data class Saves(
+            val play: Play,
+            val servers: () -> String,
+            val title: () -> String,
+            val worlds: () -> String
+        ) {
+            data class Play(
+                val button: () -> String,
+                val multipleClose: () -> String,
+                val multipleMessage: () -> String,
+                val multiplePlay: () -> String,
+                val multipleTitle: () -> String,
+                val noClose: () -> String,
+                val noMessage: () -> String,
+                val noTitle: () -> String
             )
         }
     }
@@ -428,7 +427,7 @@ open class Strings(
         val language: () -> String,
         val logout: () -> String,
         val path: Path,
-        val restratRequired: () -> String,
+        val restartRequired: () -> String,
         val source: () -> String,
         val sourceTooltip: () -> String,
         val sync: Sync,
