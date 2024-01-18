@@ -16,10 +16,9 @@ import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.*
-import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
-import net.treset.treelauncher.style.*
+import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.launchGame
 
 @Composable
@@ -63,14 +62,12 @@ fun InstanceDetails(
                             )
                         },
                         highlighted = true,
-                        modifier = Modifier.offset(y = (-10).dp),
                         tooltip = strings().selector.instance.play()
                     ) {
                         Icon(
-                            icons().play,
+                            icons().play(),
                             "Play",
-                            modifier = Modifier.size(46.dp)
-                                .offset(y = 12.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                     Text(instance.instance.first.name)

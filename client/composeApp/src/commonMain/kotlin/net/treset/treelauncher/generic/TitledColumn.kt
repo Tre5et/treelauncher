@@ -35,7 +35,10 @@ fun TitledColumn(
                 value = MaterialTheme.typography.titleMedium
             ) {
                 Box(
-                    modifier = headModifier.fillMaxWidth(),
+                    modifier = headModifier
+                        .fillMaxWidth()
+                        .requiredHeight(42.dp)
+                        .padding(top = 6.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     headerContent()

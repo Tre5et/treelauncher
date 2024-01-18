@@ -1,11 +1,10 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -87,14 +86,12 @@ fun Saves(
                             )
                         },
                         highlighted = true,
-                        modifier = Modifier.offset(y = (-10).dp),
                         tooltip = strings().selector.saves.play.button()
                     ) {
                         Icon(
-                            icons().play,
+                            icons().play(),
                             "Play",
-                            modifier = Modifier.size(46.dp)
-                                .offset(y = 12.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 }
@@ -108,14 +105,12 @@ fun Saves(
                             )
                         },
                         highlighted = true,
-                        modifier = Modifier.offset(y = (-10).dp),
                         tooltip = strings().selector.saves.play.button()
                     ) {
                         Icon(
-                            icons().play,
+                            icons().play(),
                             "Play",
-                            modifier = Modifier.size(46.dp)
-                                .offset(y = 12.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 }
