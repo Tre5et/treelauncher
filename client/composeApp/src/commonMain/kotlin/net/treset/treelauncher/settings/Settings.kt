@@ -112,11 +112,11 @@ fun Settings(
 
             var cbState by remember { mutableStateOf(true) }
             TitledCheckBox(
-                cbState,
+                title = strings().settings.path.remove(),
+                checked = cbState,
                 onCheckedChange = {
                     cbState = it
-                },
-                text = strings().settings.path.remove()
+                }
             )
 
             Button(

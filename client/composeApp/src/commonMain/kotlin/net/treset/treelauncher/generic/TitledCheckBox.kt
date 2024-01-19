@@ -14,13 +14,13 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun TitledCheckBox(
+    title: String,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: CheckboxColors = CheckboxDefaults.colors(),
-    text: String = ""
+    colors: CheckboxColors = CheckboxDefaults.colors()
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -35,7 +35,7 @@ fun TitledCheckBox(
             colors = colors
         )
         Text(
-            text = text
+            text = title
         )
     }
 }

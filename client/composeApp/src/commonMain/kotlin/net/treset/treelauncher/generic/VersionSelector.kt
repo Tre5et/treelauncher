@@ -90,7 +90,7 @@ fun VersionSelector(
         }
 
         TitledCheckBox(
-            text = strings().creator.version.showSnapshots(),
+            title = strings().creator.version.showSnapshots(),
             checked = showSnapshots,
             onCheckedChange = { showSnapshots = it }
         )

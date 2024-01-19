@@ -93,7 +93,7 @@ class EnStrings : Strings(
         label = Login.Label(
             authenticating = { "Logging you in..." },
             failure = { "Login failed. Please try again!" },
-            success = { user -> "Welcome, ${user?: "Anonymous User"}!" }
+            success = { user -> "Welcome, ${user ?: "Anonymous User"}!" }
         ),
         keepLoggedIn = { "Stay logged in" }
     ),
@@ -302,7 +302,7 @@ class EnStrings : Strings(
             changing = { "Changing path..." },
             close = { "Close" },
             errorTitle = { "Failed to change path" },
-            errorMessage = { e -> "An error occured:\n$e"},
+            errorMessage = { e -> "An error occurred:\n$e"},
             invalid = { "No valid folder provided" },
             remove = { "Remove files from old location" },
             select = { "Select a Folder" },
@@ -315,11 +315,11 @@ class EnStrings : Strings(
         sync = Settings.Sync(
             close = { "Close" },
             failure = { "Test failed!" },
-            title = { "Component Synchorization" },
+            title = { "Component Synchronization" },
             key = { "API-Key:"},
             keyPlaceholder = { "Key" },
             port = { "Port" },
-            success = { "Test successfull!" },
+            success = { "Test successfully!" },
             test = { "Test" },
             url = { "URL" }
         ),

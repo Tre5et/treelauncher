@@ -49,20 +49,20 @@ fun Saves(
         strings().selector.saves.title(),
         components,
         appContext = appContext,
-        getCreator = { mode, name, existing ->
-            when(mode) {
-                CreationMode.NEW -> name?.let{
+        getCreator = { state ->
+            when(state.mode) {
+                CreationMode.NEW -> state.name?.let{
                     SavesCreator(
-                        name,
+                        state.name,
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.savesManifest,
                         appContext.files.gameDetailsManifest
                     )
                 }
-                CreationMode.INHERIT -> name?.let{ existing?.let {
+                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     SavesCreator(
-                        name,
-                        existing,
+                        state.name,
+                        state.existing,
                         appContext.files.savesManifest,
                         appContext.files.gameDetailsManifest
                     )

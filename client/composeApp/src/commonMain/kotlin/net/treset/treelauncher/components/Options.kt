@@ -16,19 +16,19 @@ fun Options(
         strings().selector.options.title(),
         components,
         appContext,
-        getCreator = { mode, name, existing ->
-            when(mode) {
-                CreationMode.NEW -> name?.let {
+        getCreator = { state ->
+            when(state.mode) {
+                CreationMode.NEW -> state.name?.let {
                     OptionsCreator(
-                        name,
+                        state.name,
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.optionsManifest
                     )
                 }
-                CreationMode.INHERIT -> name?.let{ existing?.let {
+                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     OptionsCreator(
-                        name,
-                        existing,
+                        state.name,
+                        state.existing,
                         appContext.files.optionsManifest
                     )
                 }}

@@ -11,12 +11,13 @@ import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.generic.TitledRadioButton
 import net.treset.treelauncher.localization.strings
 
-class CreationState<T> (
+
+open class CreationState<T> (
     val mode: CreationMode,
     val name: String?,
     val existing: T?
 ) {
-    fun isValid(): Boolean = when(mode) {
+    open fun isValid(): Boolean = when(mode) {
         CreationMode.NEW -> !name.isNullOrBlank()
         CreationMode.INHERIT -> !name.isNullOrBlank() && existing != null
         CreationMode.USE -> existing != null

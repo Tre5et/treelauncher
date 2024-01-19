@@ -116,7 +116,7 @@ fun LoginScreen(
                     }
                 }
                 TitledCheckBox(
-                    text = strings().login.keepLoggedIn(),
+                    title = strings().login.keepLoggedIn(),
                     checked = keepLoggedIn,
                     onCheckedChange = { keepLoggedIn = it },
                     enabled = loginState.actionAllowed

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +17,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.components.Options
 import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
+import net.treset.treelauncher.components.mods.Mods
 import net.treset.treelauncher.creation.Create
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
@@ -66,9 +66,8 @@ fun App(
                                 NavigationState.SAVES -> Saves(appContext, loginContext)
                                 NavigationState.RESSOURCE_PACKS -> Resourcepacks(appContext)
                                 NavigationState.OPTIONS -> Options(appContext)
+                                NavigationState.MODS -> Mods(appContext)
                                 NavigationState.SETTINGS -> Settings(loginContext)
-
-                                else -> Text("TODO")
                             }
                         }
                     }

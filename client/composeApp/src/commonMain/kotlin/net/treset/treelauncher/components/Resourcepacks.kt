@@ -20,19 +20,19 @@ fun Resourcepacks(
         strings().selector.resourcepacks.title(),
         components,
         appContext,
-        getCreator = { mode, name, existing ->
-            when(mode) {
-                CreationMode.NEW -> name?.let {
+        getCreator = { state ->
+            when(state.mode) {
+                CreationMode.NEW -> state.name?.let {
                     ResourcepackCreator(
-                        name,
+                        state.name,
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.resourcepackManifest
                     )
                 }
-                CreationMode.INHERIT -> name?.let{ existing?.let {
+                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     ResourcepackCreator(
-                        name,
-                        existing,
+                        state.name,
+                        state.existing,
                         appContext.files.resourcepackManifest
                     )
                 }}

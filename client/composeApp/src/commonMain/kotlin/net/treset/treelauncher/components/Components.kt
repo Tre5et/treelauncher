@@ -15,33 +15,35 @@ import net.treset.treelauncher.backend.creation.GenericComponentCreator
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.ComponentCreator
-import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.creation.CreationPopup
+import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 
 @Composable
-fun Components(
+fun <T, C:CreationState<T>> Components(
     title: String,
-    components: List<LauncherManifest>,
+    components: List<T>,
+    manifest: T.() -> LauncherManifest,
     appContext: AppContext,
-    getCreator: (CreationMode, String?, LauncherManifest?) -> GenericComponentCreator?,
+    getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
+    createContent: (@Composable ColumnScope.((C) -> Unit) -> Unit),
     actionBarSpecial: @Composable RowScope.(
-        LauncherManifest,
+        T,
         Boolean,
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
-        LauncherManifest,
+        T,
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_->},
     settingsDefault: Boolean = false
 ) {
-    var selected: LauncherManifest? by remember(components) { mutableStateOf(null) }
+    var selected: T? by remember(components) { mutableStateOf(null) }
 
     var creatorSelected by remember { mutableStateOf(false) }
 
@@ -67,7 +69,7 @@ fun Components(
         ) {
             components.forEach { component ->
                 ComponentButton(
-                    component = component,
+                    component = component.manifest(),
                     selected = component == selected,
                     onClick = {
                         creatorSelected = false
@@ -111,7 +113,7 @@ fun Components(
                             reload
                         )
 
-                        Text(it.name)
+                        Text(it.manifest().name)
 
                         IconButton(
                             onClick = {
@@ -127,7 +129,7 @@ fun Components(
                         }
                         IconButton(
                             onClick = {
-                                LauncherFile.of(it.directory).open()
+                                LauncherFile.of(it.manifest().directory).open()
                             },
                             tooltip = strings().selector.component.openFolder()
                         ) {
@@ -157,7 +159,7 @@ fun Components(
             ) {
                 if(settingsDefault || showSettings) {
                     ComponentSettings(
-                        it,
+                        it.manifest(),
                         onClose = { showSettings = false },
                         showBack = !settingsDefault
                     )
@@ -180,16 +182,16 @@ fun Components(
 
             if (showRename) {
                 RenamePopup(
-                    manifest = it,
-                    editValid = { name -> name.isNotBlank() && name != it.name },
+                    manifest = it.manifest(),
+                    editValid = { name -> name.isNotBlank() && name != it.manifest().name },
                     onDone = { name ->
                         showRename = false
                         name?.let { newName ->
-                            it.name = newName
+                            it.manifest().name = newName
                             LauncherFile.of(
-                                it.directory,
+                                it.manifest().directory,
                                 appConfig().MANIFEST_FILE_NAME
-                            ).write(it)
+                            ).write(it.manifest())
                             redrawSelected()
                         }
                     }
@@ -198,17 +200,17 @@ fun Components(
 
             if (showDelete) {
                 DeletePopup(
-                    component = it,
+                    component = it.manifest(),
                     appContext = appContext,
-                    checkHasComponent = { details -> details.savesComponent == it.id },
+                    checkHasComponent = { details -> details.savesComponent == it.manifest().id },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        appContext.files.savesManifest.components.remove(it.id)
+                        appContext.files.savesManifest.components.remove(it.manifest().id)
                         LauncherFile.of(
                             appContext.files.savesManifest.directory,
                             appContext.files.gameDetailsManifest.components[1]
                         ).write(appContext.files.savesManifest)
-                        LauncherFile.of(it.directory).remove()
+                        LauncherFile.of(it.manifest().directory).remove()
                         reload()
                         showDelete = false
                     }
@@ -224,26 +226,21 @@ fun Components(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(12.dp)
             ) {
-                ComponentCreator(
-                    existing = components.toList(),
-                    toDisplayString = { name },
-                    onCreate = { state ->
-                        val creator = getCreator(state.mode, state.name, state.existing)
+                createContent { state ->
+                    val creator = getCreator(state)
 
-                        creator?.let { creation ->
-                            creation.statusCallback = {
-                                creationStatus = it
-                            }
-
-                            Thread {
-                                creation.execute()
-                                reload()
-                                creationStatus = null
-                            }.start()
+                    creator?.let { creation ->
+                        creation.statusCallback = {
+                            creationStatus = it
                         }
-                    },
-                    allowUse = false
-                )
+
+                        Thread {
+                            creation.execute()
+                            reload()
+                            creationStatus = null
+                        }.start()
+                    }
+                }
             }
         }
 
@@ -252,3 +249,42 @@ fun Components(
         }
     }
 }
+
+@Composable
+fun Components(
+    title: String,
+    components: List<LauncherManifest>,
+    appContext: AppContext,
+    getCreator: (CreationState<LauncherManifest>) -> GenericComponentCreator?,
+    reload: () -> Unit,
+    actionBarSpecial: @Composable RowScope.(
+        LauncherManifest,
+        Boolean,
+        () -> Unit,
+        () -> Unit
+    ) -> Unit = {_,_,_,_->},
+    detailsContent: @Composable ColumnScope.(
+        LauncherManifest,
+        () -> Unit,
+        () -> Unit
+    ) -> Unit = {_,_,_->},
+    settingsDefault: Boolean = false
+) = Components(
+    title,
+    components,
+    { this },
+    appContext,
+    getCreator,
+    reload,
+    { onCreate ->
+        ComponentCreator(
+            existing = components.toList(),
+            toDisplayString = { name },
+            onCreate = onCreate,
+            allowUse = false
+        )
+    },
+    actionBarSpecial,
+    detailsContent,
+    settingsDefault
+)
