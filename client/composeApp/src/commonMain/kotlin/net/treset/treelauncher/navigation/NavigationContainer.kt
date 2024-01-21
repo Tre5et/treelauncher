@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FixedScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.update.updater
@@ -55,16 +54,15 @@ fun NavigationContainer(
         }.start()
     }
 
-    var height by remember { mutableStateOf(0) }
     Column(
         verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier.fillMaxSize().onSizeChanged { height = it.height }
+        modifier = Modifier.fillMaxSize()
     ) {
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(LocalDensity.current.run { height.toDp() } - 51.dp)
+                .weight(1f)
         ) {
             content(NavigationContext(
                 navigationState.value
