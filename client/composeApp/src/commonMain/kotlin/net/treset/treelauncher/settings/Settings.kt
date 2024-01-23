@@ -22,7 +22,7 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.sync.SyncService
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.UrlString
+import net.treset.treelauncher.backend.util.string.openInBrowser
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
@@ -347,7 +347,7 @@ fun Settings(
 
             IconButton(
                 onClick = {
-                    UrlString.of("https://github.com/Tre5et/treelauncher").openInBrowser()
+                    "https://github.com/Tre5et/treelauncher".openInBrowser()
                 },
                 tooltip = strings().settings.sourceTooltip()
             ) {

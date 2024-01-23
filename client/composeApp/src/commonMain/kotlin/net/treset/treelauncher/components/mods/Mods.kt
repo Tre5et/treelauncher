@@ -51,6 +51,13 @@ fun Mods(
                 components,
                 onCreate = onCreate
             )
-        }
+        },
+        detailsContent = { selected, redraw, reload ->
+            ModsDetails(
+                selected = selected,
+                redraw = redraw,
+            )
+        },
+        detailsScrollable = false
     )
 }

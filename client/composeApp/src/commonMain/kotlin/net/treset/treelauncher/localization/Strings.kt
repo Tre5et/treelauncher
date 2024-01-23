@@ -249,6 +249,7 @@ open class Strings(
         data class Mods(
             val add: () -> String,
             val local: Local,
+            val card: Card,
             val change: Change,
             val changeVersion: () -> String,
             val current: () -> String,
@@ -268,6 +269,13 @@ open class Strings(
                 val name: () -> String,
                 val version: () -> String,
                 val versionError: () -> String
+            )
+
+            data class Card(
+                val changeUsed: (Boolean) -> String,
+                val delete: () -> String,
+                val download: () -> String,
+                val openBrowser: () -> String,
             )
 
             data class Change(

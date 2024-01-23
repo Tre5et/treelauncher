@@ -28,14 +28,6 @@ class UrlString(val original: String, private val operation: UrlOperation) : For
         }
     }
 
-    @Throws(IOException::class, URISyntaxException::class)
-    fun openInBrowser() {
-        val desktop = if (Desktop.isDesktopSupported()) Desktop.getDesktop() else null
-        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            desktop.browse(URL(original).toURI())
-        }
-    }
-
     companion object {
         fun of(original: String): UrlString {
             return UrlString(original, UrlOperation.NONE)
@@ -48,5 +40,13 @@ class UrlString(val original: String, private val operation: UrlOperation) : For
         fun decoded(original: String): UrlString {
             return UrlString(original, UrlOperation.DECODE)
         }
+    }
+}
+
+@Throws(IOException::class, URISyntaxException::class)
+fun String.openInBrowser() {
+    val desktop = if (Desktop.isDesktopSupported()) Desktop.getDesktop() else null
+    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+        desktop.browse(URL(this).toURI())
     }
 }

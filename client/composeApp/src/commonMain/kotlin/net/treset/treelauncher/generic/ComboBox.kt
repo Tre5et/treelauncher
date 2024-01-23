@@ -35,6 +35,7 @@ fun <T> ComboBox(
 
     LaunchedEffect(defaultSelected) {
         selectedItem = defaultSelected
+        onSelected(defaultSelected)
     }
 
     Box(
@@ -143,7 +144,7 @@ fun <T> ComboBox(
     enabled: Boolean = true
 ) = ComboBox(
     items,
-    { onSelected(it!!) },
+    { it?.let { e -> onSelected(e) } },
     placeholder,
     loading,
     loadingPlaceholder,

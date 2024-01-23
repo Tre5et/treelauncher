@@ -1,6 +1,10 @@
 package net.treset.treelauncher.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,6 +45,7 @@ fun <T, C:CreationState<T>> Components(
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_->},
+    detailsScrollable: Boolean = true,
     settingsDefault: Boolean = false
 ) {
     var selected: T? by remember(components) { mutableStateOf(null) }
@@ -66,20 +71,30 @@ fun <T, C:CreationState<T>> Components(
             modifier = Modifier.padding(12.dp),
             parentModifier = Modifier.fillMaxWidth(1 / 2f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            scrollable = false
         ) {
-            components.forEach { component ->
-                ComponentButton(
-                    component = component.manifest(),
-                    selected = component == selected,
-                    onClick = {
-                        creatorSelected = false
-                        selected = if(component == selected) {
-                            null
-                        } else {
-                            component
-                        }
+            Box(
+                modifier = Modifier
+                    .weight(1f, false)
+            ) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(components) { component ->
+                        ComponentButton(
+                            component = component.manifest(),
+                            selected = component == selected,
+                            onClick = {
+                                creatorSelected = false
+                                selected = if(component == selected) {
+                                    null
+                                } else {
+                                    component
+                                }
+                            }
+                        )
                     }
-                )
+                }
             }
 
             SelectorButton(
@@ -155,7 +170,8 @@ fun <T, C:CreationState<T>> Components(
                     }
                 },
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.dp),
+                scrollable = false
             ) {
                 if(settingsDefault || showSettings) {
                     ComponentSettings(
@@ -164,11 +180,24 @@ fun <T, C:CreationState<T>> Components(
                         showBack = !settingsDefault
                     )
                 } else {
-                    detailsContent(
-                        it,
-                        redrawSelected,
-                        reload
-                    )
+                    Column(
+                        modifier = Modifier
+                            .weight(1f, false)
+                            .let {mod ->
+                                if(detailsScrollable) {
+                                    mod.verticalScroll(rememberScrollState())
+                                } else {
+                                    mod
+                                }
+                            },
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        detailsContent(
+                            it,
+                            redrawSelected,
+                            reload
+                        )
+                    }
 
                     SelectorButton(
                         title = strings().manager.component.settings(),

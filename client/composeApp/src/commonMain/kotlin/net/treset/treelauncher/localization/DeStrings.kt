@@ -167,6 +167,12 @@ class DeStrings : Strings(
                 version = { "Version" },
                 versionError = { "Keine Version ausgewählt" }
             ),
+            card = Manager.Mods.Card(
+                changeUsed = { enabled -> if(enabled) "Mod deaktivieren" else "Mod aktivieren" },
+                delete = { "Mod Löschen" },
+                download = { "Version herunterladen" },
+                openBrowser = { "Im Browser öffnen" },
+            ),
             change = Manager.Mods.Change(
                 title = { "Die Spielversion dieser Komponente wirklich wechseln?" },
                 message = { "Dadurch kann Kompatibilität mit den aktuellen Instanzen nicht gewährleistet werden.\n\nVersionswechsel sollten nur unmittelbar nach erstellen der Komponente durchgeführt werden." },

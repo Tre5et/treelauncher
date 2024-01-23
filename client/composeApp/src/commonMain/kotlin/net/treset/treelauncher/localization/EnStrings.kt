@@ -167,6 +167,12 @@ class EnStrings : Strings(
                 version = { "Version" },
                 versionError = { "No version selected" }
             ),
+            card = Manager.Mods.Card(
+                changeUsed = { enabled -> if(enabled) "Disable Mod" else "Enable Mod" },
+                delete = { "Delete Mod" },
+                download = { "Download Version" },
+                openBrowser = { "Open in Browser" }
+            ),
             change = Manager.Mods.Change(
                 title = { "You are about to change the game version associated with this component!" },
                 message = { "This is likely to break compatibility with your instances.\nIt is generally only recommended to change version immediately after creating the component." },
