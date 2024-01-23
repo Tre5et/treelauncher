@@ -1,7 +1,6 @@
 package net.treset.treelauncher.components
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -268,9 +267,7 @@ private fun PlayPopup(
             buttonRow = {
                 Button(
                     onClick = onClose,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
+                    color = MaterialTheme.colorScheme.error
                 ) {
                     Text(strings().selector.saves.play.multipleClose())
                 }

@@ -1,6 +1,5 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,9 +51,7 @@ fun DeletePopup(
             )
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                color = MaterialTheme.colorScheme.error
             ) {
                 Text(strings().selector.component.delete.confirm())
             }

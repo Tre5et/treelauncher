@@ -208,7 +208,7 @@ fun <T> TitledComboBox(
 ) = TitledComboBox(
     title,
     items,
-    { onSelected(it!!) },
+    {  it?.let { e -> onSelected(e) } },
     loading,
     loadingPlaceholder,
     placeholder,

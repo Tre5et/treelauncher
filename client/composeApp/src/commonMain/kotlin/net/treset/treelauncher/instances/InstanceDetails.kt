@@ -1,7 +1,6 @@
 package net.treset.treelauncher.instances
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -254,9 +253,7 @@ private fun deleteDialog(
                         onSuccess()
                         setPopup(null)
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
+                    color = MaterialTheme.colorScheme.error
                 ) {
                     Text(strings().selector.instance.delete.confirm())
                 }

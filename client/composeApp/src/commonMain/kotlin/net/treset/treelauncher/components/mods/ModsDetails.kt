@@ -3,7 +3,6 @@ package net.treset.treelauncher.components.mods
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -254,9 +253,7 @@ fun ColumnScope.ModsDetails(
                                 onClick = {
                                     popupData = null
                                 },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.error
-                                )
+                                color = MaterialTheme.colorScheme.error
                             ) {
                                 Text(strings().manager.mods.change.cancel())
                             }

@@ -3,17 +3,12 @@ package net.treset.treelauncher.generic
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,8 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.style.disabled
 import net.treset.treelauncher.style.hovered
-import net.treset.treelauncher.style.pressed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,31 +32,36 @@ fun IconButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
+    val pressed by interactionSource.collectIsPressedAsState()
+    val hovered by interactionSource.collectIsHoveredAsState()
+    val nativeFocused by interactionSource.collectIsFocusedAsState()
+    //Prevent focus on click
+    val focused by remember(nativeFocused) { mutableStateOf(if(pressed) false else nativeFocused) }
+
     val foregroundColor by animateColorAsState(
-        if (highlighted) {
-            if (selected) {
-                MaterialTheme.colorScheme.onPrimary
-            } else if (interactionSource.collectIsHoveredAsState().value) {
-                interactionTint.pressed()
-            } else {
-                interactionTint
-            }
+        if(!enabled) {
+            Color.disabled()
+        } else if(selected || focused || (highlighted && pressed)) {
+            MaterialTheme.colorScheme.onPrimary
+        } else if(hovered) {
+            interactionTint.hovered()
+        } else if (highlighted) {
+            interactionTint
         } else {
-            if (interactionSource.collectIsPressedAsState().value) {
-                interactionTint.pressed()
-            } else if (selected) {
-                MaterialTheme.colorScheme.onPrimary
-            } else if (interactionSource.collectIsHoveredAsState().value) {
-                interactionTint.hovered()
-            } else {
-                LocalContentColor.current
-            }
+            LocalContentColor.current
         }
     )
 
     val backgroundColor by animateColorAsState(
-        if (selected) interactionTint else Color.Transparent,
-        label = "BackgroundColor"
+        if(!enabled) {
+            Color.Transparent
+        } else if(selected) {
+            interactionTint
+        } else if(focused) {
+            interactionTint.hovered()
+        } else {
+            Color.Transparent
+        }
     )
 
     var newModifier = modifier
@@ -72,7 +72,9 @@ fun IconButton(
     if (enabled) {
         newModifier = newModifier
             .pointerHoverIcon(PointerIcon.Hand)
-            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
+            .clickable(interactionSource = interactionSource, indication = null, onClick = {
+                onClick()
+            })
     }
 
     CompositionLocalProvider(

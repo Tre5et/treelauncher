@@ -1,6 +1,5 @@
 package net.treset.treelauncher.generic
 
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -42,9 +41,7 @@ fun RenamePopup(
                 onClick = {
                     onDone(null)
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                color = MaterialTheme.colorScheme.error
             ) {
                 Text(strings().selector.component.rename.cancel())
             }
