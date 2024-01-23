@@ -1,7 +1,6 @@
 package net.treset.treelauncher.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -99,23 +98,6 @@ private fun Float.toHover(isDark: Boolean): Float {
     }
 }
 
-fun Color.pressed(isDark: Boolean): Color = this.copy(
-        alpha = alpha,
-        red = red.toPressed(isDark),
-        green = green.toPressed(isDark),
-        blue = blue.toPressed(isDark)
-    )
+fun Color.disabledContent(): Color = this.copy(alpha = 0.38f)
 
-@Composable
-fun Color.pressed(): Color = pressed(theme().isDark())
-
-private fun Float.toPressed(isDark: Boolean): Float {
-    return if(isDark) {
-        this + (1 - this) / 3f
-    } else {
-        this - this / 3f
-    }
-}
-
-@Composable
-fun Color.Companion.disabled(): Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+fun Color.disabledContainer(): Color = this.copy(alpha = 0.12f)

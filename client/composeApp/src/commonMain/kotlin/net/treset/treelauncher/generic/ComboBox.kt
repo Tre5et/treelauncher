@@ -2,18 +2,26 @@ package net.treset.treelauncher.generic
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.disabledContainer
+import net.treset.treelauncher.style.disabledContent
+import net.treset.treelauncher.style.hovered
 import net.treset.treelauncher.style.icons
 
 @Composable
@@ -44,19 +52,22 @@ fun <T> ComboBox(
             .pointerHoverIcon(PointerIcon.Hand),
     ) {
         val borderColor by animateColorAsState(
-            if(enabled) {
+            if(enabled && !loading) {
                 if (expanded) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.secondary
+                    MaterialTheme.colorScheme.outline
                 }
             } else {
-                MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f)
+                MaterialTheme.colorScheme.outline.disabledContainer()
             }
         )
 
         val textColor by animateColorAsState(
-            if(enabled) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f)
+            if(enabled)
+                LocalContentColor.current
+            else
+                LocalContentColor.current.disabledContent()
         )
 
         val borderWidth by animateDpAsState(
@@ -96,35 +107,27 @@ fun <T> ComboBox(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
+            //TODO: make lazy
             if(allowUnselect) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            placeholder
-                        )
-                    },
+                ComboBoxItem(
+                    text = placeholder,
                     onClick = {
                         selectedItem = null
                         onSelected(null)
                         expanded = false
-                    },
-                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
+                    }
                 )
             }
             items.forEach { i ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            i.toDisplayString()
-                        )
-                    },
+                ComboBoxItem(
+                    text = i.toDisplayString(),
                     onClick = {
                         selectedItem = i
                         onSelected(i)
                         expanded = false
-                    },
-                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
+                    }
                 )
             }
         }
@@ -218,3 +221,36 @@ fun <T> TitledComboBox(
     decorated,
     enabled
 )
+
+@Composable
+fun ComboBoxItem(
+    text: String,
+    onClick: () -> Unit,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    modifier: Modifier = Modifier
+) {
+    val hovered by interactionSource.collectIsHoveredAsState()
+
+    val background = if(hovered)
+            MaterialTheme.colorScheme.primary.hovered()
+        else
+            Color.Transparent
+
+    val textColor = if(hovered)
+            MaterialTheme.colorScheme.onPrimary
+        else
+            LocalContentColor.current
+
+    DropdownMenuItem(
+        text = { Text(text) },
+        onClick = onClick,
+        interactionSource = interactionSource,
+        modifier = modifier
+            .pointerHoverIcon(PointerIcon.Hand)
+            .clip(RoundedCornerShape(4.dp))
+            .background(background),
+        colors = MenuDefaults.itemColors(
+            textColor = textColor
+        )
+    )
+}

@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.style.disabled
+import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.hovered
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +40,7 @@ fun IconButton(
 
     val foregroundColor by animateColorAsState(
         if(!enabled) {
-            Color.disabled()
+            LocalContentColor.current.disabledContent()
         } else if(selected || focused || (highlighted && pressed)) {
             MaterialTheme.colorScheme.onPrimary
         } else if(hovered) {
