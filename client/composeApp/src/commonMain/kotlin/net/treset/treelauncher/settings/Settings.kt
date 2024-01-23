@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.config.GlobalConfigLoader
 import net.treset.treelauncher.backend.config.appConfig
@@ -102,12 +103,39 @@ fun Settings(
             )
 
             var tfValue by remember { mutableStateOf(appConfig().BASE_DIR.absolutePath) }
-            TextBox(
-                tfValue,
-                {
-                    tfValue = it
+            var showDirPicker by remember { mutableStateOf(false) }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextBox(
+                    tfValue,
+                    {
+                        tfValue = it
+                    },
+                    showClear = false
+                )
+
+                IconButton(
+                    onClick = {
+                        showDirPicker = true
+                    },
+                    tooltip = strings().settings.path.select()
+                ) {
+                    Icon(
+                        icons().folder,
+                        "Choose Folder"
+                    )
+                }
+            }
+
+            DirectoryPicker(
+                show = showDirPicker,
+                initialDirectory = if(LauncherFile.of(tfValue).isDirectory()) tfValue else appConfig().BASE_DIR.absolutePath,
+                onFileSelected = {
+                    it?.let { tfValue = it }
+                    showDirPicker = false
                 },
-                showClear = false
             )
 
             var cbState by remember { mutableStateOf(true) }
