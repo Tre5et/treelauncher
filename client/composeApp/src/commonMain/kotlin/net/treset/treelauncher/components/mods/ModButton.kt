@@ -39,8 +39,6 @@ fun ModButton(
     modContext: ModContext,
     checkUpdates: Boolean
 ) {
-    //TODO: fix updating strangeness
-
     var downloading by rememberSaveable(mod) { mutableStateOf(false) }
 
     var image: Painter? by rememberSaveable(mod) { mutableStateOf(null) }
