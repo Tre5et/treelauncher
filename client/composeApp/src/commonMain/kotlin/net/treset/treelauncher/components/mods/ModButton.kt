@@ -14,14 +14,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.toPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.*
 import net.treset.treelauncher.backend.mods.ModDownloader
+import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.backend.util.loadNetworkImage
 import net.treset.treelauncher.backend.util.string.openInBrowser
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
@@ -29,11 +30,8 @@ import net.treset.treelauncher.generic.SelectorButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.DownloadingIcon
 import net.treset.treelauncher.style.icons
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
-import javax.imageio.ImageIO
 
 @Composable
 fun ModButton(
@@ -80,7 +78,7 @@ fun ModButton(
             ModProviderStatus.UNAVAILABLE
         }
     }
-    val curseforgeStatus  = remember(mod) {
+    val curseforgeStatus  = rememberSaveable(mod) {
         if(mod.currentProvider == "curseforge") {
             ModProviderStatus.CURRENT
         } else if(mod.downloads.any { it.provider == "curseforge" }) {
@@ -302,21 +300,4 @@ fun ModButton(
             }
 
     }
-}
-
-fun loadNetworkImage(link: String): Painter? {
-    val url = URL(link)
-    val connection = url.openConnection() as HttpURLConnection
-    connection.connect()
-
-    val inputStream = connection.inputStream
-    val bufferedImage = ImageIO.read(inputStream)
-
-    return bufferedImage?.toPainter()
-}
-
-enum class ModProviderStatus {
-    CURRENT,
-    AVAILABLE,
-    UNAVAILABLE
 }

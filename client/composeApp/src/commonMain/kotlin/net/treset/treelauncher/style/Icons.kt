@@ -6,7 +6,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import net.treset.treelauncher.components.mods.ModProviderStatus
+import net.treset.treelauncher.backend.util.ModProviderStatus
 
 @Composable
 fun icons() = Icons()
@@ -42,6 +42,7 @@ class Icons {
     val disable = Icons.Rounded.Extension
     val enabled = { enabled: Boolean -> if (enabled) disable else enable }
     val browser = Icons.Rounded.OpenInBrowser
+    val search = Icons.Rounded.Search
     val modrinth = @Composable { painterResource("icons/modrinth.svg") }
     val curseforge = @Composable { painterResource("icons/curseforge.svg") }
 

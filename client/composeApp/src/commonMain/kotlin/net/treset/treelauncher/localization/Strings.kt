@@ -276,6 +276,7 @@ open class Strings(
                 val delete: () -> String,
                 val download: () -> String,
                 val openBrowser: () -> String,
+                val versionPlaceholder: () -> String
             )
 
             data class Change(

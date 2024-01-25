@@ -171,7 +171,8 @@ class EnStrings : Strings(
                 changeUsed = { enabled -> if(enabled) "Disable Mod" else "Enable Mod" },
                 delete = { "Delete Mod" },
                 download = { "Download Version" },
-                openBrowser = { "Open in Browser" }
+                openBrowser = { "Open in Browser" },
+                versionPlaceholder = { "Select a version" }
             ),
             change = Manager.Mods.Change(
                 title = { "You are about to change the game version associated with this component!" },

@@ -39,11 +39,6 @@ fun ColumnScope.ModsDetails(
 ) {
     var showSearch by remember { mutableStateOf(false) }
 
-    if(showSearch) {
-        ModsSearch()
-        return
-    }
-
     var autoUpdate by remember { mutableStateOf(appSettings().isModsUpdate) }
     var disableNoVersion by remember { mutableStateOf(appSettings().isModsDisable) }
     var enableOnDownload by remember { mutableStateOf(appSettings().isModsEnable) }
@@ -110,6 +105,15 @@ fun ColumnScope.ModsDetails(
             updateQueue.add(element)
         }
 
+    }
+
+    if(showSearch) {
+        ModsSearch(
+            modContext
+        ) {
+            showSearch = false
+        }
+        return
     }
 
     Box(

@@ -172,6 +172,7 @@ class DeStrings : Strings(
                 delete = { "Mod Löschen" },
                 download = { "Version herunterladen" },
                 openBrowser = { "Im Browser öffnen" },
+                versionPlaceholder = { "Eine Version auswählen" }
             ),
             change = Manager.Mods.Change(
                 title = { "Die Spielversion dieser Komponente wirklich wechseln?" },

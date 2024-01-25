@@ -7,6 +7,7 @@ import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModData
 import net.treset.mc_version_loader.mods.ModVersionData
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.backend.util.isSame
 import java.io.IOException
 import java.nio.file.StandardCopyOption
 
@@ -50,7 +51,7 @@ class ModDownloader(
         val newMod = try {
             downloadRequired(
                 versionData,
-                launcherMod?.isEnabled ?: false || enableOnDownload,
+                launcherMod?.isEnabled ?: true || enableOnDownload,
                 !existing.contains(launcherMod)
             )
         } catch(e: FileDownloadException) {
@@ -141,13 +142,8 @@ class ModDownloader(
     }
 
     private fun modExists(mod: ModData): Boolean {
-        return existing.any { current ->
-            current.name == mod.name
-                    || current.downloads.any { currentD ->
-                mod.projectIds.any { modId ->
-                    currentD.id == modId
-                }
-            }
+        return existing.any {
+            it.isSame(mod)
         }
     }
 

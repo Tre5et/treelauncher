@@ -1,8 +1,159 @@
 package net.treset.treelauncher.components.mods
 
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.mc_version_loader.mods.MinecraftMods
+import net.treset.mc_version_loader.mods.ModData
+import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.backend.util.string.FormatString
+import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.TextBox
+import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.icons
+import kotlin.math.log10
+import kotlin.math.roundToInt
 
 @Composable
-fun ModsSearch() {
+fun ModsSearch(
+    modContext: ModContext,
+    closeSearch: () -> Unit
+) {
+    var tfValue by remember { mutableStateOf("") }
+    var results: List<ModData>? by remember { mutableStateOf(null) }
 
+    var searching by remember { mutableStateOf(false) }
+
+    var recheckExising by remember { mutableStateOf(0) }
+
+    val searchContext = remember(modContext) {
+        SearchContext.from(
+            modContext
+        ) { recheckExising++ }
+    }
+
+    LaunchedEffect(searching) {
+        if(searching) {
+            results = MinecraftMods.searchCombinedMods(
+                tfValue,
+                modContext.version,
+                "fabric",
+                25,
+                0
+            ).sortedWith { o1, o2 -> (
+                    FormatString.distance(tfValue, o1.name) -
+                    FormatString.distance(tfValue, o2.name) +
+                    log10((o2.downloadsCount / o1.downloadsCount).toDouble())
+                ).roundToInt()
+            }
+            searching = false
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            IconButton(
+                onClick = closeSearch,
+                tooltip = strings().manager.mods.search.back()
+            ) {
+                Icon(
+                    imageVector = icons().back,
+                    contentDescription = "Back",
+                )
+            }
+
+            TextBox(
+                tfValue,
+                onChange = { tfValue = it },
+                placeholder = strings().manager.mods.search.search(),
+                modifier = Modifier.onKeyEvent {
+                    if (it.key == Key.Enter) {
+                        results = null
+                        searching = true
+                    }
+                    false
+                }.weight(1f, true)
+            )
+
+            IconButton(
+                onClick = {
+                    results = null
+                    searching = true
+                },
+                tooltip = strings().manager.mods.search.searchTooltip()
+            ) {
+                Icon(
+                    imageVector = icons().search,
+                    contentDescription = "Search",
+                )
+            }
+        }
+
+        if (searching) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(0.7f)
+            )
+        } else {
+            results?.let {
+                if (it.isEmpty()) {
+                    Text(strings().manager.mods.search.noResults())
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(it) { mod ->
+                            ModSearchButton(
+                                mod,
+                                searchContext,
+                                recheckExising
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+data class SearchContext(
+    val autoUpdate: Boolean,
+    val disableNoVersion: Boolean,
+    val enableOnDownload: Boolean,
+    val version: String,
+    val directory: LauncherFile,
+    val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
+    val recheck: () -> Unit,
+) {
+    companion object {
+        fun from(
+            modContext: ModContext,
+            recheck: () -> Unit
+        ): SearchContext = SearchContext(
+            modContext.autoUpdate,
+            modContext.disableNoVersion,
+            modContext.enableOnDownload,
+            modContext.version,
+            modContext.directory,
+            modContext.registerChangingJob,
+            recheck
+        )
+    }
 }
