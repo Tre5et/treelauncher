@@ -9,6 +9,10 @@ class EnStrings : Strings(
             title = { "No Component selected" }
         )
     ),
+    comboBox = ComboBox(
+        loading = { "Loading..." },
+        search = { "Search" }
+    ),
     creator = Creator(
         buttonCreate = { "Create" },
         component = { "Component" },

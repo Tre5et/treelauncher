@@ -44,6 +44,7 @@ fun strings() = strings
 
 open class Strings(
     val components: Components,
+    val comboBox: ComboBox,
     val creator: Creator,
     val changer: Changer,
     val error: Error,
@@ -72,6 +73,11 @@ open class Strings(
             val title: () -> String
         )
     }
+
+    data class ComboBox(
+        val loading: () -> String,
+        val search: () -> String
+    )
 
     data class Creator(
         val buttonCreate: () -> String,

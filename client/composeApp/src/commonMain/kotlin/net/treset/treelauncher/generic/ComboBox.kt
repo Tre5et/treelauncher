@@ -30,9 +30,10 @@ fun <T> ComboBox(
     onSelected: (T?) -> Unit = {},
     placeholder: String = "",
     loading: Boolean = false,
-    loadingPlaceholder: String = strings().creator.version.loading(),
+    loadingPlaceholder: String = strings().comboBox.loading(),
     defaultSelected: T? = null,
     allowUnselect: Boolean,
+    allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
     enabled: Boolean = true
@@ -40,6 +41,9 @@ fun <T> ComboBox(
     var expanded by remember(enabled) { mutableStateOf(false) }
     var selectedItem: T? by remember { mutableStateOf(defaultSelected) }
     val displayString = if(loading) loadingPlaceholder else selectedItem?.toDisplayString() ?: placeholder
+
+    var search by remember { mutableStateOf("") }
+    val actualItems by remember(items, search) { mutableStateOf(items.filter { it.toDisplayString().contains(search, ignoreCase = true) }) }
 
     LaunchedEffect(defaultSelected) {
         selectedItem = defaultSelected
@@ -110,6 +114,19 @@ fun <T> ComboBox(
             modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
             //TODO: make lazy
+            if(allowSearch) {
+                TextBox(
+                    text = search,
+                    onChange = { search = it },
+                    placeholder = strings().comboBox.search(),
+                    leadingIcon = {
+                        Icon(
+                            icons().search,
+                            "Search",
+                        )
+                    },
+                )
+            }
             if(allowUnselect) {
                 ComboBoxItem(
                     text = placeholder,
@@ -120,7 +137,7 @@ fun <T> ComboBox(
                     }
                 )
             }
-            items.forEach { i ->
+            actualItems.forEach { i ->
                 ComboBoxItem(
                     text = i.toDisplayString(),
                     onClick = {
@@ -143,6 +160,7 @@ fun <T> ComboBox(
     loadingPlaceholder: String = strings().creator.version.loading(),
     defaultSelected: T? = null,
     toDisplayString: T.() -> String = { toString() },
+    allowSearch: Boolean = false,
     decorated: Boolean = true,
     enabled: Boolean = true
 ) = ComboBox(
@@ -152,6 +170,7 @@ fun <T> ComboBox(
     loading,
     loadingPlaceholder,
     allowUnselect = false,
+    allowSearch = allowSearch,
     defaultSelected = defaultSelected,
     toDisplayString = toDisplayString,
     decorated = decorated,
@@ -168,6 +187,7 @@ fun <T> TitledComboBox(
     placeholder: String = "",
     defaultSelected: T? = null,
     allowUnselect: Boolean,
+    allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
     enabled: Boolean = true
@@ -189,6 +209,7 @@ fun <T> TitledComboBox(
             loadingPlaceholder,
             defaultSelected,
             allowUnselect,
+            allowSearch,
             toDisplayString,
             decorated,
             enabled
@@ -205,21 +226,23 @@ fun <T> TitledComboBox(
     loadingPlaceholder: String = strings().creator.version.loading(),
     placeholder: String = "",
     defaultSelected: T? = null,
+    allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
     enabled: Boolean = true
 ) = TitledComboBox(
-    title,
-    items,
-    {  it?.let { e -> onSelected(e) } },
-    loading,
-    loadingPlaceholder,
-    placeholder,
-    defaultSelected,
-    false,
-    toDisplayString,
-    decorated,
-    enabled
+    title = title,
+    items = items,
+    onSelected = { it?.let { e -> onSelected(e) } },
+    loading = loading,
+    loadingPlaceholder = loadingPlaceholder,
+    placeholder = placeholder,
+    defaultSelected = defaultSelected,
+    allowUnselect = false,
+    allowSearch = allowSearch,
+    toDisplayString = toDisplayString,
+    decorated = decorated,
+    enabled = enabled
 )
 
 @Composable

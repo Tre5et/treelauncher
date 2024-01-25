@@ -78,16 +78,15 @@ fun VersionSelector(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        showSnapshots.let {
-            TitledComboBox(
-                title = strings().creator.version.version(),
-                items = minecraftVersions,
-                loading = minecraftVersions.isEmpty(),
-                defaultSelected = minecraftVersion,
-                onSelected = { minecraftVersion = it },
-                placeholder = strings().creator.version.version()
-            )
-        }
+        TitledComboBox(
+            title = strings().creator.version.version(),
+            items = minecraftVersions,
+            loading = minecraftVersions.isEmpty(),
+            defaultSelected = minecraftVersion,
+            onSelected = { minecraftVersion = it },
+            placeholder = strings().creator.version.version(),
+            allowSearch = true
+        )
 
         TitledCheckBox(
             title = strings().creator.version.showSnapshots(),

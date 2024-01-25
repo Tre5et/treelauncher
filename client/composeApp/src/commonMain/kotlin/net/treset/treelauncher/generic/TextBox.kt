@@ -23,6 +23,7 @@ fun TextBox(
     prefix: @Composable () -> Unit = {},
     suffix: @Composable () -> Unit = {},
     isError: Boolean = false,
+    leadingIcon: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var displayText by remember { mutableStateOf(text) }
@@ -40,6 +41,7 @@ fun TextBox(
         enabled = enabled,
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
+        leadingIcon = leadingIcon,
         trailingIcon = {
             if (showClear && isFocused && displayText.isNotEmpty()) {
                 IconButton(

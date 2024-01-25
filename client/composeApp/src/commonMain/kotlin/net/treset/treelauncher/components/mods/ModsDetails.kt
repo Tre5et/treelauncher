@@ -233,6 +233,7 @@ fun ColumnScope.ModsDetails(
             },
             loading = versions.isEmpty(),
             defaultSelected = selectedVersion,
+            allowSearch = true
         )
 
         TitledCheckBox(

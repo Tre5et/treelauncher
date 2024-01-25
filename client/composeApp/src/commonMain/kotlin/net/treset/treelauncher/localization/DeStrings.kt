@@ -9,6 +9,10 @@ class DeStrings : Strings(
             title = { "Keine Komponente ausgewählt" }
         )
     ),
+    comboBox = ComboBox(
+        loading = { "Laden..." },
+        search = { "Suchen" }
+    ),
     creator = Creator(
         buttonCreate = { "Erstellen" },
         component = { "Komponente" },
