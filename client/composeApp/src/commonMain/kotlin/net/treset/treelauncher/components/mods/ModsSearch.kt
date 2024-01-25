@@ -19,6 +19,7 @@ import net.treset.mc_version_loader.mods.ModData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.SelectorButton
 import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -30,6 +31,21 @@ fun ModsSearch(
     modContext: ModContext,
     closeSearch: () -> Unit
 ) {
+    var showLocal by remember { mutableStateOf(false) }
+
+    if(showLocal) {
+        ModsLocal(
+            modContext,
+        ) {
+            if(it) {
+                closeSearch()
+            } else {
+                showLocal = false
+            }
+        }
+        return
+    }
+
     var tfValue by remember { mutableStateOf("") }
     var results: List<ModData>? by remember { mutableStateOf(null) }
 
@@ -117,7 +133,8 @@ fun ModsSearch(
                     Text(strings().manager.mods.search.noResults())
                 } else {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f, false)
                     ) {
                         items(it) { mod ->
                             ModSearchButton(
@@ -129,6 +146,14 @@ fun ModsSearch(
                     }
                 }
             }
+        }
+
+        SelectorButton(
+            title = strings().manager.mods.search.addLocal(),
+            icon = icons().add,
+            selected = false,
+        ) {
+            showLocal = true
         }
     }
 }

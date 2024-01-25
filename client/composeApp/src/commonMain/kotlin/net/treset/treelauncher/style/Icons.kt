@@ -45,6 +45,7 @@ class Icons {
     val search = Icons.Rounded.Search
     val modrinth = @Composable { painterResource("icons/modrinth.svg") }
     val curseforge = @Composable { painterResource("icons/curseforge.svg") }
+    val selectFile = Icons.Rounded.FileOpen
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

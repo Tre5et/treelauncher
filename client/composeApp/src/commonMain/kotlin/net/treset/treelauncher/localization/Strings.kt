@@ -287,7 +287,7 @@ open class Strings(
             )
 
             data class Search(
-                val add: () -> String,
+                val addLocal: () -> String,
                 val back: () -> String,
                 val search: () -> String,
                 val searchTooltip: () -> String,

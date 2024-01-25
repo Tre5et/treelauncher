@@ -183,7 +183,7 @@ class DeStrings : Strings(
             changeVersion = { "Spielversion:" },
             current = { "Aktuelle Mods" },
             search = Manager.Mods.Search(
-                add = { "Mod hinzufügen" },
+                addLocal = { "Mod manuell hinzufügen" },
                 back = { "Zurück" },
                 search = { "Nach einer Mod suchen" },
                 searchTooltip = { "Suchen" },

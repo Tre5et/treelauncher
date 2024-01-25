@@ -37,20 +37,20 @@ fun ColumnScope.ModsDetails(
     selected: Pair<LauncherManifest, LauncherModsDetails>,
     redraw: () -> Unit,
 ) {
-    var showSearch by remember { mutableStateOf(false) }
+    var showSearch by remember(selected) { mutableStateOf(false) }
 
     var autoUpdate by remember { mutableStateOf(appSettings().isModsUpdate) }
     var disableNoVersion by remember { mutableStateOf(appSettings().isModsDisable) }
     var enableOnDownload by remember { mutableStateOf(appSettings().isModsEnable) }
 
-    var checkUpdates by remember { mutableStateOf(false) }
+    var checkUpdates by remember(selected) { mutableStateOf(false) }
 
     var sort: LauncherModSortType by remember { mutableStateOf(appSettings().modSortType) }
     var reverse by remember { mutableStateOf(appSettings().isModSortReverse) }
 
     var versions: List<MinecraftVersion> by remember(selected) { mutableStateOf(emptyList()) }
     var showSnapshots by remember(selected) { mutableStateOf(false) }
-    var selectedVersion: MinecraftVersion? by remember { mutableStateOf(null) }
+    var selectedVersion: MinecraftVersion? by remember(selected) { mutableStateOf(null) }
 
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
@@ -60,7 +60,7 @@ fun ColumnScope.ModsDetails(
         }
     }
 
-    LaunchedEffect(showSnapshots) {
+    LaunchedEffect(selected, showSnapshots) {
         versions = if (showSnapshots) {
             MinecraftGame.getVersions()
         } else {
@@ -72,7 +72,7 @@ fun ColumnScope.ModsDetails(
         }
     }
 
-    val updateQueue = remember {
+    val updateQueue = remember(selected) {
         EmptyingJobQueue(
             onEmptied = {
                 LauncherFile.of(
@@ -88,13 +88,13 @@ fun ColumnScope.ModsDetails(
         }
     }
 
-    DisposableEffect(Unit) {
+    DisposableEffect(selected) {
         onDispose {
             updateQueue.finish()
         }
     }
 
-    val modContext = remember(selected.second.modsVersion, autoUpdate, disableNoVersion, enableOnDownload) {
+    val modContext = remember(selected, selected.second.modsVersion, autoUpdate, disableNoVersion, enableOnDownload) {
         ModContext(
             autoUpdate,
             disableNoVersion,

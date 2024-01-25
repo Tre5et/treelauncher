@@ -6,7 +6,7 @@ import net.treset.treelauncher.localization.strings
 class LauncherModDisabledNameComparator : Comparator<LauncherMod> {
     override fun compare(o1: LauncherMod, o2: LauncherMod): Int {
         if (o1.isEnabled == o2.isEnabled) {
-            return o1.name.compareTo(o2.name)
+            return o1.name.lowercase().compareTo(o2.name.lowercase())
         }
         return if (o1.isEnabled) {
             -1

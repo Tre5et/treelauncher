@@ -183,7 +183,7 @@ class EnStrings : Strings(
             changeVersion = { "Game Version:" },
             current = { "Current Mods" },
             search = Manager.Mods.Search(
-                add = { "Add mod" },
+                addLocal = { "Add mod manually" },
                 back = { "Back" },
                 search = { "Search for a Mod" },
                 searchTooltip = { "Search" },
