@@ -52,11 +52,8 @@ fun Mods(
                 onCreate = onCreate
             )
         },
-        detailsContent = { selected, redraw, reload ->
-            ModsDetails(
-                selected = selected,
-                redraw = redraw,
-            )
+        detailsContent = { selected, _, _ ->
+            ModsDetails(selected)
         },
         detailsScrollable = false
     )

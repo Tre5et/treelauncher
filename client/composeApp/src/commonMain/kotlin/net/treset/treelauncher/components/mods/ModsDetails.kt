@@ -35,9 +35,9 @@ data class ModContext(
 @Composable
 fun ColumnScope.ModsDetails(
     selected: Pair<LauncherManifest, LauncherModsDetails>,
-    redraw: () -> Unit,
 ) {
     var showSearch by remember(selected) { mutableStateOf(false) }
+    var redrawMods by remember(selected) { mutableStateOf(0) }
 
     var autoUpdate by remember { mutableStateOf(appSettings().isModsUpdate) }
     var disableNoVersion by remember { mutableStateOf(appSettings().isModsDisable) }
@@ -54,11 +54,12 @@ fun ColumnScope.ModsDetails(
 
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
-    val mods: List<LauncherMod> = remember(sort, reverse, selected.second.mods.size, selected.second.modsVersion) {
+    val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, selected.second.mods.size, selected.second.modsVersion) {
         selected.second.mods.sortedWith(sort.comparator).let {
             if(reverse) it.reversed() else it
         }
     }
+
 
     LaunchedEffect(selected, showSnapshots) {
         versions = if (showSnapshots) {
@@ -81,7 +82,7 @@ fun ColumnScope.ModsDetails(
                 ).write(
                     selected.second
                 )
-                redraw()
+                redrawMods++
             }
         ) {
             selected.second.mods
@@ -104,7 +105,6 @@ fun ColumnScope.ModsDetails(
         ) { element ->
             updateQueue.add(element)
         }
-
     }
 
     if(showSearch) {

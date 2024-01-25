@@ -53,10 +53,13 @@ fun ModsSearch(
 
     var recheckExising by remember { mutableStateOf(0) }
 
-    val searchContext = remember(modContext) {
+    val searchContext = remember(modContext, recheckExising) {
         SearchContext.from(
-            modContext
-        ) { recheckExising++ }
+            modContext,
+            recheckExising
+        ) {
+            recheckExising++
+        }
     }
 
     LaunchedEffect(searching) {
@@ -139,8 +142,7 @@ fun ModsSearch(
                         items(it) { mod ->
                             ModSearchButton(
                                 mod,
-                                searchContext,
-                                recheckExising
+                                searchContext
                             )
                         }
                     }
@@ -165,12 +167,14 @@ data class SearchContext(
     val version: String,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
-    val recheck: () -> Unit,
+    val recheck: Int,
+    val requestRecheck: () -> Unit,
 ) {
     companion object {
         fun from(
             modContext: ModContext,
-            recheck: () -> Unit
+            recheck: Int,
+            requestRecheck: () -> Unit
         ): SearchContext = SearchContext(
             modContext.autoUpdate,
             modContext.disableNoVersion,
@@ -178,7 +182,8 @@ data class SearchContext(
             modContext.version,
             modContext.directory,
             modContext.registerChangingJob,
-            recheck
+            recheck,
+            requestRecheck
         )
     }
 }

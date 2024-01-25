@@ -36,11 +36,8 @@ import kotlin.jvm.optionals.getOrNull
 @Composable
 fun ModSearchButton(
     mod: ModData,
-    searchContext: SearchContext,
-    recheckExisting: Int
+    searchContext: SearchContext
 ) {
-    //TODO: Fix reload on download other mod
-
     var downloading by rememberSaveable(mod) { mutableStateOf(false) }
 
     var image: Painter? by rememberSaveable(mod) { mutableStateOf(null) }
@@ -52,10 +49,6 @@ fun ModSearchButton(
         versions?.firstOrNull { it.versionNumber == launcherMod?.getOrNull()?.version }
     ) }
     var selectedVersion: ModVersionData? by rememberSaveable(mod, currentVersion) { mutableStateOf(currentVersion) }
-
-    var recheck = rememberSaveable(recheckExisting) {
-        recheckExisting > 0
-    }
 
     val modrinthStatus = rememberSaveable(mod, launcherMod) {
         launcherMod?.getOrNull()?.let {
@@ -94,16 +87,13 @@ fun ModSearchButton(
         }.start()
     }
 
-    LaunchedEffect(mod, recheck) {
-        if(launcherMod == null || recheck) {
-            searchContext.registerChangingJob { mods ->
-                launcherMod = mods.firstOrNull {
-                        it.isSame(mod)
-                    }?.let {
-                        Optional.of(it)
-                    } ?: Optional.empty()
-            }
-            recheck = false
+    LaunchedEffect(mod, searchContext.recheck) {
+        searchContext.registerChangingJob { mods ->
+            launcherMod = mods.firstOrNull {
+                    it.isSame(mod)
+                }?.let {
+                    Optional.of(it)
+                } ?: Optional.empty()
         }
     }
 
@@ -185,7 +175,7 @@ fun ModSearchButton(
 
                                         downloading = false
 
-                                        searchContext.recheck()
+                                        searchContext.requestRecheck()
                                     }
                                 }
                             },
