@@ -39,6 +39,7 @@ kotlin {
             implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window:0.13.0")
 
             implementation("com.darkrockstudios:mpfilepicker:3.1.0")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.4")
         }
     }
 }

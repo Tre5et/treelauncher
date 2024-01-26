@@ -223,7 +223,10 @@ class EnStrings : Strings(
     news = News(
         close = { "Close" },
         important = { "Important News:" },
-        other = { "News:"}
+        loading = { "Loading News..." },
+        other = { "News:"},
+        tooltip = { "Open News" },
+        title = { "News" }
     ),
     selector = Selector(
         component = Selector.Component(

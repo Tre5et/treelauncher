@@ -45,7 +45,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsUpdate = true
     var isModsEnable = false
     var isModsDisable = false
-    var acknowledgedNews = listOf<String>()
+    var acknowledgedNews = mutableListOf<String>()
 
     private constructor() : this(LauncherFile("")) //constructor only for gson
 

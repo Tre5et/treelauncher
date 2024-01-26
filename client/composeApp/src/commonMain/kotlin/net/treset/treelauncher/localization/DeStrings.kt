@@ -223,7 +223,10 @@ class DeStrings : Strings(
     news = News(
         close = { "Schließen" },
         important = { "Wichtige Neuigkeiten:" },
-        other = { "Neuigkeiten:"}
+        loading = { "Neuigkeiten werden geladen..." },
+        other = { "Neuigkeiten:" },
+        tooltip = { "Neuigkeiten anzeigen" },
+        title = { "Neuigkeiten" }
     ),
     selector = Selector(
         component = Selector.Component(

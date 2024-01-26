@@ -1,12 +1,10 @@
 package net.treset.treelauncher
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,11 +20,9 @@ import androidx.compose.ui.window.rememberWindowState
 import com.multiplatform.webview.web.Cef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
-import net.treset.treelauncher.style.colors
-import net.treset.treelauncher.style.theme
-import net.treset.treelauncher.style.titleBar
-import net.treset.treelauncher.style.typography
+import net.treset.treelauncher.style.*
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.intui.standalone.theme.darkThemeDefinition
@@ -67,13 +63,28 @@ fun main() = application {
                 CompositionLocalProvider(
                     LocalContentColor provides colors().onBackground
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center
+                    Box(
+                        modifier = Modifier.offset(x = 16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             strings().launcher.name(),
                             style = typography().titleSmall
                         )
+
+                        IconButton(
+                            onClick = {
+                                app().showNews()
+                            },
+                            tooltip = strings().news.tooltip(),
+                            modifier = Modifier
+                                .offset(x = 82.dp, y = 1.dp)
+                        ) {
+                            Icon(
+                                icons().news,
+                                "News"
+                            )
+                        }
                     }
                 }
             }

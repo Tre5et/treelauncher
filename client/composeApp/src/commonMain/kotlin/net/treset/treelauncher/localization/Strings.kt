@@ -332,7 +332,10 @@ open class Strings(
     data class News(
         val close: () -> String,
         val important: () -> String,
-        val other: () -> String
+        val loading: () -> String,
+        val other: () -> String,
+        val tooltip: () -> String,
+        val title: () -> String,
     )
 
     data class Selector(

@@ -20,6 +20,8 @@ import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
 import net.treset.treelauncher.components.mods.Mods
 import net.treset.treelauncher.creation.Create
+import net.treset.treelauncher.generic.PopupData
+import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.login.LoginScreen
@@ -28,6 +30,7 @@ import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.typography
+import net.treset.treelauncher.util.getNewsPopup
 import java.io.IOException
 import kotlin.system.exitProcess
 
@@ -39,7 +42,13 @@ data class AppContext(
 fun App(
     launcherApp: LauncherApp
 ) {
-    app = remember { launcherApp }
+    var popupData: PopupData? by remember { mutableStateOf(null) }
+
+    app = remember {
+        launcherApp.apply {
+            setPopup = { popupData = it }
+        }
+    }
 
     val launcherFiles = remember { LauncherFiles() }
     launcherFiles.reloadAll()
@@ -72,6 +81,10 @@ fun App(
                         }
                     }
                 }
+
+                popupData?.let {
+                    PopupOverlay(it)
+                }
             }
         }
     }
@@ -83,21 +96,6 @@ fun app() = app
 class LauncherApp(
     val exitApplication: () -> Unit
 ) {
-    fun exit(
-        restart: Boolean = false,
-        force: Boolean = false
-    ) {
-        if(force) {
-            exitApplication()
-        }
-        //TODO: handle all the cases
-
-        updater().startUpdater(restart)
-
-        appSettings().save()
-        exitApplication()
-    }
-
     init {
         //TODO: Configure Logger
         //TODO: Close Behaviour: Prevent close, Sync, Update
@@ -132,6 +130,38 @@ class LauncherApp(
         }
 
         language().appLanguage = appSettings().language
+    }
+
+    var setPopup: (PopupData?) -> Unit = {  }
+
+    fun showNews(
+        displayOther: Boolean = true,
+        acknowledgeImportant: Boolean = true,
+        displayAcknowledged: Boolean = true
+    ) {
+        setPopup(
+            getNewsPopup(
+                close = { setPopup(null) },
+                displayOther = displayOther,
+                acknowledgeImportant = acknowledgeImportant,
+                displayAcknowledged = displayAcknowledged
+            )
+        )
+    }
+
+    fun exit(
+        restart: Boolean = false,
+        force: Boolean = false
+    ) {
+        if(force) {
+            exitApplication()
+        }
+        //TODO: handle all the cases
+
+        updater().startUpdater(restart)
+
+        appSettings().save()
+        exitApplication()
     }
 
     @Throws(IOException::class)

@@ -18,11 +18,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appSettings
+import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.allContainedIn
 import java.awt.image.BufferedImage
 
 enum class NavigationState {
@@ -52,6 +56,14 @@ fun NavigationContainer(
         Thread {
             updateAvailable = !(updater().getUpdate().latest?: true)
         }.start()
+    }
+
+    LaunchedEffect(Unit) {
+        news().let {
+            if(it.important?.map{ it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
+                app().showNews(displayOther = false, displayAcknowledged = false)
+            }
+        }
     }
 
     Column(

@@ -12,7 +12,7 @@ class NewsService : HttpService(appConfig().UPDATE_URL) {
     fun news(): News {
         val result: Pair<HttpStatusCode, ByteArray> = get(
             "news",
-            strings().launcher.name(),
+            strings().launcher.version(),
             language().appLanguage.locale
         )
         val response = String(result.second)
