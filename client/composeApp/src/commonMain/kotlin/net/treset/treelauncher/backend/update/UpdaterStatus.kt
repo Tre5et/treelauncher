@@ -2,12 +2,13 @@ package net.treset.treelauncher.backend.update
 
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
+import net.treset.treelauncher.generic.PopupType
 import net.treset.treelauncher.localization.strings
 
 class UpdaterStatus(
     var status: Status,
-    var message: String,
-    var exceptions: List<String>
+    var message: String? = null,
+    var exceptions: List<String>? = null
 ) : GenericJsonParsable() {
     enum class Status(
         val popupTitle: () -> String,
@@ -27,10 +28,4 @@ class UpdaterStatus(
             return fromJson(json, UpdaterStatus::class.java)
         }
     }
-}
-
-enum class PopupType {
-    ERROR,
-    WARNING,
-    SUCCESS
 }

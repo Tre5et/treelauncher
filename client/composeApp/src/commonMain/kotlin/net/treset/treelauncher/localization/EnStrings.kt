@@ -338,7 +338,7 @@ class EnStrings : Strings(
         theme = { "Theme:" },
         update = Settings.Update(
             available = { "Update Available!" },
-            availableMessage = { current, new ->  "Update: v$current → v$new"},
+            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
             availableTitle = { "Update Available!" },
             cancel = { "Cancel" },
             checkingTitle = { "Checking for updates..." },
@@ -346,7 +346,7 @@ class EnStrings : Strings(
             download = { "Download" },
             downloadingMessage = { file, current, total -> "$file ($current/$total)" },
             downloadingTitle = { "Downloading Update..." },
-            latestMessage = { version -> "Current Version: v$version" },
+            latestMessage = { "Current Version: v${strings().launcher.version()}" },
             latestTitle = { "Everything is up to date!" },
             successMessage = { "Restart the launcher for these changes to take effect." },
             successRestart = { "Restart Now" },

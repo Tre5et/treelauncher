@@ -480,7 +480,7 @@ open class Strings(
 
         data class Update(
             val available: () -> String,
-            val availableMessage: (current: String, new: String) -> String,
+            val availableMessage: (new: String, message: String?) -> String,
             val availableTitle: () -> String,
             val cancel: () -> String,
             val checkingTitle: () -> String,
@@ -488,7 +488,7 @@ open class Strings(
             val download: () -> String,
             val downloadingMessage: (file: String, current: Int, total: Int) -> String,
             val downloadingTitle: () -> String,
-            val latestMessage: (current: String) -> String,
+            val latestMessage: () -> String,
             val latestTitle: () -> String,
             val successMessage: () -> String,
             val successRestart: () -> String,

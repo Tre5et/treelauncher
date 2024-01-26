@@ -44,7 +44,9 @@ import kotlin.math.roundToInt
 
 fun main() = application {
 
-    val app = remember { LauncherApp() }
+    val app = remember { LauncherApp(
+        ::exitApplication
+    ) }
 
     IntUiTheme(
         theme = if(theme().isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition(),
@@ -53,7 +55,7 @@ fun main() = application {
         )
     ) {
         DecoratedWindow(
-            onCloseRequest = { onClose(::exitApplication) },
+            onCloseRequest = { app().exit() },
             title = strings().launcher.name(),
             state = rememberWindowState(
                 position = WindowPosition(Alignment.Center),

@@ -17,13 +17,12 @@ import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
-import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.ComboBox
-import net.treset.treelauncher.generic.TitledCheckBox
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.checkUpdateOnStart
 
 enum class LoginState(val actionAllowed: Boolean) {
     NOT_LOGGED_IN(true),
@@ -36,18 +35,32 @@ enum class LoginState(val actionAllowed: Boolean) {
 fun LoginScreen(
     content: @Composable (LoginContext) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     var keepLoggedIn by remember { mutableStateOf(true) }
     var loginState by remember { mutableStateOf(LoginState.NOT_LOGGED_IN) }
     var browserUrl: String? by remember { mutableStateOf(null) }
     var showContent by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(language().appLanguage) }
 
+    var updateChecked by remember { mutableStateOf(false) }
+
+    var popupData: PopupData? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        checkUpdateOnStart(
+            coroutineScope,
+            { popupData = it },
+            { updateChecked = true }
+        )
+    }
+
     LaunchedEffect(Unit) {
         if(userAuth().hasFile()) {
             startLogin(true,
                 {
                     loginState = it
-                    if(it == LoginState.LOGGED_IN) {
+                    if(it == LoginState.LOGGED_IN && updateChecked) {
                         showContent = true
                     }
                 },
@@ -163,7 +176,7 @@ fun LoginScreen(
                 .align(Alignment.BottomEnd)
                 .padding(10.dp)
         ) {
-            if (loginState == LoginState.LOGGED_IN) {
+            if (loginState == LoginState.LOGGED_IN && updateChecked) {
                 FloatingActionButton(
                     onClick = { showContent = true },
                     shape = MaterialTheme.shapes.small,
@@ -178,6 +191,10 @@ fun LoginScreen(
                 }
             }
         }
+    }
+
+    popupData?.let {
+        PopupOverlay(it)
     }
 }
 

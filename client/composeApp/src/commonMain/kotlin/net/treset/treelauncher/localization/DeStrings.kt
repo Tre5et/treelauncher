@@ -338,7 +338,7 @@ class DeStrings : Strings(
         theme = { "Farben:" },
         update = Settings.Update(
             available = { "Update verfügbar!" },
-            availableMessage = { current, new ->  "Update: v$current → v$new"},
+            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
             availableTitle = { "Update verfügbar!" },
             cancel = { "Abbrechen" },
             checkingTitle = { "Es wird nach Updates gesucht..." },
@@ -346,7 +346,7 @@ class DeStrings : Strings(
             download = { "Herunterladen" },
             downloadingMessage = { file, current, total -> "$file ($current/$total)" },
             downloadingTitle = { "Update wird heruntergeladen..." },
-            latestMessage = { version -> "Aktuelle Version: v$version" },
+            latestMessage = { "Aktuelle Version: v${strings().launcher.version()}" },
             latestTitle = { "Der Launcher ist aktuell!" },
             successMessage = { "Der Launcher muss neugestartet werden um das Update anzuwenden." },
             successRestart = { "Jetzt Neustarten" },

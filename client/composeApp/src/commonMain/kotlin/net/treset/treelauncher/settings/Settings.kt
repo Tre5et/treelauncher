@@ -33,6 +33,7 @@ import net.treset.treelauncher.style.Theme
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.style.setTheme
 import net.treset.treelauncher.style.theme
+import net.treset.treelauncher.util.onUpdate
 import java.awt.image.BufferedImage
 import java.io.IOException
 
@@ -41,6 +42,8 @@ import java.io.IOException
 fun Settings(
     loginContext: LoginContext
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     var userImage: BufferedImage? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
@@ -345,29 +348,36 @@ fun Settings(
         }
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Text(
-                strings().launcher.name(),
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                strings().settings.version()
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    strings().launcher.name(),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    strings().settings.version()
+                )
+            }
+
+
+            IconButton(
+                onClick = {
+                    onUpdate(coroutineScope) { popupContent = it }
+                },
+                highlighted = updater().getUpdate().latest == false,
+                tooltip = strings().settings.update.tooltip()
+            ) {
+                Icon(
+                    icons().update,
+                    "Download Update"
+                )
+            }
 
             if(updater().getUpdate().latest == false) {
-                IconButton(
-                    onClick = {
-                        //TODO: Update
-                    },
-                    highlighted = true,
-                    tooltip = strings().settings.update.tooltip()
-                ) {
-                    Icon(
-                        icons().update,
-                        "Download Update"
-                    )
-                }
                 Text(
                     strings().settings.update.available()
                 )
@@ -392,3 +402,4 @@ fun Settings(
         PopupOverlay(it)
     }
 }
+

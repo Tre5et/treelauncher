@@ -12,6 +12,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.components.Options
@@ -52,7 +53,6 @@ fun App(
         ProvideTextStyle(
             MaterialTheme.typography.bodyMedium
         ) {
-
             Scaffold {
                 Column(
                     Modifier.fillMaxSize(),
@@ -77,20 +77,27 @@ fun App(
     }
 }
 
-fun onClose(
-    exitApplication: () -> Unit
-) {
-    //TODO: Prevent close
-    //TODO: Sync
-    //TODO: Update
-    appSettings().save()
-    exitApplication()
-}
-
 private lateinit var app: LauncherApp
 fun app() = app
 
-class LauncherApp {
+class LauncherApp(
+    val exitApplication: () -> Unit
+) {
+    fun exit(
+        restart: Boolean = false,
+        force: Boolean = false
+    ) {
+        if(force) {
+            exitApplication()
+        }
+        //TODO: handle all the cases
+
+        updater().startUpdater(restart)
+
+        appSettings().save()
+        exitApplication()
+    }
+
     init {
         //TODO: Configure Logger
         //TODO: Close Behaviour: Prevent close, Sync, Update
