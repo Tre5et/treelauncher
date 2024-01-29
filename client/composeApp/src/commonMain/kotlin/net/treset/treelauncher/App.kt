@@ -31,6 +31,7 @@ import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.typography
 import net.treset.treelauncher.util.getNewsPopup
+import java.io.File
 import java.io.IOException
 import kotlin.system.exitProcess
 
@@ -177,5 +178,6 @@ class LauncherApp(
     companion object {
         private val LOGGER = KotlinLogging.logger {  }
     }
-
 }
+
+expect fun getUpdaterFile(): File

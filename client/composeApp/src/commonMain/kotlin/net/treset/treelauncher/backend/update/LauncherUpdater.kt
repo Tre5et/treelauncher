@@ -3,6 +3,7 @@ package net.treset.treelauncher.backend.update
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.JsonUtils
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.getUpdaterFile
 import java.io.IOException
 
 class LauncherUpdater {
@@ -135,7 +136,7 @@ class LauncherUpdater {
         val pb = ProcessBuilder(
             LauncherFile.of(System.getProperty("java.home"), "bin", "java").path,
             "-jar",
-            "app/updater.jar"
+            getUpdaterFile().path
         )
         if (restart) {
             pb.command().add("-gui")

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.min
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.multiplatform.webview.web.Cef
+import dev.datlag.kcef.KCEF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.treset.treelauncher.generic.IconButton
@@ -95,20 +95,23 @@ fun main() = application {
 
             LaunchedEffect(Unit) {
                 withContext(Dispatchers.IO) {
-                    Cef.init(builder = {
-                        installDir = File("jcef", "bundle")
-                    }, initProgress = {
-                        onDownloading {
-                            downloading = max(it, 0F)
+                    KCEF.init(
+                        builder = {
+                            installDir(File("kcef", "bundle"))
+                            progress {
+                                onDownloading {
+                                    downloading = max(it, 0F)
+                                }
+                                onInitialized {
+                                    initialized = true
+                                }
+                            }
+                        }, onError = {
+                            it?.printStackTrace()
+                        }, onRestartRequired = {
+                            restartRequired = true
                         }
-                        onInitialized {
-                            initialized = true
-                        }
-                    }, onError = {
-                        it.printStackTrace()
-                    }, onRestartRequired = {
-                        restartRequired = true
-                    })
+                    )
                 }
             }
 
@@ -136,9 +139,17 @@ fun main() = application {
 
             DisposableEffect(Unit) {
                 onDispose {
-                    Cef.dispose()
+                    KCEF.disposeBlocking()
                 }
             }
         }
     }
+}
+
+actual fun getUpdaterFile(): File {
+    val devFile = File("resources/common/updater.jar")
+    if(devFile.isFile) {
+        return devFile
+    }
+    return File("app/resources/updater.jar")
 }
