@@ -106,6 +106,13 @@ fun getNewsPopup(
                             modifier = Modifier.widthIn(0.dp, 800.dp)
                         )
                     }
+
+                    if(nws.other.isNullOrEmpty() && nws.important.isNullOrEmpty()) {
+                        Text(
+                            strings().news.none(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
             } ?: Text(strings().news.loading())
         },

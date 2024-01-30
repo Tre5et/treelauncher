@@ -224,6 +224,7 @@ class DeStrings : Strings(
         close = { "Schließen" },
         important = { "Wichtige Neuigkeiten:" },
         loading = { "Neuigkeiten werden geladen..." },
+        none = { "Keine aktuellen Neuigkeiten" },
         other = { "Neuigkeiten:" },
         tooltip = { "Neuigkeiten anzeigen" },
         title = { "Neuigkeiten" }

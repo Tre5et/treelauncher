@@ -333,6 +333,7 @@ open class Strings(
         val close: () -> String,
         val important: () -> String,
         val loading: () -> String,
+        val none: () -> String,
         val other: () -> String,
         val tooltip: () -> String,
         val title: () -> String,

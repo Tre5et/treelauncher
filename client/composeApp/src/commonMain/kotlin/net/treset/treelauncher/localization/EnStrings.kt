@@ -224,6 +224,7 @@ class EnStrings : Strings(
         close = { "Close" },
         important = { "Important News:" },
         loading = { "Loading News..." },
+        none = { "No current News" },
         other = { "News:"},
         tooltip = { "Open News" },
         title = { "News" }
