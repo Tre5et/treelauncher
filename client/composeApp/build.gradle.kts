@@ -1,5 +1,10 @@
+
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.io.BufferedOutputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -46,6 +51,11 @@ kotlin {
 
 
 val version = "2.0.0"
+val projectName = "TreeLauncher"
+val projectVendor = "TreSet"
+val resourcesDir = project.file("resources")
+val iconIco = project.file("icon_default.ico")
+val uuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
 
 compose.desktop {
     application {
@@ -53,17 +63,17 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "TreeLauncher"
+            packageName = projectName
             packageVersion = version
             includeAllModules = true
-            appResourcesRootDir = project.file("resources")
-            vendor = "TreSet"
+            appResourcesRootDir = resourcesDir
+            vendor = projectVendor
 
             windows {
-                iconFile = project.file("icon_default.ico")
+                iconFile = iconIco
                 menu = true
                 perUserInstall = true
-                upgradeUuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
+                upgradeUuid = uuid
             }
         }
 
@@ -81,21 +91,57 @@ compose.desktop {
     }
 }
 
-task("replaceVersion") {
+fun launcherTask(
+    name: String,
+    dependencies: List<String> = listOf(),
+    onRegister: Task.() -> Unit = {},
+    onExecute: Task.() -> Unit = {}
+) {
+    tasks.register(name) {
+        group = "treelauncher"
+        dependencies.forEach { dependsOn(it) }
+
+        onRegister()
+
+        doLast {
+            onExecute()
+        }
+    }
+}
+
+launcherTask(
+    "replaceVersion",
+    onRegister = {
+        var found = false
+        project.tasks.forEach { task ->
+            if(task.name == "checkRuntime") {
+                task.mustRunAfter(this)
+                found = true
+            }
+        }
+        if(!found) {
+            throw IllegalStateException("Could not find checkRuntime task to run replaceVersion before")
+        }
+    }
+) {
     val file = project.file("src/commonMain/kotlin/net/treset/treelauncher/localization/Strings.kt")
 
     var found = false
 
     val lines = file.readLines()
-    println(lines)
 
     file.writeText(
         lines.joinToString(System.lineSeparator()) { line ->
             val match = "(?<=val version: \\(\\) -> String = \\{ \\\")(.*)(?=\\\" \\})".toRegex().find(line)
-            match?.let {
-                println(it.value)
+            match?.let { result ->
                 found = true
-                line.replace(it.value, version)
+                if(result.value != version) {
+                    line.replace(result.value, version).also {
+                        println("Replaced version: ${result.value} -> $version")
+                    }
+                } else {
+                    line
+                }
             } ?: line
         }
     )
@@ -104,3 +150,54 @@ task("replaceVersion") {
         throw IllegalStateException("Could not find version string in Strings.kt")
     }
 }
+
+launcherTask(
+    "zipDist",
+    listOf("createDistributable")
+) {
+    val folder = project.file("build/compose/binaries/main/app/$projectName")
+    val zipFile = project.file("build/dist/${version}/$projectName-$version.zip")
+
+    println("Zipping dist: ${folder.absolutePath} -> ${zipFile.absolutePath}")
+
+    zipFile.parentFile.mkdirs()
+    if(zipFile.exists()) {
+        zipFile.delete()
+    }
+    ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFile))).use { zos ->
+        folder.walkTopDown().forEach { file ->
+            val zipFileName = file.absolutePath.removePrefix(folder.absolutePath).removePrefix("/")
+            val entry = ZipEntry("$zipFileName${(if (file.isDirectory) "/" else "" )}")
+            zos.putNextEntry(entry)
+            if (file.isFile) {
+                file.inputStream().use { fis -> fis.copyTo(zos) }
+            }
+        }
+    }
+
+    println("Zipped dist")
+}
+
+launcherTask(
+    "moveMsi",
+    listOf("packageMsi")
+) {
+    val src = project.file("build/compose/binaries/main/msi/$projectName-$version.msi")
+    val target = project.file("build/dist/$version/$projectName-$version.msi")
+
+    println("Moving msi: ${src.absolutePath} -> ${target.absolutePath}")
+
+    target.parentFile.mkdirs()
+    src.copyTo(target, true)
+
+    println("Moved msi")
+}
+
+launcherTask(
+    "createDist",
+    listOf(
+        "replaceVersion",
+        "zipDist",
+        "moveMsi"
+    )
+)
