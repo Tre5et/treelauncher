@@ -28,6 +28,7 @@ import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.allContainedIn
 import java.awt.image.BufferedImage
+import java.io.IOException
 
 enum class NavigationState {
     INSTANCES,
@@ -49,13 +50,15 @@ fun NavigationContainer(
     var updateAvailable by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        Thread {
-            profileImage = loginContext.userAuth.getUserIcon()
-        }.start()
+        profileImage = loginContext.userAuth.getUserIcon()
+    }
 
-        Thread {
-            updateAvailable = !(updater().getUpdate().latest?: true)
-        }.start()
+    LaunchedEffect(Unit) {
+        try {
+            updateAvailable = updater().getUpdate().latest == false
+        } catch (e: IOException) {
+            app().error(e)
+        }
     }
 
     LaunchedEffect(Unit) {

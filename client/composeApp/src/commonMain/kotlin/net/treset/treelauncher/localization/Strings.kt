@@ -154,10 +154,10 @@ open class Strings(
 
     data class Error(
         val close: () -> String,
-        val message: (message: String) -> String,
+        val message: (error: Exception) -> String,
         val title: () -> String,
         val severeClose: () -> String,
-        val severeMessage: (message: String) -> String,
+        val severeMessage: (error: Exception) -> String,
         val severeTitle: () -> String,
         val unknown: () -> String,
     )

@@ -12,12 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.news.News
 import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
 import net.treset.treelauncher.localization.strings
+import java.io.IOException
 
 fun getNewsPopup(
     close: () -> Unit,
@@ -29,23 +31,27 @@ fun getNewsPopup(
             var currentNews: News? by remember { mutableStateOf(null) }
 
             LaunchedEffect(Unit) {
-                currentNews = news().let { nws ->
-                    nws.apply {
-                        if(!displayAcknowledged) {
-                            important = important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
+                try {
+                    currentNews = news().let { nws ->
+                        nws.apply {
+                            if(!displayAcknowledged) {
+                                important = important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
+                            }
+                            if(!displayOther) {
+                                other = null
+                            }
                         }
-                        if(!displayOther) {
-                            other = null
-                        }
-                    }
-                }.also { nws ->
-                    if(acknowledgeImportant) {
-                        nws.important?.forEach {
-                            if(!appSettings().acknowledgedNews.contains(it.id)) {
-                                appSettings().acknowledgedNews.add(it.id)
+                    }.also { nws ->
+                        if(acknowledgeImportant) {
+                            nws.important?.forEach {
+                                if(!appSettings().acknowledgedNews.contains(it.id)) {
+                                    appSettings().acknowledgedNews.add(it.id)
+                                }
                             }
                         }
                     }
+                } catch(e: IOException) {
+                    app().error(e)
                 }
             }
 

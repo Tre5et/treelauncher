@@ -74,10 +74,10 @@ class EnStrings : Strings(
     ),
     error = Error(
         close = { "Acknowledge" },
-        message = { message -> "Error:\n$message\nPlease report this error." },
+        message = { error -> "Error:\n${error.message ?: "Unknown Error"}\nPlease report this error." },
         title = { "An error occurred!" },
         severeClose = { "Close launcher" },
-        severeMessage = { message -> "Error:\n$message\nPlease report this error." },
+        severeMessage = { error -> "Error:\n${error.message ?: "Unknown Error"}\nPlease report this error." },
         severeTitle = { "A severe error occurred!" },
         unknown = { "Unknown error" }
     ),

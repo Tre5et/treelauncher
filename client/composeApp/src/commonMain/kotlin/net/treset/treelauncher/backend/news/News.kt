@@ -2,6 +2,7 @@ package net.treset.treelauncher.backend.news
 
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
+import java.io.IOException
 
 class News(
     var important: List<NewsElement>?,
@@ -23,6 +24,7 @@ class News(
 
 private var news: News? = null
 
+@Throws(IOException::class)
 fun news(): News {
     news?.let {
         return it

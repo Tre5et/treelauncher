@@ -2,9 +2,7 @@ package net.treset.treelauncher
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,10 +18,12 @@ import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
 import net.treset.treelauncher.components.mods.Mods
 import net.treset.treelauncher.creation.Create
+import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
+import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
 import net.treset.treelauncher.navigation.NavigationState
@@ -45,16 +45,31 @@ fun App(
 ) {
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
+    var exceptions: List<Exception> by remember { mutableStateOf(listOf()) }
+    var fatalExceptions: List<Exception> by remember { mutableStateOf(listOf()) }
+
     app = remember {
         launcherApp.apply {
             setPopup = { popupData = it }
+            onError = {
+                LOGGER.warn(it) { "An error occurred!" }
+                exceptions = exceptions + it
+            }
+            onSevereError = {
+                LOGGER.error(it) { "A severe error occurred!" }
+                fatalExceptions = fatalExceptions + it
+            }
         }
     }
 
     val launcherFiles = remember { LauncherFiles() }
     launcherFiles.reloadAll()
 
-    val appContext = AppContext(launcherFiles)
+    val appContext = remember(launcherFiles) {
+        AppContext(
+            launcherFiles
+        )
+    }
 
     MaterialTheme(
         colorScheme = colors(),
@@ -86,6 +101,37 @@ fun App(
                 popupData?.let {
                     PopupOverlay(it)
                 }
+
+                exceptions.forEach { e ->
+                    AlertDialog(
+                        onDismissRequest = {},
+                        title = { Text(strings().error.title()) },
+                        text = { Text(strings().error.message(e)) },
+                        confirmButton = {
+                            Button(
+                                onClick = { exceptions = exceptions.filter { it != e } }
+                            ) {
+                                Text(strings().error.close())
+                            }
+                        }
+                    )
+                }
+
+                fatalExceptions.forEach { e ->
+                    AlertDialog(
+                        onDismissRequest = {},
+                        title = { Text(strings().error.severeTitle()) },
+                        text = { Text(strings().error.severeMessage(e)) },
+                        confirmButton = {
+                            Button(
+                                onClick = { app().exit(force = true) },
+                                color = MaterialTheme.colorScheme.error
+                            ) {
+                                Text(strings().error.severeClose())
+                            }
+                        }
+                    )
+                }
             }
         }
     }
@@ -95,7 +141,7 @@ private lateinit var app: LauncherApp
 fun app() = app
 
 class LauncherApp(
-    val exitApplication: () -> Unit
+    val exitApplication: () -> Unit,
 ) {
     init {
         //TODO: Configure Logger
@@ -133,7 +179,13 @@ class LauncherApp(
         language().appLanguage = appSettings().language
     }
 
-    var setPopup: (PopupData?) -> Unit = {  }
+    fun error(e: Exception) = onError(e)
+
+    fun severeError(e: Exception) = onSevereError(e)
+
+    var setPopup: (PopupData?) -> Unit = {}
+    var onError: (Exception) -> Unit = {}
+    var onSevereError: (Exception) -> Unit = {}
 
     fun showNews(
         displayOther: Boolean = true,
@@ -145,7 +197,7 @@ class LauncherApp(
                 close = { setPopup(null) },
                 displayOther = displayOther,
                 acknowledgeImportant = acknowledgeImportant,
-                displayAcknowledged = displayAcknowledged
+                displayAcknowledged = displayAcknowledged,
             )
         )
     }
@@ -154,14 +206,12 @@ class LauncherApp(
         restart: Boolean = false,
         force: Boolean = false
     ) {
-        if(force) {
-            exitApplication()
+        if(!force) {
+            updater().startUpdater(restart)
         }
-        //TODO: handle all the cases
-
-        updater().startUpdater(restart)
 
         appSettings().save()
+
         exitApplication()
     }
 
@@ -179,5 +229,7 @@ class LauncherApp(
         private val LOGGER = KotlinLogging.logger {  }
     }
 }
+
+private val LOGGER = KotlinLogging.logger {  }
 
 expect fun getUpdaterFile(): File

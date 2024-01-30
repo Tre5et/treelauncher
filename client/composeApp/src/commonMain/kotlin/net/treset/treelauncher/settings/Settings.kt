@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.config.GlobalConfigLoader
 import net.treset.treelauncher.backend.config.appConfig
@@ -53,6 +54,15 @@ fun Settings(
     var language by remember { mutableStateOf(language().appLanguage) }
 
     var popupContent: PopupData? by remember { mutableStateOf(null) }
+
+    val update = remember {
+        try {
+            updater().getUpdate()
+        } catch(e: IOException) {
+            app().error(e)
+            null
+        }
+    }
 
     TitledColumn(
         title = strings().settings.title(),
@@ -368,7 +378,7 @@ fun Settings(
                 onClick = {
                     onUpdate(coroutineScope) { popupContent = it }
                 },
-                highlighted = updater().getUpdate().latest == false,
+                highlighted = update?.latest == false,
                 tooltip = strings().settings.update.tooltip()
             ) {
                 Icon(
@@ -377,7 +387,7 @@ fun Settings(
                 )
             }
 
-            if(updater().getUpdate().latest == false) {
+            if(update?.latest == false) {
                 Text(
                     strings().settings.update.available()
                 )

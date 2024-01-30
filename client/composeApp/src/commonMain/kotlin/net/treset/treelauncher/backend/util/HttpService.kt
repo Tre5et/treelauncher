@@ -16,7 +16,7 @@ open class HttpService @JvmOverloads constructor(
         return try {
             evaluateStatus(get("$baseUrl/${route.joinToString(separator = "/")}", headers))
         } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}}", e)
+            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}", e)
         }
     }
 

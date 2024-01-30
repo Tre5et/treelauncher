@@ -32,109 +32,112 @@ fun onUpdate(
         )
     )
     coroutineScope.launch {
-        val update = updater().getUpdate()
+        try {
+            val update = updater().getUpdate()
 
-        update.id?.let {
-            setPopup(
-                PopupData(
-                    titleRow = { Text(strings().settings.update.available()) },
-                    content = { Text(strings().settings.update.availableMessage(it, update.message)) },
-                    buttonRow = {
-                        Button(
-                            onClick = { setPopup(null) },
-                            color = MaterialTheme.colorScheme.error
-                        ) {
-                            Text(strings().settings.update.cancel())
-                        }
+            update.id?.let {
+                setPopup(
+                    PopupData(
+                        titleRow = { Text(strings().settings.update.available()) },
+                        content = { Text(strings().settings.update.availableMessage(it, update.message)) },
+                        buttonRow = {
+                            Button(
+                                onClick = { setPopup(null) },
+                                color = MaterialTheme.colorScheme.error
+                            ) {
+                                Text(strings().settings.update.cancel())
+                            }
 
-                        Button(
-                            onClick = {
-                                setPopup(
-                                    PopupData(
-                                        titleRow = { Text(strings().settings.update.downloadingTitle()) }
-                                    )
-                                )
-
-                                updater().executeUpdate { amount, total, file ->
+                            Button(
+                                onClick = {
                                     setPopup(
                                         PopupData(
-                                            titleRow = { Text(strings().settings.update.downloadingTitle()) },
-                                            content = {
-                                                Text(
-                                                    strings().settings.update.downloadingMessage(
-                                                        file,
-                                                        amount,
-                                                        total
+                                            titleRow = { Text(strings().settings.update.downloadingTitle()) }
+                                        )
+                                    )
+
+                                    updater().executeUpdate { amount, total, file ->
+                                        setPopup(
+                                            PopupData(
+                                                titleRow = { Text(strings().settings.update.downloadingTitle()) },
+                                                content = {
+                                                    Text(
+                                                        strings().settings.update.downloadingMessage(
+                                                            file,
+                                                            amount,
+                                                            total
+                                                        )
                                                     )
-                                                )
+                                                }
+                                            )
+                                        )
+                                    }
+
+                                    setPopup(
+                                        PopupData(
+                                            type = PopupType.SUCCESS,
+                                            titleRow = { Text(strings().settings.update.successTitle()) },
+                                            content = { Text(strings().settings.update.successMessage()) },
+                                            buttonRow = {
+                                                Button(
+                                                    onClick = { setPopup(null) }
+                                                ) {
+                                                    Text(strings().settings.update.close())
+                                                }
+
+                                                Button(
+                                                    onClick = {
+                                                        app().exit(true)
+                                                    }
+                                                ) {
+                                                    Text(strings().settings.update.successRestart())
+                                                }
                                             }
                                         )
                                     )
                                 }
-
-                                setPopup(
-                                    PopupData(
-                                        type = PopupType.SUCCESS,
-                                        titleRow = { Text(strings().settings.update.successTitle()) },
-                                        content = { Text(strings().settings.update.successMessage()) },
-                                        buttonRow = {
-                                            Button(
-                                                onClick = { setPopup(null) }
-                                            ) {
-                                                Text(strings().settings.update.close())
-                                            }
-
-                                            Button(
-                                                onClick = {
-                                                    app().exit(true)
-                                                }
-                                            ) {
-                                                Text(strings().settings.update.successRestart())
-                                            }
-                                        }
-                                    )
-                                )
-                            }
-                        ) {
-                            Text(strings().settings.update.download())
-                        }
-                    }
-                )
-            )
-        } ?: run {
-            if(update.latest == true) {
-                setPopup(
-                    PopupData(
-                        type = PopupType.SUCCESS,
-                        titleRow = { Text(strings().settings.update.latestTitle()) },
-                        content = { Text(strings().settings.update.latestMessage()) },
-                        buttonRow = {
-                            Button(
-                                onClick = { setPopup(null) }
                             ) {
-                                Text(strings().settings.update.close())
+                                Text(strings().settings.update.download())
                             }
                         }
                     )
                 )
-            } else {
-                setPopup(
-                    PopupData(
-                        type = PopupType.WARNING,
-                        titleRow = { Text(strings().settings.update.unavailableTitle()) },
-                        content = { Text(strings().settings.update.unavailableMessage()) },
-                        buttonRow = {
-                            Button(
-                                onClick = { setPopup(null) }
-                            ) {
-                                Text(strings().settings.update.close())
+            } ?: run {
+                if (update.latest == true) {
+                    setPopup(
+                        PopupData(
+                            type = PopupType.SUCCESS,
+                            titleRow = { Text(strings().settings.update.latestTitle()) },
+                            content = { Text(strings().settings.update.latestMessage()) },
+                            buttonRow = {
+                                Button(
+                                    onClick = { setPopup(null) }
+                                ) {
+                                    Text(strings().settings.update.close())
+                                }
                             }
-                        }
+                        )
                     )
-                )
+                } else {
+                    setPopup(
+                        PopupData(
+                            type = PopupType.WARNING,
+                            titleRow = { Text(strings().settings.update.unavailableTitle()) },
+                            content = { Text(strings().settings.update.unavailableMessage()) },
+                            buttonRow = {
+                                Button(
+                                    onClick = { setPopup(null) }
+                                ) {
+                                    Text(strings().settings.update.close())
+                                }
+                            }
+                        )
+                    )
+                }
             }
+        } catch (e: IOException) {
+            app().error(e)
         }
-
     }
 }
 

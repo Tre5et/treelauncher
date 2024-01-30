@@ -74,10 +74,10 @@ class DeStrings : Strings(
     ),
     error = Error(
         close = { "Akzeptieren" },
-        message = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
+        message = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
         title = { "Ein Fehler ist aufgetreten!" },
         severeClose = { "Launcher schließen" },
-        severeMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden." },
+        severeMessage = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
         severeTitle = { "Ein kritischen Fehler ist aufgetreten!" },
         unknown = { "Unbekannter Fehler" }
     ),
