@@ -18,3 +18,4 @@ captures
 composeApp/data/
 composeApp/jcef/
 composeApp/kcef/
+composeApp/logs/
