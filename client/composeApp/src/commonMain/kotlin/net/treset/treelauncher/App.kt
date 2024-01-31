@@ -12,7 +12,6 @@ import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
-import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.components.Options
 import net.treset.treelauncher.components.Resourcepacks
@@ -64,11 +63,6 @@ fun App(
     }
 
     val launcherFiles = remember { LauncherFiles() }
-    try {
-        launcherFiles.reloadAll()
-    } catch (e: FileLoadException) {
-        app().severeError(e)
-    }
 
     val appContext = remember(launcherFiles) {
         AppContext(

@@ -2,7 +2,9 @@ package net.treset.treelauncher.components.mods
 
 import androidx.compose.runtime.*
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.creation.ModsCreator
+import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.components.Components
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.localization.strings
@@ -42,9 +44,13 @@ fun Mods(
             }
         },
         reload = {
-            appContext.files.reloadModsManifest()
-            appContext.files.reloadModsComponents()
-            components = appContext.files.modsComponents.sortedBy { it.first.name }
+            try {
+                appContext.files.reloadModsManifest()
+                appContext.files.reloadModsComponents()
+                components = appContext.files.modsComponents.sortedBy { it.first.name }
+            } catch (e: FileLoadException) {
+                app().severeError(e)
+            }
         },
         createContent =  { onCreate: (ModsCreationState) -> Unit ->
             ModsCreation(

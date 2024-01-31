@@ -10,9 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.InstanceDataSortType
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.generic.SortBox
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
@@ -29,10 +31,21 @@ fun Instances(
     var sortReversed: Boolean by remember { mutableStateOf(appSettings().isInstanceSortReverse) }
 
     val reloadInstances = {
-        appContext.files.reloadAll()
+        try {
+            appContext.files.reloadAll()
+        } catch (e: FileLoadException) {
+            app().severeError(e)
+        }
         selectedInstance = null
         instances = appContext.files.instanceComponents
-            .map { InstanceData.of(it, appContext.files) }
+            .mapNotNull {
+                try {
+                    InstanceData.of(it, appContext.files)
+                } catch (e: FileLoadException) {
+                    app().severeError(e)
+                    null
+                }
+            }
     }
 
     val redrawSelected: () -> Unit = {

@@ -12,10 +12,12 @@ import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.QuickPlayData
+import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
@@ -70,9 +72,13 @@ fun Saves(
             }
         },
         reload = {
-            appContext.files.reloadSavesManifest()
-            appContext.files.reloadSavesComponents()
-            components = appContext.files.savesComponents.sortedBy { it.name }
+            try {
+                appContext.files.reloadSavesManifest()
+                appContext.files.reloadSavesComponents()
+                components = appContext.files.savesComponents.sortedBy { it.name }
+            } catch (e: FileLoadException) {
+                app().severeError(e)
+            }
         },
         actionBarSpecial = { _, settingsShown, _, _ ->
             if(!settingsShown) {
@@ -194,7 +200,12 @@ fun Saves(
                     appContext = appContext,
                     onClose = { quickPlayData = null },
                     onConfirm = { playData, instance ->
-                        val instanceData = InstanceData.of(instance, appContext.files)
+                        val instanceData = try {
+                            InstanceData.of(instance, appContext.files)
+                        } catch (e: FileLoadException) {
+                            app().severeError(e)
+                            return@PlayPopup
+                        }
 
                         val launcher = GameLauncher(
                             instanceData,
@@ -229,8 +240,16 @@ private fun PlayPopup(
     onClose: () -> Unit,
     onConfirm: (QuickPlayData, Pair<LauncherManifest, LauncherInstanceDetails>) -> Unit
 ) {
-    val instances = remember(component) {
-        appContext.files.instanceComponents
+    var instances: List<Pair<LauncherManifest, LauncherInstanceDetails>> by remember(component) { mutableStateOf(listOf()) }
+
+    LaunchedEffect(component) {
+        try {
+            appContext.files.reloadAll()
+        } catch (e: FileLoadException) {
+            app().severeError(e)
+        }
+
+        instances = appContext.files.instanceComponents
             .filter {
                 it.second.savesComponent == component.id
             }

@@ -13,55 +13,55 @@ import java.util.*
 class LauncherFiles {
     private var _mainManifest: LauncherManifest? = null
     val mainManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _mainManifest?: throw FileLoadException("Unable to load launcher manifest: main file not loaded")
+        get() = _mainManifest!!
     private var _launcherDetails: LauncherDetails? = null
     val launcherDetails: LauncherDetails
-        @Throws(FileLoadException::class) get() = _launcherDetails?: throw FileLoadException("Unable to load launcher details: details not loaded")
+        get() = _launcherDetails!!
     private var _gameDetailsManifest: LauncherManifest? = null
     val gameDetailsManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _gameDetailsManifest?: throw FileLoadException("Unable to load launcher details: game details not loaded")
+        get() = _gameDetailsManifest!!
     private var _modsManifest: LauncherManifest? = null
     val modsManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _modsManifest?: throw FileLoadException("Unable to load launcher details: mods manifest not loaded")
+        get() = _modsManifest!!
     private var _modsComponents: Array<Pair<LauncherManifest, LauncherModsDetails>>? = null
     val modsComponents: Array<Pair<LauncherManifest, LauncherModsDetails>>
-        @Throws(FileLoadException::class) get() = _modsComponents?: throw FileLoadException("Unable to load launcher details: mods components not loaded")
+        get() = _modsComponents!!
     private var _savesManifest: LauncherManifest? = null
     val savesManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _savesManifest?: throw FileLoadException("Unable to load launcher details: saves manifest not loaded")
+        get() = _savesManifest!!
     private var _savesComponents: Array<LauncherManifest>? = null
     val savesComponents: Array<LauncherManifest>
-        @Throws(FileLoadException::class) get() = _savesComponents?: throw FileLoadException("Unable to load launcher details: saves components not loaded")
+        get() = _savesComponents!!
     private var _instanceManifest: LauncherManifest? = null
     val instanceManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _instanceManifest?: throw FileLoadException("Unable to load launcher details: instance manifest not loaded")
+        get() = _instanceManifest!!
     private var _instanceComponents: Array<Pair<LauncherManifest, LauncherInstanceDetails>>? = null
     val instanceComponents: Array<Pair<LauncherManifest, LauncherInstanceDetails>>
-        @Throws(FileLoadException::class) get() = _instanceComponents?: throw FileLoadException("Unable to load launcher details: instance components not loaded")
+        get() = _instanceComponents!!
     private var _javaManifest: LauncherManifest? = null
     val javaManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _javaManifest?: throw FileLoadException("Unable to load launcher details: java manifest not loaded")
+        get() = _javaManifest!!
     private var _javaComponents: Array<LauncherManifest>? = null
     val javaComponents: Array<LauncherManifest>
-        @Throws(FileLoadException::class) get() = _javaComponents?: throw FileLoadException("Unable to load launcher details: java components not loaded")
+        get() = _javaComponents!!
     private var _optionsManifest: LauncherManifest? = null
     val optionsManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _optionsManifest?: throw FileLoadException("Unable to load launcher details: options manifest not loaded")
+        get() = _optionsManifest!!
     private var _optionsComponents: Array<LauncherManifest>? = null
     val optionsComponents: Array<LauncherManifest>
-        @Throws(FileLoadException::class) get() = _optionsComponents?: throw FileLoadException("Unable to load launcher details: options components not loaded")
+        get() = _optionsComponents!!
     private var _resourcepackManifest: LauncherManifest? = null
     val resourcepackManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _resourcepackManifest?: throw FileLoadException("Unable to load launcher details: resourcepack manifest not loaded")
+        get() = _resourcepackManifest!!
     private var _resourcepackComponents: Array<LauncherManifest>? = null
     val resourcepackComponents: Array<LauncherManifest>
-        @Throws(FileLoadException::class) get() = _resourcepackComponents?: throw FileLoadException("Unable to load launcher details: resourcepack components not loaded")
+        get() = _resourcepackComponents!!
     private var _versionManifest: LauncherManifest? = null
     val versionManifest: LauncherManifest
-        @Throws(FileLoadException::class) get() = _versionManifest?: throw FileLoadException("Unable to load launcher details: version manifest not loaded")
+        get() = _versionManifest!!
     private var _versionComponents: Array<Pair<LauncherManifest, LauncherVersionDetails>>? = null
     val versionComponents: Array<Pair<LauncherManifest, LauncherVersionDetails>>
-        @Throws(FileLoadException::class) get() = _versionComponents?: throw FileLoadException("Unable to load launcher details: version components not loaded")
+        get() = _versionComponents!!
 
     init {
         reloadMainManifest()

@@ -1,5 +1,6 @@
 package net.treset.treelauncher.backend.util.file
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.JsonParsable
 import net.treset.treelauncher.backend.config.appConfig
 import java.awt.Desktop
@@ -165,11 +166,14 @@ class LauncherFile(pathname: String) : File(pathname) {
         return encryptedString.toString()
     }
 
-    @Throws(IOException::class)
     fun open() {
         val desktop = if (Desktop.isDesktopSupported()) Desktop.getDesktop() else null
         if (desktop != null && desktop.isSupported(Desktop.Action.OPEN)) {
-            desktop.open(this)
+            try {
+                desktop.open(this)
+            } catch (e: IOException) {
+                LOGGER.warn(e) { "Failed to open file: $this" }
+            }
         }
     }
 
@@ -178,6 +182,8 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     companion object {
+        val LOGGER = KotlinLogging.logger {  }
+
         fun of(vararg parts: String): LauncherFile {
             val path = StringBuilder()
             for (i in parts.indices) {

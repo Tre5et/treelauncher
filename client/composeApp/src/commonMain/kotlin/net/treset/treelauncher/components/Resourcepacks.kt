@@ -3,7 +3,9 @@ package net.treset.treelauncher.components
 import androidx.compose.runtime.*
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
+import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.localization.strings
@@ -40,9 +42,13 @@ fun Resourcepacks(
             }
         },
         reload = {
-            appContext.files.reloadResourcepackManifest()
-            appContext.files.reloadResourcepackComponents()
-            components = appContext.files.resourcepackComponents.sortedBy { it.name }
+            try {
+                appContext.files.reloadResourcepackManifest()
+                appContext.files.reloadResourcepackComponents()
+                components = appContext.files.resourcepackComponents.sortedBy { it.name }
+            } catch (e: FileLoadException) {
+                app().severeError(e)
+            }
         },
         detailsContent = { current, _, _ ->
             LaunchedEffect(current) {

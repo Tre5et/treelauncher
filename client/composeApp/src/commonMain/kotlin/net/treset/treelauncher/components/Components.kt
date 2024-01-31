@@ -14,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.GenericComponentCreator
 import net.treset.treelauncher.backend.util.CreationStatus
+import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.ComponentCreator
 import net.treset.treelauncher.creation.CreationPopup
@@ -24,6 +26,7 @@ import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import java.io.IOException
 
 @Composable
 fun <T, C:CreationState<T>> Components(
@@ -33,17 +36,17 @@ fun <T, C:CreationState<T>> Components(
     appContext: AppContext,
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
-    createContent: (@Composable ColumnScope.((C) -> Unit) -> Unit),
+    createContent: @Composable ColumnScope.(onCreate: (C) -> Unit) -> Unit,
     actionBarSpecial: @Composable RowScope.(
-        T,
-        Boolean,
-        () -> Unit,
-        () -> Unit
+        selected: T,
+        settingsOpen: Boolean,
+        redraw: () -> Unit,
+        reload: () -> Unit
     ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
-        T,
-        () -> Unit,
-        () -> Unit
+        selected: T,
+        redraw: () -> Unit,
+        reload: () -> Unit
     ) -> Unit = {_,_,_->},
     detailsScrollable: Boolean = true,
     settingsDefault: Boolean = false
@@ -59,6 +62,10 @@ fun <T, C:CreationState<T>> Components(
             selected = null
             selected = it
         }
+    }
+
+    LaunchedEffect(Unit) {
+        reload()
     }
 
 
@@ -217,10 +224,14 @@ fun <T, C:CreationState<T>> Components(
                         showRename = false
                         name?.let { newName ->
                             it.manifest().name = newName
-                            LauncherFile.of(
-                                it.manifest().directory,
-                                appConfig().MANIFEST_FILE_NAME
-                            ).write(it.manifest())
+                            try {
+                                LauncherFile.of(
+                                    it.manifest().directory,
+                                    appConfig().MANIFEST_FILE_NAME
+                                ).write(it.manifest())
+                            } catch (e: IOException) {
+                                app().severeError(e)
+                            }
                             redrawSelected()
                         }
                     }
@@ -235,11 +246,15 @@ fun <T, C:CreationState<T>> Components(
                     onClose = { showDelete = false },
                     onConfirm = {
                         appContext.files.savesManifest.components.remove(it.manifest().id)
-                        LauncherFile.of(
-                            appContext.files.savesManifest.directory,
-                            appContext.files.gameDetailsManifest.components[1]
-                        ).write(appContext.files.savesManifest)
-                        LauncherFile.of(it.manifest().directory).remove()
+                        try {
+                            LauncherFile.of(
+                                appContext.files.savesManifest.directory,
+                                appContext.files.gameDetailsManifest.components[1]
+                            ).write(appContext.files.savesManifest)
+                            LauncherFile.of(it.manifest().directory).remove()
+                        } catch(e: IOException) {
+                            app().severeError(e)
+                        }
                         reload()
                         showDelete = false
                     }
@@ -264,7 +279,11 @@ fun <T, C:CreationState<T>> Components(
                         }
 
                         Thread {
-                            creation.execute()
+                            try {
+                                creation.execute()
+                            } catch (e: ComponentCreationException) {
+                                app().error(e)
+                            }
                             reload()
                             creationStatus = null
                         }.start()

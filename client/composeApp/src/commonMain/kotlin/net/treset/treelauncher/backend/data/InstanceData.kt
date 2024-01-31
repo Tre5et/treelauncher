@@ -90,12 +90,6 @@ class InstanceData(
 
         @Throws(FileLoadException::class)
         fun of(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): InstanceData {
-            try {
-                files.reloadAll()
-            } catch (e: FileLoadException) {
-                throw FileLoadException("Failed to load instance data: file reload failed", e)
-            }
-
             val versionComponents = getVersionComponents(instance, files)
 
             val gameDataExcludedFiles: ArrayList<PatternString> = ArrayList()
