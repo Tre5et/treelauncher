@@ -12,6 +12,7 @@ import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
+import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.components.Options
 import net.treset.treelauncher.components.Resourcepacks
@@ -63,7 +64,11 @@ fun App(
     }
 
     val launcherFiles = remember { LauncherFiles() }
-    launcherFiles.reloadAll()
+    try {
+        launcherFiles.reloadAll()
+    } catch (e: FileLoadException) {
+        app().severeError(e)
+    }
 
     val appContext = remember(launcherFiles) {
         AppContext(
@@ -107,9 +112,12 @@ fun App(
                         onDismissRequest = {},
                         title = { Text(strings().error.title()) },
                         text = { Text(strings().error.message(e)) },
+                        containerColor = MaterialTheme.colorScheme.inversePrimary,
+                        textContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                         confirmButton = {
                             Button(
-                                onClick = { exceptions = exceptions.filter { it != e } }
+                                onClick = { exceptions = exceptions.filter { it != e } },
                             ) {
                                 Text(strings().error.close())
                             }
@@ -122,6 +130,7 @@ fun App(
                         onDismissRequest = {},
                         title = { Text(strings().error.severeTitle()) },
                         text = { Text(strings().error.severeMessage(e)) },
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
                         confirmButton = {
                             Button(
                                 onClick = { app().exit(force = true) },
@@ -207,10 +216,18 @@ class LauncherApp(
         force: Boolean = false
     ) {
         if(!force) {
-            updater().startUpdater(restart)
+            try {
+                updater().startUpdater(restart)
+            } catch (e: IOException) {
+                LOGGER.error(e) { "Failed to start updater!" }
+            }
         }
 
-        appSettings().save()
+        try {
+            appSettings().save()
+        } catch (e: IOException) {
+            LOGGER.error(e) { "Failed to save settings!" }
+        }
 
         exitApplication()
     }
