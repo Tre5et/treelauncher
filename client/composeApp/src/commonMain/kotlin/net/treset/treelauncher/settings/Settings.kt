@@ -400,7 +400,7 @@ fun Settings(
                 tooltip = strings().settings.sourceTooltip()
             ) {
                 Icon(
-                    icons().gitHub(),
+                    icons().gitHub,
                     "Link to Github Project",
                     modifier = Modifier.size(24.dp)
                 )

@@ -1,8 +1,7 @@
 package net.treset.treelauncher.backend.util.string
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.awt.Desktop
-import java.io.IOException
-import java.net.URISyntaxException
 import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -43,10 +42,15 @@ class UrlString(val original: String, private val operation: UrlOperation) : For
     }
 }
 
-@Throws(IOException::class, URISyntaxException::class)
 fun String.openInBrowser() {
     val desktop = if (Desktop.isDesktopSupported()) Desktop.getDesktop() else null
     if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-        desktop.browse(URL(this).toURI())
+        try {
+            desktop.browse(URL(this).toURI())
+        } catch (e: Exception) {
+            LOGGER.warn(e) { "Unable to open URL in Browser" }
+        }
     }
 }
+
+private val LOGGER = KotlinLogging.logger {}

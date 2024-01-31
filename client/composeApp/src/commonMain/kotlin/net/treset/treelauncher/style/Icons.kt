@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import net.treset.treelauncher.backend.util.ModProviderStatus
 
@@ -27,9 +28,9 @@ class Icons {
     val start = Icons.Rounded.PlayArrow
     val logout = Icons.Rounded.Logout
     val update = Icons.Rounded.Download
-    val gitHub = @Composable { painterResource("icons/github.svg") }
+    val gitHub: Painter @Composable get() = painterResource("icons/github.svg")
     val sort = Icons.Rounded.SwapVert
-    val play = @Composable { painterResource("icons/play_arrow_scaled.svg") }
+    val play: Painter @Composable get() = painterResource("icons/play_arrow_scaled.svg")
     val rename = Icons.Rounded.Edit
     val folder = Icons.Rounded.Folder
     val file = Icons.Rounded.InsertDriveFile
@@ -43,8 +44,8 @@ class Icons {
     val enabled = { enabled: Boolean -> if (enabled) disable else enable }
     val browser = Icons.Rounded.OpenInBrowser
     val search = Icons.Rounded.Search
-    val modrinth = @Composable { painterResource("icons/modrinth.svg") }
-    val curseforge = @Composable { painterResource("icons/curseforge.svg") }
+    val modrinth: Painter @Composable get() = painterResource("icons/modrinth.svg")
+    val curseforge: Painter @Composable get() = painterResource("icons/curseforge.svg")
     val selectFile = Icons.Rounded.FileOpen
     val news = Icons.Rounded.Newspaper
 

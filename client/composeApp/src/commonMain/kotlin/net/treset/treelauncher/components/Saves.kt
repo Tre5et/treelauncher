@@ -94,7 +94,7 @@ fun Saves(
                         tooltip = strings().selector.saves.play.button()
                     ) {
                         Icon(
-                            icons().play(),
+                            icons().play,
                             "Play",
                             modifier = Modifier.size(32.dp)
                         )
@@ -113,7 +113,7 @@ fun Saves(
                         tooltip = strings().selector.saves.play.button()
                     ) {
                         Icon(
-                            icons().play(),
+                            icons().play,
                             "Play",
                             modifier = Modifier.size(32.dp)
                         )

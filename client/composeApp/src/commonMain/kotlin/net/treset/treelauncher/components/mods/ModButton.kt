@@ -282,13 +282,13 @@ fun ModButton(
                         }
 
                         Icon(
-                            icons().modrinth(),
+                            icons().modrinth,
                             "Modrinth",
                             tint = icons().modrinthColor(modrinthStatus),
                             modifier = Modifier.size(32.dp)
                         )
                         Icon(
-                            icons().curseforge(),
+                            icons().curseforge,
                             "Curseforge",
                             tint = icons().curseforgeColor(curseforgeStatus),
                             modifier = Modifier.size(32.dp)

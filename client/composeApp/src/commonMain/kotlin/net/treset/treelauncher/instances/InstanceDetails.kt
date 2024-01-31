@@ -64,7 +64,7 @@ fun InstanceDetails(
                         tooltip = strings().selector.instance.play()
                     ) {
                         Icon(
-                            icons().play(),
+                            icons().play,
                             "Play",
                             modifier = Modifier.size(32.dp)
                         )
