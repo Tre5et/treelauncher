@@ -60,7 +60,7 @@ class JavaComponentCreator(
         }
         var release: JavaRuntimeRelease? = null
         for (r in os.releases) {
-            if (r != null && name == r.getId()) {
+            if (r != null && name == r.id) {
                 release = r
                 break
             }

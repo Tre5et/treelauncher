@@ -124,20 +124,17 @@ launcherTask(
         }
     }
 ) {
-    val file = project.file("src/commonMain/kotlin/net/treset/treelauncher/localization/Strings.kt")
-
+    val stringsFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/localization/Strings.kt")
     var found = false
-
-    val lines = file.readLines()
-
-    file.writeText(
-        lines.joinToString(System.lineSeparator()) { line ->
+    val stringsLines = stringsFile.readLines()
+    stringsFile.writeText(
+        stringsLines.joinToString(System.lineSeparator()) { line ->
             val match = "(?<=val version: \\(\\) -> String = \\{ \\\")(.*)(?=\\\" \\})".toRegex().find(line)
             match?.let { result ->
                 found = true
                 if(result.value != version) {
                     line.replace(result.value, version).also {
-                        println("Replaced version: ${result.value} -> $version")
+                        println("Replaced version in strings: ${result.value} -> $version")
                     }
                 } else {
                     line
@@ -145,10 +142,33 @@ launcherTask(
             } ?: line
         }
     )
-
     if(!found) {
         throw IllegalStateException("Could not find version string in Strings.kt")
     }
+
+
+    val configFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/backend/config/Config.kt")
+    found = false
+    val configLines = configFile.readLines()
+    configFile.writeText(
+        configLines.joinToString(System.lineSeparator()) { line ->
+            val match = "(?<=val modrinthUserAgent = \\\"TreSet/treelauncher/v)(.*)(?=\\\")".toRegex().find(line)
+            match?.let { result ->
+                found = true
+                if(result.value != version) {
+                    line.replace(result.value, version).also {
+                        println("Replaced version in Config: ${result.value} -> $version")
+                    }
+                } else {
+                    line
+                }
+            } ?: line
+        }
+    )
+    if(!found) {
+        throw IllegalStateException("Could not find version string in Config.kt")
+    }
+
 }
 
 launcherTask(

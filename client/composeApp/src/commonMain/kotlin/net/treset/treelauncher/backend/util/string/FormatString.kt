@@ -1,6 +1,5 @@
 package net.treset.treelauncher.backend.util.string
 
-import net.treset.treelauncher.backend.util.string.FormatString.FormatException
 import java.util.*
 import kotlin.math.min
 
@@ -22,25 +21,23 @@ abstract class FormatString {
 
     companion object {
         fun distance(a: String, b: String): Int {
-            var a = a
-            var b = b
-            a = a.lowercase(Locale.getDefault())
-            b = b.lowercase(Locale.getDefault())
-            val costs = IntArray(b.length + 1)
+            val modA = a.lowercase(Locale.getDefault())
+            val modB = b.lowercase(Locale.getDefault())
+            val costs = IntArray(modB.length + 1)
             for (j in costs.indices) costs[j] = j
-            for (i in 1..a.length) {
+            for (i in 1..modA.length) {
                 costs[0] = i
                 var nw = i - 1
-                for (j in 1..b.length) {
+                for (j in 1..modB.length) {
                     val cj = min(
-                        (1 + min(costs[j].toDouble(), costs[j - 1].toDouble())).toDouble(),
-                        (if (a[i - 1] == b[j - 1]) nw else nw + 1).toDouble()
+                        (1 + min(costs[j].toDouble(), costs[j - 1].toDouble())),
+                        (if (modA[i - 1] == modB[j - 1]) nw else nw + 1).toDouble()
                     ).toInt()
                     nw = costs[j]
                     costs[j] = cj
                 }
             }
-            return costs[b.length]
+            return costs[modB.length]
         }
     }
 }

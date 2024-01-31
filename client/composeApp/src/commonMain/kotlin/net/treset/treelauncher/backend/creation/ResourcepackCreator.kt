@@ -16,7 +16,7 @@ class ResourcepackCreator : GenericComponentCreator {
         null,
         name,
         typeConversion,
-        appConfig().RESOURCEPACK_DEFAULT_INCLUDED_FILES,
+        appConfig().resourcepacksDefaultIncludedFiles,
         null,
         componentsManifest
     ) {

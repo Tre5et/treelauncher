@@ -72,7 +72,7 @@ class InstanceData(
                 throw IOException("Unable to delete instance: unable to remove instance from launcher manifest")
             }
             try {
-                LauncherFile.of(files.instanceManifest.directory, appConfig().MANIFEST_FILE_NAME).write(files.instanceManifest)
+                LauncherFile.of(files.instanceManifest.directory, appConfig().manifestFileName).write(files.instanceManifest)
             } catch (e: IOException) {
                 throw IOException("Unable to delete instance: unable to write launcher manifest", e)
             }

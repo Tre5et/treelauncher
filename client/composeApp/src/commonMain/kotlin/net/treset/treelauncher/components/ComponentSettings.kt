@@ -40,7 +40,7 @@ fun ColumnScope.ComponentSettings(
             component.includedFiles = includedFiles
             LauncherFile.of(
                 component.directory,
-                appConfig().MANIFEST_FILE_NAME
+                appConfig().manifestFileName
             ).write(component)
         }
     }

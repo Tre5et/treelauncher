@@ -20,7 +20,7 @@ class Images {
             val h = base.height.coerceAtLeast(top.height)
             val combined = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
 
-            val g = combined.graphics;
+            val g = combined.graphics
             g.drawImage(base, 0, 0, null)
             g.drawImage(top, 0, 0, null)
 

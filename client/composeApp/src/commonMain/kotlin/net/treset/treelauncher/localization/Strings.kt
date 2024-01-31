@@ -16,7 +16,7 @@ enum class Language(val locale: Locale, val strings: Strings, val displayName: (
         return this.displayName()
     }
 }
-class LanguageInfo() {
+class LanguageInfo {
     val systemLanguage: Language = when (Locale.getDefault(Locale.Category.DISPLAY).language) {
         "de" -> Language.GERMAN
         else -> Language.ENGLISH

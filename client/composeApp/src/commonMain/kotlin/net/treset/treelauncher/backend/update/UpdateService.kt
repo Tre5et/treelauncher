@@ -6,7 +6,7 @@ import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
-class UpdateService : HttpService(appConfig().UPDATE_URL) {
+class UpdateService : HttpService(appConfig().updateUrl) {
     @Throws(IOException::class)
     fun update(): Update {
         val result: Pair<HttpStatusCode, ByteArray> = get(

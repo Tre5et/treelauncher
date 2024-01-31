@@ -55,11 +55,6 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    override fun download() {
-        super.download()
-    }
-
-    @Throws(IOException::class)
     override fun uploadAll(data: ComponentData) {
         uploadVersionFile()
         super.uploadAll(data)
@@ -69,11 +64,6 @@ class InstanceSynchronizer : ManifestSynchronizer {
     override fun uploadDifference(difference: List<String>) {
         uploadVersionFile()
         super.uploadDifference(difference)
-    }
-
-    @Throws(IOException::class)
-    override fun downloadNew() {
-        super.downloadNew()
     }
 
     @Throws(IOException::class)
@@ -87,7 +77,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
                 } catch (e: Exception) {
                     throw IOException("Failed to download version file", e)
                 }
-            } else if (file == appConfig().MANIFEST_FILE_NAME || file == instanceData.instance.first.details) {
+            } else if (file == appConfig().manifestFileName || file == instanceData.instance.first.details) {
                 if (detailsFileName == null) {
                     detailsFileName = downloadDetails()
                 }
@@ -127,10 +117,10 @@ class InstanceSynchronizer : ManifestSynchronizer {
         val out = service.downloadFile(
             "instance",
             instanceData.instance.first.id,
-            appConfig().MANIFEST_FILE_NAME
+            appConfig().manifestFileName
         )
         val manifest = LauncherManifest.fromJson(String(out))
-        LauncherFile.of(instanceData.instance.first.directory, appConfig().MANIFEST_FILE_NAME).write(manifest)
+        LauncherFile.of(instanceData.instance.first.directory, appConfig().manifestFileName).write(manifest)
         return manifest.details
     }
 
@@ -201,13 +191,17 @@ class InstanceSynchronizer : ManifestSynchronizer {
             LauncherVersionDetails::class.java
         )
         val creator: VersionCreator
-        if (details.versionId != instanceData.versionComponents.get(0).second.versionId) {
-            creator = if ("vanilla" == details.versionType) {
-                getVanillaCreator(details)
-            } else if ("fabric" == details.versionType) {
-                getFabricCreator(details)
-            } else {
-                throw IOException("Getting version returned unknown version type: ${details.versionType}")
+        if (details.versionId != instanceData.versionComponents[0].second.versionId) {
+            creator = when (details.versionType) {
+                "vanilla" -> {
+                    getVanillaCreator(details)
+                }
+                "fabric" -> {
+                    getFabricCreator(details)
+                }
+                else -> {
+                    throw IOException("Getting version returned unknown version type: ${details.versionType}")
+                }
             }
             creator.statusCallback = { status -> setStatus(SyncStatus(SyncStep.CREATING, status.downloadStatus)) }
             val id: String = creator.execute()

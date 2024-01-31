@@ -42,11 +42,11 @@ class GlobalConfigLoader {
     @Throws(IOException::class)
     fun updatePath(path: File, removeOld: Boolean) {
         val dstDir: LauncherFile = LauncherFile.of(path)
-        LOGGER.info("Updating path: path=${dstDir.absolutePath}, removeOld=$removeOld")
+        LOGGER.info { "Updating path: path=${dstDir.absolutePath}, removeOld=$removeOld" }
         if (!dstDir.isDirectory()) {
             throw IOException("Path is not a directory")
         }
-        if (appConfig().BASE_DIR.isChildOf(dstDir)) {
+        if (appConfig().baseDir.isChildOf(dstDir)) {
             throw IOException("Path is a child of the current directory")
         }
         val contents: String = file.readString()
@@ -62,16 +62,16 @@ class GlobalConfigLoader {
         }
         if (dstDir.isDirEmpty) {
             LOGGER.debug { "Copying files to new directory" }
-            appConfig().BASE_DIR.copyTo(dstDir, StandardCopyOption.REPLACE_EXISTING)
+            appConfig().baseDir.copyTo(dstDir, StandardCopyOption.REPLACE_EXISTING)
         } else {
-            if (!hasMainMainfest(dstDir)) {
+            if (!hasMainManifest(dstDir)) {
                 throw IOException("Directory is not empty and doesn't contain manifest file")
             }
             LOGGER.debug { "Not copying files to new directory because it is not empty" }
         }
         LOGGER.debug { "Updating config" }
-        val oldPath: LauncherFile = appConfig().BASE_DIR
-        appConfig().BASE_DIR = dstDir
+        val oldPath: LauncherFile = appConfig().baseDir
+        appConfig().baseDir = dstDir
         file.write(newContents.toString())
         if (removeOld) {
             LOGGER.debug { "Removing old directory" }
@@ -79,9 +79,9 @@ class GlobalConfigLoader {
         }
     }
 
-    fun hasMainMainfest(path: LauncherFile): Boolean {
+    fun hasMainManifest(path: LauncherFile): Boolean {
         val contents: String = try {
-            LauncherFile.of(path, appConfig().MANIFEST_FILE_NAME).readString()
+            LauncherFile.of(path, appConfig().manifestFileName).readString()
         } catch (e: IOException) {
             return false
         }

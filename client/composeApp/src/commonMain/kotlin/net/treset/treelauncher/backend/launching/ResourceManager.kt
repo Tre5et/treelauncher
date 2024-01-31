@@ -12,12 +12,7 @@ import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
 import java.util.*
 
-class ResourceManager(instanceData: InstanceData) {
-    private var instanceData: InstanceData
-
-    init {
-        this.instanceData = instanceData
-    }
+class ResourceManager(private var instanceData: InstanceData) {
 
     @Throws(GameResourceException::class)
     fun prepareResources() {
@@ -131,7 +126,7 @@ class ResourceManager(instanceData: InstanceData) {
         if (manifest.includedFiles == null) {
             throw GameResourceException("Unable to get included files: unmet requirements")
         }
-        val includedFilesDir: LauncherFile = LauncherFile.of(manifest.directory, appConfig().INCLUDED_FILES_DIR)
+        val includedFilesDir: LauncherFile = LauncherFile.of(manifest.directory, appConfig().includedFilesDirName)
         if (!includedFilesDir.isDirectory()) {
             try {
                 includedFilesDir.createDir()
@@ -205,12 +200,12 @@ class ResourceManager(instanceData: InstanceData) {
         for (f in files) {
             val launcherName = f.getLauncherName()
 
-            if (launcherName == appConfig().MANIFEST_FILE_NAME || PatternString.matchesAny(launcherName, instanceData.gameDataExcludedFiles)) {
+            if (launcherName == appConfig().manifestFileName || PatternString.matchesAny(launcherName, instanceData.gameDataExcludedFiles)) {
                 LOGGER.debug { "Removing excluded file: ${f.name}" }
                 toRemove.add(f)
             }
         }
-        files.removeAll(toRemove)
+        files.removeAll(toRemove.toSet())
         LOGGER.debug { "Removed excluded files: instance=${instanceData.instance.first.id}" }
     }
 
@@ -240,9 +235,9 @@ class ResourceManager(instanceData: InstanceData) {
     private fun removeIncludedFiles(component: LauncherManifest, files: MutableList<LauncherFile>) {
         LOGGER.debug { "Removing included files: ${component.type.name.lowercase()}, id=${component.id}, includedFiles=${component.includedFiles}, files=$files" }
         val includedFilesDir: LauncherFile =
-            LauncherFile.of(component.directory, appConfig().INCLUDED_FILES_DIR)
+            LauncherFile.of(component.directory, appConfig().includedFilesDirName)
         val oldIncludedFilesDir: LauncherFile =
-            LauncherFile.of(component.directory, "${appConfig().INCLUDED_FILES_DIR}_old")
+            LauncherFile.of(component.directory, "${appConfig().includedFilesDirName}_old")
         if (includedFilesDir.exists()) {
             try {
                 if (oldIncludedFilesDir.exists()) {
@@ -269,14 +264,14 @@ class ResourceManager(instanceData: InstanceData) {
 
                 LOGGER.debug { "Moving file: ${f.name}" }
                 try {
-                    f.moveTo(LauncherFile.of(component.directory, appConfig().INCLUDED_FILES_DIR, f.getName()), StandardCopyOption.REPLACE_EXISTING)
+                    f.moveTo(LauncherFile.of(component.directory, appConfig().includedFilesDirName, f.getName()), StandardCopyOption.REPLACE_EXISTING)
                 } catch (e: IOException) {
                     exceptionQueue.add(e)
                     LOGGER.warn { "Unable to remove included files: unable to move file: component_type=${component.type.name.lowercase()}, component=${component.id}, file=${f}" }
                 }
             }
         }
-        files.removeAll(toRemove)
+        files.removeAll(toRemove.toSet())
         if (exceptionQueue.isNotEmpty()) {
             throw GameResourceException("Unable to remove included files: unable to move ${exceptionQueue.size} files: component_type=${component.type.name.lowercase()}, component=${component.id}", exceptionQueue[0])
         }
@@ -286,7 +281,7 @@ class ResourceManager(instanceData: InstanceData) {
     @Throws(GameResourceException::class)
     private fun removeRemainingFiles(files: MutableList<LauncherFile>) {
         LOGGER.debug { "Removing remaining files: instance=${instanceData.instance.first.id}, files=$files" }
-        val includedFilesDir = LauncherFile.of(instanceData.instance.first.directory, appConfig().INCLUDED_FILES_DIR)
+        val includedFilesDir = LauncherFile.of(instanceData.instance.first.directory, appConfig().includedFilesDirName)
         if (includedFilesDir.exists()) {
             try {
                 includedFilesDir.remove()
@@ -315,7 +310,7 @@ class ResourceManager(instanceData: InstanceData) {
             } else {
                 LOGGER.debug { "Moving file: ${f.name}" }
                 try {
-                    f.moveTo(LauncherFile.of(instanceData.instance.first.directory, appConfig().INCLUDED_FILES_DIR, f.name), StandardCopyOption.REPLACE_EXISTING)
+                    f.moveTo(LauncherFile.of(instanceData.instance.first.directory, appConfig().includedFilesDirName, f.name), StandardCopyOption.REPLACE_EXISTING)
                 } catch (e: IOException) {
                     exceptionQueue.add(e)
                     LOGGER.warn { "Unable to cleanup launch resources: unable to move non-included file: ${f.name}" }

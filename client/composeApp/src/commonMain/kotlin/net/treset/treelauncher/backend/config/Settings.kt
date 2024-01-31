@@ -88,6 +88,6 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
 
 private lateinit var settings: Settings
 fun appSettings(): Settings = settings
-fun setAppSettings(_settings: Settings) {
-    settings = _settings
+fun setAppSettings(newSettings: Settings) {
+    settings = newSettings
 }

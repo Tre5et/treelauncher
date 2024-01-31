@@ -227,7 +227,7 @@ fun <T, C:CreationState<T>> Components(
                             try {
                                 LauncherFile.of(
                                     it.manifest().directory,
-                                    appConfig().MANIFEST_FILE_NAME
+                                    appConfig().manifestFileName
                                 ).write(it.manifest())
                             } catch (e: IOException) {
                                 app().severeError(e)

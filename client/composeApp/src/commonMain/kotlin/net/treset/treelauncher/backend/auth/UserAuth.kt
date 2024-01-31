@@ -18,7 +18,6 @@ import java.util.regex.Pattern
 import javax.imageio.ImageIO
 
 class UserAuth {
-    private val LOGGER = KotlinLogging.logger {}
     var isLoggedIn = false
         private set
     var isAuthenticating = false
@@ -43,31 +42,12 @@ class UserAuth {
 
     fun authenticateFromUrl(remember: Boolean, doneCallback: (Boolean) -> Unit): String? {
         val loginUrl = Authenticator.microsoftLogin().toString()
-        if (remember && !appConfig().AUTH_FILE.getParentFile().isDirectory() && !appConfig().AUTH_FILE.getParentFile().mkdirs()) {
+        if (remember && !appConfig().authFile.getParentFile().isDirectory() && !appConfig().authFile.getParentFile().mkdirs()) {
             LOGGER.error { "Unable to create auth file directory" }
             doneCallback(false)
             return null
         }
         return loginUrl
-        //TODO: Show web view
-        /*Platform.runLater {
-            val stage = Stage()
-            stage.setTitle(loginUrl)
-            stage.setOnCloseRequest { e: WindowEvent? -> onWebCloseRequested(stage, doneCallback) }
-            val webView = WebView()
-            webView.getEngine().load(loginUrl)
-            webView.getEngine().locationProperty().addListener { obeservable, oldValue, newValue ->
-                onWebLocationChanged(
-                    stage,
-                    remember,
-                    newValue,
-                    doneCallback
-                )
-            }
-            val webScene = Scene(webView)
-            stage.setScene(webScene)
-            stage.show()
-        }*/
     }
 
     fun checkUserUrl(
@@ -101,12 +81,12 @@ class UserAuth {
     }
 
     fun authenticateFromFile(doneCallback: (Boolean) -> Unit) {
-        if (!appConfig().AUTH_FILE.isFile()) {
+        if (!appConfig().authFile.isFile()) {
             return
         }
         val authFileStream: InputStream
         try {
-            authFileStream = FileInputStream(appConfig().AUTH_FILE)
+            authFileStream = FileInputStream(appConfig().authFile)
         } catch (e: FileNotFoundException) {
             LOGGER.error(e) { "Unable to open create input stream for auth file" }
             doneCallback(false)
@@ -125,13 +105,13 @@ class UserAuth {
     }
 
     fun hasFile(): Boolean {
-        return appConfig().AUTH_FILE.isFile()
+        return appConfig().authFile.isFile()
     }
 
     fun logout() {
         isLoggedIn = false
         minecraftUser = null
-        if (hasFile() && !appConfig().AUTH_FILE.delete()) {
+        if (hasFile() && !appConfig().authFile.delete()) {
             LOGGER.error { "Unable to delete auth file" }
         }
     }
@@ -176,7 +156,7 @@ class UserAuth {
     private fun writeToFile(file: AuthenticationFile): Boolean {
         val outputStream: FileOutputStream
         try {
-            outputStream = FileOutputStream(appConfig().AUTH_FILE)
+            outputStream = FileOutputStream(appConfig().authFile)
         } catch (e: FileNotFoundException) {
             LOGGER.error(e) { "Unable to create output stream for auth file" }
             return false
@@ -190,29 +170,6 @@ class UserAuth {
         }
         return true
     }
-
-    /*fun onWebCloseRequested(stage: Stage, doneCallback: Consumer<Boolean?>) {
-        stage.close()
-        LOGGER.warn { "Login window closed" }
-        doneCallback.accept(false)
-    }
-
-    fun onWebLocationChanged(stage: Stage, saveResults: Boolean, newUrl: String, doneCallback: Consumer<Boolean?>) {
-        stage.setTitle(newUrl)
-        if (newUrl.startsWith("https://login.live.com/oauth20_desktop.srf?code=")) {
-            val pattern = Pattern.compile("code=(.*)&")
-            val matcher = pattern.matcher(newUrl)
-            if (matcher.find()) {
-                val match = matcher.group(1)
-                stage.close()
-                completeAuthentication(
-                    Authenticator.ofMicrosoft(match).shouldAuthenticate().build(),
-                    saveResults,
-                    doneCallback
-                )
-            }
-        }
-    }*/
 
     private var userIcon: BufferedImage? = null
 
@@ -259,6 +216,8 @@ class UserAuth {
     }
 
     companion object {
+        private val LOGGER = KotlinLogging.logger {}
+
         private val headBaseUVWH = intArrayOf(8, 8, 8, 8)
         private val headTopUVWH = intArrayOf(40, 8, 8, 8)
     }

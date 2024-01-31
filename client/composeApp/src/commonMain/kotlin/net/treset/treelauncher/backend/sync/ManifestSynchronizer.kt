@@ -14,10 +14,8 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles, callback: SyncCallback?) :
+open class ManifestSynchronizer(var manifest: LauncherManifest, protected var files: LauncherFiles, callback: SyncCallback?) :
     FileSynchronizer(callback) {
-    var manifest: LauncherManifest
-    protected var files: LauncherFiles
     @Throws(IOException::class)
     override fun upload() {
         if (SyncService.isSyncing(manifest)) {
@@ -54,16 +52,16 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
     @Throws(IOException::class)
     protected fun uploadNew() {
         setStatus(SyncStatus(SyncStep.STARTING, null))
-        LOGGER.debug("Sync file not found, creating new sync file")
+        LOGGER.debug { "Sync file not found, creating new sync file" }
         setStatus(SyncStatus(SyncStep.COLLECTING, null))
         val data = calculateComponentData(0)
         setStatus(SyncStatus(SyncStep.UPLOADING, null))
         val service = SyncService()
-        service.newComponent(SyncService.convertType(manifest.getType()), manifest.getId())
+        service.newComponent(SyncService.convertType(manifest.type), manifest.id)
         uploadAll(data)
-        LOGGER.debug("Completing upload...")
+        LOGGER.debug { "Completing upload..." }
         val version = completeUpload(data)
-        LOGGER.debug("Upload complete: version=$version")
+        LOGGER.debug { "Upload complete: version=$version" }
         setStatus(SyncStatus(SyncStep.FINISHED, null))
     }
 
@@ -75,15 +73,15 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
 
     @Throws(IOException::class)
     protected open fun downloadNew() {
-        val dir: File = File(manifest.getDirectory())
+        val dir = File(manifest.directory)
         if (!dir.exists()) {
             Files.createDirectories(dir.toPath())
         }
         downloadDifference(0)
         val parent: LauncherManifest = parentManifest
         LOGGER.debug { "Adding component to parent manifest" }
-        parent.components.add(manifest.getId())
-        var fileName: String = appConfig().MANIFEST_FILE_NAME
+        parent.components.add(manifest.id)
+        var fileName: String = appConfig().manifestFileName
         if (manifest.type == LauncherManifestType.MODS_COMPONENT) {
             fileName = files.gameDetailsManifest.components[0]
         } else if (manifest.type == LauncherManifestType.SAVES_COMPONENT) {
@@ -94,7 +92,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
 
     @get:Throws(IOException::class)
     protected val parentManifest: LauncherManifest
-        get() = when (manifest.getType()) {
+        get() = when (manifest.type) {
             LauncherManifestType.SAVES_COMPONENT -> {
                 files.savesManifest
             }
@@ -181,7 +179,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
         for (path in difference) {
             index++
             setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(index, difference.size, path, false)))
-            LOGGER.debug("Difference: $path")
+            LOGGER.debug { "Difference: $path" }
             val file: LauncherFile = LauncherFile.of(manifest.directory, path)
             val content: ByteArray = if (file.isFile()) {
                 file.read()
@@ -219,7 +217,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
                     if (oldEntry.children!![i].path == newEntry.children!![k].path) {
                         found = true
                         for (l in j until k) {
-                            LOGGER.debug("Adding added file: " + path + "/" + newEntry.children!![l].path)
+                            LOGGER.debug { "Adding added file: $path/${newEntry.children!![l].path}" }
                             difference.addAll(
                                 getAllChildren(
                                     newEntry.children!![l],
@@ -275,7 +273,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
     @get:Throws(IOException::class)
     protected val currentComponentData: ComponentData
         get() {
-            val syncFile: LauncherFile = LauncherFile.of(manifest.directory, appConfig().SYNC_FILENAME)
+            val syncFile: LauncherFile = LauncherFile.of(manifest.directory, appConfig().syncFileName)
             if (!syncFile.exists()) {
                 throw IOException("Sync file not found")
             }
@@ -290,7 +288,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
     @Throws(IOException::class)
     protected fun downloadDifference(currentVersion: Int) {
         setStatus(SyncStatus(SyncStep.COLLECTING, null))
-        val response = SyncService().get(SyncService.convertType(manifest.type), manifest.id, currentVersion)
+        val response = SyncService()[SyncService.convertType(manifest.type), manifest.id, currentVersion]
         if (response.version == currentVersion) {
             LOGGER.debug { "Component is up to date" }
             setStatus(SyncStatus(SyncStep.FINISHED, null))
@@ -315,7 +313,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
             val path: String = try {
                 UrlString.decoded(rawPath).get()
             } catch (e: FormatString.FormatException) {
-                LOGGER.warn("Unable to decode filepath: $rawPath, this may be due to no url encoding being used, continuing with possibly encoded path, error: $e")
+                LOGGER.warn { "Unable to decode filepath: $rawPath, this may be due to no url encoding being used, continuing with possibly encoded path, error: $e" }
                 rawPath
             }
             LOGGER.debug { "Downloading file: $path" }
@@ -347,7 +345,7 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
     }
 
     private val syncFile: LauncherFile
-        get() = LauncherFile.of(manifest.directory, appConfig().SYNC_FILENAME)
+        get() = LauncherFile.of(manifest.directory, appConfig().syncFileName)
 
     @Throws(IOException::class)
     protected fun calculateComponentData(version: Int): ComponentData {
@@ -394,11 +392,6 @@ open class ManifestSynchronizer(manifest: LauncherManifest, files: LauncherFiles
     }
 
     private var count = 0
-
-    init {
-        this.manifest = manifest
-        this.files = files
-    }
 
     protected fun addCount(amount: Int) {
         count += amount

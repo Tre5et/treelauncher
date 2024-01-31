@@ -6,12 +6,7 @@ import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import java.io.IOException
 
-class AllSynchronizer(files: LauncherFiles, callback: SyncCallback?) : FileSynchronizer(callback) {
-    private val files: LauncherFiles
-
-    init {
-        this.files = files
-    }
+class AllSynchronizer(private val files: LauncherFiles, callback: SyncCallback?) : FileSynchronizer(callback) {
 
     @Throws(IOException::class)
     override fun upload() {
@@ -26,7 +21,6 @@ class AllSynchronizer(files: LauncherFiles, callback: SyncCallback?) : FileSynch
     @Throws(IOException::class)
     private fun synchronize(upload: Boolean) {
         val exceptions: MutableList<IOException> = mutableListOf()
-        //TODO: Make parallel
         files.instanceComponents.forEach { details ->
             if (!SyncService.isSyncing(details.first)) {
                 return@forEach

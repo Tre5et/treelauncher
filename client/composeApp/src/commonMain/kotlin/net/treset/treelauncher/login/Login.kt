@@ -84,10 +84,10 @@ fun LoginScreen(
     }
 
     browserUrl?.let {
-        LoginBrowserWindow(it) {url ->
+        LoginBrowserWindow(it) { url ->
             if(
-                userAuth().checkUserUrl(url, keepLoggedIn) {
-                    loginState = if (it) {
+                userAuth().checkUserUrl(url, keepLoggedIn) { success ->
+                    loginState = if (success) {
                         LoginState.LOGGED_IN
                     } else {
                         LoginState.FAILED

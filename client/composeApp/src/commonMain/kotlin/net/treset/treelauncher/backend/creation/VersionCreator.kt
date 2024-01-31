@@ -48,7 +48,7 @@ class VersionCreator : GenericComponentCreator {
         mcVersion.id,
         typeConversion,
         null,
-        appConfig().VERSION_DEFAULT_DETAILS,
+        appConfig().versionsDefaultDetails,
         componentsManifest
     ) {
         this.mcVersion = mcVersion
@@ -71,7 +71,7 @@ class VersionCreator : GenericComponentCreator {
         fabricProfile.id,
         typeConversion,
         null,
-        appConfig().VERSION_DEFAULT_DETAILS,
+        appConfig().versionsDefaultDetails,
         componentsManifest
     ) {
         this.fabricVersion = fabricVersion
@@ -219,7 +219,7 @@ class VersionCreator : GenericComponentCreator {
                 } catch (e: FileDownloadException) {
                     throw ComponentCreationException("Unable to add fabric file: failed to download fabric loader", e)
                 }
-                details.mainFile = appConfig().FABRIC_DEFAULT_CLIENT_FILENAME
+                details.mainFile = appConfig().fabricDefaultClientFileName
                 LOGGER.debug { "Added fabric file: mainFile=${details.mainFile}" }
             }?: {
                 throw ComponentCreationException("Unable to add fabric file: fabricVersion is null")
@@ -259,7 +259,7 @@ class VersionCreator : GenericComponentCreator {
                     throw ComponentCreationException("Unable to add fabric libraries: failed to download libraries", e)
                 }
                 details.libraries = libs
-                LOGGER.debug("Added fabric libraries")
+                LOGGER.debug { "Added fabric libraries" }
             }?: {
                 throw ComponentCreationException("Unable to add fabric libraries: librariesDir is null")
             }
@@ -273,13 +273,13 @@ class VersionCreator : GenericComponentCreator {
         fabricProfile?.let { fabricProfile ->
             details.jvmArguments = translateArguments(
                 fabricProfile.launchArguments.jvm,
-                appConfig().FABRIC_DEFAULT_JVM_ARGUMENTS
+                appConfig().fabricDefaultJvmArguments
             )
             details.gameArguments = translateArguments(
                 fabricProfile.launchArguments.game,
-                appConfig().FABRIC_DEFAULT_GAME_ARGUMENTS
+                appConfig().fabricDefaultGameArguments
             )
-            LOGGER.debug("Added fabric arguments")
+            LOGGER.debug { "Added fabric arguments" }
         }?: {
             throw ComponentCreationException("Unable to add fabric arguments: fabricProfile is null")
         }
@@ -320,7 +320,7 @@ class VersionCreator : GenericComponentCreator {
                     attemptCleanup()
                     throw ComponentCreationException("Unable to write version details to file", e)
                 }
-                LOGGER.debug("Created minecraft version: id={}", newManifest.id)
+                LOGGER.debug { "${"Created minecraft version: id={}"} ${newManifest.id}" }
             }?: {
                 attemptCleanup()
                 throw ComponentCreationException("Unable to create minecraft version: invalid data")
@@ -333,7 +333,7 @@ class VersionCreator : GenericComponentCreator {
     @Throws(ComponentCreationException::class)
     private fun downloadAssets() {
         mcVersion?.let {mcVersion ->
-            LOGGER.debug("Downloading assets...")
+            LOGGER.debug { "Downloading assets..." }
             setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, null))
             val assetIndexUrl: String = mcVersion.assetIndex.url
             val index: AssetIndex = try {
@@ -363,7 +363,7 @@ class VersionCreator : GenericComponentCreator {
                 } catch (e: FileDownloadException) {
                     throw ComponentCreationException("Unable to download assets: failed to download assets", e)
                 }
-                LOGGER.debug("Downloaded assets")
+                LOGGER.debug { "Downloaded assets" }
             }?: {
                 throw ComponentCreationException("Unable to download assets: files is null")
             }
@@ -378,9 +378,9 @@ class VersionCreator : GenericComponentCreator {
             val javaName: String = mcVersion.javaVersion.getComponent() ?: throw ComponentCreationException("Unable to add java component: java name is null")
             files?.let { files ->
                 for (j in files.javaComponents) {
-                    if (j != null && javaName == j.name) {
+                    if (javaName == j.name) {
                         details.java = j.id
-                        LOGGER.debug("Using existing java component: id={}", j.id)
+                        LOGGER.debug { "${"Using existing java component: id={}"} ${j.id}" }
                         return
                     }
                 }
@@ -434,7 +434,7 @@ class VersionCreator : GenericComponentCreator {
                     throw ComponentCreationException("Unable to add libraries: failed to download libraries", e)
                 }
                 details.libraries = result
-                LOGGER.debug("Added libraries: {}", result)
+                LOGGER.debug { "${"Added libraries: {}"} $result" }
             }?: {
                 throw ComponentCreationException("Unable to add libraries: librariesDir is null")
             }
@@ -472,11 +472,11 @@ class VersionCreator : GenericComponentCreator {
         mcVersion?.let { mcVersion ->
             details.gameArguments = translateArguments(
                 mcVersion.launchArguments.game,
-                appConfig().MINECRAFT_DEFAULT_GAME_ARGUMENTS
+                appConfig().minecraftDefaultGameArguments
             )
             details.jvmArguments = translateArguments(
                 mcVersion.launchArguments.jvm,
-                appConfig().MINECRAFT_DEFAULT_JVM_ARGUMENTS
+                appConfig().minecraftDefaultJvmArguments
             )
             LOGGER.debug { "Added arguments" }
         }?: {

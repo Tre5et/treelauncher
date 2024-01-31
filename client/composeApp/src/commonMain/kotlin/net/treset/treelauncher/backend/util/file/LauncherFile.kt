@@ -23,6 +23,7 @@ class LauncherFile(pathname: String) : File(pathname) {
         return Files.readAllBytes(toPath())
     }
 
+    @Suppress("CheckedExceptionsKotlin")
     @Throws(IOException::class)
     fun readString(): String {
         return String(read())
@@ -34,7 +35,7 @@ class LauncherFile(pathname: String) : File(pathname) {
 
     @Throws(IOException::class)
     fun copyTo(dst: LauncherFile, vararg options: CopyOption?) {
-        copyTo(dst, { s: String? -> true }, *options)
+        copyTo(dst, { true }, *options)
     }
 
     @Throws(IOException::class)
@@ -57,9 +58,9 @@ class LauncherFile(pathname: String) : File(pathname) {
                             exceptions.add(e)
                         }
                     }
-                    if (!exceptions.isEmpty()) {
+                    if (exceptions.isNotEmpty()) {
                         throw IOException(
-                            "Unable to copy directory: " + exceptions.size + " file copies failed: source=" + this + ", destination=" + dst,
+                            "Unable to copy directory: ${exceptions.size} file copies failed: source=$this, destination=$dst",
                             exceptions[0]
                         )
                     }
@@ -214,7 +215,7 @@ class LauncherFile(pathname: String) : File(pathname) {
         }
 
         fun ofData(vararg parts: String): LauncherFile {
-            return of(appConfig().BASE_DIR, *parts)
+            return of(appConfig().baseDir, *parts)
         }
     }
 }

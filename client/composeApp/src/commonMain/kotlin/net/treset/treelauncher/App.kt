@@ -147,10 +147,6 @@ class LauncherApp(
     val exitApplication: () -> Unit,
 ) {
     init {
-        //TODO: Configure Logger
-        //TODO: Close Behaviour: Prevent close, Sync, Update
-        //TODO: Popups
-
         try {
             GlobalConfigLoader().loadConfig()
         } catch (e: IllegalStateException) {
@@ -161,12 +157,12 @@ class LauncherApp(
             exitProcess(-1)
         }
 
-        MinecraftMods.setModrinthUserAgent(appConfig().MODRINTH_USER_AGENT)
-        MinecraftMods.setCurseforgeApiKey(appConfig().CURSEFORGE_API_KEY)
+        MinecraftMods.setModrinthUserAgent(appConfig().modrinthUserAgent)
+        MinecraftMods.setCurseforgeApiKey(appConfig().curseforgeApiKey)
 
         try {
-            if (!appConfig().BASE_DIR.exists() || !GlobalConfigLoader().hasMainMainfest(appConfig().BASE_DIR)) {
-                FileInitializer(appConfig().BASE_DIR).create()
+            if (!appConfig().baseDir.exists() || !GlobalConfigLoader().hasMainManifest(appConfig().baseDir)) {
+                FileInitializer(appConfig().baseDir).create()
             }
         } catch (e: IOException) {
             LOGGER.error(e) { "Failed to initialize directory structure!" }
@@ -228,7 +224,7 @@ class LauncherApp(
 
     @Throws(IOException::class)
     private fun loadSettings() {
-        val settingsFile = LauncherFile.of(appConfig().BASE_DIR, appConfig().SETTINGS_FILE_NAME)
+        val settingsFile = LauncherFile.of(appConfig().baseDir, appConfig().settingsFile)
         if (!settingsFile.exists()) {
             Settings.new(settingsFile)
         } else {

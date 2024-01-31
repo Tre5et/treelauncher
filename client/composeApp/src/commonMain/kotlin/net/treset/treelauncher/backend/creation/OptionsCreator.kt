@@ -16,7 +16,7 @@ class OptionsCreator : GenericComponentCreator {
         null,
         name,
         typeConversion,
-        appConfig().OPTIONS_DEFAULT_INCLUDED_FILES,
+        appConfig().optionsDefaultIncludedFiles,
         null,
         componentsManifest
     ) {

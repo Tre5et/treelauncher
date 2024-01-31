@@ -1,4 +1,5 @@
 // Package changing strangeness needed to access tbrp.fileNamePattern correctly
+@file:Suppress("PackageDirectoryMismatch")
 package ch.qos.logback.core.rolling
 
 import ch.qos.logback.core.joran.spi.NoAutoStart

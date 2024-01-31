@@ -62,8 +62,8 @@ fun NavigationContainer(
     }
 
     LaunchedEffect(Unit) {
-        news().let {
-            if(it.important?.map{ it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
+        news().let {nws ->
+            if(nws.important?.map{ it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
                 app().showNews(displayOther = false, displayAcknowledged = false)
             }
         }

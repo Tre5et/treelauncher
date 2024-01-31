@@ -20,7 +20,6 @@ class GameLauncher(
     var exitCallbacks: Array<(String?) -> Unit> = arrayOf()
 ) {
     private var resourceManager: ResourceManager? = null
-        private set
     var gameListener: GameListener? = null
 
     @Throws(GameLaunchException::class)

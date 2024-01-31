@@ -1,6 +1,5 @@
 package net.treset.treelauncher.backend.util.string
 
-import java.util.*
 import java.util.regex.Pattern
 
 class PatternString(original: String, keep: Boolean = false) : FormatString() {

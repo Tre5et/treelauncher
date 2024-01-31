@@ -67,7 +67,7 @@ class SyncService @JvmOverloads constructor(
 
     companion object {
         fun isSyncing(manifest: LauncherManifest): Boolean {
-            return LauncherFile.of(manifest.directory, appConfig().SYNC_FILENAME).isFile()
+            return LauncherFile.of(manifest.directory, appConfig().syncFileName).isFile()
         }
 
         @Throws(IOException::class)

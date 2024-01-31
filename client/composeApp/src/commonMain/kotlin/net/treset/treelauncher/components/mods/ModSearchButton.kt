@@ -79,8 +79,8 @@ fun ModSearchButton(
 
     LaunchedEffect(mod) {
         image ?: Thread {
-            mod.iconUrl?.let {
-                loadNetworkImage(it)?.let {
+            mod.iconUrl?.let { url ->
+                loadNetworkImage(url)?.let {
                     image = it
                 }
             }

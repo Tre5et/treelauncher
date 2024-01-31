@@ -215,7 +215,7 @@ fun InstanceDetails(
                     instance.instance.first.name = newName
                     LauncherFile.of(
                         instance.instance.first.directory,
-                        appConfig().MANIFEST_FILE_NAME
+                        appConfig().manifestFileName
                     ).write(instance.instance.first)
                     redrawSelected()
                 }

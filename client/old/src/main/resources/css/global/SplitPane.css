@@ -1,9 +1,0 @@
-.split-pane {
-    -fx-background-insets: 0;
-    -fx-padding: 0;
-}
-
-.split-pane > .split-pane-divider {
-    -fx-background-color: transparent;
-    -fx-cursor: default;
-}

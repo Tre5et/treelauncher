@@ -5,7 +5,6 @@ import net.treset.mc_version_loader.json.JsonParsable
 import net.treset.mc_version_loader.launcher.LauncherDetails
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import java.io.File
 import java.io.IOException
 
 class FileInitializer(directory: LauncherFile) {
@@ -81,22 +80,6 @@ class FileInitializer(directory: LauncherFile) {
         }
         for (file in files) {
             file.make()
-        }
-
-        // this is a terrible hack for the packaging
-        removeUpdaterFromClasspath()
-    }
-
-    private fun removeUpdaterFromClasspath() {
-        val cfg: LauncherFile = LauncherFile.of("app", "TreeLauncher.cfg")
-        if (cfg.exists()) {
-            try {
-                var content: String = cfg.readString()
-                content = content.replace("app.classpath=\$APPDIR\\updater.jar", "")
-                cfg.write(content)
-            } catch (e: IOException) {
-                LOGGER.error(e) { "Failed to remove updater classpath" }
-            }
         }
     }
 

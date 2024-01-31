@@ -19,7 +19,7 @@ class SavesCreator : GenericComponentCreator {
         null,
         name,
         typeConversion,
-        appConfig().SAVES_DEFAULT_INCLUDED_FILES,
+        appConfig().savesDefaultIncludedFiles,
         null,
         componentsManifest
     ) {

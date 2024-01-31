@@ -28,8 +28,8 @@ class ModsCreator : GenericComponentCreator {
         null,
         name,
         typeConversion,
-        appConfig().MODS_DEFAULT_INCLUDED_FILES,
-        appConfig().MODS_DEFAULT_DETAILS,
+        appConfig().modsDefaultIncludedFiles,
+        appConfig().modsDefaultDetails,
         componentsManifest
     ) {
         this.modsType = modsType
@@ -80,7 +80,7 @@ class ModsCreator : GenericComponentCreator {
         newManifest?.let {
             val details = LauncherModsDetails(modsType, modsVersion, listOf())
             try {
-                LauncherFile.of(it.directory, appConfig().MODS_DEFAULT_DETAILS).write(details)
+                LauncherFile.of(it.directory, appConfig().modsDefaultDetails).write(details)
             } catch (e: IOException) {
                 attemptCleanup()
                 throw ComponentCreationException("Failed to create mods component: failed to write details", e)

@@ -93,7 +93,7 @@ class LauncherFiles {
     @Throws(FileLoadException::class)
     fun reloadMainManifest() {
         val versionFile: String = try {
-            LauncherFile.of(appConfig().BASE_DIR, appConfig().MANIFEST_FILE_NAME).readString()
+            LauncherFile.of(appConfig().baseDir, appConfig().manifestFileName).readString()
         } catch (e: IOException) {
             throw FileLoadException("Unable to load launcher manifest: file error", e)
         }
@@ -106,7 +106,7 @@ class LauncherFiles {
             if (it == null || it.type != LauncherManifestType.LAUNCHER) {
                 throw FileLoadException("Unable to load launcher manifest: incorrect contents")
             }
-            it.directory = appConfig().BASE_DIR.absolutePath
+            it.directory = appConfig().baseDir.absolutePath
             LOGGER.debug { "Loaded launcher manifest" }
         }
     }
@@ -117,7 +117,7 @@ class LauncherFiles {
             it.details?: throw FileLoadException("Unable to load launcher details: invalid main file")
 
             val detailsFile: String = try {
-                LauncherFile.of(appConfig().BASE_DIR, it.details).readString()
+                LauncherFile.of(appConfig().baseDir, it.details).readString()
             } catch (e: IOException) {
                 throw FileLoadException("Unable to load launcher details: file error", e)
             }
@@ -283,7 +283,7 @@ class LauncherFiles {
 
     @Throws(FileLoadException::class)
     fun reloadManifest(path: LauncherFile, expectedType: LauncherManifestType): LauncherManifest {
-        return reloadManifest(path, appConfig().MANIFEST_FILE_NAME, expectedType)
+        return reloadManifest(path, appConfig().manifestFileName, expectedType)
     }
 
     @Throws(FileLoadException::class)
@@ -316,7 +316,7 @@ class LauncherFiles {
         return reloadComponents(
             parentManifest,
             parentPath,
-            appConfig().MANIFEST_FILE_NAME,
+            appConfig().manifestFileName,
             expectedType,
             fallbackPath
         )
@@ -392,7 +392,7 @@ class LauncherFiles {
         return reloadComponents(
             parentManifest,
             parentDir,
-            appConfig().MANIFEST_FILE_NAME,
+            appConfig().manifestFileName,
             expectedType,
             targetClass,
             fallbackPath

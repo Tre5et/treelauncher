@@ -139,7 +139,7 @@ abstract class GenericComponentCreator(
                     LauncherFile.of(newManifest.directory),
                     {
                         filename -> !filename.equals(
-                        appConfig().MANIFEST_FILE_NAME)
+                        appConfig().manifestFileName)
                     },
                     StandardCopyOption.REPLACE_EXISTING
                 )
@@ -161,10 +161,10 @@ abstract class GenericComponentCreator(
                     "${componentsMan.prefix}_${it.id}"
                 ).path
                 try {
-                    LauncherFile.of(it.getDirectory(), appConfig().MANIFEST_FILE_NAME).write(it)
+                    LauncherFile.of(it.directory, appConfig().manifestFileName).write(it)
                 } catch (e: IOException) {
                     throw ComponentCreationException(
-                        "Unable to write manifest: unable to write manifest to file: id=${it.id}, path=${it.directory}/${appConfig().MANIFEST_FILE_NAME}",
+                        "Unable to write manifest: unable to write manifest to file: id=${it.id}, path=${it.directory}/${appConfig().manifestFileName}",
                         e
                     )
                 }
@@ -181,13 +181,13 @@ abstract class GenericComponentCreator(
                 }
                 if (it.includedFiles != null) {
                     try {
-                        LauncherFile.of(it.directory, appConfig().INCLUDED_FILES_DIR).createDir()
+                        LauncherFile.of(it.directory, appConfig().includedFilesDirName).createDir()
                     } catch (e: IOException) {
-                        throw ComponentCreationException("Unable to write manifest: unable to create included files directory: id=${it.id}, path=${it.directory}/${appConfig().INCLUDED_FILES_DIR}")
+                        throw ComponentCreationException("Unable to write manifest: unable to create included files directory: id=${it.id}, path=${it.directory}/${appConfig().includedFilesDirName}")
                     }
                 }
                 LOGGER.debug {
-                    "Wrote manifest: path=${it.directory}/${appConfig().MANIFEST_FILE_NAME}"
+                    "Wrote manifest: path=${it.directory}/${appConfig().manifestFileName}"
                 }
             }
         }
@@ -211,7 +211,7 @@ abstract class GenericComponentCreator(
                     }
                 }
 
-                if (componentsMan.components != null && it.getId() != null && componentsMan.components.contains(
+                if (componentsMan.components != null && it.id != null && componentsMan.components.contains(
                         it.id
                     )
                 ) {
@@ -220,9 +220,9 @@ abstract class GenericComponentCreator(
                     componentsMan.components = components
                     try {
                         LauncherFile.of(componentsMan.directory, parentManifestFileName).write(componentsMan)
-                        LOGGER.debug { "Cleaned up parent manifest: id=${it.getId()}" }
+                        LOGGER.debug { "Cleaned up parent manifest: id=${it.id}" }
                     } catch (e: IOException) {
-                        LOGGER.warn(e) { "Unable to cleanup: unable to write parent manifest to file: continuing: id=${it.getId()} path=${componentsMan.directory}/${parentManifestFileName}" }
+                        LOGGER.warn(e) { "Unable to cleanup: unable to write parent manifest to file: continuing: id=${it.id} path=${componentsMan.directory}/${parentManifestFileName}" }
                         success = false
                     }
                 }
@@ -234,7 +234,7 @@ abstract class GenericComponentCreator(
     }
 
     protected open val parentManifestFileName: String
-        get() = appConfig().MANIFEST_FILE_NAME
+        get() = appConfig().manifestFileName
 
     @Throws(IllegalArgumentException::class)
     fun getManifestType(type: LauncherManifestType, typeConversion: Map<String, LauncherManifestType>): String {

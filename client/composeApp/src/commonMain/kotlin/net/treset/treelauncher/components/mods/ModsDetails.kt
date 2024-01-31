@@ -148,7 +148,7 @@ fun ColumnScope.ModsDetails(
                 )
             }
 
-            Column {
+            /*Column {
                 Row(
                     modifier = Modifier.requiredHeight(28.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -182,7 +182,7 @@ fun ColumnScope.ModsDetails(
                     },
                     modifier = Modifier.requiredHeight(28.dp)
                 )
-            }
+            }*/
         }
 
         Row(

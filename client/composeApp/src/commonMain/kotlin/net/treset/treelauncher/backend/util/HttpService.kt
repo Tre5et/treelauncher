@@ -183,7 +183,7 @@ open class HttpService @JvmOverloads constructor(
         NOT_EXTENDED(510, "Not Extended"),
         NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required"),
 
-        //Unkown
+        //Unknown
         UNKNOWN(-1, "Unknown");
 
         override fun toString(): String {

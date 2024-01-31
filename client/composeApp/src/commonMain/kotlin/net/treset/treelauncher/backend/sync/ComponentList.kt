@@ -17,7 +17,7 @@ class ComponentList(val entries: List<Entry>) : GenericJsonParsable() {
         @Throws(SerializationException::class)
         fun fromJson(json: String?): ComponentList {
             val entries = fromJson(json, Array<Entry>::class.java)
-            return ComponentList(Arrays.asList(*entries))
+            return ComponentList(listOf(*entries))
         }
     }
 }

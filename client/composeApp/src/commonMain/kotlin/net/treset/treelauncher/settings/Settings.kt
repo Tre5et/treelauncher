@@ -115,7 +115,7 @@ fun Settings(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            var tfValue by remember { mutableStateOf(appConfig().BASE_DIR.absolutePath) }
+            var tfValue by remember { mutableStateOf(appConfig().baseDir.absolutePath) }
             var showDirPicker by remember { mutableStateOf(false) }
 
             Row(
@@ -144,7 +144,7 @@ fun Settings(
 
             DirectoryPicker(
                 show = showDirPicker,
-                initialDirectory = if(LauncherFile.of(tfValue).isDirectory()) tfValue else appConfig().BASE_DIR.absolutePath,
+                initialDirectory = if(LauncherFile.of(tfValue).isDirectory()) tfValue else appConfig().baseDir.absolutePath,
                 onFileSelected = {
                     it?.let { tfValue = it }
                     showDirPicker = false

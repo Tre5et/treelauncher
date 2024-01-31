@@ -45,9 +45,9 @@ class DeStrings : Strings(
         status = Creator.Status(
             starting = { "Erstellung wird vorbereitet..." },
             mods = { "Mods Komponente wird erstellt..." },
-            options = { "Optionskomponente wirde erstellt..." },
+            options = { "Optionskomponente wird erstellt..." },
             resourcepacks = { "Ressoucenpaketkomponente wird erstellt..." },
-            saves = { "Werltenkomponente wird erstellt..." },
+            saves = { "Weltenkomponente wird erstellt..." },
             version = Creator.Status.Version(
                 value = { "Version wird erstellt..." },
                 vanilla = { "Minecraft Version wird erstellt..." },

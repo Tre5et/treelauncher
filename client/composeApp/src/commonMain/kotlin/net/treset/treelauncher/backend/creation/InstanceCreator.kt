@@ -27,8 +27,8 @@ class InstanceCreator(
     null,
     name,
     typeConversion,
-    appConfig().INSTANCE_DEFAULT_INCLUDED_FILES,
-    appConfig().INSTANCE_DEFAULT_DETAILS,
+    appConfig().instanceDefaultIncludedFiles,
+    appConfig().instanceDefaultDetails,
     componentsManifest
 ) {
 
@@ -41,13 +41,13 @@ class InstanceCreator(
         val result = super.createComponent()
         newManifest?.let { newManifest ->
             val features: ArrayList<LauncherFeature> = ArrayList(features)
-            features.addAll(appConfig().INSTANCE_DEFAULT_FEATURES)
+            features.addAll(appConfig().instanceDefaultFeatures)
             val ignoredFiles: ArrayList<PatternString> = ArrayList(ignoredFiles)
-            ignoredFiles.addAll(appConfig().INSTANCE_DEFAULT_IGNORED_FILES)
+            ignoredFiles.addAll(appConfig().instanceDefaultIgnoredFiles)
             val jvmArguments: ArrayList<LauncherLaunchArgument> = ArrayList(
                 jvmArguments
             )
-            jvmArguments.addAll(appConfig().INSTANCE_DEFAULT_JVM_ARGUMENTS)
+            jvmArguments.addAll(appConfig().instanceDefaultJvmArguments)
             val details = LauncherInstanceDetails(
                 features,
                 ignoredFiles.stream().map(PatternString::get).toList(),
