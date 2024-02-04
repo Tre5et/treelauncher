@@ -151,5 +151,6 @@ actual fun getUpdaterFile(): File {
     if(devFile.isFile) {
         return devFile
     }
-    return File("app/resources/updater.jar")
+    //Weird file extension to prevent automatic addition to classpath by jpackage
+    return File("app/resources/updater.cjar")
 }

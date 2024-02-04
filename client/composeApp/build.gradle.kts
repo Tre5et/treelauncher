@@ -4,6 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 plugins {
@@ -62,10 +63,10 @@ compose.desktop {
         mainClass = "net.treset.treelauncher.MainKt"
 
         nativeDistributions {
+            modules("java.instrument", "java.naming", "java.net.http", "java.sql", "jdk.management", "jdk.unsupported")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = projectName
             packageVersion = version
-            includeAllModules = true
             appResourcesRootDir = resourcesDir
             vendor = projectVendor
 
@@ -86,7 +87,7 @@ compose.desktop {
         }
 
         buildTypes.release.proguard {
-            configurationFiles.from("compose-desktop.pro")
+            configurationFiles.from(project.file("compose-desktop.pro"))
         }
     }
 }
@@ -108,6 +109,16 @@ fun launcherTask(
         }
     }
 }
+
+launcherTask(
+    "createDist",
+    listOf(
+        "replaceVersion",
+        "zipDist",
+        "moveMsi",
+        "makeUpdate"
+    )
+)
 
 launcherTask(
     "replaceVersion",
@@ -214,10 +225,148 @@ launcherTask(
 }
 
 launcherTask(
-    "createDist",
-    listOf(
-        "replaceVersion",
-        "zipDist",
-        "moveMsi"
-    )
-)
+    "makeUpdate",
+    listOf("zipDist")
+) {
+    println("Calculating difference")
+
+    println("Enter old distributable directory")
+    val oldDir = File(readln())
+
+    val newDir = project.file("build/dist/${version}/$projectName-$version")
+    newDir.mkdirs()
+    ZipFile(project.file("build/dist/${version}/$projectName-$version.zip")).use { zip ->
+        zip.entries().asSequence().forEach { entry ->
+            zip.getInputStream(entry).use { input ->
+                if (entry.isDirectory) {
+                    val d = File(newDir, entry.name)
+                    if (!d.exists()) d.mkdirs()
+                } else {
+                    val f = File(newDir, entry.name)
+                    if (f.parentFile?.exists() != true)  f.parentFile?.mkdirs()
+
+                    f.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+        }
+    }
+
+    val result = scanDir(oldDir, newDir)
+
+    val sb = StringBuilder("\"id\": \"$version\",\n\"changes\": [\n")
+    for (deleted in result.first) {
+        sb.append("  {\n")
+        sb.append("    \"mode\": \"DELETE\",\n")
+        sb.append("    \"path\": \"${deleted.replace("\\", "/")}\",\n")
+        sb.append("    \"updater\": true\n")
+        sb.append("  },\n")
+    }
+    project.file("build/dist/$version/update/latest/").deleteRecursively()
+    for (added in result.second) {
+        val file = newDir.resolve(added)
+        if(file.isFile) {
+            val toFile = project.file("build/dist/$version/update/latest/$added")
+            toFile.parentFile.mkdirs()
+            file.copyTo(toFile, true)
+        }
+        sb.append("  {\n")
+        sb.append("    \"mode\": \"FILE\",\n")
+        sb.append("    \"path\": \"${added.replace("\\", "/")}\",\n")
+        sb.append("    \"updater\": true\n")
+        sb.append("  },\n")
+    }
+    sb.append("]")
+
+    project.file("build/dist/$version/update/difference.json").writeText(sb.toString())
+
+    println("Wrote difference to build/dist/$version/update/difference.json")
+}
+
+fun scanDir(old: File, new: File): Pair<Set<String>, Set<String>> {
+    val oldFiles = mutableSetOf<String>()
+    val newFiles = mutableSetOf<String>()
+
+    old.walkBottomUp().forEach { file ->
+        val path = old.toPath().relativize(file.toPath()).toString()
+        if(!path.startsWith("logs") && !path.startsWith("data")) {
+            oldFiles.add(path)
+        }
+    }
+
+    new.walkBottomUp().forEach { file ->
+        val path = new.toPath().relativize(file.toPath()).toString()
+        if(!path.startsWith("logs") && !path.startsWith("data")) {
+            newFiles.add(path)
+        }
+    }
+
+    val deleted = oldFiles.minus(newFiles).toMutableSet()
+    val added = newFiles.minus(oldFiles).toMutableSet()
+
+    val common = oldFiles.intersect(newFiles)
+
+    for (path in common) {
+        val oldFile = old.resolve(path)
+        val newFile = new.resolve(path)
+
+        if(oldFile.lastModified() != newFile.lastModified()) {
+            added.add(path)
+        }
+    }
+
+    val toRemoveAdded = mutableSetOf<String>()
+    for (path in added) {
+        val newFile = new.resolve(path)
+        if(!newFile.isFile) {
+            toRemoveAdded.add(path)
+        }
+    }
+    added.removeAll(toRemoveAdded)
+
+    val toRemoveDeleted = mutableSetOf<String>()
+    for (path in deleted) {
+        val oldFile = old.resolve(path)
+        if(oldFile.isDirectory) {
+            if(
+                oldFile.walkTopDown().all {
+                    deleted.contains(old.toPath().relativize(it.toPath()).toString())
+                }
+            ) {
+                toRemoveDeleted.addAll(deleted.filter { it.startsWith(path) && it != path })
+            }
+        }
+    }
+    deleted.removeAll(toRemoveDeleted)
+
+    return Pair(deleted, added)
+}
+
+class Update(
+    var id: String?,
+    var changes: List<Change>?,
+    var message: String?,
+    var latest: Boolean?
+) {
+    enum class Mode {
+        FILE,
+        DELETE,
+        REGEX,
+        LINE
+    }
+
+    class Change(
+        var path: String,
+        var mode: Mode,
+        var elements: List<Element>,
+        var updater: Boolean
+    ) {
+        class Element(
+            var pattern: String,
+            var value: String,
+            var meta: String,
+            var isReplace: Boolean
+        )
+    }
+}
