@@ -157,7 +157,7 @@ class EnStrings : Strings(
             )
         ),
         mods = Manager.Mods(
-            add = { "Add local mod" },
+            add = { "Add Mod" },
             local = Manager.Mods.Local(
                 cancel = { "Cancel" },
                 confirm = { "Add" },

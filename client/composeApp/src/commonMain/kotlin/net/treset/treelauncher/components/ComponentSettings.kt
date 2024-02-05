@@ -27,9 +27,7 @@ import net.treset.treelauncher.style.icons
 
 @Composable
 fun ColumnScope.ComponentSettings(
-    component: LauncherManifest,
-    onClose: () -> Unit = {},
-    showBack: Boolean = true
+    component: LauncherManifest
 ) {
     var includedFiles: List<String> by remember { mutableStateOf(emptyList()) }
 
@@ -47,31 +45,10 @@ fun ColumnScope.ComponentSettings(
         }
     }
 
-    Box(
-        contentAlignment = Alignment.Center,
-    ) {
-        if (showBack) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                IconButton(
-                    onClick = onClose,
-                    tooltip = strings().manager.component.back()
-                ) {
-                    Icon(
-                        icons().back,
-                        "Back",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
-        }
-
-        Text(
-            strings().manager.component.includedFiles(),
-            style = MaterialTheme.typography.titleMedium
-        )
-    }
+    Text(
+        strings().manager.component.includedFiles(),
+        style = MaterialTheme.typography.titleMedium
+    )
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),

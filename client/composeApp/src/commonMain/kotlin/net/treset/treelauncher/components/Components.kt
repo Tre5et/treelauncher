@@ -43,6 +43,12 @@ fun <T, C:CreationState<T>> Components(
         redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_,_->},
+    actionBarBoxContent: @Composable BoxScope.(
+        selected: T,
+        settingsOpen: Boolean,
+        redraw: () -> Unit,
+        reload: () -> Unit
+    ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
         selected: T,
         redraw: () -> Unit,
@@ -116,7 +122,7 @@ fun <T, C:CreationState<T>> Components(
         }
 
         selected?.let {
-            var showSettings by remember { mutableStateOf(false) }
+            var showSettings by remember(it) { mutableStateOf(settingsDefault) }
 
             var showRename by remember { mutableStateOf(false) }
 
@@ -124,13 +130,30 @@ fun <T, C:CreationState<T>> Components(
 
             TitledColumn(
                 headerContent = {
+                    if(showSettings && !settingsDefault) {
+                        Box(
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            IconButton(
+                                onClick = { showSettings = false },
+                                tooltip = strings().manager.component.back()
+                            ) {
+                                Icon(
+                                    imageVector = icons().back,
+                                    contentDescription = "Back",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                    }
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         actionBarSpecial(
                             it,
-                            settingsDefault || showSettings,
+                            showSettings,
                             redrawSelected,
                             reload
                         )
@@ -175,16 +198,21 @@ fun <T, C:CreationState<T>> Components(
                             )
                         }
                     }
+
+                    actionBarBoxContent(
+                        it,
+                        showSettings,
+                        redrawSelected,
+                        reload
+                    )
                 },
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.padding(12.dp),
                 scrollable = false
             ) {
-                if(settingsDefault || showSettings) {
+                if(showSettings) {
                     ComponentSettings(
                         it.manifest(),
-                        onClose = { showSettings = false },
-                        showBack = !settingsDefault
                     )
                 } else {
                     Column(
@@ -311,11 +339,18 @@ fun Components(
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_,_->},
+    actionBarBoxContent: @Composable BoxScope.(
+        selected: LauncherManifest,
+        settingsOpen: Boolean,
+        redraw: () -> Unit,
+        reload: () -> Unit
+    ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
         LauncherManifest,
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_->},
+    detailsScrollable: Boolean = false,
     settingsDefault: Boolean = false
 ) = Components(
     title,
@@ -333,6 +368,8 @@ fun Components(
         )
     },
     actionBarSpecial,
+    actionBarBoxContent,
     detailsContent,
+    detailsScrollable,
     settingsDefault
 )

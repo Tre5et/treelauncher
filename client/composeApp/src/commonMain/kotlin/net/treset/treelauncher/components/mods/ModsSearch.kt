@@ -89,16 +89,6 @@ fun ModsSearch(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            IconButton(
-                onClick = closeSearch,
-                tooltip = strings().manager.mods.search.back()
-            ) {
-                Icon(
-                    imageVector = icons().back,
-                    contentDescription = "Back",
-                )
-            }
-
             TextBox(
                 tfValue,
                 onChange = { tfValue = it },
