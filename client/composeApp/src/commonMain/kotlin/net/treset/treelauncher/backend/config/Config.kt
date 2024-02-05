@@ -31,6 +31,7 @@ class Config(baseDir: String, val debug: Boolean, val updateUrl: String) {
         "XaeroWorldMap/",
         "XaeroWaypoints/",
         "itemscroller/",
+        "baritone/",
         "irisUpdateInfo.json",
         "optionsviveprofiles.txt",
         "g4mespeed"
