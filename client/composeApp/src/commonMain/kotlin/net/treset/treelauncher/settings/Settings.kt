@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -30,10 +31,7 @@ import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
-import net.treset.treelauncher.style.Theme
-import net.treset.treelauncher.style.icons
-import net.treset.treelauncher.style.setTheme
-import net.treset.treelauncher.style.theme
+import net.treset.treelauncher.style.*
 import net.treset.treelauncher.util.onUpdate
 import java.awt.image.BufferedImage
 import java.io.IOException
@@ -227,6 +225,7 @@ fun Settings(
             Text(
                 strings().settings.sync.title(),
                 style = MaterialTheme.typography.titleSmall,
+                color = LocalContentColor.current.disabledContent()
             )
 
             var tfUrl by remember { mutableStateOf(appSettings().syncUrl ?: "") }
@@ -237,22 +236,28 @@ fun Settings(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "http://"
+                    "http://",
+                    color = LocalContentColor.current.disabledContent()
                 )
                 TextBox(
                     tfUrl,
                     {
                         tfUrl = it
                     },
-                    placeholder = strings().settings.sync.url()
+                    placeholder = strings().settings.sync.url(),
+                    enabled = false
                 )
-                Text(":")
+                Text(
+                    ":",
+                    color = LocalContentColor.current.disabledContent()
+                )
                 TextBox(
                     tfPort,
                     {
                         tfPort = it
                     },
-                    placeholder = strings().settings.sync.port()
+                    placeholder = strings().settings.sync.port(),
+                    enabled = false
                 )
             }
 
@@ -261,14 +266,16 @@ fun Settings(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    strings().settings.sync.key()
+                    strings().settings.sync.key(),
+                    color = LocalContentColor.current.disabledContent()
                 )
                 TextBox(
                     tfKey,
                     {
                         tfKey = it
                     },
-                    placeholder = strings().settings.sync.keyPlaceholder()
+                    placeholder = strings().settings.sync.keyPlaceholder(),
+                    enabled = false
                 )
             }
 
@@ -311,7 +318,8 @@ fun Settings(
                         appSettings().syncPort = null
                         appSettings().syncKey = null
                     }
-                }
+                },
+                enabled = false
             ) {
                 Text(
                     strings().settings.sync.test()
