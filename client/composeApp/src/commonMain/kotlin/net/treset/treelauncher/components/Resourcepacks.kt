@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -67,6 +68,12 @@ fun Resourcepacks(
                     ResourcepackButton(it)
                 }
             }
-        }
+        },
+        sortContext = SortContext(
+            getSortType = { appSettings().resourcepacksComponentSortType },
+            setSortType = { appSettings().resourcepacksComponentSortType = it },
+            getReverse = { appSettings().isResourcepacksComponentSortReverse },
+            setReverse = { appSettings().isResourcepacksComponentSortReverse = it }
+        )
     )
 }

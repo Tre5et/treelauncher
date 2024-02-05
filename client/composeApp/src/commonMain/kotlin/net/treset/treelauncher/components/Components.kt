@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.LauncherManifestSortType
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.GenericComponentCreator
 import net.treset.treelauncher.backend.util.CreationStatus
@@ -27,6 +28,13 @@ import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import java.io.IOException
+
+data class SortContext(
+    val getSortType: () -> LauncherManifestSortType,
+    val setSortType: (LauncherManifestSortType) -> Unit,
+    val getReverse: () -> Boolean,
+    val setReverse: (Boolean) -> Unit
+)
 
 @Composable
 fun <T, C:CreationState<T>> Components(
@@ -55,7 +63,8 @@ fun <T, C:CreationState<T>> Components(
         reload: () -> Unit
     ) -> Unit = {_,_,_->},
     detailsScrollable: Boolean = true,
-    settingsDefault: Boolean = false
+    settingsDefault: Boolean = false,
+    sortContext: SortContext? = null
 ) {
     var selected: T? by remember(components) { mutableStateOf(null) }
 
@@ -70,6 +79,22 @@ fun <T, C:CreationState<T>> Components(
         }
     }
 
+    var sortType: LauncherManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: LauncherManifestSortType.LAST_PLAYED) }
+    var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
+
+    val actualComponents: List<T> = remember(components, sortType, sortReversed) {
+        components
+            .sortedWith { o1, o2 ->
+                sortType.comparator.compare(o1.manifest(), o2.manifest())
+            }.let {
+                if (sortReversed) {
+                    it.reversed()
+                } else {
+                    it
+                }
+            }
+    }
+
     LaunchedEffect(Unit) {
         reload()
     }
@@ -80,11 +105,30 @@ fun <T, C:CreationState<T>> Components(
     ) {
 
         TitledColumn(
-            title = title,
+            headerContent = {
+                Text(title)
+
+                sortContext?.let {
+                    SortBox(
+                        sorts = LauncherManifestSortType.entries,
+                        reversed = it.getReverse(),
+                        selected = it.getSortType(),
+                        onReversed = {
+                            it.setReverse(!sortReversed)
+                            sortReversed = !sortReversed
+                        },
+                        onSelected = { new ->
+                            it.setSortType(new)
+                            sortType = new
+                        },
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    )
+                }
+            },
             modifier = Modifier.padding(12.dp),
             parentModifier = Modifier.fillMaxWidth(1 / 2f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            scrollable = false
+            scrollable = false,
         ) {
             Box(
                 modifier = Modifier
@@ -93,7 +137,7 @@ fun <T, C:CreationState<T>> Components(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(components) { component ->
+                    items(actualComponents) { component ->
                         ComponentButton(
                             component = component.manifest(),
                             selected = component == selected,
@@ -351,7 +395,8 @@ fun Components(
         () -> Unit
     ) -> Unit = {_,_,_->},
     detailsScrollable: Boolean = false,
-    settingsDefault: Boolean = false
+    settingsDefault: Boolean = false,
+    sortContext: SortContext? = null
 ) = Components(
     title,
     components,
@@ -371,5 +416,6 @@ fun Components(
     actionBarBoxContent,
     detailsContent,
     detailsScrollable,
-    settingsDefault
+    settingsDefault,
+    sortContext
 )

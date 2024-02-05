@@ -13,6 +13,7 @@ import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.GameLauncher
@@ -224,7 +225,13 @@ fun Saves(
                     }
                 )
             }
-        }
+        },
+        sortContext = SortContext(
+            getSortType = { appSettings().savesComponentSortType },
+            setSortType = { appSettings().savesComponentSortType = it },
+            getReverse = { appSettings().isSavesComponentSortReverse },
+            setReverse = { appSettings().isSavesComponentSortReverse = it }
+        )
     )
 
     popupData?.let {

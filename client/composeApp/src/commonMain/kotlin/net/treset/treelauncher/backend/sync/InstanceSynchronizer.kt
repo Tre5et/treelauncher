@@ -100,7 +100,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
         val out = service.downloadFile("instance", instanceData.instance.first.id, details)
         val newDetails: LauncherInstanceDetails = LauncherInstanceDetails.fromJson(String(out))
         instanceData.instance.second.features = newDetails.features
-        instanceData.instance.second.jvm_arguments = newDetails.jvm_arguments
+        instanceData.instance.second.jvmArguments = newDetails.jvmArguments
         instanceData.instance.second.ignoredFiles = newDetails.ignoredFiles
         instanceData.instance.second.lastPlayed = newDetails.lastPlayed
         instanceData.instance.second.totalTime = newDetails.totalTime

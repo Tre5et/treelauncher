@@ -79,7 +79,7 @@ class CommandBuilder(
         processBuilder.command()
             .add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
 
-        val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvm_arguments.toTypedArray())
+        val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvmArguments.toTypedArray())
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.jvmArguments.toTypedArray())
         }

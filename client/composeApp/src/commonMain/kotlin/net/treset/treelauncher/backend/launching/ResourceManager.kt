@@ -37,11 +37,34 @@ class ResourceManager(private var instanceData: InstanceData) {
     @Throws(IOException::class)
     fun setLastPlayedTime() {
         LOGGER.debug { "Setting last played time: instance=${instanceData.instance.first.id}" }
-        instanceData.instance.second.setLastPlayedTime(LocalDateTime.now())
+        val time = LocalDateTime.now()
+        instanceData.instance.first.setLastUsedTime(time)
+        instanceData.savesComponent.setLastUsedTime(time)
+        instanceData.resourcepacksComponent.setLastUsedTime(time)
+        instanceData.optionsComponent.setLastUsedTime(time)
+        instanceData.modsComponent?.first?.setLastUsedTime(time)
         LauncherFile.of(
             instanceData.instance.first.directory,
             instanceData.instance.first.details
         ).write(instanceData.instance.second)
+        LauncherFile.of(
+            instanceData.savesComponent.directory,
+            appConfig().manifestFileName
+        ).write(instanceData.savesComponent)
+        LauncherFile.of(
+            instanceData.resourcepacksComponent.directory,
+            appConfig().manifestFileName
+        ).write(instanceData.resourcepacksComponent)
+        LauncherFile.of(
+            instanceData.optionsComponent.directory,
+            appConfig().manifestFileName
+        ).write(instanceData.optionsComponent)
+        instanceData.modsComponent?.let {
+            LauncherFile.of(
+                it.first.directory,
+                appConfig().manifestFileName
+            ).write(it.first)
+        }
         LOGGER.debug { "Set last played time: instance=${instanceData.instance.first.id}" }
     }
 

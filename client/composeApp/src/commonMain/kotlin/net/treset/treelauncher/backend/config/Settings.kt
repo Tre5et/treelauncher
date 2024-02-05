@@ -2,6 +2,7 @@ package net.treset.treelauncher.backend.config
 
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -30,6 +31,15 @@ enum class LauncherModSortType(val comparator: Comparator<LauncherMod>) {
     }
 }
 
+enum class LauncherManifestSortType(val comparator: Comparator<LauncherManifest>) {
+    NAME(LauncherManifestNameComparator()),
+    LAST_PLAYED(LauncherManifestLastPlayedComparator());
+
+    override fun toString(): String {
+        return comparator.toString()
+    }
+}
+
 
 class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
 
@@ -40,6 +50,14 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var syncKey: String? = null
     var instanceSortType: InstanceDataSortType = InstanceDataSortType.NAME
     var isInstanceSortReverse = false
+    var savesComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var isSavesComponentSortReverse = false
+    var resourcepacksComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var isResourcepacksComponentSortReverse = false
+    var optionsComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var isOptionsComponentSortReverse = false
+    var modComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var isModComponentSortReverse = false
     var modSortType: LauncherModSortType = LauncherModSortType.NAME
     var isModSortReverse = false
     var isModsUpdate = true

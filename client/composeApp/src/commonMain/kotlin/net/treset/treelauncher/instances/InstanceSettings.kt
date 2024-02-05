@@ -41,7 +41,7 @@ fun InstanceSettings(
     val startRes = remember(instance) { getResolution(instance) }
     var res by remember(instance) { mutableStateOf(startRes) }
 
-    val startArgs = remember { instance.instance.second.jvm_arguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
+    val startArgs = remember { instance.instance.second.jvmArguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
     var args by remember { mutableStateOf(startArgs) }
 
     val systemMemory = remember { getSystemMemory() / 256 * 256 }
@@ -221,7 +221,7 @@ fun InstanceSettings(
 
 @Throws(IOException::class)
 private fun getCurrentMemory(instance: InstanceData): Int {
-    for (argument in instance.instance.second.jvm_arguments) {
+    for (argument in instance.instance.second.jvmArguments) {
         if ((argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) && argument.argument.endsWith("m")
         ) {
             return argument.argument.replace("-Xmx", "").replace("m".toRegex(), "").toInt()
@@ -253,14 +253,14 @@ private fun getSystemMemory(): Int {
 private fun saveMemory(instance: InstanceData, memory: Int, startMemory: Int) {
     if (memory != startMemory) {
         val newArguments = ArrayList<LauncherLaunchArgument>()
-        for (argument in instance.instance.second.jvm_arguments) {
+        for (argument in instance.instance.second.jvmArguments) {
             if (!argument.argument.startsWith("-Xmx") && !argument.argument.startsWith("-Xms")) {
                 newArguments.add(argument)
             }
         }
         newArguments.add(LauncherLaunchArgument("-Xmx${memory}m", null, null, null, null))
         newArguments.add(LauncherLaunchArgument("-Xms${memory}m", null, null, null, null))
-        instance.instance.second.jvm_arguments = newArguments
+        instance.instance.second.jvmArguments = newArguments
     }
 }
 
@@ -289,12 +289,12 @@ private fun saveResolution(instance: InstanceData, res: Pair<Int, Int>, startRes
 private fun saveArgs(instance: InstanceData, args: List<LauncherLaunchArgument>, startArgs: List<LauncherLaunchArgument>) {
     if (args != startArgs) {
         val mutArgs = args.toMutableList()
-        for (argument in instance.instance.second.jvm_arguments) {
+        for (argument in instance.instance.second.jvmArguments) {
             if (argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) {
                 mutArgs.add(argument)
             }
         }
-        instance.instance.second.jvm_arguments = mutArgs
+        instance.instance.second.jvmArguments = mutArgs
     }
 }
 

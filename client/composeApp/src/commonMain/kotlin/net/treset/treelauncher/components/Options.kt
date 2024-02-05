@@ -3,6 +3,7 @@ package net.treset.treelauncher.components
 import androidx.compose.runtime.*
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.OptionsCreator
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.creation.CreationMode
@@ -46,6 +47,12 @@ fun Options(
                 app().severeError(e)
             }
         },
-        settingsDefault = true
+        settingsDefault = true,
+        sortContext = SortContext(
+            getSortType = { appSettings().optionsComponentSortType },
+            setSortType = { appSettings().optionsComponentSortType = it },
+            getReverse = { appSettings().isOptionsComponentSortReverse },
+            setReverse = { appSettings().isOptionsComponentSortReverse = it }
+        )
     )
 }

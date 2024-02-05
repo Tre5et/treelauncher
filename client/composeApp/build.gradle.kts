@@ -31,7 +31,7 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
-            implementation("net.treset:mc-version-loader:2.0.2")
+            implementation("net.treset:mc-version-loader:2.1.0")
             implementation("net.hycrafthd:minecraft_authenticator:3.0.5")
 
             implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")

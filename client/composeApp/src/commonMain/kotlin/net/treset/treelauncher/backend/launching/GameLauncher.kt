@@ -48,8 +48,8 @@ class GameLauncher(
         }
         Thread(Runnable {
             try {
-                resourceManager!!.prepareResources()
                 resourceManager!!.setLastPlayedTime()
+                resourceManager!!.prepareResources()
             } catch (e: GameResourceException) {
                 val gle = GameLaunchException("Unable to launch game: unable to prepare resources", e)
                 try {
