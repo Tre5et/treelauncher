@@ -230,58 +230,63 @@ launcherTask(
 ) {
     println("Calculating difference")
 
-    println("Enter old distributable directory")
-    val oldDir = File(readln())
+    println("Enter old distributable directory (enter to skip):")
+    val oldPath = readln()
+    if(oldPath.isEmpty()) {
+        println("Skipping update generation")
+    } else {
+        val oldDir = File(oldPath)
 
-    val newDir = project.file("build/dist/${version}/$projectName-$version")
-    newDir.mkdirs()
-    ZipFile(project.file("build/dist/${version}/$projectName-$version.zip")).use { zip ->
-        zip.entries().asSequence().forEach { entry ->
-            zip.getInputStream(entry).use { input ->
-                if (entry.isDirectory) {
-                    val d = File(newDir, entry.name)
-                    if (!d.exists()) d.mkdirs()
-                } else {
-                    val f = File(newDir, entry.name)
-                    if (f.parentFile?.exists() != true)  f.parentFile?.mkdirs()
+        val newDir = project.file("build/dist/${version}/$projectName-$version")
+        newDir.mkdirs()
+        ZipFile(project.file("build/dist/${version}/$projectName-$version.zip")).use { zip ->
+            zip.entries().asSequence().forEach { entry ->
+                zip.getInputStream(entry).use { input ->
+                    if (entry.isDirectory) {
+                        val d = File(newDir, entry.name)
+                        if (!d.exists()) d.mkdirs()
+                    } else {
+                        val f = File(newDir, entry.name)
+                        if (f.parentFile?.exists() != true) f.parentFile?.mkdirs()
 
-                    f.outputStream().use { output ->
-                        input.copyTo(output)
+                        f.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
                     }
                 }
             }
         }
-    }
 
-    val result = scanDir(oldDir, newDir)
+        val result = scanDir(oldDir, newDir)
 
-    val sb = StringBuilder("\"id\": \"$version\",\n\"changes\": [\n")
-    for (deleted in result.first) {
-        sb.append("  {\n")
-        sb.append("    \"mode\": \"DELETE\",\n")
-        sb.append("    \"path\": \"${deleted.replace("\\", "/")}\",\n")
-        sb.append("    \"updater\": true\n")
-        sb.append("  },\n")
-    }
-    project.file("build/dist/$version/update/latest/").deleteRecursively()
-    for (added in result.second) {
-        val file = newDir.resolve(added)
-        if(file.isFile) {
-            val toFile = project.file("build/dist/$version/update/latest/$added")
-            toFile.parentFile.mkdirs()
-            file.copyTo(toFile, true)
+        val sb = StringBuilder("\"id\": \"$version\",\n\"changes\": [\n")
+        for (deleted in result.first) {
+            sb.append("  {\n")
+            sb.append("    \"mode\": \"DELETE\",\n")
+            sb.append("    \"path\": \"${deleted.replace("\\", "/")}\",\n")
+            sb.append("    \"updater\": true\n")
+            sb.append("  },\n")
         }
-        sb.append("  {\n")
-        sb.append("    \"mode\": \"FILE\",\n")
-        sb.append("    \"path\": \"${added.replace("\\", "/")}\",\n")
-        sb.append("    \"updater\": true\n")
-        sb.append("  },\n")
+        project.file("build/dist/$version/update/latest/").deleteRecursively()
+        for (added in result.second) {
+            val file = newDir.resolve(added)
+            if (file.isFile) {
+                val toFile = project.file("build/dist/$version/update/latest/$added")
+                toFile.parentFile.mkdirs()
+                file.copyTo(toFile, true)
+            }
+            sb.append("  {\n")
+            sb.append("    \"mode\": \"FILE\",\n")
+            sb.append("    \"path\": \"${added.replace("\\", "/")}\",\n")
+            sb.append("    \"updater\": true\n")
+            sb.append("  },\n")
+        }
+        sb.append("]")
+
+        project.file("build/dist/$version/update/difference.json").writeText(sb.toString())
+
+        println("Wrote difference to build/dist/$version/update/difference.json")
     }
-    sb.append("]")
-
-    project.file("build/dist/$version/update/difference.json").writeText(sb.toString())
-
-    println("Wrote difference to build/dist/$version/update/difference.json")
 }
 
 fun scanDir(old: File, new: File): Pair<Set<String>, Set<String>> {

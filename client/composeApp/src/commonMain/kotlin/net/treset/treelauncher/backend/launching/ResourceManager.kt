@@ -45,8 +45,8 @@ class ResourceManager(private var instanceData: InstanceData) {
         instanceData.modsComponent?.first?.setLastUsedTime(time)
         LauncherFile.of(
             instanceData.instance.first.directory,
-            instanceData.instance.first.details
-        ).write(instanceData.instance.second)
+            appConfig().manifestFileName
+        ).write(instanceData.instance.first)
         LauncherFile.of(
             instanceData.savesComponent.directory,
             appConfig().manifestFileName
