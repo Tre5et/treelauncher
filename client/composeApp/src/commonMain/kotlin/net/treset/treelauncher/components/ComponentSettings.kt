@@ -2,7 +2,9 @@ package net.treset.treelauncher.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,29 +47,39 @@ fun ColumnScope.ComponentSettings(
         }
     }
 
-    if(showBack) {
-        IconButton(
-            onClick = onClose,
-            modifier = Modifier.align(Alignment.Start),
-            tooltip = strings().manager.component.back()
-        ) {
-            Icon(
-                icons().back,
-                "Back",
-                modifier = Modifier.size(32.dp)
-            )
+    Box(
+        contentAlignment = Alignment.Center,
+    ) {
+        if (showBack) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                IconButton(
+                    onClick = onClose,
+                    tooltip = strings().manager.component.back()
+                ) {
+                    Icon(
+                        icons().back,
+                        "Back",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
         }
-    }
 
-    Text(
-        strings().manager.component.includedFiles(),
-        style = MaterialTheme.typography.titleMedium
-    )
+        Text(
+            strings().manager.component.includedFiles(),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(12.dp)
+        modifier = Modifier
+            .padding(12.dp)
+            .weight(1f, false)
+            .verticalScroll(rememberScrollState())
     ) {
 
         includedFiles.forEach {
