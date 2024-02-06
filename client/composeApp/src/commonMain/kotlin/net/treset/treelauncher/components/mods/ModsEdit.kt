@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModDownload
@@ -152,6 +153,7 @@ fun ModsEdit(
                     val (description, iconUrl) = getDescriptionIconUrl(tfCurseforge, tfModrinth)
 
                     currentMod?.let {
+                        LOGGER.debug { "Editing existing mod: ${it.name}:v${it.version} -> $name:v$tfVersion" }
                         it.name = name
                         it.description = description
                         it.iconUrl = iconUrl
@@ -160,6 +162,7 @@ fun ModsEdit(
                         it.url = url
 
                         if(currentFile?.path != file.path) {
+                            LOGGER.debug { "Changing file: ${currentFile?.path} -> ${file.path}" }
                             val oldFile = LauncherFile.of(
                                 modContext.directory,
                                 it.fileName
@@ -170,6 +173,7 @@ fun ModsEdit(
                                 "${it.fileName}.old"
                             )
                             try {
+                                LOGGER.debug { "Backing up old file: ${oldFile.path} -> ${backupFile.path}"}
                                 oldFile.moveTo(backupFile)
                             } catch (e: IOException) {
                                 app().error(e)
@@ -182,8 +186,11 @@ fun ModsEdit(
                                     file.name
                                 )
 
+                                LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}"}
+
                                 file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
                             } catch (e: IOException) {
+                                LOGGER.warn { "Failed to copy new file: ${file.path} -> ${oldFile.path}, restoring backup"}
                                 try {
                                     backupFile.moveTo(oldFile)
                                 } catch (e: IOException) {
@@ -193,15 +200,19 @@ fun ModsEdit(
                             }
 
                             try {
+                                LOGGER.debug { "Removing backup file: ${backupFile.path}" }
                                 backupFile.remove()
                             } catch (_: IOException) {
+                                LOGGER.warn { "Failed to remove backup file: ${backupFile.path}" }
                             }
 
                             it.currentProvider = null
                             it.fileName = file.name
                         }
+                        LOGGER.debug { "Edit completed" }
                     } ?: run {
 
+                        LOGGER.debug { "Adding new mod: $name:v$tfVersion" }
                         val mod = LauncherMod(
                             null,
                             description,
@@ -220,6 +231,7 @@ fun ModsEdit(
                         )
 
                         try {
+                            LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}" }
                             file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
                         } catch(e: IOException) {
                             app().error(e)
@@ -227,6 +239,8 @@ fun ModsEdit(
                         }
 
                         mods.add(mod)
+
+                        LOGGER.debug { "Add completed" }
                     }
 
                     close()
@@ -308,3 +322,5 @@ private fun getDescriptionIconUrl(
     }
     return Pair(null, null)
 }
+
+private val LOGGER = KotlinLogging.logger {}
