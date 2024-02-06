@@ -69,6 +69,7 @@ fun Resourcepacks(
                 }
             }
         },
+        detailsScrollable = true,
         sortContext = SortContext(
             getSortType = { appSettings().resourcepacksComponentSortType },
             setSortType = { appSettings().resourcepacksComponentSortType = it },

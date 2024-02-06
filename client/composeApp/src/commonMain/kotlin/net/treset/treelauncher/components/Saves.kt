@@ -226,6 +226,7 @@ fun Saves(
                 )
             }
         },
+        detailsScrollable = true,
         sortContext = SortContext(
             getSortType = { appSettings().savesComponentSortType },
             setSortType = { appSettings().savesComponentSortType = it },
