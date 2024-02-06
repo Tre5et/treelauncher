@@ -152,17 +152,15 @@ fun InstanceDetails(
                 selectedDetails = if (selectedDetails == InstanceDetails.OPTIONS) null else InstanceDetails.OPTIONS
             }
         )
-        if(instance.versionComponents.size > 1) { // Fabric
-            SelectorButton(
-                title = strings().manager.instance.details.mods(),
-                component = instance.modsComponent?.first,
-                icon = icons().mods,
-                selected = selectedDetails == InstanceDetails.MODS,
-                onClick = {
-                    selectedDetails = if (selectedDetails == InstanceDetails.MODS) null else InstanceDetails.MODS
-                }
-            )
-        }
+        SelectorButton(
+            title = strings().manager.instance.details.mods(),
+            component = instance.modsComponent?.first,
+            icon = instance.modsComponent?.let { icons().mods } ?: icons().add,
+            selected = selectedDetails == InstanceDetails.MODS,
+            onClick = {
+                selectedDetails = if (selectedDetails == InstanceDetails.MODS) null else InstanceDetails.MODS
+            }
+        )
         SelectorButton(
             title = strings().manager.instance.details.settings(),
             icon = icons().settings,

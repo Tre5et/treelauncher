@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.AppContext
@@ -26,6 +27,8 @@ fun Create(
     appContext: AppContext,
     navContext: NavigationContext
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     var instanceName by remember { mutableStateOf("") }
 
     var versionState: VersionState? by remember { mutableStateOf(null) }
@@ -34,7 +37,13 @@ fun Create(
     var optionsState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
     var modsState: CreationState<Pair<LauncherManifest, LauncherModsDetails>>? by remember { mutableStateOf(null) }
 
-    var hasMods by remember { mutableStateOf(true) }
+    var hasMods by remember(versionState?.versionType) { mutableStateOf(
+        if(versionState?.versionType == VersionType.FABRIC) {
+            true
+        } else if(modsState?.name == null && modsState?.existing == null) {
+            false
+        } else true
+    ) }
 
     var creationStatus: CreationStatus? by remember { mutableStateOf(null) }
     var showCreationDone: Boolean by remember { mutableStateOf(false) }
@@ -149,40 +158,40 @@ fun Create(
                 )
             }
 
-            if(versionState?.versionType == VersionType.FABRIC) {
-                Column(
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(12.dp)
+                    .fillMaxHeight()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .padding(12.dp)
-                        .fillMaxHeight()
+                        .padding(start = 8.dp)
+                        .requiredHeight(24.dp)
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    Text(
+                        strings().creator.instance.mods(),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Switch(
+                        checked = hasMods,
+                        onCheckedChange = {
+                            hasMods = it
+                        },
                         modifier = Modifier
-                            .padding(start = 8.dp)
-                            .requiredHeight(24.dp)
-                    ) {
-                        Text(
-                            strings().creator.instance.mods(),
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Switch(
-                            checked = hasMods,
-                            onCheckedChange = { hasMods = it },
-                            modifier = Modifier
-                                .scale(0.7f)
-                                .offset(y = (-1).dp)
-                        )
-                    }
-                    if (hasMods) {
-                        ComponentCreator(
-                            existing = appContext.files.modsComponents.toList(),
-                            showCreate = false,
-                            setCurrentState = { modsState = it },
-                            toDisplayString = { first.name },
-                        )
-                    }
+                            .scale(0.7f)
+                            .offset(y = (-1).dp)
+                    )
+                }
+                if (hasMods) {
+                    ComponentCreator(
+                        existing = appContext.files.modsComponents.toList(),
+                        showCreate = false,
+                        setCurrentState = { modsState = it },
+                        toDisplayString = { first.name },
+                    )
                 }
             }
         }
@@ -306,7 +315,7 @@ fun Create(
                 )
                 instanceCreator.statusCallback = { creationStatus = it }
 
-                Thread{
+                coroutineScope.launch {
                     try {
                         instanceCreator.execute()
                     } catch(e: Exception) {
@@ -314,7 +323,7 @@ fun Create(
                     }
                     showCreationDone = true
                     creationStatus = null
-                }.start()
+                }
             }}}}}}}}},
             enabled =
                 instanceName.isNotBlank() &&

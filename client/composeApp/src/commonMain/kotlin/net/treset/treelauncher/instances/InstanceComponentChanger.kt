@@ -63,19 +63,19 @@ fun InstanceComponentChanger(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(text = strings().manager.instance.change.activeTitle(type, current?.name))
-                IconButton(
-                    onClick = {
-                        current?.let {
+                current?.let {
+                    IconButton(
+                        onClick = {
                             LauncherFile.of(it.directory).open()
-                        }
-                    },
-                    tooltip = strings().selector.component.openFolder()
-                ) {
-                    Icon(
-                        icons().folder,
-                        "Open Folder",
-                        modifier = Modifier.size(32.dp)
-                    )
+                        },
+                        tooltip = strings().selector.component.openFolder()
+                    ) {
+                        Icon(
+                            icons().folder,
+                            "Open Folder",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
             }
         },
