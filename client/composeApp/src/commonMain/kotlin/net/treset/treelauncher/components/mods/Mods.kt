@@ -61,8 +61,8 @@ fun Mods(
                         state.name,
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.modsManifest,
-                        state.version,
                         "fabric",
+                        state.version,
                         appContext.files.gameDetailsManifest
                     )
                 }}
