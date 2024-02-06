@@ -3,6 +3,7 @@ package net.treset.treelauncher.localization
 import com.multiplatform.webview.web.WebViewState
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.mc_version_loader.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.instances.InstanceDetails
@@ -54,7 +55,6 @@ open class Strings(
     val launcher: Launcher,
     val login: Login,
     val manager: Manager,
-    val menu: Menu,
     val nav: Nav,
     val news: News,
     val selector: Selector,
@@ -202,7 +202,9 @@ open class Strings(
     data class Manager(
         val component: Component,
         val instance: Instance,
-        val mods: Mods
+        val mods: Mods,
+        val resourcepacks: Resourcepacks,
+        val saves: Saves
     ) {
         data class Component(
             val addFile: () -> String,
@@ -211,9 +213,28 @@ open class Strings(
             val file: () -> String,
             val fileName: () -> String,
             val folder: () -> String,
+            val import: Import,
             val includedFiles: () -> String,
             val settings: () -> String,
-        )
+        ) {
+            data class Import(
+                val back: () -> String,
+                val tooltipExpand: (expanded: Boolean) -> String
+            )
+
+            data class ImportStrings(
+                val delete: () -> String,
+                val import: () -> String,
+                val importComponent: () -> String,
+                val importFile: () -> String,
+                val importing: () -> String,
+                val selectedFiles: () -> String,
+                val tooltipAdd: () -> String,
+                val tooltipFile: () -> String,
+                val back: () -> String = { strings().manager.component.import.back() },
+                val tooltipExpand: (expanded: Boolean) -> String = { strings().manager.component.import.tooltipExpand(it) },
+            )
+        }
 
         data class Instance(
             val change: Change,
@@ -310,16 +331,27 @@ open class Strings(
                 val tooltip: () -> String
             )
         }
-    }
 
-    data class Menu(
-        val delete: () -> String,
-        val rename: () -> String,
-        val noSelection: () -> String,
-        val folder: () -> String,
-        val play: () -> String,
-        val sync: () -> String
-    )
+        data class Resourcepacks(
+            val delete: () -> String,
+            val deleteTitle: () -> String,
+            val deleteMessage: () -> String,
+            val deleteConfirm: () -> String,
+            val deleteCancel: () -> String,
+            val import: Component.ImportStrings,
+            val tooltipAdd: () -> String
+        )
+
+        data class Saves(
+            val delete: () -> String,
+            val deleteTitle: (world: Save) -> String,
+            val deleteMessage: (world: Save) -> String,
+            val deleteConfirm: (world: Save) -> String,
+            val deleteCancel: () -> String,
+            val import: Component.ImportStrings,
+            val tooltipAdd: () -> String
+        )
+    }
 
     data class Nav(
         val add: () -> String,

@@ -48,6 +48,7 @@ class Icons {
     val curseforge: Painter @Composable get() = painterResource("icons/curseforge.svg")
     val selectFile = Icons.Rounded.FileOpen
     val news = Icons.Rounded.Newspaper
+    val expand = Icons.Rounded.ExpandMore
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

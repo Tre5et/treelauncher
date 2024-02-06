@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 
 @Composable
 fun TitledRadioButton(
@@ -29,7 +31,8 @@ fun TitledRadioButton(
             onClick = onClick,
             enabled = enabled,
             colors = colors,
-            interactionSource = interactionSource
+            interactionSource = interactionSource,
+            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
         )
         Text(
             text = text

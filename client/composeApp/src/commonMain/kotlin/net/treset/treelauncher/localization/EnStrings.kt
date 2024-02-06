@@ -109,6 +109,10 @@ class EnStrings : Strings(
             file = { "File" },
             fileName = { "Enter Filename" },
             folder = { "Folder" },
+            import = Manager.Component.Import(
+                back = { "Back" },
+                tooltipExpand = { expanded -> if(expanded) "Collapse" else "Expand" },
+            ),
             includedFiles = { "Included Files:" },
             settings = { "Component Settings" }
         ),
@@ -154,7 +158,7 @@ class EnStrings : Strings(
                 memory = { "Instance Memory:" },
                 resolution = { "Resolution:" },
                 title = { "Instance Settings" }
-            )
+            ),
         ),
         mods = Manager.Mods(
             add = { "Add Mod" },
@@ -202,15 +206,43 @@ class EnStrings : Strings(
                 tooltip = { "Check for Updates" }
             ),
             version = { "Game Version" }
-        )
-    ),
-    menu = Menu(
-        delete = { "Delete" },
-        rename = { "Rename" },
-        noSelection = { "Nothing selected" },
-        folder = { "Open in File Explorer" },
-        play = { "Start" },
-        sync = { "Upload Component" }
+        ),
+        resourcepacks = Manager.Resourcepacks(
+            delete = { "Delete Resourcepack" },
+            deleteTitle = { "You are about to delete this resourcepack!"},
+            deleteMessage = { "This action cannot be undone!" },
+            deleteConfirm = { "Yes, delete" },
+            deleteCancel = { "Cancel" },
+            import = Manager.Component.ImportStrings(
+                delete = { "Unselect Resourcepacks" },
+                import = { "Import Resourcepacks" },
+                importComponent = { "Select resourcepacks from other Components:" },
+                importFile = { "Copy local resourcepack files:" },
+                importing = { "Importing Resourcepacks..." },
+                selectedFiles = { "Selected Resourcepacks:" },
+                tooltipAdd = { "Add Resourcepack" },
+                tooltipFile = { "Select Resourcepack" },
+            ),
+            tooltipAdd = { "Add Resourcepack" },
+        ),
+        saves = Manager.Saves(
+            delete = { "Delete World" },
+            deleteTitle = { world -> "You are about to delete the world \"${world.name}\"!"},
+            deleteMessage = { "This action cannot be undone!\nAny data in this world will be lost forever." },
+            deleteConfirm = { world -> "Yes, delete the world \"${world.name}\" forever" },
+            deleteCancel = { "Cancel" },
+            import = Manager.Component.ImportStrings(
+                delete = { "Unselect World" },
+                import = { "Import Worlds" },
+                importComponent = { "Select worlds from other Components:" },
+                importFile = { "Copy local world files:" },
+                importing = { "Importing Worlds..." },
+                selectedFiles = { "Selected Worlds:" },
+                tooltipAdd = { "Add World" },
+                tooltipFile = { "Select World" },
+            ),
+            tooltipAdd = { "Add World" },
+        ),
     ),
     nav = Nav(
         add = { "Create Instance" },

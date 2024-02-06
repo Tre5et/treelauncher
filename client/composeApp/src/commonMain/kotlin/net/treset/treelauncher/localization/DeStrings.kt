@@ -109,6 +109,10 @@ class DeStrings : Strings(
             file = { "Datei" },
             fileName = { "Dateiname eingeben" },
             folder = { "Verzeichnis" },
+            import = Manager.Component.Import(
+                back = { "Zurück" },
+                tooltipExpand = { expanded -> if(expanded) "Zuklappen" else "Aufklappen" },
+            ),
             includedFiles = { "Einbegriffene Dateien:" },
             settings = { "Komponenteneinstellungen" }
         ),
@@ -202,15 +206,43 @@ class DeStrings : Strings(
                 tooltip = { "Nach Updates suchen" }
             ),
             version = { "Spielversion" }
-        )
-    ),
-    menu = Menu(
-        delete = { "Löschen" },
-        rename = { "Umbenennen" },
-        noSelection = { "Nichts ausgewählt" },
-        folder = { "Im Dateiexplorer öffnen" },
-        play = { "Start" },
-        sync = { "Komponente hochladen" }
+        ),
+        resourcepacks = Manager.Resourcepacks(
+            delete = { "Ressourcenpaket löschen" },
+            deleteTitle = { "Die Ressourcenpaket wirklich löschen?" },
+            deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden." },
+            deleteConfirm = { "Ja, löschen" },
+            deleteCancel = { "Abbrechen" },
+            import = Manager.Component.ImportStrings(
+                delete = { "Ressourcenpaket entfernen" },
+                import = { "Ressourcenpakete importieren" },
+                importComponent = { "Ressourcenpakete aus anderen Komponenten auswählen:" },
+                importFile = { "Lokale Ressourcenpakete kopieren:" },
+                importing = { "Ressourcenpakete werden importiert..." },
+                selectedFiles = { "Ausgewählte Ressourcenpakete:" },
+                tooltipAdd = { "Hinzufügen" },
+                tooltipFile = { "Ressourcenpaket auswählen" }
+            ),
+            tooltipAdd = { "Ressourcenpaket hinzufügen" },
+        ),
+        saves = Manager.Saves(
+            delete = { "Welt löschen" },
+            deleteTitle = { world -> "Die Welt \"${world.name}\" wirklich löschen?" },
+            deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle Daten dieser Welt werden unwiederruflich gelöscht." },
+            deleteConfirm = { world -> "Ja, die Welt \"${world.name}\" permanent löschen" },
+            deleteCancel = { "Abbrechen" },
+            import = Manager.Component.ImportStrings(
+                delete = { "Welt entfernen" },
+                import = { "Welten importieren" },
+                importComponent = { "Welten aus anderen Komponenten auswählen:" },
+                importFile = { "Lokale Weltendateien kopieren:" },
+                importing = { "Welten werden importiert..." },
+                selectedFiles = { "Ausgewählte Welten:" },
+                tooltipAdd = { "Hinzufügen" },
+                tooltipFile = { "Weltendatei auswählen" }
+            ),
+            tooltipAdd = { "Welt hinzufügen" },
+        ),
     ),
     nav = Nav(
         add = { "Instanz erstellen" },

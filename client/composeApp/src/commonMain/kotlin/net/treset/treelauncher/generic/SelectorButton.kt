@@ -124,7 +124,8 @@ fun ImageSelectorButton(
     onClick: () -> Unit,
     image: ImageBitmap?,
     title: String?,
-    subtitle: String? = null
+    subtitle: String? = null,
+    overlayContent: @Composable BoxScope.() -> Unit = {}
 ) {
     SelectorButton(
         selected = selected,
@@ -167,5 +168,7 @@ fun ImageSelectorButton(
                 }
             }
         }
+
+        overlayContent()
     }
 }

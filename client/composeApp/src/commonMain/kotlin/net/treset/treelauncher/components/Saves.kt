@@ -1,10 +1,13 @@
 package net.treset.treelauncher.components
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
@@ -37,7 +40,7 @@ fun Saves(
 
     var selected: LauncherManifest? by remember { mutableStateOf(null) }
 
-    var saves: List<Save> by remember { mutableStateOf(emptyList()) }
+    var saves: List<Pair<Save, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var servers: List<Server> by remember { mutableStateOf(emptyList()) }
 
     var selectedSave: Save? by remember(selected) { mutableStateOf(null) }
@@ -46,6 +49,33 @@ fun Saves(
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
     var quickPlayData: QuickPlayData? by remember(selected) { mutableStateOf(null) }
+
+    var showAdd by remember(selected) { mutableStateOf(false) }
+
+    val reloadSaves = {
+        selected?.let {
+            saves = LauncherFile.of(it.directory).listFiles()
+                .filter { it.isDirectory }
+                .mapNotNull { file ->
+                    try {
+                        Save.from(file)
+                    } catch (e: IOException) {
+                        null
+                    }?.let { it to file }
+                }
+                .sortedBy { it.first.name }
+            val serversFile = LauncherFile.of(it.directory, ".included_files", "servers.dat")
+            servers = if (serversFile.exists()) {
+                try {
+                    Server.from(serversFile)
+                } catch (e: IOException) {
+                    emptyList()
+                }
+            } else {
+                emptyList()
+            }
+        }
+    }
 
     Components(
         strings().selector.saves.title(),
@@ -81,8 +111,121 @@ fun Saves(
                 app().severeError(e)
             }
         },
+        detailsContent = { current, _, _ ->
+            DisposableEffect(current) {
+                selected = current
+                reloadSaves()
+
+                onDispose {
+                    selected = null
+                }
+            }
+
+            if(showAdd) {
+                FileImport(
+                    current,
+                    appContext.files.savesComponents,
+                    {
+                        try {
+                            Save.from(this)
+                        } catch (e: IOException) {
+                            null
+                        }
+                    },
+                    {
+                        this.name
+                    },
+                    icons().saves,
+                    strings().manager.saves.import,
+                    allowFilePicker = false,
+                    allowDirectoryPicker = true
+                ) {
+                    showAdd = false
+                    reloadSaves()
+                }
+            } else {
+                if (saves.isNotEmpty()) {
+                    Text(
+                        strings().selector.saves.worlds(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    saves.forEach {
+                        SaveButton(
+                            it.first,
+                            selectedSave == it.first,
+                            onDelete = {
+                                try {
+                                    it.second.remove()
+                                    reloadSaves()
+                                } catch (e: IOException) {
+                                    app().error(e)
+                                }
+                            },
+                        ) {
+                            selectedServer = null
+                            selectedSave = if (selectedSave == it.first) {
+                                null
+                            } else {
+                                it.first
+                            }
+                        }
+                    }
+                }
+                if (servers.isNotEmpty()) {
+                    Text(
+                        strings().selector.saves.servers(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    servers.forEach {
+                        ServerButton(
+                            it,
+                            selectedServer == it
+                        ) {
+                            selectedSave = null
+                            selectedServer = if (selectedServer == it) {
+                                null
+                            } else {
+                                it
+                            }
+                        }
+                    }
+                }
+            }
+
+            quickPlayData?.let {
+                PlayPopup(
+                    component = current,
+                    quickPlayData = it,
+                    appContext = appContext,
+                    onClose = { quickPlayData = null },
+                    onConfirm = { playData, instance ->
+                        val instanceData = try {
+                            InstanceData.of(instance, appContext.files)
+                        } catch (e: FileLoadException) {
+                            app().severeError(e)
+                            return@PlayPopup
+                        }
+
+                        val launcher = GameLauncher(
+                            instanceData,
+                            appContext.files,
+                            loginContext.userAuth.minecraftUser!!,
+                            playData
+                        )
+
+                        quickPlayData = null
+
+                        launchGame(
+                            launcher,
+                            { pd -> popupData = pd },
+                            { }
+                        )
+                    }
+                )
+            }
+        },
         actionBarSpecial = { _, settingsShown, _, _ ->
-            if(!settingsShown) {
+            if(!settingsShown && !showAdd) {
                 selectedSave?.let {
                     IconButton(
                         onClick = {
@@ -120,110 +263,40 @@ fun Saves(
                         )
                     }
                 }
+
+                IconButton(
+                    onClick = {
+                        showAdd = true
+                    },
+                    tooltip = strings().manager.saves.tooltipAdd()
+                ) {
+                    Icon(
+                        icons().add,
+                        "Add World",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
         },
-        detailsContent = { current, _, _ ->
-            LaunchedEffect(current) {
-                selected = current
-
-                saves = LauncherFile.of(current.directory).listFiles()
-                    .filter { it.isDirectory }
-                    .mapNotNull {
-                        try {
-                            Save.from(it)
-                        } catch (e: IOException) {
-                            null
-                        }
-                    }
-                    .sortedBy { it.name }
-
-                val serversFile = LauncherFile.of(current.directory, ".included_files", "servers.dat")
-                servers = if (serversFile.exists()) {
-                    try {
-                        Server.from(serversFile)
-                    } catch (e: IOException) {
-                        emptyList()
-                    }
-                } else {
-                    emptyList()
-                }
-            }
-
-            DisposableEffect(current) {
-                onDispose {
-                    selected = null
-                }
-            }
-
-            if (saves.isNotEmpty()) {
-                Text(
-                    strings().selector.saves.worlds(),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                saves.forEach {
-                    SaveButton(
-                        it,
-                        selectedSave == it
+        actionBarBoxContent = {_, _, _, _ ->
+            if(showAdd) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconButton(
+                        onClick = {
+                            showAdd = false
+                        },
+                        tooltip = strings().manager.component.import.back(),
+                        modifier = Modifier.align(Alignment.CenterStart)
                     ) {
-                        selectedServer = null
-                        selectedSave = if (selectedSave == it) {
-                            null
-                        } else {
-                            it
-                        }
-                    }
-                }
-            }
-            if (servers.isNotEmpty()) {
-                Text(
-                    strings().selector.saves.servers(),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                servers.forEach {
-                    ServerButton(
-                        it,
-                        selectedServer == it
-                    ) {
-                        selectedSave = null
-                        selectedServer = if (selectedServer == it) {
-                            null
-                        } else {
-                            it
-                        }
-                    }
-                }
-            }
-
-            quickPlayData?.let {
-                PlayPopup(
-                    component = current,
-                    quickPlayData = it,
-                    appContext = appContext,
-                    onClose = { quickPlayData = null },
-                    onConfirm = { playData, instance ->
-                        val instanceData = try {
-                            InstanceData.of(instance, appContext.files)
-                        } catch (e: FileLoadException) {
-                            app().severeError(e)
-                            return@PlayPopup
-                        }
-
-                        val launcher = GameLauncher(
-                            instanceData,
-                            appContext.files,
-                            loginContext.userAuth.minecraftUser!!,
-                            playData
-                        )
-
-                        quickPlayData = null
-
-                        launchGame(
-                            launcher,
-                            { pd -> popupData = pd },
-                            { }
+                        Icon(
+                            icons().back,
+                            "Back",
+                            modifier = Modifier.size(32.dp)
                         )
                     }
-                )
+                }
             }
         },
         detailsScrollable = true,

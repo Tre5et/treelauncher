@@ -390,9 +390,9 @@ fun Components(
         reload: () -> Unit
     ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
-        LauncherManifest,
-        () -> Unit,
-        () -> Unit
+        selected: LauncherManifest,
+        redraw: () -> Unit,
+        reload: () -> Unit
     ) -> Unit = {_,_,_->},
     detailsScrollable: Boolean = false,
     settingsDefault: Boolean = false,
