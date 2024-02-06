@@ -236,6 +236,7 @@ class EnStrings : Strings(
                 confirm = { "Delete" },
                 message = { "This action cannot be undone!\nAny data in this Component will be lost forever.\nThis Component is not currently used by any instance." },
                 title = { "You are about to delete this Component!" },
+                tooltip = { "Delete Component" },
                 unableClose = { "Close" },
                 unableMessage = { instance -> "It is used by the following instance: ${instance.name}" },
                 unableTitle = { "Unable to delete this component!" },
@@ -254,7 +255,8 @@ class EnStrings : Strings(
                 cancel = { "Cancel" },
                 confirm = { "Delete" },
                 message = { "This cannot be undone.\nAll used components will still exist after deletion." },
-                title = { "You are about to delete this Instance!" }
+                title = { "You are about to delete this Instance!" },
+                tooltip = { "Delete Instance" }
             ),
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Error:\n$message\nPlease report this error."},

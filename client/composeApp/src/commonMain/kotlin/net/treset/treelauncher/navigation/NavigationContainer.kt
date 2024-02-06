@@ -149,7 +149,8 @@ fun NavigationContainer(
 
                 NavigationButton(
                     NavigationState.SETTINGS,
-                    navigationState
+                    navigationState,
+                    tooltip = strings().nav.settings()
                 ) {
                     Icon(
                         icons().settings,

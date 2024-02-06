@@ -96,13 +96,16 @@ fun IconButton(
             val hoverHandler = remember {
                 HoverHandler(
                     coroutineScope,
-                    { tooltipState.show() },
-                    { tooltipState.dismiss() }
+                    tooltipState
                 )
             }
 
             LaunchedEffect(hovered) {
                 hoverHandler.hovered = hovered
+            }
+
+            LaunchedEffect(focused) {
+                hoverHandler.focused = focused
             }
 
             PlainTooltipBox(
@@ -125,29 +128,42 @@ fun IconButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 private class HoverHandler(
-    var coroutineScope: CoroutineScope,
-    var onOpen: suspend () -> Unit,
-    var onClose: suspend () -> Unit,
+    val coroutineScope: CoroutineScope,
+    val tooltipState: PlainTooltipState
 ) {
     private var num = 0
     var hovered = false
         set(value) {
             field = value
             num++
-            launch()
+            handleHover()
         }
 
-    fun launch() {
+    var focused = false
+        set(value) {
+            field = value
+            num++
+            handleFocus()
+        }
+
+    fun handleHover() {
         coroutineScope.launch {
             if(hovered) {
                 val currentNum = num
-                delay(1500)
+                delay(1000)
                 if (hovered && num == currentNum) {
-                    onOpen()
+                    tooltipState.show()
                 }
-            } else {
-                onClose()
+            }
+        }
+    }
+
+    fun handleFocus() {
+        coroutineScope.launch {
+            if(focused) {
+                tooltipState.show()
             }
         }
     }

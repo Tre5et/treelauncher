@@ -233,7 +233,7 @@ fun <T, C:CreationState<T>> Components(
                                 showDelete = true
                             },
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().selector.component.delete.title()
+                            tooltip = strings().selector.component.delete.tooltip()
                         ) {
                             Icon(
                                 icons().delete,

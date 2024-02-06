@@ -104,7 +104,7 @@ fun InstanceDetails(
                             )
                         },
                         interactionTint = MaterialTheme.colorScheme.error,
-                        tooltip = strings().selector.component.delete.title()
+                        tooltip = strings().selector.instance.delete.tooltip()
                     ) {
                         Icon(
                             icons().delete,

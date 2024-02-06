@@ -236,6 +236,7 @@ class DeStrings : Strings(
                 confirm = { "Löschen" },
                 message = { "Diese Aktion kann nicht rückgängig gemacht werden!\nDaten in dieser Komponente werden unwiderruflich gelöscht.\nDiese Komponente wird von keiner Instanz verwendet." },
                 title = { "Diese Komponente wirklich löschen?" },
+                tooltip = { "Komponente löschen" },
                 unableClose = { "Schließen" },
                 unableMessage = { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
                 unableTitle = { "Diese Komponente kann nicht gelöscht werden!" },
@@ -254,7 +255,8 @@ class DeStrings : Strings(
                 cancel = { "Abbrechen" },
                 confirm = { "Löschen" },
                 message = { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle verwendeten Komponenten bleiben bestehen." },
-                title = { "Diese Instanz wirklich löschen?" }
+                title = { "Diese Instanz wirklich löschen?" },
+                tooltip = { "Instanz löschen" }
             ),
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},

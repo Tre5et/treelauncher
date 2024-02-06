@@ -357,6 +357,7 @@ open class Strings(
                 val confirm: () -> String,
                 val message: () -> String,
                 val title: () -> String,
+                val tooltip: () -> String,
                 val unableClose: () -> String,
                 val unableMessage: (instance: LauncherManifest) -> String,
                 val unableTitle: () -> String
@@ -385,7 +386,8 @@ open class Strings(
                 val cancel: () -> String,
                 val confirm: () -> String,
                 val message: () -> String,
-                val title: () -> String
+                val title: () -> String,
+                val tooltip: () -> String
             )
             data class Game(
                 val errorMessage: (message: String) -> String,
