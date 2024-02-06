@@ -33,7 +33,7 @@ enum class LauncherModSortType(val comparator: Comparator<LauncherMod>) {
 
 enum class LauncherManifestSortType(val comparator: Comparator<LauncherManifest>) {
     NAME(LauncherManifestNameComparator()),
-    LAST_PLAYED(LauncherManifestLastPlayedComparator());
+    LAST_USED(LauncherManifestLastUsedComparator());
 
     override fun toString(): String {
         return comparator.toString()
@@ -65,7 +65,8 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsDisable = false
     var acknowledgedNews = mutableListOf<String>()
 
-    private constructor() : this(LauncherFile("")) //constructor only for gson
+    //constructor only for gson
+    private constructor() : this(LauncherFile(""))
 
     fun hasSyncData(): Boolean {
         return syncUrl != null && syncPort != null && syncKey != null

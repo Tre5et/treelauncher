@@ -514,6 +514,7 @@ open class Strings(
         data class Sort(
             val enabledName: () -> String,
             val lastPlayed: () -> String,
+            val lastUsed: () -> String,
             val name: () -> String,
             val time: () -> String
         )

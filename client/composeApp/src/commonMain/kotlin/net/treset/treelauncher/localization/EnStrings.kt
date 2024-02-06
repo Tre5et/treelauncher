@@ -369,6 +369,7 @@ class EnStrings : Strings(
         sort = SortBox.Sort(
             enabledName = { "Name (Enabled first)" },
             lastPlayed = { "Last Played" },
+            lastUsed = { "Last Used" },
             name = { "Name" },
             time = { "Time Played" }
         ),

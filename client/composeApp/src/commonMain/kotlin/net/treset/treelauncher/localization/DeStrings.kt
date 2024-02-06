@@ -369,6 +369,7 @@ class DeStrings : Strings(
         sort = SortBox.Sort(
             enabledName = { "Name (Aktivierte zuerst)" },
             lastPlayed = { "Zuletzt gespielt" },
+            lastUsed = { "Zuletzt verwendet" },
             name = { "Name" },
             time = { "Spielzeit" }
         ),

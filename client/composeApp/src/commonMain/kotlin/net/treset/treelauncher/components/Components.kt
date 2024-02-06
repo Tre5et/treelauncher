@@ -79,7 +79,7 @@ fun <T, C:CreationState<T>> Components(
         }
     }
 
-    var sortType: LauncherManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: LauncherManifestSortType.LAST_PLAYED) }
+    var sortType: LauncherManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: LauncherManifestSortType.LAST_USED) }
     var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
 
     val actualComponents: List<T> = remember(components, sortType, sortReversed) {
