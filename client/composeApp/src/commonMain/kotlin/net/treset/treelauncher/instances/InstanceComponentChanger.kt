@@ -30,11 +30,11 @@ fun InstanceComponentChanger(
 ) {
     var components: Array<LauncherManifest> by remember { mutableStateOf(emptyArray()) }
 
-    var current: LauncherManifest? by remember { mutableStateOf(null) }
+    var current: LauncherManifest? by remember(type) { mutableStateOf(null) }
 
-    var selected: LauncherManifest? by remember{ mutableStateOf(current) }
+    var selected: LauncherManifest? by remember(current) { mutableStateOf(current) }
 
-    val loadFirstSelected = {
+    val loadCurrent = {
         current = when (type) {
             InstanceDetails.SAVES -> instance.savesComponent
             InstanceDetails.RESOURCE_PACKS -> instance.resourcepacksComponent
@@ -42,8 +42,6 @@ fun InstanceComponentChanger(
             InstanceDetails.MODS -> instance.modsComponent?.first
             else -> null
         }
-
-        selected = current
     }
 
     LaunchedEffect(type) {
@@ -55,7 +53,7 @@ fun InstanceComponentChanger(
             else -> emptyArray()
         }
 
-        loadFirstSelected()
+        loadCurrent()
     }
 
     TitledColumn(
@@ -97,6 +95,7 @@ fun InstanceComponentChanger(
                 placeholder = strings().manager.instance.change.noComponent(),
                 defaultSelected = selected,
                 toDisplayString = { name },
+                loading = components.isEmpty()
             )
             IconButton(
                 onClick = {
@@ -119,7 +118,7 @@ fun InstanceComponentChanger(
                         }
                         else -> {}
                     }
-                    loadFirstSelected()
+                    loadCurrent()
                     LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
                     redrawSelected()
                 },
