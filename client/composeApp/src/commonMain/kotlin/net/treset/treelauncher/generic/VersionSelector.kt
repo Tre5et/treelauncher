@@ -70,7 +70,6 @@ fun VersionSelector(
                         } ?: versions.firstOrNull { it.loader.version == default }
                     }
                 }
-
         }
     }
 
@@ -124,7 +123,13 @@ fun VersionSelector(
                     )?.let {
                         onDone(it)
                     }               },
-                enabled = minecraftVersion != null && (versionType == VersionType.VANILLA || fabricVersion != null),
+                enabled = minecraftVersion != null
+                        && (versionType == VersionType.VANILLA || fabricVersion != null)
+                        && (
+                            minecraftVersion?.let { it.id != defaultVersionId } ?: false
+                            || versionType != defaultVersionType
+                            || versionType == VersionType.FABRIC && fabricVersion?.let { it.loader.version != defaultFabricVersion } ?: false
+                        ),
                 tooltip = strings().changer.apply()
             ) {
                 Icon(

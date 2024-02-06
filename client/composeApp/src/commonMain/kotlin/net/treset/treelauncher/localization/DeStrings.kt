@@ -122,7 +122,7 @@ class DeStrings : Strings(
                 message = { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
                 noComponent = { "Keine Komponente" },
                 success = { "Version geändert!" },
-                title = { "Eine Komponente auswählen" },
+                title = { "Die Version dieser Instanz wirklich ändern?" },
                 activeTitle = { type, name ->
                     when(type) {
                         InstanceDetails.SAVES -> strings().manager.instance.details.saves()

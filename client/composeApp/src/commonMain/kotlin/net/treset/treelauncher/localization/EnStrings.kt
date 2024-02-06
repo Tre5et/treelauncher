@@ -122,7 +122,7 @@ class EnStrings : Strings(
                 message = { "This is likely to cause incompatibilities.\nIt is recommended to change versions by creating a new instance." },
                 noComponent = { "No Component" },
                 success = { "Version Changed!" },
-                title = { "Select a component" },
+                title = { "You are about to change the version of this Instance!" },
                 activeTitle = { type, name ->
                     when(type) {
                         InstanceDetails.SAVES -> strings().manager.instance.details.saves()
