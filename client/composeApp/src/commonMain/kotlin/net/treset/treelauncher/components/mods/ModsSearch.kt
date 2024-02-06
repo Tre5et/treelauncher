@@ -34,14 +34,10 @@ fun ModsSearch(
     var showLocal by remember { mutableStateOf(false) }
 
     if(showLocal) {
-        ModsLocal(
+        ModsEdit(
             modContext,
         ) {
-            if(it) {
-                closeSearch()
-            } else {
-                showLocal = false
-            }
+            closeSearch()
         }
         return
     }

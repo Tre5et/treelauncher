@@ -158,9 +158,9 @@ class EnStrings : Strings(
         ),
         mods = Manager.Mods(
             add = { "Add Mod" },
-            local = Manager.Mods.Local(
+            edit = Manager.Mods.Edit(
                 cancel = { "Cancel" },
-                confirm = { "Add" },
+                confirm = { current -> current?.let{ "Apply" } ?: "Add" },
                 curseforge = { "Curseforge Project ID" },
                 curseforgeError = { "Invalid Project ID" },
                 file = { "File" },
@@ -175,6 +175,7 @@ class EnStrings : Strings(
                 changeUsed = { enabled -> if(enabled) "Disable Mod" else "Enable Mod" },
                 delete = { "Delete Mod" },
                 download = { "Download Version" },
+                edit = { "Edit Mod" },
                 openBrowser = { "Open in Browser" },
                 versionPlaceholder = { "Select a version" }
             ),

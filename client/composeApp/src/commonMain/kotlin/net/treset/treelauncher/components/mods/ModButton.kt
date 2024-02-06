@@ -37,7 +37,8 @@ import java.util.*
 fun ModButton(
     mod: LauncherMod,
     modContext: ModContext,
-    checkUpdates: Boolean
+    checkUpdates: Boolean,
+    onEdit: () -> Unit
 ) {
     var downloading by rememberSaveable(mod) { mutableStateOf(false) }
 
@@ -217,6 +218,18 @@ fun ModButton(
                     }
 
                     Row {
+                        IconButton(
+                            onClick = {
+                                onEdit()
+                            },
+                            tooltip = strings().manager.mods.card.edit(),
+                        ) {
+                            Icon(
+                                icons().edit,
+                                "Edit"
+                            )
+                        }
+
                         IconButton(
                             onClick = {
                                 modContext.registerChangingJob {

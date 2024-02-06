@@ -31,7 +31,7 @@ class Icons {
     val gitHub: Painter @Composable get() = painterResource("icons/github.svg")
     val sort = Icons.Rounded.SwapVert
     val play: Painter @Composable get() = painterResource("icons/play_arrow_scaled.svg")
-    val rename = Icons.Rounded.Edit
+    val edit = Icons.Rounded.Edit
     val folder = Icons.Rounded.Folder
     val file = Icons.Rounded.InsertDriveFile
     val delete = Icons.Rounded.Delete

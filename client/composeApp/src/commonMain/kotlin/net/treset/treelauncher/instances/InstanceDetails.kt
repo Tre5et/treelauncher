@@ -77,7 +77,7 @@ fun InstanceDetails(
                         tooltip = strings().selector.component.rename.title()
                     ) {
                         Icon(
-                            icons().rename,
+                            icons().edit,
                             "Rename",
                             modifier = Modifier.size(32.dp)
                         )

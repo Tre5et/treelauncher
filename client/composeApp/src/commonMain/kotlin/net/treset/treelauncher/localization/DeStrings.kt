@@ -158,9 +158,9 @@ class DeStrings : Strings(
         ),
         mods = Manager.Mods(
             add = { "Lokale mod hinzufügen" },
-            local = Manager.Mods.Local(
+            edit = Manager.Mods.Edit(
                 cancel = { "Abbrechen" },
-                confirm = { "Hinzufügen" },
+                confirm = { current -> current?.let{ "Anwenden" } ?: "Hinzufügen" },
                 curseforge = { "Curseforge Projekt ID" },
                 curseforgeError = { "Ungültige Projekt ID" },
                 file = { "Datei" },
@@ -175,6 +175,7 @@ class DeStrings : Strings(
                 changeUsed = { enabled -> if(enabled) "Mod deaktivieren" else "Mod aktivieren" },
                 delete = { "Mod Löschen" },
                 download = { "Version herunterladen" },
+                edit = { "Mod bearbeiten" },
                 openBrowser = { "Im Browser öffnen" },
                 versionPlaceholder = { "Eine Version auswählen" }
             ),

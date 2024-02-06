@@ -15,53 +15,47 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModDownload
 import net.treset.mc_version_loader.mods.MinecraftMods
+import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import java.io.IOException
 import java.nio.file.StandardCopyOption
 
 @Composable
-fun ModsLocal(
+fun ModsEdit(
     modContext: ModContext,
-    close: (Boolean) -> Unit
+    currentMod: LauncherMod? = null,
+    close: () -> Unit
 ) {
-    var tfName by remember { mutableStateOf("") }
-    var tfFile by remember { mutableStateOf("") }
-    var fileError by remember { mutableStateOf(false) }
-    var tfVersion by remember { mutableStateOf("") }
-    var tfCurseforge by remember { mutableStateOf("") }
-    var curseforgeError by remember { mutableStateOf(false) }
-    var tfModrinth by remember { mutableStateOf("") }
-    var modrinthError by remember { mutableStateOf(false) }
+    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.let { LauncherFile.of(modContext.directory, it) } }
+    val currentCurseforge: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "curseforge" }?.id }
+    val currentModrinth: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "modrinth" }?.id }
 
-    var showFilePicker by remember { mutableStateOf(false) }
+    var tfName by remember(currentMod) { mutableStateOf(currentMod?.name ?: "") }
+    var tfFile by remember(currentMod) { mutableStateOf(currentFile?.path ?: "") }
+    var fileError by remember(currentMod) { mutableStateOf(false) }
+    var tfVersion by remember(currentMod) { mutableStateOf(currentMod?.version ?: "") }
+    var tfCurseforge by remember(currentMod) { mutableStateOf(currentCurseforge ?: "") }
+    var curseforgeError by remember(currentMod) { mutableStateOf(false) }
+    var tfModrinth by remember(currentMod) { mutableStateOf(currentModrinth ?: "") }
+    var modrinthError by remember(currentMod) { mutableStateOf(false) }
+
+    var showFilePicker by remember(currentMod) { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(
-                onClick = { close(false) },
-                tooltip = strings().manager.mods.search.back()
-            ) {
-                Icon(
-                    imageVector = icons().back,
-                    contentDescription = "Back",
-                )
-            }
-        }
-
         TextBox(
             text = tfName,
             onChange = { tfName = it },
-            placeholder = strings().manager.mods.local.name()
+            placeholder = strings().manager.mods.edit.name()
         )
 
         Row(
@@ -73,7 +67,7 @@ fun ModsLocal(
                     tfFile = it
                     fileError = false
                 },
-                placeholder = strings().manager.mods.local.file(),
+                placeholder = strings().manager.mods.edit.file(),
                 modifier = Modifier.weight(1f, false),
                 isError = fileError
             )
@@ -82,7 +76,7 @@ fun ModsLocal(
                 onClick = {
                     showFilePicker = true
                 },
-                tooltip = strings().manager.mods.local.file()
+                tooltip = strings().manager.mods.edit.file()
             ) {
                 Icon(
                     icons().selectFile,
@@ -105,16 +99,18 @@ fun ModsLocal(
         TextBox(
             text = tfVersion,
             onChange = { tfVersion = it },
-            placeholder = strings().manager.mods.local.version()
+            placeholder = strings().manager.mods.edit.version()
         )
 
         TextBox(
             text = tfCurseforge,
             onChange = {
-                tfCurseforge = it
-                curseforgeError = false
+                if(it.matches("[0-9]*".toRegex())) {
+                    tfCurseforge = it
+                    curseforgeError = false
+                }
             },
-            placeholder = strings().manager.mods.local.curseforge(),
+            placeholder = strings().manager.mods.edit.curseforge(),
             isError = curseforgeError
         )
 
@@ -124,7 +120,7 @@ fun ModsLocal(
                 tfModrinth = it
                 modrinthError = false
             },
-            placeholder = strings().manager.mods.local.modrinth(),
+            placeholder = strings().manager.mods.edit.modrinth(),
             isError = modrinthError
         )
 
@@ -141,7 +137,7 @@ fun ModsLocal(
                     }
 
                     val file = LauncherFile.of(tfFile)
-                    if(!file.isFile || !file.name.endsWith(".jar")) {
+                    if(!file.isFile || !file.name.endsWith(".jar") || (currentFile?.let {file.path != it.path} != false && file.absolutePath.startsWith(appConfig().baseDir.absolutePath))) {
                         fileError = true
                         return@registerChangingJob
                     }
@@ -155,33 +151,91 @@ fun ModsLocal(
                         "https://www.curseforge.com/projects/${downloads[0].id}"
                     val (description, iconUrl) = getDescriptionIconUrl(tfCurseforge, tfModrinth)
 
-                    val mod = LauncherMod(
-                        null,
-                        description,
-                        true,
-                        url,
-                        iconUrl,
-                        name,
-                        file.name,
-                        tfVersion,
-                        downloads,
-                    )
+                    currentMod?.let {
+                        it.name = name
+                        it.description = description
+                        it.iconUrl = iconUrl
+                        it.version = tfVersion
+                        it.downloads = downloads
+                        it.url = url
 
-                    val newFile = LauncherFile.of(
-                        modContext.directory,
-                        file.name
-                    )
+                        if(currentFile?.path != file.path) {
+                            val oldFile = LauncherFile.of(
+                                modContext.directory,
+                                it.fileName
+                            )
 
-                    file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
+                            val backupFile = LauncherFile.of(
+                                modContext.directory,
+                                "${it.fileName}.old"
+                            )
+                            try {
+                                oldFile.moveTo(backupFile)
+                            } catch (e: IOException) {
+                                app().error(e)
+                                return@registerChangingJob
+                            }
 
-                    mods.add(mod)
+                            try {
+                                val newFile = LauncherFile.of(
+                                    modContext.directory,
+                                    file.name
+                                )
 
-                    close(true)
+                                file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
+                            } catch (e: IOException) {
+                                try {
+                                    backupFile.moveTo(oldFile)
+                                } catch (e: IOException) {
+                                    app().error(e)
+                                }
+                                return@registerChangingJob
+                            }
+
+                            try {
+                                backupFile.remove()
+                            } catch (_: IOException) {
+                            }
+
+                            it.currentProvider = null
+                            it.fileName = file.name
+                        }
+                    } ?: run {
+
+                        val mod = LauncherMod(
+                            null,
+                            description,
+                            true,
+                            url,
+                            iconUrl,
+                            name,
+                            file.name,
+                            tfVersion,
+                            downloads,
+                        )
+
+                        val newFile = LauncherFile.of(
+                            modContext.directory,
+                            file.name
+                        )
+
+                        try {
+                            file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
+                        } catch(e: IOException) {
+                            app().error(e)
+                            return@registerChangingJob
+                        }
+
+                        mods.add(mod)
+                    }
+
+                    close()
                 }
             },
             enabled = tfFile.isNotBlank() && tfVersion.isNotBlank()
+                    && currentMod?.let { it.name != tfName || it.version != tfVersion || currentFile?.let { it.path == tfName } ?: true || (currentCurseforge ?: "") != tfCurseforge || (currentModrinth ?: "") != tfModrinth } ?: true
         ) {
-            Text(strings().manager.mods.local.confirm())
+            Text(strings().manager.mods.edit.confirm(currentMod))
         }
     }
 }

@@ -49,6 +49,8 @@ fun Mods(
     var sort: LauncherModSortType by remember { mutableStateOf(appSettings().modSortType) }
     var reverse by remember { mutableStateOf(appSettings().isModSortReverse) }
 
+    var editingMod: LauncherMod? by remember { mutableStateOf(null) }
+
     Components(
         title = strings().selector.mods.title(),
         components = components,
@@ -162,7 +164,14 @@ fun Mods(
                 }
             }
 
-            if(showSearch) {
+            editingMod?.let {
+                ModsEdit(
+                    modContext,
+                    it
+                ) {
+                    editingMod = null
+                }
+            } ?: if(showSearch) {
                 ModsSearch(
                     modContext
                 ) {
@@ -181,7 +190,9 @@ fun Mods(
                                 mod,
                                 modContext,
                                 checkUpdates
-                            )
+                            ) {
+                                editingMod = mod
+                            }
                         }
                     }
                 }
@@ -262,7 +273,7 @@ fun Mods(
         },
         detailsScrollable = false,
         actionBarSpecial = { _, settingsOpen, _, _ ->
-            if(!settingsOpen && !showSearch) {
+            if(!settingsOpen && !showSearch && editingMod == null) {
                 IconButton(
                     onClick = {
                         showSearch = true
@@ -291,7 +302,7 @@ fun Mods(
             }
         },
         actionBarBoxContent = { _, settingsOpen, _, _ ->
-            if(!settingsOpen && !showSearch) {
+            if(!settingsOpen && !showSearch && editingMod == null) {
                 SortBox(
                     sorts = LauncherModSortType.entries,
                     modifier = Modifier.align(Alignment.CenterEnd),
@@ -306,12 +317,15 @@ fun Mods(
                         appSettings().isModSortReverse = reverse
                     }
                 )
-            } else if(showSearch && !settingsOpen) {
+            } else if((showSearch || editingMod != null) && !settingsOpen) {
                 Box(
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
                     IconButton(
-                        onClick = { showSearch = false },
+                        onClick = {
+                            showSearch = false
+                            editingMod = null
+                        },
                         tooltip = strings().manager.mods.search.back()
                     ) {
                         Icon(

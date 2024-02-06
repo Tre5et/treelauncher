@@ -2,6 +2,7 @@ package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
 import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.instances.InstanceDetails
@@ -254,33 +255,20 @@ open class Strings(
 
         data class Mods(
             val add: () -> String,
-            val local: Local,
             val card: Card,
             val change: Change,
             val changeVersion: () -> String,
             val current: () -> String,
+            val edit: Edit,
             val search: Search,
             val update: Update,
             val version: () -> String,
         ) {
-            data class Local(
-                val cancel: () -> String,
-                val confirm: () -> String,
-                val curseforge: () -> String,
-                val curseforgeError: () -> String,
-                val file: () -> String,
-                val fileError: () -> String,
-                val modrinth: () -> String,
-                val modrinthError: () -> String,
-                val name: () -> String,
-                val version: () -> String,
-                val versionError: () -> String
-            )
-
             data class Card(
                 val changeUsed: (Boolean) -> String,
                 val delete: () -> String,
                 val download: () -> String,
+                val edit: () -> String,
                 val openBrowser: () -> String,
                 val versionPlaceholder: () -> String
             )
@@ -290,6 +278,20 @@ open class Strings(
                 val message: () -> String,
                 val confirm: () -> String,
                 val cancel: () -> String
+            )
+
+            data class Edit(
+                val cancel: () -> String,
+                val confirm: (LauncherMod?) -> String,
+                val curseforge: () -> String,
+                val curseforgeError: () -> String,
+                val file: () -> String,
+                val fileError: () -> String,
+                val modrinth: () -> String,
+                val modrinthError: () -> String,
+                val name: () -> String,
+                val version: () -> String,
+                val versionError: () -> String
             )
 
             data class Search(
