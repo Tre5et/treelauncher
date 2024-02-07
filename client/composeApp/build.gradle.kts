@@ -3,6 +3,7 @@ import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
+import java.security.MessageDigest
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -232,30 +233,34 @@ launcherTask(
 
     println("Enter old distributable directory (enter to skip):")
     val oldPath = readln()
-    if(oldPath.isEmpty()) {
-        println("Skipping update generation")
-    } else {
-        val oldDir = File(oldPath)
 
-        val newDir = project.file("build/dist/${version}/$projectName-$version")
-        newDir.mkdirs()
-        ZipFile(project.file("build/dist/${version}/$projectName-$version.zip")).use { zip ->
-            zip.entries().asSequence().forEach { entry ->
-                zip.getInputStream(entry).use { input ->
-                    if (entry.isDirectory) {
-                        val d = File(newDir, entry.name)
-                        if (!d.exists()) d.mkdirs()
-                    } else {
-                        val f = File(newDir, entry.name)
-                        if (f.parentFile?.exists() != true) f.parentFile?.mkdirs()
+    val newDir = project.file("build/dist/${version}/$projectName-$version")
+    if(!newDir.exists()) {
+        newDir.deleteRecursively()
+    }
+    newDir.mkdirs()
+    ZipFile(project.file("build/dist/${version}/$projectName-$version.zip")).use { zip ->
+        zip.entries().asSequence().forEach { entry ->
+            zip.getInputStream(entry).use { input ->
+                if (entry.isDirectory) {
+                    val d = File(newDir, entry.name)
+                    if (!d.exists()) d.mkdirs()
+                } else {
+                    val f = File(newDir, entry.name)
+                    if (f.parentFile?.exists() != true) f.parentFile?.mkdirs()
 
-                        f.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
+                    f.outputStream().use { output ->
+                        input.copyTo(output)
                     }
                 }
             }
         }
+    }
+
+    if(oldPath.isEmpty()) {
+        println("Skipping update generation")
+    } else {
+        val oldDir = File(oldPath)
 
         val result = scanDir(oldDir, newDir)
 
@@ -312,11 +317,13 @@ fun scanDir(old: File, new: File): Pair<Set<String>, Set<String>> {
 
     val common = oldFiles.intersect(newFiles)
 
+    val md = MessageDigest.getInstance("MD5")
+
     for (path in common) {
         val oldFile = old.resolve(path)
         val newFile = new.resolve(path)
 
-        if(oldFile.lastModified() != newFile.lastModified()) {
+        if(!md.digest(oldFile.readBytes()).contentEquals(md.digest(newFile.readBytes()))) {
             added.add(path)
         }
     }
