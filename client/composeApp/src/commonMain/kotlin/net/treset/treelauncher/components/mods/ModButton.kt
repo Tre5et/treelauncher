@@ -17,8 +17,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.*
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -30,6 +33,7 @@ import net.treset.treelauncher.generic.SelectorButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.DownloadingIcon
 import net.treset.treelauncher.style.icons
+import java.io.IOException
 import java.time.LocalDateTime
 import java.util.*
 
@@ -102,21 +106,24 @@ fun ModButton(
             if(modData.isEmpty) {
                 try {
                     modData = Optional.of(mod.modData)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } catch (e: FileDownloadException) {
+                    LOGGER.debug(e) { "Failed to get mod data for ${mod.fileName}, this may be correct" }
                 }
             }
             if(modData.isPresent) {
-                versions = modData.get().getVersions(modContext.version, "fabric")
-                    .also { vs ->
-                        vs
-                            .firstOrNull { it.versionNumber == currentVersion.versionNumber }
-                            ?.let {
-                                currentVersion = it
-                            }
+                versions = try {
+                        modData.get().getVersions(modContext.version, "fabric")
+                    } catch (e: FileDownloadException) {
+                        app().error(e)
+                        emptyList()
+                    }.also { vs ->
+                        vs.firstOrNull {
+                            it.versionNumber == currentVersion.versionNumber
+                        }?.let {
+                            currentVersion = it
+                        }
                     }
-
-            }
+                }
         }.start()
     }
 
@@ -176,20 +183,28 @@ fun ModButton(
                                 onClick = {
                                     downloading = true
                                     modContext.registerChangingJob { currentMods ->
-                                        ModDownloader(
-                                            mod,
-                                            modContext.directory,
-                                            "fabric",
-                                            modContext.version,
-                                            currentMods,
-                                            modContext.enableOnDownload
-                                        ).download(
-                                            selectedVersion
-                                        )
+                                        LOGGER.debug { "Downloading mod ${mod.fileName} version ${selectedVersion.versionNumber}" }
+
+                                        try {
+                                            ModDownloader(
+                                                mod,
+                                                modContext.directory,
+                                                "fabric",
+                                                modContext.version,
+                                                currentMods,
+                                                modContext.enableOnDownload
+                                            ).download(
+                                                selectedVersion
+                                            )
+                                        } catch (e: Exception) {
+                                            app().error(e)
+                                            return@registerChangingJob
+                                        }
 
                                         currentVersion = selectedVersion
 
                                         downloading = false
+                                        LOGGER.debug { "Mod downloaded" }
                                     }
                                 },
                                 tooltip = strings().manager.mods.card.download(),
@@ -233,6 +248,8 @@ fun ModButton(
                         IconButton(
                             onClick = {
                                 modContext.registerChangingJob {
+                                    LOGGER.debug { "Changing mod state of ${mod.fileName} to ${!enabled}" }
+
                                     val modFile: LauncherFile = LauncherFile.of(
                                         modContext.directory,
                                         "${mod.fileName}${if (enabled) "" else ".disabled"}"
@@ -241,11 +258,24 @@ fun ModButton(
                                         modContext.directory,
                                         "${mod.fileName}${if (enabled) ".disabled" else ""}"
                                     )
-                                    modFile.moveTo(newFile)
+                                    if(!modFile.exists() && newFile.exists()) {
+                                        LOGGER.debug { "Mod is already in correct state, not changing" }
+                                        return@registerChangingJob
+                                    }
+
+                                    LOGGER.debug { "Renaming mod file ${modFile.path} -> ${newFile.path}" }
+
+                                    try {
+                                        modFile.moveTo(newFile)
+                                    } catch(e: IOException) {
+                                        app().error(IOException("Failed to move mod file", e))
+                                    }
 
                                     mod.isEnabled = !enabled
 
                                     enabled = !enabled
+
+                                    LOGGER.debug { "Mod state changed" }
                                 }
                             },
                             tooltip = strings().manager.mods.card.changeUsed(enabled),
@@ -263,8 +293,15 @@ fun ModButton(
                                         modContext.directory,
                                         "${mod.fileName}${if (enabled) "" else ".disabled"}"
                                     )
-                                    oldFile.remove()
+                                    LOGGER.debug { "Deleting mod file: ${oldFile.path}" }
+                                    try {
+                                        oldFile.remove()
+                                    } catch(e: IOException) {
+                                        app().error(IOException("Failed to delete mod file", e))
+                                        return@registerChangingJob
+                                    }
                                     mods.remove(mod)
+                                    LOGGER.debug { "Mod file deleted" }
                                 }
                             },
                             interactionTint = MaterialTheme.colorScheme.error,
@@ -309,6 +346,7 @@ fun ModButton(
                     }
                 }
             }
-
     }
 }
+
+private val LOGGER = KotlinLogging.logger {  }

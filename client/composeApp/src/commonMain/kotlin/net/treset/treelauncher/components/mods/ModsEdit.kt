@@ -31,6 +31,7 @@ import java.nio.file.StandardCopyOption
 fun ModsEdit(
     modContext: ModContext,
     currentMod: LauncherMod? = null,
+    onNewMod: ((LauncherMod, LauncherFile) -> Unit)? = null,
     close: () -> Unit
 ) {
     val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.let { LauncherFile.of(modContext.directory, it) } }
@@ -225,22 +226,33 @@ fun ModsEdit(
                             downloads,
                         )
 
-                        val newFile = LauncherFile.of(
-                            modContext.directory,
-                            file.name
-                        )
+                        onNewMod?.let {
+                            LOGGER.debug { "Delegating mod handling to onNewMod function" }
+                            tfVersion = ""
+                            tfCurseforge = ""
+                            tfModrinth = ""
+                            tfFile = ""
+                            tfName = ""
+                            it(mod, file)
+                        } ?: run {
 
-                        try {
-                            LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}" }
-                            file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
-                        } catch(e: IOException) {
-                            app().error(e)
-                            return@registerChangingJob
+                            val newFile = LauncherFile.of(
+                                modContext.directory,
+                                file.name
+                            )
+
+                            try {
+                                LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}" }
+                                file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
+                            } catch (e: IOException) {
+                                app().error(e)
+                                return@registerChangingJob
+                            }
+
+                            mods.add(mod)
+
+                            LOGGER.debug { "Add completed" }
                         }
-
-                        mods.add(mod)
-
-                        LOGGER.debug { "Add completed" }
                     }
 
                     close()

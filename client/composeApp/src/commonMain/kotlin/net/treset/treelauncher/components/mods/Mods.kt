@@ -173,7 +173,9 @@ fun Mods(
                 }
             } ?: if(showSearch) {
                 ModsSearch(
-                    modContext
+                    selected,
+                    modContext,
+                    appContext
                 ) {
                     showSearch = false
                 }

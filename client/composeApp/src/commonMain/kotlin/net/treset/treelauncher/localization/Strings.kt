@@ -281,6 +281,7 @@ open class Strings(
             val changeVersion: () -> String,
             val current: () -> String,
             val edit: Edit,
+            val import: ImportStrings,
             val search: Search,
             val update: Update,
             val version: () -> String,
@@ -313,6 +314,20 @@ open class Strings(
                 val name: () -> String,
                 val version: () -> String,
                 val versionError: () -> String
+            )
+
+            data class ImportStrings(
+                val delete: () -> String,
+                val displayName: (LauncherMod) -> String,
+                val import: () -> String,
+                val importComponent: () -> String,
+                val importFile: () -> String,
+                val importing: () -> String,
+                val selectedFiles: () -> String,
+                val tooltipAdd: () -> String,
+                val tooltipFile: () -> String,
+                val back: () -> String = { strings().manager.component.import.back() },
+                val tooltipExpand: (expanded: Boolean) -> String = { strings().manager.component.import.tooltipExpand(it) },
             )
 
             data class Search(

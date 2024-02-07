@@ -191,6 +191,17 @@ class EnStrings : Strings(
             ),
             changeVersion = { "Game Version:" },
             current = { "Current Mods" },
+            import = Manager.Mods.ImportStrings(
+                delete = { "Unselect Mod" },
+                displayName = { mod -> "${mod.name} v${mod.version}" },
+                import = { "Import Mods" },
+                importComponent = { "Select mods from other Components:" },
+                importFile = { "Copy local mod files:" },
+                importing = { "Importing Mods..." },
+                selectedFiles = { "Selected Mods:" },
+                tooltipAdd = { "Add Mod" },
+                tooltipFile = { "Select Mod" },
+            ),
             search = Manager.Mods.Search(
                 addLocal = { "Add mod manually" },
                 back = { "Back" },

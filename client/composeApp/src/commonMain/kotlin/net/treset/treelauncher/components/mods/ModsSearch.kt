@@ -13,9 +13,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModData
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.generic.IconButton
@@ -28,14 +31,18 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ModsSearch(
+    component: Pair<LauncherManifest, LauncherModsDetails>,
     modContext: ModContext,
+    appContext: AppContext,
     closeSearch: () -> Unit
 ) {
     var showLocal by remember { mutableStateOf(false) }
 
     if(showLocal) {
-        ModsEdit(
+        ModsImport(
+            component,
             modContext,
+            appContext
         ) {
             closeSearch()
         }

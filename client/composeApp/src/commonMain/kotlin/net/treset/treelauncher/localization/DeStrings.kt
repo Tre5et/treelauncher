@@ -191,6 +191,17 @@ class DeStrings : Strings(
             ),
             changeVersion = { "Spielversion:" },
             current = { "Aktuelle Mods" },
+            import = Manager.Mods.ImportStrings(
+                delete = { "Mod entfernen" },
+                displayName = { mod -> "${mod.name} v${mod.version}"},
+                import = { "Mods importieren" },
+                importComponent = { "Mods aus anderen Komponenten auswählen:" },
+                importFile = { "Lokale Moddateien kopieren:" },
+                importing = { "Mods werden importiert..." },
+                selectedFiles = { "Ausgewählte Mods:" },
+                tooltipAdd = { "Hinzufügen" },
+                tooltipFile = { "Moddatei auswählen" }
+            ),
             search = Manager.Mods.Search(
                 addLocal = { "Mod manuell hinzufügen" },
                 back = { "Zurück" },
