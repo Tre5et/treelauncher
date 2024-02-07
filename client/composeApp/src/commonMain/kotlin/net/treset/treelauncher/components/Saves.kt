@@ -156,6 +156,9 @@ fun Saves(
                             onDelete = {
                                 try {
                                     it.second.remove()
+                                    if(selectedSave == it.first) {
+                                        selectedSave = null
+                                    }
                                     reloadSaves()
                                 } catch (e: IOException) {
                                     app().error(e)
