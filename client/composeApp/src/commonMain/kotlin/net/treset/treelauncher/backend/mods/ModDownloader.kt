@@ -51,7 +51,7 @@ class ModDownloader(
         val newMod = try {
             downloadRequired(
                 versionData,
-                launcherMod?.isEnabled ?: true || enableOnDownload,
+                launcherMod?.isEnabled != false || enableOnDownload,
                 !existing.contains(launcherMod)
             )
         } catch(e: FileDownloadException) {
@@ -119,6 +119,16 @@ class ModDownloader(
             "Downloading mod file: ${versionData.name}"
         }
         val newMod = MinecraftMods.downloadModFile(versionData, directory)
+        if(!enabled) {
+            LOGGER.debug { "Disabling new mod file: ${newMod.fileName}" }
+            val file = LauncherFile.of(directory, newMod.fileName)
+            val disabledFile = LauncherFile.of(directory, "${newMod.fileName}.disabled")
+            try {
+                file.moveTo(disabledFile, StandardCopyOption.REPLACE_EXISTING)
+            } catch(e: IOException) {
+                throw FileDownloadException("Failed to disable new mod file: ${file.name}", e)
+            }
+        }
         newMod.isEnabled = enabled
 
         if(addToList) {

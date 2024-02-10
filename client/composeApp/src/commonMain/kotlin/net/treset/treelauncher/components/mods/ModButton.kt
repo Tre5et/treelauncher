@@ -192,7 +192,7 @@ fun ModButton(
                                                 "fabric",
                                                 modContext.version,
                                                 currentMods,
-                                                modContext.enableOnDownload
+                                                false //modContext.enableOnDownload
                                             ).download(
                                                 selectedVersion
                                             )
@@ -260,6 +260,8 @@ fun ModButton(
                                     )
                                     if(!modFile.exists() && newFile.exists()) {
                                         LOGGER.debug { "Mod is already in correct state, not changing" }
+                                        mod.isEnabled = !enabled
+                                        enabled = !enabled
                                         return@registerChangingJob
                                     }
 
@@ -272,7 +274,6 @@ fun ModButton(
                                     }
 
                                     mod.isEnabled = !enabled
-
                                     enabled = !enabled
 
                                     LOGGER.debug { "Mod state changed" }
