@@ -108,6 +108,7 @@ fun ModButton(
                     modData = Optional.of(mod.modData)
                 } catch (e: FileDownloadException) {
                     LOGGER.debug(e) { "Failed to get mod data for ${mod.fileName}, this may be correct" }
+                    versions = emptyList()
                 }
             }
             if(modData.isPresent) {
@@ -125,6 +126,14 @@ fun ModButton(
                     }
                 }
         }.start()
+    }
+
+    LaunchedEffect(checkUpdates, versions) {
+        versions?.let {
+            if(checkUpdates && it.isNotEmpty()) {
+                selectedVersion = it[0]
+            }
+        }
     }
 
     SelectorButton(
@@ -227,7 +236,7 @@ fun ModButton(
                             onSelected = {
                                 selectedVersion = it
                             },
-                            selected = versions?.let { if(checkUpdates && it.isNotEmpty()) it[0] else null } ?: currentVersion,
+                            selected = selectedVersion,
                             loading = versions == null && checkUpdates,
                         )
                     }

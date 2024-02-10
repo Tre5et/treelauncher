@@ -9,7 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.treelauncher.AppContext
@@ -42,13 +44,15 @@ fun Mods(
 ) {
     var components by remember { mutableStateOf(appContext.files.modsComponents.sortedBy { it.first.name }) }
 
-    var showSearch by remember { mutableStateOf(false) }
-    var checkUpdates by remember { mutableStateOf(false) }
+    var selected: Pair<LauncherManifest, LauncherModsDetails>? by remember { mutableStateOf(null) }
+
+    var showSearch by remember(selected) { mutableStateOf(false) }
+    var checkUpdates by remember(selected) { mutableStateOf(false) }
 
     var sort: LauncherModSortType by remember { mutableStateOf(appSettings().modSortType) }
     var reverse by remember { mutableStateOf(appSettings().isModSortReverse) }
 
-    var editingMod: LauncherMod? by remember { mutableStateOf(null) }
+    var editingMod: LauncherMod? by remember(selected) { mutableStateOf(null) }
 
     Components(
         title = strings().selector.mods.title(),
@@ -93,31 +97,34 @@ fun Mods(
                 onCreate = onCreate
             )
         },
-        detailsContent = { selected, _, _ ->
-            var redrawMods by remember(selected) { mutableStateOf(0) }
+        detailsContent = { current, _, _ ->
+            var redrawMods by remember(current) { mutableStateOf(0) }
 
             val autoUpdate by remember { mutableStateOf(appSettings().isModsUpdate) }
             val disableNoVersion by remember { mutableStateOf(appSettings().isModsDisable) }
             val enableOnDownload by remember { mutableStateOf(appSettings().isModsEnable) }
 
-            var versions: List<MinecraftVersion> by remember(selected) { mutableStateOf(emptyList()) }
-            var showSnapshots by remember(selected) { mutableStateOf(false) }
-            var selectedVersion: MinecraftVersion? by remember(selected) { mutableStateOf(null) }
+            var versions: List<MinecraftVersion> by remember(current) { mutableStateOf(emptyList()) }
+            var showSnapshots by remember(current) { mutableStateOf(false) }
+            var selectedVersion: MinecraftVersion? by remember(current) { mutableStateOf(null) }
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, selected.second.mods.size, selected.second.modsVersion) {
-                selected.second.mods.sortedWith(sort.comparator).let {
+            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, current.second.mods.size, current.second.modsVersion) {
+                current.second.mods.sortedWith(sort.comparator).let {
                     if(reverse) it.reversed() else it
                 }
             }
 
-            LaunchedEffect(selected) {
-                showSnapshots = false
-                checkUpdates = false
+            DisposableEffect(current) {
+                selected = current
+
+                onDispose {
+                    selected = null
+                }
             }
 
-            LaunchedEffect(selected, showSnapshots) {
+            LaunchedEffect(current, showSnapshots) {
                 Thread {
                     versions = if (showSnapshots) {
                         MinecraftGame.getVersions()
@@ -125,41 +132,41 @@ fun Mods(
                         MinecraftGame.getReleases()
                     }.also { v ->
                         selectedVersion = v.firstOrNull {
-                            it.id == selected.second.modsVersion
+                            it.id == current.second.modsVersion
                         }
                     }
                 }.start()
             }
 
-            val updateQueue = remember(selected) {
+            val updateQueue = remember(current) {
                 EmptyingJobQueue(
                     onEmptied = {
                         LauncherFile.of(
-                            selected.first.directory,
-                            selected.first.details
+                            current.first.directory,
+                            current.first.details
                         ).write(
-                            selected.second
+                            current.second
                         )
                         redrawMods++
                     }
                 ) {
-                    selected.second.mods
+                    current.second.mods
                 }
             }
 
-            DisposableEffect(selected) {
+            DisposableEffect(current) {
                 onDispose {
                     updateQueue.finish()
                 }
             }
 
-            val modContext = remember(selected, selected.second.modsVersion, autoUpdate, disableNoVersion, enableOnDownload) {
+            val modContext = remember(current, current.second.modsVersion, autoUpdate, disableNoVersion, enableOnDownload) {
                 ModContext(
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
-                    selected.second.modsVersion,
-                    LauncherFile.of(selected.first.directory)
+                    current.second.modsVersion,
+                    LauncherFile.of(current.first.directory)
                 ) { element ->
                     updateQueue.add(element)
                 }
@@ -174,7 +181,7 @@ fun Mods(
                 }
             } ?: if(showSearch) {
                 ModsSearch(
-                    selected,
+                    current,
                     modContext,
                     appContext
                 ) {
@@ -243,12 +250,12 @@ fun Mods(
                                         Button(
                                             onClick = {
                                                 modContext.registerChangingJob {
-                                                    selected.second.modsVersion = v.id
+                                                    current.second.modsVersion = v.id
 
                                                     LauncherFile.of(
-                                                        selected.first.directory,
-                                                        selected.first.details
-                                                    ).write(selected.second)
+                                                        current.first.directory,
+                                                        current.first.details
+                                                    ).write(current.second)
 
                                                     popupData = null
                                                 }
@@ -260,7 +267,7 @@ fun Mods(
                                 )
                             }
                         },
-                        enabled = selectedVersion?.let { it.id != selected.second.modsVersion } ?: false
+                        enabled = selectedVersion?.let { it.id != current.second.modsVersion } ?: false
                     ) {
                         Icon(
                             icons().change,
@@ -294,7 +301,8 @@ fun Mods(
                     onClick = {
                         checkUpdates = true
                     },
-                    tooltip = strings().manager.mods.update.tooltip()
+                    tooltip = strings().manager.mods.update.tooltip(),
+                    enabled = !checkUpdates
                 ) {
                     Icon(
                         icons().update,
