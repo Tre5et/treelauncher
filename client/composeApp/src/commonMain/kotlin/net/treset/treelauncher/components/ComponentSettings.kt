@@ -113,7 +113,7 @@ fun ColumnScope.ComponentSettings(
 
         TextBox(
             text = newArg,
-            onChange = {
+            onTextChanged = {
                 newArg = it
             },
             placeholder = strings().manager.component.fileName(),

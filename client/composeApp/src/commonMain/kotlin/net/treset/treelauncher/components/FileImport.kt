@@ -213,7 +213,7 @@ fun <T> FileImport(
             ) {
                 TextBox(
                     text = tfFile,
-                    onChange = { tfFile = it },
+                    onTextChanged = { tfFile = it },
                     isError = fileError,
                     modifier = Modifier
                         .weight(1f, false)

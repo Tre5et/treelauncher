@@ -69,7 +69,7 @@ fun Create(
                 )
                 TextBox(
                     text = instanceName,
-                    onChange = { instanceName = it },
+                    onTextChanged = { instanceName = it },
                     placeholder = strings().creator.name()
                 )
             }

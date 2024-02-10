@@ -111,13 +111,12 @@ fun InstanceSettings(
 
                 TextBox(
                     text = memory.toString(),
-                    onChange = {
+                    onTextChanged = {
                         memory = it.toIntOrNull()?.let { num -> if(num in 256..(systemMemory ?: 256)) num else null} ?: memory
                     },
                     suffix = {
                         Text(strings().units.megabytes())
                     },
-                    showClear = false,
                     enabled = systemMemory != null && memory != null
                 )
             }
@@ -137,26 +136,24 @@ fun InstanceSettings(
             ) {
                 TextBox(
                     text = res.first.toString(),
-                    onChange = {
+                    onTextChanged = {
                         res = Pair(it.toIntOrNull()?.let { num -> if(num > 0) num else null} ?: res.first, res.second)
                     },
                     suffix = {
                         Text(strings().units.pixels())
-                    },
-                    showClear = false
+                    }
                 )
 
                 Text(strings().units.resolutionBy())
 
                 TextBox(
                     text = res.second.toString(),
-                    onChange = {
+                    onTextChanged = {
                         res = Pair(res.first, it.toIntOrNull()?.let { num -> if(num > 0) num else null} ?: res.second)
                     },
                     suffix = {
                         Text(strings().units.pixels())
-                    },
-                    showClear = false
+                    }
                 )
             }
         }
@@ -217,7 +214,7 @@ fun InstanceSettings(
             ) {
                 TextBox(
                     text = newArg,
-                    onChange = {
+                    onTextChanged = {
                         newArg = it
                     },
                     placeholder = strings().manager.instance.settings.argumentPlaceholder(),

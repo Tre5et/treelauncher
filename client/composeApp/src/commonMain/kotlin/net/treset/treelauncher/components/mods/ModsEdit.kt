@@ -56,7 +56,7 @@ fun ModsEdit(
     ) {
         TextBox(
             text = tfName,
-            onChange = { tfName = it },
+            onTextChanged = { tfName = it },
             placeholder = strings().manager.mods.edit.name()
         )
 
@@ -65,7 +65,7 @@ fun ModsEdit(
         ) {
             TextBox(
                 text = tfFile,
-                onChange = {
+                onTextChanged = {
                     tfFile = it
                     fileError = false
                 },
@@ -100,13 +100,13 @@ fun ModsEdit(
 
         TextBox(
             text = tfVersion,
-            onChange = { tfVersion = it },
+            onTextChanged = { tfVersion = it },
             placeholder = strings().manager.mods.edit.version()
         )
 
         TextBox(
             text = tfCurseforge,
-            onChange = {
+            onTextChanged = {
                 if(it.matches("[0-9]*".toRegex())) {
                     tfCurseforge = it
                     curseforgeError = false
@@ -118,7 +118,7 @@ fun ModsEdit(
 
         TextBox(
             text = tfModrinth,
-            onChange = {
+            onTextChanged = {
                 tfModrinth = it
                 modrinthError = false
             },

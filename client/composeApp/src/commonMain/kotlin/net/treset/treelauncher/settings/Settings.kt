@@ -125,8 +125,7 @@ fun Settings(
                     tfValue,
                     {
                         tfValue = it
-                    },
-                    showClear = false
+                    }
                 )
 
                 IconButton(

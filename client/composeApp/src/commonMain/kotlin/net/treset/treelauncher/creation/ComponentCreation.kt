@@ -80,7 +80,7 @@ fun <T> ComponentCreator(
         )
         TextBox(
             text = newName,
-            onChange = {
+            onTextChanged = {
                 newName = it
             },
             placeholder = strings().creator.name(),
@@ -94,7 +94,7 @@ fun <T> ComponentCreator(
         )
         TextBox(
             text = inheritName,
-            onChange = {
+            onTextChanged = {
                 inheritName = it
             },
             placeholder = strings().creator.name(),

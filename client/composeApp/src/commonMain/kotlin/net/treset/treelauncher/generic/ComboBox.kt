@@ -118,7 +118,7 @@ fun <T> ComboBox(
             if(allowSearch) {
                 TextBox(
                     text = search,
-                    onChange = { search = it },
+                    onTextChanged = { search = it },
                     placeholder = strings().comboBox.search(),
                     leadingIcon = {
                         Icon(

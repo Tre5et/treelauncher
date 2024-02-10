@@ -94,7 +94,7 @@ fun ModsSearch(
         ) {
             TextBox(
                 tfValue,
-                onChange = { tfValue = it },
+                onTextChanged = { tfValue = it },
                 placeholder = strings().manager.mods.search.search(),
                 modifier = Modifier.onKeyEvent {
                     if (it.key == Key.Enter) {
