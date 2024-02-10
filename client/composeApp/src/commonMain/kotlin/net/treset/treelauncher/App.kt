@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.treelauncher.backend.config.*
@@ -22,6 +23,7 @@ import net.treset.treelauncher.creation.Create
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
 import net.treset.treelauncher.generic.PopupOverlay
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
@@ -127,7 +129,12 @@ fun App(
                     AlertDialog(
                         onDismissRequest = {},
                         title = { Text(strings().error.title()) },
-                        text = { Text(strings().error.message(e)) },
+                        text = {
+                            Text(
+                                strings().error.message(e),
+                                textAlign = TextAlign.Start
+                            )
+                        },
                         containerColor = MaterialTheme.colorScheme.inversePrimary,
                         textContentColor = MaterialTheme.colorScheme.onPrimary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -145,7 +152,12 @@ fun App(
                     AlertDialog(
                         onDismissRequest = {},
                         title = { Text(strings().error.severeTitle()) },
-                        text = { Text(strings().error.severeMessage(e)) },
+                        text = {
+                            Text(
+                                strings().error.severeMessage(e),
+                                textAlign = TextAlign.Start
+                            )
+                        },
                         containerColor = MaterialTheme.colorScheme.errorContainer,
                         confirmButton = {
                             Button(

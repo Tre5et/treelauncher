@@ -20,7 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import net.treset.treelauncher.style.colors
+import net.treset.treelauncher.style.contrast
 import net.treset.treelauncher.style.hovered
+import net.treset.treelauncher.style.inverted
 
 @Composable
 fun Button(
@@ -29,7 +32,7 @@ fun Button(
     enabled: Boolean = true,
     shape: Shape = ButtonDefaults.shape,
     color: Color = MaterialTheme.colorScheme.primary,
-    invertedContent: Boolean = true,
+    dynamicContentColor: Boolean = true,
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     border: BorderStroke? = null,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -50,10 +53,16 @@ fun Button(
         }
     )
 
-    val foregroundColor = if(invertedContent) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.onBackground
+    val contentColor = colors().onBackground
+
+    val foregroundColor = remember(color, contentColor, dynamicContentColor) {
+        val inversionBetter = color.contrast(contentColor) < 4.5f && color.contrast(contentColor.inverted()) > 4.5f
+
+        if(inversionBetter) {
+            contentColor.inverted()
+        } else {
+            contentColor
+        }
     }
 
     androidx.compose.material3.Button(

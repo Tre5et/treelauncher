@@ -1,7 +1,6 @@
 package net.treset.treelauncher.util
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -12,6 +11,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
 import net.treset.treelauncher.generic.PopupType
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 

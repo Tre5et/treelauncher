@@ -1,7 +1,6 @@
 package net.treset.treelauncher.components
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
@@ -10,6 +9,7 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.PopupType
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 
 @Composable

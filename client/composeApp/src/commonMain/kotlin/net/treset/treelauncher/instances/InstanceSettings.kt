@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings

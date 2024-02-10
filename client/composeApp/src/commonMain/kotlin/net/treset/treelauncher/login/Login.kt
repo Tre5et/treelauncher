@@ -4,13 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
@@ -143,7 +141,7 @@ fun LoginScreen(
                     LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
                     LoginState.FAILED -> strings().login.label.failure()
                 },
-                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.fillMaxWidth()
             )
         }

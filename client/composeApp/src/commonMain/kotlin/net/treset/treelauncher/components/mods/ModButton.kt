@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -30,6 +29,7 @@ import net.treset.treelauncher.backend.util.string.openInBrowser
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.SelectorButton
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.DownloadingIcon
 import net.treset.treelauncher.style.icons

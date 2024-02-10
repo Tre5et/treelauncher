@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +15,7 @@ import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons

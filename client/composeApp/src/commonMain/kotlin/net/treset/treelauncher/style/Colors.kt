@@ -5,6 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.localization.strings
 import org.jetbrains.jewel.intui.window.styling.dark
@@ -25,7 +26,7 @@ enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> S
 private fun dark() = darkColorScheme(
     primary = Color.Green,
     onPrimary = Color.Black,
-    error = Color.Red,
+    error = Color(0xFFE20505),
     inversePrimary = Color.Yellow,
     tertiary = Color(0xFF43454A),
     onBackground = Color.White
@@ -101,3 +102,22 @@ private fun Float.toHover(isDark: Boolean): Float {
 fun Color.disabledContent(): Color = this.copy(alpha = 0.38f)
 
 fun Color.disabledContainer(): Color = this.copy(alpha = 0.12f)
+
+fun Color.contrast(other: Color): Float {
+    val l1 = this.luminance()
+    val l2 = other.luminance()
+    return if(l1 > l2) {
+        (l1 + 0.05f) / (l2 + 0.05f)
+    } else {
+        (l2 + 0.05f) / (l1 + 0.05f)
+    }
+}
+
+fun Color.inverted(): Color = Color(
+    red = red.inverted(),
+    green = green.inverted(),
+    blue = blue.inverted(),
+    alpha = this.alpha
+)
+
+private fun Float.inverted() = 1f - this

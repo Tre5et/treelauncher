@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +15,7 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.generic.SortBox
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext

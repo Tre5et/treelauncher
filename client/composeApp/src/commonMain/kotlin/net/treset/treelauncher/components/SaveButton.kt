@@ -3,14 +3,12 @@ package net.treset.treelauncher.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import androidx.compose.ui.text.style.TextAlign
 import net.treset.mc_version_loader.saves.Save
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
@@ -55,10 +53,7 @@ fun SaveButton(
             type = PopupType.WARNING,
             titleRow = { Text(strings().manager.saves.deleteTitle(save)) },
             content = {
-                Text(
-                    strings().manager.saves.deleteMessage(save),
-                    textAlign = TextAlign.Center
-                )
+                Text(strings().manager.saves.deleteMessage(save))
             },
             buttonRow = {
                 Button(

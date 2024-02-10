@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import net.treset.treelauncher.app
@@ -18,6 +16,7 @@ import net.treset.treelauncher.backend.news.News
 import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
@@ -79,7 +78,6 @@ fun getNewsPopup(
                         Text(
                             content,
                             softWrap = true,
-                            textAlign = TextAlign.Center,
                             modifier = Modifier.widthIn(0.dp, 800.dp)
                         )
                     }
@@ -102,7 +100,6 @@ fun getNewsPopup(
                         Text(
                             content,
                             softWrap = true,
-                            textAlign = TextAlign.Center,
                             modifier = Modifier.widthIn(0.dp, 800.dp)
                         )
                     }

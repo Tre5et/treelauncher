@@ -1,9 +1,7 @@
 package net.treset.treelauncher.util
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.style.TextAlign
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.data.InstanceData
@@ -14,6 +12,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.PopupType
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
@@ -71,10 +70,7 @@ fun FixFilesPopup(
             type = PopupType.WARNING,
             titleRow = { Text(strings().fixFiles.title()) },
             content = {
-                Text(
-                    strings().fixFiles.message(),
-                    textAlign = TextAlign.Center
-                )
+                Text(strings().fixFiles.message())
             },
             buttonRow = {
                 Button(
@@ -150,10 +146,7 @@ fun FixFilesPopup(
         PopupOverlay(
             titleRow = { Text(it.title) },
             content = {
-                Text(
-                    it.content,
-                    textAlign = TextAlign.Center
-                )
+                Text(it.content)
             },
             buttonRow = { it.buttonRow { cleanupStatus = null } }
         )

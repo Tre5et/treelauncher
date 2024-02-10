@@ -3,11 +3,9 @@ package net.treset.treelauncher.instances
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
@@ -236,10 +234,7 @@ private fun deleteDialog(
         PopupData(
             type = PopupType.WARNING,
             titleRow = { Text(strings().selector.instance.delete.title()) },
-            content =  { Text(
-                strings().selector.instance.delete.message(),
-                textAlign = TextAlign.Center,
-            ) },
+            content =  { Text(strings().selector.instance.delete.message(),) },
             buttonRow = {
                 Button(
                     onClick = { setPopup(null) },

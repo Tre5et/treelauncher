@@ -1,6 +1,5 @@
 package net.treset.treelauncher.util
 
-import androidx.compose.material3.Text
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.GameLauncher
@@ -9,6 +8,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
 import net.treset.treelauncher.generic.PopupType
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 
 fun launchGame(
