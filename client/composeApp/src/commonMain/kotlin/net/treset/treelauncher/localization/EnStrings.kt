@@ -81,6 +81,19 @@ class EnStrings : Strings(
         severeTitle = { "A severe error occurred!" },
         unknown = { "Unknown error" }
     ),
+    fixFiles = FixFiles(
+        cancel = { "Don't attempt" },
+        close = { "Close" },
+        confirm = { "Attempt to restore launcher" },
+        failureMessage = { "Trying again probably won't help here.\nTry to fix the files manually or contact the developer." },
+        failureTitle = { "Failed to restore launcher!" },
+        message = { "The launcher is not usable in this state.\nThis may be caused by an unexpected close while the game was running.\n\nAttempt to fix these files automatically?\nNon-world data from your last playing session may be lost.\n\nDO NOT START THIS WHILE A INSTANCE OF THE GAME IS RUNNING!" },
+        runningMessage = { "This may take a while." },
+        runningTitle = { "Attempting to restore launcher..." },
+        successMessage = { "The launcher should be usable again." },
+        successTitle = { "Launcher successfully restored!" },
+        title = { "Inconsistent launcher files detected!" }
+    ),
     game = Game(),
     language = Language(
         systemLanguage = { "system language" }

@@ -10,6 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -30,6 +31,8 @@ import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.typography
+import net.treset.treelauncher.util.FixFilesPopup
+import net.treset.treelauncher.util.allContainedIn
 import net.treset.treelauncher.util.getNewsPopup
 import java.io.File
 import java.io.IOException
@@ -83,6 +86,25 @@ fun App(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     LoginScreen { loginContext ->
+                        LaunchedEffect(Unit) {
+                            try {
+                                news().let { nws ->
+                                    if (nws.important?.map { it.id }
+                                            ?.allContainedIn(appSettings().acknowledgedNews) == false) {
+                                        popupData = getNewsPopup(
+                                            close = { popupData = null },
+                                            displayOther = false,
+                                            displayAcknowledged = false
+                                        )
+                                    }
+                                }
+                            } catch(e: IOException) {
+                                LOGGER.warn(e) { "Unable to load news" }
+                            }
+                        }
+
+                        FixFilesPopup(appContext)
+
                         NavigationContainer(loginContext) { navContext ->
                             when (navContext.navigationState) {
                                 NavigationState.INSTANCES -> Instances(appContext, loginContext)

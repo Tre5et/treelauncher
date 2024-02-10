@@ -50,6 +50,7 @@ open class Strings(
     val creator: Creator,
     val changer: Changer,
     val error: Error,
+    val fixFiles: FixFiles,
     val game: Game,
     val language: Language,
     val launcher: Launcher,
@@ -161,6 +162,20 @@ open class Strings(
         val severeMessage: (error: Exception) -> String,
         val severeTitle: () -> String,
         val unknown: () -> String,
+    )
+
+    data class FixFiles(
+        val cancel: () -> String,
+        val close: () -> String,
+        val confirm: () -> String,
+        val failureMessage: () -> String,
+        val failureTitle: () -> String,
+        val message: () -> String,
+        val runningMessage: () -> String,
+        val runningTitle: () -> String,
+        val successMessage: () -> String,
+        val successTitle: () -> String,
+        val title: () -> String
     )
 
     data class Game(

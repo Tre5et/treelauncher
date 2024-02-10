@@ -18,15 +18,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.treelauncher.app
-import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
-import net.treset.treelauncher.util.allContainedIn
 import java.awt.image.BufferedImage
 import java.io.IOException
 
@@ -50,7 +49,11 @@ fun NavigationContainer(
     var updateAvailable by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        profileImage = loginContext.userAuth.getUserIcon()
+        try {
+            profileImage = loginContext.userAuth.getUserIcon()
+        } catch (e: FileDownloadException) {
+            LOGGER.debug(e) { "Unable to load profile image." }
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -58,14 +61,6 @@ fun NavigationContainer(
             updateAvailable = updater().getUpdate().latest == false
         } catch (e: IOException) {
             app().error(e)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        news().let {nws ->
-            if(nws.important?.map{ it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
-                app().showNews(displayOther = false, displayAcknowledged = false)
-            }
         }
     }
 
@@ -232,3 +227,5 @@ data class NavigationContext(
     val navigationState: NavigationState,
     val navigateTo: (NavigationState) -> Unit
 )
+
+private val LOGGER = KotlinLogging.logger {  }

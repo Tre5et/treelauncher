@@ -81,6 +81,19 @@ class DeStrings : Strings(
         severeTitle = { "Ein kritischen Fehler ist aufgetreten!" },
         unknown = { "Unbekannter Fehler" }
     ),
+    fixFiles = FixFiles(
+        cancel = { "Nicht versuchen" },
+        close = { "Schließen" },
+        confirm = { "Versuchen, den Launcher wiederherzustellen" },
+        failureMessage = { "Ein erneuter Versuch wird wahrscheinlich nicht helfen.\nBitte versuchen, die Dateien manuell zu reparieren oder den Entwickler zu kontaktieren." },
+        failureTitle = { "Wiederherstellung des Launchers fehlgeschlagen!" },
+        message = { "Der Launcher ist in diesem Zustand nicht nutzbar.\nDies kann durch ein unerwartetes Schließen während das Spiel lief verursacht worden sein.\n\nVersuchen, die Dateien automatisch zu reparieren?\nNicht-Weltdaten aus Ihrer letzten Spielsitzung können hierbei verloren gehen.\n\nDIESEN VORGANG NUR STARTEN, WENN KEINE SPIELINSTANZ LÄUFT!" },
+        runningMessage = { "Dies könnte eine Weile dauern." },
+        runningTitle = { "Versuchen, den Launcher wiederherzustellen..." },
+        successMessage = { "Der Launcher sollte wieder nutzbar sein." },
+        successTitle = { "Launcher erfolgreich wiederhergestellt!" },
+        title = { "Inkonsistente Launcher-Dateien erkannt!" }
+    ),
     game = Game(),
     language = Language(
         systemLanguage = { "Systemsprache" }
