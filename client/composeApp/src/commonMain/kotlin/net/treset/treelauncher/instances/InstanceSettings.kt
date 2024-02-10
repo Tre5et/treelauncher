@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.sun.management.OperatingSystemMXBean
 import net.treset.mc_version_loader.launcher.LauncherFeature
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -35,8 +36,8 @@ import java.util.stream.Collectors
 fun InstanceSettings(
     instance: InstanceData
 ) {
-    val startMemory = remember(instance) { getCurrentMemory(instance) }
-    var memory by remember(instance) { mutableStateOf(startMemory) }
+    var startMemory: Int? by remember(instance) { mutableStateOf(null) }
+    var memory by remember(startMemory) { mutableStateOf(startMemory) }
 
     val startRes = remember(instance) { getResolution(instance) }
     var res by remember(instance) { mutableStateOf(startRes) }
@@ -44,19 +45,39 @@ fun InstanceSettings(
     val startArgs = remember { instance.instance.second.jvmArguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
     var args by remember { mutableStateOf(startArgs) }
 
-    val systemMemory = remember { getSystemMemory() / 256 * 256 }
+    var systemMemory: Int? by remember { mutableStateOf(null) }
 
     DisposableEffect(instance) {
+        Thread {
+            try {
+                startMemory = getCurrentMemory(instance)
+            } catch(e: IOException) {
+                app().error(e)
+            }
+        }.start()
+
+        Thread {
+            systemMemory = getSystemMemory() / 256 * 256
+        }.start()
+
         onDispose {
-            save(
-                instance,
-                memory,
-                startMemory,
-                res,
-                startRes,
-                args,
-                startArgs
-            )
+            memory?.let {mem ->
+                startMemory?.let {startMem ->
+                    try {
+                        save(
+                            instance,
+                            mem,
+                            startMem,
+                            res,
+                            startRes,
+                            args,
+                            startArgs
+                        )
+                    } catch(e: IOException) {
+                        app().error(e)
+                    }
+                }
+            }
         }
     }
 
@@ -78,24 +99,26 @@ fun InstanceSettings(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Slider(
-                    value = memory.toFloat(),
-                    valueRange = 256f..systemMemory.toFloat(),
+                    value = memory?.toFloat()?: 256f,
+                    valueRange = 256f..(systemMemory?.toFloat()?: 256f),
                     onValueChange = {
                         memory = it.toInt()
                     },
-                    steps = (systemMemory - 256) / 256 - 1,
-                    modifier = Modifier.fillMaxWidth(2/3f)
+                    steps = systemMemory?.let { (it - 256) / 256 - 1 } ?: 0,
+                    modifier = Modifier.fillMaxWidth(2/3f),
+                    enabled = systemMemory != null && memory != null
                 )
 
                 TextBox(
                     text = memory.toString(),
                     onChange = {
-                        memory = it.toIntOrNull()?.let { num -> if(num in 256..systemMemory) num else null} ?: memory
+                        memory = it.toIntOrNull()?.let { num -> if(num in 256..(systemMemory ?: 256)) num else null} ?: memory
                     },
                     suffix = {
                         Text(strings().units.megabytes())
                     },
-                    showClear = false
+                    showClear = false,
+                    enabled = systemMemory != null && memory != null
                 )
             }
         }
@@ -224,7 +247,9 @@ private fun getCurrentMemory(instance: InstanceData): Int {
     for (argument in instance.instance.second.jvmArguments) {
         if ((argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) && argument.argument.endsWith("m")
         ) {
-            return argument.argument.replace("-Xmx", "").replace("m".toRegex(), "").toInt()
+            try {
+                return argument.argument.replace("-Xmx", "").replace("m".toRegex(), "").toInt()
+            } catch (_: NumberFormatException) { }
         }
     }
 
@@ -241,7 +266,11 @@ private fun getCurrentMemory(instance: InstanceData): Int {
     )
     val match = regex.firstGroup(result)
     return match?.let {
-        (it.toLong() / 1024 / 1024).toInt()
+        try {
+            (it.toLong() / 1024 / 1024).toInt()
+        } catch (_: NumberFormatException) {
+            null
+        }
     } ?: 1024
 }
 
