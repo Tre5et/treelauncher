@@ -12,12 +12,14 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModData
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.generic.IconButton
@@ -67,19 +69,26 @@ fun ModsSearch(
 
     LaunchedEffect(searching) {
         if(searching) {
-            results = MinecraftMods.searchCombinedMods(
-                tfValue,
-                modContext.version,
-                "fabric",
-                25,
-                0
-            ).sortedWith { o1, o2 -> (
-                    FormatString.distance(tfValue, o1.name) -
-                    FormatString.distance(tfValue, o2.name) +
-                    log10((o2.downloadsCount / o1.downloadsCount).toDouble())
-                ).roundToInt()
-            }
-            searching = false
+            Thread {
+                try {
+                    results = MinecraftMods.searchCombinedMods(
+                        tfValue,
+                        modContext.version,
+                        "fabric",
+                        25,
+                        0
+                    ).sortedWith { o1, o2 ->
+                        (
+                            FormatString.distance(tfValue, o1.name) -
+                                FormatString.distance(tfValue, o2.name) +
+                                log10((o2.downloadsCount / o1.downloadsCount).toDouble())
+                        ).roundToInt()
+                    }
+                } catch (e: FileDownloadException) {
+                    app().error(e)
+                }
+                searching = false
+            }.start()
         }
     }
 

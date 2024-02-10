@@ -16,8 +16,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.*
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.isSame
@@ -98,9 +100,13 @@ fun ModSearchButton(
     }
 
     LaunchedEffect(mod) {
-        versions ?: run {
-            versions = mod.getVersions(searchContext.version, "fabric")
-        }
+        versions ?: Thread {
+            try {
+                versions = mod.getVersions(searchContext.version, "fabric")
+            } catch (e: FileDownloadException) {
+                app().error(e)
+            }
+        }.start()
     }
 
     SelectorButton(
@@ -160,18 +166,22 @@ fun ModSearchButton(
                                 downloading = true
                                 selectedVersion?.let {
                                     searchContext.registerChangingJob { currentMods ->
-                                        ModDownloader(
-                                            launcherMod?.getOrNull(),
-                                            searchContext.directory,
-                                            "fabric",
-                                            searchContext.version,
-                                            currentMods,
-                                            searchContext.enableOnDownload
-                                        ).download(
-                                            it
-                                        )
+                                        try {
+                                            ModDownloader(
+                                                launcherMod?.getOrNull(),
+                                                searchContext.directory,
+                                                "fabric",
+                                                searchContext.version,
+                                                currentMods,
+                                                searchContext.enableOnDownload
+                                            ).download(
+                                                it
+                                            )
 
-                                        currentVersion = selectedVersion
+                                            currentVersion = selectedVersion
+                                        } catch(e: Exception) {
+                                            app().error(e)
+                                        }
 
                                         downloading = false
 
