@@ -50,6 +50,8 @@ fun Settings(
 
     var language by remember { mutableStateOf(language().appLanguage) }
 
+    var theme by remember { mutableStateOf(theme()) }
+
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
     val update = remember {
@@ -81,7 +83,7 @@ fun Settings(
                     language = it
                     language().appLanguage = it
                 },
-                defaultSelected = language
+                selected = language
             )
 
             var restart by remember { mutableStateOf(false) }
@@ -89,10 +91,11 @@ fun Settings(
                 strings().settings.theme(),
                 items = Theme.entries,
                 onSelected = {
+                    theme = it
                     setTheme(it)
                     restart = true
                 },
-                defaultSelected = theme()
+                selected = theme
             )
 
             if(restart) {

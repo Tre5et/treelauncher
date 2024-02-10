@@ -47,30 +47,34 @@ fun VersionSelector(
     setCurrentState(VersionState(minecraftVersion, versionType, fabricVersion))
 
     LaunchedEffect(showSnapshots) {
-        minecraftVersions = if (showSnapshots) {
-            MinecraftGame.getVersions()
-        } else {
-            MinecraftGame.getReleases()
-        }.also { versions ->
-            defaultVersionId?.let { default ->
-                minecraftVersion = minecraftVersion?.let { current ->
-                    versions.firstOrNull { it.id == current.id }
-                } ?: versions.firstOrNull { it.id == default }
+        Thread {
+            minecraftVersions = if (showSnapshots) {
+                MinecraftGame.getVersions()
+            } else {
+                MinecraftGame.getReleases()
+            }.also { versions ->
+                defaultVersionId?.let { default ->
+                    minecraftVersion = minecraftVersion?.let { current ->
+                        versions.firstOrNull { it.id == current.id }
+                    } ?: versions.firstOrNull { it.id == default }
+                }
             }
-        }
+        }.start()
     }
 
     LaunchedEffect(minecraftVersion) {
-        minecraftVersion?.also { mcVersion ->
-            fabricVersions = FabricLoader.getFabricVersions(mcVersion.id)
-                .also { versions ->
-                    defaultFabricVersion?.let { default ->
-                        fabricVersion = fabricVersion?.let { current ->
-                            versions.firstOrNull { it.loader.version == current.loader.version }
-                        } ?: versions.firstOrNull { it.loader.version == default }
+        Thread {
+            minecraftVersion?.also { mcVersion ->
+                fabricVersions = FabricLoader.getFabricVersions(mcVersion.id)
+                    .also { versions ->
+                        defaultFabricVersion?.let { default ->
+                            fabricVersion = fabricVersion?.let { current ->
+                                versions.firstOrNull { it.loader.version == current.loader.version }
+                            } ?: versions.firstOrNull { it.loader.version == default }
+                        }
                     }
-                }
-        }
+            }
+        }.start()
     }
 
     Column(
@@ -81,7 +85,7 @@ fun VersionSelector(
             title = strings().creator.version.version(),
             items = minecraftVersions,
             loading = minecraftVersions.isEmpty(),
-            defaultSelected = minecraftVersion,
+            selected = minecraftVersion,
             onSelected = { minecraftVersion = it },
             placeholder = strings().creator.version.version(),
             allowSearch = true
@@ -97,7 +101,7 @@ fun VersionSelector(
             title = strings().creator.version.type(),
             items = VersionType.entries,
             onSelected = { versionType = it },
-            defaultSelected = versionType,
+            selected = versionType,
         )
 
         minecraftVersion?.let {
@@ -105,7 +109,7 @@ fun VersionSelector(
                     TitledComboBox(
                         title = strings().creator.version.loader(),
                         items = fabricVersions,
-                        defaultSelected = fabricVersion,
+                        selected = fabricVersion,
                         onSelected = { fabricVersion = it },
                         loading = fabricVersions.isEmpty(),
                         placeholder = strings().creator.version.loader(),

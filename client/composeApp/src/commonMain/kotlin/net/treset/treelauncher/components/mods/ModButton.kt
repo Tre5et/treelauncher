@@ -227,7 +227,7 @@ fun ModButton(
                             onSelected = {
                                 selectedVersion = it
                             },
-                            defaultSelected = versions?.let { if(checkUpdates && it.isNotEmpty()) it[0] else null } ?: currentVersion,
+                            selected = versions?.let { if(checkUpdates && it.isNotEmpty()) it[0] else null } ?: currentVersion,
                             loading = versions == null && checkUpdates,
                         )
                     }

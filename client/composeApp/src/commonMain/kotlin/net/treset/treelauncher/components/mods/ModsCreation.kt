@@ -135,7 +135,7 @@ fun ModsCreation(
         )
         ComboBox(
             items = existing,
-            defaultSelected = inheritSelected,
+            selected = inheritSelected,
             onSelected = {
                 inheritSelected = it
             },

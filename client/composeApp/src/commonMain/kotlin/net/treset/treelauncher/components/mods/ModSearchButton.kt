@@ -199,7 +199,7 @@ fun ModSearchButton(
                         onSelected = {
                             selectedVersion = it
                         },
-                        defaultSelected = selectedVersion,
+                        selected = selectedVersion,
                         placeholder = strings().manager.mods.card.versionPlaceholder(),
                     )
                 }

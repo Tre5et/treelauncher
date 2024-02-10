@@ -118,15 +118,17 @@ fun Mods(
             }
 
             LaunchedEffect(selected, showSnapshots) {
-                versions = if (showSnapshots) {
-                    MinecraftGame.getVersions()
-                } else {
-                    MinecraftGame.getReleases()
-                }.also { v ->
-                    selectedVersion = v.firstOrNull {
-                        it.id == selected.second.modsVersion
+                Thread {
+                    versions = if (showSnapshots) {
+                        MinecraftGame.getVersions()
+                    } else {
+                        MinecraftGame.getReleases()
+                    }.also { v ->
+                        selectedVersion = v.firstOrNull {
+                            it.id == selected.second.modsVersion
+                        }
                     }
-                }
+                }.start()
             }
 
             val updateQueue = remember(selected) {
@@ -207,7 +209,7 @@ fun Mods(
                             selectedVersion = it
                         },
                         loading = versions.isEmpty(),
-                        defaultSelected = selectedVersion,
+                        selected = selectedVersion,
                         allowSearch = true
                     )
 

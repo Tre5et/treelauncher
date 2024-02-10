@@ -34,7 +34,7 @@ fun <T> SortBox(
             ComboBox(
                 items = sorts,
                 onSelected = onSelected,
-                defaultSelected = selected,
+                selected = selected,
                 decorated = false
             )
             IconButton(

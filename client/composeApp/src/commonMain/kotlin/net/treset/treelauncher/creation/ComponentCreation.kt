@@ -102,7 +102,7 @@ fun <T> ComponentCreator(
         )
         ComboBox(
             items = existing,
-            defaultSelected = inheritSelected,
+            selected = inheritSelected,
             onSelected = {
                 inheritSelected = it
             },
@@ -119,7 +119,7 @@ fun <T> ComponentCreator(
             )
             ComboBox(
                 items = existing,
-                defaultSelected = useSelected,
+                selected = useSelected,
                 onSelected = {
                     useSelected = it
                 },

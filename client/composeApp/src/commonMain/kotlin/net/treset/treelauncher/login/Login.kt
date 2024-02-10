@@ -163,7 +163,7 @@ fun LoginScreen(
                     language = it
                     language().appLanguage = it
                 },
-                defaultSelected = language,
+                selected = language,
                 toDisplayString = { displayName() },
                 decorated = false
             )

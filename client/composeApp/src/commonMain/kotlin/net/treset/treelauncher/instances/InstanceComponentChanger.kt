@@ -93,7 +93,7 @@ fun InstanceComponentChanger(
                 },
                 allowUnselect = allowUnselect,
                 placeholder = strings().manager.instance.change.noComponent(),
-                defaultSelected = selected,
+                selected = selected,
                 toDisplayString = { name },
                 loading = components.isEmpty()
             )

@@ -361,7 +361,7 @@ private fun PlayPopup(
                 Text(strings().selector.saves.play.multipleMessage())
                 ComboBox(
                     items = instances,
-                    defaultSelected = selectedInstance,
+                    selected = selectedInstance,
                     onSelected = { selectedInstance = it },
                     toDisplayString = { first.name }
                 )
