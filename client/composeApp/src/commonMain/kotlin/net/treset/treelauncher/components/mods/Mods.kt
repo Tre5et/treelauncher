@@ -57,7 +57,9 @@ fun Mods(
     Components(
         title = strings().selector.mods.title(),
         components = components,
-        manifest = { first },
+        componentManifest = appContext.files.modsManifest,
+        checkHasComponent = { details, component -> details.modsComponent == component.id },
+        getManifest = { first },
         appContext = appContext,
         getCreator = { state: ModsCreationState ->
             when(state.mode) {

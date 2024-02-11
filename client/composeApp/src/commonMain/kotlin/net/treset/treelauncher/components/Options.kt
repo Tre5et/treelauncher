@@ -17,8 +17,10 @@ fun Options(
 
     Components(
         strings().selector.options.title(),
-        components,
-        appContext,
+        components = components,
+        componentManifest = appContext.files.optionsManifest,
+        checkHasComponent = { details, component -> details.optionsComponent == component.id },
+        appContext = appContext,
         getCreator = { state ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let {

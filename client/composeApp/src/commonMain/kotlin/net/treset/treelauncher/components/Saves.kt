@@ -78,7 +78,9 @@ fun Saves(
 
     Components(
         strings().selector.saves.title(),
-        components,
+        components = components,
+        componentManifest = appContext.files.savesManifest,
+        checkHasComponent = { details, component -> details.savesComponent == component.id },
         appContext = appContext,
         getCreator = { state ->
             when(state.mode) {

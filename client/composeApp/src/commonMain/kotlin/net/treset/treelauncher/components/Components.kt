@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
 import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.LauncherManifestSortType
@@ -39,7 +41,9 @@ data class SortContext(
 fun <T, C:CreationState<T>> Components(
     title: String,
     components: List<T>,
-    manifest: T.() -> LauncherManifest,
+    componentManifest: LauncherManifest,
+    checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
+    getManifest: T.() -> LauncherManifest,
     appContext: AppContext,
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
@@ -84,7 +88,7 @@ fun <T, C:CreationState<T>> Components(
     val actualComponents: List<T> = remember(components, sortType, sortReversed) {
         components
             .sortedWith { o1, o2 ->
-                sortType.comparator.compare(o1.manifest(), o2.manifest())
+                sortType.comparator.compare(o1.getManifest(), o2.getManifest())
             }.let {
                 if (sortReversed) {
                     it.reversed()
@@ -138,7 +142,7 @@ fun <T, C:CreationState<T>> Components(
                 ) {
                     items(actualComponents) { component ->
                         ComponentButton(
-                            component = component.manifest(),
+                            component = component.getManifest(),
                             selected = component == selected,
                             onClick = {
                                 creatorSelected = false
@@ -201,7 +205,7 @@ fun <T, C:CreationState<T>> Components(
                             reload
                         )
 
-                        Text(it.manifest().name)
+                        Text(it.getManifest().name)
 
                         IconButton(
                             onClick = {
@@ -217,7 +221,7 @@ fun <T, C:CreationState<T>> Components(
                         }
                         IconButton(
                             onClick = {
-                                LauncherFile.of(it.manifest().directory).open()
+                                LauncherFile.of(it.getManifest().directory).open()
                             },
                             tooltip = strings().selector.component.openFolder()
                         ) {
@@ -255,7 +259,7 @@ fun <T, C:CreationState<T>> Components(
             ) {
                 if(showSettings) {
                     ComponentSettings(
-                        it.manifest(),
+                        it.getManifest(),
                     )
                 } else {
                     Column(
@@ -289,17 +293,17 @@ fun <T, C:CreationState<T>> Components(
 
             if (showRename) {
                 RenamePopup(
-                    manifest = it.manifest(),
-                    editValid = { name -> name.isNotBlank() && name != it.manifest().name },
+                    manifest = it.getManifest(),
+                    editValid = { name -> name.isNotBlank() && name != it.getManifest().name },
                     onDone = { name ->
                         showRename = false
                         name?.let { newName ->
-                            it.manifest().name = newName
+                            it.getManifest().name = newName
                             try {
                                 LauncherFile.of(
-                                    it.manifest().directory,
+                                    it.getManifest().directory,
                                     appConfig().manifestFileName
-                                ).write(it.manifest())
+                                ).write(it.getManifest())
                             } catch (e: IOException) {
                                 app().severeError(e)
                             }
@@ -311,18 +315,22 @@ fun <T, C:CreationState<T>> Components(
 
             if (showDelete) {
                 DeletePopup(
-                    component = it.manifest(),
+                    component = it.getManifest(),
                     appContext = appContext,
-                    checkHasComponent = { details -> details.savesComponent == it.manifest().id },
+                    checkHasComponent = { details -> checkHasComponent(details, it.getManifest()) },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        appContext.files.savesManifest.components.remove(it.manifest().id)
+                        componentManifest.components.remove(it.getManifest().id)
                         try {
                             LauncherFile.of(
-                                appContext.files.savesManifest.directory,
-                                appContext.files.gameDetailsManifest.components[1]
-                            ).write(appContext.files.savesManifest)
-                            LauncherFile.of(it.manifest().directory).remove()
+                                componentManifest.directory,
+                                when(componentManifest.type) {
+                                    LauncherManifestType.SAVES -> "saves.json"
+                                    LauncherManifestType.MODS -> "mods.json"
+                                    else -> appConfig().manifestFileName
+                                }
+                            ).write(componentManifest)
+                            LauncherFile.of(it.getManifest().directory).remove()
                         } catch(e: IOException) {
                             app().severeError(e)
                         }
@@ -372,7 +380,9 @@ fun <T, C:CreationState<T>> Components(
 @Composable
 fun Components(
     title: String,
+    componentManifest: LauncherManifest,
     components: List<LauncherManifest>,
+    checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
     appContext: AppContext,
     getCreator: (CreationState<LauncherManifest>) -> GenericComponentCreator?,
     reload: () -> Unit,
@@ -399,6 +409,8 @@ fun Components(
 ) = Components(
     title,
     components,
+    componentManifest,
+    checkHasComponent,
     { this },
     appContext,
     getCreator,

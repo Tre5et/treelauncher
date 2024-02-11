@@ -49,8 +49,10 @@ fun Resourcepacks(
 
     Components(
         strings().selector.resourcepacks.title(),
-        components,
-        appContext,
+        components = components,
+        componentManifest = appContext.files.resourcepackManifest,
+        checkHasComponent = { details, component -> details.resourcepacksComponent == component.id },
+        appContext = appContext,
         getCreator = { state ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let {
