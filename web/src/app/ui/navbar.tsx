@@ -14,14 +14,13 @@ export function NavBar() {
                 >
                     <Image
                         src="/icon.svg"
-                        className="align-middle"
                         width={32}
                         height={32}
                         alt="Launcher Icon"
                     />
-                    <span className="align-middle text-lg ml-2">TreeLauncher</span>
+                    <span className="text-lg ml-2">TreeLauncher</span>
                 </Link>
-                <div className="align-middle flex items-center">
+                <div className="align-middle flex items-center gap-4">
                     <Link
                         href="/about"
                     >
@@ -29,26 +28,22 @@ export function NavBar() {
                     </Link>
                     <Link
                         href="https://github.com/tre5et/treelauncher"
-                        className="ml-4 align-middle"
                     >
                         GitHub
                     </Link>
                     <Link
                         href="/download"
-                        className="ml-4 align-middle"
                     >
                         <Button
                         >
                             Download
                         </Button>
                     </Link>
-                    <ThemeToggle
-                        className="align-middle ml-4"
-                    />
+                    <ThemeToggle/>
                 </div>
             </div>
             <hr
-                className="bg-secondary"
+                className="border-secondary"
             />
         </div>
     )

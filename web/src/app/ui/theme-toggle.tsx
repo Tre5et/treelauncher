@@ -9,7 +9,7 @@ export function ThemeToggle({...rest} : React.ComponentPropsWithoutRef<"div">) {
         {...rest}
     >
         <span 
-            className="material-symbols-outlined cursor-pointer text-center translate-y-1"
+            className="material-symbols-rounded cursor-pointer text-center select-none translate-y-1"
             onClick={() => theme === "dark" ? setTheme("light") : setTheme("dark")}
         >
             {theme === "dark" ? (<p>light_mode</p>) : (<p>dark_mode</p>)}
