@@ -17,8 +17,10 @@ export function NavBar() {
                         width={32}
                         height={32}
                         alt="Launcher Icon"
+                        className="hidden md:block "
                     />
-                    <span className="text-lg ml-2">TreeLauncher</span>
+                    <span className="hidden md:block text-lg ml-2">TreeLauncher</span>
+                    <span className="block md:hidden material-symbols-rounded">home</span>
                 </Link>
                 <div className="align-middle flex items-center gap-4">
                     <Link
