@@ -1,17 +1,20 @@
 'use client';
 
 import { useTheme } from "next-themes"
+import Image from "next/image";
 
 interface ContentCardProps extends React.PropsWithChildren {
     imgId: string
     imgAlt: string
+    imgWidth?: number
+    imgHeight?: number
     rightAligned?: boolean
     keepTextAlignment?: boolean
     title?: string
 }
 
 export function ContentCard({
-    imgId, rightAligned, keepTextAlignment, imgAlt, title, children
+    imgId, rightAligned, keepTextAlignment, imgAlt, imgWidth, imgHeight, title, children
 }: ContentCardProps) {
     const {theme, setTheme} = useTheme()
     return (
@@ -23,9 +26,11 @@ export function ContentCard({
                     </p>
                 </div>
             )}
-            <img
-                src={imgId + (theme==="dark" ? "_dark" : "_light") + ".png"}
+            <Image
+                src={"/" + imgId + (theme==="dark" ? "_dark" : "_light") + ".png"}
                 alt={imgAlt}
+                width={imgWidth? imgWidth : 500}
+                height={imgHeight? imgHeight : 500}
                 className={`md:w-1/2 object-cover rounded-2xl border-4 border-accent`}
             />
             <div className="md:w-1/2">
