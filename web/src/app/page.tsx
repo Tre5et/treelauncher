@@ -36,7 +36,23 @@ export default function Home() {
             Manage everything about your mods directly in the Launcher.
           </ContentCard>
         </div>
-        <p className="text-2xl">And more...</p>
+        <p className="text-3xl">And more...</p>
+
+        <p className="text-4xl mt-16">Components for easy management</p>
+        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+          <ContentCard
+            imgId="components"
+            imgAlt="Component Selectors"
+            title="Components"
+            imgClassName="w-1/2"
+          >
+            <p>Components hold Saves, Resourcepacks, Options or Mods.<br/>Instances are made up of components.</p>
+            <p className="text-3xl mt-4">Shared</p>
+            <p>Progress is automatically shared between Instances that use the same component.<br/>Never copy your worlds or settings between instances again.</p>
+            <p className="text-3xl mt-4">Modifiable</p>
+            <p>Quickly create copies of your components to keep yor progress when updating.<br/>No copying files manually required.</p>
+          </ContentCard>
+        </div>
       </div>
     </main>
   );
