@@ -6,12 +6,13 @@ interface ContentCardProps extends React.PropsWithChildren {
     imgId: string
     imgAlt: string
     rightAligned?: boolean
+    keepTextAlignment?: boolean
     imgClassName?: string
-    title: string
+    title?: string
 }
 
 export function ContentCard({
-    imgId, rightAligned, imgAlt, title, imgClassName, children
+    imgId, rightAligned, keepTextAlignment, imgAlt, title, imgClassName, children
 }: ContentCardProps) {
     const {theme, setTheme} = useTheme()
     return (
@@ -22,10 +23,12 @@ export function ContentCard({
                 className={`w-3/5 object-cover rounded-2xl border-4 border-accent ${imgClassName}`}
             />
             <div>
-                <p className={`text-3xl ${rightAligned && "text-right"}`}>
-                    {title}
-                </p>
-                <p className={`text-lg ${rightAligned ? "text-right" : "text-left"}`}>
+                {title && (
+                    <p className={`text-3xl ${rightAligned && !keepTextAlignment && "text-right"}`}>
+                        {title}
+                    </p>
+                )}
+                <p className={`text-lg ${rightAligned ? (keepTextAlignment ? "text-justify" :  "text-right") : "text-left"}`}>
                     {children}
                 </p>
             </div>
