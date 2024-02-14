@@ -71,6 +71,7 @@ export default function Home() {
             <p>Add local mod files easily and link them to online mods to update them as soon as there is a newer version.<br/>Edit details of installed mods.</p>
           </ContentCard>
         </div>
+
         <p className="text-4xl mt-16">Get there easily</p>
         <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
           <ContentCard
@@ -85,6 +86,28 @@ export default function Home() {
             <p className="text-3xl mt-4">Customizable</p>
             <p>Supports multiple languages and themes.<br/>Uses tooltips, tab-navigation and screen-reader texts to provide anyone with an optimal experience.</p>
           </ContentCard>
+        </div>
+
+        <p className="text-4xl mt-16">Suggestions or feedback?</p>
+        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+          <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher">TreeLauncher GitHub page</a>.<br/><br/>Or fork the project and implement your own changes.</p>
+        </div>
+
+        <p className="text-4xl mt-16">Support Development</p>
+        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+          <Link
+            href="https://ko-fi.com/treset"
+          >
+            <Button>
+              <Image
+                src="/kofi.png"
+                width={32}
+                height={32}
+                alt="Ko-Fi Logo"
+              />
+              Support me on Ko-Fi
+            </Button>
+          </Link>
         </div>
       </div>
     </main>

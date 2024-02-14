@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Providers } from "./providers";
 import { exo2 } from "./ui/fonts";
 import { NavBar } from "./ui/navbar";
+import { Footer } from "./ui/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
           <div>
             <NavBar/>
             {children}
+            <Footer/>
           </div>
         </Providers>
       </body>
