@@ -90,7 +90,7 @@ export default function Home() {
 
         <p className="text-4xl mt-16">Suggestions or feedback?</p>
         <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
-          <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher">TreeLauncher GitHub page</a>.<br/><br/>Or fork the project and implement your own changes.</p>
+          <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher" className="underline">TreeLauncher GitHub page</a>.<br/><br/>Or fork the project and implement your own changes.</p>
         </div>
 
         <p className="text-4xl mt-16">Support Development</p>
@@ -98,7 +98,7 @@ export default function Home() {
           <Link
             href="https://ko-fi.com/treset"
           >
-            <Button>
+            <Button tabIndex={-1}>
               <Image
                 src="/kofi.png"
                 width={32}

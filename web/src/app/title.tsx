@@ -20,7 +20,9 @@ export function Title() {
                         href="/download"
                         className="w-min"
                         >
-                            <Button><p className="text-lg">Download</p></Button>
+                            <Button tabIndex={-1}>
+                                <p className="text-lg">Download</p>
+                            </Button>
                         </Link>
                     </div>
                 </div>

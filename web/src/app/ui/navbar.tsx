@@ -34,8 +34,7 @@ export function NavBar() {
                     <Link
                         href="/download"
                     >
-                        <Button
-                        >
+                        <Button tabIndex={-1}>
                             Download
                         </Button>
                     </Link>

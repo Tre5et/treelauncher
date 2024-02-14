@@ -8,12 +8,14 @@ const config: Config = {
   ],
   darkMode: 'class',
   theme: {
-    colors: {
-      'background': '#1c1b1f',
-      'primary': '#00ff00',
-      'onPrimary': '#000000',
-      'secondary': '#4a4458',
-      'accent': '#e8def8',
+    extend: {
+      colors: {
+        'background': '#1c1b1f',
+        'primary': '#00ff00',
+        'onPrimary': '#000000',
+        'secondary': '#4a4458',
+        'accent': '#e8def8',
+      }
     }
   },
   plugins: [],
