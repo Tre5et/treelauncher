@@ -8,7 +8,7 @@ import { ContentCard } from "./content-card";
 
 export default function Home() {
   return (
-    <main>
+    <main className="mb-20">
       <Title/>
       <div className="flex flex-col w-dvh items-center gap-6 mt-16">
         <p className="text-4xl text-center">Manage your game</p>
@@ -87,7 +87,7 @@ export default function Home() {
 
         <p className="text-4xl mt-16 text-center">Suggestions or feedback?</p>
         <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
-          <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher" className="underline">TreeLauncher GitHub page</a>.<br/><br/>Or fork the project and implement your own changes.</p>
+          <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher/issues" className="underline">GitHub Issues</a> page.<br/><br/>Or fork the project and implement your own changes.</p>
         </div>
 
         <p className="text-4xl mt-16 text-center">Support Development</p>

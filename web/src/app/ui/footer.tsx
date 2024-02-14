@@ -3,11 +3,11 @@ import Link from "next/link";
 export function Footer({className, ...rest}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
     return (
         <div
-            className={`w-full bg-white dark:bg-background pt-24 ${className}`}
+            className={`w-full bg-white dark:bg-background pt-8 ${className}`}
             {...rest}
         >
             <hr className="border-secondary"/>
-            <p className="flex flex-row gap-4 justify-center p-2">
+            <div className="flex flex-row gap-4 justify-center p-2">
                 <Link
                     href="/about"
                 >About</Link>
@@ -23,7 +23,7 @@ export function Footer({className, ...rest}: React.DetailedHTMLProps<React.HTMLA
                 <Link
                     href="https://ko-fi.com/treset"
                 >Ko-Fi</Link>
-            </p>
+            </div>
             <p className="text-center">&copy; 2024 by TreSet</p>
         </div>
     )
