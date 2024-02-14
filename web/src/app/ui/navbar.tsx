@@ -5,7 +5,7 @@ import { ThemeToggle } from "./theme-toggle";
 
 export function NavBar() {
     return (
-        <div className="sticky top-0 bg-white dark:bg-background">
+        <div className="sticky top-0 bg-white dark:bg-background z-10">
             <div className="flex justify-between items-center p-2">
                 <Link 
                     className="align-middle flex items-center"

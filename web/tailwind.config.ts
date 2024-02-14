@@ -12,7 +12,8 @@ const config: Config = {
       'background': '#1c1b1f',
       'primary': '#00ff00',
       'onPrimary': '#000000',
-      'secondary': '#4a4458'
+      'secondary': '#4a4458',
+      'accent': '#e8def8',
     }
   },
   plugins: [],
