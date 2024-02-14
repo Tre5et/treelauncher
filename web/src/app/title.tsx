@@ -6,7 +6,7 @@ export function Title() {
     return (
         <div>
             <div
-                className="flex justify-center items-center gap-8 flex-wrap-reverse my-32"
+                className="flex flex-col-reverse md:flex-row justify-center items-center gap-8 my-32 px-4"
             >
                 <div>
                     <p className="text-center text-6xl font-semibold text-primary">

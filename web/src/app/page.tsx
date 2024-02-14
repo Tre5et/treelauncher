@@ -11,8 +11,8 @@ export default function Home() {
     <main>
       <Title/>
       <div className="flex flex-col w-dvh items-center gap-6 mt-16">
-        <p className="text-4xl">Manage your game</p>
-        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+        <p className="text-4xl text-center">Manage your game</p>
+        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-8 md:gap-4">
           <ContentCard
             imgId="instances_settings"
             imgAlt="Instance Manager"
@@ -38,12 +38,11 @@ export default function Home() {
         </div>
         <p className="text-3xl">And more...</p>
 
-        <p className="text-4xl mt-16">Components for easy management</p>
-        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+        <p className="text-4xl mt-16 text-center">Components for easy management</p>
+        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
           <ContentCard
             imgId="components"
             imgAlt="Component Selectors"
-            imgClassName="w-1/2"
           >
             <p className="text-3xl mt-4">Components</p>
             <p>Components hold Saves, Resourcepacks, Options or Mods.<br/>Instances are made up of components.</p>
@@ -54,12 +53,11 @@ export default function Home() {
           </ContentCard>
         </div>
 
-        <p className="text-4xl mt-16">Powerful Mods Manager</p>
-        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+        <p className="text-4xl mt-16 text-center">Powerful Mods Manager</p>
+        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
           <ContentCard
             imgId="mods_search"
             imgAlt="Mod Search"
-            imgClassName="w-1/2"
             rightAligned
             keepTextAlignment
           >
@@ -72,12 +70,11 @@ export default function Home() {
           </ContentCard>
         </div>
 
-        <p className="text-4xl mt-16">Get there easily</p>
-        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+        <p className="text-4xl mt-16 text-center">Get there easily</p>
+        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
           <ContentCard
             imgId="accessibility"
             imgAlt="Dark and Light Theme"
-            imgClassName="w-1/2"
           >
             <p className="text-3xl mt-4">Play quickly</p>
             <p>Launch any instance with two clicks.<br/>Start a world or server directly using quick-play.</p>
@@ -88,13 +85,13 @@ export default function Home() {
           </ContentCard>
         </div>
 
-        <p className="text-4xl mt-16">Suggestions or feedback?</p>
-        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+        <p className="text-4xl mt-16 text-center">Suggestions or feedback?</p>
+        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
           <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher" className="underline">TreeLauncher GitHub page</a>.<br/><br/>Or fork the project and implement your own changes.</p>
         </div>
 
-        <p className="text-4xl mt-16">Support Development</p>
-        <div className="flex flex-col items-center max-w-6xl px-12 gap-4">
+        <p className="text-4xl mt-16 text-center">Support Development</p>
+        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
           <Link
             href="https://ko-fi.com/treset"
           >

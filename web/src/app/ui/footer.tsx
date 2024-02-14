@@ -1,8 +1,11 @@
 import Link from "next/link";
 
-export function Footer() {
+export function Footer({className, ...rest}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
     return (
-        <div className="w-full bg-white dark:bg-background mt-24">
+        <div
+            className={`w-full bg-white dark:bg-background pt-24 ${className}`}
+            {...rest}
+        >
             <hr className="border-secondary"/>
             <p className="flex flex-row gap-4 justify-center p-2">
                 <Link

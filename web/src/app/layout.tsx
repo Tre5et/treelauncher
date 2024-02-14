@@ -24,10 +24,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} ${exo2.className} bg-white dark:bg-background text-black dark:text-white`}>
         <Providers>
-          <div>
+          <div className="flex flex-col min-h-dvh">
             <NavBar/>
             {children}
-            <Footer/>
+            <Footer className="mt-auto"/>
           </div>
         </Providers>
       </body>
