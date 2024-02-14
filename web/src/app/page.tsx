@@ -39,7 +39,7 @@ export default function Home() {
         <p className="text-3xl">And more...</p>
 
         <p className="text-4xl mt-16 text-center">Components for easy management</p>
-        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
+        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
           <ContentCard
             imgId="components"
             imgAlt="Component Selectors"
@@ -54,7 +54,7 @@ export default function Home() {
         </div>
 
         <p className="text-4xl mt-16 text-center">Powerful Mods Manager</p>
-        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
+        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
           <ContentCard
             imgId="mods_search"
             imgAlt="Mod Search"
@@ -71,7 +71,7 @@ export default function Home() {
         </div>
 
         <p className="text-4xl mt-16 text-center">Get there easily</p>
-        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
+        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
           <ContentCard
             imgId="accessibility"
             imgAlt="Dark and Light Theme"
@@ -86,7 +86,7 @@ export default function Home() {
         </div>
 
         <p className="text-4xl mt-16 text-center">Suggestions or feedback?</p>
-        <div className="flex flex-col items-center max-w-7xl px-12 gap-4">
+        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
           <p className="text-lg text-center">Leave them on the <a href="https://github.com/tre5et/treelauncher" className="underline">TreeLauncher GitHub page</a>.<br/><br/>Or fork the project and implement your own changes.</p>
         </div>
 
