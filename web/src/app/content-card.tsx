@@ -26,17 +26,14 @@ export function ContentCard({
 
     let [narrow, setNarrow] = useState(true)
     useEffect(() => {
-        // set initial value
-        const mediaWatcher = window.matchMedia("(max-width: 500px)")
+        const mediaWatcher = window.matchMedia("(max-width: 768px)")
         setNarrow(mediaWatcher.matches);
     
-        //watch for updates
         function updateIsNarrowScreen(e: MediaQueryListEvent) {
             setNarrow(e.matches);
         }
         mediaWatcher.addEventListener('change', updateIsNarrowScreen)
     
-        // clean up after ourselves
         return function cleanup() {
             mediaWatcher.removeEventListener('change', updateIsNarrowScreen)
         }

@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { exo2 } from "./ui/fonts";
-import { NavBar } from "./ui/navbar";
 import { Footer } from "./ui/footer";
-
-const inter = Inter({ subsets: ["latin"] });
+import { NavBar } from "./ui/navbar";
 
 export const metadata: Metadata = {
   title: "TreeLauncher",
@@ -21,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${exo2.className} bg-white dark:bg-background text-black dark:text-white overflow-x-hidden`}>
+      <body className={`bg-white dark:bg-background text-black dark:text-white overflow-x-hidden`}>
         <Providers>
           <div className="flex flex-col min-h-dvh">
             <NavBar/>
