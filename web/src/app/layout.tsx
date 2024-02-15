@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${exo2.className} bg-white dark:bg-background text-black dark:text-white`}>
+      <body className={`${inter.className} ${exo2.className} bg-white dark:bg-background text-black dark:text-white overflow-x-hidden`}>
         <Providers>
           <div className="flex flex-col min-h-dvh">
             <NavBar/>
