@@ -1,10 +1,9 @@
 import Image from "next/image";
-import { ThemeToggle } from "./ui/theme-toggle";
-import { NavBar } from "./ui/navbar";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Title } from "./title";
 import { ContentCard } from "./content-card";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   return (
@@ -12,7 +11,7 @@ export default function Home() {
       <Title/>
       <div className="flex flex-col w-dvh items-center gap-6 mt-16">
         <p className="text-4xl text-center">Manage your game</p>
-        <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-8 md:gap-4">
+        <div className="flex flex-col items-center max-w-7xl w-full px-4 md:px-12 gap-8 md:gap-4">
           <ContentCard
             imgId="instances_settings"
             imgAlt="Instance Manager"
@@ -122,3 +121,7 @@ export default function Home() {
     </main>
   );
 }
+function setMounted(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
+
