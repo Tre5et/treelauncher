@@ -3,10 +3,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
+
+@layer base {
+    :root {
+        --primary: 0 224 0;
+        --onPrimary: 0 0 0;
+        --secondary: 232 222 248;
+        --background: 255 251 254;
+        --accent: 29 25 43;
+    }
+
+    :root.dark {
+        --primary: 0 255 0;
+        --secondary: 74 68 88;
+        --background: 28 27 31;
+        --accent: 232 222 248;
+    }
 }
 
 p>a{

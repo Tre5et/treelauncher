@@ -16,13 +16,13 @@ export function Footer({className, ...rest}: React.DetailedHTMLProps<React.HTMLA
                     href="/download"
                 >Download</Link>
                 &bull;
-                <Link
+                <a
                     href="https://github.com/tre5et/treelauncher"
-                >GitHub</Link>
+                >GitHub</a>
                 &bull;
-                <Link
+                <a
                     href="https://ko-fi.com/treset"
-                >Ko-Fi</Link>
+                >Ko-Fi</a>
             </div>
             <p className="text-center">&copy; 2024 by TreSet</p>
         </div>

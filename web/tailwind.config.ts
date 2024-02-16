@@ -10,11 +10,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'background': '#1c1b1f',
-        'primary': '#00ff00',
-        'onPrimary': '#000000',
-        'secondary': '#4a4458',
-        'accent': '#e8def8',
+        'primary': 'rgb(var(--primary) / 1)',
+        'onPrimary': 'rgb(var(--onPrimary) / 1)',
+        'secondary': 'rgb(var(--secondary) / 1)',
+        'background': 'rgb(var(--background) / 1)',
+        'accent': 'rgb(var(--accent) / 1)',
       }
     }
   },

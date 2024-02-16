@@ -9,7 +9,6 @@ export function NavBar() {
             <div className="flex justify-between items-center p-2">
                 <Link 
                     className="align-middle flex items-center"
-                    key="home"
                     href="/"
                 >
                     <Image
@@ -23,19 +22,13 @@ export function NavBar() {
                     <span className="block md:hidden material-symbols-rounded">home</span>
                 </Link>
                 <div className="align-middle flex items-center gap-4">
-                    <Link
-                        href="/about"
-                    >
+                    <Link href="/about">
                         About
                     </Link>
-                    <Link
-                        href="https://github.com/tre5et/treelauncher"
-                    >
+                    <a href="https://github.com/tre5et/treelauncher">
                         GitHub
-                    </Link>
-                    <Link
-                        href="/download"
-                    >
+                    </a>
+                    <Link href="/download">
                         <Button tabIndex={-1}>
                             Download
                         </Button>

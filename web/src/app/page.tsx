@@ -103,9 +103,7 @@ export default function Home() {
 
         <p className="text-4xl mt-16 text-center">Support Development</p>
         <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
-          <Link
-            href="https://ko-fi.com/treset"
-          >
+          <a href="https://ko-fi.com/treset">
             <Button tabIndex={-1}>
               <Image
                 src="/kofi.png"
@@ -115,7 +113,7 @@ export default function Home() {
               />
               Support me on Ko-Fi
             </Button>
-          </Link>
+          </a>
         </div>
       </div>
     </main>
