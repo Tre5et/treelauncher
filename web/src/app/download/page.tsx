@@ -30,7 +30,7 @@ export default function Page() {
                 releases!.map((release, index) => {
                     if(index == firstReleaseIndex) {
                         return (
-                            <div className="bg-secondary rounded-2xl w-full max-w-2xl p-4">
+                            <div key={release.name} className="bg-secondary rounded-2xl w-full max-w-2xl p-4">
                                 <div className="flex flex-row text-2xl text-center mb-1 justify-center items-center gap-1">
                                     Latest Version: {release.name} 
                                     <a href={release.html_url} target="_blank" className="material-symbols-rounded text-xl" style={{ transform: 'translateY(0.0625rem)' }}>open_in_new</a>
@@ -38,10 +38,10 @@ export default function Page() {
                                 <div className="flex flex-row gap-x-8 gap-y-1 justify-center items-center flex-wrap">
                                     {release.assets.map((asset) => {
                                         if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                            return (<p><a href={asset.browser_download_url}>Windows Installer</a></p>)
+                                            return (<p key={asset.name}><a href={asset.browser_download_url}>Windows Installer</a></p>)
                                         }
                                         if(asset.name.endsWith(".zip")) {
-                                            return (<p className="text-sm"><a href={asset.browser_download_url}>Windows Portable</a></p>)
+                                            return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>Windows Portable</a></p>)
                                         }
                                         return ""
                                     })}
@@ -73,7 +73,7 @@ export default function Page() {
                         releases!.map((release, index) => {
                             if(index != firstReleaseIndex) {
                                 return (
-                                    <div>
+                                    <div key={index.toString()}>
                                         <hr className="border-accent my-2"/>
                                         <div className="flex flex-row items-center justify-center gap-1 text-xl text-center">
                                             {release.prerelease && "Pre-Release: "}{release.name} 
@@ -82,10 +82,10 @@ export default function Page() {
                                         <div className="flex flex-row gap-x-8 gap-y-1 flex-wrap justify-center items-center">
                                             {release.assets.map((asset) => {
                                                 if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                                    return (<p><a href={asset.browser_download_url}>Windows Installer</a></p>)
+                                                    return (<p key={asset.name}><a href={asset.browser_download_url}>Windows Installer</a></p>)
                                                 }
                                                 if(asset.name.endsWith(".zip")) {
-                                                    return (<p className="text-sm"><a href={asset.browser_download_url}>Windows Portable</a></p>)
+                                                    return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>Windows Portable</a></p>)
                                                 }
                                                 return ""
                                             })}
