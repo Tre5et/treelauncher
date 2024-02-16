@@ -6,7 +6,7 @@ export default function Page() {
             <div className="flex flex-col items-center p-4 text-center max-w-2xl">
                 <p className="text-3xl">About TreeLauncher:</p>
                 <p className="text-xl mt-2">In Short:</p>
-                <p>TreeLauncher is a modern minecraft launcher that introduces the concept of components for managing instances to streamline instance management and creation.</p>
+                <p>TreeLauncher is a modern Minecraft launcher that introduces the concept of components for managing instances to streamline instance management and creation.</p>
                 <p className="text-xl mt-2">The &quot;Team&quot;:</p>
                 <p>TreSet (Planning, Development, Design and everything else)</p>
                 <p className="text-xl mt-2">Issues and Feedback:</p>

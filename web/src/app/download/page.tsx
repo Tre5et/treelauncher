@@ -32,7 +32,7 @@ export default function Page() {
                         return (
                             <div key={release.name} className="bg-secondary rounded-2xl w-full max-w-2xl p-4">
                                 <div className="flex flex-row text-2xl text-center mb-1 justify-center items-center gap-1">
-                                    Latest Version: {release.name} 
+                                    Latest Release: {release.name} 
                                     <a href={release.html_url} target="_blank" className="material-symbols-rounded text-xl" style={{ transform: 'translateY(0.0625rem)' }}>open_in_new</a>
                                 </div>
                                 <div className="flex flex-row gap-x-8 gap-y-1 justify-center items-center flex-wrap">
