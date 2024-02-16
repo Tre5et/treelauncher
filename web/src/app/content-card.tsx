@@ -60,7 +60,7 @@ export function ContentCard({
                 alt={imgAlt}
                 width={imgWidth? imgWidth : 500}
                 height={imgHeight? imgHeight : 500}
-                className={`md:w-1/2 grow-0 rounded-2xl border-4 border-accent`}
+                className={`md:w-1/2 grow-0 rounded-2xl border-4 border-secondary`}
             />
             <div className="md:w-1/2 grow">
                 {title && (
@@ -93,7 +93,7 @@ export function ContentCard({
                 alt={imgAlt}
                 width={imgWidth? imgWidth : 500}
                 height={imgHeight? imgHeight : 500}
-                className={`md:w-1/2 grow-0 rounded-2xl border-4 border-accent`}
+                className={`md:w-1/2 grow-0 rounded-2xl border-4 border-secondary`}
             />
             <div className="md:w-1/2 grow">
                 {title && (
