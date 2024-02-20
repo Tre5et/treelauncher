@@ -112,6 +112,7 @@ class EnStrings : Strings(
             failure = { "Login failed. Please try again!" },
             success = { user -> "Welcome, ${user ?: "Anonymous User"}!" }
         ),
+        logout = { "Delete Saved Login Data" },
         keepLoggedIn = { "Stay logged in" }
     ),
     manager = Manager(

@@ -112,6 +112,7 @@ class DeStrings : Strings(
             failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
             success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
         ),
+        logout = { "Gespeichertes Logindaten löschen" },
         keepLoggedIn = { "Eingeloggt bleiben" }
     ),
     manager = Manager(

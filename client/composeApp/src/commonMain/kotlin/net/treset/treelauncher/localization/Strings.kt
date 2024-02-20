@@ -205,6 +205,7 @@ open class Strings(
         val browserTitle: (WebViewState) -> String,
         val button: () -> String,
         val label: Label,
+        val logout: () -> String,
         val keepLoggedIn: () -> String
     ) {
         data class Label(

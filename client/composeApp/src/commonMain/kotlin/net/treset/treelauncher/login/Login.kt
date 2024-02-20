@@ -67,16 +67,20 @@ fun LoginScreen(
         }
     }
 
+    val loginContext = remember(loginState, userAuth().isLoggedIn) {
+        LoginContext(
+            loginState,
+            userAuth()
+        ) {
+            loginState = LoginState.NOT_LOGGED_IN
+            showContent = false
+            userAuth().logout()
+        }
+    }
+
     if(showContent) {
         content(
-            LoginContext(
-                loginState,
-                userAuth()
-            ) {
-                loginState = LoginState.NOT_LOGGED_IN
-                showContent = false
-                userAuth().logout()
-            }
+            loginContext
         )
         return
     }
@@ -134,16 +138,29 @@ fun LoginScreen(
                 )
             }
 
-            Text(
-                text = when (loginState) {
-                    LoginState.NOT_LOGGED_IN -> ""
-                    LoginState.AUTHENTICATING -> strings().login.label.authenticating()
-                    LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
-                    LoginState.FAILED -> strings().login.label.failure()
-                },
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row {
+                Text(
+                    text = when (loginState) {
+                        LoginState.NOT_LOGGED_IN -> ""
+                        LoginState.AUTHENTICATING -> strings().login.label.authenticating()
+                        LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                        LoginState.FAILED -> strings().login.label.failure()
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if(loginState == LoginState.FAILED) {
+                    Button(
+                        onClick = {
+                            loginContext.logout()
+                        },
+                        color = MaterialTheme.colorScheme.error,
+                    ) {
+                        Text(strings().login.logout())
+                    }
+                }
+            }
         }
 
         Row(
