@@ -29,7 +29,7 @@ class PatternString(original: String, keep: Boolean = false) : FormatString() {
     }
 
     fun matches(test: String?): Boolean {
-        return test?.matches(get().toRegex()) ?: false
+        return get().toRegex().containsMatchIn(test ?: "")
     }
 
     fun changeDirectoryEnding(): PatternString {

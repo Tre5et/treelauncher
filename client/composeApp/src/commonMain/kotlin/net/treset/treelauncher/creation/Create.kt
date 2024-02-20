@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.generic.*
@@ -340,6 +341,10 @@ fun Create(
 
     if(showCreationDone) {
         creationException?.let {
+            LaunchedEffect(Unit) {
+                app().error(it)
+            }
+
             PopupOverlay(
                 type = PopupType.ERROR,
                 titleRow = { Text(strings().creator.instance.popup.failure()) },

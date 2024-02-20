@@ -241,8 +241,8 @@ class VersionCreator : GenericComponentCreator {
                         throw ComponentCreationException("Unable to add fabric libraries: failed to create libraries directory: path=$librariesDir", e)
                     }
                 }
-                val loaderPattern = PatternString(":fabric-loader:")
-                val clientLibs: List<FabricLibrary> = ArrayList<FabricLibrary>(libraries).stream().filter { !loaderPattern.matches(it.name) }.toList()
+                val loaderPattern = PatternString(":fabric-loader:", true)
+                val clientLibs = libraries.filter { !loaderPattern.matches(it.name) }.toList()
                 val libs: List<String> = try {
                     FabricLoader.downloadFabricLibraries(
                         librariesDir,
