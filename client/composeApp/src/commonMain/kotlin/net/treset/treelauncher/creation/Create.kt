@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.AppContext
@@ -25,8 +24,6 @@ fun Create(
     appContext: AppContext,
     navContext: NavigationContext
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     var instanceName by remember { mutableStateOf("") }
 
     var versionState: VersionState? by remember { mutableStateOf(null) }
@@ -313,7 +310,7 @@ fun Create(
                 )
                 instanceCreator.statusCallback = { creationStatus = it }
 
-                coroutineScope.launch {
+                 Thread {
                     try {
                         instanceCreator.execute()
                     } catch(e: Exception) {
@@ -321,7 +318,7 @@ fun Create(
                     }
                     showCreationDone = true
                     creationStatus = null
-                }
+                }.start()
             }}}}}}}}},
             enabled =
                 instanceName.isNotBlank() &&
