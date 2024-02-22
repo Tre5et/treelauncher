@@ -215,7 +215,7 @@ class VersionCreator : GenericComponentCreator {
             fabricVersion?.let { fabricVersion ->
 
                 try {
-                    FabricLoader.downloadFabricLoader(baseDir, fabricVersion.loader)
+                    FabricLoader.downloadFabricClient(baseDir, fabricVersion.loader)
                 } catch (e: FileDownloadException) {
                     throw ComponentCreationException("Unable to add fabric file: failed to download fabric loader", e)
                 }

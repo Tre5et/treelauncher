@@ -47,24 +47,13 @@ class JavaComponentCreator(
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get os identifier", e)
         }
-        var os: JavaRuntimeOs? = null
-        for (o in java.runtimes) {
-            if (o.id == osIdentifier) {
-                os = o
-                break
-            }
-        }
-        if (os?.releases == null) {
+        val os = java[osIdentifier]
+        if (os?.entries == null || os.entries.isEmpty()) {
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get os runtime")
         }
-        var release: JavaRuntimeRelease? = null
-        for (r in os.releases) {
-            if (r != null && name == r.id) {
-                release = r
-                break
-            }
-        }
+
+        val release = os[name]?.get(0)
         if (release?.manifest == null || release.manifest.url == null) {
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get release")

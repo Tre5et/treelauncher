@@ -45,7 +45,9 @@ class CommandBuilder(
         val libraries: MutableList<String> = mutableListOf()
         for (v in instanceData.versionComponents) {
             for (l in v.second.libraries) {
-                libraries.add(LauncherFile.of(instanceData.librariesDir, l).absolutePath)
+                val library = LauncherFile.of(instanceData.librariesDir, l).absolutePath
+                if(libraries.any { it == library }) continue
+                libraries.add(library)
             }
         }
         if (libraries.isEmpty()) {
@@ -53,10 +55,9 @@ class CommandBuilder(
         }
 
         for (v in instanceData.versionComponents) {
-            if (v.second.mainFile == null || v.second.mainFile.isBlank()) {
-                throw GameCommandException("Unable to create start command: unable to determine main file: version=${v.first.id}")
+            if (v.second.mainFile != null && v.second.mainFile.isNotBlank()) {
+                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile).absolutePath)
             }
-            libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile).absolutePath)
         }
 
         var resX: String? = null
