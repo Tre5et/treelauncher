@@ -11,6 +11,8 @@ import net.treset.mc_version_loader.fabric.FabricVersionDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.backend.creation.FabricVersionCreator
+import net.treset.treelauncher.backend.creation.VanillaVersionCreator
 import net.treset.treelauncher.backend.creation.VersionCreator
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.strings
@@ -152,7 +154,7 @@ fun getVersionCreator(
     versionState.minecraftVersion?.let { mcVersion ->
         when(versionState.versionType) {
             VersionType.VANILLA -> {
-                return VersionCreator(
+                return VanillaVersionCreator(
                     appContext.files.launcherDetails.typeConversion,
                     appContext.files.versionManifest,
                     MinecraftGame.getVersionDetails(mcVersion.url),
@@ -162,7 +164,7 @@ fun getVersionCreator(
             }
             VersionType.FABRIC -> {
                 versionState.fabricVersion?.let {
-                    return VersionCreator(
+                    return FabricVersionCreator(
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.versionManifest,
                         it,

@@ -13,6 +13,8 @@ import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
 import net.treset.mc_version_loader.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.creation.FabricVersionCreator
+import net.treset.treelauncher.backend.creation.VanillaVersionCreator
 import net.treset.treelauncher.backend.creation.VersionCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
@@ -216,7 +218,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
             throw IOException("Failed to find version: " + details.versionId)
         val url: String = version.url
         val versionDetails: MinecraftVersionDetails = MinecraftGame.getVersionDetails(url)
-        return VersionCreator(
+        return VanillaVersionCreator(
             instanceData.instance.first.typeConversion,
             files.versionManifest,
             versionDetails,
@@ -231,7 +233,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
             FabricLoader.getFabricVersionDetails(details.versionNumber, details.loaderVersion)
         val profile: FabricProfile =
             FabricLoader.getFabricProfile(details.versionNumber, details.loaderVersion)
-        return VersionCreator(
+        return FabricVersionCreator(
             instanceData.instance.first.typeConversion,
             files.versionManifest,
             version,
