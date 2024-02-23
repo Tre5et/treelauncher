@@ -34,6 +34,7 @@ data class ModContext(
     val disableNoVersion: Boolean,
     val enableOnDownload: Boolean,
     val version: String,
+    val type: VersionType,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
 )
@@ -63,16 +64,16 @@ fun Mods(
         appContext = appContext,
         getCreator = { state: ModsCreationState ->
             when(state.mode) {
-                CreationMode.NEW -> state.name?.let{ state.version?.let {
+                CreationMode.NEW -> state.name?.let{ state.version?.let { state.type?.let {
                     ModsCreator(
                         state.name,
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.modsManifest,
-                        "fabric",
-                        state.version,
+                        state.type.id,
+                        state.version.id,
                         appContext.files.gameDetailsManifest
                     )
-                }}
+                }}}
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     ModsCreator(
                         state.name,
@@ -96,6 +97,7 @@ fun Mods(
         createContent =  { onCreate: (ModsCreationState) -> Unit ->
             ModsCreation(
                 components,
+                showUse = false,
                 onCreate = onCreate
             )
         },
@@ -109,6 +111,8 @@ fun Mods(
             var versions: List<MinecraftVersion> by remember(current) { mutableStateOf(emptyList()) }
             var showSnapshots by remember(current) { mutableStateOf(false) }
             var selectedVersion: MinecraftVersion? by remember(current) { mutableStateOf(null) }
+
+            var selectedType: VersionType by remember(current) { mutableStateOf(VersionType.fromId(current.second.modsType)) }
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
@@ -162,12 +166,13 @@ fun Mods(
                 }
             }
 
-            val modContext = remember(current, current.second.modsVersion, autoUpdate, disableNoVersion, enableOnDownload) {
+            val modContext = remember(current, current.second.modsVersion, current.second.modsType, autoUpdate, disableNoVersion, enableOnDownload) {
                 ModContext(
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
                     current.second.modsVersion,
+                    VersionType.fromId(current.second.modsType),
                     LauncherFile.of(current.first.directory)
                 ) { element ->
                     updateQueue.add(element)
@@ -222,6 +227,15 @@ fun Mods(
                         allowSearch = true
                     )
 
+                    ComboBox(
+                        items = VersionType.entries.filter { it != VersionType.VANILLA },
+                        selected = selectedType,
+                        onSelected = {
+                            selectedType = it
+                        },
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+
                     TitledCheckBox(
                         title = strings().creator.version.showSnapshots(),
                         checked = showSnapshots,
@@ -229,6 +243,7 @@ fun Mods(
                             showSnapshots = it
                         }
                     )
+
 
                     IconButton(
                         onClick = {
@@ -253,6 +268,7 @@ fun Mods(
                                             onClick = {
                                                 modContext.registerChangingJob {
                                                     current.second.modsVersion = v.id
+                                                    current.second.modsType = selectedType.id
 
                                                     LauncherFile.of(
                                                         current.first.directory,
@@ -270,6 +286,7 @@ fun Mods(
                             }
                         },
                         enabled = selectedVersion?.let { it.id != current.second.modsVersion } ?: false
+                                || selectedType.id != current.second.modsType
                     ) {
                         Icon(
                             icons().change,

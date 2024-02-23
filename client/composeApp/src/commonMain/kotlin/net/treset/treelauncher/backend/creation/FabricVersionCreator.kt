@@ -13,7 +13,6 @@ import net.treset.mc_version_loader.launcher.LauncherVersionDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
-import net.treset.mc_version_loader.util.DownloadStatus
 import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
@@ -29,42 +28,32 @@ class FabricVersionCreator(
     componentsManifest: LauncherManifest,
     var fabricVersion: FabricVersionDetails,
     var fabricProfile: FabricProfile,
-    var files: LauncherFiles,
+    files: LauncherFiles,
     var librariesDir: LauncherFile
 ) : VersionCreator(
     fabricProfile.id,
     typeConversion,
-    componentsManifest
+    componentsManifest,
+    files
 ) {
     init {
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.VERSION, null)
+        defaultStatus = CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC, null)
+    }
+
+    override fun matchesVersion(id: String): Boolean {
+        return id == fabricProfile.id
     }
 
     @Throws(ComponentCreationException::class)
-    override fun createComponent(): String {
-        for (v in files.versionComponents) {
-            if (v.second.versionId != null && v.second.versionId == fabricProfile.id) {
-                LOGGER.debug { "Matching version already exists, using instead: versionId=${v.second.versionId}, usingId=${v.first.id}" }
-                uses = v.first
-                return useComponent()
-            }
-        }
-        val result = super.createComponent()
-        if (newManifest == null) {
-            attemptCleanup()
-            throw ComponentCreationException("Failed to create version component: invalid data")
-        }
-        makeVersion()
-        LOGGER.debug { "Created version component: id=${newManifest!!.id}" }
-        return result
-    }
-
-    @Throws(ComponentCreationException::class)
-    private fun makeVersion() {
+    override fun makeVersion() {
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC, null))
+        LOGGER.debug { "Creating fabric version..." }
+
         if (fabricProfile.inheritsFrom == null) {
             throw ComponentCreationException("Unable to create fabric version: no valid fabric profile")
         }
+
+        LOGGER.debug { "Creating minecraft version..." }
         val versions: List<MinecraftVersion> = try {
             MinecraftGame.getVersions()
         } catch (e: FileDownloadException) {
@@ -94,6 +83,8 @@ class FabricVersionCreator(
                 } catch (e: ComponentCreationException) {
                     throw ComponentCreationException("Unable to create fabric version: failed to create mc version: versionId=${fabricProfile.inheritsFrom}", e)
                 }
+                LOGGER.debug { "Created minecraft version: id=$dependsId" }
+
                 val details = LauncherVersionDetails(
                     fabricProfile.inheritsFrom,
                     "fabric",
@@ -109,9 +100,9 @@ class FabricVersionCreator(
                     fabricProfile.id
                 )
                 try {
-                    addFabricArguments(details)
-                    addFabricLibraries(details)
-                    addFabricFile(details)
+                    addArguments(details)
+                    addLibraries(details)
+                    addClient(details)
                 } catch (e: ComponentCreationException) {
                     mcCreator.attemptCleanup()
                     attemptCleanup()
@@ -130,7 +121,8 @@ class FabricVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun addFabricArguments(details: LauncherVersionDetails) {
+    private fun addArguments(details: LauncherVersionDetails) {
+        LOGGER.debug { "Adding fabric arguments..." }
         details.jvmArguments = translateArguments(
             fabricProfile.launchArguments.jvm,
             appConfig().fabricDefaultJvmArguments
@@ -143,8 +135,9 @@ class FabricVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun addFabricLibraries(details: LauncherVersionDetails) {
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, null))
+    private fun addLibraries(details: LauncherVersionDetails) {
+        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC_LIBRARIES, null))
+        LOGGER.debug { "Adding fabric libraries..." }
         fabricProfile.libraries?.let { libraries: List<FabricLibrary> ->
             if (!librariesDir.isDirectory()) {
                 try {
@@ -154,18 +147,13 @@ class FabricVersionCreator(
                 }
             }
             val loaderPattern = PatternString(":fabric-loader:", true)
-            val clientLibs = libraries.filter { !loaderPattern.matches(it.name) }.toList()
+            val clientLibs = libraries.filter { !loaderPattern.matches(it.name) }
             val libs: List<String> = try {
                 FabricLoader.downloadFabricLibraries(
                     librariesDir,
                     clientLibs
-                ) { status: DownloadStatus? ->
-                    setStatus(
-                        CreationStatus(
-                            CreationStatus.DownloadStep.VERSION_LIBRARIES,
-                            status
-                        )
-                    )
+                ) {
+                    setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC_LIBRARIES, it))
                 }
             } catch (e: FileDownloadException) {
                 throw ComponentCreationException("Unable to add fabric libraries: failed to download libraries", e)
@@ -176,20 +164,22 @@ class FabricVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun addFabricFile(details: LauncherVersionDetails) {
+    private fun addClient(details: LauncherVersionDetails) {
+        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC_FILE, null))
+        LOGGER.debug { "Adding fabric client..." }
         newManifest?.let { newManifest ->
             val baseDir = File(newManifest.directory)
             if (!baseDir.isDirectory()) {
-                throw ComponentCreationException("Unable to add fabric file: base dir is not a directory")
+                throw ComponentCreationException("Unable to add fabric client: base dir is not a directory")
             }
             try {
                 FabricLoader.downloadFabricClient(File(baseDir, appConfig().fabricDefaultClientFileName), fabricVersion.loader)
             } catch (e: FileDownloadException) {
-                throw ComponentCreationException("Unable to add fabric file: failed to download fabric loader", e)
+                throw ComponentCreationException("Unable to add fabric client: failed to download fabric loader", e)
             }
             details.mainFile = appConfig().fabricDefaultClientFileName
-            LOGGER.debug { "Added fabric file: mainFile=${details.mainFile}" }
-        }?: throw ComponentCreationException("Unable to add fabric file: newManifest is null")
+            LOGGER.debug { "Added fabric client: mainFile=${details.mainFile}" }
+        }?: throw ComponentCreationException("Unable to add fabric client: newManifest is null")
     }
 
     companion object {

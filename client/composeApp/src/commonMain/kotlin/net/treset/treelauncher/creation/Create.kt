@@ -1,6 +1,8 @@
 package net.treset.treelauncher.creation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -10,11 +12,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.util.CreationStatus
+import net.treset.treelauncher.components.mods.ModsCreation
+import net.treset.treelauncher.components.mods.ModsCreationState
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.navigation.NavigationContext
@@ -31,14 +34,12 @@ fun Create(
     var savesState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
     var resourcepackState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
     var optionsState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
-    var modsState: CreationState<Pair<LauncherManifest, LauncherModsDetails>>? by remember { mutableStateOf(null) }
+    var modsState: ModsCreationState? by remember { mutableStateOf(null) }
 
-    var hasMods by remember(versionState?.versionType) { mutableStateOf(
-        if(versionState?.versionType == VersionType.FABRIC) {
-            true
-        } else if(modsState?.name == null && modsState?.existing == null) {
-            false
-        } else true
+    var hasMods by remember(versionState?.versionType == VersionType.VANILLA || versionState?.versionType == null) { mutableStateOf(
+        !((versionState?.versionType == VersionType.VANILLA  || versionState?.versionType == null)
+                && modsState?.name == null && modsState?.existing == null && modsState?.version == versionState?.minecraftVersion
+        )
     ) }
 
     var creationStatus: CreationStatus? by remember { mutableStateOf(null) }
@@ -166,10 +167,16 @@ fun Create(
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .requiredHeight(24.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            hasMods = !hasMods
+                        }
                 ) {
                     Text(
                         strings().creator.instance.mods(),
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.titleSmall,
                     )
                     Switch(
                         checked = hasMods,
@@ -182,11 +189,12 @@ fun Create(
                     )
                 }
                 if (hasMods) {
-                    ComponentCreator(
+                    ModsCreation(
                         existing = appContext.files.modsComponents.toList(),
                         showCreate = false,
                         setCurrentState = { modsState = it },
-                        toDisplayString = { first.name },
+                        defaultVersion = versionState?.minecraftVersion,
+                        defaultType = versionState?.versionType?.let { if(it == VersionType.VANILLA) null else it },
                     )
                 }
             }
@@ -264,16 +272,16 @@ fun Create(
                 val modsCreator: ModsCreator? = if(hasMods) {
                     modsState?.let { mods -> if (mods.isValid()) {
                             when (mods.mode) {
-                                CreationMode.NEW -> mods.name?.let {
+                                CreationMode.NEW -> mods.name?.let { mods.type?.let { mods.version?.let {
                                     ModsCreator(
                                         mods.name,
                                         appContext.files.launcherDetails.typeConversion,
                                         appContext.files.modsManifest,
-                                        "fabric",
-                                        version.minecraftVersion!!.id,
+                                        mods.type.id,
+                                        mods.version.id,
                                         appContext.files.gameDetailsManifest
                                     )
-                                }
+                                }}}
 
                                 CreationMode.INHERIT -> mods.name?.let {
                                     mods.existing?.let {

@@ -35,7 +35,7 @@ fun InstanceButton(
                 instance.instance.first.name,
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(instance.versionComponents[0].second.versionId)
+            Text(instance.versionComponents[0].first.name)
         }
 
         val interactionSource = remember { MutableInteractionSource() }

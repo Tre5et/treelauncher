@@ -60,15 +60,15 @@ fun <T> ComponentCreator(
 
     var useSelected: T? by remember(existing) { mutableStateOf(null) }
 
-    setCurrentState(
+    val creationState = remember(existing, mode, newName, inheritName, inheritSelected, useSelected) {
         CreationState.of(
             mode,
             newName,
             inheritName,
             inheritSelected,
             useSelected
-        )
-    )
+        ).also(setCurrentState)
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -131,21 +131,9 @@ fun <T> ComponentCreator(
 
         if(showCreate) {
             Button(
-                enabled = when(mode) {
-                    CreationMode.NEW -> newName.isNotBlank()
-                    CreationMode.INHERIT -> inheritName.isNotBlank() && inheritSelected != null
-                    CreationMode.USE -> useSelected != null
-                },
+                enabled = creationState.isValid(),
                 onClick = {
-                    CreationState.of(
-                        mode,
-                        newName,
-                        inheritName,
-                        inheritSelected,
-                        useSelected
-                    ).let {
-                        if(it.isValid()) onCreate(it)
-                    }
+                    if(creationState.isValid()) onCreate(creationState)
                 }
             ) {
                 Text(strings().creator.buttonCreate())

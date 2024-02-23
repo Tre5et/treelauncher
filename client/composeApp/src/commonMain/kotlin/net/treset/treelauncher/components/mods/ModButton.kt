@@ -113,7 +113,7 @@ fun ModButton(
             }
             if(modData.isPresent) {
                 versions = try {
-                        modData.get().getVersions(modContext.version, "fabric")
+                        modData.get().getVersions(modContext.version, modContext.type.id)
                     } catch (e: FileDownloadException) {
                         app().error(e)
                         emptyList()
@@ -198,7 +198,7 @@ fun ModButton(
                                             ModDownloader(
                                                 mod,
                                                 modContext.directory,
-                                                "fabric",
+                                                modContext.type.id,
                                                 modContext.version,
                                                 currentMods,
                                                 false //modContext.enableOnDownload

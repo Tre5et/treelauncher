@@ -45,10 +45,14 @@ class Config(baseDir: String, val debug: Boolean, val updateUrl: String) {
         LauncherLaunchArgument("--resourcePackDir", null, null, null, null),
         LauncherLaunchArgument("\${resourcepack_directory}", null, null, null, null)
     )
+    val minecraftDefaultFileName = "client.jar"
     val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val forgeDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val forgeDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultClientFileName = "fabric-client.jar"
+    val forgeDefaultClientFileName = "forge-client.jar"
     val modrinthUserAgent = "TreSet/treelauncher/v2.0.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"
 }

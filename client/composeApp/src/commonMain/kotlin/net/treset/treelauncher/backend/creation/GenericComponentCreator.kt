@@ -25,9 +25,9 @@ abstract class GenericComponentCreator(
     var details: String?,
     var componentsManifest: LauncherManifest?
 ) : ComponentCreator {
-    protected var newManifest: LauncherManifest? = null
+    var newManifest: LauncherManifest? = null
     open var statusCallback: (CreationStatus) -> Unit = {}
-    protected var defaultStatus: CreationStatus? = null
+    var defaultStatus: CreationStatus? = null
 
     @get:Throws(ComponentCreationException::class)
     override val id: String

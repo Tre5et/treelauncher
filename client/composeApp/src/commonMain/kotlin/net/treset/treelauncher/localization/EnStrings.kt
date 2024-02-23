@@ -36,7 +36,8 @@ class EnStrings : Strings(
             version = { "Version" },
         ),
         mods = Creator.Mods(
-            version = { "Version" }
+            version = { "Version" },
+            type = { "Mod Loader" },
         ),
         name = { "Name" },
         radioCreate = { "Create" },
@@ -49,11 +50,17 @@ class EnStrings : Strings(
             resourcepacks = { "Creating resourcepacks component..." },
             saves = { "Creating saves component..." },
             version = Creator.Status.Version(
-                value = { "Creating version..." },
-                vanilla = { "Creating minecraft version..." },
                 assets = { "Downloading assets..." },
+                fabric = { "Creating fabric version..." },
+                fabricFile = { "Downloading fabric version..." },
+                fabricLibraries = { "Downloading fabric libraries..." },
+                file = { "Downloading version..." },
+                forge = { "Creating forge version..." },
+                forgeFile = { "Patching forge version..." },
+                forgeLibraries = { "Downloading forge libraries..." },
                 libraries = { "Downloading libraries..." },
-                fabric = { "Creating fabric version..." }
+                value = { "Creating version..." },
+                vanilla = { "Creating minecraft version..." }
             ),
             java = { "Downloading java version..." },
             finishing = { "Finishing creation..." }
@@ -62,8 +69,9 @@ class EnStrings : Strings(
             errorVersion = { "No Version selected" },
             errorType = { "No Version Type selected" },
             errorLoader = { "No Fabric Version selected" },
+            fabric = { "Fabric version" },
+            forge = { "Forge version" },
             showSnapshots = { "Show Snapshots" },
-            loader = { "Fabric version" },
             loading = { "Loading..." },
             type = { "Version type" },
             version = { "Version" }
@@ -486,5 +494,10 @@ class EnStrings : Strings(
             warningMessage = { "Cleaning up temporary resources failed.\nThis will probably not affect usage.\nDetails were written to the logs." },
             warningTitle = { "The launcher was updated." }
         )
-    )
+    ),
+    version = Version(
+        fabric = { "Fabric" },
+        forge = { "Forge" },
+        vanilla = { "Vanilla" }
+    ),
 )

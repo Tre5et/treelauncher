@@ -36,7 +36,8 @@ fun <T> ComboBox(
     allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember(enabled) { mutableStateOf(false) }
     val displayString = remember(loading, loadingPlaceholder, selected, placeholder) { if(loading) loadingPlaceholder else selected?.toDisplayString() ?: placeholder }
@@ -49,7 +50,7 @@ fun <T> ComboBox(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentSize(Alignment.TopStart)
             .pointerHoverIcon(PointerIcon.Hand),
     ) {
@@ -161,7 +162,8 @@ fun <T> ComboBox(
     toDisplayString: T.() -> String = { toString() },
     allowSearch: Boolean = false,
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) = ComboBox(
     items,
     { it?.let { e -> onSelected(e) } },
@@ -173,7 +175,8 @@ fun <T> ComboBox(
     selected = selected,
     toDisplayString = toDisplayString,
     decorated = decorated,
-    enabled = enabled
+    enabled = enabled,
+    modifier = modifier
 )
 
 @Composable
@@ -189,11 +192,13 @@ fun <T> TitledComboBox(
     allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+        modifier = modifier
     ) {
         Text(
             title,
@@ -228,7 +233,8 @@ fun <T> TitledComboBox(
     allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) = TitledComboBox(
     title = title,
     items = items,
@@ -241,7 +247,8 @@ fun <T> TitledComboBox(
     allowSearch = allowSearch,
     toDisplayString = toDisplayString,
     decorated = decorated,
-    enabled = enabled
+    enabled = enabled,
+    modifier = modifier
 )
 
 @Composable

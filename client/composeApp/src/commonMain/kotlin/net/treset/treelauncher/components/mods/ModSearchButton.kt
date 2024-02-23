@@ -102,7 +102,7 @@ fun ModSearchButton(
     LaunchedEffect(mod) {
         versions ?: Thread {
             try {
-                versions = mod.getVersions(searchContext.version, "fabric")
+                versions = mod.getVersions(searchContext.version, searchContext.type.id)
             } catch (e: FileDownloadException) {
                 app().error(e)
             }
@@ -170,7 +170,7 @@ fun ModSearchButton(
                                             ModDownloader(
                                                 launcherMod?.getOrNull(),
                                                 searchContext.directory,
-                                                "fabric",
+                                                searchContext.type.id,
                                                 searchContext.version,
                                                 currentMods,
                                                 searchContext.enableOnDownload

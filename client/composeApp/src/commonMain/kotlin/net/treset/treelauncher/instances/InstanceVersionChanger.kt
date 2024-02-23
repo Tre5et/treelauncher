@@ -47,9 +47,11 @@ fun InstanceVersionChanger(
                 defaultVersionId = instance.versionComponents[0].second.versionNumber,
                 defaultVersionType = when(instance.versionComponents[0].second.versionType) {
                     "fabric" -> VersionType.FABRIC
+                    "forge" -> VersionType.FORGE
                     else -> VersionType.VANILLA
                 },
                 defaultFabricVersion = instance.versionComponents[0].second.loaderVersion,
+                defaultForgeVersion = instance.versionComponents[0].second.loaderVersion,
             )
         }
     }

@@ -36,7 +36,8 @@ class DeStrings : Strings(
             version = { "Version" },
         ),
         mods = Creator.Mods (
-            version = { "Version" }
+            version = { "Version" },
+            type = { "Mod-Loader"},
         ),
         name = { "Name" },
         radioCreate = { "Erstellen" },
@@ -49,11 +50,17 @@ class DeStrings : Strings(
             resourcepacks = { "Ressoucenpaketkomponente wird erstellt..." },
             saves = { "Weltenkomponente wird erstellt..." },
             version = Creator.Status.Version(
-                value = { "Version wird erstellt..." },
-                vanilla = { "Minecraft Version wird erstellt..." },
                 assets = { "Assets werden heruntergeladen..." },
+                fabric = { "Fabric Version wird erstellt..." },
+                fabricFile = { "Fabric Version wird heruntergeladen..." },
+                fabricLibraries = { "Fabric Bibliotheken werden heruntergeladen..." },
+                file = { "Version wird heruntergeladen..." },
+                forge = { "Forge Version wird erstellt..." },
+                forgeFile = { "Forge Version wird heruntergeladen..." },
+                forgeLibraries = { "Forge Bibliotheken werden heruntergeladen..." },
                 libraries = { "Bibliotheken werden heruntergeladen..." },
-                fabric = { "Fabric Version wird erstellt..." }
+                value = { "Version wird erstellt..." },
+                vanilla = { "Minecraft Version wird erstellt..." }
             ),
             java = { "Java Version wird heruntergeladen..." },
             finishing = { "Erstellung wird abgeschlossen..." }
@@ -62,8 +69,9 @@ class DeStrings : Strings(
             errorVersion = { "Keine Version ausgewählt." },
             errorType = { "Kein Versionstyp ausgewählt." },
             errorLoader = { "Keine Fabric Version ausgewählt." },
+            fabric = { "Fabric Version" },
+            forge = { "Forge Version" },
             showSnapshots = { "Snapshots anzeigen" },
-            loader = { "Fabric Version" },
             loading = { "Laden..." },
             type = { "Versionstyp" },
             version = { "Version" }
@@ -486,5 +494,10 @@ class DeStrings : Strings(
             warningMessage = { "Das Löschen temporärer Update Ressourcen ist fehlgeschlagen.\nDas verursacht wahrscheinlich keine Fehler.\nDetails wurden in die Logs geschrieben." },
             warningTitle = { "Der Launcher wurde aktualisiert." }
         )
-    )
+    ),
+    version = Version(
+        fabric = { "Fabric" },
+        forge = { "Forge" },
+        vanilla = { "Vanilla" }
+    ),
 )

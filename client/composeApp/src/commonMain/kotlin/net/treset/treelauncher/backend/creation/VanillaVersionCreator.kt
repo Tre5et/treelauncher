@@ -22,45 +22,26 @@ class VanillaVersionCreator(
     typeConversion: Map<String, LauncherManifestType>,
     componentsManifest: LauncherManifest,
     var mcVersion: MinecraftVersionDetails,
-    var files: LauncherFiles,
+    files: LauncherFiles,
     var librariesDir: LauncherFile
 ) : VersionCreator(
     mcVersion.id,
     typeConversion,
-    componentsManifest
+    componentsManifest,
+    files
 ) {
-
     init {
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.VERSION, null)
     }
 
-    @Throws(ComponentCreationException::class)
-    override fun createComponent(): String {
-        for (v in files.versionComponents) {
-            if (v.second.versionId != null && (v.second.versionId == mcVersion.id)) {
-                LOGGER.debug { "Matching vanilla version already exists, using instead: versionId=${v.second.versionId}, usingId=${v.first.id}" }
-                uses = v.first
-                return useComponent()
-            }
-        }
-        val result = super.createComponent()
-        if (newManifest == null) {
-            attemptCleanup()
-            throw ComponentCreationException("Failed to create version component: invalid data")
-        }
-        makeVersion()
-        LOGGER.debug { "Created vanilla version component: id=${newManifest!!.id}" }
-        return result
+    override fun matchesVersion(id: String): Boolean {
+        return id == mcVersion.id
     }
 
     @Throws(ComponentCreationException::class)
-    override fun inheritComponent(): String {
-        throw ComponentCreationException("Unable to inherit version: not supported")
-    }
-
-    @Throws(ComponentCreationException::class)
-    private fun makeVersion() {
+    override fun makeVersion() {
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_VANILLA, null))
+        LOGGER.debug { "Creating minecraft version..." }
         val details = LauncherVersionDetails(
             mcVersion.id,
             "vanilla",
@@ -80,7 +61,7 @@ class VanillaVersionCreator(
             addArguments(details)
             addJava(details)
             addLibraries(details)
-            addFile(details)
+            addClient(details)
         } catch (e: ComponentCreationException) {
             attemptCleanup()
             throw ComponentCreationException("Unable to create minecraft version", e)
@@ -148,6 +129,7 @@ class VanillaVersionCreator(
 
     @Throws(ComponentCreationException::class)
     private fun addJava(details: LauncherVersionDetails) {
+        LOGGER.debug { "Adding java component..." }
         val javaName: String = mcVersion.javaVersion.getComponent() ?: throw ComponentCreationException("Unable to add java component: java name is null")
         for (j in files.javaComponents) {
             if (javaName == j.name) {
@@ -163,11 +145,13 @@ class VanillaVersionCreator(
         } catch (e: ComponentCreationException) {
             throw ComponentCreationException("Unable to add java component: failed to create java component", e)
         }
+        LOGGER.debug { "Added java component: id=${details.java}" }
     }
 
     @Throws(ComponentCreationException::class)
     private fun addLibraries(details: LauncherVersionDetails) {
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, null))
+        LOGGER.debug { "Adding libraries..." }
         if (mcVersion.libraries == null) {
             throw ComponentCreationException("Unable to add libraries: libraries is null")
         }
@@ -202,21 +186,23 @@ class VanillaVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun addFile(details: LauncherVersionDetails) {
+    private fun addClient(details: LauncherVersionDetails) {
+        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FILE, null))
+        LOGGER.debug { "Adding client..." }
         newManifest?.let { newManifest ->
             val baseDir = File(newManifest.directory)
             if (!baseDir.isDirectory()) {
-                throw ComponentCreationException("Unable to add file: base dir is not a directory: dir=${newManifest.directory}")
+                throw ComponentCreationException("Unable to add client: base dir is not a directory: dir=${newManifest.directory}")
             }
             try {
-                MinecraftGame.downloadVersionDownload(mcVersion.downloads.client, baseDir)
+                MinecraftGame.downloadVersionDownload(mcVersion.downloads.client, File(baseDir, appConfig().minecraftDefaultFileName))
             } catch (e: FileDownloadException) {
-                throw ComponentCreationException("Unable to add file: Failed to download client: url=${mcVersion.downloads.client.url}", e)
+                throw ComponentCreationException("Unable to add client: Failed to download client: url=${mcVersion.downloads.client.url}", e)
             }
             val urlParts: Array<String> = mcVersion.downloads.client.url.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             details.mainFile = urlParts[urlParts.size - 1]
-            LOGGER.debug { "Added file: mainFile=${details.mainFile}" }
-        }?: throw ComponentCreationException("Unable to add file: newManifest is null")
+            LOGGER.debug { "Added client: mainFile=${details.mainFile}" }
+        }?: throw ComponentCreationException("Unable to add client: newManifest is null")
     }
 
     companion object {

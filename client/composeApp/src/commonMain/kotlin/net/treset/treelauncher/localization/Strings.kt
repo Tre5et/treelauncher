@@ -65,7 +65,8 @@ open class Strings(
     val textBox: TextBox,
     val theme: Theme,
     val units: Units,
-    val updater: Updater
+    val updater: Updater,
+    val version: Version
 ) {
     data class Components(
         val create: () -> String,
@@ -126,11 +127,17 @@ open class Strings(
             val finishing: () -> String
         ) {
             data class Version(
-                val value: () -> String,
-                val vanilla: () -> String,
                 val assets: () -> String,
+                val fabric: () -> String,
+                val fabricFile: () -> String,
+                val fabricLibraries: () -> String,
+                val file: () -> String,
+                val forge: () -> String,
+                val forgeFile: () -> String,
+                val forgeLibraries: () -> String,
                 val libraries: () -> String,
-                val fabric: () -> String
+                val value: () -> String,
+                val vanilla: () -> String
             )
         }
 
@@ -138,15 +145,17 @@ open class Strings(
             val errorVersion: () -> String,
             val errorLoader: () -> String,
             val errorType: () -> String,
+            val fabric: () -> String,
+            val forge: () -> String,
             val showSnapshots: () -> String,
-            val loader: () -> String,
             val loading: () -> String,
             val type: () -> String,
             val version: () -> String,
         )
 
         data class Mods(
-            val version: () -> String
+            val version: () -> String,
+            val type: () -> String,
         )
     }
 
@@ -666,4 +675,10 @@ open class Strings(
             val warningTitle: () -> String
         )
     }
+
+    data class Version(
+        val fabric: () -> String,
+        val forge: () -> String,
+        val vanilla: () -> String,
+    )
 }

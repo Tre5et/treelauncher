@@ -116,6 +116,7 @@ class CommandBuilder(
         LOGGER.info { "Created start command, instance=${instanceData.instance.first.id}" }
     }
 
+    @Throws(GameCommandException::class)
     private fun appendArguments(
         pb: ProcessBuilder,
         argOrder: Array<Array<LauncherLaunchArgument>>,
@@ -139,6 +140,7 @@ class CommandBuilder(
                 assetsDir,
                 assetsIndex,
                 libraries,
+                instanceData.librariesDir.absolutePath,
                 resX,
                 resY,
                 quickPlayData
@@ -156,6 +158,7 @@ class CommandBuilder(
         assetsDir: String,
         assetsIndex: String,
         libraries: List<String>,
+        libraryPath: String,
         resX: String?,
         resY: String?,
         quickPlayData: QuickPlayData?
@@ -171,6 +174,7 @@ class CommandBuilder(
                     assetsDir,
                     assetsIndex,
                     libraries,
+                    libraryPath,
                     resX,
                     resY,
                     a,
@@ -195,6 +199,7 @@ class CommandBuilder(
         assetsDir: String,
         assetsIndex: String,
         libraries: List<String>,
+        libraryPath: String,
         resX: String?,
         resY: String?,
         a: LauncherLaunchArgument,
@@ -213,6 +218,7 @@ class CommandBuilder(
                         instanceData.resourcepacksComponent.directory,
                         assetsIndex,
                         libraries,
+                        libraryPath,
                         minecraftUser,
                         strings().game.versionName(instanceData),
                         strings().game.versionType(instanceData),
@@ -232,7 +238,7 @@ class CommandBuilder(
             }
             a.replace(replacements)
             if (!a.isFinished) {
-                throw GameCommandException("Unable to append argument: unable to replace all variables: argument=$a")
+                throw GameCommandException("Unable to append argument: unable to replace all variables: argument=${a.argument}")
             }
             pb.command().add(a.parsedArgument)
         }
@@ -247,6 +253,7 @@ class CommandBuilder(
         resourcepackDir: String,
         assetsIndex: String,
         libraries: List<String>,
+        libraryPath: String,
         minecraftUser: User,
         versionName: String,
         versionType: String,
@@ -256,7 +263,7 @@ class CommandBuilder(
     ): String {
         return when (key) {
             "natives_directory" -> {
-                javaDir + "lib"
+                "$javaDir/lib"
             }
 
             "launcher_name" -> {
@@ -273,6 +280,14 @@ class CommandBuilder(
                     sb.append(l).append(";")
                 }
                 sb.substring(0, sb.length - 1)
+            }
+
+            "classpath_separator" -> {
+                System.getProperty("path.separator")
+            }
+
+            "library_directory" -> {
+                libraryPath
             }
 
             "auth_player_name" -> {

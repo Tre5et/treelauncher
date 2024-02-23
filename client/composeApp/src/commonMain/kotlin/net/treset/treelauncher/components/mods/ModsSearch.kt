@@ -22,10 +22,7 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
-import net.treset.treelauncher.generic.IconButton
-import net.treset.treelauncher.generic.SelectorButton
-import net.treset.treelauncher.generic.Text
-import net.treset.treelauncher.generic.TextBox
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import kotlin.math.log10
@@ -74,7 +71,7 @@ fun ModsSearch(
                     results = MinecraftMods.searchCombinedMods(
                         tfValue,
                         modContext.version,
-                        "fabric",
+                        modContext.type.id,
                         25,
                         0
                     ).sortedWith { o1, o2 ->
@@ -167,6 +164,7 @@ data class SearchContext(
     val disableNoVersion: Boolean,
     val enableOnDownload: Boolean,
     val version: String,
+    val type: VersionType,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
     val recheck: Int,
@@ -182,6 +180,7 @@ data class SearchContext(
             modContext.disableNoVersion,
             modContext.enableOnDownload,
             modContext.version,
+            modContext.type,
             modContext.directory,
             modContext.registerChangingJob,
             recheck,
