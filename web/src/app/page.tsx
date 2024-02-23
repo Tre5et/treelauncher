@@ -19,7 +19,7 @@ export default function Home() {
             imgHeight={591}
             title="Instances"
           > 
-            Create multiple Instances with different versions.<br/>Vanilla or fabric.
+            Create multiple Instances with different versions.<br/>Vanilla, Fabric or Forge.
           </ContentCard>
           <ContentCard
             imgId="saves_open"
