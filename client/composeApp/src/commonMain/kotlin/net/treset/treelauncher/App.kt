@@ -8,7 +8,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.mc_version_loader.fabric.FabricLoader
+import net.treset.mc_version_loader.forge.MinecraftForge
+import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.mods.MinecraftMods
+import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.news.news
@@ -191,8 +195,7 @@ class LauncherApp(
             exitProcess(-1)
         }
 
-        MinecraftMods.setModrinthUserAgent(appConfig().modrinthUserAgent)
-        MinecraftMods.setCurseforgeApiKey(appConfig().curseforgeApiKey)
+        configureVersionLoader()
 
         try {
             if (!appConfig().baseDir.exists() || !GlobalConfigLoader().hasMainManifest(appConfig().baseDir)) {
@@ -210,6 +213,16 @@ class LauncherApp(
         }
 
         language().appLanguage = appSettings().language
+    }
+
+    private fun configureVersionLoader() {
+        MinecraftMods.setModrinthUserAgent(appConfig().modrinthUserAgent)
+        MinecraftMods.setCurseforgeApiKey(appConfig().curseforgeApiKey)
+
+        MinecraftGame.useVersionCache(true)
+        FabricLoader.useVersionCache(true)
+        MinecraftForge.useVersionCache(true)
+        FileUtil.useWebRequestCache(true)
     }
 
     fun error(e: Exception) = onError(e)
