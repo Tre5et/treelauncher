@@ -520,6 +520,7 @@ open class Strings(
 
     data class Settings(
         val appearance: () -> String,
+        val cleanup: Cleanup,
         val language: () -> String,
         val logout: () -> String,
         val path: Path,
@@ -533,6 +534,20 @@ open class Strings(
         val user: () -> String,
         val version: () -> String
     ) {
+        data class Cleanup(
+            val button: () -> String,
+            val cancel: () -> String,
+            val close: () -> String,
+            val confirm: () -> String,
+            val deleting: () -> String,
+            val failureMessage: () -> String,
+            val failureTitle: () -> String,
+            val libraries: () -> String,
+            val message: () -> String,
+            val success: () -> String,
+            val title: () -> String
+        )
+
         data class Path(
             val apply: () -> String,
             val changing: () -> String,

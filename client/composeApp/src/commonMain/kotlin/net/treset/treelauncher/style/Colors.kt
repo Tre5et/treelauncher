@@ -29,7 +29,7 @@ private fun dark() = darkColorScheme(
     primary = Color.Green,
     onPrimary = Color.Black,
     error = Color(0xFFE20505),
-    inversePrimary = Color.Yellow,
+    inversePrimary = Color(0xFFEBDC02),
     tertiary = Color(0xFF43454A),
     onBackground = Color.White
 )

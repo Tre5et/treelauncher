@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.config.GlobalConfigLoader
@@ -23,6 +24,7 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.sync.SyncService
 import net.treset.treelauncher.backend.update.updater
+import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.openInBrowser
 import net.treset.treelauncher.generic.*
@@ -38,6 +40,7 @@ import java.io.IOException
 
 @Composable
 fun Settings(
+    appContext: AppContext,
     loginContext: LoginContext
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -51,6 +54,8 @@ fun Settings(
     var language by remember { mutableStateOf(language().appLanguage) }
 
     var theme by remember { mutableStateOf(theme()) }
+
+    var showCleanup by remember { mutableStateOf(false) }
 
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
@@ -217,6 +222,17 @@ fun Settings(
                     strings().settings.path.apply()
                 )
             }
+        }
+
+        Button(
+            onClick = {
+                showCleanup = true
+            },
+            color = MaterialTheme.colorScheme.inversePrimary
+        ) {
+            Text(
+                strings().settings.cleanup.button()
+            )
         }
 
         Column(
@@ -414,6 +430,90 @@ fun Settings(
                     modifier = Modifier.size(24.dp)
                 )
             }
+        }
+    }
+
+    if(showCleanup) {
+        var includeLibraries by remember { mutableStateOf(true) }
+        var state: Int by remember { mutableStateOf(0) }
+
+        when(state) {
+            0 -> PopupOverlay(
+                titleRow = { Text(strings().settings.cleanup.title()) },
+                content = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            strings().settings.cleanup.message(),
+                        )
+
+                        TitledCheckBox(
+                            title = strings().settings.cleanup.libraries(),
+                            checked = includeLibraries,
+                            onCheckedChange = {
+                                includeLibraries = it
+                            }
+                        )
+                    }
+                },
+                buttonRow = {
+                    Button(
+                        onClick = {
+                            showCleanup = false
+                        },
+                        color = MaterialTheme.colorScheme.error
+                    ) {
+                        Text(strings().settings.cleanup.cancel())
+                    }
+                    Button(
+                        onClick = {
+                            Thread {
+                                try {
+                                    appContext.files.cleanupVersions(includeLibraries)
+                                    state = 2
+                                } catch(e: FileLoadException) {
+                                    app().error(e)
+                                    state = 3
+                                }
+                            }.start()
+                            state = 1
+                        }
+                    ) {
+                        Text(strings().settings.cleanup.confirm())
+                    }
+                }
+            )
+            1 -> PopupOverlay(
+                titleRow = { Text(strings().settings.cleanup.deleting()) }
+            )
+            2 -> PopupOverlay(
+                type = PopupType.SUCCESS,
+                titleRow = { Text(strings().settings.cleanup.success()) },
+                buttonRow = {
+                    Button(
+                        onClick = {
+                            showCleanup = false
+                        }
+                    ) {
+                        Text(strings().settings.cleanup.close())
+                    }
+                }
+            )
+            3 -> PopupOverlay(
+                type = PopupType.ERROR,
+                titleRow = { Text(strings().settings.cleanup.failureTitle()) },
+                content = { Text(strings().settings.cleanup.failureMessage()) },
+                buttonRow = {
+                    Button(
+                        onClick = {
+                            showCleanup = false
+                        }
+                    ) {
+                        Text(strings().settings.cleanup.close())
+                    }
+                }
+            )
         }
     }
 

@@ -378,6 +378,19 @@ class EnStrings : Strings(
     ),
     settings = Settings(
         appearance = { "Appearance" },
+        cleanup = Settings.Cleanup(
+            button = { "Delete unused Files" },
+            cancel = { "Cancel" },
+            close = { "Close" },
+            confirm = { "Delete Files" },
+            deleting = { "Deleting Files..." },
+            failureMessage = { "The files could not be deleted.\nThis will probably not affect launcher functionality.\nDetails were written to the logs." },
+            failureTitle = { "Failed to delete unused files!" },
+            libraries = { "Also delete unused Libraries" },
+            message = { "This will delete all version files that are not used by any Instance to free up space.\nVersions can be reinstalled at any time." },
+            success = { "Unused files have been deleted." },
+            title = { "Delete unused Files" }
+        ),
         language = { "Language:" },
         logout = { "Logout" },
         path = Settings.Path(

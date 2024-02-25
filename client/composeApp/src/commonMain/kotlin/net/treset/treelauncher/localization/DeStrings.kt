@@ -378,6 +378,19 @@ class DeStrings : Strings(
     ),
     settings = Settings(
         appearance = { "Darstellung" },
+        cleanup = Settings.Cleanup(
+            button = { "Ungenutzte Dateien löschen" },
+            cancel = { "Abbrechen" },
+            close = { "Schließen" },
+            confirm = { "Dateien Löschen" },
+            deleting = { "Dateien werden gelöscht..." },
+            failureMessage = { "Nicht alle Dateien konnten gelöscht werden.\nDies beeinflusst die funtkionalität des Launchers wahrscheinlich nicht.\nDetails wurden in die Logs geschrieben." },
+            failureTitle = { "Löschen fehlgeschlagen." },
+            libraries = { "Auch ungenutzte Bibliotheken löschen" },
+            message = { "Alle versionsdateien, die von keiner Instanz genutzt werden, werden gelöscht um Speicherplatz zu sparen.\n Versionen können jederzeit wieder installiert werden." },
+            success = { "Ungenutzte Dateien gelöscht." },
+            title = { "Ungenutzte Dateien löschen?" }
+        ),
         language = { "Sprache:" },
         logout = { "Ausloggen" },
         path = Settings.Path(

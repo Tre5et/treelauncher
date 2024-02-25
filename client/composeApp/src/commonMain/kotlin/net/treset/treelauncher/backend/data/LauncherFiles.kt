@@ -489,6 +489,113 @@ class LauncherFiles {
         list.add(Pair(manifest, details))
     }
 
+    @Throws(FileLoadException::class)
+    fun cleanupVersions(
+        includeLibraries: Boolean
+    ) {
+        reloadAll()
+
+        LOGGER.debug { "Cleaning up versions..." }
+        LOGGER.debug { "Checking for used versions..." }
+        val usedVersions: MutableList<String> = mutableListOf()
+        for (instance in instanceComponents) {
+            usedVersions.add(instance.second.versionComponent)
+            LOGGER.debug { "Used version: ${instance.second.versionComponent}" }
+        }
+
+        var newFound: Boolean
+        do {
+            LOGGER.debug { "Checking for dependencies..." }
+            newFound = false
+            for (version in versionComponents) {
+                if (usedVersions.contains(version.first.id)) {
+                    version.second.depends?.let {
+                        if (!usedVersions.contains(it)) {
+                            usedVersions.add(it)
+                            newFound = true
+                            LOGGER.debug { "Used version: ${version.first.id}" }
+                        }
+                    }
+                }
+            }
+        } while(newFound)
+        LOGGER.debug { "Finished checking for dependencies" }
+        LOGGER.debug { "Finished checking for used versions" }
+
+        LOGGER.debug { "Deleting unused versions..."}
+        for (version in versionComponents) {
+            if (!usedVersions.contains(version.first.id)) {
+                LOGGER.debug { "Deleting unused version: ${version.first.id}" }
+                versionManifest.components.remove(version.first.id)
+                try {
+                    LauncherFile.of(version.first.directory).remove()
+                } catch(e: IOException) {
+                    throw FileLoadException("Unable to remove unused version: file error", e)
+                }
+            }
+        }
+        LOGGER.debug { "Finished deleting unused versions" }
+
+        LOGGER.debug { "Saving instance manifest..." }
+        try {
+            LauncherFile.of(
+                versionManifest.directory,
+                appConfig().manifestFileName
+            ).write(versionManifest)
+        } catch(e: IOException) {
+            throw FileLoadException("Unable to save instance manifest: file error", e)
+        }
+        LOGGER.debug { "Saved instance manifest" }
+
+        if(includeLibraries) {
+            cleanupLibraries(usedVersions)
+        }
+
+        LOGGER.debug { "Finished cleaning up versions" }
+    }
+
+    private fun cleanupLibraries(
+        usedVersions: List<String>
+    ) {
+        LOGGER.debug { "Cleaning up libraries..." }
+
+        LOGGER.debug { "Collecting libraries in unused versions..." }
+        val unusedLibraries: MutableList<String> = mutableListOf()
+        for(version in versionComponents) {
+            if(!usedVersions.contains(version.first.id)) {
+                unusedLibraries.addAll(version.second.libraries)
+                LOGGER.debug { "Unused libraries: ${version.second.libraries}" }
+            }
+        }
+        LOGGER.debug { "Finished collecting libraries in unused versions" }
+
+        LOGGER.debug { "Checking unused libraries against used versions..." }
+        for(version in versionComponents) {
+            if(usedVersions.contains(version.first.id)) {
+                val libsToRemove = unusedLibraries.filter { version.second.libraries.contains(it) }
+                if(libsToRemove.isNotEmpty()) {
+                    unusedLibraries.removeAll(libsToRemove)
+                    LOGGER.debug { "Removing used libraries from unused list: $libsToRemove" }
+                }
+            }
+        }
+        LOGGER.debug { "Finished checking unused libraries against used versions" }
+
+        LOGGER.debug { "Deleting unused libraries..." }
+        for(library in unusedLibraries) {
+            val libFile = LauncherFile.of(versionManifest.directory, library)
+            if(libFile.exists()) {
+                try {
+                    libFile.remove()
+                } catch(e: IOException) {
+                    LOGGER.warn(e) { "Unable to remove unused library, ignoring" }
+                }
+            }
+        }
+        LOGGER.debug { "Finished deleting unused libraries" }
+        LOGGER.debug { "Finished cleaning up libraries" }
+    }
+
     companion object {
         private val LOGGER = KotlinLogging.logger{}
     }

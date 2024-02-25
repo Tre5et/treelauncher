@@ -119,7 +119,7 @@ fun App(
                                 NavigationState.RESSOURCE_PACKS -> Resourcepacks(appContext)
                                 NavigationState.OPTIONS -> Options(appContext)
                                 NavigationState.MODS -> Mods(appContext)
-                                NavigationState.SETTINGS -> Settings(loginContext)
+                                NavigationState.SETTINGS -> Settings(appContext, loginContext)
                             }
                         }
                     }
