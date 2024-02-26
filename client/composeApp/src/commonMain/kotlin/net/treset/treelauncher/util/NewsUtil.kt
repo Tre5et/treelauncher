@@ -1,12 +1,8 @@
 package net.treset.treelauncher.util
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
@@ -55,61 +51,56 @@ fun getNewsPopup(
             }
 
             currentNews?.let {nws ->
-                Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (!nws.important.isNullOrEmpty()) {
-                        Text(
-                            strings().news.important(),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
+                if (!nws.important.isNullOrEmpty()) {
+                    Text(
+                        strings().news.important(),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
 
-                        val content = remember {
-                            val sb = StringBuilder("<hr/>")
-                            nws.important!!.forEach {
-                                sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
-                            }
-
-                            print(sb.toString())
-                            htmlToAnnotatedString(sb.toString())
+                    val content = remember {
+                        val sb = StringBuilder("<hr/>")
+                        nws.important!!.forEach {
+                            sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
                         }
 
-                        Text(
-                            content,
-                            softWrap = true,
-                            modifier = Modifier.widthIn(0.dp, 800.dp)
-                        )
+                        print(sb.toString())
+                        htmlToAnnotatedString(sb.toString())
                     }
 
-                    if (!nws.other.isNullOrEmpty()) {
-                        Text(
-                            strings().news.other(),
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                    Text(
+                        content,
+                        softWrap = true,
+                        modifier = Modifier.widthIn(0.dp, 800.dp)
+                    )
+                }
 
-                        val content = remember {
-                            val sb = StringBuilder()
-                            nws.other!!.forEach {
-                                sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
-                            }
+                if (!nws.other.isNullOrEmpty()) {
+                    Text(
+                        strings().news.other(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-                            htmlToAnnotatedString(sb.toString())
+                    val content = remember {
+                        val sb = StringBuilder()
+                        nws.other!!.forEach {
+                            sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
                         }
 
-                        Text(
-                            content,
-                            softWrap = true,
-                            modifier = Modifier.widthIn(0.dp, 800.dp)
-                        )
+                        htmlToAnnotatedString(sb.toString())
                     }
 
-                    if(nws.other.isNullOrEmpty() && nws.important.isNullOrEmpty()) {
-                        Text(
-                            strings().news.none(),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    Text(
+                        content,
+                        softWrap = true,
+                        modifier = Modifier.widthIn(0.dp, 800.dp)
+                    )
+                }
+
+                if(nws.other.isNullOrEmpty() && nws.important.isNullOrEmpty()) {
+                    Text(
+                        strings().news.none(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             } ?: Text(strings().news.loading())
         },

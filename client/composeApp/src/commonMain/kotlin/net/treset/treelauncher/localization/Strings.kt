@@ -202,7 +202,7 @@ open class Strings(
         val name: () -> String = { "TreeLauncher" },
         val slug: () -> String = { "treelauncher" },
         val status: Status,
-        val version: () -> String = { "2.0.0" }
+        val version: () -> String = { "1.0.0" }
     ) {
         data class Status(
             val preparing: (Int) -> String,
