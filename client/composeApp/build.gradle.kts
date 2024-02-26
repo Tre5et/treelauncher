@@ -76,6 +76,7 @@ compose.desktop {
                 menu = true
                 perUserInstall = true
                 upgradeUuid = uuid
+                dirChooser = true
             }
         }
 

@@ -14,8 +14,10 @@ class GlobalConfigLoader {
     fun loadConfig(): Config {
         if (!file.exists()) {
             LOGGER.info { "No config found, creating default" }
+
+            val path = "${System.getenv("LOCALAPPDATA")}/treelauncher-data" + if(System.getenv("debug") == "true") "-debug" else ""
             file.write(
-                "path=data${System.lineSeparator()}update_url=http://update.treelauncher.net:8732"
+                "path=$path${System.lineSeparator()}update_url=http://update.treelauncher.net:8732"
             )
         }
         val contents: String = file.readString()
@@ -98,6 +100,6 @@ class GlobalConfigLoader {
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
-        private val file: LauncherFile = LauncherFile.of("app", "launcher.conf")
+        private val file: LauncherFile = LauncherFile.of("app", "treelauncher.conf")
     }
 }
