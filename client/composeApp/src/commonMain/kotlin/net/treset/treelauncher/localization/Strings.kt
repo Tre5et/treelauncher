@@ -62,7 +62,6 @@ open class Strings(
     val settings: Settings,
     val sortBox: SortBox,
     val sync: Sync,
-    val textBox: TextBox,
     val theme: Theme,
     val units: Units,
     val updater: Updater,
@@ -449,6 +448,8 @@ open class Strings(
 
         data class Instance(
             val delete: Delete,
+            val empty: () -> Pair<String, String>,
+            val emptyTitle: () -> String,
             val game: Game,
             val mods: () -> String,
             val options: () -> String,
@@ -635,10 +636,6 @@ open class Strings(
             val uploading: () -> String
         )
     }
-
-    data class TextBox(
-        val clear: () -> String,
-    )
 
     data class Theme(
         val dark: () -> String,

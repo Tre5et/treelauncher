@@ -326,6 +326,8 @@ class EnStrings : Strings(
                 title = { "You are about to delete this Instance!" },
                 tooltip = { "Delete Instance" }
             ),
+            empty = { "Click the" to "at the bottom to create one." },
+            emptyTitle= { "No Instances created yet." },
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Error:\n$message\nPlease report this error."},
                 errorTitle = { "Game Launch Failed!" },
@@ -476,9 +478,6 @@ class EnStrings : Strings(
         ),
         syncing = { "Synchronizing Component..."},
         unknown = { "<Unknown Name>" }
-    ),
-    textBox = TextBox(
-        clear = { "Clear" }
     ),
     theme = Theme(
         dark = { "Dark" },

@@ -1,9 +1,8 @@
 package net.treset.treelauncher.instances
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
+import net.treset.treelauncher.style.icons
 
 @Composable
 fun Instances(
@@ -29,6 +29,8 @@ fun Instances(
     var instances: List<InstanceData> by remember { mutableStateOf(emptyList()) }
     var selectedSort: InstanceDataSortType by remember { mutableStateOf(appSettings().instanceSortType) }
     var sortReversed: Boolean by remember { mutableStateOf(appSettings().isInstanceSortReverse) }
+
+    var loading by remember { mutableStateOf(true) }
 
     val reloadInstances = {
         try {
@@ -46,6 +48,7 @@ fun Instances(
                     null
                 }
             }
+        loading = false
     }
 
     val redrawSelected: () -> Unit = {
@@ -63,6 +66,34 @@ fun Instances(
         val newInst = instances
             .sortedWith(selectedSort.comparator)
         instances = if(sortReversed) newInst.reversed() else newInst
+    }
+
+    if(instances.isEmpty() && !loading) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                strings().selector.instance.emptyTitle(),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                strings().selector.instance.empty().let {
+                    Text(it.first)
+                    Icon(
+                        icons().add,
+                        "Add",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(it.second)
+                }
+            }
+        }
+        return
     }
 
     Row(

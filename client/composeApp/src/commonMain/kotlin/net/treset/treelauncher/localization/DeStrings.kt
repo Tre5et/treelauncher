@@ -326,6 +326,8 @@ class DeStrings : Strings(
                 title = { "Diese Instanz wirklich löschen?" },
                 tooltip = { "Instanz löschen" }
             ),
+            empty = { "Auf den" to "Knopf unten klicken, um Instanzen zu erstellen." },
+            emptyTitle = { "Noch keine Instanzen vorhanden." },
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},
                 errorTitle ={ "Spielstart fehlgeschlagen!" },
@@ -476,9 +478,6 @@ class DeStrings : Strings(
         ),
         syncing = { "Komponente wird synchronisiert..."},
         unknown = { "<Unbekannter Name>" }
-    ),
-    textBox = TextBox(
-        clear = { "Löschen" }
     ),
     theme = Theme(
         dark = { "Dunkel" },
