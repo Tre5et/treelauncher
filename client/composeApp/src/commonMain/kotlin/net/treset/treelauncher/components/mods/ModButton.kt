@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -169,12 +170,15 @@ fun ModButton(
                 ) {
                     Text(
                         mod.name,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Start,
                     )
                     mod.description?.let {
                         Text(
                             it,
                             overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Start,
+                            maxLines = 2
                         )
                     }
                 }

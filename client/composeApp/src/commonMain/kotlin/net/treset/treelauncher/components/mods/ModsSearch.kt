@@ -101,7 +101,21 @@ fun ModsSearch(
             TextBox(
                 tfValue,
                 onTextChanged = { tfValue = it },
-                placeholder = strings().manager.mods.search.search(),
+                placeholder = strings().manager.mods.addMods.search(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            results = null
+                            searching = true
+                        },
+                        tooltip = strings().manager.mods.addMods.searchTooltip()
+                    ) {
+                        Icon(
+                            imageVector = icons().search,
+                            contentDescription = "Search",
+                        )
+                    }
+                },
                 modifier = Modifier.onKeyEvent {
                     if (it.key == Key.Enter) {
                         results = null
@@ -110,19 +124,6 @@ fun ModsSearch(
                     false
                 }.weight(1f, true)
             )
-
-            IconButton(
-                onClick = {
-                    results = null
-                    searching = true
-                },
-                tooltip = strings().manager.mods.search.searchTooltip()
-            ) {
-                Icon(
-                    imageVector = icons().search,
-                    contentDescription = "Search",
-                )
-            }
         }
 
         if (searching) {
@@ -132,7 +133,7 @@ fun ModsSearch(
         } else {
             results?.let {
                 if (it.isEmpty()) {
-                    Text(strings().manager.mods.search.noResults())
+                    Text(strings().manager.mods.addMods.noResults())
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -150,7 +151,7 @@ fun ModsSearch(
         }
 
         SelectorButton(
-            title = strings().manager.mods.search.addLocal(),
+            title = strings().manager.mods.addMods.addLocal(),
             icon = icons().add,
             selected = false,
         ) {

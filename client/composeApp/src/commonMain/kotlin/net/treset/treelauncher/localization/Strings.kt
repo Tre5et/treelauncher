@@ -301,13 +301,15 @@ open class Strings(
 
         data class Mods(
             val add: () -> String,
+            val addMods: Add,
             val card: Card,
             val change: Change,
             val changeVersion: () -> String,
             val current: () -> String,
             val edit: Edit,
+            val empty: () -> String,
             val import: ImportStrings,
-            val search: Search,
+            val searchPlaceholder: () -> String,
             val update: Update,
             val version: () -> String,
         ) {
@@ -355,7 +357,7 @@ open class Strings(
                 val tooltipExpand: (expanded: Boolean) -> String = { strings().manager.component.import.tooltipExpand(it) },
             )
 
-            data class Search(
+            data class Add(
                 val addLocal: () -> String,
                 val back: () -> String,
                 val search: () -> String,

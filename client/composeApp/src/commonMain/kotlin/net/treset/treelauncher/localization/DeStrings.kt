@@ -184,18 +184,13 @@ class DeStrings : Strings(
         ),
         mods = Manager.Mods(
             add = { "Lokale mod hinzufügen" },
-            edit = Manager.Mods.Edit(
-                cancel = { "Abbrechen" },
-                confirm = { current -> current?.let{ "Anwenden" } ?: "Hinzufügen" },
-                curseforge = { "Curseforge Projekt ID" },
-                curseforgeError = { "Ungültige Projekt ID" },
-                file = { "Datei" },
-                fileError = { "Keine Datei ausgewählt" },
-                modrinth = { "Modrinth Projekt ID" },
-                modrinthError = { "Ungültige Projekt ID" },
-                name = { "Name" },
-                version = { "Version" },
-                versionError = { "Keine Version ausgewählt" }
+            addMods = Manager.Mods.Add(
+                addLocal = { "Mod manuell hinzufügen" },
+                back = { "Zurück" },
+                search = { "Online nach einer Mod suchen" },
+                searchTooltip = { "Suchen" },
+                loading = { "Mods werden gesucht..."},
+                noResults = { "Keine Mod mit passender Version gefunden." }
             ),
             card = Manager.Mods.Card(
                 changeUsed = { enabled -> if(enabled) "Mod deaktivieren" else "Mod aktivieren" },
@@ -213,6 +208,20 @@ class DeStrings : Strings(
             ),
             changeVersion = { "Spielversion:" },
             current = { "Aktuelle Mods" },
+            edit = Manager.Mods.Edit(
+                cancel = { "Abbrechen" },
+                confirm = { current -> current?.let{ "Anwenden" } ?: "Hinzufügen" },
+                curseforge = { "Curseforge Projekt ID" },
+                curseforgeError = { "Ungültige Projekt ID" },
+                file = { "Datei" },
+                fileError = { "Keine Datei ausgewählt" },
+                modrinth = { "Modrinth Projekt ID" },
+                modrinthError = { "Ungültige Projekt ID" },
+                name = { "Name" },
+                version = { "Version" },
+                versionError = { "Keine Version ausgewählt" }
+            ),
+            empty = { "Keine Mods gefunden" },
             import = Manager.Mods.ImportStrings(
                 delete = { "Mod entfernen" },
                 displayName = { mod -> "${mod.name} v${mod.version}"},
@@ -224,14 +233,7 @@ class DeStrings : Strings(
                 tooltipAdd = { "Hinzufügen" },
                 tooltipFile = { "Moddatei auswählen" }
             ),
-            search = Manager.Mods.Search(
-                addLocal = { "Mod manuell hinzufügen" },
-                back = { "Zurück" },
-                search = { "Nach einer Mod suchen" },
-                searchTooltip = { "Suchen" },
-                loading = { "Mods werden gesucht..."},
-                noResults = { "Keine Mod mit passender Version gefunden." }
-            ),
+            searchPlaceholder = { "Nach einer Mod suchen" },
             update = Manager.Mods.Update(
                 auto = { "Automatisch aktualisieren" },
                 disable = { "Mods ohne passende Version deaktivieren" },

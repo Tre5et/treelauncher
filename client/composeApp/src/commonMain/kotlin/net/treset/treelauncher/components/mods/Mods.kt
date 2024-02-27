@@ -108,6 +108,8 @@ fun Mods(
             val disableNoVersion by remember { mutableStateOf(appSettings().isModsDisable) }
             val enableOnDownload by remember { mutableStateOf(appSettings().isModsEnable) }
 
+            var searchContent by remember { mutableStateOf("") }
+
             var versions: List<MinecraftVersion> by remember(current) { mutableStateOf(emptyList()) }
             var showSnapshots by remember(current) { mutableStateOf(false) }
             var selectedVersion: MinecraftVersion? by remember(current) { mutableStateOf(null) }
@@ -119,6 +121,12 @@ fun Mods(
             val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, current.second.mods.size, current.second.modsVersion) {
                 current.second.mods.sortedWith(sort.comparator).let {
                     if(reverse) it.reversed() else it
+                }
+            }
+
+            val filteredMods  = remember(mods, searchContent) {
+                mods.filter {
+                    it.name.contains(searchContent, true)
                 }
             }
 
@@ -195,6 +203,21 @@ fun Mods(
                     showSearch = false
                 }
             } else {
+                TextBox(
+                    text = searchContent,
+                    onTextChanged = {
+                        searchContent = it
+                    },
+                    placeholder = strings().manager.mods.searchPlaceholder(),
+                    trailingIcon = {
+                        Icon(
+                            icons().search,
+                            "Search"
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 Box(
                     modifier = Modifier
                         .weight(1f, false),
@@ -202,7 +225,16 @@ fun Mods(
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(mods) { mod ->
+                        item {
+                            if(filteredMods.isEmpty()) {
+                                Text(
+                                    strings().manager.mods.empty(),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+
+                        items(filteredMods) { mod ->
                             ModButton(
                                 mod,
                                 modContext,
@@ -356,7 +388,7 @@ fun Mods(
                             showSearch = false
                             editingMod = null
                         },
-                        tooltip = strings().manager.mods.search.back()
+                        tooltip = strings().manager.mods.addMods.back()
                     ) {
                         Icon(
                             imageVector = icons().back,
