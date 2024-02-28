@@ -12,11 +12,10 @@ import net.treset.mc_version_loader.forge.ForgeMetaVersion
 import net.treset.mc_version_loader.forge.MinecraftForge
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
+import net.treset.mc_version_loader.quiltmc.QuiltMC
+import net.treset.mc_version_loader.quiltmc.QuiltVersion
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.creation.FabricVersionCreator
-import net.treset.treelauncher.backend.creation.ForgeVersionCreator
-import net.treset.treelauncher.backend.creation.VanillaVersionCreator
-import net.treset.treelauncher.backend.creation.VersionCreator
+import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -25,12 +24,14 @@ class VersionState(
     val minecraftVersion: MinecraftVersion?,
     val versionType: VersionType,
     val fabricVersion: FabricVersionDetails?,
-    val forgeVersion: String?
+    val forgeVersion: String?,
+    val quiltVersion: QuiltVersion?
 ) {
     fun isValid(): Boolean = when(versionType) {
         VersionType.VANILLA -> minecraftVersion != null
         VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
         VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
+        VersionType.QUILT -> quiltVersion != null
     }
 }
 
@@ -40,8 +41,7 @@ fun VersionSelector(
     appContext: AppContext,
     defaultVersionId: String? = null,
     defaultVersionType: VersionType = VersionType.VANILLA,
-    defaultFabricVersion: String? = null,
-    defaultForgeVersion: String? = null,
+    defaultLoaderVersion: String? = null,
     showChange: Boolean = true,
     setCurrentState: (VersionState) -> Unit = {_->}
 ) {
@@ -54,9 +54,11 @@ fun VersionSelector(
     var allForgeVersions: List<ForgeMetaVersion>? by remember { mutableStateOf(null) }
     var forgeVersions: List<String> by remember(minecraftVersion, allForgeVersions) { mutableStateOf(emptyList()) }
     var forgeVersion: String? by remember { mutableStateOf(null) }
+    var quiltVersions: List<QuiltVersion> by remember { mutableStateOf(emptyList()) }
+    var quiltVersion: QuiltVersion? by remember { mutableStateOf(null) }
 
-    val currentState = remember(minecraftVersion, versionType, fabricVersion, forgeVersion) {
-        VersionState(minecraftVersion, versionType, fabricVersion, forgeVersion)
+    val currentState = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
+        VersionState(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion)
             .also(setCurrentState)
     }
 
@@ -89,8 +91,19 @@ fun VersionSelector(
             Thread {
                 fabricVersions = FabricLoader.getFabricVersions(mcVersion.id)
                     .also { versions ->
-                        defaultFabricVersion?.let { default ->
+                        defaultLoaderVersion?.let { default ->
                             fabricVersion = prevFabric?.let { current ->
+                                versions.firstOrNull { it.loader.version == current.loader.version }
+                            } ?: versions.firstOrNull { it.loader.version == default }
+                        }
+                    }
+            }.start()
+
+            Thread {
+                quiltVersions = QuiltMC.getQuiltReleases(mcVersion.id)
+                    .also { versions ->
+                        defaultVersionId?.let { default ->
+                            quiltVersion = quiltVersion?.let { current ->
                                 versions.firstOrNull { it.loader.version == current.loader.version }
                             } ?: versions.firstOrNull { it.loader.version == default }
                         }
@@ -106,7 +119,7 @@ fun VersionSelector(
             Thread {
                 forgeVersions = (allForgeVersions?.firstOrNull { it.name == mcVersion.id }?.versions ?: emptyList<String>())
                     .also { versions ->
-                        defaultForgeVersion?.let { default ->
+                        defaultLoaderVersion?.let { default ->
                             forgeVersion = prevForge?.let { current ->
                                 versions.firstOrNull { it == current }
                             } ?: versions.firstOrNull { it == default }
@@ -175,6 +188,19 @@ fun VersionSelector(
                     }
                 )
             }
+
+            if(versionType == VersionType.QUILT) {
+                TitledComboBox(
+                    title = strings().creator.version.quilt(),
+                    items = quiltVersions,
+                    selected = quiltVersion,
+                    onSelected = { quiltVersion = it },
+                    loading = quiltVersions.isEmpty(),
+                    placeholder = strings().creator.version.quilt(),
+                    loadingPlaceholder = strings().creator.version.loading(),
+                    toDisplayString = { loader.version }
+                )
+            }
         }
 
         if(showChange) {
@@ -190,8 +216,9 @@ fun VersionSelector(
                         && (
                             minecraftVersions.isNotEmpty() && minecraftVersion?.let { it.id != defaultVersionId } ?: false
                             || versionType != defaultVersionType
-                            || versionType == VersionType.FABRIC && fabricVersion?.let { it.loader.version != defaultFabricVersion } ?: false
-                            || versionType == VersionType.FORGE && forgeVersion != defaultForgeVersion
+                            || versionType == VersionType.FABRIC && fabricVersion?.let { it.loader.version != defaultLoaderVersion } ?: false
+                            || versionType == VersionType.FORGE && forgeVersion != defaultLoaderVersion
+                            || versionType == VersionType.QUILT && quiltVersion?.let { it.loader.version != defaultLoaderVersion } ?: false
                         ),
                 tooltip = strings().changer.apply()
             ) {
@@ -242,6 +269,18 @@ fun getVersionCreator(
                     )
                 }
             }
+            VersionType.QUILT -> {
+                versionState.quiltVersion?.let {
+                    return QuiltVersionCreator(
+                        appContext.files.launcherDetails.typeConversion,
+                        appContext.files.versionManifest,
+                        it,
+                        QuiltMC.getQuiltProfile(mcVersion.id, it.loader.version),
+                        appContext.files,
+                        LauncherFile.ofData(appContext.files.launcherDetails.librariesDir)
+                    )
+                }
+            }
         }
     }
 
@@ -254,7 +293,8 @@ enum class VersionType(
 ) {
     VANILLA("vanilla", { strings().version.vanilla() }),
     FABRIC("fabric", { strings().version.fabric() }),
-    FORGE("forge", { strings().version.forge() });
+    FORGE("forge", { strings().version.forge() }),
+    QUILT("quilt", { strings().version.quilt() });
 
     override fun toString(): String {
         return displayName()
@@ -263,6 +303,10 @@ enum class VersionType(
     companion object {
         fun fromId(id: String): VersionType {
             return entries.firstOrNull { it.id == id } ?: VANILLA
+        }
+
+        fun fromIds(ids: List<String>): List<VersionType> {
+            return ids.map { fromId(it) }
         }
     }
 }

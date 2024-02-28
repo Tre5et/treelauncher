@@ -20,14 +20,15 @@ class ModsCreationState(
     name: String?,
     existing: Pair<LauncherManifest, LauncherModsDetails>?,
     val version: MinecraftVersion?,
-    val type: VersionType?
+    val type: VersionType?,
+    val alternateLoader: Boolean?
 ) : CreationState<Pair<LauncherManifest, LauncherModsDetails>>(
     mode,
     name,
     existing
 ) {
     override fun isValid(): Boolean = when(mode) {
-        CreationMode.NEW -> !name.isNullOrBlank() && version != null && type != null
+        CreationMode.NEW -> !name.isNullOrBlank() && version != null && type != null && alternateLoader != null
         CreationMode.INHERIT -> !name.isNullOrBlank() && existing != null
         CreationMode.USE -> existing != null
     }
@@ -38,6 +39,7 @@ class ModsCreationState(
             newName: String?,
             newVersion: MinecraftVersion?,
             newType: VersionType?,
+            alternateLoader: Boolean?,
             inheritName: String?,
             inheritSelected: Pair<LauncherManifest, LauncherModsDetails>?,
             useSelected: Pair<LauncherManifest, LauncherModsDetails>?
@@ -54,7 +56,8 @@ class ModsCreationState(
                 CreationMode.USE -> useSelected
             },
             if(mode == CreationMode.NEW) newVersion else null,
-            if(mode == CreationMode.NEW) newType else null
+            if(mode == CreationMode.NEW) newType else null,
+            if(mode == CreationMode.NEW) alternateLoader else null
         )
     }
 }
@@ -67,6 +70,7 @@ fun ModsCreation(
     setCurrentState: (ModsCreationState) -> Unit = {},
     defaultVersion: MinecraftVersion? = null,
     defaultType: VersionType? = null,
+    defaultAlternate: Boolean = true,
     onCreate: (ModsCreationState) -> Unit = { _->}
 ) {
     var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
@@ -74,6 +78,7 @@ fun ModsCreation(
     var newName by remember(existing) { mutableStateOf("") }
     var newVersion: MinecraftVersion? by remember(existing, defaultVersion) { mutableStateOf(defaultVersion) }
     var newType: VersionType? by remember(existing, defaultType) { mutableStateOf(defaultType) }
+    var alternateLoader by remember(existing, defaultAlternate) { mutableStateOf(defaultAlternate) }
 
     var inheritName by remember(existing) { mutableStateOf("") }
     var inheritSelected: Pair<LauncherManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
@@ -83,12 +88,13 @@ fun ModsCreation(
     var showSnapshots by remember(existing) { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
 
-    val currentState = remember(mode, newName, newVersion, newType, inheritName, inheritSelected, useSelected) {
+    val currentState = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
         ModsCreationState.of(
             mode,
             newName,
             newVersion,
             newType,
+            alternateLoader,
             inheritName,
             inheritSelected,
             useSelected
@@ -144,15 +150,28 @@ fun ModsCreation(
             )
         }
 
-        ComboBox(
-            items = VersionType.entries.filter { it != VersionType.VANILLA },
-            selected = newType,
-            onSelected = {
-                newType = it
-            },
-            placeholder = strings().creator.mods.type(),
-            enabled = mode == CreationMode.NEW
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ComboBox(
+                items = VersionType.entries.filter { it != VersionType.VANILLA },
+                selected = newType,
+                onSelected = {
+                    newType = it
+                },
+                placeholder = strings().creator.mods.type(),
+                enabled = mode == CreationMode.NEW
+            )
+            if(newType == VersionType.QUILT) {
+                TitledCheckBox(
+                    title = strings().creator.mods.quiltIncludeFabric(),
+                    checked = alternateLoader,
+                    onCheckedChange = {
+                        alternateLoader = it
+                    },
+                )
+            }
+        }
 
         TitledRadioButton(
             text = strings().creator.radioInherit(),

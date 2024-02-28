@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.RadioButtonDefaults
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun TitledRadioButton(
@@ -42,7 +44,9 @@ fun TitledRadioButton(
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
         )
         Text(
-            text = text
+            text = text,
+            modifier = Modifier
+                .offset(y = (-1).dp, x = (-5).dp)
         )
     }
 }

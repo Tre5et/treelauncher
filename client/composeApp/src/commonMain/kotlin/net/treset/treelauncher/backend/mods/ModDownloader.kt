@@ -8,14 +8,15 @@ import net.treset.mc_version_loader.mods.ModData
 import net.treset.mc_version_loader.mods.ModVersionData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.isSame
+import net.treset.treelauncher.generic.VersionType
 import java.io.IOException
 import java.nio.file.StandardCopyOption
 
 class ModDownloader(
     val launcherMod: LauncherMod?,
     val directory: LauncherFile,
-    val versionType: String,
-    val version: String,
+    val versionTypes: List<VersionType>,
+    val versions: List<String>,
     val existing: MutableList<LauncherMod>,
     val enableOnDownload: Boolean = false,
 ) {
@@ -135,7 +136,7 @@ class ModDownloader(
             existing.add(newMod)
         }
 
-        for (d in versionData.getRequiredDependencies(version, versionType)) {
+        for (d in versionData.getRequiredDependencies(versions, versionTypes.map { it.id })) {
             if (d == null) {
                 continue
             }

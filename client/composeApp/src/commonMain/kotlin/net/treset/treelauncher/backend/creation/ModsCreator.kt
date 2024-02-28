@@ -11,16 +11,16 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class ModsCreator : GenericComponentCreator {
-    private val modsType: String?
-    private val modsVersion: String?
+    private val types: List<String>?
+    private val versions: List<String>?
     private var gameManifest: LauncherManifest? = null
 
     constructor(
         name: String?,
         typeConversion: Map<String, LauncherManifestType>,
         componentsManifest: LauncherManifest,
-        modsType: String?,
-        modsVersion: String?,
+        types: List<String>?,
+        versions: List<String>?,
         gameManifest: LauncherManifest?
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
@@ -32,8 +32,8 @@ class ModsCreator : GenericComponentCreator {
         appConfig().modsDefaultDetails,
         componentsManifest
     ) {
-        this.modsType = modsType
-        this.modsVersion = modsVersion
+        this.types = types
+        this.versions = versions
         this.gameManifest = gameManifest
         this.defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
@@ -53,8 +53,8 @@ class ModsCreator : GenericComponentCreator {
         null,
         componentsManifest
     ) {
-        modsType = null
-        modsVersion = null
+        types = null
+        versions = null
         this.gameManifest = gameManifest
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
@@ -69,8 +69,8 @@ class ModsCreator : GenericComponentCreator {
         null,
         null
     ) {
-        modsType = null
-        modsVersion = null
+        types = null
+        versions = null
         defaultStatus = (CreationStatus(CreationStatus.DownloadStep.MODS, null))
     }
 
@@ -78,7 +78,7 @@ class ModsCreator : GenericComponentCreator {
     override fun createComponent(): String {
         val result: String = super.createComponent()
         newManifest?.let {
-            val details = LauncherModsDetails(modsType, modsVersion, listOf())
+            val details = LauncherModsDetails(types, versions, listOf())
             try {
                 LauncherFile.of(it.directory, appConfig().modsDefaultDetails).write(details)
             } catch (e: IOException) {

@@ -159,7 +159,7 @@ class LauncherFiles {
             _modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
             LauncherManifestType.MODS_COMPONENT,
-            LauncherModsDetails::class.java,
+            LauncherModsDetails::fromJson,
             LauncherFile.ofData(
                 _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration"),
                 "mods"
@@ -203,7 +203,7 @@ class LauncherFiles {
             _instanceManifest?: throw FileLoadException("Unable to load instance components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance components: invalid configuration")),
             LauncherManifestType.INSTANCE_COMPONENT,
-            LauncherInstanceDetails::class.java,
+            { LauncherInstanceDetails.fromJson(it) },
             null
         )
     }
@@ -276,7 +276,7 @@ class LauncherFiles {
             _versionManifest?: throw FileLoadException("Unable to load version components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version components: invalid configuration")),
             LauncherManifestType.VERSION_COMPONENT,
-            LauncherVersionDetails::class.java,
+            { LauncherVersionDetails.fromJson(it, LauncherVersionDetails::class.java) },
             null
         )
     }
@@ -386,7 +386,7 @@ class LauncherFiles {
         parentManifest: LauncherManifest,
         parentDir: LauncherFile,
         expectedType: LauncherManifestType,
-        targetClass: Class<T>,
+        toType: (String) -> T,
         fallbackPath: LauncherFile?
     ): Array<Pair<LauncherManifest, T>> {
         return reloadComponents(
@@ -394,7 +394,7 @@ class LauncherFiles {
             parentDir,
             appConfig().manifestFileName,
             expectedType,
-            targetClass,
+            toType,
             fallbackPath
         )
     }
@@ -405,7 +405,7 @@ class LauncherFiles {
         parentPath: LauncherFile,
         filename: String,
         expectedType: LauncherManifestType,
-        targetClass: Class<T>,
+        toType: (String) -> T,
         fallbackPath: LauncherFile?
     ): Array<Pair<LauncherManifest, T>> {
         if (parentManifest.prefix == null || parentManifest.components == null) {
@@ -420,7 +420,7 @@ class LauncherFiles {
                     LauncherFile.of(parentPath, "${parentManifest.prefix}_$c"),
                     filename,
                     expectedType,
-                    targetClass,
+                    toType,
                     fallbackPath,
                     c
                 )
@@ -441,7 +441,7 @@ class LauncherFiles {
         path: LauncherFile,
         filename: String,
         expectedType: LauncherManifestType,
-        targetClass: Class<T>,
+        toType: (String) -> T,
         fallbackPath: LauncherFile?,
         expectedId: String
     ) {
@@ -450,7 +450,7 @@ class LauncherFiles {
         } catch (e: IOException) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId", e)
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId)
+            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
             return
         }
         val manifest: LauncherManifest = try {
@@ -461,7 +461,7 @@ class LauncherFiles {
         if (manifest.type == null || manifest.type != expectedType || manifest.id == null || manifest.id != expectedId || manifest.details == null) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: incorrect contents: id=$expectedId")
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId)
+            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
             return
         }
 
@@ -471,19 +471,19 @@ class LauncherFiles {
         } catch (e: IOException) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: file error: id=$expectedId", e)
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId)
+            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
             return
         }
 
         val details: T = try {
-            GenericJsonParsable.fromJson(detailsFile, targetClass)
+            toType(detailsFile)
         } catch (e: SerializationException) {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: json error: id=$expectedId", e)
         }
         if (details == null) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: incorrect contents: id=$expectedId")
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, targetClass, null, expectedId)
+            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
             return
         }
         list.add(Pair(manifest, details))

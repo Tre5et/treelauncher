@@ -33,8 +33,8 @@ data class ModContext(
     val autoUpdate: Boolean,
     val disableNoVersion: Boolean,
     val enableOnDownload: Boolean,
-    val version: String,
-    val type: VersionType,
+    val versions: List<String>,
+    val types: List<VersionType>,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
 )
@@ -64,16 +64,20 @@ fun Mods(
         appContext = appContext,
         getCreator = { state: ModsCreationState ->
             when(state.mode) {
-                CreationMode.NEW -> state.name?.let{ state.version?.let { state.type?.let {
+                CreationMode.NEW -> state.name?.let{ state.version?.let { state.type?.let { state.alternateLoader?.let {
                     ModsCreator(
                         state.name,
                         appContext.files.launcherDetails.typeConversion,
                         appContext.files.modsManifest,
-                        state.type.id,
-                        state.version.id,
+                        if(state.alternateLoader && state.type == VersionType.QUILT) {
+                            listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
+                        } else {
+                            listOf(state.type.id)
+                        },
+                        listOf(state.version.id),
                         appContext.files.gameDetailsManifest
                     )
-                }}}
+                }}}}
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     ModsCreator(
                         state.name,
@@ -102,6 +106,10 @@ fun Mods(
             )
         },
         detailsContent = { current, _, _ ->
+            val types = remember(current.second.types) {
+                VersionType.fromIds(current.second.types)
+            }
+
             var redrawMods by remember(current) { mutableStateOf(0) }
 
             val autoUpdate by remember { mutableStateOf(appSettings().isModsUpdate) }
@@ -113,12 +121,14 @@ fun Mods(
             var versions: List<MinecraftVersion> by remember(current) { mutableStateOf(emptyList()) }
             var showSnapshots by remember(current) { mutableStateOf(false) }
             var selectedVersion: MinecraftVersion? by remember(current) { mutableStateOf(null) }
-
-            var selectedType: VersionType by remember(current) { mutableStateOf(VersionType.fromId(current.second.modsType)) }
+            var selectedType: VersionType by remember(types) { mutableStateOf(types[0]) }
+            var includeAlternateLoader by remember(types) { mutableStateOf(
+                !(types[0] == VersionType.QUILT && types.size <= 1)
+            ) }
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, current.second.mods.size, current.second.modsVersion) {
+            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, current.second.mods.size, current.second.versions) {
                 current.second.mods.sortedWith(sort.comparator).let {
                     if(reverse) it.reversed() else it
                 }
@@ -146,7 +156,7 @@ fun Mods(
                         MinecraftGame.getReleases()
                     }.also { v ->
                         selectedVersion = v.firstOrNull {
-                            it.id == current.second.modsVersion
+                            it.id == current.second.versions[0]
                         }
                     }
                 }.start()
@@ -174,13 +184,13 @@ fun Mods(
                 }
             }
 
-            val modContext = remember(current, current.second.modsVersion, current.second.modsType, autoUpdate, disableNoVersion, enableOnDownload) {
+            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload) {
                 ModContext(
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
-                    current.second.modsVersion,
-                    VersionType.fromId(current.second.modsType),
+                    current.second.versions,
+                    types,
                     LauncherFile.of(current.first.directory)
                 ) { element ->
                     updateQueue.add(element)
@@ -276,6 +286,16 @@ fun Mods(
                         }
                     )
 
+                    if(selectedType == VersionType.QUILT) {
+                        TitledCheckBox(
+                            title = strings().creator.mods.quiltIncludeFabric(),
+                            checked = includeAlternateLoader,
+                            onCheckedChange = {
+                                includeAlternateLoader = it
+                            }
+                        )
+                    }
+
 
                     IconButton(
                         onClick = {
@@ -299,8 +319,12 @@ fun Mods(
                                         Button(
                                             onClick = {
                                                 modContext.registerChangingJob {
-                                                    current.second.modsVersion = v.id
-                                                    current.second.modsType = selectedType.id
+                                                    current.second.versions = listOf(v.id)
+                                                    current.second.types = if(selectedType == VersionType.QUILT && includeAlternateLoader) {
+                                                        listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
+                                                    } else {
+                                                        listOf(selectedType.id)
+                                                    }
 
                                                     LauncherFile.of(
                                                         current.first.directory,
@@ -317,8 +341,11 @@ fun Mods(
                                 )
                             }
                         },
-                        enabled = selectedVersion?.let { it.id != current.second.modsVersion } ?: false
-                                || selectedType.id != current.second.modsType
+                        enabled = selectedVersion?.let { it.id != current.second.versions[0] } ?: false
+                                || selectedType != types[0]
+                                || includeAlternateLoader != types.size > 1,
+                        modifier = Modifier
+                            .padding(start = 4.dp)
                     ) {
                         Icon(
                             icons().change,

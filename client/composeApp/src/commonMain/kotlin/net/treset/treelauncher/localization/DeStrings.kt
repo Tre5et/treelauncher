@@ -36,8 +36,9 @@ class DeStrings : Strings(
             version = { "Version" },
         ),
         mods = Creator.Mods (
-            version = { "Version" },
+            quiltIncludeFabric = { "Fabric Mods nutzen" },
             type = { "Mod-Loader"},
+            version = { "Version" },
         ),
         name = { "Name" },
         radioCreate = { "Erstellen" },
@@ -59,6 +60,8 @@ class DeStrings : Strings(
                 forgeFile = { "Forge Version wird heruntergeladen..." },
                 forgeLibraries = { "Forge Bibliotheken werden heruntergeladen..." },
                 libraries = { "Bibliotheken werden heruntergeladen..." },
+                quilt = { "Quilt Version wird erstellt..." },
+                quiltLibraries = { "Quilt Bibliotheken werden heruntergeladen..." },
                 value = { "Version wird erstellt..." },
                 vanilla = { "Minecraft Version wird erstellt..." }
             ),
@@ -73,6 +76,7 @@ class DeStrings : Strings(
             forge = { "Forge Version" },
             showSnapshots = { "Snapshots anzeigen" },
             loading = { "Laden..." },
+            quilt = { "Quilt Version" },
             type = { "Versionstyp" },
             version = { "Version" }
         )
@@ -512,6 +516,7 @@ class DeStrings : Strings(
     version = Version(
         fabric = { "Fabric" },
         forge = { "Forge" },
-        vanilla = { "Vanilla" }
+        quilt = { "QuiltMC" },
+        vanilla = { "Vanilla" },
     ),
 )

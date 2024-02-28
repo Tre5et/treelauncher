@@ -58,7 +58,7 @@ fun ModButton(
             override fun getDownloadUrl(): String? = null
             override fun getModLoaders(): MutableList<String> = mutableListOf()
             override fun getGameVersions(): MutableList<String> = mutableListOf()
-            override fun getRequiredDependencies(p0: String?, p1: String?): MutableList<ModVersionData> = mutableListOf()
+            override fun getRequiredDependencies(p0: List<String>?, p1: List<String>?): MutableList<ModVersionData> = mutableListOf()
             override fun getParentMod(): ModData? = null
             override fun setParentMod(p0: ModData?) {}
             override fun getModProviders(): MutableList<ModProvider> = mutableListOf()
@@ -66,8 +66,8 @@ fun ModButton(
         }
     )}
 
-    var versions: List<ModVersionData>? by rememberSaveable(mod, modContext.version) { mutableStateOf(null) }
-    var selectedVersion: ModVersionData by rememberSaveable(mod, modContext.version) { mutableStateOf(currentVersion)}
+    var versions: List<ModVersionData>? by rememberSaveable(mod, modContext.versions) { mutableStateOf(null) }
+    var selectedVersion: ModVersionData by rememberSaveable(mod, modContext.versions) { mutableStateOf(currentVersion)}
 
     var enabled by rememberSaveable(mod) { mutableStateOf(mod.isEnabled) }
 
@@ -102,7 +102,7 @@ fun ModButton(
         }.start()
     }
 
-    LaunchedEffect(mod, modContext.version) {
+    LaunchedEffect(mod, modContext.versions) {
         versions ?: Thread {
             if(modData.isEmpty) {
                 try {
@@ -114,7 +114,7 @@ fun ModButton(
             }
             if(modData.isPresent) {
                 versions = try {
-                        modData.get().getVersions(modContext.version, modContext.type.id)
+                        modData.get().getVersions(modContext.versions, modContext.types.map { it.id })
                     } catch (e: FileDownloadException) {
                         app().error(e)
                         emptyList()
@@ -202,8 +202,8 @@ fun ModButton(
                                             ModDownloader(
                                                 mod,
                                                 modContext.directory,
-                                                modContext.type.id,
-                                                modContext.version,
+                                                modContext.types,
+                                                modContext.versions,
                                                 currentMods,
                                                 false //modContext.enableOnDownload
                                             ).download(

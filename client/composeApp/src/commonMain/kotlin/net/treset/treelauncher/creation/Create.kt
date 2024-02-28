@@ -272,17 +272,20 @@ fun Create(
                 val modsCreator: ModsCreator? = if(hasMods) {
                     modsState?.let { mods -> if (mods.isValid()) {
                             when (mods.mode) {
-                                CreationMode.NEW -> mods.name?.let { mods.type?.let { mods.version?.let {
+                                CreationMode.NEW -> mods.name?.let { mods.type?.let { mods.version?.let { mods.alternateLoader?.let {
                                     ModsCreator(
                                         mods.name,
                                         appContext.files.launcherDetails.typeConversion,
                                         appContext.files.modsManifest,
-                                        mods.type.id,
-                                        mods.version.id,
+                                        if(mods.alternateLoader && mods.type == VersionType.QUILT) {
+                                            listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
+                                        } else {
+                                            listOf(mods.type.id)
+                                        },
+                                        listOf(mods.version.id),
                                         appContext.files.gameDetailsManifest
                                     )
-                                }}}
-
+                                }}}}
                                 CreationMode.INHERIT -> mods.name?.let {
                                     mods.existing?.let {
                                         ModsCreator(
@@ -293,7 +296,6 @@ fun Create(
                                         )
                                     }
                                 }
-
                                 CreationMode.USE -> mods.existing?.let {
                                     ModsCreator(
                                         mods.existing

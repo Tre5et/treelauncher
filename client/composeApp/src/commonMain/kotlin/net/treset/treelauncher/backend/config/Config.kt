@@ -9,7 +9,6 @@ class Config(baseDir: String, val debug: Boolean, val updateUrl: String) {
     var baseDir: LauncherFile = LauncherFile.of(baseDir)
     val syncFileName = "data.sync"
     val metaDir: LauncherFile = LauncherFile.of(baseDir, ".launcher")
-    val logDir: LauncherFile = LauncherFile.of(metaDir, "logs")
     val authFile: LauncherFile = LauncherFile.of(metaDir, "secrets.auth")
     val settingsFile: LauncherFile = LauncherFile.of(".launcher", "settings.json")
     val manifestFileName = "manifest.json"
@@ -52,7 +51,6 @@ class Config(baseDir: String, val debug: Boolean, val updateUrl: String) {
     val forgeDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val forgeDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultClientFileName = "fabric-client.jar"
-    val forgeDefaultClientFileName = "forge-client.jar"
     val modrinthUserAgent = "TreSet/treelauncher/v2.0.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"
 }

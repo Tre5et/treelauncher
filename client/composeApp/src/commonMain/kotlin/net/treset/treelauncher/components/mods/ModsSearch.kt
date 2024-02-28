@@ -49,6 +49,7 @@ fun ModsSearch(
     }
 
     var tfValue by remember { mutableStateOf("") }
+
     var results: List<ModData>? by remember { mutableStateOf(null) }
 
     var searching by remember { mutableStateOf(false) }
@@ -70,8 +71,8 @@ fun ModsSearch(
                 try {
                     results = MinecraftMods.searchCombinedMods(
                         tfValue,
-                        modContext.version,
-                        modContext.type.id,
+                        modContext.versions,
+                        modContext.types.map { it.id },
                         25,
                         0
                     ).sortedWith { o1, o2 ->
@@ -164,8 +165,8 @@ data class SearchContext(
     val autoUpdate: Boolean,
     val disableNoVersion: Boolean,
     val enableOnDownload: Boolean,
-    val version: String,
-    val type: VersionType,
+    val versions: List<String>,
+    val types: List<VersionType>,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
     val recheck: Int,
@@ -180,8 +181,8 @@ data class SearchContext(
             modContext.autoUpdate,
             modContext.disableNoVersion,
             modContext.enableOnDownload,
-            modContext.version,
-            modContext.type,
+            modContext.versions,
+            modContext.types,
             modContext.directory,
             modContext.registerChangingJob,
             recheck,

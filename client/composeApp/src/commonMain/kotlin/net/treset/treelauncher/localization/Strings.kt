@@ -135,6 +135,8 @@ open class Strings(
                 val forgeFile: () -> String,
                 val forgeLibraries: () -> String,
                 val libraries: () -> String,
+                val quilt: () -> String,
+                val quiltLibraries: () -> String,
                 val value: () -> String,
                 val vanilla: () -> String
             )
@@ -148,13 +150,15 @@ open class Strings(
             val forge: () -> String,
             val showSnapshots: () -> String,
             val loading: () -> String,
+            val quilt: () -> String,
             val type: () -> String,
             val version: () -> String,
         )
 
         data class Mods(
-            val version: () -> String,
+            val quiltIncludeFabric: () -> String,
             val type: () -> String,
+            val version: () -> String,
         )
     }
 
@@ -693,6 +697,7 @@ open class Strings(
     data class Version(
         val fabric: () -> String,
         val forge: () -> String,
+        val quilt: () -> String,
         val vanilla: () -> String,
     )
 }

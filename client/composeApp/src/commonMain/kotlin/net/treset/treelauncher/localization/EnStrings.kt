@@ -36,8 +36,9 @@ class EnStrings : Strings(
             version = { "Version" },
         ),
         mods = Creator.Mods(
-            version = { "Version" },
+            quiltIncludeFabric = { "Include Fabric Mods" },
             type = { "Mod Loader" },
+            version = { "Version" },
         ),
         name = { "Name" },
         radioCreate = { "Create" },
@@ -59,6 +60,8 @@ class EnStrings : Strings(
                 forgeFile = { "Patching forge version..." },
                 forgeLibraries = { "Downloading forge libraries..." },
                 libraries = { "Downloading libraries..." },
+                quilt = { "Creating quilt version..." },
+                quiltLibraries = { "Downloading quilt libraries..." },
                 value = { "Creating version..." },
                 vanilla = { "Creating minecraft version..." }
             ),
@@ -73,6 +76,7 @@ class EnStrings : Strings(
             forge = { "Forge version" },
             showSnapshots = { "Show Snapshots" },
             loading = { "Loading..." },
+            quilt = { "Quilt version" },
             type = { "Version type" },
             version = { "Version" }
         )
@@ -512,6 +516,7 @@ class EnStrings : Strings(
     version = Version(
         fabric = { "Fabric" },
         forge = { "Forge" },
-        vanilla = { "Vanilla" }
+        quilt = { "QuiltMC" },
+        vanilla = { "Vanilla" },
     ),
 )
