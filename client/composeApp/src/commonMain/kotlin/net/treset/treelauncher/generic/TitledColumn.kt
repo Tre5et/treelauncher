@@ -3,7 +3,7 @@ package net.treset.treelauncher.generic
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
@@ -43,7 +43,7 @@ fun TitledColumn(
                     headerContent()
                 }
             }
-            Divider(
+            HorizontalDivider(
                 color = MaterialTheme.colorScheme.primary,
                 thickness = 2.dp
             )

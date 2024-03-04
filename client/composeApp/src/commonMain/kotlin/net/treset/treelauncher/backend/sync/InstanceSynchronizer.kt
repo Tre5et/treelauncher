@@ -69,7 +69,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadFiles(difference: List<String>) {
+    private fun downloadFiles(difference: List<String>) {
         var detailsFileName: String? = null
         val newDifference: MutableList<String> = mutableListOf()
         for (file in difference) {
@@ -96,7 +96,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadDetails(): String {
+    private fun downloadDetails(): String {
         val details = downloadManifest()
         val service = SyncService()
         val out = service.downloadFile("instance", instanceData.instance.first.id, details)
@@ -114,7 +114,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadManifest(): String {
+    private fun downloadManifest(): String {
         val service = SyncService()
         val out = service.downloadFile(
             "instance",
@@ -127,7 +127,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadDependency(id: String, type: LauncherManifestType): String {
+    private fun downloadDependency(id: String, type: LauncherManifestType): String {
         val parentManifest: LauncherManifest
         val otherComponents: Array<LauncherManifest>
         val currentManifest: LauncherManifest?
@@ -185,7 +185,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class, ComponentCreationException::class, FileDownloadException::class)
-    protected fun downloadVersion() {
+    private fun downloadVersion() {
         val service = SyncService()
         setStatus(SyncStatus(SyncStep.DOWNLOADING, DownloadStatus(0, 0, "version.json", false)))
         val details: LauncherVersionDetails = LauncherVersionDetails.fromJson(
@@ -212,7 +212,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class, FileDownloadException::class)
-    protected fun getVanillaCreator(details: LauncherVersionDetails): VersionCreator {
+    private fun getVanillaCreator(details: LauncherVersionDetails): VersionCreator {
         val version: MinecraftVersion = MinecraftGame.getReleases()
             .firstOrNull { it.id == details.versionId || it.id == details.versionNumber }?:
             throw IOException("Failed to find version: " + details.versionId)
@@ -228,7 +228,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class, FileDownloadException::class)
-    protected fun getFabricCreator(details: LauncherVersionDetails): VersionCreator {
+    private fun getFabricCreator(details: LauncherVersionDetails): VersionCreator {
         val version: FabricVersionDetails =
             FabricLoader.getFabricVersionDetails(details.versionNumber, details.loaderVersion)
         val profile: FabricProfile =
@@ -244,7 +244,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun uploadDependency(manifest: LauncherManifest?) {
+    private fun uploadDependency(manifest: LauncherManifest?) {
         if (manifest != null && (isUpdateEverything || !SyncService.isSyncing(manifest))) {
             val synchronizer = ManifestSynchronizer(manifest, files, callback)
             synchronizer.upload()
@@ -252,7 +252,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun uploadVersionFile() {
+    private fun uploadVersionFile() {
         val details = LauncherVersionDetails(
             instanceData.versionComponents[0].second.versionNumber,
             instanceData.versionComponents[0].second.versionType,

@@ -495,7 +495,10 @@ class DeStrings : Strings(
         seconds = { "s" },
         megabytes = { "mb" },
         pixels = { "px" },
-        resolutionBy = { "x" }
+        resolutionBy = { "x" },
+        accurateTime = { secs ->
+            "${secs/3600}h ${(secs%3600/60).toString().padStart(2,'0')}m ${(secs%60).toString().padStart(2,'0')}s"
+        }
     ),
     updater = Updater(
         close = { "Schließen" },

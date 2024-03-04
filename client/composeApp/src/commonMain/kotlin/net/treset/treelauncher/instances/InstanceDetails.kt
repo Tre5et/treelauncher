@@ -234,7 +234,7 @@ private fun deleteDialog(
         PopupData(
             type = PopupType.WARNING,
             titleRow = { Text(strings().selector.instance.delete.title()) },
-            content =  { Text(strings().selector.instance.delete.message(),) },
+            content =  { Text(strings().selector.instance.delete.message()) },
             buttonRow = {
                 Button(
                     onClick = { setPopup(null) },

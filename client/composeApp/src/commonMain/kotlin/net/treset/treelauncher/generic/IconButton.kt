@@ -1,8 +1,11 @@
 package net.treset.treelauncher.generic
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -15,13 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.hovered
 
@@ -38,8 +39,6 @@ fun IconButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val pressed by interactionSource.collectIsPressedAsState()
     val hovered by interactionSource.collectIsHoveredAsState()
     val nativeFocused by interactionSource.collectIsFocusedAsState()
@@ -90,30 +89,62 @@ fun IconButton(
     ) {
         tooltip?.let {
 
+            val coroutine = rememberCoroutineScope()
+
             //TODO: Update to Compose 1.6 to work natively with hover
-            val tooltipState = remember { PlainTooltipState() }
+            val tooltipState = rememberTooltipState(
+                isPersistent = true
+            )
 
-            val hoverHandler = remember {
-                HoverHandler(
-                    coroutineScope,
-                    tooltipState
-                )
-            }
-
-            LaunchedEffect(hovered) {
-                hoverHandler.hovered = hovered
-            }
-
-            LaunchedEffect(focused) {
-                hoverHandler.focused = focused
-            }
-
-            PlainTooltipBox(
-                tooltip = { Text(it) },
-                tooltipState = tooltipState
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip(
+                        caretProperties = TooltipDefaults.caretProperties,
+                    ) {
+                        Text(it)
+                    }
+                },
+                state = tooltipState,
+                enableUserInput = false,
+                modifier = Modifier
+                    .pointerInput(tooltipState) {
+                        coroutineScope {
+                            awaitPointerEventScope {
+                                val pass = PointerEventPass.Main
+                                var job: Job? = null
+                                while (true) {
+                                    val event = awaitPointerEvent(pass)
+                                    val inputType = event.changes[0].type
+                                    if (inputType == PointerType.Mouse) {
+                                        when (event.type) {
+                                            PointerEventType.Enter -> {
+                                                job = launch {
+                                                    delay(1000)
+                                                    tooltipState.show(MutatePriority.UserInput)
+                                                }
+                                            }
+                                            PointerEventType.Exit -> {
+                                                job?.cancel()
+                                                tooltipState.dismiss()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }.onFocusChanged {
+                        if(it.isFocused) {
+                            coroutine.launch {
+                                tooltipState.show()
+                            }
+                        } else {
+                            tooltipState.dismiss()
+                        }
+                    }
             ) {
                 Box(
-                    modifier = newModifier.tooltipAnchor(),
+                    modifier = newModifier,
                     contentAlignment = Alignment.Center
                 ) {
                     content()
@@ -124,47 +155,6 @@ fun IconButton(
             contentAlignment = Alignment.Center
         ) {
             content()
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-private class HoverHandler(
-    val coroutineScope: CoroutineScope,
-    val tooltipState: PlainTooltipState
-) {
-    private var num = 0
-    var hovered = false
-        set(value) {
-            field = value
-            num++
-            handleHover()
-        }
-
-    var focused = false
-        set(value) {
-            field = value
-            num++
-            handleFocus()
-        }
-
-    fun handleHover() {
-        coroutineScope.launch {
-            if(hovered) {
-                val currentNum = num
-                delay(1000)
-                if (hovered && num == currentNum) {
-                    tooltipState.show()
-                }
-            }
-        }
-    }
-
-    fun handleFocus() {
-        coroutineScope.launch {
-            if(focused) {
-                tooltipState.show()
-            }
         }
     }
 }

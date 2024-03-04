@@ -14,9 +14,7 @@ class InstanceDetailsLastPlayedComparator : Comparator<InstanceData> {
         if (firstLastPlayed == null) {
             return 1
         }
-        return if (secondLastPlayed == null) {
-            -1
-        } else secondLastPlayed.compareTo(firstLastPlayed)
+        return secondLastPlayed?.compareTo(firstLastPlayed) ?: -1
     }
 
     override fun toString(): String = strings().sortBox.sort.lastPlayed()

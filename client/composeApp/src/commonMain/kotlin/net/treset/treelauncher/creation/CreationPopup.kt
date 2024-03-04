@@ -26,8 +26,8 @@ fun CreationPopup(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     LinearProgressIndicator(
-                        progress = it.currentAmount.toFloat() / it.totalAmount,
-                        modifier = Modifier.width(250.dp)
+                        progress = { it.currentAmount.toFloat() / it.totalAmount },
+                        modifier = Modifier.width(250.dp),
                     )
                     Text(strings().settings.update.downloadingMessage(it.currentFile, it.currentAmount, it.totalAmount))
                 }
