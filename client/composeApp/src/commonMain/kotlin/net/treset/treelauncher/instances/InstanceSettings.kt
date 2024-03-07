@@ -36,8 +36,10 @@ import java.util.stream.Collectors
 fun InstanceSettings(
     instance: InstanceData
 ) {
-    var startMemory: Int? by remember(instance) { mutableStateOf(null) }
-    var memory by remember(startMemory) { mutableStateOf(startMemory) }
+    var startMemory: Int? = remember(instance) { null }
+    var memory by remember(startMemory) {
+        mutableStateOf(startMemory)
+    }
 
     val startRes = remember(instance) { getResolution(instance) }
     var res by remember(instance) { mutableStateOf(startRes) }
@@ -51,6 +53,7 @@ fun InstanceSettings(
         Thread {
             try {
                 startMemory = getCurrentMemory(instance)
+                memory = startMemory
             } catch(e: IOException) {
                 app().error(e)
             }
@@ -61,8 +64,8 @@ fun InstanceSettings(
         }.start()
 
         onDispose {
-            memory?.let {mem ->
-                startMemory?.let {startMem ->
+            memory?.let { mem ->
+                startMemory?.let { startMem ->
                     try {
                         save(
                             instance,
@@ -73,7 +76,7 @@ fun InstanceSettings(
                             args,
                             startArgs
                         )
-                    } catch(e: IOException) {
+                    } catch (e: IOException) {
                         app().error(e)
                     }
                 }
