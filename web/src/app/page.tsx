@@ -1,9 +1,13 @@
 import Image from "next/image";
 import { Button } from "./ui/button";
-import Link from "next/link";
 import { Title } from "./title";
 import { ContentCard } from "./content-card";
-import { useEffect, useState } from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  description: "TreeLauncher is a modern Minecraft launcher that introduces the concept of components for managing instances to streamline instance management and creation.",
+};
+
 
 export default function Home() {
   return (
@@ -19,7 +23,7 @@ export default function Home() {
             imgHeight={591}
             title="Instances"
           > 
-            Create multiple Instances with different versions.<br/>Vanilla, Fabric or Forge.
+            <p>Create multiple Instances with different versions.<br/>Vanilla, <a href="https://fabricmc.net/">Fabric</a>, <a href="https://minecraftforge.net/">Forge</a> or <a href="https://quiltmc.org/">Quilt</a>.</p>
           </ContentCard>
           <ContentCard
             imgId="saves_open"

@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+    title: "About",
+    description: "Information about Treelauncher.",
+};
 
 export default function Page() {
     return (

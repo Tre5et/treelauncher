@@ -5,9 +5,13 @@ import { Footer } from "./ui/footer";
 import { NavBar } from "./ui/navbar";
 
 export const metadata: Metadata = {
-  title: "TreeLauncher",
-  description: "Homepage of TreeLauncher",
-  icons: "/icon.ico"
+  title: {
+    template: "%s - TreeLauncher",
+    default: "TreeLauncher",
+  },
+  icons: "/icon.ico",
+  creator: "TreSet",
+  keywords: ["treelauncher", "minecraft", "launcher", "components", "mods", "forge", "fabric", "quilt", "modded", "game", "tre5et", "treset"]
 };
 
 export default function RootLayout({
