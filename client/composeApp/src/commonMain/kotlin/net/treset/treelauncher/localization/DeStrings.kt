@@ -516,10 +516,5 @@ class DeStrings : Strings(
             warningTitle = { "Der Launcher wurde aktualisiert." }
         )
     ),
-    version = Version(
-        fabric = { "Fabric" },
-        forge = { "Forge" },
-        quilt = { "QuiltMC" },
-        vanilla = { "Vanilla" },
-    ),
+    version = Version()
 )

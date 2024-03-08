@@ -695,9 +695,9 @@ open class Strings(
     }
 
     data class Version(
-        val fabric: () -> String,
-        val forge: () -> String,
-        val quilt: () -> String,
-        val vanilla: () -> String,
+        val fabric: () -> String = { "Fabric" },
+        val forge: () -> String = { "Forge" },
+        val quilt: () -> String = { "Quilt" },
+        val vanilla: () -> String = { "Vanilla" },
     )
 }

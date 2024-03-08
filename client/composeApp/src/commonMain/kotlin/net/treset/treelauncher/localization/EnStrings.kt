@@ -513,10 +513,5 @@ class EnStrings : Strings(
             warningTitle = { "The launcher was updated." }
         )
     ),
-    version = Version(
-        fabric = { "Fabric" },
-        forge = { "Forge" },
-        quilt = { "QuiltMC" },
-        vanilla = { "Vanilla" },
-    ),
+    version = Version()
 )
