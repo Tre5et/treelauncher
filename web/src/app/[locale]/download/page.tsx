@@ -6,8 +6,12 @@ export const metadata: Metadata = {
     description: "Download versions of TreeLauncher.",
 };
 
-export default function Page() {
+export default function Page({
+    params: { locale }
+   } : {
+     params: { locale: string }
+   }) {
     return (
-        <VersionPage/>
+        <VersionPage params={{locale}}/>
     )
 }

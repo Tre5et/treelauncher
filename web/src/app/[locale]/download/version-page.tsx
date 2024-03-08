@@ -4,7 +4,11 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
 
-export function VersionPage() {
+export function VersionPage({
+    params: { locale }
+   } : {
+     params: { locale: string }
+   }) {
     const [releases, setReleases] = useState<Release[]>()
     useEffect(() => {
         fetch("https://api.github.com/repos/tre5et/treelauncher/releases")
@@ -30,16 +34,16 @@ export function VersionPage() {
                         return (
                             <div key={release.name} className="bg-secondary rounded-2xl w-full max-w-2xl p-4">
                                 <div className="flex flex-row text-2xl text-center mb-1 justify-center items-center gap-1">
-                                    Latest Release: {release.name} 
+                                    {{"de": "Neueste Vollversion:"}[locale] || "Latest Release:"} {release.name} 
                                     <a href={release.html_url} target="_blank" className="material-symbols-rounded text-xl" style={{ transform: 'translateY(0.0625rem)' }}>open_in_new</a>
                                 </div>
                                 <div className="flex flex-row gap-x-8 gap-y-1 justify-center items-center flex-wrap">
                                     {release.assets.map((asset) => {
                                         if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                            return (<p key={asset.name}><a href={asset.browser_download_url}>Windows Installer</a></p>)
+                                            return (<p key={asset.name}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
                                         }
                                         if(asset.name.endsWith(".zip")) {
-                                            return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>Windows Portable</a></p>)
+                                            return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
                                         }
                                         return ""
                                     })}
@@ -58,9 +62,9 @@ export function VersionPage() {
                             <motion.span 
                                 initial={{rotate: -90, translateY: "0.05rem"}} 
                                 animate={{rotate: open? 0 : -90}} 
-                                className="text-3xl material-symbols-rounded"
+                                className="text-3xl material-symbols-rounded select-none"
                             >expand_more</motion.span>
-                            <div className="text-2xl text-center">Older Versions</div>
+                            <div className="text-2xl text-center">{{"de": "Andere Versionen"}[locale] || "Other Versions"}</div>
                         </div>
                     )}
                     onOpening={() => {setOpen(true)}}
@@ -74,16 +78,16 @@ export function VersionPage() {
                                     <div key={index.toString()}>
                                         <hr className="border-accent my-2"/>
                                         <div className="flex flex-row items-center justify-center gap-1 text-xl text-center">
-                                            {release.prerelease && "Pre-Release: "}{release.name} 
+                                            {release.prerelease && {"de": "Pre-Release:"}[locale] || "Pre-Release:"} {release.name} 
                                             <a href={release.html_url} target="_blank" className="material-symbols-rounded text-lg" style={{ transform: 'translateY(0.125rem)' }}>open_in_new</a>
                                         </div>
                                         <div className="flex flex-row gap-x-8 gap-y-1 flex-wrap justify-center items-center">
                                             {release.assets.map((asset) => {
                                                 if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                                    return (<p key={asset.name}><a href={asset.browser_download_url}>Windows Installer</a></p>)
+                                                    return (<p key={asset.name}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
                                                 }
                                                 if(asset.name.endsWith(".zip")) {
-                                                    return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>Windows Portable</a></p>)
+                                                    return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
                                                 }
                                                 return ""
                                             })}

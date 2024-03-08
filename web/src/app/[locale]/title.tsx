@@ -2,7 +2,11 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
-export function Title() {
+export function Title({
+    params: { locale }
+   } : {
+     params: { locale: string }
+   }) {
     return (
         <div>
             <div
@@ -13,15 +17,15 @@ export function Title() {
                         TreeLauncher
                     </p>
                     <p className="text-center">
-                        A modern, component based Minecraft Launcher
+                        {{"de": "Ein moderner, Komponenten-basierter Minecraft Launcher"}[locale] || "A modern, component based Minecraft launcher"}
                     </p>
                     <div className="flex justify-center mt-2">
                         <Link
-                        href="/download"
-                        className="w-min"
+                            href={`/${locale}/download`}
+                            className="w-min"
                         >
                             <Button tabIndex={-1}>
-                                <p className="text-lg">Download</p>
+                                <p className="text-lg">{{"de": "Herunterladen"}[locale] || "Download"}</p>
                             </Button>
                         </Link>
                     </div>
@@ -31,7 +35,7 @@ export function Title() {
                     src="/icon.svg"
                     height={128}
                     width={128}
-                    alt="Launcher Icon"
+                    alt={{"de": "Launcher Titelbild"}[locale] || "Launcher Icon"}
                 />
                 </div>
         </div>
