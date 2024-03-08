@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s - TreeLauncher",
     default: "TreeLauncher",
   },
-  icons: "icon.ico",
+  icons: "/images/icon.ico",
   creator: "TreSet",
   keywords: ["treelauncher", "minecraft", "launcher", "components", "mods", "forge", "fabric", "quilt", "modded", "game", "tre5et", "treset"]
 };
