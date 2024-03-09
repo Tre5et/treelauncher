@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,13 +77,9 @@ fun ModsEdit(
                 onClick = {
                     showFilePicker = true
                 },
+                icon = icons().selectFile,
                 tooltip = strings().manager.mods.edit.file()
-            ) {
-                Icon(
-                    icons().selectFile,
-                    "Open File Picker"
-                )
-            }
+            )
 
             FilePicker(
                 show = showFilePicker,

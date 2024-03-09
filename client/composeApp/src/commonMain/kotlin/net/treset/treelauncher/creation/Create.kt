@@ -185,7 +185,7 @@ fun Create(
                         },
                         modifier = Modifier
                             .scale(0.7f)
-                            .offset(y = (-1).dp)
+                            .offset(y = (-2).dp)
                     )
                 }
                 if (hasMods) {

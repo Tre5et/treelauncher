@@ -1,8 +1,9 @@
 package net.treset.treelauncher
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -76,15 +77,11 @@ fun main() = application {
                             onClick = {
                                 app().showNews()
                             },
+                            icon = icons().news,
                             tooltip = strings().news.tooltip(),
                             modifier = Modifier
                                 .offset(x = 82.dp, y = 1.dp)
-                        ) {
-                            Icon(
-                                icons().news,
-                                "News"
-                            )
-                        }
+                        )
                     }
                 }
             }

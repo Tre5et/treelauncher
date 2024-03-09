@@ -1,9 +1,11 @@
 package net.treset.treelauncher.settings
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -137,13 +139,9 @@ fun Settings(
                     onClick = {
                         showDirPicker = true
                     },
+                    icon = icons().folder,
                     tooltip = strings().settings.path.select()
-                ) {
-                    Icon(
-                        icons().folder,
-                        "Choose Folder"
-                    )
-                }
+                )
             }
 
             DirectoryPicker(
@@ -370,16 +368,12 @@ fun Settings(
             )
             IconButton(
                 onClick = loginContext.logout,
+                icon = icons().logout,
+                size = 32.dp,
                 interactionTint = MaterialTheme.colorScheme.error,
                 highlighted = true,
                 tooltip = strings().settings.logout()
-            ) {
-                Icon(
-                    icons().logout,
-                    "Logout",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
+            )
         }
 
         Column(
@@ -403,14 +397,10 @@ fun Settings(
                 onClick = {
                     onUpdate(coroutineScope) { popupContent = it }
                 },
+                icon = icons().update,
                 highlighted = update?.latest == false,
                 tooltip = strings().settings.update.tooltip()
-            ) {
-                Icon(
-                    icons().update,
-                    "Download Update"
-                )
-            }
+            )
 
             if(update?.latest == false) {
                 Text(
@@ -422,14 +412,9 @@ fun Settings(
                 onClick = {
                     "https://github.com/Tre5et/treelauncher".openInBrowser()
                 },
+                painter = icons().gitHub,
                 tooltip = strings().settings.sourceTooltip()
-            ) {
-                Icon(
-                    icons().gitHub,
-                    "Link to Github Project",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            )
         }
     }
 

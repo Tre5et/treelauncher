@@ -193,13 +193,9 @@ fun ModSearchButton(
                                     }
                                 }
                             },
+                            icon = icons().download,
                             tooltip = strings().manager.mods.card.download(),
-                        ) {
-                            Icon(
-                                icons().download,
-                                "Download"
-                            )
-                        }
+                        )
                     }
                     if(downloading) {
                         DownloadingIcon(
@@ -226,13 +222,9 @@ fun ModSearchButton(
                             onClick = {
                                 it.openInBrowser()
                             },
+                            icon = icons().browser,
                             tooltip = strings().manager.mods.card.openBrowser()
-                        ) {
-                            Icon(
-                                icons().browser,
-                                "Open in browser"
-                            )
-                        }
+                        )
                     }
 
                     Icon(

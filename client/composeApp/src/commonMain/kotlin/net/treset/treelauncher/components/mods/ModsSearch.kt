@@ -1,9 +1,11 @@
 package net.treset.treelauncher.components.mods
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -109,13 +111,9 @@ fun ModsSearch(
                             results = null
                             searching = true
                         },
+                        icon = icons().search,
                         tooltip = strings().manager.mods.addMods.searchTooltip()
-                    ) {
-                        Icon(
-                            imageVector = icons().search,
-                            contentDescription = "Search",
-                        )
-                    }
+                    )
                 },
                 modifier = Modifier.onKeyEvent {
                     if (it.key == Key.Enter) {

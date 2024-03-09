@@ -3,7 +3,6 @@ package net.treset.treelauncher.instances
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.runtime.*
@@ -196,14 +195,10 @@ fun InstanceSettings(
                             onClick = {
                                 args = args.filter { arg -> arg != it }
                             },
+                            icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
                             tooltip = strings().manager.instance.settings.deleteArgument()
-                        ) {
-                            Icon(
-                                icons().delete,
-                                "Edit Argument"
-                            )
-                        }
+                        )
                     }
 
                 }
@@ -228,15 +223,11 @@ fun InstanceSettings(
                         args = args + LauncherLaunchArgument(newArg, null, null, null, null)
                         newArg = ""
                     },
+                    icon = icons().add,
+                    size = 32.dp,
                     enabled = newArg.isNotBlank(),
                     tooltip = strings().manager.instance.settings.addArgument()
-                ) {
-                    Icon(
-                        icons().add,
-                        "Add Argument",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                )
             }
         }
     }

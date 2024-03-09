@@ -121,14 +121,10 @@ fun <T> FileImport(
                         ) {
                             IconButton(
                                 onClick = { expanded = !expanded },
+                                icon = icons().expand,
+                                modifier = Modifier.rotate(rotation),
                                 tooltip = stringPackage.tooltipExpand(expanded)
-                            ) {
-                                Icon(
-                                    icons().expand,
-                                    "Expand",
-                                    Modifier.rotate(rotation)
-                                )
-                            }
+                            )
 
                             Text(component.name)
                         }
@@ -179,14 +175,10 @@ fun <T> FileImport(
                                                 onClick = {
                                                     selectedFiles += it
                                                 },
+                                                icon = icons().add,
                                                 tooltip = stringPackage.tooltipAdd(),
                                                 enabled = !selectedFiles.contains(it)
-                                            ) {
-                                                Icon(
-                                                    icons().add,
-                                                    "Add World"
-                                                )
-                                            }
+                                            )
                                         }
                                     }
                                 }
@@ -222,25 +214,17 @@ fun <T> FileImport(
                 if (allowFilePicker) {
                     IconButton(
                         onClick = { showFilePicker = true },
+                        icon = icons().selectFile,
                         tooltip = stringPackage.tooltipFile()
-                    ) {
-                        Icon(
-                            icons().selectFile,
-                            "Open File Picker"
-                        )
-                    }
+                    )
                 }
 
                 if (allowDirectoryPicker) {
                     IconButton(
                         onClick = { showDirPicker = true },
+                        icon = icons().folder,
                         tooltip = stringPackage.tooltipFile()
-                    ) {
-                        Icon(
-                            icons().folder,
-                            "Open Directory Picker"
-                        )
-                    }
+                    )
                 }
 
                 IconButton(
@@ -253,14 +237,10 @@ fun <T> FileImport(
                             fileError = true
                         }
                     },
+                    icon = icons().add,
                     tooltip = stringPackage.tooltipAdd(),
                     enabled = tfFile.isNotEmpty()
-                ) {
-                    Icon(
-                        icons().add,
-                        "Add World"
-                    )
-                }
+                )
 
                 DirectoryPicker(
                     show = showDirPicker,
@@ -326,14 +306,10 @@ fun <T> FileImport(
                                 onClick = {
                                     selectedFiles = selectedFiles.filter { world -> world != it }
                                 },
+                                icon = icons().delete,
                                 interactionTint = MaterialTheme.colorScheme.error,
                                 tooltip = stringPackage.delete()
-                            ) {
-                                Icon(
-                                    icons().delete,
-                                    "Remove File",
-                                )
-                            }
+                            )
                         }
                     }
                 }

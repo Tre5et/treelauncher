@@ -2,7 +2,6 @@ package net.treset.treelauncher.generic
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -211,7 +210,9 @@ fun VersionSelector(
                         appContext
                     )?.let {
                         onDone(it)
-                    }               },
+                    }
+                },
+                icon = icons().change,
                 enabled = currentState.isValid()
                         && (
                             minecraftVersions.isNotEmpty() && minecraftVersion?.let { it.id != defaultVersionId } ?: false
@@ -221,12 +222,7 @@ fun VersionSelector(
                             || versionType == VersionType.QUILT && quiltVersion?.let { it.loader.version != defaultLoaderVersion } ?: false
                         ),
                 tooltip = strings().changer.apply()
-            ) {
-                Icon(
-                    icons().change,
-                    "Change Version"
-                )
-            }
+            )
         }
     }
 }

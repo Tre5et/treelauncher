@@ -220,13 +220,9 @@ fun ModButton(
                                         LOGGER.debug { "Mod downloaded" }
                                     }
                                 },
+                                icon = icons().download,
                                 tooltip = strings().manager.mods.card.download(),
-                            ) {
-                                Icon(
-                                    icons().download,
-                                    "Download"
-                                )
-                            }
+                            )
                         }
                         if(downloading) {
                             DownloadingIcon(
@@ -250,13 +246,9 @@ fun ModButton(
                             onClick = {
                                 onEdit()
                             },
+                            icon = icons().edit,
                             tooltip = strings().manager.mods.card.edit(),
-                        ) {
-                            Icon(
-                                icons().edit,
-                                "Edit"
-                            )
-                        }
+                        )
 
                         IconButton(
                             onClick = {
@@ -292,13 +284,9 @@ fun ModButton(
                                     LOGGER.debug { "Mod state changed" }
                                 }
                             },
+                            icon = icons().enabled(enabled),
                             tooltip = strings().manager.mods.card.changeUsed(enabled),
-                        ) {
-                            Icon(
-                                icons().enabled(enabled),
-                                if(enabled) "Disable" else "Enable"
-                            )
-                        }
+                        )
 
                         IconButton(
                             onClick = {
@@ -318,14 +306,10 @@ fun ModButton(
                                     LOGGER.debug { "Mod file deleted" }
                                 }
                             },
+                            icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
                             tooltip = strings().manager.mods.card.delete(),
-                        ) {
-                            Icon(
-                                icons().delete,
-                                "Delete"
-                            )
-                        }
+                        )
                     }
 
                     Row(
@@ -336,13 +320,9 @@ fun ModButton(
                                 onClick = {
                                     it.openInBrowser()
                                 },
+                                icon = icons().browser,
                                 tooltip = strings().manager.mods.card.openBrowser()
-                            ) {
-                                Icon(
-                                    icons().browser,
-                                    "Open in browser"
-                                )
-                            }
+                            )
                         }
 
                         Icon(

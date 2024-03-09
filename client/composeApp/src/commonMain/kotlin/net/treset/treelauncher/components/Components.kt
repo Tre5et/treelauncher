@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -183,14 +182,10 @@ fun <T, C:CreationState<T>> Components(
                         ) {
                             IconButton(
                                 onClick = { showSettings = false },
-                                tooltip = strings().manager.component.back()
-                            ) {
-                                Icon(
-                                    imageVector = icons().back,
-                                    contentDescription = "Back",
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
+                                icon = icons().back,
+                                size = 32.dp,
+                                tooltip = strings().manager.component.back(),
+                            )
                         }
                     }
 
@@ -211,39 +206,27 @@ fun <T, C:CreationState<T>> Components(
                             onClick = {
                                 showRename = true
                             },
+                            icon = icons().edit,
+                            size = 32.dp,
                             tooltip = strings().selector.component.rename.title()
-                        ) {
-                            Icon(
-                                icons().edit,
-                                "Rename",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                        )
                         IconButton(
                             onClick = {
                                 LauncherFile.of(it.getManifest().directory).open()
                             },
+                            icon = icons().folder,
+                            size = 32.dp,
                             tooltip = strings().selector.component.openFolder()
-                        ) {
-                            Icon(
-                                icons().folder,
-                                "Open Folder",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                        )
                         IconButton(
                             onClick = {
                                 showDelete = true
                             },
+                            icon = icons().delete,
+                            size = 32.dp,
                             interactionTint = MaterialTheme.colorScheme.error,
                             tooltip = strings().selector.component.delete.tooltip()
-                        ) {
-                            Icon(
-                                icons().delete,
-                                "Delete",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                        )
                     }
 
                     actionBarBoxContent(

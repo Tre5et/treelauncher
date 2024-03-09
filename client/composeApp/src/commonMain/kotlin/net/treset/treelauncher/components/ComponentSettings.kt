@@ -84,14 +84,10 @@ fun ColumnScope.ComponentSettings(
                     onClick = {
                         includedFiles = includedFiles.filter { file -> file != it }
                     },
+                    icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
                     tooltip = strings().manager.component.deleteFile()
-                ) {
-                    Icon(
-                        icons().delete,
-                        "Delete File",
-                    )
-                }
+                )
             }
 
         }
@@ -124,15 +120,10 @@ fun ColumnScope.ComponentSettings(
                 includedFiles = includedFiles + PatternString("$newArg${if(fileType == FileType.FOLDER) "/" else ""}").get()
                 newArg = ""
             },
+            icon = icons().add,
             enabled = newArg.isNotBlank(),
             tooltip = strings().manager.component.addFile()
-        ) {
-            Icon(
-                icons().add,
-                "Add Argument",
-                modifier = Modifier.size(32.dp)
-            )
-        }
+        )
     }
 }
 

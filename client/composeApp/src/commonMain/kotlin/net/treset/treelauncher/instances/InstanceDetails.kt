@@ -1,7 +1,9 @@
 package net.treset.treelauncher.instances
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,40 +60,28 @@ fun InstanceDetails(
                                 { redrawSelected() }
                             )
                         },
+                        painter = icons().play,
+                        size = 32.dp,
                         highlighted = true,
                         tooltip = strings().selector.instance.play()
-                    ) {
-                        Icon(
-                            icons().play,
-                            "Play",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     Text(instance.instance.first.name)
                     IconButton(
                         onClick = {
                             showRename = true
                         },
+                        icon = icons().edit,
+                        size = 32.dp,
                         tooltip = strings().selector.component.rename.title()
-                    ) {
-                        Icon(
-                            icons().edit,
-                            "Rename",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     IconButton(
                         onClick = {
                             LauncherFile.of(instance.instance.first.directory).open()
                         },
+                        icon = icons().folder,
+                        size = 32.dp,
                         tooltip = strings().selector.component.openFolder()
-                    ) {
-                        Icon(
-                            icons().folder,
-                            "Open Folder",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     IconButton(
                         onClick = {
                             deleteDialog(
@@ -101,15 +91,11 @@ fun InstanceDetails(
                                 { reloadInstances() }
                             )
                         },
+                        icon = icons().delete,
+                        size = 32.dp,
                         interactionTint = MaterialTheme.colorScheme.error,
                         tooltip = strings().selector.instance.delete.tooltip()
-                    ) {
-                        Icon(
-                            icons().delete,
-                            "Delete",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
         }
     ) {

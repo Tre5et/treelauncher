@@ -2,8 +2,6 @@ package net.treset.treelauncher.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -136,14 +134,10 @@ fun Resourcepacks(
                     onClick = {
                         showAdd = true
                     },
+                    icon = icons().add,
+                    size = 32.dp,
                     tooltip = strings().manager.saves.tooltipAdd()
-                ) {
-                    Icon(
-                        icons().add,
-                        "Add Resourcepack",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                )
             }
         },
         actionBarBoxContent = { _, _, _, _ ->
@@ -155,15 +149,11 @@ fun Resourcepacks(
                         onClick = {
                             showAdd = false
                         },
+                        icon = icons().back,
+                        size = 32.dp,
                         tooltip = strings().manager.component.import.back(),
                         modifier = Modifier.align(Alignment.CenterStart)
-                    ) {
-                        Icon(
-                            icons().back,
-                            "Back",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
             }
         },

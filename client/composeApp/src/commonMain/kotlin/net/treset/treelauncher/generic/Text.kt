@@ -1,5 +1,6 @@
 package net.treset.treelauncher.generic
 
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun Text(
@@ -37,7 +39,7 @@ fun Text(
     style: TextStyle = LocalTextStyle.current
 ) = androidx.compose.material3.Text(
     text,
-    modifier,
+    modifier.offset(y = (-2).dp),
     color,
     fontSize,
     fontStyle,
@@ -77,7 +79,7 @@ fun Text(
     style: TextStyle = LocalTextStyle.current
 ) = androidx.compose.material3.Text(
     text,
-    modifier,
+    modifier.offset(y = (-2).dp),
     color,
     fontSize,
     fontStyle,

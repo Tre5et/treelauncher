@@ -3,8 +3,6 @@ package net.treset.treelauncher.instances
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,14 +66,10 @@ fun InstanceComponentChanger(
                         onClick = {
                             LauncherFile.of(it.directory).open()
                         },
+                        icon = icons().folder,
+                        size = 32.dp,
                         tooltip = strings().selector.component.openFolder()
-                    ) {
-                        Icon(
-                            icons().folder,
-                            "Open Folder",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
             }
         },
@@ -122,14 +116,10 @@ fun InstanceComponentChanger(
                     LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
                     redrawSelected()
                 },
+                icon = icons().change,
                 enabled = (allowUnselect || selected != null) && selected != current,
                 tooltip = strings().changer.apply()
-            ) {
-                Icon(
-                    icons().change,
-                    "change"
-                )
-            }
+            )
         }
     }
 }

@@ -46,7 +46,7 @@ fun TitledCheckBox(
         Text(
             text = title,
             modifier = Modifier
-                .offset(y = (-1).dp, x = (-5).dp)
+                .offset(x = (-5).dp)
         )
     }
 }

@@ -108,14 +108,10 @@ fun ModsImport(
                         ) {
                             IconButton(
                                 onClick = { expanded = !expanded },
+                                icon = icons().expand,
+                                modifier = Modifier.rotate(rotation),
                                 tooltip = strings().manager.mods.import.tooltipExpand(expanded)
-                            ) {
-                                Icon(
-                                    icons().expand,
-                                    "Expand",
-                                    Modifier.rotate(rotation)
-                                )
-                            }
+                            )
 
                             Text(component.first.name)
                         }
@@ -166,14 +162,10 @@ fun ModsImport(
                                                 onClick = {
                                                     selectedMods += it to LauncherFile.of(component.first.directory, it.fileName)
                                                 },
+                                                icon = icons().add,
                                                 tooltip = strings().manager.mods.import.tooltipAdd(),
                                                 enabled = !selectedMods.map { it.first }.contains(it)
-                                            ) {
-                                                Icon(
-                                                    icons().add,
-                                                    "Add World"
-                                                )
-                                            }
+                                            )
                                         }
                                     }
                                 }
@@ -242,14 +234,10 @@ fun ModsImport(
                                 onClick = {
                                     selectedMods = selectedMods.filter { mod -> mod != it }
                                 },
+                                icon = icons().delete,
                                 interactionTint = MaterialTheme.colorScheme.error,
                                 tooltip = strings().manager.mods.import.delete()
-                            ) {
-                                Icon(
-                                    icons().delete,
-                                    "Remove File",
-                                )
-                            }
+                            )
                         }
                     }
                 }

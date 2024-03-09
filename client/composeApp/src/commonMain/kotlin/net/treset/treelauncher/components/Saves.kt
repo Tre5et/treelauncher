@@ -2,8 +2,6 @@ package net.treset.treelauncher.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -238,15 +236,11 @@ fun Saves(
                                 it.fileName
                             )
                         },
+                        painter = icons().play,
+                        size = 32.dp,
                         highlighted = true,
                         tooltip = strings().selector.saves.play.button()
-                    ) {
-                        Icon(
-                            icons().play,
-                            "Play",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
 
                 selectedServer?.let {
@@ -257,29 +251,21 @@ fun Saves(
                                 it.ip
                             )
                         },
+                        painter = icons().play,
+                        size = 32.dp,
                         highlighted = true,
                         tooltip = strings().selector.saves.play.button()
-                    ) {
-                        Icon(
-                            icons().play,
-                            "Play",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
 
                 IconButton(
                     onClick = {
                         showAdd = true
                     },
+                    icon = icons().add,
+                    size = 32.dp,
                     tooltip = strings().manager.saves.tooltipAdd()
-                ) {
-                    Icon(
-                        icons().add,
-                        "Add World",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                )
             }
         },
         actionBarBoxContent = {_, _, _, _ ->
@@ -291,15 +277,11 @@ fun Saves(
                         onClick = {
                             showAdd = false
                         },
+                        icon = icons().back,
+                        size = 32.dp,
                         tooltip = strings().manager.component.import.back(),
                         modifier = Modifier.align(Alignment.CenterStart)
-                    ) {
-                        Icon(
-                            icons().back,
-                            "Back",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
             }
         },

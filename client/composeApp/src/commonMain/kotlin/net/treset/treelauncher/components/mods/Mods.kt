@@ -341,17 +341,13 @@ fun Mods(
                                 )
                             }
                         },
+                        icon = icons().change,
                         enabled = selectedVersion?.let { it.id != current.second.versions[0] } ?: false
                                 || selectedType != types[0]
                                 || includeAlternateLoader != types.size > 1,
                         modifier = Modifier
                             .padding(start = 4.dp)
-                    ) {
-                        Icon(
-                            icons().change,
-                            "Change Version"
-                        )
-                    }
+                    )
                 }
 
                 popupData?.let {
@@ -366,28 +362,20 @@ fun Mods(
                     onClick = {
                         showSearch = true
                     },
+                    icon = icons().add,
+                    size = 32.dp,
                     tooltip = strings().manager.mods.add()
-                ) {
-                    Icon(
-                        icons().add,
-                        "Add Mod",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                )
 
                 IconButton(
                     onClick = {
                         checkUpdates = true
                     },
+                    icon = icons().update,
+                    size = 32.dp,
                     tooltip = strings().manager.mods.update.tooltip(),
                     enabled = !checkUpdates
-                ) {
-                    Icon(
-                        icons().update,
-                        "Check Updates",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                )
             }
         },
         actionBarBoxContent = { _, settingsOpen, _, _ ->
@@ -415,14 +403,10 @@ fun Mods(
                             showSearch = false
                             editingMod = null
                         },
+                        icon = icons().back,
+                        size = 32.dp,
                         tooltip = strings().manager.mods.addMods.back()
-                    ) {
-                        Icon(
-                            imageVector = icons().back,
-                            contentDescription = "Back",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                 }
             }
         },

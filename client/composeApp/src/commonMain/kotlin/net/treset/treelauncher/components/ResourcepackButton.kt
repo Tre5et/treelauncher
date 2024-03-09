@@ -1,7 +1,6 @@
 package net.treset.treelauncher.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,14 +34,10 @@ fun ResourcepackButton(
                 onClick = {
                     showDeleteDialog = true
                 },
+                icon = icons().delete,
                 interactionTint = MaterialTheme.colorScheme.error,
                 tooltip = strings().manager.saves.delete(),
-            ) {
-                Icon(
-                    icons().delete,
-                    "Delete World"
-                )
-            }
+            )
         }
     }
 

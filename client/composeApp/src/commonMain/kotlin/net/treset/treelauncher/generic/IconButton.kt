@@ -4,14 +4,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,9 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.hovered
 
@@ -156,5 +161,43 @@ fun IconButton(
         ) {
             content()
         }
+    }
+}
+
+@Composable
+fun IconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    selected: Boolean = false,
+    highlighted: Boolean = false,
+    tooltip: String? = null,
+    interactionTint: Color = MaterialTheme.colorScheme.primary,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    icon: ImageVector? = null,
+    painter: Painter? = null,
+    size: Dp = 24.dp
+) = IconButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    selected = selected,
+    highlighted = highlighted,
+    tooltip = tooltip,
+    interactionTint = interactionTint,
+    interactionSource = interactionSource
+) {
+    if(icon != null) {
+        Icon(
+            imageVector = icon,
+            contentDescription = tooltip,
+            modifier = Modifier.size(size)
+        )
+    } else if(painter != null) {
+        Icon(
+            painter = painter,
+            contentDescription = tooltip,
+            modifier = Modifier.size(size)
+        )
     }
 }
