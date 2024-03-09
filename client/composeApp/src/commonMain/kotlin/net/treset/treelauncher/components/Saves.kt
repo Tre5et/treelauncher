@@ -13,6 +13,7 @@ import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
@@ -57,7 +58,11 @@ fun Saves(
                     try {
                         Save.from(file)
                     } catch (e: IOException) {
-                        null
+                        if(!file.name.startsWith(appConfig().includedFilesDirName)) {
+                            Save(file.name, null, null)
+                        } else {
+                            null
+                        }
                     }?.let { it to file }
                 }
                 .sortedBy { it.first.name }

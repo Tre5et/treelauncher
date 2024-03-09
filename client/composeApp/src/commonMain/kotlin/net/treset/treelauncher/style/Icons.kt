@@ -1,6 +1,9 @@
 package net.treset.treelauncher.style
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
@@ -25,19 +28,18 @@ class Icons {
     val version = Icons.Rounded.SwapHoriz
     val comboBox = Icons.Rounded.ArrowDropDown
     val updateHint = Icons.Rounded.DownloadForOffline
-    val clear = Icons.Rounded.Close
     val start = Icons.Rounded.PlayArrow
-    val logout = Icons.Rounded.Logout
+    val logout = Icons.AutoMirrored.Rounded.Logout
     val update = Icons.Rounded.Download
     val gitHub: Painter @Composable get() = painterResource("icons/github.svg")
     val sort = Icons.Rounded.SwapVert
     val play: Painter @Composable get() = painterResource("icons/play_arrow_scaled.svg")
     val edit = Icons.Rounded.Edit
     val folder = Icons.Rounded.Folder
-    val file = Icons.Rounded.InsertDriveFile
+    val file = Icons.AutoMirrored.Rounded.InsertDriveFile
     val delete = Icons.Rounded.Delete
     val change = Icons.Rounded.Sync
-    val back = Icons.Rounded.ArrowBack
+    val back = Icons.AutoMirrored.Rounded.ArrowBack
     val language = Icons.Rounded.Language
     val download = Icons.Rounded.CloudDownload
     val enable = Icons.Rounded.ExtensionOff
@@ -50,6 +52,7 @@ class Icons {
     val selectFile = Icons.Rounded.FileOpen
     val news = Icons.Rounded.Newspaper
     val expand = Icons.Rounded.ExpandMore
+    val zip = Icons.Rounded.FolderZip
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

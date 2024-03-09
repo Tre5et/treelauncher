@@ -260,7 +260,12 @@ class DeStrings : Strings(
                 importing = { "Ressourcenpakete werden importiert..." },
                 selectedFiles = { "Ausgewählte Ressourcenpakete:" },
                 tooltipAdd = { "Hinzufügen" },
-                tooltipFile = { "Ressourcenpaket auswählen" }
+                tooltipFile = { "Ressourcenpaket auswählen" },
+                unknownCancel = { "Abbrechen" },
+                unknownConfirm = { "Ressourcenpaket importieren" },
+                unknownMessage = { "Diese Datei hat kein dem Launcher bekanntes Ressourcenpaketformat.\nDas Ressourcenpaket trotzdem importieren?" },
+                unknownTitle = { "Unbekanntes Ressourcenpaketformat" }
+
             ),
             tooltipAdd = { "Ressourcenpaket hinzufügen" },
         ),
@@ -278,7 +283,11 @@ class DeStrings : Strings(
                 importing = { "Welten werden importiert..." },
                 selectedFiles = { "Ausgewählte Welten:" },
                 tooltipAdd = { "Hinzufügen" },
-                tooltipFile = { "Weltendatei auswählen" }
+                tooltipFile = { "Weltendatei auswählen" },
+                unknownCancel = { "Abbrechen" },
+                unknownConfirm = { "Welt importieren" },
+                unknownMessage = { "Dieser Ordner hat kein dem Launcher bekanntes Weltenformat.\nDie Welt trotzdem importieren?" },
+                unknownTitle = { "Unbekanntes Weltenformat" }
             ),
             tooltipAdd = { "Welt hinzufügen" },
         ),

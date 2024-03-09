@@ -10,6 +10,7 @@ import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -39,7 +40,11 @@ fun Resourcepacks(
                     try {
                         Resourcepack.from(file)
                     } catch (e: Exception) {
-                        null
+                        if(!file.name.startsWith(appConfig().includedFilesDirName) && !file.name.startsWith(appConfig().manifestFileName)) {
+                            Resourcepack(file.name, null, null)
+                        } else {
+                            null
+                        }
                     }?.let { it to file }
                 }
         }

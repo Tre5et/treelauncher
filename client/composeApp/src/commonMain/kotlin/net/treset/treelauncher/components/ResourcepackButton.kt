@@ -25,7 +25,7 @@ fun ResourcepackButton(
         onClick = {},
         image = resourcepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) },
         title = resourcepack.name,
-        subtitle = resourcepack.packMcmeta.pack.description
+        subtitle = resourcepack.packMcmeta?.pack?.description
     ) {
         Box(
             modifier = Modifier.align(Alignment.CenterEnd)

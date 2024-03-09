@@ -261,6 +261,10 @@ class EnStrings : Strings(
                 selectedFiles = { "Selected Resourcepacks:" },
                 tooltipAdd = { "Add Resourcepack" },
                 tooltipFile = { "Select Resourcepack" },
+                unknownCancel = { "Cancel" },
+                unknownConfirm = { "Add Resourcepack" },
+                unknownMessage = { "This file doesn't have any resourcepack format the launcher is aware of.\nDo you want to add it anyways?" },
+                unknownTitle = { "Unknown Resourcepack Format" }
             ),
             tooltipAdd = { "Add Resourcepack" },
         ),
@@ -279,6 +283,10 @@ class EnStrings : Strings(
                 selectedFiles = { "Selected Worlds:" },
                 tooltipAdd = { "Add World" },
                 tooltipFile = { "Select World" },
+                unknownCancel = { "Cancel" },
+                unknownConfirm = { "Add World" },
+                unknownMessage = { "This folder doesn't have any world format the launcher is aware of.\nDo you want to add it anyways?" },
+                unknownTitle = { "Unknown World Format" }
             ),
             tooltipAdd = { "Add World" },
         ),

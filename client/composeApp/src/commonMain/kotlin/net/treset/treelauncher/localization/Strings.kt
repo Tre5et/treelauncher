@@ -6,6 +6,7 @@ import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
 import java.io.IOException
 import java.util.*
@@ -251,6 +252,7 @@ open class Strings(
             )
 
             data class ImportStrings(
+                val back: () -> String = { strings().manager.component.import.back() },
                 val delete: () -> String,
                 val import: () -> String,
                 val importComponent: () -> String,
@@ -259,8 +261,11 @@ open class Strings(
                 val selectedFiles: () -> String,
                 val tooltipAdd: () -> String,
                 val tooltipFile: () -> String,
-                val back: () -> String = { strings().manager.component.import.back() },
                 val tooltipExpand: (expanded: Boolean) -> String = { strings().manager.component.import.tooltipExpand(it) },
+                val unknownCancel: () -> String,
+                val unknownConfirm: () -> String,
+                val unknownMessage: (file: LauncherFile) -> String,
+                val unknownTitle: () -> String
             )
         }
 

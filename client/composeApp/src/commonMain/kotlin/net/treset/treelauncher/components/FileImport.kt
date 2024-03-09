@@ -46,11 +46,10 @@ fun <T> FileImport(
     close: () -> Unit
 ) {
     var tfFile by remember(component) { mutableStateOf("") }
-    var fileError by remember(tfFile) { mutableStateOf(false) }
     var showFilePicker by remember(component) { mutableStateOf(false) }
     var showDirPicker by remember(component) { mutableStateOf(false) }
 
-    var selectedFiles: List<Pair<T, LauncherFile>> by remember { mutableStateOf(emptyList()) }
+    var selectedFiles: List<Pair<T?, LauncherFile>> by remember { mutableStateOf(emptyList()) }
 
     var popupContent: PopupData? by remember(component) { mutableStateOf(null) }
 
@@ -206,7 +205,6 @@ fun <T> FileImport(
                 TextBox(
                     text = tfFile,
                     onTextChanged = { tfFile = it },
-                    isError = fileError,
                     modifier = Modifier
                         .weight(1f, false)
                 )
@@ -214,7 +212,7 @@ fun <T> FileImport(
                 if (allowFilePicker) {
                     IconButton(
                         onClick = { showFilePicker = true },
-                        icon = icons().selectFile,
+                        icon = if(fileExtensions.size == 1 && fileExtensions[0] == "zip") icons().zip else icons().selectFile,
                         tooltip = stringPackage.tooltipFile()
                     )
                 }
@@ -234,7 +232,32 @@ fun <T> FileImport(
                             selectedFiles += Pair(it, file)
                             tfFile = ""
                         } ?: run {
-                            fileError = true
+                            popupContent = PopupData(
+                                type = PopupType.WARNING,
+                                titleRow = { Text(stringPackage.unknownTitle()) },
+                                content = {
+                                    Text(stringPackage.unknownMessage(file))
+                                },
+                                buttonRow = {
+                                    Button(
+                                        onClick = {
+                                            popupContent = null
+                                        },
+                                        color = MaterialTheme.colorScheme.error
+                                    ) {
+                                        Text(stringPackage.unknownCancel())
+                                    }
+                                    Button(
+                                        onClick = {
+                                            selectedFiles += Pair(null, file)
+                                            tfFile = ""
+                                            popupContent = null
+                                        }
+                                    ) {
+                                        Text(stringPackage.unknownConfirm())
+                                    }
+                                }
+                            )
                         }
                     },
                     icon = icons().add,
@@ -300,7 +323,7 @@ fun <T> FileImport(
                                 ""
                             )
 
-                            Text(it.first.getDisplayName())
+                            Text(it.first?.getDisplayName() ?: it.second.name)
 
                             IconButton(
                                 onClick = {
