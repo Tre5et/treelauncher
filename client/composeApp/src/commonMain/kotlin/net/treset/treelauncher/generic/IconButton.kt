@@ -17,15 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.treset.treelauncher.style.disabledContent
@@ -93,13 +92,30 @@ fun IconButton(
         LocalContentColor provides foregroundColor
     ) {
         tooltip?.let {
-
-            val coroutine = rememberCoroutineScope()
-
-            //TODO: Update to Compose 1.6 to work natively with hover
             val tooltipState = rememberTooltipState(
                 isPersistent = true
             )
+
+            LaunchedEffect(focused) {
+                if(focused) {
+                    tooltipState.show(MutatePriority.UserInput)
+                } else {
+                    tooltipState.dismiss()
+                }
+            }
+
+            var job: Job? = remember { null }
+            LaunchedEffect(hovered) {
+                if(hovered) {
+                    job = launch {
+                        delay(1000)
+                        tooltipState.show(MutatePriority.UserInput)
+                    }
+                } else {
+                    job?.cancel()
+                    tooltipState.dismiss()
+                }
+            }
 
             TooltipBox(
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
@@ -112,41 +128,6 @@ fun IconButton(
                 },
                 state = tooltipState,
                 enableUserInput = false,
-                modifier = Modifier
-                    .pointerInput(tooltipState) {
-                        coroutineScope {
-                            awaitPointerEventScope {
-                                val pass = PointerEventPass.Main
-                                var job: Job? = null
-                                while (true) {
-                                    val event = awaitPointerEvent(pass)
-                                    val inputType = event.changes[0].type
-                                    if (inputType == PointerType.Mouse) {
-                                        when (event.type) {
-                                            PointerEventType.Enter -> {
-                                                job = launch {
-                                                    delay(1000)
-                                                    tooltipState.show(MutatePriority.UserInput)
-                                                }
-                                            }
-                                            PointerEventType.Exit -> {
-                                                job?.cancel()
-                                                tooltipState.dismiss()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }.onFocusChanged {
-                        if(it.isFocused) {
-                            coroutine.launch {
-                                tooltipState.show()
-                            }
-                        } else {
-                            tooltipState.dismiss()
-                        }
-                    }
             ) {
                 Box(
                     modifier = newModifier,
