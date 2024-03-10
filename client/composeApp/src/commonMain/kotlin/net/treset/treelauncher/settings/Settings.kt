@@ -98,7 +98,7 @@ fun Settings(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 8.dp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
