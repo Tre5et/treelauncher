@@ -1,11 +1,10 @@
 package net.treset.treelauncher.settings
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -34,7 +33,10 @@ import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
-import net.treset.treelauncher.style.*
+import net.treset.treelauncher.style.AccentColor
+import net.treset.treelauncher.style.Theme
+import net.treset.treelauncher.style.disabledContent
+import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.onUpdate
 import java.awt.image.BufferedImage
 import java.io.IOException
@@ -94,25 +96,92 @@ fun Settings(
                 selected = language
             )
 
-            TitledComboBox(
-                strings().settings.theme(),
-                items = Theme.entries,
-                onSelected = {
-                    theme = it
-                    appContext.setTheme(it)
-                },
-                selected = theme
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(100.dp))
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .padding(5.dp)
+                ) {
+                    IconButton(
+                        onClick = {
+                            theme = Theme.DARK
+                            appContext.setTheme(Theme.DARK)
+                        },
+                        tooltip = Theme.DARK.displayName(),
+                        icon = icons().darkMode,
+                        selected = theme == Theme.DARK,
+                        modifier = Modifier.clip(RoundedCornerShape(100.dp))
+                    )
 
-            TitledComboBox(
-                strings().settings.accentColor(),
-                items = AccentColor.entries,
-                onSelected = {
-                    accentColor = it
-                    appContext.setAccentColor(it)
-                },
-                selected = accentColor
-            )
+                    IconButton(
+                        onClick = {
+                            theme = Theme.LIGHT
+                            appContext.setTheme(Theme.LIGHT)
+                        },
+                        tooltip = Theme.LIGHT.displayName(),
+                        icon = icons().lightMode,
+                        selected = theme == Theme.LIGHT,
+                        modifier = Modifier.clip(RoundedCornerShape(100.dp))
+                    )
+
+                    IconButton(
+                        onClick = {
+                            theme = Theme.SYSTEM
+                            appContext.setTheme(Theme.SYSTEM)
+                        },
+                        tooltip = Theme.SYSTEM.displayName(),
+                        icon = icons().systemMode,
+                        selected = theme == Theme.SYSTEM,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(100.dp))
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(100.dp))
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .padding(1.dp)
+                ) {
+                    AccentColor.entries.forEach {
+                        IconButton(
+                            onClick = {
+                                accentColor = it
+                                appContext.setAccentColor(it)
+                            },
+                            tooltip = it.displayName()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(it.primary(theme.isDark()))
+                            ) {
+                                if (accentColor == it) {
+                                    Icon(
+                                        imageVector = icons().check,
+                                        contentDescription = it.displayName(),
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .align(Alignment.Center),
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         Column(
@@ -227,8 +296,7 @@ fun Settings(
         Button(
             onClick = {
                 showCleanup = true
-            },
-            color = MaterialTheme.colorScheme.inversePrimary
+            }
         ) {
             Text(
                 strings().settings.cleanup.button()

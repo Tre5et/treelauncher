@@ -53,6 +53,10 @@ class Icons {
     val news = Icons.Rounded.Newspaper
     val expand = Icons.Rounded.ExpandMore
     val zip = Icons.Rounded.FolderZip
+    val check = Icons.Rounded.Check
+    val darkMode = Icons.Rounded.DarkMode
+    val lightMode = Icons.Rounded.LightMode
+    val systemMode = Icons.Rounded.BrightnessMedium
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {
