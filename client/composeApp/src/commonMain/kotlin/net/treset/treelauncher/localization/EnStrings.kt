@@ -393,7 +393,6 @@ class EnStrings : Strings(
         )
     ),
     settings = Settings(
-        accentColor = { "Accent Color:" },
         appearance = { "Appearance" },
         cleanup = Settings.Cleanup(
             button = { "Delete unused Files" },
@@ -436,7 +435,11 @@ class EnStrings : Strings(
             url = { "URL" }
         ),
         title = { "Settings" },
-        theme = { "Theme:" },
+        theme = Settings.Theme(
+            cancel = { "Cancel" },
+            confirm = { "Apply" },
+            title = { "Select a custom accent color:" }
+        ),
         update = Settings.Update(
             available = { "Update Available!" },
             availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
@@ -497,10 +500,9 @@ class EnStrings : Strings(
         system = { "Match System" },
         green = { "Green" },
         blue = { "Blue" },
-        red = { "Red" },
-        cyan = { "Cyan" },
         magenta = { "Magenta" },
-        orange = { "Orange" }
+        orange = { "Orange" },
+        custom = { "Custom" }
     ),
     units = Units(
         days = { "d" },

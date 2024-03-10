@@ -17,6 +17,8 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import com.godaddy.android.colorpicker.ClassicColorPicker
+import com.godaddy.android.colorpicker.HsvColor
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.auth.userAuth
@@ -54,6 +56,8 @@ fun Settings() {
 
     var theme by remember { mutableStateOf(appSettings().theme) }
     var accentColor by remember { mutableStateOf(appSettings().accentColor) }
+    var customColor by remember { mutableStateOf(appSettings().customColor) }
+    var showColorPicker by remember { mutableStateOf(false) }
 
     var showCleanup by remember { mutableStateOf(false) }
 
@@ -157,28 +161,64 @@ fun Settings() {
                             .padding(1.dp)
                     ) {
                         AccentColor.entries.forEach {
-                            IconButton(
-                                onClick = {
-                                    accentColor = it
-                                    AppContext.setAccentColor(it)
-                                },
-                                tooltip = it.displayName()
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(it.primary(theme.isDark()))
+                            if(it == AccentColor.CUSTOM) {
+                                IconButton(
+                                    onClick = {
+                                        showColorPicker = true
+                                    },
+                                    tooltip = it.displayName()
                                 ) {
-                                    if (accentColor == it) {
-                                        Icon(
-                                            imageVector = icons().check,
-                                            contentDescription = it.displayName(),
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .align(Alignment.Center),
-                                            tint = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(RoundedCornerShape(16.dp))
+                                            .background(customColor)
+                                    ) {
+                                        if(accentColor == it) {
+                                            Icon(
+                                                imageVector = icons().check,
+                                                contentDescription = it.displayName(),
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .align(Alignment.Center),
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = icons().edit,
+                                                contentDescription = it.displayName(),
+                                                modifier = Modifier
+                                                    .size(20.dp)
+                                                    .align(Alignment.Center),
+                                                tint = it.onPrimary(theme.isDark())
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                IconButton(
+                                    onClick = {
+                                        accentColor = it
+                                        AppContext.setAccentColor(it)
+                                    },
+                                    tooltip = it.displayName()
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(RoundedCornerShape(16.dp))
+                                            .background(it.primary(theme.isDark()))
+                                    ) {
+                                        if (accentColor == it) {
+                                            Icon(
+                                                imageVector = icons().check,
+                                                contentDescription = it.displayName(),
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .align(Alignment.Center),
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -507,6 +547,46 @@ fun Settings() {
                 )
             }
         }
+    }
+
+    if(showColorPicker) {
+        var color by remember { mutableStateOf(HsvColor.from(customColor)) }
+
+        PopupOverlay(
+            titleRow = { Text(strings().settings.theme.title()) },
+            content = {
+                ClassicColorPicker(
+                    onColorChanged = {
+                        color = it
+                    },
+                    color = color,
+                    showAlphaBar = false,
+                    modifier = Modifier.size(300.dp)
+                )
+            },
+            buttonRow = {
+                Button(
+                    onClick = {
+                        showColorPicker = false
+                    },
+                    color = MaterialTheme.colorScheme.error
+                ) {
+                    Text(strings().settings.theme.cancel())
+                }
+                Button(
+                    onClick = {
+                        customColor = color.toColor()
+                        accentColor = AccentColor.CUSTOM
+                        AppContext.setCustomColor(color.toColor())
+                        AppContext.setAccentColor(AccentColor.CUSTOM)
+                        showColorPicker = false
+                    },
+                    color = color.toColor()
+                ) {
+                    Text(strings().settings.theme.confirm())
+                }
+            }
+        )
     }
 
     if(showCleanup) {

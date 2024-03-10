@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.fabric.FabricLoader
@@ -46,8 +47,9 @@ import kotlin.system.exitProcess
 
 data class AppContextData(
     val files: LauncherFiles,
-    val setTheme: (Theme) -> Unit = {},
-    val setAccentColor: (AccentColor) -> Unit = {}
+    val setTheme: (Theme) -> Unit,
+    val setAccentColor: (AccentColor) -> Unit,
+    val setCustomColor: (Color) -> Unit
 )
 
 lateinit var AppContext: AppContextData
@@ -78,7 +80,8 @@ fun App(
     var theme by remember { mutableStateOf(appSettings().theme) }
     val themeDark = theme.isDark()
     var accentColor by remember { mutableStateOf(appSettings().accentColor) }
-    val colors: ColorScheme by remember(themeDark, accentColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
+    var customColor by remember { mutableStateOf(appSettings().customColor) }
+    val colors: ColorScheme by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
 
     val launcherFiles = remember { LauncherFiles() }
 
@@ -93,6 +96,10 @@ fun App(
             setAccentColor = {
                 accentColor = it
                 appSettings().accentColor = it
+            },
+            setCustomColor = {
+                customColor = it
+                appSettings().customColor = it
             }
         )
     }

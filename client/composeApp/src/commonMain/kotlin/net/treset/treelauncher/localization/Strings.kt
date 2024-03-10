@@ -531,7 +531,6 @@ open class Strings(
     }
 
     data class Settings(
-        val accentColor: () -> String,
         val appearance: () -> String,
         val cleanup: Cleanup,
         val language: () -> String,
@@ -541,11 +540,17 @@ open class Strings(
         val sourceTooltip: () -> String,
         val sync: Sync,
         val title: () -> String,
-        val theme: () -> String,
+        val theme: Theme,
         val update: Update,
         val user: () -> String,
         val version: () -> String
     ) {
+        data class Theme(
+            var cancel: () -> String,
+            var confirm: () -> String,
+            var title: () -> String
+        )
+
         data class Cleanup(
             val button: () -> String,
             val cancel: () -> String,
@@ -652,10 +657,9 @@ open class Strings(
         val system: () -> String,
         val green: () -> String,
         val blue: () -> String,
-        val red: () -> String,
-        val cyan: () -> String,
         val magenta: () -> String,
-        val orange: () -> String
+        val orange: () -> String,
+        val custom: () -> String
     )
 
     data class Units(

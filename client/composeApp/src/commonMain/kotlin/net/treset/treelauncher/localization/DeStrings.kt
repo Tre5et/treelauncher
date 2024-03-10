@@ -394,7 +394,6 @@ class DeStrings : Strings(
         )
     ),
     settings = Settings(
-        accentColor = { "Akzentfarbe:" },
         appearance = { "Darstellung" },
         cleanup = Settings.Cleanup(
             button = { "Ungenutzte Dateien löschen" },
@@ -437,7 +436,11 @@ class DeStrings : Strings(
             url = { "URL" }
         ),
         title = { "Einstellungen" },
-        theme = { "Farben:" },
+        theme = Settings.Theme(
+            cancel = { "Abbrechen" },
+            confirm = { "Anwenden" },
+            title = { "Akzentfarbe auswählen:" }
+        ),
         update = Settings.Update(
             available = { "Update verfügbar!" },
             availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
@@ -498,10 +501,9 @@ class DeStrings : Strings(
         system = { "Systemeinstellung" },
         green = { "Grün" },
         blue = { "Blau" },
-        red = { "Rot" },
-        cyan = { "Cyan" },
         magenta = { "Magenta" },
-        orange = { "Orange" }
+        orange = { "Orange" },
+        custom = { "Benutzerdefiniert" }
     ),
     units = Units(
         days = { "d" },

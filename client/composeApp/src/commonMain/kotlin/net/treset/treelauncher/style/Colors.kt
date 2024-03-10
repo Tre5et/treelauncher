@@ -6,6 +6,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.localization.strings
 import org.jetbrains.jewel.intui.window.styling.dark
 import org.jetbrains.jewel.intui.window.styling.light
@@ -33,25 +34,20 @@ enum class AccentColor(val primary: (dark: Boolean) -> Color, val onPrimary: (da
         { Color.White },
         { strings().theme.blue() }
     ),
-    RED(
-        {if(it) Color(0xFFE20505) else Color(0xFFD00000)},
-        { Color.White },
-        { strings().theme.red() }
-    ),
-    CYAN(
-        {if(it) Color.Cyan else Color(0xFF00E0E0)},
+    ORANGE(
+        {if(it) Color(0xFFE0A000) else Color(0xFFD0A000)},
         { Color.Black },
-        { strings().theme.cyan() }
+        { strings().theme.orange() }
     ),
     MAGENTA(
         {if(it) Color.Magenta else Color(0xFFE000E0)},
         { Color.Black },
         { strings().theme.magenta() }
     ),
-    ORANGE(
-        {if(it) Color(0xFFE0A000) else Color(0xFFD0A000)},
-        { Color.Black },
-        { strings().theme.orange() }
+    CUSTOM(
+        { appSettings().customColor },
+        { if(appSettings().customColor.contrast(Color.Black) > appSettings().customColor.contrast(Color.White)) Color.Black else Color.White },
+        { strings().theme.custom() }
     );
 
     override fun toString(): String {

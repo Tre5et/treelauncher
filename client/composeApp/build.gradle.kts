@@ -47,6 +47,7 @@ kotlin {
 
             implementation("com.darkrockstudios:mpfilepicker:3.1.0")
             implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.4")
+            implementation("com.godaddy.android.colorpicker:compose-color-picker:0.7.0")
         }
     }
 }

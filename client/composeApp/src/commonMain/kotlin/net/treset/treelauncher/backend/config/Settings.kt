@@ -1,5 +1,6 @@
 package net.treset.treelauncher.backend.config
 
+import androidx.compose.ui.graphics.Color
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
 import net.treset.mc_version_loader.launcher.LauncherManifest
@@ -47,6 +48,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var language: Language = language().systemLanguage
     var theme: Theme = Theme.SYSTEM
     var accentColor: AccentColor = AccentColor.GREEN
+    var customColor: Color = Color.White
     var syncUrl: String? = null
     var syncPort: String? = null
     var syncKey: String? = null
