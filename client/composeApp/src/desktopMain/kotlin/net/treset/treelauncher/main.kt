@@ -40,16 +40,25 @@ import kotlin.math.roundToInt
 
 
 fun main() = application {
+    var theme by remember { mutableStateOf(Theme.SYSTEM) }
 
-    val app = remember { LauncherApp(
-        ::exitApplication
-    ) }
+    val app = remember {
+        LauncherApp(
+            ::exitApplication
+        ) {
+            theme = it
+        }
+    }
+
+    val titleColors = if(theme.isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition()
+    val styling = ComponentStyling.decoratedWindow(
+        titleBarStyle = if(theme.isDark()) darkTitleBar() else lightTitleBar()
+    )
+    val colors = if(theme.isDark()) darkColors() else lightColors()
 
     IntUiTheme(
-        theme = if(theme().isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition(),
-        styling = ComponentStyling.decoratedWindow(
-            titleBarStyle = titleBar()
-        )
+        theme = titleColors,
+        styling = styling
     ) {
         DecoratedWindow(
             onCloseRequest = { app().exit() },
@@ -62,7 +71,7 @@ fun main() = application {
         ) {
             TitleBar(Modifier.newFullscreenControls()) {
                 CompositionLocalProvider(
-                    LocalContentColor provides colors().onBackground
+                    LocalContentColor provides colors.onBackground
                 ) {
                     Box(
                         modifier = Modifier.offset(x = 16.dp),
@@ -115,12 +124,12 @@ fun main() = application {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors().background)
+                    .background(colors.background)
             ) {
                 if (restartRequired) {
                     Text(
                         text = strings().launcher.status.restartRequired(),
-                        color = colors().onBackground
+                        color = colors.onBackground
                     )
                 } else {
                     if (initialized) {
@@ -128,7 +137,7 @@ fun main() = application {
                     } else if(downloading > 0) {
                         Text(
                             text = strings().launcher.status.preparing(downloading.roundToInt()),
-                            color = colors().onBackground
+                            color = colors.onBackground
                         )
                     }
                 }

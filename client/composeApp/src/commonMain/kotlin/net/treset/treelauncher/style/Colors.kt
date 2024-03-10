@@ -1,14 +1,11 @@
 package net.treset.treelauncher.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.localization.strings
 import org.jetbrains.jewel.intui.window.styling.dark
 import org.jetbrains.jewel.intui.window.styling.light
@@ -25,7 +22,9 @@ enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> S
     }
 }
 
-private fun dark() = darkColorScheme(
+var colorsTheme: Theme? = null
+
+fun darkColors() = darkColorScheme(
     primary = Color.Green,
     onPrimary = Color.Black,
     error = Color(0xFFE20505),
@@ -34,7 +33,7 @@ private fun dark() = darkColorScheme(
     onBackground = Color.White
 )
 
-private fun light() = lightColorScheme(
+fun lightColors() = lightColorScheme(
     primary = Color(0xFF00E000),
     onPrimary = Color.Black,
     error = Color(0xFFD00000),
@@ -44,49 +43,25 @@ private fun light() = lightColorScheme(
 )
 
 @Composable
-private fun darkTitleBar() = TitleBarStyle.dark(
+fun darkTitleBar() = TitleBarStyle.dark(
     colors = TitleBarColors.dark(
-        backgroundColor = dark().background,
-        inactiveBackground = dark().background,
-        borderColor = dark().tertiary
+        backgroundColor = darkColors().background,
+        inactiveBackground = darkColors().background,
+        borderColor = darkColors().tertiary
     )
 )
 
 @Composable
-private fun lightTitleBar() = TitleBarStyle.light(
+fun lightTitleBar() = TitleBarStyle.light(
     colors = TitleBarColors.light(
-        backgroundColor = light().background,
-        inactiveBackground = light().background,
-        borderColor = light().tertiary
+        backgroundColor = lightColors().background,
+        inactiveBackground = lightColors().background,
+        borderColor = lightColors().tertiary
     )
 )
 
-private var currentTheme: Theme = appSettings().theme
-
-fun theme() = currentTheme
-fun setTheme(theme: Theme) {
-    currentTheme = theme
-    appSettings().theme = theme
-}
-
 @Composable
-fun colors(): ColorScheme {
-    val isDark = theme().isDark()
-    return rememberSaveable(isDark) {
-        if (isDark) {
-            dark()
-        } else {
-            light()
-        }
-    }
-}
-
-@Composable
-fun titleBar() = if(theme().isDark()) {
-    darkTitleBar()
-} else {
-    lightTitleBar()
-}
+fun Color.hovered(): Color = this.hovered(colorsTheme?.isDark?.let { it() } ?: true)
 
 fun Color.hovered(isDark: Boolean): Color = this.copy(
         alpha = alpha,
@@ -94,9 +69,6 @@ fun Color.hovered(isDark: Boolean): Color = this.copy(
         green = green.toHover(isDark),
         blue = blue.toHover(isDark)
     )
-
-@Composable
-fun Color.hovered(): Color = hovered(theme().isDark())
 
 private fun Float.toHover(isDark: Boolean): Float {
     return if(isDark) {

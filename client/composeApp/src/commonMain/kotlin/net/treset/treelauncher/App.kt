@@ -35,8 +35,7 @@ import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
-import net.treset.treelauncher.style.colors
-import net.treset.treelauncher.style.typography
+import net.treset.treelauncher.style.*
 import net.treset.treelauncher.util.FixFilesPopup
 import net.treset.treelauncher.util.allContainedIn
 import net.treset.treelauncher.util.getNewsPopup
@@ -45,7 +44,9 @@ import java.io.IOException
 import kotlin.system.exitProcess
 
 data class AppContext(
-    val files: LauncherFiles
+    val files: LauncherFiles,
+    val theme: Theme,
+    val setTheme: (Theme) -> Unit = {},
 )
 
 @Composable
@@ -71,16 +72,27 @@ fun App(
         }
     }
 
+    var theme by remember { mutableStateOf(appSettings().theme) }
+    val themeDark = theme.isDark()
+    val colors: ColorScheme by remember(themeDark) { mutableStateOf(if(themeDark) darkColors() else lightColors()) }
+
     val launcherFiles = remember { LauncherFiles() }
 
     val appContext = remember(launcherFiles) {
         AppContext(
-            launcherFiles
+            files = launcherFiles,
+            theme = theme,
+            setTheme = {
+                theme = it
+                app.setTheme(it)
+                colorsTheme = it
+                appSettings().theme = it
+            }
         )
     }
 
     MaterialTheme(
-        colorScheme = colors(),
+        colorScheme = colors,
         typography = typography()
     ) {
         ProvideTextStyle(
@@ -183,6 +195,7 @@ fun app() = app
 
 class LauncherApp(
     val exitApplication: () -> Unit,
+    val setTheme: (Theme) -> Unit
 ) {
     init {
         try {
@@ -211,6 +224,8 @@ class LauncherApp(
             LOGGER.error(e) { "Failed to load settings!" }
             exitProcess(-1)
         }
+
+        setTheme(appSettings().theme)
 
         language().appLanguage = appSettings().language
     }

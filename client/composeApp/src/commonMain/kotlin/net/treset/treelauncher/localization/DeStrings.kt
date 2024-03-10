@@ -422,7 +422,6 @@ class DeStrings : Strings(
             success = { "Dateipfad geändert" },
             title = { "Launcher Dateipfad"}
         ),
-        restartRequired = { "Diese Einstellung wird nach dem Neustart angewendet" },
         source = { "Quellcode Repository" },
         sourceTooltip = { "Quellcode Repository öffnen" },
         sync = Settings.Sync(

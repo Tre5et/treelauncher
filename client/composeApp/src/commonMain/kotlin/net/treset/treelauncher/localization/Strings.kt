@@ -536,7 +536,6 @@ open class Strings(
         val language: () -> String,
         val logout: () -> String,
         val path: Path,
-        val restartRequired: () -> String,
         val source: () -> String,
         val sourceTooltip: () -> String,
         val sync: Sync,

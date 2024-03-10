@@ -55,7 +55,7 @@ fun Settings(
 
     var language by remember { mutableStateOf(language().appLanguage) }
 
-    var theme by remember { mutableStateOf(theme()) }
+    var theme by remember { mutableStateOf(appContext.theme) }
 
     var showCleanup by remember { mutableStateOf(false) }
 
@@ -93,24 +93,15 @@ fun Settings(
                 selected = language
             )
 
-            var restart by remember { mutableStateOf(false) }
             TitledComboBox(
                 strings().settings.theme(),
                 items = Theme.entries,
                 onSelected = {
                     theme = it
-                    setTheme(it)
-                    restart = true
+                    appContext.setTheme(it)
                 },
                 selected = theme
             )
-
-            if(restart) {
-                Text(
-                    strings().settings.restartRequired(),
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
         }
 
         Column(

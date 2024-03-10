@@ -421,7 +421,6 @@ class EnStrings : Strings(
             success = { "Successfully changed path" },
             title = { "Launcher Data Directory"}
         ),
-        restartRequired = { "A restart is required for this to take effect" },
         source = { "Source Repository" },
         sourceTooltip = { "Open Source Repository" },
         sync = Settings.Sync(

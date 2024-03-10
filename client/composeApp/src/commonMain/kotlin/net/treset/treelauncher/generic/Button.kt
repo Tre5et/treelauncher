@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import net.treset.treelauncher.style.colors
 import net.treset.treelauncher.style.contrast
 import net.treset.treelauncher.style.hovered
 import net.treset.treelauncher.style.inverted
@@ -53,7 +52,7 @@ fun Button(
         }
     )
 
-    val contentColor = colors().onBackground
+    val contentColor = MaterialTheme.colorScheme.onBackground
 
     val foregroundColor = remember(color, contentColor, dynamicContentColor) {
         val inversionBetter = color.contrast(contentColor) < 4.5f && color.contrast(contentColor.inverted()) > 4.5f
