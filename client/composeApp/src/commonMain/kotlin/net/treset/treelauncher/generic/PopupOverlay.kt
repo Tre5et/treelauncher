@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 enum class PopupType(val accent: @Composable () -> Color) {
     NONE({ MaterialTheme.colorScheme.secondary }),
@@ -31,53 +31,49 @@ fun PopupOverlay(
     buttonRow: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit = {}
 ) {
-    Popup(
-        properties = PopupProperties(focusable = true)
+    Dialog(
+        onDismissRequest = {},
+        //properties = PopupProperties(focusable = true),
+        properties = DialogProperties(),
+        //alignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .border(1.dp, type.accent(), RoundedCornerShape(6.dp))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .border(1.dp, type.accent(), RoundedCornerShape(6.dp))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        ProvideTextStyle(
-                            MaterialTheme.typography.titleMedium
-                        ) {
-                            titleRow()
-                        }
-                    }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier
-                            .weight(1f, false)
-                            .verticalScroll(rememberScrollState())
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        content()
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-                    ) {
-                        buttonRow()
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            ProvideTextStyle(
+                                MaterialTheme.typography.titleMedium
+                            ) {
+                                titleRow()
+                            }
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
+                                .weight(1f, false)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            content()
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                        ) {
+                            buttonRow()
+                        }
                     }
                 }
-            }
-        }
     }
 }
 
