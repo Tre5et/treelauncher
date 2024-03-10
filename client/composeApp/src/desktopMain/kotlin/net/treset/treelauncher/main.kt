@@ -74,12 +74,13 @@ fun main() = application {
                     LocalContentColor provides colors.onBackground
                 ) {
                     Box(
-                        modifier = Modifier.offset(x = 16.dp),
+                        modifier = Modifier.offset(x = (-9).dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             strings().launcher.name(),
-                            style = typography().titleSmall
+                            style = typography().titleSmall,
+                            modifier = Modifier.offset(y = 2.dp)
                         )
 
                         IconButton(
