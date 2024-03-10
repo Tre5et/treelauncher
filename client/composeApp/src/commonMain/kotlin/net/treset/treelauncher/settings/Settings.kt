@@ -55,7 +55,8 @@ fun Settings(
 
     var language by remember { mutableStateOf(language().appLanguage) }
 
-    var theme by remember { mutableStateOf(appContext.theme) }
+    var theme by remember { mutableStateOf(appSettings().theme) }
+    var accentColor by remember { mutableStateOf(appSettings().accentColor) }
 
     var showCleanup by remember { mutableStateOf(false) }
 
@@ -101,6 +102,16 @@ fun Settings(
                     appContext.setTheme(it)
                 },
                 selected = theme
+            )
+
+            TitledComboBox(
+                strings().settings.accentColor(),
+                items = AccentColor.entries,
+                onSelected = {
+                    accentColor = it
+                    appContext.setAccentColor(it)
+                },
+                selected = accentColor
             )
         }
 

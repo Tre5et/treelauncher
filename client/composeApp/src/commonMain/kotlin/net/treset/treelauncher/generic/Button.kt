@@ -52,7 +52,7 @@ fun Button(
         }
     )
 
-    val contentColor = MaterialTheme.colorScheme.onBackground
+    val contentColor = MaterialTheme.colorScheme.onPrimary
 
     val foregroundColor = remember(color, contentColor, dynamicContentColor) {
         val inversionBetter = color.contrast(contentColor) < 4.5f && color.contrast(contentColor.inverted()) > 4.5f

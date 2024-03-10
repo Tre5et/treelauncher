@@ -394,6 +394,7 @@ class DeStrings : Strings(
         )
     ),
     settings = Settings(
+        accentColor = { "Akzentfarbe:" },
         appearance = { "Darstellung" },
         cleanup = Settings.Cleanup(
             button = { "Ungenutzte Dateien löschen" },
@@ -494,7 +495,13 @@ class DeStrings : Strings(
     theme = Theme(
         dark = { "Dunkel" },
         light = { "Hell" },
-        system = { "Systemeinstellung" }
+        system = { "Systemeinstellung" },
+        green = { "Grün" },
+        blue = { "Blau" },
+        red = { "Rot" },
+        cyan = { "Cyan" },
+        magenta = { "Magenta" },
+        orange = { "Orange" }
     ),
     units = Units(
         days = { "d" },

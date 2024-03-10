@@ -22,20 +22,59 @@ enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> S
     }
 }
 
-var colorsTheme: Theme? = null
+enum class AccentColor(val primary: (dark: Boolean) -> Color, val onPrimary: (dark: Boolean) -> Color, val displayName: () -> String) {
+    GREEN(
+        {if(it) Color.Green else Color(0xFF00E000)},
+        { Color.Black },
+        { strings().theme.green() }
+    ),
+    BLUE(
+        {if(it) Color.Blue else Color(0xFF0000E0)},
+        { Color.White },
+        { strings().theme.blue() }
+    ),
+    RED(
+        {if(it) Color(0xFFE20505) else Color(0xFFD00000)},
+        { Color.White },
+        { strings().theme.red() }
+    ),
+    CYAN(
+        {if(it) Color.Cyan else Color(0xFF00E0E0)},
+        { Color.Black },
+        { strings().theme.cyan() }
+    ),
+    MAGENTA(
+        {if(it) Color.Magenta else Color(0xFFE000E0)},
+        { Color.Black },
+        { strings().theme.magenta() }
+    ),
+    ORANGE(
+        {if(it) Color(0xFFE0A000) else Color(0xFFD0A000)},
+        { Color.Black },
+        { strings().theme.orange() }
+    );
 
-fun darkColors() = darkColorScheme(
-    primary = Color.Green,
-    onPrimary = Color.Black,
+    override fun toString(): String {
+        return this.displayName()
+    }
+}
+
+fun darkColors() = darkColors(AccentColor.GREEN)
+
+fun lightColors() = lightColors(AccentColor.GREEN)
+
+fun darkColors(primary: AccentColor) = darkColorScheme(
+    primary = primary.primary(true),
+    onPrimary = primary.onPrimary(true),
     error = Color(0xFFE20505),
     inversePrimary = Color(0xFFEBDC02),
     tertiary = Color(0xFF43454A),
     onBackground = Color.White
 )
 
-fun lightColors() = lightColorScheme(
-    primary = Color(0xFF00E000),
-    onPrimary = Color.Black,
+fun lightColors(primary: AccentColor) = lightColorScheme(
+    primary = primary.primary(false),
+    onPrimary = primary.onPrimary(false),
     error = Color(0xFFD00000),
     inversePrimary = Color(0xFFD0A000),
     tertiary = Color(0xFFB4B6BB),
@@ -60,23 +99,14 @@ fun lightTitleBar() = TitleBarStyle.light(
     )
 )
 
-@Composable
-fun Color.hovered(): Color = this.hovered(colorsTheme?.isDark?.let { it() } ?: true)
-
-fun Color.hovered(isDark: Boolean): Color = this.copy(
+fun Color.hovered(): Color = this.copy(
         alpha = alpha,
-        red = red.toHover(isDark),
-        green = green.toHover(isDark),
-        blue = blue.toHover(isDark)
+        red = red.toHover(),
+        green = green.toHover(),
+        blue = blue.toHover()
     )
 
-private fun Float.toHover(isDark: Boolean): Float {
-    return if(isDark) {
-        this + (1 - this) / 2.2f
-    } else {
-        this - this / 2.2f
-    }
-}
+private fun Float.toHover(): Float = this + (1f - this) / 3f
 
 fun Color.disabledContent(): Color = this.copy(alpha = 0.38f)
 

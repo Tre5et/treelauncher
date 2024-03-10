@@ -531,6 +531,7 @@ open class Strings(
     }
 
     data class Settings(
+        val accentColor: () -> String,
         val appearance: () -> String,
         val cleanup: Cleanup,
         val language: () -> String,
@@ -648,7 +649,13 @@ open class Strings(
     data class Theme(
         val dark: () -> String,
         val light: () -> String,
-        val system: () -> String
+        val system: () -> String,
+        val green: () -> String,
+        val blue: () -> String,
+        val red: () -> String,
+        val cyan: () -> String,
+        val magenta: () -> String,
+        val orange: () -> String
     )
 
     data class Units(

@@ -45,8 +45,8 @@ import kotlin.system.exitProcess
 
 data class AppContext(
     val files: LauncherFiles,
-    val theme: Theme,
     val setTheme: (Theme) -> Unit = {},
+    val setAccentColor: (AccentColor) -> Unit = {}
 )
 
 @Composable
@@ -74,19 +74,22 @@ fun App(
 
     var theme by remember { mutableStateOf(appSettings().theme) }
     val themeDark = theme.isDark()
-    val colors: ColorScheme by remember(themeDark) { mutableStateOf(if(themeDark) darkColors() else lightColors()) }
+    var accentColor by remember { mutableStateOf(appSettings().accentColor) }
+    val colors: ColorScheme by remember(themeDark, accentColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
 
     val launcherFiles = remember { LauncherFiles() }
 
     val appContext = remember(launcherFiles) {
         AppContext(
             files = launcherFiles,
-            theme = theme,
             setTheme = {
                 theme = it
                 app.setTheme(it)
-                colorsTheme = it
                 appSettings().theme = it
+            },
+            setAccentColor = {
+                accentColor = it
+                appSettings().accentColor = it
             }
         )
     }

@@ -393,6 +393,7 @@ class EnStrings : Strings(
         )
     ),
     settings = Settings(
+        accentColor = { "Accent Color:" },
         appearance = { "Appearance" },
         cleanup = Settings.Cleanup(
             button = { "Delete unused Files" },
@@ -493,7 +494,13 @@ class EnStrings : Strings(
     theme = Theme(
         dark = { "Dark" },
         light = { "Light" },
-        system = { "Match System" }
+        system = { "Match System" },
+        green = { "Green" },
+        blue = { "Blue" },
+        red = { "Red" },
+        cyan = { "Cyan" },
+        magenta = { "Magenta" },
+        orange = { "Orange" }
     ),
     units = Units(
         days = { "d" },
