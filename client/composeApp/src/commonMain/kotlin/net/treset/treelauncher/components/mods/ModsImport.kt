@@ -179,8 +179,6 @@ fun ModsImport(
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
         ) {
             Text(
                 strings().manager.mods.import.importFile(),

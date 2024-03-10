@@ -1,9 +1,6 @@
 package net.treset.treelauncher.components.mods
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,18 +46,20 @@ fun ModsEdit(
     var showFilePicker by remember(currentMod) { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.width(IntrinsicSize.Min),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextBox(
             text = tfName,
             onTextChanged = { tfName = it },
-            placeholder = strings().manager.mods.edit.name()
+            placeholder = strings().manager.mods.edit.name(),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
             TextBox(
                 text = tfFile,
@@ -96,7 +95,8 @@ fun ModsEdit(
         TextBox(
             text = tfVersion,
             onTextChanged = { tfVersion = it },
-            placeholder = strings().manager.mods.edit.version()
+            placeholder = strings().manager.mods.edit.version(),
+            modifier = Modifier.fillMaxWidth()
         )
 
         TextBox(
@@ -108,7 +108,8 @@ fun ModsEdit(
                 }
             },
             placeholder = strings().manager.mods.edit.curseforge(),
-            isError = curseforgeError
+            isError = curseforgeError,
+            modifier = Modifier.fillMaxWidth()
         )
 
         TextBox(
@@ -118,7 +119,8 @@ fun ModsEdit(
                 modrinthError = false
             },
             placeholder = strings().manager.mods.edit.modrinth(),
-            isError = modrinthError
+            isError = modrinthError,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Button(
