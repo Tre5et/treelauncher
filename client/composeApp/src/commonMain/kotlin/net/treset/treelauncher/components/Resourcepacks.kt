@@ -22,10 +22,8 @@ import net.treset.treelauncher.style.icons
 import java.io.IOException
 
 @Composable
-fun Resourcepacks(
-    appContext: AppContext
-) {
-    var components by remember { mutableStateOf(appContext.files.resourcepackComponents.sortedBy { it.name }) }
+fun Resourcepacks() {
+    var components by remember { mutableStateOf(AppContext.files.resourcepackComponents.sortedBy { it.name }) }
 
     var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
 
@@ -53,23 +51,22 @@ fun Resourcepacks(
     Components(
         strings().selector.resourcepacks.title(),
         components = components,
-        componentManifest = appContext.files.resourcepackManifest,
+        componentManifest = AppContext.files.resourcepackManifest,
         checkHasComponent = { details, component -> details.resourcepacksComponent == component.id },
-        appContext = appContext,
         getCreator = { state ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let {
                     ResourcepackCreator(
                         state.name,
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.resourcepackManifest
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.resourcepackManifest
                     )
                 }
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     ResourcepackCreator(
                         state.name,
                         state.existing,
-                        appContext.files.resourcepackManifest
+                        AppContext.files.resourcepackManifest
                     )
                 }}
                 CreationMode.USE -> null
@@ -77,9 +74,9 @@ fun Resourcepacks(
         },
         reload = {
             try {
-                appContext.files.reloadResourcepackManifest()
-                appContext.files.reloadResourcepackComponents()
-                components = appContext.files.resourcepackComponents.sortedBy { it.name }
+                AppContext.files.reloadResourcepackManifest()
+                AppContext.files.reloadResourcepackComponents()
+                components = AppContext.files.resourcepackComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
                 app().severeError(e)
             }
@@ -97,7 +94,7 @@ fun Resourcepacks(
             if(showAdd) {
                 FileImport(
                     current,
-                    appContext.files.resourcepackComponents,
+                    AppContext.files.resourcepackComponents,
                     {
                         try {
                             Resourcepack.from(this)

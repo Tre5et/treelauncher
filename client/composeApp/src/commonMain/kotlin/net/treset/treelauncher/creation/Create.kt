@@ -24,10 +24,7 @@ import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
 
 @Composable
-fun Create(
-    appContext: AppContext,
-    navContext: NavigationContext
-) {
+fun Create() {
     var instanceName by remember { mutableStateOf("") }
 
     var versionState: VersionState? by remember { mutableStateOf(null) }
@@ -85,7 +82,6 @@ fun Create(
                     style = MaterialTheme.typography.titleSmall
                 )
                 VersionSelector(
-                    appContext = appContext,
                     showChange = false,
                     setCurrentState = { versionState = it }
                 )
@@ -110,7 +106,7 @@ fun Create(
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
-                    existing = appContext.files.savesComponents.toList(),
+                    existing = AppContext.files.savesComponents.toList(),
                     showCreate = false,
                     setCurrentState = { savesState = it },
                     toDisplayString = { name },
@@ -129,7 +125,7 @@ fun Create(
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
-                    existing = appContext.files.resourcepackComponents.toList(),
+                    existing = AppContext.files.resourcepackComponents.toList(),
                     showCreate = false,
                     setCurrentState = { resourcepackState = it },
                     toDisplayString = { name },
@@ -148,7 +144,7 @@ fun Create(
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
-                    existing = appContext.files.optionsComponents.toList(),
+                    existing = AppContext.files.optionsComponents.toList(),
                     showCreate = false,
                     setCurrentState = { optionsState = it },
                     toDisplayString = { name },
@@ -190,7 +186,7 @@ fun Create(
                 }
                 if (hasMods) {
                     ModsCreation(
-                        existing = appContext.files.modsComponents.toList(),
+                        existing = AppContext.files.modsComponents.toList(),
                         showCreate = false,
                         setCurrentState = { modsState = it },
                         defaultVersion = versionState?.minecraftVersion,
@@ -203,15 +199,15 @@ fun Create(
         Button(
             onClick = {
                 versionState?.let { version -> if(version.isValid()) {
-                    val versionCreator = getVersionCreator(version, appContext)
+                    val versionCreator = getVersionCreator(version)
                 savesState?.let { saves -> if(saves.isValid()) {
                     val savesCreator = when(saves.mode) {
                         CreationMode.NEW -> saves.name?.let {
                             SavesCreator(
                                 saves.name,
-                                appContext.files.launcherDetails.typeConversion,
-                                appContext.files.savesManifest,
-                                appContext.files.gameDetailsManifest
+                                AppContext.files.launcherDetails.typeConversion,
+                                AppContext.files.savesManifest,
+                                AppContext.files.gameDetailsManifest
                             )
                         }
 
@@ -219,8 +215,8 @@ fun Create(
                                 SavesCreator(
                                     saves.name,
                                     saves.existing,
-                                    appContext.files.savesManifest,
-                                    appContext.files.gameDetailsManifest
+                                    AppContext.files.savesManifest,
+                                    AppContext.files.gameDetailsManifest
                                 )
                             }
                         }
@@ -234,15 +230,15 @@ fun Create(
                         CreationMode.NEW -> resourcepacks.name?.let{
                             ResourcepackCreator(
                                 resourcepacks.name,
-                                appContext.files.launcherDetails.typeConversion,
-                                appContext.files.resourcepackManifest
+                                AppContext.files.launcherDetails.typeConversion,
+                                AppContext.files.resourcepackManifest
                             )
                         }
                         CreationMode.INHERIT -> resourcepacks.name?.let{ resourcepacks.existing?.let {
                             ResourcepackCreator(
                                 resourcepacks.name,
                                 resourcepacks.existing,
-                                appContext.files.resourcepackManifest
+                                AppContext.files.resourcepackManifest
                             )
                         }}
                         CreationMode.USE -> resourcepacks.existing?.let {
@@ -254,15 +250,15 @@ fun Create(
                         CreationMode.NEW -> options.name?.let {
                             OptionsCreator(
                                 options.name,
-                                appContext.files.launcherDetails.typeConversion,
-                                appContext.files.optionsManifest
+                                AppContext.files.launcherDetails.typeConversion,
+                                AppContext.files.optionsManifest
                             )
                         }
                         CreationMode.INHERIT -> options.name?.let{ options.existing?.let {
                             OptionsCreator(
                                 options.name,
                                 options.existing,
-                                appContext.files.optionsManifest
+                                AppContext.files.optionsManifest
                             )
                         }}
                         CreationMode.USE -> options.existing?.let {
@@ -275,15 +271,15 @@ fun Create(
                                 CreationMode.NEW -> mods.name?.let { mods.type?.let { mods.version?.let { mods.alternateLoader?.let {
                                     ModsCreator(
                                         mods.name,
-                                        appContext.files.launcherDetails.typeConversion,
-                                        appContext.files.modsManifest,
+                                        AppContext.files.launcherDetails.typeConversion,
+                                        AppContext.files.modsManifest,
                                         if(mods.alternateLoader && mods.type == VersionType.QUILT) {
                                             listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
                                         } else {
                                             listOf(mods.type.id)
                                         },
                                         listOf(mods.version.id),
-                                        appContext.files.gameDetailsManifest
+                                        AppContext.files.gameDetailsManifest
                                     )
                                 }}}}
                                 CreationMode.INHERIT -> mods.name?.let {
@@ -291,8 +287,8 @@ fun Create(
                                         ModsCreator(
                                             mods.name,
                                             mods.existing,
-                                            appContext.files.modsManifest,
-                                            appContext.files.gameDetailsManifest
+                                            AppContext.files.modsManifest,
+                                            AppContext.files.gameDetailsManifest
                                         )
                                     }
                                 }
@@ -308,8 +304,8 @@ fun Create(
 
                 val instanceCreator = InstanceCreator(
                     instanceName,
-                    appContext.files.launcherDetails.typeConversion,
-                    appContext.files.instanceManifest,
+                    AppContext.files.launcherDetails.typeConversion,
+                    AppContext.files.instanceManifest,
                     listOf(),
                     listOf(),
                     listOf(),
@@ -377,7 +373,7 @@ fun Create(
                 Button(
                     onClick = {
                         showCreationDone = false
-                        navContext.navigateTo(NavigationState.INSTANCES)
+                        NavigationContext.navigateTo(NavigationState.INSTANCES)
                     }
                 ) {
                     Text(strings().creator.instance.popup.backToInstances())

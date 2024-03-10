@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.LauncherManifestSortType
 import net.treset.treelauncher.backend.config.appConfig
@@ -43,7 +42,6 @@ fun <T, C:CreationState<T>> Components(
     componentManifest: LauncherManifest,
     checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
     getManifest: T.() -> LauncherManifest,
-    appContext: AppContext,
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
     createContent: @Composable ColumnScope.(onCreate: (C) -> Unit) -> Unit,
@@ -299,7 +297,6 @@ fun <T, C:CreationState<T>> Components(
             if (showDelete) {
                 DeletePopup(
                     component = it.getManifest(),
-                    appContext = appContext,
                     checkHasComponent = { details -> checkHasComponent(details, it.getManifest()) },
                     onClose = { showDelete = false },
                     onConfirm = {
@@ -366,7 +363,6 @@ fun Components(
     componentManifest: LauncherManifest,
     components: List<LauncherManifest>,
     checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
-    appContext: AppContext,
     getCreator: (CreationState<LauncherManifest>) -> GenericComponentCreator?,
     reload: () -> Unit,
     actionBarSpecial: @Composable RowScope.(
@@ -395,7 +391,6 @@ fun Components(
     componentManifest,
     checkHasComponent,
     { this },
-    appContext,
     getCreator,
     reload,
     { onCreate ->

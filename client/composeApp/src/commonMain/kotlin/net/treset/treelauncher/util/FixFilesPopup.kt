@@ -53,14 +53,12 @@ private enum class CleanupState(
 }
 
 @Composable
-fun FixFilesPopup(
-    appContext: AppContext
-) {
+fun FixFilesPopup() {
     var showPopup by remember { mutableStateOf(false) }
     var cleanupStatus: CleanupState? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(appContext.files) {
-        if(appContext.files.launcherDetails.activeInstance != null) {
+    LaunchedEffect(AppContext.files) {
+        if(AppContext.files.launcherDetails.activeInstance != null) {
             showPopup = true
         }
     }
@@ -86,15 +84,15 @@ fun FixFilesPopup(
                         showPopup = false
 
                         try {
-                            appContext.files.reloadAll()
+                            AppContext.files.reloadAll()
                         } catch (e: FileLoadException) {
                             app().error(e)
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
 
-                        val instance = appContext.files.instanceComponents.firstOrNull {
-                            it.first.id == appContext.files.launcherDetails.activeInstance
+                        val instance = AppContext.files.instanceComponents.firstOrNull {
+                            it.first.id == AppContext.files.launcherDetails.activeInstance
                         } ?: run {
                             app().error(IOException("Unable to cleanup old instance: instance not found"))
                             cleanupStatus = CleanupState.FAILURE
@@ -102,7 +100,7 @@ fun FixFilesPopup(
                         }
 
                         val instanceData = try {
-                            InstanceData.of(instance, appContext.files)
+                            InstanceData.of(instance, AppContext.files)
                         } catch (e: FileLoadException) {
                             app().error(e)
                             cleanupStatus = CleanupState.FAILURE
@@ -119,15 +117,15 @@ fun FixFilesPopup(
                             return@Button
                         }
 
-                        appContext.files.launcherDetails.activeInstance = null
+                        AppContext.files.launcherDetails.activeInstance = null
                         try {
                             LauncherFile.of(
-                                appContext.files.mainManifest.directory,
-                                appContext.files.mainManifest.details
-                            ).write(appContext.files.launcherDetails)
+                                AppContext.files.mainManifest.directory,
+                                AppContext.files.mainManifest.details
+                            ).write(AppContext.files.launcherDetails)
                         } catch (e: IOException) {
                             app().error(e)
-                            appContext.files.launcherDetails.activeInstance = instance.first.id
+                            AppContext.files.launcherDetails.activeInstance = instance.first.id
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }

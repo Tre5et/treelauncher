@@ -15,13 +15,12 @@ import net.treset.treelauncher.localization.strings
 @Composable
 fun DeletePopup(
     component: LauncherManifest,
-    appContext: AppContext,
     checkHasComponent: (LauncherInstanceDetails) -> Boolean,
     onClose: () -> Unit,
     onConfirm: () -> Unit
 ) {
     val usedBy = remember(component) {
-        appContext.files.instanceComponents
+        AppContext.files.instanceComponents
             .firstOrNull {
                 checkHasComponent(it.second)
             }

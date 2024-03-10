@@ -26,7 +26,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
-import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
@@ -41,7 +41,7 @@ import java.io.IOException
 fun ModsImport(
     component: Pair<LauncherManifest, LauncherModsDetails>,
     modContext: ModContext,
-    appContext: AppContext,
+    appContext: AppContextData,
     close: () -> Unit
 ) {
     var selectedMods: List<Pair<LauncherMod, LauncherFile>> by remember(component) { mutableStateOf(emptyList()) }

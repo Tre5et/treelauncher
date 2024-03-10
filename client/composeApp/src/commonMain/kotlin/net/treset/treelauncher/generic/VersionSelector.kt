@@ -37,7 +37,6 @@ class VersionState(
 @Composable
 fun VersionSelector(
     onDone: (VersionCreator) -> Unit = {},
-    appContext: AppContext,
     defaultVersionId: String? = null,
     defaultVersionType: VersionType = VersionType.VANILLA,
     defaultLoaderVersion: String? = null,
@@ -206,8 +205,7 @@ fun VersionSelector(
             IconButton(
                 onClick = {
                     getVersionCreator(
-                        currentState,
-                        appContext
+                        currentState
                     )?.let {
                         onDone(it)
                     }
@@ -228,52 +226,51 @@ fun VersionSelector(
 }
 
 fun getVersionCreator(
-    versionState: VersionState,
-    appContext: AppContext
+    versionState: VersionState
 ): VersionCreator? {
     versionState.minecraftVersion?.let { mcVersion ->
         when(versionState.versionType) {
             VersionType.VANILLA -> {
                 return VanillaVersionCreator(
-                    appContext.files.launcherDetails.typeConversion,
-                    appContext.files.versionManifest,
+                    AppContext.files.launcherDetails.typeConversion,
+                    AppContext.files.versionManifest,
                     MinecraftGame.getVersionDetails(mcVersion.url),
-                    appContext.files,
-                    LauncherFile.ofData(appContext.files.launcherDetails.librariesDir)
+                    AppContext.files,
+                    LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
                 )
             }
             VersionType.FABRIC -> {
                 versionState.fabricVersion?.let {
                     return FabricVersionCreator(
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.versionManifest,
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.versionManifest,
                         it,
                         FabricLoader.getFabricProfile(mcVersion.id, it.loader.version),
-                        appContext.files,
-                        LauncherFile.ofData(appContext.files.launcherDetails.librariesDir)
+                        AppContext.files,
+                        LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
                     )
                 }
             }
             VersionType.FORGE -> {
                 versionState.forgeVersion?.let { forgeVersion ->
                     return ForgeVersionCreator(
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.versionManifest,
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.versionManifest,
                         forgeVersion,
-                        appContext.files,
-                        LauncherFile.ofData(appContext.files.launcherDetails.librariesDir)
+                        AppContext.files,
+                        LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
                     )
                 }
             }
             VersionType.QUILT -> {
                 versionState.quiltVersion?.let {
                     return QuiltVersionCreator(
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.versionManifest,
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.versionManifest,
                         it,
                         QuiltMC.getQuiltProfile(mcVersion.id, it.loader.version),
-                        appContext.files,
-                        LauncherFile.ofData(appContext.files.launcherDetails.librariesDir)
+                        AppContext.files,
+                        LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
                     )
                 }
             }

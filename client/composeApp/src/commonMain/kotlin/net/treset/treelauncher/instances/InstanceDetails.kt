@@ -25,8 +25,6 @@ fun InstanceDetails(
     instance: InstanceData,
     redrawSelected: () -> Unit,
     reloadInstances: () -> Unit,
-    appContext: AppContext,
-    loginContext: LoginContext,
 ) {
     var selectedDetails: InstanceDetails? by remember { mutableStateOf(null) }
 
@@ -51,8 +49,8 @@ fun InstanceDetails(
                         onClick = {
                             val launcher = GameLauncher(
                                 instance,
-                                appContext.files,
-                                loginContext.userAuth.minecraftUser!!
+                                AppContext.files,
+                                LoginContext.userAuth.minecraftUser!!
                             )
                             launchGame(
                                 launcher,
@@ -86,7 +84,6 @@ fun InstanceDetails(
                         onClick = {
                             deleteDialog(
                                 instance,
-                                appContext,
                                 { pc -> popupContent = pc },
                                 { reloadInstances() }
                             )
@@ -161,7 +158,7 @@ fun InstanceDetails(
                 InstanceComponentChanger(
                     instance = instance,
                     type = it,
-                    appContext = appContext,
+                    appContext = AppContext,
                     redrawSelected = redrawSelected
                 )
             }
@@ -170,14 +167,14 @@ fun InstanceDetails(
                     instance = instance,
                     type = it,
                     allowUnselect = true,
-                    appContext = appContext,
+                    appContext = AppContext,
                     redrawSelected = redrawSelected
                 )
             }
             InstanceDetails.VERSION -> {
                 InstanceVersionChanger(
                     instance = instance,
-                    appContext = appContext,
+                    appContext = AppContext,
                     redrawCurrent = redrawSelected
                 )
             }
@@ -212,7 +209,6 @@ fun InstanceDetails(
 
 private fun deleteDialog(
     instance: InstanceData,
-    appContext: AppContext,
     setPopup: (PopupData?) -> Unit,
     onSuccess: () -> Unit
 ) {
@@ -228,7 +224,7 @@ private fun deleteDialog(
                 )
                 Button(
                     onClick = {
-                        instance.delete(appContext.files)
+                        instance.delete(AppContext.files)
                         onSuccess()
                         setPopup(null)
                     },

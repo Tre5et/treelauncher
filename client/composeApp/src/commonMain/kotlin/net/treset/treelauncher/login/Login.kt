@@ -29,9 +29,17 @@ enum class LoginState(val actionAllowed: Boolean) {
     FAILED(true)
 }
 
+data class LoginContextData(
+    val loginState: LoginState,
+    val userAuth: UserAuth,
+    val logout: () -> Unit
+)
+
+lateinit var LoginContext: LoginContextData
+
 @Composable
 fun LoginScreen(
-    content: @Composable (LoginContext) -> Unit
+    content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -67,8 +75,8 @@ fun LoginScreen(
         }
     }
 
-    val loginContext = remember(loginState, userAuth().isLoggedIn) {
-        LoginContext(
+    LoginContext = remember(loginState, userAuth().isLoggedIn) {
+        LoginContextData(
             loginState,
             userAuth()
         ) {
@@ -79,9 +87,7 @@ fun LoginScreen(
     }
 
     if(showContent) {
-        content(
-            loginContext
-        )
+        content()
         return
     }
 
@@ -153,7 +159,7 @@ fun LoginScreen(
                 if(loginState == LoginState.FAILED) {
                     Button(
                         onClick = {
-                            loginContext.logout()
+                            LoginContext.logout()
                         },
                         color = MaterialTheme.colorScheme.error,
                     ) {
@@ -262,9 +268,3 @@ private fun startLogin(
         url?.let { onUrl(it) }
     }.start()
 }
-
-data class LoginContext(
-    val loginState: LoginState,
-    val userAuth: UserAuth,
-    val logout: () -> Unit
-)

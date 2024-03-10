@@ -43,10 +43,7 @@ import java.io.IOException
 
 
 @Composable
-fun Settings(
-    appContext: AppContext,
-    loginContext: LoginContext
-) {
+fun Settings() {
     val coroutineScope = rememberCoroutineScope()
 
     var userImage: BufferedImage? by remember { mutableStateOf(null) }
@@ -110,7 +107,7 @@ fun Settings(
                     IconButton(
                         onClick = {
                             theme = Theme.DARK
-                            appContext.setTheme(Theme.DARK)
+                            AppContext.setTheme(Theme.DARK)
                         },
                         tooltip = Theme.DARK.displayName(),
                         icon = icons().darkMode,
@@ -121,7 +118,7 @@ fun Settings(
                     IconButton(
                         onClick = {
                             theme = Theme.LIGHT
-                            appContext.setTheme(Theme.LIGHT)
+                            AppContext.setTheme(Theme.LIGHT)
                         },
                         tooltip = Theme.LIGHT.displayName(),
                         icon = icons().lightMode,
@@ -132,7 +129,7 @@ fun Settings(
                     IconButton(
                         onClick = {
                             theme = Theme.SYSTEM
-                            appContext.setTheme(Theme.SYSTEM)
+                            AppContext.setTheme(Theme.SYSTEM)
                         },
                         tooltip = Theme.SYSTEM.displayName(),
                         icon = icons().systemMode,
@@ -157,7 +154,7 @@ fun Settings(
                         IconButton(
                             onClick = {
                                 accentColor = it
-                                appContext.setAccentColor(it)
+                                AppContext.setAccentColor(it)
                             },
                             tooltip = it.displayName()
                         ) {
@@ -437,7 +434,7 @@ fun Settings(
                 style = MaterialTheme.typography.labelSmall
             )
             IconButton(
-                onClick = loginContext.logout,
+                onClick = LoginContext.logout,
                 icon = icons().logout,
                 size = 32.dp,
                 interactionTint = MaterialTheme.colorScheme.error,
@@ -525,7 +522,7 @@ fun Settings(
                         onClick = {
                             Thread {
                                 try {
-                                    appContext.files.cleanupVersions(includeLibraries)
+                                    AppContext.files.cleanupVersions(includeLibraries)
                                     state = 2
                                 } catch(e: FileLoadException) {
                                     app().error(e)

@@ -37,43 +37,43 @@ fun PopupOverlay(
         properties = DialogProperties(),
         //alignment = Alignment.Center
     ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .border(1.dp, type.accent(), RoundedCornerShape(6.dp))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .border(1.dp, type.accent(), RoundedCornerShape(6.dp))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ProvideTextStyle(
+                        MaterialTheme.typography.titleMedium
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            ProvideTextStyle(
-                                MaterialTheme.typography.titleMedium
-                            ) {
-                                titleRow()
-                            }
-                        }
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier
-                                .weight(1f, false)
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            content()
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-                        ) {
-                            buttonRow()
-                        }
+                        titleRow()
                     }
                 }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier
+                        .weight(1f, false)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    content()
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                ) {
+                    buttonRow()
+                }
+            }
+        }
     }
 }
 

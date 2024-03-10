@@ -30,11 +30,8 @@ import net.treset.treelauncher.util.launchGame
 import java.io.IOException
 
 @Composable
-fun Saves(
-    appContext: AppContext,
-    loginContext: LoginContext
-) {
-    var components by remember { mutableStateOf(appContext.files.savesComponents.sortedBy { it.name }) }
+fun Saves() {
+    var components by remember { mutableStateOf(AppContext.files.savesComponents.sortedBy { it.name }) }
 
     var selected: LauncherManifest? by remember { mutableStateOf(null) }
 
@@ -82,25 +79,24 @@ fun Saves(
     Components(
         strings().selector.saves.title(),
         components = components,
-        componentManifest = appContext.files.savesManifest,
+        componentManifest = AppContext.files.savesManifest,
         checkHasComponent = { details, component -> details.savesComponent == component.id },
-        appContext = appContext,
         getCreator = { state ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let{
                     SavesCreator(
                         state.name,
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.savesManifest,
-                        appContext.files.gameDetailsManifest
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.savesManifest,
+                        AppContext.files.gameDetailsManifest
                     )
                 }
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     SavesCreator(
                         state.name,
                         state.existing,
-                        appContext.files.savesManifest,
-                        appContext.files.gameDetailsManifest
+                        AppContext.files.savesManifest,
+                        AppContext.files.gameDetailsManifest
                     )
                 }}
                 CreationMode.USE -> null
@@ -108,9 +104,9 @@ fun Saves(
         },
         reload = {
             try {
-                appContext.files.reloadSavesManifest()
-                appContext.files.reloadSavesComponents()
-                components = appContext.files.savesComponents.sortedBy { it.name }
+                AppContext.files.reloadSavesManifest()
+                AppContext.files.reloadSavesComponents()
+                components = AppContext.files.savesComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
                 app().severeError(e)
             }
@@ -128,7 +124,7 @@ fun Saves(
             if(showAdd) {
                 FileImport(
                     current,
-                    appContext.files.savesComponents,
+                    AppContext.files.savesComponents,
                     {
                         try {
                             Save.from(this)
@@ -203,11 +199,10 @@ fun Saves(
                 PlayPopup(
                     component = current,
                     quickPlayData = it,
-                    appContext = appContext,
                     onClose = { quickPlayData = null },
                     onConfirm = { playData, instance ->
                         val instanceData = try {
-                            InstanceData.of(instance, appContext.files)
+                            InstanceData.of(instance, AppContext.files)
                         } catch (e: FileLoadException) {
                             app().severeError(e)
                             return@PlayPopup
@@ -215,8 +210,8 @@ fun Saves(
 
                         val launcher = GameLauncher(
                             instanceData,
-                            appContext.files,
-                            loginContext.userAuth.minecraftUser!!,
+                            AppContext.files,
+                            LoginContext.userAuth.minecraftUser!!,
                             playData
                         )
 
@@ -308,7 +303,6 @@ fun Saves(
 private fun PlayPopup(
     component: LauncherManifest,
     quickPlayData: QuickPlayData,
-    appContext: AppContext,
     onClose: () -> Unit,
     onConfirm: (QuickPlayData, Pair<LauncherManifest, LauncherInstanceDetails>) -> Unit
 ) {
@@ -316,12 +310,12 @@ private fun PlayPopup(
 
     LaunchedEffect(component) {
         try {
-            appContext.files.reloadAll()
+            AppContext.files.reloadAll()
         } catch (e: FileLoadException) {
             app().severeError(e)
         }
 
-        instances = appContext.files.instanceComponents
+        instances = AppContext.files.instanceComponents
             .filter {
                 it.second.savesComponent == component.id
             }

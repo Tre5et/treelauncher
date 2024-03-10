@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.ComboBox
@@ -23,7 +23,7 @@ fun InstanceComponentChanger(
     instance: InstanceData,
     type: InstanceDetails,
     allowUnselect: Boolean = false,
-    appContext: AppContext,
+    appContext: AppContextData,
     redrawSelected: () -> Unit
 ) {
     var components: Array<LauncherManifest> by remember { mutableStateOf(emptyArray()) }

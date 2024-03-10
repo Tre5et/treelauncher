@@ -10,31 +10,28 @@ import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.localization.strings
 
 @Composable
-fun Options(
-    appContext: AppContext
-) {
-    var components by remember { mutableStateOf(appContext.files.optionsComponents.sortedBy { it.name }) }
+fun Options() {
+    var components by remember { mutableStateOf(AppContext.files.optionsComponents.sortedBy { it.name }) }
 
     Components(
         strings().selector.options.title(),
         components = components,
-        componentManifest = appContext.files.optionsManifest,
+        componentManifest = AppContext.files.optionsManifest,
         checkHasComponent = { details, component -> details.optionsComponent == component.id },
-        appContext = appContext,
         getCreator = { state ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let {
                     OptionsCreator(
                         state.name,
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.optionsManifest
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.optionsManifest
                     )
                 }
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     OptionsCreator(
                         state.name,
                         state.existing,
-                        appContext.files.optionsManifest
+                        AppContext.files.optionsManifest
                     )
                 }}
                 CreationMode.USE -> null
@@ -42,9 +39,9 @@ fun Options(
         },
         reload = {
             try {
-                appContext.files.reloadOptionsManifest()
-                appContext.files.reloadOptionsComponents()
-                components = appContext.files.optionsComponents.sortedBy { it.name }
+                AppContext.files.reloadOptionsManifest()
+                AppContext.files.reloadOptionsComponents()
+                components = AppContext.files.optionsComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
                 app().severeError(e)
             }

@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.creation.VersionCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.CreationStatus
@@ -22,7 +22,7 @@ import net.treset.treelauncher.localization.strings
 @Composable
 fun InstanceVersionChanger(
     instance: InstanceData,
-    appContext: AppContext,
+    appContext: AppContextData,
     redrawCurrent: () -> Unit
 ) {
     var creator: VersionCreator? by remember { mutableStateOf(null) }
@@ -43,7 +43,6 @@ fun InstanceVersionChanger(
                 onDone = {
                      creator = it
                 },
-                appContext = appContext,
                 defaultVersionId = instance.versionComponents[0].second.versionNumber,
                 defaultVersionType = when(instance.versionComponents[0].second.versionType) {
                     "fabric" -> VersionType.FABRIC

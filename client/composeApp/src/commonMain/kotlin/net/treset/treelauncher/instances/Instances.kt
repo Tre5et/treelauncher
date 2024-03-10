@@ -17,14 +17,10 @@ import net.treset.treelauncher.generic.SortBox
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
-import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
 
 @Composable
-fun Instances(
-    appContext: AppContext,
-    loginContext: LoginContext
-) {
+fun Instances() {
     var selectedInstance: InstanceData? by remember { mutableStateOf(null) }
     var instances: List<InstanceData> by remember { mutableStateOf(emptyList()) }
     var selectedSort: InstanceDataSortType by remember { mutableStateOf(appSettings().instanceSortType) }
@@ -34,15 +30,15 @@ fun Instances(
 
     val reloadInstances = {
         try {
-            appContext.files.reloadAll()
+            AppContext.files.reloadAll()
         } catch (e: FileLoadException) {
             app().severeError(e)
         }
         selectedInstance = null
-        instances = appContext.files.instanceComponents
+        instances = AppContext.files.instanceComponents
             .mapNotNull {
                 try {
-                    InstanceData.of(it, appContext.files)
+                    InstanceData.of(it, AppContext.files)
                 } catch (e: FileLoadException) {
                     app().severeError(e)
                     null
@@ -136,8 +132,6 @@ fun Instances(
                 it,
                 redrawSelected,
                 reloadInstances,
-                appContext,
-                loginContext,
             )
         }
     }

@@ -40,10 +40,8 @@ data class ModContext(
 )
 
 @Composable
-fun Mods(
-    appContext: AppContext
-) {
-    var components by remember { mutableStateOf(appContext.files.modsComponents.sortedBy { it.first.name }) }
+fun Mods() {
+    var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.first.name }) }
 
     var selected: Pair<LauncherManifest, LauncherModsDetails>? by remember { mutableStateOf(null) }
 
@@ -58,32 +56,31 @@ fun Mods(
     Components(
         title = strings().selector.mods.title(),
         components = components,
-        componentManifest = appContext.files.modsManifest,
+        componentManifest = AppContext.files.modsManifest,
         checkHasComponent = { details, component -> details.modsComponent == component.id },
         getManifest = { first },
-        appContext = appContext,
         getCreator = { state: ModsCreationState ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let{ state.version?.let { state.type?.let { state.alternateLoader?.let {
                     ModsCreator(
                         state.name,
-                        appContext.files.launcherDetails.typeConversion,
-                        appContext.files.modsManifest,
+                        AppContext.files.launcherDetails.typeConversion,
+                        AppContext.files.modsManifest,
                         if(state.alternateLoader && state.type == VersionType.QUILT) {
                             listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
                         } else {
                             listOf(state.type.id)
                         },
                         listOf(state.version.id),
-                        appContext.files.gameDetailsManifest
+                        AppContext.files.gameDetailsManifest
                     )
                 }}}}
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     ModsCreator(
                         state.name,
                         state.existing,
-                        appContext.files.modsManifest,
-                        appContext.files.gameDetailsManifest
+                        AppContext.files.modsManifest,
+                        AppContext.files.gameDetailsManifest
                     )
                 }}
                 CreationMode.USE -> null
@@ -91,9 +88,9 @@ fun Mods(
         },
         reload = {
             try {
-                appContext.files.reloadModsManifest()
-                appContext.files.reloadModsComponents()
-                components = appContext.files.modsComponents.sortedBy { it.first.name }
+                AppContext.files.reloadModsManifest()
+                AppContext.files.reloadModsComponents()
+                components = AppContext.files.modsComponents.sortedBy { it.first.name }
             } catch (e: FileLoadException) {
                 app().severeError(e)
             }
@@ -208,7 +205,7 @@ fun Mods(
                 ModsSearch(
                     current,
                     modContext,
-                    appContext
+                    AppContext
                 ) {
                     showSearch = false
                 }

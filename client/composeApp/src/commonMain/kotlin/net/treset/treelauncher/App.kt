@@ -32,6 +32,7 @@ import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginScreen
+import net.treset.treelauncher.navigation.LocalNavigationState
 import net.treset.treelauncher.navigation.NavigationContainer
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
@@ -43,11 +44,13 @@ import java.io.File
 import java.io.IOException
 import kotlin.system.exitProcess
 
-data class AppContext(
+data class AppContextData(
     val files: LauncherFiles,
     val setTheme: (Theme) -> Unit = {},
     val setAccentColor: (AccentColor) -> Unit = {}
 )
+
+lateinit var AppContext: AppContextData
 
 @Composable
 fun App(
@@ -79,8 +82,8 @@ fun App(
 
     val launcherFiles = remember { LauncherFiles() }
 
-    val appContext = remember(launcherFiles) {
-        AppContext(
+    AppContext = remember(launcherFiles) {
+        AppContextData(
             files = launcherFiles,
             setTheme = {
                 theme = it
@@ -106,7 +109,7 @@ fun App(
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LoginScreen { loginContext ->
+                    LoginScreen {
                         LaunchedEffect(Unit) {
                             try {
                                 news().let { nws ->
@@ -119,22 +122,22 @@ fun App(
                                         )
                                     }
                                 }
-                            } catch(e: IOException) {
+                            } catch (e: IOException) {
                                 LOGGER.warn(e) { "Unable to load news" }
                             }
                         }
 
-                        FixFilesPopup(appContext)
+                        FixFilesPopup()
 
-                        NavigationContainer(loginContext) { navContext ->
-                            when (navContext.navigationState) {
-                                NavigationState.INSTANCES -> Instances(appContext, loginContext)
-                                NavigationState.ADD -> Create(appContext, navContext)
-                                NavigationState.SAVES -> Saves(appContext, loginContext)
-                                NavigationState.RESSOURCE_PACKS -> Resourcepacks(appContext)
-                                NavigationState.OPTIONS -> Options(appContext)
-                                NavigationState.MODS -> Mods(appContext)
-                                NavigationState.SETTINGS -> Settings(appContext, loginContext)
+                        NavigationContainer {
+                            when(LocalNavigationState.current) {
+                                NavigationState.INSTANCES -> Instances()
+                                NavigationState.ADD -> Create()
+                                NavigationState.SAVES -> Saves()
+                                NavigationState.RESSOURCE_PACKS -> Resourcepacks()
+                                NavigationState.OPTIONS -> Options()
+                                NavigationState.MODS -> Mods()
+                                NavigationState.SETTINGS -> Settings()
                             }
                         }
                     }
