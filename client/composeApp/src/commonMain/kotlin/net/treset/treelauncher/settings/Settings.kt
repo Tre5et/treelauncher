@@ -463,7 +463,6 @@ fun Settings() {
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(12.dp)
-                    .fillMaxWidth()
             ) {
                 Text(
                     strings().settings.user()
