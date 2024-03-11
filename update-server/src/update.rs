@@ -49,8 +49,7 @@ pub fn get_update(req: HttpRequest) -> HttpResponse {
     let mut latest = false;
     for v in version_file {
         let version_str = v.id.unwrap();
-        let version: VersionReq = VersionReq::parse(version_str.as_str()).unwrap();
-        if !found && version.matches(&input_version) {
+        if !found && version_str == input_version.to_string() {
             found = true;
             latest = true;
         } else if found {
