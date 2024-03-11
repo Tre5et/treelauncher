@@ -12,11 +12,12 @@ interface ContentCardProps extends React.PropsWithChildren {
     imgHeight?: number
     rightAligned?: boolean
     keepTextAlignment?: boolean
-    title?: string
+    title?: string,
+    locale: string
 }
 
 export function ContentCard({
-    imgId, rightAligned, keepTextAlignment, imgAlt, imgWidth, imgHeight, title, children
+    imgId, rightAligned, keepTextAlignment, imgAlt, imgWidth, imgHeight, title, locale, children
 }: ContentCardProps) {
     const { resolvedTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
@@ -41,7 +42,7 @@ export function ContentCard({
   
     let src: string
     if(mounted) {
-        src = `/${imgId}_${resolvedTheme==="dark" ? 'dark' : 'light'}.png`
+        src = `/${imgId}_${locale}_${resolvedTheme==="dark" ? 'dark' : 'light'}.png`
     } else {
         src = `/${imgId}_placeholder.png`
     }

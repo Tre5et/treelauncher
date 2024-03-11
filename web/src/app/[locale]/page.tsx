@@ -25,11 +25,12 @@ export default function Home({
         }</p>
         <div className="flex flex-col items-center max-w-7xl w-full px-4 md:px-12 gap-8 md:gap-4">
           <ContentCard
-            imgId="instances_settings"
+            imgId="instances"
             imgAlt={{"de": "Instanzverwaltung"}[locale] || "Instance Manager"}
             imgWidth={1050}
             imgHeight={591}
             title= {{"de": "Instanzen"}[locale] || "Instances"}
+            locale={locale}
           >
               {{
                 "de": (<p>Mehrere Instanzen mit verschiedenen Versionen estellen.<br/>Vanilla, <a href="https://fabricmc.net/">Fabric</a>, <a href="https://minecraftforge.net/">Forge</a> oder <a href="https://quiltmc.org/">Quilt</a>.</p>)
@@ -38,12 +39,13 @@ export default function Home({
             }
           </ContentCard>
           <ContentCard
-            imgId="saves_open"
+            imgId="saves"
             imgAlt={{"de": "Weltenverwaltung"}[locale] || "Saves Manager"}
             imgWidth={900}
             imgHeight={507}
             rightAligned
             title={{"de": "Welten"}[locale] || "Worlds"}
+            locale={locale}
           > 
             {{
               "de": <p>Welten aus lokalen Dateien hinzufügen und zwischen Instanzen kopieren.<br/>Direkt aus dem Launcher.</p>
@@ -52,11 +54,12 @@ export default function Home({
             }
           </ContentCard>
           <ContentCard
-            imgId="mods_open"
+            imgId="mods"
             imgAlt={{"de": "Modverwaltung"}[locale] || "Mods Manager"}
             imgWidth={900}
             imgHeight={507}
             title="Mods"
+            locale={locale}
           > 
             {{
               "de": <p>Modverwaltung direkt aus dem Launcher.</p>
@@ -74,6 +77,7 @@ export default function Home({
             imgAlt={{"de": "Komponentenauswahlmenüs"}[locale] || "Component Selectors"}
             imgWidth={790}
             imgHeight={700}
+            locale={locale}
           >
             <p className="text-3xl mt-4">{{"de": "Komponenten"}[locale] || "Components"}</p>
             {{
@@ -99,12 +103,13 @@ export default function Home({
         <p className="text-4xl mt-16 text-center">{{"de": "Leistungsstarke Mod-Verwaltung"}[locale] || "Powerfull Mods Manager"}</p>
         <div className="flex flex-col items-center max-w-7xl px-4 md:px-12 gap-4">
           <ContentCard
-            imgId="mods_search"
+            imgId="search"
             imgAlt={{"de": "Mod Suche"}[locale] || "Mod Search"}
             imgWidth={800}
             imgHeight={860}
             rightAligned
             keepTextAlignment
+            locale={locale}
           >
             <p className="text-3xl mt-4">{{"de": "Vereinigt"}[locale] || "Unified"}</p>
             {{
@@ -134,6 +139,7 @@ export default function Home({
             imgAlt={{"de": "Heller und Dunkler Farbmodus"}[locale] || "Dark and Light Theme"}
             imgWidth={900}
             imgHeight={800}
+            locale={locale}
           >
             <p className="text-3xl mt-4">{{"de": "Schnell spielen"}[locale] || "Play quickly"}</p>
             {{
