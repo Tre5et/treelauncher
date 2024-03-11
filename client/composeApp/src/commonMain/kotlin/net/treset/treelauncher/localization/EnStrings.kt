@@ -442,7 +442,7 @@ class EnStrings : Strings(
         ),
         update = Settings.Update(
             available = { "Update Available!" },
-            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
+            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"} ?: ""}"},
             availableTitle = { "Update Available!" },
             cancel = { "Cancel" },
             checkingTitle = { "Checking for updates..." },

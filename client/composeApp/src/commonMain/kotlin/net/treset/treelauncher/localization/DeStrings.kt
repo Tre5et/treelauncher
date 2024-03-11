@@ -443,7 +443,7 @@ class DeStrings : Strings(
         ),
         update = Settings.Update(
             available = { "Update verfügbar!" },
-            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
+            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"} ?: ""}"},
             availableTitle = { "Update verfügbar!" },
             cancel = { "Abbrechen" },
             checkingTitle = { "Es wird nach Updates gesucht..." },

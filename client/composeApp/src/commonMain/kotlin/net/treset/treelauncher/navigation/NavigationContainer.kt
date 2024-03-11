@@ -68,7 +68,7 @@ fun NavigationContainer(
 
     LaunchedEffect(Unit) {
         try {
-            updateAvailable = updater().getUpdate().latest == false
+            updateAvailable = updater().getUpdate().id != null
         } catch (e: IOException) {
             app().error(e)
         }
@@ -185,7 +185,7 @@ fun NavigationContainer(
                                 tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = "Update Available",
                                 modifier = Modifier
-                                    .offset(12.dp, 12.dp)
+                                    .offset(8.dp, 8.dp)
                                     .clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.background)
                                     .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)

@@ -527,11 +527,11 @@ fun Settings() {
                         onUpdate(coroutineScope) { popupContent = it }
                     },
                     icon = icons().update,
-                    highlighted = update?.latest == false,
+                    highlighted = update?.id != null,
                     tooltip = strings().settings.update.tooltip()
                 )
 
-                if (update?.latest == false) {
+                if (update?.id != null) {
                     Text(
                         strings().settings.update.available()
                     )
