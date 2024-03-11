@@ -52,6 +52,7 @@ class LauncherUpdater {
                             updateFile.write(updateService.file(it.id!!, change.path))
                         } catch (e: IOException) {
                             exceptions.add(e)
+                            LOGGER.warn(e) { "Failed to download file: " + change.path }
                         }
                         if (change.updater) {
                             LOGGER.debug { "Delegating file to updater: " + change.path }
@@ -66,6 +67,7 @@ class LauncherUpdater {
                                 updateFile.moveTo(targetFile)
                             } catch (e: IOException) {
                                 exceptions.add(e)
+                                LOGGER.warn(e) { "Failed to move file: " + change.path }
                             }
                         }
                     }
@@ -84,6 +86,7 @@ class LauncherUpdater {
                             }
                         } catch (e: IOException) {
                             exceptions.add(e)
+                            LOGGER.warn(e) { "Failed to delete file: " + change.path }
                         }
                     }
 
