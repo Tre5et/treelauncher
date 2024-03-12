@@ -5,9 +5,10 @@ mod status;
 mod updater;
 
 fn main() {
+    println!("Starting updater...");
     let args = parse_arg();
     if args.is_err() {
-        println!("{}", args.unwrap_err());
+        println!("Error parsing arguments: {}", args.unwrap_err());
         return
     }
     let args = args.unwrap();
@@ -20,11 +21,14 @@ fn main() {
 
     let update = update::get_update(args.input.as_str());
     if update.is_err() {
+        let update = update.unwrap_err();
+        println!("Error reading update file: {}", update);
         status::write_status(args.output.clone(), status::UpdaterStatus {
             status: status::Status::FAILURE,
             message: Some("Failed to read update file".to_string()),
-            exceptions: Some(vec![update.unwrap_err()])
+            exceptions: Some(vec![update])
         }).expect("Unable to write status!");
+        updater::restart(args.restart_dir.unwrap(), args.restart_command.unwrap());
         return
     }
     let update = update.unwrap();
@@ -33,6 +37,7 @@ fn main() {
     status::write_status(args.output.clone(), final_status).expect("Unable to write status!");
 
     if args.restart_dir.is_some() && args.restart_command.is_some() {
+        println!("Restarting...");
         updater::restart(args.restart_dir.unwrap(), args.restart_command.unwrap())
     }
 
