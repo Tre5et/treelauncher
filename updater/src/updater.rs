@@ -161,7 +161,7 @@ fn line_mode(target: PathBuf, backup_file: PathBuf, elements: Vec<UpdateElement>
 
         let value = element.value;
 
-        println!(" - {}({}) {} {}", line + 1, meta, if replace { "->" } else { "+" }, if(value.is_none()) { "[blank]" } else { value.as_ref().unwrap().as_str() });
+        println!(" - {}({}) {} {}", line + 1, meta, if replace { "->" } else { "+" }, if value.is_none() { "[blank]" } else { value.as_ref().unwrap().as_str() });
 
         if line < 0 {
             continue;
