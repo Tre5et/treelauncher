@@ -237,7 +237,7 @@ launcherTask(
     val oldPath = readln()
 
     val newDir = project.file("build/dist/${version}/$projectName-$version")
-    if(!newDir.exists()) {
+    if(newDir.exists()) {
         newDir.deleteRecursively()
     }
     newDir.mkdirs()
@@ -266,13 +266,13 @@ launcherTask(
 
         val result = scanDir(oldDir, newDir)
 
-        val sb = StringBuilder("\"id\": \"$version\",\n\"changes\": [\n")
+        val sb = StringBuilder("  {\n    \"id\": \"$version\",\n    \"changes\": [\n")
         for (deleted in result.first) {
-            sb.append("  {\n")
-            sb.append("    \"mode\": \"DELETE\",\n")
-            sb.append("    \"path\": \"${deleted.replace("\\", "/")}\",\n")
-            sb.append("    \"updater\": true\n")
-            sb.append("  },\n")
+            sb.append("      {\n")
+            sb.append("        \"mode\": \"DELETE\",\n")
+            sb.append("        \"path\": \"${deleted.replace("\\", "/")}\",\n")
+            sb.append("        \"updater\": true\n")
+            sb.append("      },\n")
         }
         project.file("build/dist/$version/update/latest/").deleteRecursively()
         for (added in result.second) {
@@ -282,13 +282,14 @@ launcherTask(
                 toFile.parentFile.mkdirs()
                 file.copyTo(toFile, true)
             }
-            sb.append("  {\n")
-            sb.append("    \"mode\": \"FILE\",\n")
-            sb.append("    \"path\": \"${added.replace("\\", "/")}\",\n")
-            sb.append("    \"updater\": true\n")
-            sb.append("  },\n")
+            sb.append("      {\n")
+            sb.append("        \"mode\": \"FILE\",\n")
+            sb.append("        \"path\": \"${added.replace("\\", "/")}\",\n")
+            sb.append("        \"updater\": true\n")
+            sb.append("      },\n")
         }
-        sb.append("]")
+        sb.deleteRange(sb.length - 2, sb.length)
+        sb.append("\n    ]\n  }")
 
         project.file("build/dist/$version/update/difference.json").writeText(sb.toString())
 
@@ -301,16 +302,20 @@ fun scanDir(old: File, new: File): Pair<Set<String>, Set<String>> {
     val newFiles = mutableSetOf<String>()
 
     old.walkBottomUp().forEach { file ->
-        val path = old.toPath().relativize(file.toPath()).toString()
-        if(!path.startsWith("logs") && !path.startsWith("data")) {
-            oldFiles.add(path)
+        if(file.isFile) {
+            val path = old.toPath().relativize(file.toPath()).toString()
+            if (!path.startsWith("logs") && !path.startsWith("data")) {
+                oldFiles.add(path)
+            }
         }
     }
 
     new.walkBottomUp().forEach { file ->
-        val path = new.toPath().relativize(file.toPath()).toString()
-        if(!path.startsWith("logs") && !path.startsWith("data")) {
-            newFiles.add(path)
+        if(file.isFile) {
+            val path = new.toPath().relativize(file.toPath()).toString()
+            if (!path.startsWith("logs") && !path.startsWith("data")) {
+                newFiles.add(path)
+            }
         }
     }
 
