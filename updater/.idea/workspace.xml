@@ -7,16 +7,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Added Ability to restart">
-      <change afterPath="$PROJECT_DIR$/app/test.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zenity" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zenity.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/updater.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/updater.rs" afterDir="false" />
-    </list>
+    <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Implemented Updater Logic" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,27 +34,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Cargo.Build `Run`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;updater-rewrite&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Hannes/Coding/gits/treelauncher/updater&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
-    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Build `Run`.executor": "Run",
+    "Cargo.Run.executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "git-widget-placeholder": "updater-rewrite",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/Hannes/Coding/gits/treelauncher/updater",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "settings.sync",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Hannes\Coding\gits\treelauncher\updater" />
@@ -109,7 +101,7 @@
       <workItem from="1710257498577" duration="2207000" />
       <workItem from="1710259726432" duration="60000" />
       <workItem from="1710260782251" duration="1933000" />
-      <workItem from="1710269608016" duration="8667000" />
+      <workItem from="1710269608016" duration="8991000" />
     </task>
     <task id="LOCAL-00001" summary="Changed Updater to Rust Project">
       <option name="closed" value="true" />
@@ -135,7 +127,23 @@
       <option name="project" value="LOCAL" />
       <updated>1710255903192</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Implemented Updater Logic">
+      <option name="closed" value="true" />
+      <created>1710278608688</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1710278608688</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Implemented Updater Logic">
+      <option name="closed" value="true" />
+      <created>1710278649016</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1710278649016</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -145,6 +153,7 @@
     <MESSAGE value="Changed Updater to Rust Project" />
     <MESSAGE value="Implemented Updater Structure" />
     <MESSAGE value="Added Ability to restart" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Ability to restart" />
+    <MESSAGE value="Implemented Updater Logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented Updater Logic" />
   </component>
 </project>

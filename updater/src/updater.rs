@@ -151,6 +151,7 @@ fn line_mode(target: PathBuf, backup_file: PathBuf, elements: Vec<UpdateElement>
             false
         } else {
             element.replace.unwrap()
+
         };
 
         let line = if meta < 0 {
