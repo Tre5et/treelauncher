@@ -32,6 +32,10 @@ fn main() {
     let final_status = updater::execute_update(update);
     status::write_status(args.output.clone(), final_status).expect("Unable to write status!");
 
+    if args.restart_dir.is_some() && args.restart_command.is_some() {
+        updater::restart(args.restart_dir.unwrap(), args.restart_command.unwrap())
+    }
+
     return
 }
 
@@ -50,9 +54,25 @@ fn parse_arg() -> Result<Args, String> {
     }
     let output = output.unwrap();
 
+    let restart = get_arg(args.clone(), vec!["-r", "--restart="]);
+    let mut restart_dir: Option<String> = None;
+    let mut restart_command: Option<String> = None;
+    if restart.is_some() {
+        let restart = restart.unwrap();
+        let parts = restart.split(";").collect::<Vec<&str>>();
+        if parts.len() == 2 {
+            restart_dir = Some(parts.get(0).unwrap().to_string());
+            restart_command = Some(parts.get(1).unwrap().to_string());
+        } else {
+            return Err("Invalid restart Command; use [path];[command]".to_string())
+        }
+    }
+
     return Ok(Args {
         input,
-        output
+        output,
+        restart_dir,
+        restart_command
     });
 }
 
@@ -70,5 +90,7 @@ fn get_arg(args: Vec<String>, keys: Vec<&str>) -> Option<String> {
 #[derive(Debug)]
 struct Args {
     input: String,
-    output: String
+    output: String,
+    restart_dir: Option<String>,
+    restart_command: Option<String>
 }

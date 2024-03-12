@@ -29,7 +29,7 @@ pub struct UpdateElement {
 
 pub(crate) fn get_update(path: &str) -> Result<Vec<UpdateChange>, String> {
     let file = Path::new(path);
-    if(!file.is_file()) {
+    if !file.is_file() {
         return Err(format!("Update file not found!: {}", file.to_string_lossy()));
     }
 
