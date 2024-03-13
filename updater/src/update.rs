@@ -27,7 +27,7 @@ pub struct UpdateElement {
     pub replace: Option<bool>
 }
 
-pub(crate) fn get_update(path: &str) -> Result<Vec<UpdateChange>, String> {
+pub fn get_update(path: &str) -> Result<Vec<UpdateChange>, String> {
     let file = Path::new(path);
     if !file.is_file() {
         return Err(format!("Update file not found!: {}", file.to_string_lossy()));
@@ -44,4 +44,16 @@ pub(crate) fn get_update(path: &str) -> Result<Vec<UpdateChange>, String> {
         return Err(format!("Unable to parse update file!\n{}", update.unwrap_err()));
     }
     return Ok(update.unwrap());
+}
+
+pub fn delete_update(path: &str) -> Result<(), String> {
+    println!("Deleting update file...");
+    let file = Path::new(path);
+    if file.is_file() {
+        let delete = fs::remove_file(file);
+        if delete.is_err() {
+            return Err(format!("Unable to delete update file!: {}", file.to_string_lossy()));
+        }
+    }
+    return Ok(());
 }

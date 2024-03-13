@@ -8,7 +8,7 @@ pub struct UpdaterStatus {
     pub exceptions: Option<Vec<String>>
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum Status {
     UPDATING,
     SUCCESS,

@@ -34,7 +34,11 @@ fn main() {
     let update = update.unwrap();
 
     let final_status = updater::execute_update(update);
-    status::write_status(args.output.clone(), final_status).expect("Unable to write status!");
+    status::write_status(args.output.clone(), final_status.clone()).expect("Unable to write status!");
+
+    if final_status.status == status::Status::SUCCESS || final_status.status == status::Status::WARNING {
+        update::delete_update(args.input.as_str()).expect("Unable to delete update file!");
+    }
 
     if args.restart_dir.is_some() && args.restart_command.is_some() {
         println!("Restarting...");

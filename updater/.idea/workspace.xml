@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="ALL" />
   </component>
@@ -7,7 +10,16 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Implemented Updater Logic" />
+    <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Implemented Updater Logic">
+      <change beforePath="$PROJECT_DIR$/../client/composeApp/resources/common/updater.cjar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/backend/update/LauncherUpdater.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/backend/update/LauncherUpdater.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/util/UpdateUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/util/UpdateUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/composeApp/src/desktopMain/kotlin/net/treset/treelauncher/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/src/desktopMain/kotlin/net/treset/treelauncher/main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/status.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/status.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/update.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/update.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,6 +49,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Cargo.Build `Run`.executor": "Run",
+    "Cargo.Build.executor": "Run",
     "Cargo.Run.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -66,7 +79,24 @@
       <recent name="D:\Hannes\Coding\gits\treelauncher\updater\target\debug" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Cargo.Run">
+    <configuration name="Build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
+      <option name="command" value="build --release" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package updater --bin updater --  -iD:/Hannes/Coding/gits/treelauncher/updater/update.json -oD:/Hannes/Coding/gits/treelauncher/updater/result.json -rC:/Users/hanne/AppData/Local/TreeLauncher;$USER_HOME$/AppData/Local/TreeLauncher/TreeLauncher.exe" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -84,6 +114,10 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Cargo.Run" />
+      <item itemvalue="Cargo.Build" />
+    </list>
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
@@ -101,7 +135,8 @@
       <workItem from="1710257498577" duration="2207000" />
       <workItem from="1710259726432" duration="60000" />
       <workItem from="1710260782251" duration="1933000" />
-      <workItem from="1710269608016" duration="8991000" />
+      <workItem from="1710269608016" duration="9019000" />
+      <workItem from="1710330031086" duration="1186000" />
     </task>
     <task id="LOCAL-00001" summary="Changed Updater to Rust Project">
       <option name="closed" value="true" />
@@ -143,7 +178,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710278649016</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Implemented Updater Logic">
+      <option name="closed" value="true" />
+      <created>1710278673101</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1710278673101</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
