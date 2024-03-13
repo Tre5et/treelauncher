@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
+import { VersionContent } from "./version-card";
 
 export function VersionPage({
     params: { locale }
@@ -33,21 +34,7 @@ export function VersionPage({
                     if(index == firstReleaseIndex) {
                         return (
                             <div key={release.name} className="bg-secondary rounded-2xl w-full max-w-2xl p-4">
-                                <div className="flex flex-row text-2xl text-center mb-1 justify-center items-center gap-1">
-                                    {{"de": "Neueste Vollversion:"}[locale] || "Latest Release:"} {release.name} 
-                                    <a href={release.html_url} target="_blank" className="material-symbols-rounded text-xl" style={{ transform: 'translateY(0.0625rem)' }}>open_in_new</a>
-                                </div>
-                                <div className="flex flex-row gap-x-8 gap-y-1 justify-center items-center flex-wrap">
-                                    {release.assets.map((asset) => {
-                                        if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                            return (<p key={asset.name}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
-                                        }
-                                        if(asset.name.endsWith(".zip")) {
-                                            return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
-                                        }
-                                        return ""
-                                    })}
-                                </div>
+                                <VersionContent release={release} locale={locale} current/>
                             </div>
                         )
                     }
@@ -77,21 +64,7 @@ export function VersionPage({
                                 return (
                                     <div key={index.toString()}>
                                         <hr className="border-accent my-2"/>
-                                        <div className="flex flex-row items-center justify-center gap-1 text-xl text-center">
-                                            {release.prerelease && {"de": "Pre-Release:"}[locale] || "Pre-Release:"} {release.name} 
-                                            <a href={release.html_url} target="_blank" className="material-symbols-rounded text-lg" style={{ transform: 'translateY(0.125rem)' }}>open_in_new</a>
-                                        </div>
-                                        <div className="flex flex-row gap-x-8 gap-y-1 flex-wrap justify-center items-center">
-                                            {release.assets.map((asset) => {
-                                                if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                                    return (<p key={asset.name}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
-                                                }
-                                                if(asset.name.endsWith(".zip")) {
-                                                    return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
-                                                }
-                                                return ""
-                                            })}
-                                        </div>
+                                        <VersionContent release={release} locale={locale}/>
                                     </div>
                                 )
                             }
@@ -105,7 +78,7 @@ export function VersionPage({
     )
 }
 
-interface Release {
+export interface Release {
     name: string
     body: string
     prerelease?: boolean
@@ -113,7 +86,7 @@ interface Release {
     assets: Asset[]
 }
 
-interface Asset {
+export interface Asset {
     url: string
     name: string
     browser_download_url: string
