@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.times
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -43,6 +44,8 @@ fun <T> FileImport(
     allowFilePicker: Boolean = true,
     allowDirectoryPicker: Boolean = false,
     fileExtensions: List<String> = listOf(),
+    filesToAdd: List<LauncherFile> = emptyList(),
+    clearFilesToAdd: () -> Unit = {},
     close: () -> Unit
 ) {
     var tfFile by remember(component) { mutableStateOf("") }
@@ -60,6 +63,50 @@ fun <T> FileImport(
             .filter {
                 it != component
             }
+    }
+
+    LaunchedEffect(filesToAdd) {
+        var interactingWithPopup = false
+        for (file in filesToAdd) {
+            while(interactingWithPopup) {
+                delay(100)
+            }
+            file.toFile()?.let {
+                selectedFiles += Pair(it, file)
+                tfFile = ""
+            } ?: run {
+                interactingWithPopup = true
+                popupContent = PopupData(
+                    type = PopupType.WARNING,
+                    titleRow = { Text(stringPackage.unknownTitle(file)) },
+                    content = {
+                        Text(stringPackage.unknownMessage(file))
+                    },
+                    buttonRow = {
+                        Button(
+                            onClick = {
+                                interactingWithPopup = false
+                                popupContent = null
+                            },
+                            color = MaterialTheme.colorScheme.error
+                        ) {
+                            Text(stringPackage.unknownCancel())
+                        }
+                        Button(
+                            onClick = {
+                                selectedFiles += Pair(null, file)
+                                tfFile = ""
+                                interactingWithPopup = false
+                                popupContent = null
+                            }
+                        ) {
+                            Text(stringPackage.unknownConfirm())
+                        }
+                    }
+                )
+            }
+        }
+        clearFilesToAdd()
     }
 
     Column(
@@ -234,7 +281,7 @@ fun <T> FileImport(
                         } ?: run {
                             popupContent = PopupData(
                                 type = PopupType.WARNING,
-                                titleRow = { Text(stringPackage.unknownTitle()) },
+                                titleRow = { Text(stringPackage.unknownTitle(file)) },
                                 content = {
                                     Text(stringPackage.unknownMessage(file))
                                 },

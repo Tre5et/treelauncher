@@ -263,7 +263,7 @@ class DeStrings : Strings(
                 tooltipFile = { "Ressourcenpaket auswählen" },
                 unknownCancel = { "Abbrechen" },
                 unknownConfirm = { "Ressourcenpaket importieren" },
-                unknownMessage = { "Diese Datei hat kein dem Launcher bekanntes Ressourcenpaketformat.\nDas Ressourcenpaket trotzdem importieren?" },
+                unknownMessage = { file -> "Die Datei \"${file.name}\" hat kein dem Launcher bekanntes Ressourcenpaketformat.\nDas Ressourcenpaket trotzdem importieren?" },
                 unknownTitle = { "Unbekanntes Ressourcenpaketformat" }
 
             ),
@@ -286,7 +286,7 @@ class DeStrings : Strings(
                 tooltipFile = { "Weltendatei auswählen" },
                 unknownCancel = { "Abbrechen" },
                 unknownConfirm = { "Welt importieren" },
-                unknownMessage = { "Dieser Ordner hat kein dem Launcher bekanntes Weltenformat.\nDie Welt trotzdem importieren?" },
+                unknownMessage = { file -> "Die Datei \"${file.name}\" hat kein dem Launcher bekanntes Weltenformat.\nDie Welt trotzdem importieren?" },
                 unknownTitle = { "Unbekanntes Weltenformat" }
             ),
             tooltipAdd = { "Welt hinzufügen" },

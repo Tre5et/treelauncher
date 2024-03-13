@@ -8,6 +8,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.DragData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
@@ -35,6 +37,7 @@ data class SortContext(
     val setReverse: (Boolean) -> Unit
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T, C:CreationState<T>> Components(
     title: String,
@@ -62,6 +65,7 @@ fun <T, C:CreationState<T>> Components(
         redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_->},
+    detailsOnDrop: ((DragData) -> Unit)? = null,
     detailsScrollable: Boolean = true,
     settingsDefault: Boolean = false,
     sortContext: SortContext? = null
@@ -238,36 +242,51 @@ fun <T, C:CreationState<T>> Components(
                 modifier = Modifier.padding(12.dp),
                 scrollable = false
             ) {
+                val columnContent = @Composable {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f, false)
+                                .let {mod ->
+                                    if(detailsScrollable) {
+                                        mod.verticalScroll(rememberScrollState())
+                                    } else {
+                                        mod
+                                    }
+                                },
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            detailsContent(
+                                it,
+                                redrawSelected,
+                                reload
+                            )
+                        }
+
+                        SelectorButton(
+                            title = strings().manager.component.settings(),
+                            icon = icons().settings,
+                            selected = showSettings,
+                            onClick = { showSettings = true }
+                        )
+                    }
+                }
+
                 if(showSettings) {
                     ComponentSettings(
                         it.getManifest(),
                     )
                 } else {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f, false)
-                            .let {mod ->
-                                if(detailsScrollable) {
-                                    mod.verticalScroll(rememberScrollState())
-                                } else {
-                                    mod
-                                }
-                            },
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        detailsContent(
-                            it,
-                            redrawSelected,
-                            reload
-                        )
-                    }
-
-                    SelectorButton(
-                        title = strings().manager.component.settings(),
-                        icon = icons().settings,
-                        selected = showSettings,
-                        onClick = { showSettings = true }
-                    )
+                    detailsOnDrop?.let {
+                        DroppableArea(
+                            onDrop = it,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            columnContent()
+                        }
+                    } ?: columnContent()
                 }
             }
 
@@ -357,6 +376,7 @@ fun <T, C:CreationState<T>> Components(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Components(
     title: String,
@@ -382,6 +402,7 @@ fun Components(
         redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_->},
+    detailsOnDrop: ((DragData) -> Unit)? = null,
     detailsScrollable: Boolean = false,
     settingsDefault: Boolean = false,
     sortContext: SortContext? = null
@@ -404,6 +425,7 @@ fun Components(
     actionBarSpecial,
     actionBarBoxContent,
     detailsContent,
+    detailsOnDrop,
     detailsScrollable,
     settingsDefault,
     sortContext

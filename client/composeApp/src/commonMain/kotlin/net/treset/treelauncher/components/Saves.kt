@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.DragData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
@@ -28,7 +30,9 @@ import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.launchGame
 import java.io.IOException
+import java.net.URI
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Saves() {
     var components by remember { mutableStateOf(AppContext.files.savesComponents.sortedBy { it.name }) }
@@ -46,6 +50,13 @@ fun Saves() {
     var quickPlayData: QuickPlayData? by remember(selected) { mutableStateOf(null) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
+    var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
+
+    LaunchedEffect(showAdd) {
+        if(!showAdd) {
+            filesToAdd = emptyList()
+        }
+    }
 
     val reloadSaves = {
         selected?.let {
@@ -138,7 +149,9 @@ fun Saves() {
                     icons().saves,
                     strings().manager.saves.import,
                     allowFilePicker = false,
-                    allowDirectoryPicker = true
+                    allowDirectoryPicker = true,
+                    filesToAdd = filesToAdd,
+                    clearFilesToAdd = { filesToAdd = emptyList() }
                 ) {
                     showAdd = false
                     reloadSaves()
@@ -156,7 +169,7 @@ fun Saves() {
                             onDelete = {
                                 try {
                                     it.second.remove()
-                                    if(selectedSave == it.first) {
+                                    if (selectedSave == it.first) {
                                         selectedSave = null
                                     }
                                     reloadSaves()
@@ -283,6 +296,12 @@ fun Saves() {
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
                 }
+            }
+        },
+        detailsOnDrop = {
+            if(it is DragData.FilesList) {
+                filesToAdd = it.readFiles().map { LauncherFile.of(URI(it).path) }
+                showAdd = true
             }
         },
         detailsScrollable = true,

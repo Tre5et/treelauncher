@@ -7,6 +7,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
@@ -39,6 +40,7 @@ data class ModContext(
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Mods() {
     var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.first.name }) }

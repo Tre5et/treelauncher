@@ -1,6 +1,7 @@
 package net.treset.treelauncher.components
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.appSettings
@@ -9,6 +10,7 @@ import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.localization.strings
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Options() {
     var components by remember { mutableStateOf(AppContext.files.optionsComponents.sortedBy { it.name }) }

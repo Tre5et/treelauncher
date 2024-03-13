@@ -265,7 +265,7 @@ open class Strings(
                 val unknownCancel: () -> String,
                 val unknownConfirm: () -> String,
                 val unknownMessage: (file: LauncherFile) -> String,
-                val unknownTitle: () -> String
+                val unknownTitle: (file: LauncherFile) -> String
             )
         }
 

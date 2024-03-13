@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.DragData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
@@ -20,7 +22,9 @@ import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import java.io.IOException
+import java.net.URI
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Resourcepacks() {
     var components by remember { mutableStateOf(AppContext.files.resourcepackComponents.sortedBy { it.name }) }
@@ -30,6 +34,7 @@ fun Resourcepacks() {
     var selected: LauncherManifest? by remember { mutableStateOf(null) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
+    var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
 
     val reloadResourcepacks = {
         selected?.let { current ->
@@ -45,6 +50,12 @@ fun Resourcepacks() {
                         }
                     }?.let { it to file }
                 }
+        }
+    }
+
+    LaunchedEffect(showAdd) {
+        if(!showAdd) {
+            filesToAdd = emptyList()
         }
     }
 
@@ -108,7 +119,9 @@ fun Resourcepacks() {
                     icons().resourcePacks,
                     strings().manager.resourcepacks.import,
                     fileExtensions = listOf("zip"),
-                    allowDirectoryPicker = true
+                    allowDirectoryPicker = true,
+                    filesToAdd = filesToAdd,
+                    clearFilesToAdd = { filesToAdd = emptyList() }
                 ) {
                     showAdd = false
                     reloadResourcepacks()
@@ -157,6 +170,12 @@ fun Resourcepacks() {
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
                 }
+            }
+        },
+        detailsOnDrop = {
+            if(it is DragData.FilesList) {
+                filesToAdd = it.readFiles().map { LauncherFile.of(URI(it).path) }
+                showAdd = true
             }
         },
         detailsScrollable = true,
