@@ -17,7 +17,7 @@ class GlobalConfigLoader {
 
             val path = "${System.getenv("LOCALAPPDATA")}/treelauncher-data" + if(System.getenv("debug") == "true") "-debug" else ""
             file.write(
-                "path=$path${System.lineSeparator()}update_url=http://update.treelauncher.net:8732"
+                "path=$path${System.lineSeparator()}update_url=https://update.treelauncher.net"
             )
         }
         val contents: String = file.readString()
