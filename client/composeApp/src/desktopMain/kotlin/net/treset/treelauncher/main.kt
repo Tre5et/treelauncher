@@ -154,10 +154,9 @@ fun main() = application {
 }
 
 actual fun getUpdaterFile(): File {
-    val devFile = File("resources/common/updater.jar")
+    val devFile = File("resources/windows/updater.exe")
     if(devFile.isFile) {
         return devFile
     }
-    //Weird file extension to prevent automatic addition to classpath by jpackage
-    return File("app/resources/updater.cjar")
+    return File("app/resources/updater")
 }

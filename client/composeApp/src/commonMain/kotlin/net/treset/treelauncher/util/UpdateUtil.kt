@@ -161,8 +161,14 @@ fun checkUpdateOnStart(
         status.exceptions?.let { exs ->
             LOGGER.warn { "Exceptions occurred during update: " + status.message }
             exs.forEach {
-                LOGGER.warn(IOException(it)) {}
+                LOGGER.warn { it }
             }
+        }
+
+        try {
+            updateFile.delete()
+        } catch (e: IOException) {
+            LOGGER.warn(e) { "Failed to delete update file" }
         }
 
         setPopup(PopupData(

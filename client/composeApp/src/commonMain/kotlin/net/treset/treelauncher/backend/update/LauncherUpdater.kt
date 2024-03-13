@@ -2,9 +2,11 @@ package net.treset.treelauncher.backend.update
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.JsonUtils
+import net.treset.mc_version_loader.util.OsUtil
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.getUpdaterFile
 import java.io.IOException
+import java.nio.file.Paths
 
 class LauncherUpdater {
     private val updateService: UpdateService = UpdateService()
@@ -136,29 +138,31 @@ class LauncherUpdater {
             return
         }
         LOGGER.info { "Starting updater..." }
-        val pb = ProcessBuilder(
-            LauncherFile.of(System.getProperty("java.home"), "bin", "java").path,
-            "-jar",
-            getUpdaterFile().path
-        )
+        val path = Paths.get("").toAbsolutePath()
+        val commandBuilder = StringBuilder()
+        commandBuilder.append(getUpdaterFile().absolutePath)
+        commandBuilder.append(" -i").append(path).append("/update.json")
+        commandBuilder.append(" -o").append(path).append("/updater.json")
         if (restart) {
-            pb.command().add("-gui")
             if (LauncherFile("TreeLauncher.exe").isFile()) {
                 LOGGER.info { "Restarting TreeLauncher.exe after update" }
-                pb.command().add("-rTreeLauncher.exe")
+                commandBuilder.append(" -r${path};${path}/TreeLauncher.exe")
             } else {
                 LOGGER.warn { "TreeLauncher.exe not found to restart, searching alternative file..." }
                 val files: Array<LauncherFile> = LauncherFile(".").listFiles()
                 for (file in files) {
                     if (file.getName().endsWith(".exe")) {
                         LOGGER.info { "Restarting alternative file ${file.getName()} after update" }
-                        pb.command().add("-r" + file.getName())
+                        commandBuilder.append(" -r${path};${path}/${file.getName()}")
                         break
                     }
                 }
             }
         }
-        pb.start()
+        if(OsUtil.isOsName("windows")) {
+            val pb = ProcessBuilder("cmd.exe", "/c", "start", "cmd", "/c", commandBuilder.toString())
+            pb.start()
+        }
     }
 
     companion object {
