@@ -2,6 +2,8 @@
 
 A modern, component based Minecraft Launcher.
 
+### Visit [the official Website](https://treelauncher.net) for more information.
+
 ## Features
 - Component System
   - Instances are made up of components that can be reused across different instances
@@ -12,9 +14,9 @@ A modern, component based Minecraft Launcher.
     - Mods
 - Instance creation and management
   - Create, delete, and edit instances
-  - Support for Vanilla, Fabric and Forge
+  - Support for Vanilla, Fabric, Forge and Quilt
   - Smart version management so that the same version isn't installed multiple times
-- Support for fabric and forge Mods
+- Support for fabric, forge and quilt Mods
   - Searching mods from [Modrinth](https://modrinth.com/) and [CurseForge](https://www.curseforge.com/)
   - Automatic installation and updates
   - Automatic dependency resolution
@@ -30,4 +32,4 @@ When creating a component, you can also easily inherit the configuration from an
 ## Setup
 - Download the latest `TreeLauncher-xxx.msi` file from [releases](https://github.com/Tre5et/treelauncher/releases) and install it
   - Windows might warn you about the installer because I'm not smart enough to sign it properly. Decide for your self whether you want to click `More info` and `Run anyway` ;)
-- Alternatively, download the latest `TreeLauncher-xxx.zip` file from [releases](https://github.com/Tre5et/treelauncher/releases), extract it and run the `.ext` file.
+- Alternatively, download the latest `TreeLauncher-xxx.zip` file from [releases](https://github.com/Tre5et/treelauncher/releases), extract it and run the `.exe` file.
