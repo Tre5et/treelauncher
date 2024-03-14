@@ -30,7 +30,7 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     fun isChildOf(parent: File): Boolean {
-        return parent.isDirectory() && absolutePath.startsWith(parent.absolutePath)
+        return parent.isDirectory() && toPath().startsWith(parent.toPath())
     }
 
     @Throws(IOException::class)

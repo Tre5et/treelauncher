@@ -274,7 +274,7 @@ fun Settings() {
                     },
                 )
 
-                var cbState by remember { mutableStateOf(true) }
+                var cbState by remember { mutableStateOf(false) }
                 TitledCheckBox(
                     title = strings().settings.path.remove(),
                     checked = cbState,

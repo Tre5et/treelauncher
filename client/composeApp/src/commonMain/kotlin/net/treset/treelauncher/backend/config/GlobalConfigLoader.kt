@@ -49,7 +49,10 @@ class GlobalConfigLoader {
             throw IOException("Path is not a directory")
         }
         if (appConfig().baseDir.isChildOf(dstDir)) {
-            throw IOException("Path is a child of the current directory")
+            throw IOException("Current Directory is child of Selected Directory")
+        }
+        if (dstDir.isChildOf(appConfig().baseDir)) {
+            throw IOException("Selected Directory is child of Current Directory")
         }
         val contents: String = file.readString()
         val lines = contents.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -57,7 +60,6 @@ class GlobalConfigLoader {
         for (line in lines) {
             if (line.startsWith("path=")) {
                 newContents.append("path=").append(dstDir.absolutePath).append("/").append("\n")
-                break
             } else {
                 newContents.append(line).append("\n")
             }
