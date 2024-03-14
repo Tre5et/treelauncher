@@ -294,6 +294,7 @@ class DeStrings : Strings(
     ),
     nav = Nav(
         add = { "Instanz erstellen" },
+        gameRunning = { instance -> "Aktuell läuft: ${instance.instance.first.name}" },
         home = { "Instanzen" },
         mods = { "Mods Komponenten" },
         options = { "Optionskomponenten" },
@@ -344,6 +345,8 @@ class DeStrings : Strings(
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},
                 errorTitle ={ "Spielstart fehlgeschlagen!" },
+                exitingMessage = { "Das Spiel wird geschlossen." },
+                exitingTitle = { "Spielressourcen werden aufgeräumt..." },
                 preparingMessage = { "Das Spiel starten in Kürze." },
                 preparingTitle ={ "Spielressourcen werden vorbereitet..." },
                 runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },

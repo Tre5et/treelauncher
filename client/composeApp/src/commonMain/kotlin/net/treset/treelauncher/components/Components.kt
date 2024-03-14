@@ -45,6 +45,7 @@ fun <T, C:CreationState<T>> Components(
     componentManifest: LauncherManifest,
     checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
     getManifest: T.() -> LauncherManifest,
+    isEnabled: T.() -> Boolean = {true},
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
     createContent: @Composable ColumnScope.(onCreate: (C) -> Unit) -> Unit,
@@ -145,6 +146,7 @@ fun <T, C:CreationState<T>> Components(
                         ComponentButton(
                             component = component.getManifest(),
                             selected = component == selected,
+                            enabled = component.isEnabled(),
                             onClick = {
                                 creatorSelected = false
                                 selected = if(component == selected) {
@@ -383,6 +385,7 @@ fun Components(
     componentManifest: LauncherManifest,
     components: List<LauncherManifest>,
     checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
+    isEnabled: LauncherManifest.() -> Boolean = {true},
     getCreator: (CreationState<LauncherManifest>) -> GenericComponentCreator?,
     reload: () -> Unit,
     actionBarSpecial: @Composable RowScope.(
@@ -412,6 +415,7 @@ fun Components(
     componentManifest,
     checkHasComponent,
     { this },
+    isEnabled,
     getCreator,
     reload,
     { onCreate ->

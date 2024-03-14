@@ -200,15 +200,12 @@ class InstanceData(
 
         @Throws(FileLoadException::class)
         private fun getSavesComponent(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): LauncherManifest {
-            var savesComponent: LauncherManifest? = null
             for (s in files.savesComponents) {
                 if (s.id == instance.second.savesComponent) {
-                    savesComponent = s
-                    break
+                    return s
                 }
             }
-            savesComponent ?: throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.second.savesComponent)
-            return savesComponent
+            throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.second.savesComponent)
         }
 
         @Throws(FileLoadException::class)

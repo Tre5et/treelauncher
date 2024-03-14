@@ -45,8 +45,6 @@ fun Saves() {
     var selectedSave: Save? by remember(selected) { mutableStateOf(null) }
     var selectedServer: Server? by remember(selected) { mutableStateOf(null) }
 
-    var popupData: PopupData? by remember { mutableStateOf(null) }
-
     var quickPlayData: QuickPlayData? by remember(selected) { mutableStateOf(null) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
@@ -212,31 +210,28 @@ fun Saves() {
                 PlayPopup(
                     component = current,
                     quickPlayData = it,
-                    onClose = { quickPlayData = null },
-                    onConfirm = { playData, instance ->
-                        val instanceData = try {
-                            InstanceData.of(instance, AppContext.files)
-                        } catch (e: FileLoadException) {
-                            app().severeError(e)
-                            return@PlayPopup
-                        }
-
-                        val launcher = GameLauncher(
-                            instanceData,
-                            AppContext.files,
-                            LoginContext.userAuth.minecraftUser!!,
-                            playData
-                        )
-
-                        quickPlayData = null
-
-                        launchGame(
-                            launcher,
-                            { pd -> popupData = pd },
-                            { }
-                        )
+                    onClose = { quickPlayData = null }
+                ) { playData, instance ->
+                    val instanceData = try {
+                        InstanceData.of(instance, AppContext.files)
+                    } catch (e: FileLoadException) {
+                        app().severeError(e)
+                        return@PlayPopup
                     }
-                )
+
+                    val launcher = GameLauncher(
+                        instanceData,
+                        AppContext.files,
+                        LoginContext.userAuth.minecraftUser!!,
+                        playData
+                    )
+
+                    quickPlayData = null
+
+                    launchGame(
+                        launcher
+                    ) { }
+                }
             }
         },
         actionBarSpecial = { _, settingsShown, _, _ ->
@@ -312,10 +307,6 @@ fun Saves() {
             setReverse = { appSettings().isSavesComponentSortReverse = it }
         )
     )
-
-    popupData?.let {
-        PopupOverlay(it)
-    }
 }
 
 @Composable

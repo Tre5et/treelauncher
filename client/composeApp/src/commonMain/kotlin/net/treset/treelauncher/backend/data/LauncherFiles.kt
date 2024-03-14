@@ -160,10 +160,16 @@ class LauncherFiles {
             LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
             LauncherManifestType.MODS_COMPONENT,
             LauncherModsDetails::fromJson,
+            {
+                it.types = types
+                it.versions = versions
+                it.mods = mods
+            },
             LauncherFile.ofData(
                 _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration"),
                 "mods"
-            )
+            ),
+            _modsComponents?: emptyArray()
         )
     }
 
@@ -185,7 +191,8 @@ class LauncherFiles {
             LauncherFile.ofData(
                 _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration"),
                 "saves"
-            )
+            ),
+            _savesComponents?: emptyArray()
         )
     }
 
@@ -204,7 +211,20 @@ class LauncherFiles {
             LauncherFile.ofData(_launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance components: invalid configuration")),
             LauncherManifestType.INSTANCE_COMPONENT,
             { LauncherInstanceDetails.fromJson(it) },
-            null
+            {
+                it.features = features
+                it.ignoredFiles = ignoredFiles
+                it.jvmArguments = jvmArguments
+                it.lastPlayed = lastPlayed
+                it.totalTime = totalTime
+                it.modsComponent = modsComponent
+                it.optionsComponent = optionsComponent
+                it.resourcepacksComponent = resourcepacksComponent
+                it.savesComponent = savesComponent
+                it.versionComponent = versionComponent
+            },
+            null,
+            _instanceComponents?: emptyArray()
         )
     }
 
@@ -223,7 +243,8 @@ class LauncherFiles {
             _javaManifest?: throw FileLoadException("Unable to load java components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java components: invalid configuration")),
             LauncherManifestType.JAVA_COMPONENT,
-            null
+            null,
+            _javaComponents?: emptyArray()
         )
     }
 
@@ -241,7 +262,8 @@ class LauncherFiles {
             _optionsManifest?: throw FileLoadException("Unable to load options components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options components: invalid configuration")),
             LauncherManifestType.OPTIONS_COMPONENT,
-            null
+            null,
+            _optionsComponents?: emptyArray()
         )
     }
 
@@ -259,7 +281,8 @@ class LauncherFiles {
             _resourcepackManifest?: throw FileLoadException("Unable to load resourcepack components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.resourcepacksDir?: throw FileLoadException("Unable to load resourcepack components: invalid configuration")),
             LauncherManifestType.RESOURCEPACKS_COMPONENT,
-            null
+            null,
+            _resourcepackComponents?: emptyArray()
         )
     }
     @Throws(FileLoadException::class)
@@ -277,7 +300,22 @@ class LauncherFiles {
             LauncherFile.ofData(_launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version components: invalid configuration")),
             LauncherManifestType.VERSION_COMPONENT,
             { LauncherVersionDetails.fromJson(it, LauncherVersionDetails::class.java) },
-            null
+            {
+                it.versionNumber = versionNumber
+                it.versionType = versionType
+                it.loaderVersion = loaderVersion
+                it.assets = assets
+                it.depends = depends
+                it.gameArguments = gameArguments
+                it.jvmArguments = jvmArguments
+                it.java = java
+                it.libraries = libraries
+                it.mainClass = mainClass
+                it.mainFile = mainFile
+                it.versionId = versionId
+            },
+            null,
+            _versionComponents?: emptyArray()
         )
     }
 
@@ -311,14 +349,16 @@ class LauncherFiles {
         parentManifest: LauncherManifest,
         parentPath: LauncherFile,
         expectedType: LauncherManifestType,
-        fallbackPath: LauncherFile?
+        fallbackPath: LauncherFile?,
+        currentComponents: Array<LauncherManifest>
     ): Array<LauncherManifest> {
         return reloadComponents(
             parentManifest,
             parentPath,
             appConfig().manifestFileName,
             expectedType,
-            fallbackPath
+            fallbackPath,
+            currentComponents
         )
     }
 
@@ -328,12 +368,13 @@ class LauncherFiles {
         parentPath: LauncherFile,
         filename: String,
         expectedType: LauncherManifestType,
-        fallbackPath: LauncherFile?
+        fallbackPath: LauncherFile?,
+        currentComponents: Array<LauncherManifest>
     ): Array<LauncherManifest> {
         val out: MutableList<LauncherManifest> = mutableListOf()
         for (c in parentManifest.components) {
             try {
-                addComponent(
+                val manifest = getComponent(
                     out,
                     LauncherFile.of(parentPath, "${parentManifest.prefix}_$c"),
                     filename,
@@ -341,6 +382,17 @@ class LauncherFiles {
                     c,
                     fallbackPath
                 )
+                currentComponents.filter { it.id == manifest.id }.firstOrNull() ?.let {
+                    it.name = manifest.name
+                    it.directory = manifest.directory
+                    it.details = manifest.details
+                    it.prefix = manifest.prefix
+                    it.lastUsed = manifest.lastUsed
+                    it.includedFiles = manifest.includedFiles
+                    it.components = manifest.components
+                    it.typeConversion = manifest.typeConversion
+                    out.add(it)
+                } ?: out.add(manifest)
             } catch (e: FileLoadException) {
                 throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} components: component error: id=$c")
             }
@@ -350,21 +402,20 @@ class LauncherFiles {
     }
 
     @Throws(FileLoadException::class)
-    private fun addComponent(
+    private fun getComponent(
         list: MutableList<LauncherManifest>,
         path: LauncherFile,
         filename: String,
         expectedType: LauncherManifestType,
         expectedId: String,
         fallbackPath: LauncherFile?
-    ) {
+    ): LauncherManifest {
         val manifestFile: String = try {
             LauncherFile.of(path, filename).readString()
         } catch (e: IOException) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId", e)
             LOGGER.debug { "Falling back to fallback path loading " + expectedType.name.lowercase(Locale.getDefault()) + " component: file error: id=" + expectedId }
-            addComponent(list, fallbackPath, filename, expectedType, expectedId, null)
-            return
+            return getComponent(list, fallbackPath, filename, expectedType, expectedId, null)
         }
         val manifest: LauncherManifest = try {
             LauncherManifest.fromJson(manifestFile, _launcherDetails?.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
@@ -374,11 +425,10 @@ class LauncherFiles {
         if (manifest.type == null || manifest.type != expectedType || manifest.id == null || manifest.id != expectedId) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: incorrect contents: id=$expectedId")
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, expectedId, null)
-            return
+            return getComponent(list, fallbackPath, filename, expectedType, expectedId, null)
         }
         manifest.directory = path.absolutePath
-        list.add(manifest)
+        return manifest
     }
 
     @Throws(FileLoadException::class)
@@ -387,7 +437,9 @@ class LauncherFiles {
         parentDir: LauncherFile,
         expectedType: LauncherManifestType,
         toType: (String) -> T,
-        fallbackPath: LauncherFile?
+        copyTo: T.(T) -> Unit,
+        fallbackPath: LauncherFile?,
+        currentComponents: Array<Pair<LauncherManifest, T>>
     ): Array<Pair<LauncherManifest, T>> {
         return reloadComponents(
             parentManifest,
@@ -395,7 +447,9 @@ class LauncherFiles {
             appConfig().manifestFileName,
             expectedType,
             toType,
-            fallbackPath
+            copyTo,
+            fallbackPath,
+            currentComponents
         )
     }
 
@@ -406,7 +460,9 @@ class LauncherFiles {
         filename: String,
         expectedType: LauncherManifestType,
         toType: (String) -> T,
-        fallbackPath: LauncherFile?
+        copyTo: T.(T) -> Unit,
+        fallbackPath: LauncherFile?,
+        currentComponents: Array<Pair<LauncherManifest, T>>
     ): Array<Pair<LauncherManifest, T>> {
         if (parentManifest.prefix == null || parentManifest.components == null) {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} components: invalid configuration")
@@ -415,8 +471,7 @@ class LauncherFiles {
         val exceptionQueue: MutableList<FileLoadException> = mutableListOf()
         for (c in parentManifest.components) {
             try {
-                addComponent(
-                    out,
+                val component = getComponent(
                     LauncherFile.of(parentPath, "${parentManifest.prefix}_$c"),
                     filename,
                     expectedType,
@@ -424,6 +479,19 @@ class LauncherFiles {
                     fallbackPath,
                     c
                 )
+                currentComponents.filter { it.first.id == component.first.id }.firstOrNull() ?.let {
+                    it.first.name = component.first.name
+                    it.first.directory = component.first.directory
+                    it.first.details = component.first.details
+                    it.first.prefix = component.first.prefix
+                    it.first.lastUsed = component.first.lastUsed
+                    it.first.includedFiles = component.first.includedFiles
+                    it.first.components = component.first.components
+                    it.first.typeConversion = component.first.typeConversion
+
+                    component.second.copyTo(it.second)
+                    out.add(it)
+                } ?: out.add(component)
             } catch (e: FileLoadException) {
                 exceptionQueue.add(e)
             }
@@ -436,22 +504,20 @@ class LauncherFiles {
     }
 
     @Throws(FileLoadException::class)
-    private fun <T : GenericJsonParsable?> addComponent(
-        list: MutableList<Pair<LauncherManifest, T>>,
+    private fun <T : GenericJsonParsable?> getComponent(
         path: LauncherFile,
         filename: String,
         expectedType: LauncherManifestType,
         toType: (String) -> T,
         fallbackPath: LauncherFile?,
         expectedId: String
-    ) {
+    ): Pair<LauncherManifest, T> {
         val manifestFile: String = try {
             LauncherFile.of(path, filename).readString()
         } catch (e: IOException) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId", e)
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
-            return
+            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
         }
         val manifest: LauncherManifest = try {
             LauncherManifest.fromJson(manifestFile, launcherDetails.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
@@ -461,8 +527,7 @@ class LauncherFiles {
         if (manifest.type == null || manifest.type != expectedType || manifest.id == null || manifest.id != expectedId || manifest.details == null) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: incorrect contents: id=$expectedId")
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
-            return
+            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
         }
 
         manifest.directory = path.absolutePath
@@ -471,8 +536,7 @@ class LauncherFiles {
         } catch (e: IOException) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: file error: id=$expectedId", e)
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
-            return
+            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
         }
 
         val details: T = try {
@@ -483,10 +547,9 @@ class LauncherFiles {
         if (details == null) {
             fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: incorrect contents: id=$expectedId")
             LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            addComponent(list, fallbackPath, filename, expectedType, toType, null, expectedId)
-            return
+            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
         }
-        list.add(Pair(manifest, details))
+        return Pair(manifest, details)
     }
 
     @Throws(FileLoadException::class)

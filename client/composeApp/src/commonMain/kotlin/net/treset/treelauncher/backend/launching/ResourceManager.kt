@@ -111,14 +111,18 @@ class ResourceManager(private var instanceData: InstanceData) {
     private fun renameComponents() {
         LOGGER.debug { "Renaming components: instance=${instanceData.instance.first.id}" }
         try {
-            LauncherFile.of(instanceData.savesComponent.directory).moveTo(LauncherFile.of(instanceData.gameDataDir, "saves"), StandardCopyOption.ATOMIC_MOVE)
+            val savesLocation = LauncherFile.of(instanceData.gameDataDir, "saves")
+            LauncherFile.of(instanceData.savesComponent.directory).moveTo(savesLocation, StandardCopyOption.ATOMIC_MOVE)
+            instanceData.savesComponent.directory = savesLocation.path
         } catch (e: IOException) {
             throw GameResourceException("Unable to rename saves file", e)
         }
         instanceData.savesComponent.directory = LauncherFile.of(instanceData.gameDataDir, "saves").path
         instanceData.modsComponent?.let { modsComponents ->
             try {
-                LauncherFile.of(modsComponents.first.directory).moveTo(LauncherFile.of(instanceData.gameDataDir, "mods"), StandardCopyOption.ATOMIC_MOVE)
+                val modsLocation = LauncherFile.of(instanceData.gameDataDir, "mods")
+                LauncherFile.of(modsComponents.first.directory).moveTo(modsLocation, StandardCopyOption.ATOMIC_MOVE)
+                modsComponents.first.directory = modsLocation.path
             } catch (e: IOException) {
                 throw GameResourceException("Unable to rename mods file", e)
             }
@@ -188,6 +192,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         val newSavesDir = LauncherFile.of(instanceData.gameDataDir, "${instanceData.savesPrefix}_${instanceData.savesComponent.id}")
         try {
             LauncherFile.of(instanceData.savesComponent.directory).moveTo(newSavesDir)
+            instanceData.savesComponent.directory = newSavesDir.path
         } catch (e: IOException) {
             throw GameResourceException("Unable to cleanup launch resources: rename saves file failed", e)
         }
@@ -196,6 +201,7 @@ class ResourceManager(private var instanceData: InstanceData) {
             val newModsDir = LauncherFile.of(instanceData.gameDataDir, "${instanceData.modsPrefix}_${modsComponents.first.id}")
             try {
                 LauncherFile.of(modsComponents.first.directory).moveTo(newModsDir)
+                instanceData.modsComponent?.first?.directory = newModsDir.path
             } catch (e: IOException) {
                 throw GameResourceException("Unable to cleanup launch resources: rename mods file failed", e)
             }

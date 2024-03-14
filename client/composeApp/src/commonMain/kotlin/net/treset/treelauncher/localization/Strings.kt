@@ -405,6 +405,7 @@ open class Strings(
 
     data class Nav(
         val add: () -> String,
+        val gameRunning: (InstanceData) -> String,
         val home: () -> String,
         val mods: () -> String,
         val options: () -> String,
@@ -478,6 +479,8 @@ open class Strings(
             data class Game(
                 val errorMessage: (message: String) -> String,
                 val errorTitle: () -> String,
+                val exitingMessage: () -> String,
+                val exitingTitle: () -> String,
                 val preparingMessage: () -> String,
                 val preparingTitle: () -> String,
                 val runningMessage: () -> String,

@@ -122,6 +122,7 @@ fun Instances() {
                 InstanceButton(
                     instance = it,
                     selected = selectedInstance == it,
+                    enabled = !AppContext.running || AppContext.lastPlayedInstance != it,
                     onClick = { selectedInstance = if(selectedInstance == it) null else it }
                 )
             }
@@ -131,8 +132,10 @@ fun Instances() {
             InstanceDetails(
                 it,
                 redrawSelected,
-                reloadInstances,
-            )
+                reloadInstances
+            ) {
+                selectedInstance = null
+            }
         }
     }
 }

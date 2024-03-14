@@ -21,20 +21,25 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.treelauncher.style.disabledContainer
+import net.treset.treelauncher.style.disabledContent
 
 @Composable
 fun SelectorButton(
     selected: Boolean,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit
 ) {
     val backgroundColor by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.primary
+        if(!enabled) MaterialTheme.colorScheme.secondaryContainer.disabledContainer()
+        else if(selected) MaterialTheme.colorScheme.primary
         else MaterialTheme.colorScheme.secondaryContainer
     )
 
     val contentColor by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.onPrimary
+        if(!enabled) MaterialTheme.colorScheme.onSecondaryContainer.disabledContent()
+        else if (selected) MaterialTheme.colorScheme.onPrimary
         else MaterialTheme.colorScheme.onSecondaryContainer
     )
 
@@ -43,8 +48,8 @@ fun SelectorButton(
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
             .background(backgroundColor)
-            .pointerHoverIcon(PointerIcon.Hand)
-            .clickable { onClick() }
+            .pointerHoverIcon(if(enabled) PointerIcon.Hand else PointerIcon.Default)
+            .clickable(enabled = enabled) { onClick() }
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -62,11 +67,13 @@ fun SelectorButton(
     component: LauncherManifest? = null,
     icon: ImageVector,
     selected: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     SelectorButton(
         selected = selected,
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -99,11 +106,13 @@ fun SelectorButton(
 fun ComponentButton(
     component: LauncherManifest,
     selected: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     SelectorButton(
         selected = selected,
         onClick = onClick,
+        enabled = enabled
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -124,11 +133,13 @@ fun ImageSelectorButton(
     image: ImageBitmap?,
     title: String?,
     subtitle: String? = null,
+    enabled: Boolean = true,
     overlayContent: @Composable BoxScope.() -> Unit = {}
 ) {
     SelectorButton(
         selected = selected,
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier

@@ -17,7 +17,8 @@ class GameLauncher(
     val files: LauncherFiles,
     val minecraftUser: User,
     val quickPlayData: QuickPlayData? = null,
-    var exitCallbacks: Array<(String?) -> Unit> = arrayOf()
+    var onExit: (String?) -> Unit = { _ -> },
+    var onExited: (String?) -> Unit = { _ -> },
 ) {
     private var resourceManager: ResourceManager? = null
     var gameListener: GameListener? = null
@@ -40,12 +41,6 @@ class GameLauncher(
             }
         }
         resourceManager = ResourceManager(instance)
-        files.launcherDetails.activeInstance = instance.instance.first.id
-        try {
-            LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).write(files.launcherDetails)
-        } catch (e: IOException) {
-            throw GameLaunchException("Unable to launch game: unable to write launcher details", e)
-        }
         Thread(Runnable {
             try {
                 resourceManager!!.setLastPlayedTime()
@@ -93,7 +88,7 @@ class GameLauncher(
         try {
             val p = pb.start()
             resourceManager?.let { resourceManager ->
-                GameListener(p, resourceManager, exitCallbacks).let {
+                GameListener(p, this::cleanupResources).let {
                     gameListener = it
                     it.start()
                 }
@@ -147,6 +142,21 @@ class GameLauncher(
         } catch (e: IOException) {
             throw GameLaunchException("Unable to abort launch correctly: failed to write launcher details")
         }
+    }
+
+    @Throws(GameResourceException::class)
+    private fun cleanupResources(playDuration: Long, error: String?) {
+        LOGGER.info { "Cleaning up resources" }
+        onExit(error)
+        try {
+            resourceManager?.addPlayDuration(playDuration)
+        } catch (e: IOException) {
+            LOGGER.error(e) { "Unable to add play duration to statistics: duration=$playDuration" }
+        }
+
+        resourceManager?.cleanupGameFiles()
+
+        onExited(error)
     }
 
     companion object {

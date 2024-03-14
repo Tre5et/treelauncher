@@ -22,11 +22,13 @@ import net.treset.treelauncher.style.icons
 fun InstanceButton(
     instance: InstanceData,
     selected: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     SelectorButton(
         selected = selected,
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally

@@ -1,6 +1,7 @@
 package net.treset.treelauncher.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.exception.GameLaunchException
@@ -13,12 +14,10 @@ import net.treset.treelauncher.localization.strings
 
 fun launchGame(
     launcher: GameLauncher,
-    setPopup: (PopupData?) -> Unit,
     onExit: () -> Unit
 ) {
     GameLaunchHelper(
         launcher,
-        setPopup,
         onExit
     )
 }
@@ -27,12 +26,12 @@ private val LOGGER = KotlinLogging.logger { }
 
 class GameLaunchHelper(
     val launcher: GameLauncher,
-    val setPopup: (PopupData?) -> Unit,
     val onExit: () -> Unit
 ) {
     init {
         onPrep()
-        launcher.exitCallbacks = arrayOf({ onGameExit(it) })
+        launcher.onExit = { onGameExit() }
+        launcher.onExited = this::onGameExited
         try {
             launcher.launch(false) { onLaunchDone(it) }
         } catch(e: GameLaunchException) {
@@ -41,12 +40,13 @@ class GameLaunchHelper(
     }
 
     private fun onPrep() {
-        setPopup(
+        AppContext.setGlobalPopup(
             PopupData(
                 titleRow = { Text(strings().selector.instance.game.preparingTitle()) },
                 content =  { Text(strings().selector.instance.game.preparingMessage()) },
             )
         )
+        AppContext.setLastPlayedInstance(launcher.instance)
     }
 
     private fun onLaunchDone(
@@ -58,24 +58,20 @@ class GameLaunchHelper(
     }
 
     private fun onRunning() {
-        setPopup(
-            PopupData(
-                titleRow = { Text(strings().selector.instance.game.runningTitle()) },
-                content =  { Text(strings().selector.instance.game.runningMessage()) },
-            )
-        )
+        AppContext.setGlobalPopup(null)
+        AppContext.setRunning(true)
     }
 
     private fun onLaunchFailed(
         e: Exception
     ) {
-        setPopup(
+        AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.ERROR,
                 titleRow = { Text(strings().selector.instance.game.errorTitle()) },
                 content =  { Text(strings().selector.instance.game.errorMessage(e.toString())) },
                 buttonRow = { Button(
-                    onClick = { setPopup(null) },
+                    onClick = { AppContext.setGlobalPopup(null) },
                     content = { Text(strings().selector.instance.game.crashClose()) }
                 ) }
             )
@@ -84,14 +80,24 @@ class GameLaunchHelper(
         onExit()
     }
 
-    private fun onGameExit(
+    private fun onGameExit() {
+        AppContext.setGlobalPopup(
+            PopupData(
+                titleRow = { Text(strings().selector.instance.game.exitingTitle()) },
+                content =  { Text(strings().selector.instance.game.exitingMessage()) },
+            )
+        )
+        AppContext.setRunning(false)
+    }
+
+    private fun onGameExited(
         error: String?
     ) {
         error?.let {
             onCrash(it)
             return
         }
-        setPopup(null)
+        AppContext.setGlobalPopup(null)
         LOGGER.info { "Game exited normally!" }
         onExit()
     }
@@ -99,14 +105,14 @@ class GameLaunchHelper(
     private fun onCrash(
         error: String
     ) {
-        setPopup(
+        AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.WARNING,
                 titleRow = { Text(strings().selector.instance.game.crashTitle()) },
                 content =  { Text(strings().selector.instance.game.crashMessage(error)) },
                 buttonRow = {
                     Button(
-                        onClick = { setPopup(null) },
+                        onClick = { AppContext.setGlobalPopup(null) },
                         content = { Text(strings().selector.instance.game.crashClose()) }
                     )
                     Button(

@@ -25,6 +25,7 @@ fun InstanceDetails(
     instance: InstanceData,
     redrawSelected: () -> Unit,
     reloadInstances: () -> Unit,
+    unselectInstance: () -> Unit
 ) {
     var selectedDetails: InstanceDetails? by remember { mutableStateOf(null) }
 
@@ -47,20 +48,20 @@ fun InstanceDetails(
                 ) {
                     IconButton(
                         onClick = {
+                            unselectInstance()
                             val launcher = GameLauncher(
                                 instance,
                                 AppContext.files,
                                 LoginContext.userAuth.minecraftUser!!
                             )
                             launchGame(
-                                launcher,
-                                { popupContent = it },
-                                { redrawSelected() }
-                            )
+                                launcher
+                            ) { redrawSelected() }
                         },
                         painter = icons().play,
                         size = 32.dp,
                         highlighted = true,
+                        enabled = !AppContext.running,
                         tooltip = strings().selector.instance.play()
                     )
                     Text(instance.instance.first.name)

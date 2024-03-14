@@ -37,6 +37,10 @@ data class LoginContextData(
 
 lateinit var LoginContext: LoginContextData
 
+val LocalLoginContext = staticCompositionLocalOf<LoginContextData> {
+    error("No LoginState provided")
+}
+
 @Composable
 fun LoginScreen(
     content: @Composable () -> Unit
@@ -86,8 +90,13 @@ fun LoginScreen(
         }
     }
 
+
     if(showContent) {
-        content()
+        CompositionLocalProvider(
+            LocalLoginContext provides LoginContext
+        ) {
+            content()
+        }
         return
     }
 

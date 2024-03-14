@@ -1,5 +1,8 @@
 package net.treset.treelauncher.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.FilterQuality
@@ -20,9 +24,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
@@ -46,12 +52,13 @@ data class NavigationContextData(
 
 lateinit var NavigationContext: NavigationContextData
 
-val LocalNavigationState = staticCompositionLocalOf<NavigationState> {
+val LocalNavigationContext = staticCompositionLocalOf<NavigationContextData> {
     error("No NavigationState provided")
 }
 
 @Composable
 fun NavigationContainer(
+    gameRunning: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val navigationState = remember { mutableStateOf(NavigationState.INSTANCES) }
@@ -81,16 +88,38 @@ fun NavigationContainer(
     }
 
     CompositionLocalProvider(
-        LocalNavigationState provides navigationState.value
+        LocalNavigationContext provides NavigationContext
     ) {
         Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()
         ) {
+            AnimatedVisibility(
+                visible = gameRunning,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                AppContext.lastPlayedInstance?.let {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            strings().nav.gameRunning(it),
+                            modifier = Modifier.padding(4.dp),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 content()
             }

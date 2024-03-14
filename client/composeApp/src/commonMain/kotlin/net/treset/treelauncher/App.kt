@@ -15,6 +15,7 @@ import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.*
+import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.backend.update.updater
@@ -33,8 +34,8 @@ import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginScreen
-import net.treset.treelauncher.navigation.LocalNavigationState
 import net.treset.treelauncher.navigation.NavigationContainer
+import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.*
@@ -47,12 +48,22 @@ import kotlin.system.exitProcess
 
 data class AppContextData(
     val files: LauncherFiles,
+    val running: Boolean,
+    val setRunning: (Boolean) -> Unit,
+    val lastPlayedInstance: InstanceData?,
+    val setLastPlayedInstance: (InstanceData) -> Unit,
     val setTheme: (Theme) -> Unit,
     val setAccentColor: (AccentColor) -> Unit,
-    val setCustomColor: (Color) -> Unit
+    val setCustomColor: (Color) -> Unit,
+    val globalPopup: PopupData?,
+    val setGlobalPopup: (PopupData?) -> Unit
 )
 
 lateinit var AppContext: AppContextData
+
+val LocalAppContext = staticCompositionLocalOf<AppContextData> {
+    error("No NavigationState provided")
+}
 
 @Composable
 fun App(
@@ -83,11 +94,20 @@ fun App(
     var customColor by remember { mutableStateOf(appSettings().customColor) }
     val colors: ColorScheme by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
 
+    var running by remember { mutableStateOf(false) }
+    var lastPlayedInstance: InstanceData? by remember { mutableStateOf(null) }
+
     val launcherFiles = remember { LauncherFiles() }
 
-    AppContext = remember(launcherFiles) {
+    AppContext = remember(launcherFiles, running, lastPlayedInstance, popupData) {
         AppContextData(
             files = launcherFiles,
+            running = running,
+            setRunning = { running = it },
+            lastPlayedInstance = lastPlayedInstance,
+            setLastPlayedInstance = {
+                lastPlayedInstance = it
+            },
             setTheme = {
                 theme = it
                 app.setTheme(it)
@@ -100,7 +120,9 @@ fun App(
             setCustomColor = {
                 customColor = it
                 appSettings().customColor = it
-            }
+            },
+            globalPopup = popupData,
+            setGlobalPopup = { popupData = it }
         )
     }
 
@@ -108,95 +130,101 @@ fun App(
         colorScheme = colors,
         typography = typography()
     ) {
-        ProvideTextStyle(
-            MaterialTheme.typography.bodyMedium
+        CompositionLocalProvider(
+            LocalAppContext provides AppContext
         ) {
-            Scaffold {
-                Column(
-                    Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LoginScreen {
-                        LaunchedEffect(Unit) {
-                            try {
-                                news().let { nws ->
-                                    if (nws.important?.map { it.id }
-                                            ?.allContainedIn(appSettings().acknowledgedNews) == false) {
-                                        popupData = getNewsPopup(
-                                            close = { popupData = null },
-                                            displayOther = false,
-                                            displayAcknowledged = false
-                                        )
+            ProvideTextStyle(
+                MaterialTheme.typography.bodyMedium
+            ) {
+                Scaffold {
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LoginScreen {
+                            LaunchedEffect(Unit) {
+                                try {
+                                    news().let { nws ->
+                                        if (nws.important?.map { it.id }
+                                                ?.allContainedIn(appSettings().acknowledgedNews) == false) {
+                                            popupData = getNewsPopup(
+                                                close = { popupData = null },
+                                                displayOther = false,
+                                                displayAcknowledged = false
+                                            )
+                                        }
                                     }
+                                } catch (e: IOException) {
+                                    LOGGER.warn(e) { "Unable to load news" }
                                 }
-                            } catch (e: IOException) {
-                                LOGGER.warn(e) { "Unable to load news" }
                             }
-                        }
 
-                        FixFilesPopup()
+                            FixFilesPopup()
 
-                        NavigationContainer {
-                            when(LocalNavigationState.current) {
-                                NavigationState.INSTANCES -> Instances()
-                                NavigationState.ADD -> Create()
-                                NavigationState.SAVES -> Saves()
-                                NavigationState.RESSOURCE_PACKS -> Resourcepacks()
-                                NavigationState.OPTIONS -> Options()
-                                NavigationState.MODS -> Mods()
-                                NavigationState.SETTINGS -> Settings()
+                            NavigationContainer(
+                                gameRunning = running
+                            ) {
+                                when (NavigationContext.navigationState) {
+                                    NavigationState.INSTANCES -> Instances()
+                                    NavigationState.ADD -> Create()
+                                    NavigationState.SAVES -> Saves()
+                                    NavigationState.RESSOURCE_PACKS -> Resourcepacks()
+                                    NavigationState.OPTIONS -> Options()
+                                    NavigationState.MODS -> Mods()
+                                    NavigationState.SETTINGS -> Settings()
+                                }
                             }
                         }
                     }
-                }
 
-                popupData?.let {
-                    PopupOverlay(it)
-                }
+                    popupData?.let {
+                        PopupOverlay(it)
+                    }
 
-                exceptions.forEach { e ->
-                    AlertDialog(
-                        onDismissRequest = {},
-                        title = { Text(strings().error.title()) },
-                        text = {
-                            Text(
-                                strings().error.message(e),
-                                textAlign = TextAlign.Start
-                            )
-                        },
-                        containerColor = MaterialTheme.colorScheme.inversePrimary,
-                        textContentColor = MaterialTheme.colorScheme.onPrimary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        confirmButton = {
-                            Button(
-                                onClick = { exceptions = exceptions.filter { it != e } },
-                            ) {
-                                Text(strings().error.close())
+                    exceptions.forEach { e ->
+                        AlertDialog(
+                            onDismissRequest = {},
+                            title = { Text(strings().error.title()) },
+                            text = {
+                                Text(
+                                    strings().error.message(e),
+                                    textAlign = TextAlign.Start
+                                )
+                            },
+                            containerColor = MaterialTheme.colorScheme.inversePrimary,
+                            textContentColor = MaterialTheme.colorScheme.onPrimary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            confirmButton = {
+                                Button(
+                                    onClick = { exceptions = exceptions.filter { it != e } },
+                                ) {
+                                    Text(strings().error.close())
+                                }
                             }
-                        }
-                    )
-                }
+                        )
+                    }
 
-                fatalExceptions.forEach { e ->
-                    AlertDialog(
-                        onDismissRequest = {},
-                        title = { Text(strings().error.severeTitle()) },
-                        text = {
-                            Text(
-                                strings().error.severeMessage(e),
-                                textAlign = TextAlign.Start
-                            )
-                        },
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        confirmButton = {
-                            Button(
-                                onClick = { app().exit(force = true) },
-                                color = MaterialTheme.colorScheme.error
-                            ) {
-                                Text(strings().error.severeClose())
+                    fatalExceptions.forEach { e ->
+                        AlertDialog(
+                            onDismissRequest = {},
+                            title = { Text(strings().error.severeTitle()) },
+                            text = {
+                                Text(
+                                    strings().error.severeMessage(e),
+                                    textAlign = TextAlign.Start
+                                )
+                            },
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            confirmButton = {
+                                Button(
+                                    onClick = { app().exit(force = true) },
+                                    color = MaterialTheme.colorScheme.error
+                                ) {
+                                    Text(strings().error.severeClose())
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -280,6 +308,12 @@ class LauncherApp(
         restart: Boolean = false,
         force: Boolean = false
     ) {
+        if((AppContext.running || AppContext.globalPopup != null) && !force) {
+            // Abort close; game is running or an important popup is open
+            LOGGER.info{ "Close request denied: Important Action Running" }
+            return
+        }
+
         if(!force) {
             try {
                 updater().startUpdater(restart)

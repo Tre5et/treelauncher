@@ -293,6 +293,7 @@ class EnStrings : Strings(
     ),
     nav = Nav(
         add = { "Create Instance" },
+        gameRunning = { instance -> "Currently Playing: ${instance.instance.first.name}" },
         home = { "Instances" },
         mods = { "Mods Components" },
         options = { "Options Components" },
@@ -343,6 +344,8 @@ class EnStrings : Strings(
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Error:\n$message\nPlease report this error."},
                 errorTitle = { "Game Launch Failed!" },
+                exitingMessage = { "The game will exit shortly..." },
+                exitingTitle = { "Cleaning Game Resources..." },
                 preparingMessage = { "The Game will start shortly." },
                 preparingTitle = { "Preparing Game Resources..." },
                 runningMessage = { "Close the game to be able to perform actions in the launcher." },
