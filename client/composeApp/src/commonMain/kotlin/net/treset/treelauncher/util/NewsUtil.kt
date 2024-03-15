@@ -44,7 +44,6 @@ fun News(
                             newOnly = false
                             popupVisible = true
                         },
-                        color = MaterialTheme.colorScheme.tertiary,
                         content = {
                             Text(strings().news.notification())
                         },

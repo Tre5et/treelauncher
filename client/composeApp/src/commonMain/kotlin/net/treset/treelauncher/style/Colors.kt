@@ -63,6 +63,7 @@ fun darkColors(primary: AccentColor) = darkColorScheme(
     primary = primary.primary(true),
     onPrimary = primary.onPrimary(true),
     error = Color(0xFFE20505),
+    onError = Color.White,
     inversePrimary = Color(0xFFEBDC02),
     tertiary = Color(0xFF43454A),
     onBackground = Color.White
@@ -72,6 +73,7 @@ fun lightColors(primary: AccentColor) = lightColorScheme(
     primary = primary.primary(false),
     onPrimary = primary.onPrimary(false),
     error = Color(0xFFD00000),
+    onError = Color.White,
     inversePrimary = Color(0xFFD0A000),
     tertiary = Color(0xFFB4B6BB),
     onBackground = Color.Black
@@ -117,12 +119,3 @@ fun Color.contrast(other: Color): Float {
         (l2 + 0.05f) / (l1 + 0.05f)
     }
 }
-
-fun Color.inverted(): Color = Color(
-    red = red.inverted(),
-    green = green.inverted(),
-    blue = blue.inverted(),
-    alpha = this.alpha
-)
-
-private fun Float.inverted() = 1f - this

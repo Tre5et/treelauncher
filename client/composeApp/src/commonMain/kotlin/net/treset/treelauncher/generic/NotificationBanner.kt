@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,26 +17,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.style.contrast
-import net.treset.treelauncher.style.inverted
 
 @Composable
 fun NotificationBanner(
     visible: Boolean,
-    color: Color? = null,
+    color: Color = MaterialTheme.colorScheme.primary,
     onDismissed: () -> Unit,
     onClick: ((NotificationContext) -> Unit)? = null,
     content: @Composable RowScope.(NotificationContext) -> Unit
 ) {
-    val localColor = LocalContentColor.current
+    val colorScheme = MaterialTheme.colorScheme
     val contentColor = remember(color) {
-        color?.let {
-            if(color.contrast(localColor) < 4.5f && color.contrast(localColor.inverted()) > 4.5f) {
-                localColor.inverted()
-            } else {
-                localColor
-            }
-        }
+        colorScheme.contentColorFor(color)
     }
 
     var dismiss by remember { mutableStateOf(false) }
@@ -57,7 +50,7 @@ fun NotificationBanner(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color ?: MaterialTheme.colorScheme.primary)
+                .background(color)
                 .clickable { onClick?.invoke(context) }
                 .pointerHoverIcon(if(onClick != null) PointerIcon.Hand else PointerIcon.Default)
                 .padding(4.dp),
@@ -68,7 +61,7 @@ fun NotificationBanner(
                 MaterialTheme.typography.titleSmall
             ) {
                 CompositionLocalProvider(
-                    LocalContentColor provides (contentColor ?: MaterialTheme.colorScheme.onPrimary)
+                    LocalContentColor provides contentColor
                 ) {
                     content(context)
                 }
@@ -85,7 +78,7 @@ fun NotificationBanner(
 ) {
     NotificationBanner(
         visible = visible,
-        color = data.color,
+        color = data.color?: MaterialTheme.colorScheme.primary,
         onClick = data.onClick,
         onDismissed = onDismissed
     ) {
