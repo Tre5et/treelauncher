@@ -26,9 +26,8 @@ import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
 import net.treset.treelauncher.components.mods.Mods
 import net.treset.treelauncher.creation.Create
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupData
-import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
@@ -48,14 +47,14 @@ import kotlin.system.exitProcess
 
 data class AppContextData(
     val files: LauncherFiles,
-    val running: Boolean,
-    val setRunning: (Boolean) -> Unit,
-    val lastPlayedInstance: InstanceData?,
-    val setLastPlayedInstance: (InstanceData) -> Unit,
+    val runningInstance: InstanceData?,
+    val setRunningInstance: (InstanceData?) -> Unit,
     val setTheme: (Theme) -> Unit,
     val setAccentColor: (AccentColor) -> Unit,
     val setCustomColor: (Color) -> Unit,
     val globalPopup: PopupData?,
+    val addNotification: (NotificationData) -> Unit,
+    val dismissNotification: (NotificationData) -> Unit,
     val setGlobalPopup: (PopupData?) -> Unit
 )
 
@@ -94,19 +93,18 @@ fun App(
     var customColor by remember { mutableStateOf(appSettings().customColor) }
     val colors: ColorScheme by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
 
-    var running by remember { mutableStateOf(false) }
-    var lastPlayedInstance: InstanceData? by remember { mutableStateOf(null) }
+    var runningInstance: InstanceData? by remember { mutableStateOf(null) }
 
     val launcherFiles = remember { LauncherFiles() }
 
-    AppContext = remember(launcherFiles, running, lastPlayedInstance, popupData) {
+    var notifications: List<NotificationBannerData> by remember { mutableStateOf(listOf()) }
+
+    AppContext = remember(launcherFiles, runningInstance, popupData) {
         AppContextData(
             files = launcherFiles,
-            running = running,
-            setRunning = { running = it },
-            lastPlayedInstance = lastPlayedInstance,
-            setLastPlayedInstance = {
-                lastPlayedInstance = it
+            runningInstance = runningInstance,
+            setRunningInstance = {
+                runningInstance = it
             },
             setTheme = {
                 theme = it
@@ -122,7 +120,16 @@ fun App(
                 appSettings().customColor = it
             },
             globalPopup = popupData,
-            setGlobalPopup = { popupData = it }
+            setGlobalPopup = { popupData = it },
+            addNotification = {
+                notifications += NotificationBannerData(
+                    visible = false,
+                    data = it
+                )
+            },
+            dismissNotification = {toRemove ->
+                notifications.firstOrNull { it.data == toRemove }?.visible = false
+            }
         )
     }
 
@@ -141,6 +148,18 @@ fun App(
                         Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        for(notification in notifications) {
+                            LaunchedEffect(Unit) {
+                                notification.visible = true
+                            }
+                            NotificationBanner(
+                                visible = notification.visible,
+                                color = notification.data.color,
+                                onDismissed = { notifications -= notification },
+                                content = notification.data.content
+                            )
+                        }
+
                         LoginScreen {
                             LaunchedEffect(Unit) {
                                 try {
@@ -161,9 +180,7 @@ fun App(
 
                             FixFilesPopup()
 
-                            NavigationContainer(
-                                gameRunning = running
-                            ) {
+                            NavigationContainer {
                                 when (NavigationContext.navigationState) {
                                     NavigationState.INSTANCES -> Instances()
                                     NavigationState.ADD -> Create()
@@ -308,7 +325,7 @@ class LauncherApp(
         restart: Boolean = false,
         force: Boolean = false
     ) {
-        if((AppContext.running || AppContext.globalPopup != null) && !force) {
+        if((AppContext.runningInstance != null || AppContext.globalPopup != null) && !force) {
             // Abort close; game is running or an important popup is open
             LOGGER.info{ "Close request denied: Important Action Running" }
             return
@@ -345,6 +362,11 @@ class LauncherApp(
         private val LOGGER = KotlinLogging.logger {  }
     }
 }
+
+internal data class NotificationBannerData(
+    var visible: Boolean,
+    val data: NotificationData,
+)
 
 private val LOGGER = KotlinLogging.logger {  }
 

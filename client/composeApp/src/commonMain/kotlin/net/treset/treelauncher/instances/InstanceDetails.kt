@@ -61,7 +61,7 @@ fun InstanceDetails(
                         painter = icons().play,
                         size = 32.dp,
                         highlighted = true,
-                        enabled = !AppContext.running,
+                        enabled = AppContext.runningInstance == null,
                         tooltip = strings().selector.instance.play()
                     )
                     Text(instance.instance.first.name)

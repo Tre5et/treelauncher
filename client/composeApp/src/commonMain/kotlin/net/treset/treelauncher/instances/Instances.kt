@@ -122,7 +122,7 @@ fun Instances() {
                 InstanceButton(
                     instance = it,
                     selected = selectedInstance == it,
-                    enabled = !AppContext.running || AppContext.lastPlayedInstance != it,
+                    enabled = AppContext.runningInstance != it,
                     onClick = { selectedInstance = if(selectedInstance == it) null else it }
                 )
             }

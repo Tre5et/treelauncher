@@ -61,7 +61,7 @@ fun Mods() {
         componentManifest = AppContext.files.modsManifest,
         checkHasComponent = { details, component -> details.modsComponent == component.id },
         getManifest = { first },
-        isEnabled = { !AppContext.running || first.id != AppContext.lastPlayedInstance?.modsComponent?.first?.id },
+        isEnabled = { first.id != AppContext.runningInstance?.modsComponent?.first?.id },
         getCreator = { state: ModsCreationState ->
             when(state.mode) {
                 CreationMode.NEW -> state.name?.let{ state.version?.let { state.type?.let { state.alternateLoader?.let {

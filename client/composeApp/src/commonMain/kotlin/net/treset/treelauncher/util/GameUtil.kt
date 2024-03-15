@@ -6,10 +6,7 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.exception.GameLaunchException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupData
-import net.treset.treelauncher.generic.PopupType
-import net.treset.treelauncher.generic.Text
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 
 fun launchGame(
@@ -28,6 +25,8 @@ class GameLaunchHelper(
     val launcher: GameLauncher,
     val onExit: () -> Unit
 ) {
+    private var notification: NotificationData? = null
+
     init {
         onPrep()
         launcher.onExit = { onGameExit() }
@@ -46,7 +45,11 @@ class GameLaunchHelper(
                 content =  { Text(strings().selector.instance.game.preparingMessage()) },
             )
         )
-        AppContext.setLastPlayedInstance(launcher.instance)
+        notification = NotificationData(
+            content = {
+                Text(strings().nav.gameRunning(launcher.instance))
+            },
+        ).also { AppContext.addNotification(it) }
     }
 
     private fun onLaunchDone(
@@ -59,7 +62,7 @@ class GameLaunchHelper(
 
     private fun onRunning() {
         AppContext.setGlobalPopup(null)
-        AppContext.setRunning(true)
+        AppContext.setRunningInstance(launcher.instance)
     }
 
     private fun onLaunchFailed(
@@ -87,7 +90,8 @@ class GameLaunchHelper(
                 content =  { Text(strings().selector.instance.game.exitingMessage()) },
             )
         )
-        AppContext.setRunning(false)
+        AppContext.setRunningInstance(null)
+        notification?.let { AppContext.dismissNotification(it) }
     }
 
     private fun onGameExited(
