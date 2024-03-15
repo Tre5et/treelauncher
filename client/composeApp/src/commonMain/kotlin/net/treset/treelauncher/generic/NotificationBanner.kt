@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.style.contentColor
 
 @Composable
 fun NotificationBanner(
@@ -27,9 +27,7 @@ fun NotificationBanner(
     content: @Composable RowScope.(NotificationContext) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val contentColor = remember(color) {
-        colorScheme.contentColorFor(color)
-    }
+    val contentColor = colorScheme.contentColor(color)
 
     var dismiss by remember { mutableStateOf(false) }
 

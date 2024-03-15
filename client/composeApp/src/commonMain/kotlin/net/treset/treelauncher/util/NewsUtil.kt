@@ -15,6 +15,7 @@ import net.treset.treelauncher.generic.NotificationData
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.info
 import java.io.IOException
 
 @Composable
@@ -35,6 +36,7 @@ fun News(
 
     var currentNews: News? by remember { mutableStateOf(null) }
 
+    val notificationColor = MaterialTheme.colorScheme.info
     LaunchedEffect(Unit) {
         try {
             currentNews = news().also { nws ->
@@ -44,6 +46,7 @@ fun News(
                             newOnly = false
                             popupVisible = true
                         },
+                        color = notificationColor,
                         content = {
                             Text(strings().news.notification())
                         },

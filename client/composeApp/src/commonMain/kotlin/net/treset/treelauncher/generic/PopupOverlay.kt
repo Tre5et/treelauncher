@@ -16,11 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import net.treset.treelauncher.style.warning
 
 enum class PopupType(val accent: @Composable () -> Color) {
     NONE({ MaterialTheme.colorScheme.secondary }),
     SUCCESS({ MaterialTheme.colorScheme.primary }),
-    WARNING({ MaterialTheme.colorScheme.inversePrimary }),
+    WARNING({ MaterialTheme.colorScheme.warning }),
     ERROR({ MaterialTheme.colorScheme.error })
 }
 

@@ -71,7 +71,7 @@ fun main() = application {
         ) {
             TitleBar(Modifier.newFullscreenControls()) {
                 CompositionLocalProvider(
-                    LocalContentColor provides colors.onBackground
+                    LocalContentColor provides colors.material.onBackground
                 ) {
                     Box(
                         modifier = Modifier.offset(x = (-9).dp),
@@ -125,12 +125,12 @@ fun main() = application {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors.background)
+                    .background(colors.material.background)
             ) {
                 if (restartRequired) {
                     Text(
                         text = strings().launcher.status.restartRequired(),
-                        color = colors.onBackground
+                        color = colors.material.onBackground
                     )
                 } else {
                     if (initialized) {
@@ -138,7 +138,7 @@ fun main() = application {
                     } else if(downloading > 0) {
                         Text(
                             text = strings().launcher.status.preparing(downloading.roundToInt()),
-                            color = colors.onBackground
+                            color = colors.material.onBackground
                         )
                     }
                 }

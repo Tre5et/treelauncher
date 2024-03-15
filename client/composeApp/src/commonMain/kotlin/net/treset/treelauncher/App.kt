@@ -78,7 +78,7 @@ fun App(
     val themeDark = theme.isDark()
     var accentColor by remember { mutableStateOf(appSettings().accentColor) }
     var customColor by remember { mutableStateOf(appSettings().customColor) }
-    val colors: ColorScheme by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
+    val colors by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
 
     var runningInstance: InstanceData? by remember { mutableStateOf(null) }
 
@@ -128,7 +128,7 @@ fun App(
                 LOGGER.warn(e) { "An error occurred!" }
                 AppContext.addNotification(
                     NotificationData(
-                        color = colors.inversePrimary,
+                        color = colors.warning,
                         onClick = {
                             it.dismiss()
                         },
@@ -148,8 +148,8 @@ fun App(
         )
     }
 
-    MaterialTheme(
-        colorScheme = colors,
+    LauncherTheme(
+        colors = colors,
         typography = typography()
     ) {
         CompositionLocalProvider(

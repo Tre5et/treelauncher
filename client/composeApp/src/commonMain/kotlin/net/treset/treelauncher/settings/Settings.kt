@@ -36,6 +36,7 @@ import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.AccentColor
 import net.treset.treelauncher.style.Theme
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.style.info
 import net.treset.treelauncher.util.onUpdate
 import java.awt.image.BufferedImage
 import java.io.IOException
@@ -497,7 +498,8 @@ fun Settings() {
             Button(
                 onClick = {
                     showCleanup = true
-                }
+                },
+                color = MaterialTheme.colorScheme.info
             ) {
                 Text(
                     strings().settings.cleanup.button()

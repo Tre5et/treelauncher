@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +21,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import net.treset.treelauncher.style.contentColor
 import net.treset.treelauncher.style.hovered
 
 @Composable
@@ -55,9 +55,9 @@ fun Button(
     val contentColor = MaterialTheme.colorScheme.onPrimary
 
     val colorScheme = MaterialTheme.colorScheme
-    val foregroundColor = remember(color, contentColor, dynamicContentColor) {
+    val foregroundColor =
         if(dynamicContentColor) {
-            colorScheme.contentColorFor(backgroundColor).let {
+            colorScheme.contentColor(backgroundColor).let {
                 if(it.isUnspecified) {
                     contentColor
                 } else {
@@ -67,7 +67,6 @@ fun Button(
         } else {
             contentColor
         }
-    }
 
     androidx.compose.material3.Button(
         onClick,
