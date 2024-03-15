@@ -11,109 +11,139 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.news.News
 import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupData
+import net.treset.treelauncher.generic.NotificationData
+import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
-fun getNewsPopup(
-    close: () -> Unit,
-    displayOther: Boolean = true,
-    acknowledgeImportant: Boolean = true,
-    displayAcknowledged: Boolean = true
-): PopupData = PopupData(
-        content = {
-            var currentNews: News? by remember { mutableStateOf(null) }
+@Composable
+fun News(
+    openNews: Int = 0,
+) {
+    var newOnly: Boolean by remember { mutableStateOf(false) }
 
-            LaunchedEffect(Unit) {
-                try {
-                    currentNews = news().let { nws ->
-                        nws.apply {
-                            if(!displayAcknowledged) {
-                                important = important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
-                            }
-                            if(!displayOther) {
-                                other = null
-                            }
-                        }
-                    }.also { nws ->
-                        if(acknowledgeImportant) {
-                            nws.important?.forEach {
-                                if(!appSettings().acknowledgedNews.contains(it.id)) {
-                                    appSettings().acknowledgedNews.add(it.id)
-                                }
-                            }
-                        }
-                    }
-                } catch(e: IOException) {
-                    AppContext.error(e)
+    var popupVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(openNews) {
+        if (openNews > 0) {
+            newOnly = false
+            popupVisible = true
+        }
+    }
+
+    var notification: NotificationData? by remember { mutableStateOf(null) }
+
+    var currentNews: News? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            currentNews = news().also { nws ->
+                if (nws.important?.map { it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
+                    notification = NotificationData(
+                        onClick = {
+                            newOnly = false
+                            popupVisible = true
+                        },
+                        color = MaterialTheme.colorScheme.tertiary,
+                        content = {
+                            Text(strings().news.notification())
+                        },
+                    ).also { AppContext.addNotification(it) }
                 }
             }
+        } catch (e: IOException) {
+            AppContext.error(IOException("Unable to load News", e))
+        }
+    }
 
-            currentNews?.let {nws ->
-                if (!nws.important.isNullOrEmpty()) {
-                    Text(
-                        strings().news.important(),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
+    if(popupVisible) {
+        PopupOverlay(
+            content = {
+                val important = remember(currentNews) {
+                    if(newOnly) {
+                        currentNews?.important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
+                    } else {
+                        currentNews?.important
+                    }
+                }
 
-                    val content = remember {
-                        val sb = StringBuilder("<hr/>")
-                        nws.important!!.forEach {
-                            sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
+                val other = remember(currentNews) {
+                    if(newOnly) {
+                        null
+                    } else {
+                        currentNews?.other
+                    }
+                }
+
+                    if (!important.isNullOrEmpty()) {
+                        Text(
+                            strings().news.important(),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+
+                        val content = remember {
+                            val sb = StringBuilder("<hr/>")
+                            important.forEach {
+                                sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
+                            }
+
+                            htmlToAnnotatedString(sb.toString())
                         }
 
-                        print(sb.toString())
-                        htmlToAnnotatedString(sb.toString())
+                        Text(
+                            content,
+                            softWrap = true,
+                            modifier = Modifier.widthIn(0.dp, 800.dp)
+                        )
                     }
 
-                    Text(
-                        content,
-                        softWrap = true,
-                        modifier = Modifier.widthIn(0.dp, 800.dp)
-                    )
-                }
+                    if (!other.isNullOrEmpty()) {
+                        Text(
+                            strings().news.other(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
 
-                if (!nws.other.isNullOrEmpty()) {
-                    Text(
-                        strings().news.other(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                        val content = remember {
+                            val sb = StringBuilder()
+                            other.forEach {
+                                sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
+                            }
 
-                    val content = remember {
-                        val sb = StringBuilder()
-                        nws.other!!.forEach {
-                            sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
+                            htmlToAnnotatedString(sb.toString())
                         }
 
-                        htmlToAnnotatedString(sb.toString())
+                        Text(
+                            content,
+                            softWrap = true,
+                            modifier = Modifier.widthIn(0.dp, 800.dp)
+                        )
                     }
 
-                    Text(
-                        content,
-                        softWrap = true,
-                        modifier = Modifier.widthIn(0.dp, 800.dp)
-                    )
+                    if(other.isNullOrEmpty() && important.isNullOrEmpty()) {
+                        Text(
+                            strings().news.none(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+            },
+            buttonRow  = {
+                Button(
+                    onClick = {
+                        popupVisible = false
+                        notification?.let { AppContext.dismissNotification(it) }
+                        currentNews?.important?.forEach {
+                            if(!appSettings().acknowledgedNews.contains(it.id)) {
+                                appSettings().acknowledgedNews.add(it.id)
+                            }
+                        }
+                    }
+                ) {
+                    Text(strings().news.close())
                 }
-
-                if(nws.other.isNullOrEmpty() && nws.important.isNullOrEmpty()) {
-                    Text(
-                        strings().news.none(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            } ?: Text(strings().news.loading())
-        },
-        buttonRow  = {
-            Button(
-                onClick = {
-                    close()
-                }
-            ) {
-                Text(strings().news.close())
-            }
-        },
-    )
+            },
+        )
+    }
+}
 
 fun <T> List<T>.allContainedIn(other: List<T>): Boolean {
     return this.all { other.contains(it) }

@@ -85,7 +85,7 @@ fun main() = application {
 
                         IconButton(
                             onClick = {
-                                app().showNews()
+                                AppContext.openNews()
                             },
                             icon = icons().news,
                             tooltip = strings().news.tooltip(),

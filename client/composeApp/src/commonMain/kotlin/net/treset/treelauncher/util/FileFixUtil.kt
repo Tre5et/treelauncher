@@ -49,7 +49,7 @@ private enum class CleanupState(
 }
 
 @Composable
-fun FixFilesPopup() {
+fun FixFiles() {
     var showPopup by remember { mutableStateOf(false) }
     var cleanupStatus: CleanupState? by remember { mutableStateOf(null) }
 

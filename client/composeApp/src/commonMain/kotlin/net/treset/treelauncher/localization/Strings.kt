@@ -418,6 +418,7 @@ open class Strings(
         val important: () -> String,
         val loading: () -> String,
         val none: () -> String,
+        val notification: () -> String,
         val other: () -> String,
         val tooltip: () -> String,
         val title: () -> String,

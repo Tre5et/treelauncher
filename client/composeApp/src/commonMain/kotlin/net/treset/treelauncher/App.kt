@@ -17,7 +17,6 @@ import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -37,9 +36,8 @@ import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.*
-import net.treset.treelauncher.util.FixFilesPopup
-import net.treset.treelauncher.util.allContainedIn
-import net.treset.treelauncher.util.getNewsPopup
+import net.treset.treelauncher.util.FixFiles
+import net.treset.treelauncher.util.News
 import java.io.File
 import java.io.IOException
 import kotlin.system.exitProcess
@@ -55,6 +53,7 @@ data class AppContextData(
     val addNotification: (NotificationData) -> Unit,
     val dismissNotification: (NotificationData) -> Unit,
     val setGlobalPopup: (PopupData?) -> Unit,
+    val openNews: () -> Unit,
     val error: (Exception) -> Unit,
     val severeError: (Exception) -> Unit
 )
@@ -73,11 +72,7 @@ fun App(
 
     var fatalExceptions: List<Exception> by remember { mutableStateOf(listOf()) }
 
-    app = remember {
-        launcherApp.apply {
-            setPopup = { popupData = it }
-        }
-    }
+    app = launcherApp
 
     var theme by remember { mutableStateOf(appSettings().theme) }
     val themeDark = theme.isDark()
@@ -91,6 +86,8 @@ fun App(
 
     var notifications: List<NotificationBannerData> by remember { mutableStateOf(listOf()) }
     var notificationsChanged by remember { mutableStateOf(0) }
+
+    var openNews by remember { mutableStateOf(0) }
 
     AppContext = remember(launcherFiles, runningInstance, popupData) {
         AppContextData(
@@ -123,6 +120,9 @@ fun App(
             dismissNotification = {toRemove ->
                 notifications.firstOrNull { it.data == toRemove }?.visible = false
                 notificationsChanged++
+            },
+            openNews = {
+                openNews++
             },
             error = {e ->
                 LOGGER.warn(e) { "An error occurred!" }
@@ -178,24 +178,8 @@ fun App(
                         }
 
                         LoginScreen {
-                            LaunchedEffect(Unit) {
-                                try {
-                                    news().let { nws ->
-                                        if (nws.important?.map { it.id }
-                                                ?.allContainedIn(appSettings().acknowledgedNews) == false) {
-                                            popupData = getNewsPopup(
-                                                close = { popupData = null },
-                                                displayOther = false,
-                                                displayAcknowledged = false
-                                            )
-                                        }
-                                    }
-                                } catch (e: IOException) {
-                                    LOGGER.warn(e) { "Unable to load news" }
-                                }
-                            }
-
-                            FixFilesPopup()
+                            News(openNews)
+                            FixFiles()
 
                             NavigationContainer {
                                 when (NavigationContext.navigationState) {
@@ -290,23 +274,6 @@ class LauncherApp(
         FabricLoader.useVersionCache(true)
         MinecraftForge.useVersionCache(true)
         FileUtil.useWebRequestCache(true)
-    }
-
-    var setPopup: (PopupData?) -> Unit = {}
-
-    fun showNews(
-        displayOther: Boolean = true,
-        acknowledgeImportant: Boolean = true,
-        displayAcknowledged: Boolean = true
-    ) {
-        setPopup(
-            getNewsPopup(
-                close = { setPopup(null) },
-                displayOther = displayOther,
-                acknowledgeImportant = acknowledgeImportant,
-                displayAcknowledged = displayAcknowledged,
-            )
-        )
     }
 
     fun exit(

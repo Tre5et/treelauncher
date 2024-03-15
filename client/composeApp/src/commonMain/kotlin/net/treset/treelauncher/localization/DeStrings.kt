@@ -306,6 +306,7 @@ class DeStrings : Strings(
         important = { "Wichtige Neuigkeiten:" },
         loading = { "Neuigkeiten werden geladen..." },
         none = { "Keine aktuellen Neuigkeiten" },
+        notification = { "Neue Neuigkeiten verfügbar! Hier klicken zum Anzeigen." },
         other = { "Neuigkeiten:" },
         tooltip = { "Neuigkeiten anzeigen" },
         title = { "Neuigkeiten" }

@@ -305,6 +305,7 @@ class EnStrings : Strings(
         important = { "Important News:" },
         loading = { "Loading News..." },
         none = { "No current News" },
+        notification = { "New News available! Klick here to view." },
         other = { "News:"},
         tooltip = { "Open News" },
         title = { "News" }
