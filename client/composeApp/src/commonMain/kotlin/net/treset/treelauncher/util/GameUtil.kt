@@ -45,11 +45,6 @@ class GameLaunchHelper(
                 content =  { Text(strings().selector.instance.game.preparingMessage()) },
             )
         )
-        notification = NotificationData(
-            content = {
-                Text(strings().nav.gameRunning(launcher.instance))
-            },
-        ).also { AppContext.addNotification(it) }
     }
 
     private fun onLaunchDone(
@@ -61,8 +56,13 @@ class GameLaunchHelper(
     }
 
     private fun onRunning() {
-        AppContext.setGlobalPopup(null)
         AppContext.setRunningInstance(launcher.instance)
+        notification = NotificationData(
+            content = {
+                Text(strings().selector.instance.game.runningNotification(launcher.instance))
+            },
+        ).also { AppContext.addNotification(it) }
+        AppContext.setGlobalPopup(null)
     }
 
     private fun onLaunchFailed(

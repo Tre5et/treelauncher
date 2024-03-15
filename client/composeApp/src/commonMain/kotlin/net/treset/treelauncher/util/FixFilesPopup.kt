@@ -1,7 +1,14 @@
 package net.treset.treelauncher.util
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.data.InstanceData
@@ -9,10 +16,7 @@ import net.treset.treelauncher.backend.launching.ResourceManager
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.exception.GameResourceException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupOverlay
-import net.treset.treelauncher.generic.PopupType
-import net.treset.treelauncher.generic.Text
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
@@ -57,9 +61,27 @@ fun FixFilesPopup() {
     var showPopup by remember { mutableStateOf(false) }
     var cleanupStatus: CleanupState? by remember { mutableStateOf(null) }
 
+    var notification: NotificationData? by remember { mutableStateOf(null) }
+
+    val errorColor = MaterialTheme.colorScheme.error
     LaunchedEffect(AppContext.files) {
         if(AppContext.files.launcherDetails.activeInstance != null) {
-            showPopup = true
+            notification = NotificationData(
+                color = errorColor,
+                content = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPopup = true
+                            }
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(strings().fixFiles.notification())
+                    }
+                }
+            ).also { AppContext.addNotification(it) }
         }
     }
 
@@ -131,6 +153,7 @@ fun FixFilesPopup() {
                         }
 
                         cleanupStatus = CleanupState.SUCCESS
+                        notification?.let { AppContext.dismissNotification(it) }
                     },
                     color = MaterialTheme.colorScheme.primary
                 ) {

@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +21,7 @@ fun NotificationBanner(
     visible: Boolean,
     color: Color? = null,
     onDismissed: () -> Unit,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.(NotificationContext) -> Unit
 ) {
     val localColor = LocalContentColor.current
     val contentColor = remember(color) {
@@ -37,8 +34,14 @@ fun NotificationBanner(
         }
     }
 
+    var dismiss by remember { mutableStateOf(false) }
+
+    val context = NotificationContext {
+        dismiss = true
+    }
+
     AnimatedVisibility(
-        visible = visible,
+        visible = visible && !dismiss,
         enter = expandVertically(),
         exit = shrinkVertically()
     ) {
@@ -61,14 +64,18 @@ fun NotificationBanner(
                 CompositionLocalProvider(
                     LocalContentColor provides (contentColor ?: MaterialTheme.colorScheme.onPrimary)
                 ) {
-                    content()
+                    content(context)
                 }
             }
         }
     }
 }
 
+data class NotificationContext(
+    val dismiss: () -> Unit
+)
+
 data class NotificationData(
     val color: Color? = null,
-    val content: @Composable RowScope.() -> Unit
+    val content: @Composable RowScope.(NotificationContext) -> Unit
 )

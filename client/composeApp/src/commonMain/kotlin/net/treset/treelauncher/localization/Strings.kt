@@ -184,6 +184,7 @@ open class Strings(
         val failureMessage: () -> String,
         val failureTitle: () -> String,
         val message: () -> String,
+        val notification: () -> String,
         val runningMessage: () -> String,
         val runningTitle: () -> String,
         val successMessage: () -> String,
@@ -405,7 +406,6 @@ open class Strings(
 
     data class Nav(
         val add: () -> String,
-        val gameRunning: (InstanceData) -> String,
         val home: () -> String,
         val mods: () -> String,
         val options: () -> String,
@@ -484,6 +484,7 @@ open class Strings(
                 val preparingMessage: () -> String,
                 val preparingTitle: () -> String,
                 val runningMessage: () -> String,
+                val runningNotification: (InstanceData) -> String,
                 val runningTitle: () -> String,
                 val crashClose: () -> String,
                 val crashMessage: (message: String) -> String,

@@ -100,6 +100,7 @@ class EnStrings : Strings(
         failureMessage = { "Trying again probably won't help here.\nTry to fix the files manually or contact the developer." },
         failureTitle = { "Failed to restore launcher!" },
         message = { "The launcher is not usable in this state.\nThis may be caused by an unexpected close while the game was running.\n\nAttempt to fix these files automatically?\nNon-world data from your last playing session may be lost.\n\nDO NOT START THIS WHILE A INSTANCE OF THE GAME IS RUNNING!" },
+        notification = { "Inconsistent files detected! Click here to fix."},
         runningMessage = { "This may take a while." },
         runningTitle = { "Attempting to restore launcher..." },
         successMessage = { "The launcher should be usable again." },
@@ -293,7 +294,6 @@ class EnStrings : Strings(
     ),
     nav = Nav(
         add = { "Create Instance" },
-        gameRunning = { instance -> "Currently Playing: ${instance.instance.first.name}" },
         home = { "Instances" },
         mods = { "Mods Components" },
         options = { "Options Components" },
@@ -349,6 +349,7 @@ class EnStrings : Strings(
                 preparingMessage = { "The Game will start shortly." },
                 preparingTitle = { "Preparing Game Resources..." },
                 runningMessage = { "Close the game to be able to perform actions in the launcher." },
+                runningNotification = { instance -> "Currently Playing: ${instance.instance.first.name}" },
                 runningTitle = { "The Game is running..." },
                 crashClose = { "Close" },
                 crashMessage = { message -> "Error:\n$message\nThis might be unrelated to the launcher." },

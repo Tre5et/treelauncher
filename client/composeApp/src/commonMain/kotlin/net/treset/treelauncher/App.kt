@@ -98,6 +98,7 @@ fun App(
     val launcherFiles = remember { LauncherFiles() }
 
     var notifications: List<NotificationBannerData> by remember { mutableStateOf(listOf()) }
+    var notificationsChanged by remember { mutableStateOf(0) }
 
     AppContext = remember(launcherFiles, runningInstance, popupData) {
         AppContextData(
@@ -129,6 +130,7 @@ fun App(
             },
             dismissNotification = {toRemove ->
                 notifications.firstOrNull { it.data == toRemove }?.visible = false
+                notificationsChanged++
             }
         )
     }
@@ -148,16 +150,19 @@ fun App(
                         Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        for(notification in notifications) {
-                            LaunchedEffect(Unit) {
-                                notification.visible = true
+                        notificationsChanged.let {
+                            for(notification in notifications) {
+                                LaunchedEffect(Unit) {
+                                    notification.visible = true
+                                    notificationsChanged++
+                                }
+                                NotificationBanner(
+                                    visible = notification.visible,
+                                    color = notification.data.color,
+                                    onDismissed = { notifications -= notification },
+                                    content = notification.data.content
+                                )
                             }
-                            NotificationBanner(
-                                visible = notification.visible,
-                                color = notification.data.color,
-                                onDismissed = { notifications -= notification },
-                                content = notification.data.content
-                            )
                         }
 
                         LoginScreen {

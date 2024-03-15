@@ -100,6 +100,7 @@ class DeStrings : Strings(
         failureMessage = { "Ein erneuter Versuch wird wahrscheinlich nicht helfen.\nBitte versuchen, die Dateien manuell zu reparieren oder den Entwickler zu kontaktieren." },
         failureTitle = { "Wiederherstellung des Launchers fehlgeschlagen!" },
         message = { "Der Launcher ist in diesem Zustand nicht nutzbar.\nDies kann durch ein unerwartetes Schließen während das Spiel lief verursacht worden sein.\n\nVersuchen, die Dateien automatisch zu reparieren?\nNicht-Weltdaten aus Ihrer letzten Spielsitzung können hierbei verloren gehen.\n\nDIESEN VORGANG NUR STARTEN, WENN KEINE SPIELINSTANZ LÄUFT!" },
+        notification = { "Launcher-Dateien inkonsistent! Hier klicken zum Beheben." },
         runningMessage = { "Dies könnte eine Weile dauern." },
         runningTitle = { "Versuchen, den Launcher wiederherzustellen..." },
         successMessage = { "Der Launcher sollte wieder nutzbar sein." },
@@ -294,7 +295,6 @@ class DeStrings : Strings(
     ),
     nav = Nav(
         add = { "Instanz erstellen" },
-        gameRunning = { instance -> "Aktuell läuft: ${instance.instance.first.name}" },
         home = { "Instanzen" },
         mods = { "Mods Komponenten" },
         options = { "Optionskomponenten" },
@@ -350,6 +350,7 @@ class DeStrings : Strings(
                 preparingMessage = { "Das Spiel starten in Kürze." },
                 preparingTitle ={ "Spielressourcen werden vorbereitet..." },
                 runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
+                runningNotification = { instance -> "Aktuell läuft: ${instance.instance.first.name}" },
                 runningTitle = { "Das Spiel läuft..." },
                 crashClose = { "Schließen" },
                 crashMessage = { message -> "Fehler:\n$message\nDies wurde vermutlich nicht durch den Launcher verursacht." },
