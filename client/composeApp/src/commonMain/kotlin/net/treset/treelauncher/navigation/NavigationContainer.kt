@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
@@ -70,7 +70,7 @@ fun NavigationContainer(
         try {
             updateAvailable = updater().getUpdate().id != null
         } catch (e: IOException) {
-            app().error(e)
+            AppContext.error(e)
         }
     }
 

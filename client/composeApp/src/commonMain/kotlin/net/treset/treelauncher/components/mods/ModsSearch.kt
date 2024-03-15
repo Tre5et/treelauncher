@@ -20,8 +20,8 @@ import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModData
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.generic.*
@@ -85,7 +85,7 @@ fun ModsSearch(
                         ).roundToInt()
                     }
                 } catch (e: FileDownloadException) {
-                    app().error(e)
+                    AppContext.error(e)
                 }
                 searching = false
             }.start()

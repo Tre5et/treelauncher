@@ -26,8 +26,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.IconButton
@@ -272,7 +272,7 @@ fun ModsImport(
                             mod.fileName = newName
                         }
                         if (!found) {
-                            app().error(IOException("Failed to find a unique name for mod file: ${file.path}"))
+                            AppContext.error(IOException("Failed to find a unique name for mod file: ${file.path}"))
                             return@registerChangingJob
                         }
 
@@ -280,7 +280,7 @@ fun ModsImport(
                             LOGGER.debug { "Copying mod file: ${file.path} -> ${newFile.path}" }
                             file.copyTo(newFile)
                         } catch (e: IOException) {
-                            app().error(e)
+                            AppContext.error(e)
                         }
 
                         LOGGER.debug { "Adding mod to component: ${mod.name}" }

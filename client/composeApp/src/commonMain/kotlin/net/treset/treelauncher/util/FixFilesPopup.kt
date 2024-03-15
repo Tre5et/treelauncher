@@ -1,16 +1,8 @@
 package net.treset.treelauncher.util
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.ResourceManager
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -68,18 +60,11 @@ fun FixFilesPopup() {
         if(AppContext.files.launcherDetails.activeInstance != null) {
             notification = NotificationData(
                 color = errorColor,
+                onClick = {
+                    showPopup = true
+                },
                 content = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                showPopup = true
-                            }
-                            .pointerHoverIcon(PointerIcon.Hand),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(strings().fixFiles.notification())
-                    }
+                    Text(strings().fixFiles.notification())
                 }
             ).also { AppContext.addNotification(it) }
         }
@@ -108,7 +93,7 @@ fun FixFilesPopup() {
                         try {
                             AppContext.files.reloadAll()
                         } catch (e: FileLoadException) {
-                            app().error(e)
+                            AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
@@ -116,7 +101,7 @@ fun FixFilesPopup() {
                         val instance = AppContext.files.instanceComponents.firstOrNull {
                             it.first.id == AppContext.files.launcherDetails.activeInstance
                         } ?: run {
-                            app().error(IOException("Unable to cleanup old instance: instance not found"))
+                            AppContext.error(IOException("Unable to cleanup old instance: instance not found"))
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
@@ -124,7 +109,7 @@ fun FixFilesPopup() {
                         val instanceData = try {
                             InstanceData.of(instance, AppContext.files)
                         } catch (e: FileLoadException) {
-                            app().error(e)
+                            AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
@@ -134,7 +119,7 @@ fun FixFilesPopup() {
                         try {
                             resourceManager.cleanupGameFiles()
                         } catch (e: GameResourceException) {
-                            app().error(e)
+                            AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
@@ -146,7 +131,7 @@ fun FixFilesPopup() {
                                 AppContext.files.mainManifest.details
                             ).write(AppContext.files.launcherDetails)
                         } catch (e: IOException) {
-                            app().error(e)
+                            AppContext.error(e)
                             AppContext.files.launcherDetails.activeInstance = instance.first.id
                             cleanupStatus = CleanupState.FAILURE
                             return@Button

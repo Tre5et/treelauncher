@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.InstanceDataSortType
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
@@ -32,7 +31,7 @@ fun Instances() {
         try {
             AppContext.files.reloadAll()
         } catch (e: FileLoadException) {
-            app().severeError(e)
+            AppContext.severeError(e)
         }
         selectedInstance = null
         instances = AppContext.files.instanceComponents
@@ -40,7 +39,7 @@ fun Instances() {
                 try {
                     InstanceData.of(it, AppContext.files)
                 } catch (e: FileLoadException) {
-                    app().severeError(e)
+                    AppContext.severeError(e)
                     null
                 }
             }

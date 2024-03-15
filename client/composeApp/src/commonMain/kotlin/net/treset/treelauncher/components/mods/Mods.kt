@@ -16,7 +16,6 @@ import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.LauncherModSortType
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ModsCreator
@@ -95,7 +94,7 @@ fun Mods() {
                 AppContext.files.reloadModsComponents()
                 components = AppContext.files.modsComponents.sortedBy { it.first.name }
             } catch (e: FileLoadException) {
-                app().severeError(e)
+                AppContext.severeError(e)
             }
         },
         createContent =  { onCreate: (ModsCreationState) -> Unit ->

@@ -21,7 +21,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.*
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -116,7 +116,7 @@ fun ModButton(
                 versions = try {
                         modData.get().getVersions(modContext.versions, modContext.types.map { it.id })
                     } catch (e: FileDownloadException) {
-                        app().error(e)
+                        AppContext.error(e)
                         emptyList()
                     }.also { vs ->
                         vs.firstOrNull {
@@ -210,7 +210,7 @@ fun ModButton(
                                                 selectedVersion
                                             )
                                         } catch (e: Exception) {
-                                            app().error(e)
+                                            AppContext.error(e)
                                             return@registerChangingJob
                                         }
 
@@ -275,7 +275,7 @@ fun ModButton(
                                     try {
                                         modFile.moveTo(newFile)
                                     } catch(e: IOException) {
-                                        app().error(IOException("Failed to move mod file", e))
+                                        AppContext.error(IOException("Failed to move mod file", e))
                                     }
 
                                     mod.isEnabled = !enabled
@@ -299,7 +299,7 @@ fun ModButton(
                                     try {
                                         oldFile.remove()
                                     } catch(e: IOException) {
-                                        app().error(IOException("Failed to delete mod file", e))
+                                        AppContext.error(IOException("Failed to delete mod file", e))
                                         return@registerChangingJob
                                     }
                                     mods.remove(mod)

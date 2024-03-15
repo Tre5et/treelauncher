@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.components.mods.ModsCreation
@@ -348,7 +347,7 @@ fun Create() {
     if(showCreationDone) {
         creationException?.let {
             LaunchedEffect(Unit) {
-                app().error(it)
+                AppContext.error(it)
             }
 
             PopupOverlay(

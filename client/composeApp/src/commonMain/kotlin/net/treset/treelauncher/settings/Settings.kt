@@ -20,7 +20,6 @@ import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.config.GlobalConfigLoader
 import net.treset.treelauncher.backend.config.appConfig
@@ -67,7 +66,7 @@ fun Settings() {
         try {
             updater().getUpdate()
         } catch(e: IOException) {
-            app().error(e)
+            AppContext.error(e)
             null
         }
     }
@@ -628,7 +627,7 @@ fun Settings() {
                                     AppContext.files.cleanupVersions(includeLibraries)
                                     state = 2
                                 } catch(e: FileLoadException) {
-                                    app().error(e)
+                                    AppContext.error(e)
                                     state = 3
                                 }
                             }.start()

@@ -27,7 +27,6 @@ import net.treset.treelauncher.components.Saves
 import net.treset.treelauncher.components.mods.Mods
 import net.treset.treelauncher.creation.Create
 import net.treset.treelauncher.generic.*
-import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
@@ -55,7 +54,9 @@ data class AppContextData(
     val globalPopup: PopupData?,
     val addNotification: (NotificationData) -> Unit,
     val dismissNotification: (NotificationData) -> Unit,
-    val setGlobalPopup: (PopupData?) -> Unit
+    val setGlobalPopup: (PopupData?) -> Unit,
+    val error: (Exception) -> Unit,
+    val severeError: (Exception) -> Unit
 )
 
 lateinit var AppContext: AppContextData
@@ -70,20 +71,11 @@ fun App(
 ) {
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
-    var exceptions: List<Exception> by remember { mutableStateOf(listOf()) }
     var fatalExceptions: List<Exception> by remember { mutableStateOf(listOf()) }
 
     app = remember {
         launcherApp.apply {
             setPopup = { popupData = it }
-            onError = {
-                LOGGER.warn(it) { "An error occurred!" }
-                exceptions = exceptions + it
-            }
-            onSevereError = {
-                LOGGER.error(it) { "A severe error occurred!" }
-                fatalExceptions = fatalExceptions + it
-            }
         }
     }
 
@@ -131,6 +123,27 @@ fun App(
             dismissNotification = {toRemove ->
                 notifications.firstOrNull { it.data == toRemove }?.visible = false
                 notificationsChanged++
+            },
+            error = {e ->
+                LOGGER.warn(e) { "An error occurred!" }
+                AppContext.addNotification(
+                    NotificationData(
+                        color = colors.inversePrimary,
+                        onClick = {
+                            it.dismiss()
+                        },
+                        content = {
+                            Text(
+                                strings().error.notification(e),
+                                softWrap = true
+                            )
+                        }
+                    )
+                )
+            },
+            severeError = {
+                LOGGER.error(it) { "A severe error occurred!" }
+                fatalExceptions = fatalExceptions + it
             }
         )
     }
@@ -158,9 +171,8 @@ fun App(
                                 }
                                 NotificationBanner(
                                     visible = notification.visible,
-                                    color = notification.data.color,
                                     onDismissed = { notifications -= notification },
-                                    content = notification.data.content
+                                    data = notification.data
                                 )
                             }
                         }
@@ -201,29 +213,6 @@ fun App(
 
                     popupData?.let {
                         PopupOverlay(it)
-                    }
-
-                    exceptions.forEach { e ->
-                        AlertDialog(
-                            onDismissRequest = {},
-                            title = { Text(strings().error.title()) },
-                            text = {
-                                Text(
-                                    strings().error.message(e),
-                                    textAlign = TextAlign.Start
-                                )
-                            },
-                            containerColor = MaterialTheme.colorScheme.inversePrimary,
-                            textContentColor = MaterialTheme.colorScheme.onPrimary,
-                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                            confirmButton = {
-                                Button(
-                                    onClick = { exceptions = exceptions.filter { it != e } },
-                                ) {
-                                    Text(strings().error.close())
-                                }
-                            }
-                        )
                     }
 
                     fatalExceptions.forEach { e ->
@@ -303,13 +292,7 @@ class LauncherApp(
         FileUtil.useWebRequestCache(true)
     }
 
-    fun error(e: Exception) = onError(e)
-
-    fun severeError(e: Exception) = onSevereError(e)
-
     var setPopup: (PopupData?) -> Unit = {}
-    var onError: (Exception) -> Unit = {}
-    var onSevereError: (Exception) -> Unit = {}
 
     fun showNews(
         displayOther: Boolean = true,

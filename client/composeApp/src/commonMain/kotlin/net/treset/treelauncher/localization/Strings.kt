@@ -169,8 +169,7 @@ open class Strings(
 
     data class Error(
         val close: () -> String,
-        val message: (error: Exception) -> String,
-        val title: () -> String,
+        val notification: (error: Exception) -> String,
         val severeClose: () -> String,
         val severeMessage: (error: Exception) -> String,
         val severeTitle: () -> String,

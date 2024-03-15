@@ -3,7 +3,6 @@ package net.treset.treelauncher.components
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.OptionsCreator
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -46,7 +45,7 @@ fun Options() {
                 AppContext.files.reloadOptionsComponents()
                 components = AppContext.files.optionsComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
-                app().severeError(e)
+                AppContext.severeError(e)
             }
         },
         settingsDefault = true,

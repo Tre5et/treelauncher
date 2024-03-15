@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.sun.management.OperatingSystemMXBean
 import net.treset.mc_version_loader.launcher.LauncherFeature
 import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -54,7 +54,7 @@ fun InstanceSettings(
                 startMemory = getCurrentMemory(instance)
                 memory = startMemory
             } catch(e: IOException) {
-                app().error(e)
+                AppContext.error(e)
             }
         }.start()
 
@@ -76,7 +76,7 @@ fun InstanceSettings(
                             startArgs
                         )
                     } catch (e: IOException) {
-                        app().error(e)
+                        AppContext.error(e)
                     }
                 }
             }

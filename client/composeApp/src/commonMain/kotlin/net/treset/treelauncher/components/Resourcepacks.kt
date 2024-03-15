@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
@@ -89,7 +88,7 @@ fun Resourcepacks() {
                 AppContext.files.reloadResourcepackComponents()
                 components = AppContext.files.resourcepackComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
-                app().severeError(e)
+                AppContext.severeError(e)
             }
         },
         detailsContent = { current, _, _ ->
@@ -136,7 +135,7 @@ fun Resourcepacks() {
                                 it.second.remove()
                                 reloadResourcepacks()
                             } catch (e: IOException) {
-                                app().error(e)
+                                AppContext.error(e)
                             }
                         }
                     }

@@ -14,7 +14,6 @@ import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
@@ -117,7 +116,7 @@ fun Saves() {
                 AppContext.files.reloadSavesComponents()
                 components = AppContext.files.savesComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
-                app().severeError(e)
+                AppContext.severeError(e)
             }
         },
         detailsContent = { current, _, _ ->
@@ -172,7 +171,7 @@ fun Saves() {
                                     }
                                     reloadSaves()
                                 } catch (e: IOException) {
-                                    app().error(e)
+                                    AppContext.error(e)
                                 }
                             },
                         ) {
@@ -215,7 +214,7 @@ fun Saves() {
                     val instanceData = try {
                         InstanceData.of(instance, AppContext.files)
                     } catch (e: FileLoadException) {
-                        app().severeError(e)
+                        AppContext.severeError(e)
                         return@PlayPopup
                     }
 
@@ -322,7 +321,7 @@ private fun PlayPopup(
         try {
             AppContext.files.reloadAll()
         } catch (e: FileLoadException) {
-            app().severeError(e)
+            AppContext.severeError(e)
         }
 
         instances = AppContext.files.instanceComponents

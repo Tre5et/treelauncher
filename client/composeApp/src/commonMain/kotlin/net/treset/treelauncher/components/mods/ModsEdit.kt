@@ -11,7 +11,7 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModDownload
 import net.treset.mc_version_loader.mods.MinecraftMods
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
@@ -174,7 +174,7 @@ fun ModsEdit(
                                 LOGGER.debug { "Backing up old file: ${oldFile.path} -> ${backupFile.path}"}
                                 oldFile.moveTo(backupFile)
                             } catch (e: IOException) {
-                                app().error(e)
+                                AppContext.error(e)
                                 return@registerChangingJob
                             }
 
@@ -192,7 +192,7 @@ fun ModsEdit(
                                 try {
                                     backupFile.moveTo(oldFile)
                                 } catch (e: IOException) {
-                                    app().error(e)
+                                    AppContext.error(e)
                                 }
                                 return@registerChangingJob
                             }
@@ -242,7 +242,7 @@ fun ModsEdit(
                                 LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}" }
                                 file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
                             } catch (e: IOException) {
-                                app().error(e)
+                                AppContext.error(e)
                                 return@registerChangingJob
                             }
 

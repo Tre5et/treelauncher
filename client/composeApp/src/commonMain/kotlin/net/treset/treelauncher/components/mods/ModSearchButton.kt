@@ -19,8 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
-import net.treset.mc_version_loader.mods.*
-import net.treset.treelauncher.app
+import net.treset.mc_version_loader.mods.ModData
+import net.treset.mc_version_loader.mods.ModProvider
+import net.treset.mc_version_loader.mods.ModVersionData
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.isSame
@@ -105,7 +107,7 @@ fun ModSearchButton(
             try {
                 versions = mod.getVersions(searchContext.versions, searchContext.types.map { it.id })
             } catch (e: FileDownloadException) {
-                app().error(e)
+                AppContext.error(e)
             }
         }.start()
     }
@@ -184,7 +186,7 @@ fun ModSearchButton(
 
                                             currentVersion = selectedVersion
                                         } catch(e: Exception) {
-                                            app().error(e)
+                                            AppContext.error(e)
                                         }
 
                                         downloading = false

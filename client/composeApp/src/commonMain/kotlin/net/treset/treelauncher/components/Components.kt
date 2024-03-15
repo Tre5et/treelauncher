@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.LauncherManifestSortType
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.GenericComponentCreator
@@ -307,7 +307,7 @@ fun <T, C:CreationState<T>> Components(
                                     appConfig().manifestFileName
                                 ).write(it.getManifest())
                             } catch (e: IOException) {
-                                app().severeError(e)
+                                AppContext.severeError(e)
                             }
                             redrawSelected()
                         }
@@ -333,7 +333,7 @@ fun <T, C:CreationState<T>> Components(
                             ).write(componentManifest)
                             LauncherFile.of(it.getManifest().directory).remove()
                         } catch(e: IOException) {
-                            app().severeError(e)
+                            AppContext.severeError(e)
                         }
                         reload()
                         showDelete = false
@@ -362,7 +362,7 @@ fun <T, C:CreationState<T>> Components(
                             try {
                                 creation.execute()
                             } catch (e: ComponentCreationException) {
-                                app().error(e)
+                                AppContext.error(e)
                             }
                             reload()
                             creationStatus = null

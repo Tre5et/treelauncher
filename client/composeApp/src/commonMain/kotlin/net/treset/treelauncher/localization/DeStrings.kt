@@ -86,8 +86,7 @@ class DeStrings : Strings(
     ),
     error = Error(
         close = { "Akzeptieren" },
-        message = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
-        title = { "Ein Fehler ist aufgetreten!" },
+        notification = { error -> "Ein Fehler ist aufgetreten: ${error.message ?: "Unbekannter Fehler"}. Hier klicken zum schließen." },
         severeClose = { "Launcher schließen" },
         severeMessage = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
         severeTitle = { "Ein kritischen Fehler ist aufgetreten!" },

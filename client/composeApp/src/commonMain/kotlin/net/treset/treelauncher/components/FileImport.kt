@@ -26,7 +26,7 @@ import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Strings
@@ -413,7 +413,7 @@ fun <T> FileImport(
                             newDir = LauncherFile.of(component.directory, newName)
                         }
                         if(!found) {
-                            app().error(IOException("Failed to find a unique name for file: ${file.second.path}"))
+                            AppContext.error(IOException("Failed to find a unique name for file: ${file.second.path}"))
                             return@Thread
                         }
 
@@ -421,7 +421,7 @@ fun <T> FileImport(
                             LOGGER.debug { "Copying file: ${file.second.path} -> ${newDir.path}" }
                             file.second.copyTo(newDir)
                         } catch (e: IOException) {
-                            app().error(e)
+                            AppContext.error(e)
                         }
                     }
                     close()

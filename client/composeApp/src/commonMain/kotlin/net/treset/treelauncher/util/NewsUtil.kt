@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.news.News
 import net.treset.treelauncher.backend.news.news
@@ -46,7 +46,7 @@ fun getNewsPopup(
                         }
                     }
                 } catch(e: IOException) {
-                    app().error(e)
+                    AppContext.error(e)
                 }
             }
 
