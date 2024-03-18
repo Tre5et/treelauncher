@@ -496,6 +496,8 @@ open class Strings(
 
         data class Mods(
             val content: Content,
+            val empty: () -> Pair<String, String>,
+            val emptyTitle: () -> String,
             val title: () -> String
         ) {
             data class Content(
@@ -512,10 +514,14 @@ open class Strings(
         )
 
         data class Resourcepacks(
+            val empty: () -> Pair<String, String>,
+            val emptyTitle: () -> String,
             val title: () -> String
         )
 
         data class Saves(
+            val empty: () -> Pair<String, String>,
+            val emptyTitle: () -> String,
             val play: Play,
             val servers: () -> String,
             val title: () -> String,

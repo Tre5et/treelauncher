@@ -1,7 +1,8 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.DragData
@@ -18,6 +19,7 @@ import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import java.io.IOException
@@ -126,7 +128,31 @@ fun Resourcepacks() {
                     reloadResourcepacks()
                 }
             } else {
-                if (resourcepacks.isNotEmpty()) {
+                if(resourcepacks.isEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            strings().selector.resourcepacks.emptyTitle(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            strings().selector.resourcepacks.empty().let {
+                                Text(it.first)
+                                Icon(
+                                    icons().add,
+                                    "Add",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(it.second)
+                            }
+                        }
+                    }
+                } else {
                     resourcepacks.forEach {
                         ResourcepackButton(
                             it.first

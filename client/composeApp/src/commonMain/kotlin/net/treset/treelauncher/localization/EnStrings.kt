@@ -372,15 +372,23 @@ class EnStrings : Strings(
                 install = { "Install Version" },
                 open = { "Open in Browser" }
             ),
+            empty = {
+              "Click the" to "at the top to add a mod."
+            },
+            emptyTitle = { "No Mods added yet." },
             title = { "Mods" }
         ),
         options = Selector.Options(
             title = { "Options" }
         ),
         resourcepacks = Selector.Resourcepacks(
+            empty = { "Drag and Drop Resourcepacks here or click the" to "at the top to import some." },
+            emptyTitle = { "No Resourcepacks added yet." },
             title = { "Resourcepacks" }
         ),
         saves = Selector.Saves(
+            empty = { "Drag and Drop Worlds here or click the" to "at the top to import some." },
+            emptyTitle = { "No Worlds added yet." },
             play = Selector.Saves.Play(
                 button = { "Start World" },
                 multipleClose = { "Cancel" },

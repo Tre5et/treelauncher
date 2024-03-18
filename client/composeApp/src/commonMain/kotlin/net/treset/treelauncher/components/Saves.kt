@@ -1,7 +1,7 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -152,6 +152,31 @@ fun Saves() {
                 ) {
                     showAdd = false
                     reloadSaves()
+                }
+            } else if(saves.isEmpty() && servers.isEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        strings().selector.saves.emptyTitle(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        strings().selector.saves.empty().let {
+                            Text(it.first)
+                            Icon(
+                                icons().add,
+                                "Add",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(it.second)
+                        }
+                    }
                 }
             } else {
                 if (saves.isNotEmpty()) {

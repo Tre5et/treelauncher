@@ -212,44 +212,71 @@ fun Mods() {
                     showSearch = false
                 }
             } else {
-                TextBox(
-                    text = searchContent,
-                    onTextChanged = {
-                        searchContent = it
-                    },
-                    placeholder = strings().manager.mods.searchPlaceholder(),
-                    trailingIcon = {
-                        Icon(
-                            icons().search,
-                            "Search"
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f, false),
-                ) {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                if(mods.isEmpty()) {
+                    Column(
+                        modifier = Modifier.weight(1f, true).fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        item {
-                            if(filteredMods.isEmpty()) {
-                                Text(
-                                    strings().manager.mods.empty(),
-                                    modifier = Modifier.fillMaxWidth()
+                        Text(
+                            strings().selector.mods.emptyTitle(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            strings().selector.mods.empty().let {
+                                Text(it.first)
+                                Icon(
+                                    icons().add,
+                                    "Add",
+                                    modifier = Modifier.size(20.dp)
                                 )
+                                Text(it.second)
                             }
                         }
+                    }
+                } else {
+                    TextBox(
+                        text = searchContent,
+                        onTextChanged = {
+                            searchContent = it
+                        },
+                        placeholder = strings().manager.mods.searchPlaceholder(),
+                        trailingIcon = {
+                            Icon(
+                                icons().search,
+                                "Search"
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                        items(filteredMods) { mod ->
-                            ModButton(
-                                mod,
-                                modContext,
-                                checkUpdates
-                            ) {
-                                editingMod = mod
+                    Box(
+                        modifier = Modifier
+                            .weight(1f, false),
+                    ) {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            item {
+                                if (filteredMods.isEmpty()) {
+                                    Text(
+                                        strings().manager.mods.empty(),
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+
+                            items(filteredMods) { mod ->
+                                ModButton(
+                                    mod,
+                                    modContext,
+                                    checkUpdates
+                                ) {
+                                    editingMod = mod
+                                }
                             }
                         }
                     }

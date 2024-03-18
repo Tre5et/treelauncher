@@ -341,7 +341,7 @@ class DeStrings : Strings(
                 tooltip = { "Instanz löschen" }
             ),
             empty = { "Auf den" to "Knopf unten klicken, um Instanzen zu erstellen." },
-            emptyTitle = { "Noch keine Instanzen vorhanden." },
+            emptyTitle = { "Keine Instanzen erstellt." },
             game = Selector.Instance.Game(
                 errorMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},
                 errorTitle ={ "Spielstart fehlgeschlagen!" },
@@ -366,6 +366,8 @@ class DeStrings : Strings(
             version = { "Version" }
         ),
         mods = Selector.Mods(
+            empty = { "Auf den" to "Knopf oben drücken, um Mods hinzuzufügen." },
+            emptyTitle = { "Keine Mods hinzugefügt." },
             content = Selector.Mods.Content(
                 delete = { "Mod löschen" },
                 disable = { "Mod deaktivieren" },
@@ -379,9 +381,13 @@ class DeStrings : Strings(
             title = { "Optionen" }
         ),
         resourcepacks = Selector.Resourcepacks(
+            empty = { "Ressourcenpakete hierher ziehen oder auf den" to "Knopf oben drücken, um welche importieren." },
+            emptyTitle = { "Keine Ressourcenpakete hinzugefügt." },
             title = { "Ressourcenpakete" }
         ),
         saves = Selector.Saves(
+            empty = { "Welten hierher ziehen oder auf den" to "Knopf oben drücken, um welche importieren." },
+            emptyTitle = { "Keine Welten hinzugefügt." },
             play = Selector.Saves.Play(
                 button = { "Welt starten" },
                 multipleClose = { "Abbrechen" },
