@@ -171,7 +171,10 @@ fun App(
                                 }
                                 NotificationBanner(
                                     visible = notification.visible,
-                                    onDismissed = { notifications -= notification },
+                                    onDismissed = {
+                                        //Strange behavior when removing, downstream notifications get dismissed too, so keep them in the list
+                                        //notifications -= notification
+                                    },
                                     data = notification.data
                                 )
                             }

@@ -31,8 +31,10 @@ fun NotificationBanner(
 
     var dismiss by remember { mutableStateOf(false) }
 
-    val context = NotificationContext {
-        dismiss = true
+    val context = remember(content) {
+        NotificationContext {
+            dismiss = true
+        }
     }
 
     AnimatedVisibility(
@@ -40,7 +42,7 @@ fun NotificationBanner(
         enter = expandVertically(),
         exit = shrinkVertically()
     ) {
-        DisposableEffect(Unit) {
+        DisposableEffect(content) {
             onDispose {
                 onDismissed()
             }
