@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import net.treset.treelauncher.style.contentColor
@@ -57,13 +56,8 @@ fun Button(
     val colorScheme = MaterialTheme.colorScheme
     val foregroundColor =
         if(dynamicContentColor) {
-            colorScheme.contentColor(backgroundColor).let {
-                if(it.isUnspecified) {
-                    contentColor
-                } else {
-                    it
-                }
-            }
+            //Use unhovered color always
+            colorScheme.contentColor(color)
         } else {
             contentColor
         }

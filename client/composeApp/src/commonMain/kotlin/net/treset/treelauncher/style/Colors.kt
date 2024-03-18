@@ -8,6 +8,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.takeOrElse
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.localization.strings
 import org.jetbrains.jewel.intui.window.styling.dark
@@ -171,6 +172,13 @@ fun LauncherTheme(
     }
 }
 
+fun Color.inverted(): Color = Color(
+    red = 1f - red,
+    green = 1f - green,
+    blue = 1f - blue,
+    alpha = alpha
+)
+
 
 val ColorScheme.warning: Color
     @Composable @ReadOnlyComposable
@@ -193,5 +201,11 @@ fun ColorScheme.contentColor(backgroundColor: Color): Color =
     when(backgroundColor) {
         warning -> onWarning
         info -> onInfo
-        else -> contentColorFor(backgroundColor)
+        else -> contentColorFor(backgroundColor).takeOrElse {
+            if(backgroundColor.contrast(onBackground) < 4.5f && backgroundColor.contrast(onBackground.inverted()) > 4.5f) {
+                onBackground.inverted()
+            } else {
+                onBackground
+            }
+        }
     }

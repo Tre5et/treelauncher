@@ -21,12 +21,15 @@ fun TextBox(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    inputAcceptable: (String) -> Boolean = { true },
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     OutlinedTextField(
         value = text,
         onValueChange = {
-            onTextChanged(it)
+            if(inputAcceptable(it)) {
+                onTextChanged(it)
+            }
         },
         placeholder = { Text(placeholder) },
         enabled = enabled,

@@ -11,14 +11,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
-import com.godaddy.android.colorpicker.ClassicColorPicker
-import com.godaddy.android.colorpicker.HsvColor
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.backend.config.GlobalConfigLoader
@@ -36,8 +35,9 @@ import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.AccentColor
 import net.treset.treelauncher.style.Theme
 import net.treset.treelauncher.style.icons
-import net.treset.treelauncher.style.info
+import net.treset.treelauncher.util.HsvColor
 import net.treset.treelauncher.util.onUpdate
+import org.jetbrains.jewel.ui.util.toRgbaHexString
 import java.awt.image.BufferedImage
 import java.io.IOException
 
@@ -499,7 +499,6 @@ fun Settings() {
                 onClick = {
                     showCleanup = true
                 },
-                color = MaterialTheme.colorScheme.info
             ) {
                 Text(
                     strings().settings.cleanup.button()
@@ -551,17 +550,39 @@ fun Settings() {
 
     if(showColorPicker) {
         var color by remember { mutableStateOf(HsvColor.from(customColor)) }
+        var colorString by remember(color) { mutableStateOf(color.toColor().toRgbaHexString().removeRange(0,1).let {
+            if(it.length == 8) it.removeRange(6,8) else it
+        }) }
 
         PopupOverlay(
             titleRow = { Text(strings().settings.theme.title()) },
             content = {
-                ClassicColorPicker(
+                ColorPicker(
                     onColorChanged = {
                         color = it
                     },
                     color = color,
-                    showAlphaBar = false,
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier.size(400.dp)
+                )
+                TextBox(
+                    colorString,
+                    {
+                        colorString = it
+                        if(it.length == 6) {
+                            try {
+                                color = HsvColor.from(Color(("ff${it}").toLong(16)))
+                            } catch (exception: NumberFormatException) {
+                                //ignore
+                            }
+                        }
+                    },
+                    prefix = {
+                        Text(
+                            "#",
+                            modifier = Modifier.offset(y = 4.dp)
+                        )
+                    },
+                    inputAcceptable = { it.length <= 6 && it.all { c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' } }
                 )
             },
             buttonRow = {
