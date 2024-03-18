@@ -30,12 +30,14 @@ import java.net.URI
 fun Resourcepacks() {
     var components by remember { mutableStateOf(AppContext.files.resourcepackComponents.sortedBy { it.name }) }
 
-    var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
-
     var selected: LauncherManifest? by remember { mutableStateOf(null) }
+
+    var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
+    var loading by remember(selected) { mutableStateOf(true) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
+
 
     val reloadResourcepacks = {
         selected?.let { current ->
@@ -51,6 +53,7 @@ fun Resourcepacks() {
                         }
                     }?.let { it to file }
                 }
+            loading = false
         }
     }
 
@@ -128,8 +131,9 @@ fun Resourcepacks() {
                     reloadResourcepacks()
                 }
             } else {
-                if(resourcepacks.isEmpty()) {
+                if(resourcepacks.isEmpty() && !loading) {
                     Column(
+                        modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -203,7 +207,7 @@ fun Resourcepacks() {
                 showAdd = true
             }
         },
-        detailsScrollable = true,
+        detailsScrollable = resourcepacks.isNotEmpty(),
         sortContext = SortContext(
             getSortType = { appSettings().resourcepacksComponentSortType },
             setSortType = { appSettings().resourcepacksComponentSortType = it },

@@ -40,6 +40,7 @@ fun Saves() {
 
     var saves: List<Pair<Save, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var servers: List<Server> by remember { mutableStateOf(emptyList()) }
+    var loading by remember(selected) { mutableStateOf(true) }
 
     var selectedSave: Save? by remember(selected) { mutableStateOf(null) }
     var selectedServer: Server? by remember(selected) { mutableStateOf(null) }
@@ -81,6 +82,7 @@ fun Saves() {
             } else {
                 emptyList()
             }
+            loading = false
         }
     }
 
@@ -153,11 +155,11 @@ fun Saves() {
                     showAdd = false
                     reloadSaves()
                 }
-            } else if(saves.isEmpty() && servers.isEmpty()) {
+            } else if(saves.isEmpty() && servers.isEmpty() && !loading) {
                 Column(
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         strings().selector.saves.emptyTitle(),
@@ -323,7 +325,7 @@ fun Saves() {
                 showAdd = true
             }
         },
-        detailsScrollable = true,
+        detailsScrollable = saves.isNotEmpty() || servers.isNotEmpty(),
         sortContext = SortContext(
             getSortType = { appSettings().savesComponentSortType },
             setSortType = { appSettings().savesComponentSortType = it },

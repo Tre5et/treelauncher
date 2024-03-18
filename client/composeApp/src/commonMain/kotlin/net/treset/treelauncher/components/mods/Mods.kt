@@ -254,8 +254,7 @@ fun Mods() {
                     )
 
                     Box(
-                        modifier = Modifier
-                            .weight(1f, false),
+                        modifier = Modifier.weight(1f, true),
                     ) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
