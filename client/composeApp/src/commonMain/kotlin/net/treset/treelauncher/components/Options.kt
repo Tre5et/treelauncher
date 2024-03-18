@@ -18,7 +18,6 @@ fun Options() {
         strings().selector.options.title(),
         components = components,
         componentManifest = AppContext.files.optionsManifest,
-        isEnabled = { id != AppContext.runningInstance?.optionsComponent?.id },
         checkHasComponent = { details, component -> details.optionsComponent == component.id },
         getCreator = { state ->
             when(state.mode) {
