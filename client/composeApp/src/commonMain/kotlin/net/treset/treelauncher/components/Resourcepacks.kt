@@ -33,7 +33,7 @@ fun Resourcepacks() {
     var selected: LauncherManifest? by remember { mutableStateOf(null) }
 
     var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
-    var loading by remember(selected) { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(true) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
@@ -53,8 +53,8 @@ fun Resourcepacks() {
                         }
                     }?.let { it to file }
                 }
-            loading = false
         }
+        loading = false
     }
 
     LaunchedEffect(showAdd) {

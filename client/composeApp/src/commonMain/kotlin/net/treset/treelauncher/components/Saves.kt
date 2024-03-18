@@ -40,7 +40,7 @@ fun Saves() {
 
     var saves: List<Pair<Save, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var servers: List<Server> by remember { mutableStateOf(emptyList()) }
-    var loading by remember(selected) { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(true) }
 
     var selectedSave: Save? by remember(selected) { mutableStateOf(null) }
     var selectedServer: Server? by remember(selected) { mutableStateOf(null) }
