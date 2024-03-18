@@ -206,6 +206,16 @@ class ResourceManager(private var instanceData: InstanceData) {
                 throw GameResourceException("Unable to cleanup launch resources: rename mods file failed", e)
             }
             modsComponents.first.directory = newModsDir.path
+        } ?: run {
+            LOGGER.debug { "No mods component to cleanup, deleting mods dir" }
+            val modsDir = LauncherFile.of(instanceData.gameDataDir, "mods")
+            if (modsDir.exists()) {
+                try {
+                    modsDir.remove()
+                } catch (e: IOException) {
+                    throw GameResourceException("Unable to cleanup launch resources: unable to delete mods directory", e)
+                }
+            }
         }
         LOGGER.debug { "Undid component renames: instance=${instanceData.instance.first.id}" }
     }
