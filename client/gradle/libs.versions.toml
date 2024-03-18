@@ -1,10 +1,9 @@
 [versions]
-compose = "1.6.0"
-compose-plugin = "1.6.0"
-compose-compiler = "1.5.4"
-kotlin = "1.9.20"
+compose = "1.6.1"
+compose-plugin = "1.6.1"
+compose-compiler = "1.5.10"
+kotlin = "1.9.23"
 junit = "4.13.2"
-mc-version-loader = "2.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -15,7 +14,6 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = 
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-mc-version-loader = { module = "net.treset.mc-version-loader:mc-version-loader", version.ref = "mc-version-loader" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

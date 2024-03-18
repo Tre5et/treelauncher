@@ -33,17 +33,17 @@ kotlin {
 
             implementation("com.google.code.gson:gson:2.10.1")
             implementation("net.treset:mc-version-loader:4.0.0")
-            implementation("net.hycrafthd:minecraft_authenticator:3.0.5")
+            implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
-            implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
-            implementation("org.slf4j:slf4j-api:2.0.9")
-            implementation("ch.qos.logback:logback-classic:1.4.11")
+            implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
+            implementation("org.slf4j:slf4j-api:2.0.12")
+            implementation("ch.qos.logback:logback-classic:1.5.3")
 
-            api("io.github.kevinnzou:compose-webview-multiplatform:1.8.4")
+            api("io.github.kevinnzou:compose-webview-multiplatform:1.9.0")
             implementation("dev.datlag:kcef:2024.01.07.1")
 
-            implementation("org.jetbrains.jewel:jewel-int-ui-standalone:0.13.0")
-            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window:0.13.0")
+            implementation("org.jetbrains.jewel:jewel-int-ui-standalone:0.15.2")
+            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window:0.15.2")
 
             implementation("com.darkrockstudios:mpfilepicker:3.1.0")
             implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.4")
@@ -53,7 +53,7 @@ kotlin {
 }
 
 
-val version = "2.1.0"
+val version = "2.2.0"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
@@ -91,6 +91,20 @@ compose.desktop {
 
         buildTypes.release.proguard {
             configurationFiles.from(project.file("compose-desktop.pro"))
+        }
+    }
+}
+
+tasks {
+    withType<JavaExec> {
+        // afterEvaluate is needed because the Compose Gradle Plugin
+        // register the task in the afterEvaluate block
+        afterEvaluate {
+            javaLauncher = project.javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(17)
+                vendor = JvmVendorSpec.JETBRAINS
+            }
+            setExecutable(javaLauncher.map { it.executablePath.asFile.absolutePath }.get())
         }
     }
 }
@@ -187,9 +201,9 @@ launcherTask(
 
 launcherTask(
     "zipDist",
-    listOf("createDistributable")
+    listOf("createReleaseDistributable")
 ) {
-    val folder = project.file("build/compose/binaries/main/app/$projectName")
+    val folder = project.file("build/compose/binaries/main-release/app/$projectName")
     val zipFile = project.file("build/dist/${version}/$projectName-$version.zip")
 
     println("Zipping dist: ${folder.absolutePath} -> ${zipFile.absolutePath}")
@@ -214,9 +228,9 @@ launcherTask(
 
 launcherTask(
     "moveMsi",
-    listOf("packageMsi")
+    listOf("packageReleaseMsi")
 ) {
-    val src = project.file("build/compose/binaries/main/msi/$projectName-$version.msi")
+    val src = project.file("build/compose/binaries/main-release/msi/$projectName-$version.msi")
     val target = project.file("build/dist/$version/$projectName-$version.msi")
 
     println("Moving msi: ${src.absolutePath} -> ${target.absolutePath}")
