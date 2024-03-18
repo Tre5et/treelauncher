@@ -3,6 +3,7 @@ package net.treset.treelauncher.generic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
@@ -20,7 +21,7 @@ import androidx.compose.ui.unit.dp
 fun DroppableArea(
     onDrop: (DragData) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     var isDragging by remember { mutableStateOf(false) }
 
