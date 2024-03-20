@@ -106,6 +106,7 @@ fun ModSearchButton(
         versions ?: Thread {
             try {
                 versions = mod.getVersions(searchContext.versions, searchContext.types.map { it.id })
+                    .sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
             } catch (e: FileDownloadException) {
                 AppContext.error(e)
             }

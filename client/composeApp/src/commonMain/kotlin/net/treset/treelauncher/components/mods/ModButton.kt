@@ -115,6 +115,7 @@ fun ModButton(
             if(modData.isPresent) {
                 versions = try {
                         modData.get().getVersions(modContext.versions, modContext.types.map { it.id })
+                            .sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
                     } catch (e: FileDownloadException) {
                         AppContext.error(e)
                         emptyList()
