@@ -217,6 +217,7 @@ open class Strings(
     data class Login(
         val browserTitle: (WebViewState) -> String,
         val button: () -> String,
+        val hint: () -> String,
         val label: Label,
         val logout: () -> String,
         val keepLoggedIn: () -> String

@@ -119,6 +119,20 @@ class DeStrings : Strings(
     login = Login(
         browserTitle = { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
         button = { "Login mit Microsoft" },
+        hint = { "Tipp: ${
+            arrayOf(
+                "Dateien können in Welten oder Ressourcenpaket Komponenten gezogen werden, um diese zu importieren.",
+                "Welten oder Server können direkt gestartet werden. Diese auswählen und den Spielen Knopf klicken.",
+                "Die Farbe des Launchers kann in den Einstellungen angepasst werden.",
+                "Den Nachrichten Knopf am oberen Bildschirmrand klicken, um die neuesten Neuigkeiten zu sehen.",
+                "Mit dem Mauszeiger kann über die Spielzeit einer Instanz gefahren werden, um die genaue Zeit anzuzeigen.",
+                "Die Mods-Komponente einer Instanz kann durch auswahl des der Option \"Keine Komponente\" entfernt werden.",
+                "Launcher-Dateien können an einem anderen Speicherort gespeichert werden. Der Ort wird in den Einstellungen ausgewählt.",
+                "Die Sortierung von Komponenten kann durch Klicken auf den Sortierknopf neben dem Zeilenkopf geändert werden.",
+                "Der Launcher kann komplett durch benutzen der Tabulator-Taste verwendet werden.",
+                "Dateien können in die Komponenteneinstellungen gezogen werden, um diese den Einbegriffenen Dateien hinzuzufügen."
+            ).random()
+        }" },
         label = Login.Label(
             authenticating = { "Einloggen..." },
             failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },

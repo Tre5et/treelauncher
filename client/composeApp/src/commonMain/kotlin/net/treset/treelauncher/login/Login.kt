@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.*
@@ -76,6 +77,31 @@ fun LoginScreen(
                 },
                 { browserUrl = it }
             )
+        }
+    }
+
+    val notificationColor = MaterialTheme.colorScheme.secondaryContainer
+    var notification: NotificationData? by remember { mutableStateOf(null) }
+    DisposableEffect(loginState) {
+        notification = (if(loginState == LoginState.AUTHENTICATING) {
+            NotificationData(
+                color = notificationColor,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
+                ) {
+                    Text(strings().login.hint())
+                }
+            }
+        } else null)?.also {
+            AppContext.addNotification(it)
+        }
+
+        onDispose {
+            notification?.also {
+                AppContext.dismissNotification(it)
+            }
         }
     }
 
@@ -153,26 +179,33 @@ fun LoginScreen(
                 )
             }
 
-            Row {
-                Text(
-                    text = when (loginState) {
-                        LoginState.NOT_LOGGED_IN -> ""
-                        LoginState.AUTHENTICATING -> strings().login.label.authenticating()
-                        LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
-                        LoginState.FAILED -> strings().login.label.failure()
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if(loginState == LoginState.FAILED) {
-                    Button(
-                        onClick = {
-                            LoginContext.logout()
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = when (loginState) {
+                            LoginState.NOT_LOGGED_IN -> ""
+                            LoginState.AUTHENTICATING -> strings().login.label.authenticating()
+                            LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                            LoginState.FAILED -> strings().login.label.failure()
                         },
-                        color = MaterialTheme.colorScheme.error,
-                    ) {
-                        Text(strings().login.logout())
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+
+                    if (loginState == LoginState.FAILED) {
+                        Button(
+                            onClick = {
+                                LoginContext.logout()
+                            },
+                            color = MaterialTheme.colorScheme.error,
+                        ) {
+                            Text(strings().login.logout())
+                        }
                     }
                 }
             }
@@ -204,7 +237,7 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(10.dp)
+                .padding(10.dp),
         ) {
             if (loginState == LoginState.LOGGED_IN && updateChecked) {
                 FloatingActionButton(

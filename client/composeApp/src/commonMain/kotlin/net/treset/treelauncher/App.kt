@@ -118,7 +118,7 @@ fun App(
                 )
             },
             dismissNotification = {toRemove ->
-                notifications.firstOrNull { it.data == toRemove }?.visible = false
+                notifications.firstOrNull { it.data === toRemove }?.visible = false
                 notificationsChanged++
             },
             openNews = {

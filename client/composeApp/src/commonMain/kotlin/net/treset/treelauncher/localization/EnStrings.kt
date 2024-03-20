@@ -119,6 +119,20 @@ class EnStrings : Strings(
     login = Login(
         browserTitle = { state -> "Login: ${state.pageTitle ?: "Loading..."} (${state.lastLoadedUrl ?: "Getting url..."})" },
         button = { "Login with Microsoft" },
+        hint = { "Hint: ${
+            arrayOf(
+                "Drag and Drop files into Saves or Resourcepack components to import them.",
+                "Directly start a world or server by selecting it and clicking the play button.",
+                "Customize the color of the Launcher in the settings.",
+                "Click the news button at the top of the screen to view the latest news.",
+                "Hover over the instance played time to see a more accurate representation.",
+                "You can remove mods from an instance by selecting \"No Component\" in the instance options.",
+                "Files can be stored in different locations. Change the data path in the settings.",
+                "You can change the sorting of all component menus. Click the sort button next to the title.",
+                "You can navigate all of the Launcher by using the Tab key.",
+                "Drag and Drop files or folders into component settings to add the to included files."
+            ).random()
+        }" },
         label = Login.Label(
             authenticating = { "Logging you in..." },
             failure = { "Login failed. Please try again!" },
