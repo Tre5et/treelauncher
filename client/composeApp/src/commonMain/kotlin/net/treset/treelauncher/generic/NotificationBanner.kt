@@ -51,7 +51,7 @@ fun NotificationBanner(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color)
-                .clickable { onClick?.invoke(context) }
+                .clickable(enabled = onClick != null) { onClick?.invoke(context) }
                 .pointerHoverIcon(if(onClick != null) PointerIcon.Hand else PointerIcon.Default)
                 .padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
