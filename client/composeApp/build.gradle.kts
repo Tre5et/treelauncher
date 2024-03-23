@@ -32,9 +32,10 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
-            implementation("net.treset:mc-version-loader:4.0.0")
+            implementation("net.treset:mc-version-loader:5.0.0")
             implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
+            implementation("io.github.oshai:kotlin-logging:6.0.3")
             implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
             implementation("org.slf4j:slf4j-api:2.0.12")
             implementation("ch.qos.logback:logback-classic:1.5.3")
@@ -89,6 +90,7 @@ compose.desktop {
         }
 
         buildTypes.release.proguard {
+            isEnabled.set(true)
             configurationFiles.from(project.file("compose-desktop.pro"))
         }
     }
