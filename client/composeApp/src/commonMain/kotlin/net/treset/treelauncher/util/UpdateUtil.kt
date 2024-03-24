@@ -57,21 +57,26 @@ fun onUpdate(
                                         )
                                     )
 
-                                    updater().executeUpdate { amount, total, file ->
-                                        setPopup(
-                                            PopupData(
-                                                titleRow = { Text(strings().settings.update.downloadingTitle()) },
-                                                content = {
-                                                    Text(
-                                                        strings().settings.update.downloadingMessage(
-                                                            file,
-                                                            amount,
-                                                            total
+                                    try {
+                                        updater().executeUpdate { amount, total, file ->
+                                            setPopup(
+                                                PopupData(
+                                                    titleRow = { Text(strings().settings.update.downloadingTitle()) },
+                                                    content = {
+                                                        Text(
+                                                            strings().settings.update.downloadingMessage(
+                                                                file,
+                                                                amount,
+                                                                total
+                                                            )
                                                         )
-                                                    )
-                                                }
+                                                    }
+                                                )
                                             )
-                                        )
+                                        }
+                                    } catch(e: IOException) {
+                                        setPopup(null)
+                                        AppContext.error(e)
                                     }
 
                                     setPopup(
