@@ -202,9 +202,9 @@ launcherTask(
 
 launcherTask(
     "zipDist",
-    listOf("createReleaseDistributable")
+    listOf("createDistributable")
 ) {
-    val folder = project.file("build/compose/binaries/main-release/app/$projectName")
+    val folder = project.file("build/compose/binaries/main/app/$projectName")
     val zipFile = project.file("build/dist/${version}/$projectName-$version.zip")
 
     println("Zipping dist: ${folder.absolutePath} -> ${zipFile.absolutePath}")
@@ -229,9 +229,9 @@ launcherTask(
 
 launcherTask(
     "moveMsi",
-    listOf("packageReleaseMsi")
+    listOf("packageMsi")
 ) {
-    val src = project.file("build/compose/binaries/main-release/msi/$projectName-$version.msi")
+    val src = project.file("build/compose/binaries/main/msi/$projectName-$version.msi")
     val target = project.file("build/dist/$version/$projectName-$version.msi")
 
     println("Moving msi: ${src.absolutePath} -> ${target.absolutePath}")
