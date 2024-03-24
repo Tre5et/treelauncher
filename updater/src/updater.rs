@@ -105,9 +105,10 @@ fn backup_file(file: PathBuf) -> Result<Option<PathBuf>, String> {
                     return Ok(Some(backup_file.to_owned()));
                 }
                 Err(e) => {
+                    println!("Waiting for launcher to close...");
                     attempts += 1;
                     error = e.to_string();
-                    sleep(Duration::from_millis(1000))
+                    sleep(Duration::from_millis(500))
                 }
             }
         }
@@ -121,11 +122,21 @@ fn file_mode(target: PathBuf, update_file: PathBuf) -> Result<(), String> {
     if !update_file.is_file() {
         return Err(format!("Update file not found!: {}", update_file.to_string_lossy()));
     }
-    let rename = fs::rename(update_file, target);
-    if rename.is_err() {
-        return Err(format!("Failed to move file: {}", rename.unwrap_err()));
+    let mut attempts = 0;
+    let mut error: String = String::new();
+    while attempts < 60 {
+        let rename = fs::rename(update_file.clone(), target.clone());
+        if rename.is_err() {
+            println!("Waiting for launcher to close...");
+            attempts += 1;
+            error = rename.unwrap_err().to_string();
+            sleep(Duration::from_millis(500));
+        } else {
+            return Ok(());
+        }
     }
-    return Ok(());
+
+    return Err(format!("Failed to upgrade file: {}", error));
 }
 
 fn line_mode(target: PathBuf, backup_file: PathBuf, elements: Vec<UpdateElement>) -> Result<(), String> {
@@ -183,11 +194,20 @@ fn line_mode(target: PathBuf, backup_file: PathBuf, elements: Vec<UpdateElement>
         }
     }
 
-    let write = fs::write(target, lines.join("\n"));
-    if write.is_err() {
-        return Err(format!("Failed to write file: {}", write.unwrap_err()));
+    let mut attempts = 0;
+    let mut error: String = String::new();
+    while attempts < 60 {
+        let write = fs::write(target.clone(), lines.join("\n"));
+        if write.is_err() {
+            println!("Waiting for launcher to close...");
+            attempts += 1;
+            error = write.unwrap_err().to_string();
+            sleep(Duration::from_millis(500));
+        } else {
+            return Ok(());
+        }
     }
-    return Ok(());
+    return Err(format!("Failed to upgrade file: {}", error));
 }
 
 fn regex_mode(target: PathBuf, backup_file: PathBuf, elements: Vec<UpdateElement>) -> Result<(), String> {
@@ -242,11 +262,20 @@ fn regex_mode(target: PathBuf, backup_file: PathBuf, elements: Vec<UpdateElement
         }
     }
 
-    let write = fs::write(target, result);
-    if write.is_err() {
-        return Err(format!("Failed to write file: {}", write.unwrap_err()));
+    let mut attempts = 0;
+    let mut error: String = String::new();
+    while attempts < 60 {
+        let write = fs::write(target.clone(), result.clone());
+        if write.is_err() {
+            println!("Waiting for launcher to close...");
+            attempts += 1;
+            error = write.unwrap_err().to_string();
+            sleep(Duration::from_millis(500));
+        } else {
+            return Ok(());
+        }
     }
-    return Ok(());
+    return Err(format!("Failed to upgrade file: {}", error));
 }
 
 fn remove_backups(backed_up_files: Vec<PathBuf>) -> Result<(), String> {

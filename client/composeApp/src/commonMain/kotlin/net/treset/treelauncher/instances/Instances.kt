@@ -121,7 +121,7 @@ fun Instances() {
                 InstanceButton(
                     instance = it,
                     selected = selectedInstance == it,
-                    enabled = AppContext.runningInstance != it,
+                    enabled = AppContext.runningInstance?.instance?.first?.id != it.instance.first.id,
                     onClick = { selectedInstance = if(selectedInstance == it) null else it }
                 )
             }

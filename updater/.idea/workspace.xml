@@ -11,14 +11,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Implemented Updater Logic">
-      <change beforePath="$PROJECT_DIR$/../client/composeApp/resources/common/updater.cjar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/backend/update/LauncherUpdater.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/backend/update/LauncherUpdater.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/util/UpdateUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/src/commonMain/kotlin/net/treset/treelauncher/util/UpdateUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/composeApp/src/desktopMain/kotlin/net/treset/treelauncher/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/src/desktopMain/kotlin/net/treset/treelauncher/main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/composeApp/compose-desktop.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/compose-desktop.pro" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/status.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/status.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/update.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/update.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/updater.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/updater.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,11 +45,11 @@
   "keyToString": {
     "Cargo.Build `Run`.executor": "Run",
     "Cargo.Build.executor": "Run",
-    "Cargo.Run.executor": "Debug",
+    "Cargo.Run.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "git-widget-placeholder": "updater-rewrite",
+    "git-widget-placeholder": "dev",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "D:/Hannes/Coding/gits/treelauncher/updater",
     "node.js.detected.package.eslint": "true",
@@ -79,7 +74,7 @@
       <recent name="D:\Hannes\Coding\gits\treelauncher\updater\target\debug" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Run">
+  <component name="RunManager" selected="Cargo.Build">
     <configuration name="Build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
       <option name="command" value="build --release" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -137,6 +132,7 @@
       <workItem from="1710260782251" duration="1933000" />
       <workItem from="1710269608016" duration="9019000" />
       <workItem from="1710330031086" duration="1186000" />
+      <workItem from="1711290074416" duration="1862000" />
     </task>
     <task id="LOCAL-00001" summary="Changed Updater to Rust Project">
       <option name="closed" value="true" />
