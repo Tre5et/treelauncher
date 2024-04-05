@@ -1,6 +1,7 @@
 package net.treset.treelauncher.backend.config
 
 import androidx.compose.ui.graphics.Color
+import com.google.gson.annotations.SerializedName
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
 import net.treset.mc_version_loader.launcher.LauncherManifest
@@ -68,7 +69,14 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsEnable = false
     var isModsDisable = false
     var acknowledgedNews = mutableListOf<String>()
-
+    var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
+    @SerializedName("isDebug")
+    private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null
+    var isDebug: Boolean
+        get() = _isDebug ?: false
+        set(value) {
+            _isDebug = if(value) true else null
+        }
     //constructor only for gson
     private constructor() : this(LauncherFile(""))
 

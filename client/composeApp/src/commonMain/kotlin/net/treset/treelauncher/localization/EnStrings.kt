@@ -485,6 +485,13 @@ class EnStrings : Strings(
             unavailableMessage = { "An update is available, but this version of the launcher can not automatically update to it.\nCheck online how to manually update." },
             unavailableTitle = { "Not able to update." }
         ),
+        updateUrl = Settings.UpdateUrl(
+            apply = { "Apply" },
+            popupClose = { "Close" },
+            popupMessage = {e -> "The following error occured:\n${e.message}" },
+            popupTitle = { "Invalid Update URL" },
+            title = { "Update URL" }
+        ),
         user = { "Logged in as:" },
         version = { "Version: v${strings().launcher.version()}" }
     ),

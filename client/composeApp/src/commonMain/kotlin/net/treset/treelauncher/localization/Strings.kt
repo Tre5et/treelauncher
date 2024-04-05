@@ -553,6 +553,7 @@ open class Strings(
         val title: () -> String,
         val theme: Theme,
         val update: Update,
+        val updateUrl: UpdateUrl,
         val user: () -> String,
         val version: () -> String
     ) {
@@ -619,6 +620,14 @@ open class Strings(
             val tooltip: () -> String,
             val unavailableMessage: () -> String,
             val unavailableTitle: () -> String
+        )
+
+        data class UpdateUrl(
+            val apply: () -> String,
+            val popupClose: () -> String,
+            val popupMessage: (IOException) -> String,
+            val popupTitle: () -> String,
+            val title: () -> String,
         )
     }
 

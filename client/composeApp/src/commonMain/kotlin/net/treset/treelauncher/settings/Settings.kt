@@ -26,6 +26,8 @@ fun Settings() {
 
             //TODO: Sync()
 
+            UpdateUrl()
+
             User()
 
             Cleanup()

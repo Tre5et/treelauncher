@@ -1,12 +1,11 @@
 package net.treset.treelauncher.backend.update
 
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.HttpService
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
-class UpdateService : HttpService(appConfig().updateUrl) {
+class UpdateService(url: String) : HttpService(url) {
     @Throws(IOException::class)
     fun update(): Update {
         val result: Pair<HttpStatusCode, ByteArray> = get(

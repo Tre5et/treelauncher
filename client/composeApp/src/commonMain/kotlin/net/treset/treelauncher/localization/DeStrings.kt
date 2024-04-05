@@ -484,6 +484,13 @@ class DeStrings : Strings(
             unavailableMessage = { "Ein Update ist verfügbar, aber der Launcher kann nicht automatisch aktualisiert werden.\nBitte online nach manueller Update-Anleitung suchen." },
             unavailableTitle = { "Update kann nicht durchgeführt werden." }
         ),
+        updateUrl = Settings.UpdateUrl(
+            apply = { "Anwenden" },
+            popupClose = { "Schließen" },
+            popupMessage = {e -> "Der folgende Fehler ist aufgetreten:\n${e.message}" },
+            popupTitle = { "URL konnte nicht geändert werden" },
+            title = { "Update URL" }
+        ),
         user = { "Eingeloggt als:" },
         version = { "Version: v${strings().launcher.version()}" }
     ),

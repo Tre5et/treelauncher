@@ -7,35 +7,23 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
 
-open class HttpService @JvmOverloads constructor(
+open class HttpService(
     private val baseUrl: String,
     private val headers: Array<Pair<String, String>> = arrayOf()
 ) {
     @Throws(IOException::class)
     protected operator fun get(vararg route: Any): Pair<HttpStatusCode, ByteArray> {
-        return try {
-            evaluateStatus(get("$baseUrl/${route.joinToString(separator = "/")}", headers))
-        } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}", e)
-        }
+        return evaluateStatus(get("$baseUrl/${route.joinToString(separator = "/")}", headers))
     }
 
     @Throws(IOException::class)
     protected fun post(data: ByteArray, vararg route: Any): Pair<HttpStatusCode, ByteArray> {
-        return try {
-            evaluateStatus(post("$baseUrl/${route.joinToString(separator = "/")}", headers, data))
-        } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}", e)
-        }
+        return evaluateStatus(post("$baseUrl/${route.joinToString(separator = "/")}", headers, data))
     }
 
     @Throws(IOException::class)
     protected fun post(contentType: String, data: ByteArray, vararg route: Any): Pair<HttpStatusCode, ByteArray> {
-        return try {
-            evaluateStatus(post("$baseUrl/${route.joinToString(separator = "/")}", headers, contentType, data))
-        } catch (e: IOException) {
-            throw IOException("Failed to connect to server: $baseUrl/${route.joinToString(separator = "/")}", e)
-        }
+        return evaluateStatus(post("$baseUrl/${route.joinToString(separator = "/")}", headers, contentType, data))
     }
 
     @Throws(IOException::class)
@@ -55,8 +43,12 @@ open class HttpService @JvmOverloads constructor(
     @Throws(IOException::class)
     private operator fun get(url: String, headers: Array<Pair<String, String>>): Pair<HttpStatusCode, ByteArray> {
         val client = httpClient
-        val requestBuilder = HttpRequest.newBuilder()
-            .uri(URI.create(url))
+        val requestBuilder = try {
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+        } catch (e: IllegalArgumentException) {
+            throw IOException("Invalid URL: $url", e)
+        }
         headers.forEach {
             requestBuilder.header(
                 it.first,
@@ -84,9 +76,13 @@ open class HttpService @JvmOverloads constructor(
         data: ByteArray
     ): Pair<HttpStatusCode, ByteArray> {
         val client = httpClient
-        val requestBuilder = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header("Content-Type", contentType)
+        val requestBuilder = try {
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", contentType)
+        } catch (e: IllegalArgumentException) {
+            throw IOException("Invalid URL: $url", e)
+        }
         headers.forEach {
             requestBuilder.header(
                 it.first,
@@ -104,9 +100,9 @@ open class HttpService @JvmOverloads constructor(
         val response: HttpResponse<ByteArray> = try {
             client.send(request, HttpResponse.BodyHandlers.ofByteArray())
         } catch (e: InterruptedException) {
-            throw IOException("The request was interrupted", e)
+            throw IOException("The request was interrupted: ${request.uri()}", e)
         } catch (e: Exception) {
-            throw IOException("Failed to connect to server", e)
+            throw IOException("Failed to connect to server: ${request.uri()}", e)
         }
         return Pair(HttpStatusCode.getById(response.statusCode()), response.body())
     }

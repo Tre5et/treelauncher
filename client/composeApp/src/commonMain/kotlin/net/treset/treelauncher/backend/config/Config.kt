@@ -5,7 +5,7 @@ import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 
-class Config(baseDir: String, val debug: Boolean, val updateUrl: String) {
+class Config(baseDir: String, val updateUrl: String?) {
     var baseDir: LauncherFile = LauncherFile.of(baseDir)
     val syncFileName = "data.sync"
     val metaDir: LauncherFile = LauncherFile.of(baseDir, ".launcher")

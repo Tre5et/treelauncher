@@ -17,26 +17,23 @@ class GlobalConfigLoader {
 
             val path = "${System.getenv("LOCALAPPDATA")}/treelauncher-data" + if(System.getenv("debug") == "true") "-debug" else ""
             file.write(
-                "path=$path${System.lineSeparator()}update_url=https://update.treelauncher.net"
+                "path=$path"
             )
         }
         val contents: String = file.readString()
         val lines = contents.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         var path: String? = null
-        var debug = false
         var updateUrl: String? = null
         for (line in lines) {
             if (line.startsWith("path=")) {
                 path = line.substring(5).replace("\r", "").replace("\n", "")
-            } else if (line.startsWith("debug=")) {
-                debug = line.substring(6).toBoolean()
             } else if (line.startsWith("update_url=")) {
                 updateUrl = line.substring(11).replace("\r", "").replace("\n", "")
             }
         }
-        check(!(path.isNullOrBlank() || updateUrl.isNullOrBlank())) { "Invalid config: path=$path, updateUrl=$updateUrl" }
-        LOGGER.info { "Loaded config: path=$path, debug=$debug" }
-        val config = Config(path, debug, updateUrl)
+        check(!(path.isNullOrBlank())) { "Invalid config: path=$path" }
+        LOGGER.info { "Loaded config: path=$path" }
+        val config = Config(path, updateUrl)
         setAppConfig(config)
         return config
     }
