@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,9 +33,7 @@ import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
-import net.treset.treelauncher.style.AccentColor
-import net.treset.treelauncher.style.Theme
-import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.style.*
 import net.treset.treelauncher.util.HsvColor
 import net.treset.treelauncher.util.onUpdate
 import org.jetbrains.jewel.ui.util.toRgbaHexString
@@ -71,6 +70,8 @@ fun Settings() {
             null
         }
     }
+
+    val instanceRunning = remember { AppContext.runningInstance != null }
 
     TitledColumn(
         title = strings().settings.title(),
@@ -231,14 +232,15 @@ fun Settings() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .background(if(instanceRunning) MaterialTheme.colorScheme.secondaryContainer.disabledContainer() else MaterialTheme.colorScheme.secondaryContainer)
                     .padding(12.dp)
                     .fillMaxWidth()
             ) {
                 Text(
                     strings().settings.path.title(),
                     style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    color = if(instanceRunning) LocalContentColor.current.disabledContent() else LocalContentColor.current
                 )
 
                 var tfValue by remember { mutableStateOf(appConfig().baseDir.absolutePath) }
@@ -251,7 +253,8 @@ fun Settings() {
                         tfValue,
                         {
                             tfValue = it
-                        }
+                        },
+                        enabled = !instanceRunning
                     )
 
                     IconButton(
@@ -259,12 +262,13 @@ fun Settings() {
                             showDirPicker = true
                         },
                         icon = icons().folder,
-                        tooltip = strings().settings.path.select()
+                        tooltip = strings().settings.path.select(),
+                        enabled = !instanceRunning
                     )
                 }
 
                 DirectoryPicker(
-                    show = showDirPicker,
+                    show = showDirPicker && !instanceRunning,
                     initialDirectory = if (LauncherFile.of(tfValue)
                             .isDirectory()
                     ) tfValue else appConfig().baseDir.absolutePath,
@@ -280,7 +284,8 @@ fun Settings() {
                     checked = cbState,
                     onCheckedChange = {
                         cbState = it
-                    }
+                    },
+                    enabled = !instanceRunning
                 )
 
                 Button(
@@ -335,7 +340,8 @@ fun Settings() {
                                 }
                             }.start()
                         }
-                    }
+                    },
+                    enabled = !instanceRunning
                 ) {
                     Text(
                         strings().settings.path.apply()
@@ -491,7 +497,8 @@ fun Settings() {
                     size = 32.dp,
                     interactionTint = MaterialTheme.colorScheme.error,
                     highlighted = true,
-                    tooltip = strings().settings.logout()
+                    tooltip = strings().settings.logout(),
+                    enabled = !instanceRunning
                 )
             }
 
@@ -499,6 +506,7 @@ fun Settings() {
                 onClick = {
                     showCleanup = true
                 },
+                enabled = !instanceRunning
             ) {
                 Text(
                     strings().settings.cleanup.button()
@@ -528,7 +536,8 @@ fun Settings() {
                     },
                     icon = icons().update,
                     highlighted = update?.id != null,
-                    tooltip = strings().settings.update.tooltip()
+                    tooltip = strings().settings.update.tooltip(),
+                    enabled = !instanceRunning
                 )
 
                 if (update?.id != null) {

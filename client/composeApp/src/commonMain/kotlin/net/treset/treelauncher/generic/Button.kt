@@ -64,7 +64,7 @@ fun Button(
 
     androidx.compose.material3.Button(
         onClick,
-        modifier.pointerHoverIcon(PointerIcon.Hand),
+        modifier.pointerHoverIcon(if(enabled) PointerIcon.Hand else PointerIcon.Default),
         enabled,
         shape,
         ButtonDefaults.buttonColors(

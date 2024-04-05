@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.style.disabledContent
 
 @Composable
 fun TitledCheckBox(
@@ -33,6 +35,7 @@ fun TitledCheckBox(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
+                enabled = enabled
             ) { onCheckedChange?.invoke(!checked) }
     ) {
         Checkbox(
@@ -41,12 +44,13 @@ fun TitledCheckBox(
             enabled = enabled,
             interactionSource = interactionSource,
             colors = colors,
-            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
+            modifier = Modifier.pointerHoverIcon(if(enabled) PointerIcon.Hand else PointerIcon.Default)
         )
         Text(
             text = title,
             modifier = Modifier
-                .offset(x = (-5).dp)
+                .offset(x = (-5).dp),
+            color = if(enabled) LocalContentColor.current else LocalContentColor.current.disabledContent()
         )
     }
 }
