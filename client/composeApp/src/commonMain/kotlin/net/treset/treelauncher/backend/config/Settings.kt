@@ -2,6 +2,7 @@ package net.treset.treelauncher.backend.config
 
 import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
 import net.treset.mc_version_loader.launcher.LauncherManifest
@@ -86,7 +87,9 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
 
     @Throws(IOException::class)
     fun save() {
+        LOGGER.debug { "Saving settings to: $file..." }
         file.write(this)
+        LOGGER.debug { "Saved settings" }
     }
 
     companion object {
@@ -97,6 +100,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
 
         @Throws(IOException::class)
         fun load(file: LauncherFile): Settings {
+            LOGGER.debug { "Loading settings from: $file..." }
             val result: Settings = try {
                 fromJson(file.readString())
             } catch (e: SerializationException) {
@@ -104,18 +108,23 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
             }
             result.file = file
             setAppSettings(result)
+            LOGGER.debug { "Loaded settings" }
             return appSettings()
         }
 
         @Throws(IOException::class)
         fun new(file: LauncherFile): Settings {
+            LOGGER.debug { "Creating new settings at: $file..." }
             val result = Settings(file)
             setAppSettings(result)
             result.save()
+            LOGGER.debug { "Created new settings" }
             return appSettings()
         }
     }
 }
+
+private val LOGGER = KotlinLogging.logger {}
 
 private lateinit var settings: Settings
 fun appSettings(): Settings = settings
