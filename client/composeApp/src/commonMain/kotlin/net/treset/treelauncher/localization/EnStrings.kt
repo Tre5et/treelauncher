@@ -433,6 +433,7 @@ class EnStrings : Strings(
             success = { "Unused files have been deleted." },
             title = { "Delete unused Files" }
         ),
+        debugNotification = { "Debug mode ${if(it) "enabled" else "disabled"}!" },
         language = { "Language:" },
         logout = { "Logout" },
         path = Settings.Path(

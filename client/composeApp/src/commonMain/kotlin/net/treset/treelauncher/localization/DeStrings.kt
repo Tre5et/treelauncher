@@ -432,6 +432,7 @@ class DeStrings : Strings(
             success = { "Ungenutzte Dateien gelöscht." },
             title = { "Ungenutzte Dateien löschen?" }
         ),
+        debugNotification = { "Debug-Modus ${if(it) "aktiviert" else "deaktiviert"}!" },
         language = { "Sprache:" },
         logout = { "Ausloggen" },
         path = Settings.Path(

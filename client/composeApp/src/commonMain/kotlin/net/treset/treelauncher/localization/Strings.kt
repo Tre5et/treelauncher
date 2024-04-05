@@ -544,6 +544,7 @@ open class Strings(
     data class Settings(
         val appearance: () -> String,
         val cleanup: Cleanup,
+        val debugNotification: (enabled: Boolean) -> String,
         val language: () -> String,
         val logout: () -> String,
         val path: Path,

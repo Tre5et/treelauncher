@@ -70,7 +70,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsDisable = false
     var acknowledgedNews = mutableListOf<String>()
     var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
-    @SerializedName("isDebug")
+    @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null
     var isDebug: Boolean
         get() = _isDebug ?: false
