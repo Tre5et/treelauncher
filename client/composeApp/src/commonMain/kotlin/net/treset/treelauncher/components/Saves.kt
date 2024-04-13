@@ -273,7 +273,8 @@ fun Saves() {
                         painter = icons().play,
                         size = 32.dp,
                         highlighted = true,
-                        tooltip = strings().selector.saves.play.button()
+                        tooltip = strings().selector.saves.play.button(),
+                        enabled = AppContext.runningInstance == null
                     )
                 }
 
@@ -288,7 +289,8 @@ fun Saves() {
                         painter = icons().play,
                         size = 32.dp,
                         highlighted = true,
-                        tooltip = strings().selector.saves.play.button()
+                        tooltip = strings().selector.saves.play.button(),
+                        enabled = AppContext.runningInstance == null
                     )
                 }
 
