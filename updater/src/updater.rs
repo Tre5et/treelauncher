@@ -39,8 +39,7 @@ pub fn execute_update(update: Vec<UpdateChange>) -> UpdaterStatus {
                 }
             },
             UpdateMode::DELETE => {
-                println!("DELETE: {}", target.to_string_lossy());
-                let result = fs::remove_file(target);
+                let result = delete_mode(target.to_owned());
                 if result.is_err() {
                     errors.push(format!("{}: {}", result.unwrap_err(), update_file.to_string_lossy()));
                 }
@@ -115,6 +114,25 @@ fn backup_file(file: PathBuf) -> Result<Option<PathBuf>, String> {
         return Err(format!("Failed to backup file:\n{}", error));
     }
     return Ok(None);
+}
+
+fn delete_mode(target: PathBuf) -> Result<(), String> {
+    println!("DELETE: {}", target.to_string_lossy());
+    let mut attempts = 0;
+    let mut error: String = String::new();
+    while attempts < 60 {
+        let delete = fs::remove_file(target.clone());
+        if delete.is_err() {
+            println!("Waiting for launcher to close...");
+            attempts += 1;
+            error = delete.unwrap_err().to_string();
+            sleep(Duration::from_millis(500));
+        } else {
+            return Ok(());
+        }
+    }
+
+    return Err(format!("Failed to delete file: {}", error));
 }
 
 fn file_mode(target: PathBuf, update_file: PathBuf) -> Result<(), String> {

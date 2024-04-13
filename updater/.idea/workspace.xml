@@ -11,7 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Implemented Updater Logic">
-      <change beforePath="$PROJECT_DIR$/../client/composeApp/compose-desktop.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../client/composeApp/compose-desktop.pro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../update-server/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../update-server/.idea/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/updater.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/updater.rs" afterDir="false" />
     </list>
@@ -59,6 +59,7 @@
     "nodejs_package_manager_path": "npm",
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.first.attach.projects": "true",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "settings.sync",
     "vue.rearranger.settings.migration": "true"
@@ -133,6 +134,7 @@
       <workItem from="1710269608016" duration="9019000" />
       <workItem from="1710330031086" duration="1186000" />
       <workItem from="1711290074416" duration="1862000" />
+      <workItem from="1713033296348" duration="1595000" />
     </task>
     <task id="LOCAL-00001" summary="Changed Updater to Rust Project">
       <option name="closed" value="true" />
