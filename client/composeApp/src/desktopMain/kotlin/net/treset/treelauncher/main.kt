@@ -20,6 +20,8 @@ import androidx.compose.ui.window.rememberWindowState
 import dev.datlag.kcef.KCEF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.treset.mc_version_loader.util.OsUtil
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
@@ -153,10 +155,17 @@ fun main() = application {
     }
 }
 
-actual fun getUpdaterFile(): File {
-    val devFile = File("resources/windows/updater.exe")
-    if(devFile.isFile) {
-        return devFile
+actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {
+    val updaterFile = File("resources/windows/updater.exe").let {
+        if(it.isFile) it else File("app/resources/updater")
     }
-    return File("app/resources/updater")
+
+    val commandBuilder = StringBuilder()
+    commandBuilder.append(updaterFile.absolutePath)
+    return if(OsUtil.isOsName("windows")) {
+        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(appSettings().isDebug) "/k" else "/c", commandBuilder.toString())
+    } else {
+        //TODO
+        ProcessBuilder("UNIMPLEMENTED")
+    }
 }

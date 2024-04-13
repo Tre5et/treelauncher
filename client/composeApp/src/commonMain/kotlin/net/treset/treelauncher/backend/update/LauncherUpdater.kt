@@ -2,10 +2,9 @@ package net.treset.treelauncher.backend.update
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.JsonUtils
-import net.treset.mc_version_loader.util.OsUtil
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.getUpdaterFile
+import net.treset.treelauncher.getUpdaterProcess
 import java.io.IOException
 import java.nio.file.Paths
 
@@ -142,7 +141,6 @@ class LauncherUpdater {
         LOGGER.info { "Starting updater..." }
         val path = Paths.get("").toAbsolutePath()
         val commandBuilder = StringBuilder()
-        commandBuilder.append(getUpdaterFile().absolutePath)
         commandBuilder.append(" -i").append(path).append("/update.json")
         commandBuilder.append(" -o").append(path).append("/updater.json")
         if (restart) {
@@ -161,10 +159,7 @@ class LauncherUpdater {
                 }
             }
         }
-        if(OsUtil.isOsName("windows")) {
-            val pb = ProcessBuilder("cmd.exe", "/c", "start", "cmd", "/c", commandBuilder.toString())
-            pb.start()
-        }
+        getUpdaterProcess(commandBuilder.toString()).start()
     }
 
     companion object {

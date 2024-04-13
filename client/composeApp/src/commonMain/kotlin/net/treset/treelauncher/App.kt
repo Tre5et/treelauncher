@@ -38,7 +38,6 @@ import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.*
 import net.treset.treelauncher.util.FixFiles
 import net.treset.treelauncher.util.News
-import java.io.File
 import java.io.IOException
 import kotlin.system.exitProcess
 
@@ -328,4 +327,4 @@ internal data class NotificationBannerData(
 
 private val LOGGER = KotlinLogging.logger {  }
 
-expect fun getUpdaterFile(): File
+expect fun getUpdaterProcess(updaterArgs: String): ProcessBuilder
