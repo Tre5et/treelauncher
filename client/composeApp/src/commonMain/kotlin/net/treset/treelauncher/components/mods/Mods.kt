@@ -133,9 +133,40 @@ fun Mods() {
                 }
             }
 
-            val filteredMods  = remember(mods, searchContent) {
+            val updateQueue = remember(current) {
+                EmptyingJobQueue(
+                    onEmptied = {
+                        LauncherFile.of(
+                            current.first.directory,
+                            current.first.details
+                        ).write(
+                            current.second
+                        )
+                        redrawMods++
+                    }
+                ) {
+                    current.second.mods
+                }
+            }
+
+            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload) {
+                ModContext(
+                    autoUpdate,
+                    disableNoVersion,
+                    enableOnDownload,
+                    current.second.versions,
+                    types,
+                    LauncherFile.of(current.first.directory)
+                ) { element ->
+                    updateQueue.add(element)
+                }
+            }
+
+            val filteredMods = remember(mods, searchContent, modContext) {
                 mods.filter {
                     it.name.contains(searchContent, true)
+                }.map {
+                    LauncherModDisplay(it, modContext)
                 }
             }
 
@@ -161,38 +192,15 @@ fun Mods() {
                 }.start()
             }
 
-            val updateQueue = remember(current) {
-                EmptyingJobQueue(
-                    onEmptied = {
-                        LauncherFile.of(
-                            current.first.directory,
-                            current.first.details
-                        ).write(
-                            current.second
-                        )
-                        redrawMods++
-                    }
-                ) {
-                    current.second.mods
-                }
-            }
-
             DisposableEffect(current) {
                 onDispose {
                     updateQueue.finish()
                 }
             }
 
-            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload) {
-                ModContext(
-                    autoUpdate,
-                    disableNoVersion,
-                    enableOnDownload,
-                    current.second.versions,
-                    types,
-                    LauncherFile.of(current.first.directory)
-                ) { element ->
-                    updateQueue.add(element)
+            LaunchedEffect(checkUpdates) {
+                filteredMods.forEach {
+                    it.selectLatest = checkUpdates
                 }
             }
 
@@ -269,12 +277,12 @@ fun Mods() {
                             }
 
                             items(filteredMods) { mod ->
-                                ModButton(
-                                    mod,
-                                    modContext,
-                                    checkUpdates
+                                ModDataProvider(
+                                    element = mod
                                 ) {
-                                    editingMod = mod
+                                    ModButton {
+                                        editingMod = mod.mod
+                                    }
                                 }
                             }
                         }
