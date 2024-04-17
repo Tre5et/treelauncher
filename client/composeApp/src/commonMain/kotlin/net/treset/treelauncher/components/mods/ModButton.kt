@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.mods.ModVersionData
 import net.treset.treelauncher.backend.util.string.openInBrowser
+import net.treset.treelauncher.components.mods.display.ModDisplayData
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.SelectorButton
@@ -30,7 +31,7 @@ import net.treset.treelauncher.style.icons
 fun ModDisplayData.ModButton(
     onEdit: () -> Unit
 ) {
-    var selectedVersion: ModVersionData by rememberSaveable(currentVersion) { mutableStateOf(currentVersion)}
+    var selectedVersion: ModVersionData by rememberSaveable(currentVersion!!) { mutableStateOf(currentVersion)}
 
     LaunchedEffect(selectLatest, versions) {
         versions?.let {
@@ -72,11 +73,11 @@ fun ModDisplayData.ModButton(
                         .weight(1f)
                 ) {
                     Text(
-                        mod.name,
+                        mod?.name?: "",
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Start,
                     )
-                    mod.description?.let {
+                    mod?.description?.let {
                         Text(
                             it,
                             overflow = TextOverflow.Ellipsis,
@@ -94,7 +95,7 @@ fun ModDisplayData.ModButton(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if(!downloading && currentVersion.versionNumber != selectedVersion.versionNumber) {
+                        if(!downloading && currentVersion?.versionNumber != selectedVersion.versionNumber) {
                             IconButton(
                                 onClick = {
                                     startDownload(selectedVersion)
@@ -151,7 +152,7 @@ fun ModDisplayData.ModButton(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        mod.url?.let {
+                        mod?.url?.let {
                             IconButton(
                                 onClick = {
                                     it.openInBrowser()

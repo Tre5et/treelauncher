@@ -12,22 +12,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.launcher.LauncherMod
-import net.treset.mc_version_loader.mods.ModData
-import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.mc_version_loader.mods.ModVersionData
-import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.mods.ModDownloader
-import net.treset.treelauncher.backend.util.ModProviderStatus
-import net.treset.treelauncher.backend.util.isSame
-import net.treset.treelauncher.backend.util.loadNetworkImage
 import net.treset.treelauncher.backend.util.string.openInBrowser
+import net.treset.treelauncher.components.mods.display.ModDisplayData
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.SelectorButton
@@ -35,82 +26,13 @@ import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.DownloadingIcon
 import net.treset.treelauncher.style.icons
-import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 @Composable
-fun ModSearchButton(
-    mod: ModData,
-    searchContext: SearchContext
-) {
-    var downloading by rememberSaveable(mod) { mutableStateOf(false) }
-
-    var image: Painter? by rememberSaveable(mod) { mutableStateOf(null) }
-
-    var launcherMod: Optional<LauncherMod>? by rememberSaveable(mod) { mutableStateOf(null) }
-
-    var versions: List<ModVersionData>? by rememberSaveable(mod) { mutableStateOf(null) }
-    var currentVersion: ModVersionData? by rememberSaveable(mod, launcherMod, versions) { mutableStateOf(
-        versions?.firstOrNull { it.versionNumber == launcherMod?.getOrNull()?.version }
-    ) }
+fun ModDisplayData.ModSearchButton() {
     var selectedVersion: ModVersionData? by rememberSaveable(mod, currentVersion) { mutableStateOf(currentVersion) }
 
-    val modrinthStatus = rememberSaveable(mod, launcherMod) {
-        launcherMod?.getOrNull()?.let {
-            if(it.currentProvider == "modrinth") {
-                ModProviderStatus.CURRENT
-            } else null
-        } ?: run {
-            if(mod.modProviders.contains(ModProvider.MODRINTH)) {
-                ModProviderStatus.AVAILABLE
-            } else {
-                ModProviderStatus.UNAVAILABLE
-            }
-        }
-    }
-    val curseforgeStatus  = rememberSaveable(mod, launcherMod) {
-        launcherMod?.getOrNull()?.let {
-            if(it.currentProvider == "curseforge") {
-                ModProviderStatus.CURRENT
-            } else null
-        } ?: run {
-            if(mod.modProviders.contains(ModProvider.CURSEFORGE)) {
-                ModProviderStatus.AVAILABLE
-            } else {
-                ModProviderStatus.UNAVAILABLE
-            }
-        }
-    }
-
-    LaunchedEffect(mod) {
-        image ?: Thread {
-            mod.iconUrl?.let { url ->
-                loadNetworkImage(url)?.let {
-                    image = it
-                }
-            }
-        }.start()
-    }
-
-    LaunchedEffect(mod, searchContext.recheck) {
-        searchContext.registerChangingJob { mods ->
-            launcherMod = mods.firstOrNull {
-                    it.isSame(mod)
-                }?.let {
-                    Optional.of(it)
-                } ?: Optional.empty()
-        }
-    }
-
-    LaunchedEffect(mod) {
-        versions ?: Thread {
-            try {
-                versions = mod.getVersions(searchContext.versions, searchContext.types.map { it.id })
-                    .sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
-            } catch (e: FileDownloadException) {
-                AppContext.error(e)
-            }
-        }.start()
+    LaunchedEffect(currentVersion) {
+        selectedVersion = currentVersion
     }
 
     SelectorButton(
@@ -145,11 +67,11 @@ fun ModSearchButton(
                     .weight(1f)
             ) {
                 Text(
-                    mod.name,
+                    modData?.name?: "",
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Start
                 )
-                mod.description?.let {
+                modData?.description?.let {
                     Text(
                         it,
                         overflow = TextOverflow.Ellipsis,
@@ -170,30 +92,8 @@ fun ModSearchButton(
                     if(!downloading && currentVersion?.versionNumber != selectedVersion?.versionNumber) {
                         IconButton(
                             onClick = {
-                                downloading = true
                                 selectedVersion?.let {
-                                    searchContext.registerChangingJob { currentMods ->
-                                        try {
-                                            ModDownloader(
-                                                launcherMod?.getOrNull(),
-                                                searchContext.directory,
-                                                searchContext.types,
-                                                searchContext.versions,
-                                                currentMods,
-                                                searchContext.enableOnDownload
-                                            ).download(
-                                                it
-                                            )
-
-                                            currentVersion = selectedVersion
-                                        } catch(e: Exception) {
-                                            AppContext.error(e)
-                                        }
-
-                                        downloading = false
-
-                                        searchContext.requestRecheck()
-                                    }
+                                    startDownload(it)
                                 }
                             },
                             icon = icons().download,
@@ -220,7 +120,7 @@ fun ModSearchButton(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    mod.url?.let {
+                    modData?.url?.let {
                         IconButton(
                             onClick = {
                                 it.openInBrowser()

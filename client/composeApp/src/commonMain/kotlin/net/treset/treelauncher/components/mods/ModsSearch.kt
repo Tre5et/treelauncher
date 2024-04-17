@@ -19,11 +19,12 @@ import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.mods.MinecraftMods
-import net.treset.mc_version_loader.mods.ModData
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
+import net.treset.treelauncher.components.mods.display.ModDataProvider
+import net.treset.treelauncher.components.mods.display.ModDataSearchDisplay
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -52,22 +53,17 @@ fun ModsSearch(
 
     var tfValue by remember { mutableStateOf("") }
 
-    var results: List<ModData>? by remember { mutableStateOf(null) }
+    var results: List<ModDataSearchDisplay>? by remember { mutableStateOf(null) }
 
     var searching by remember { mutableStateOf(false) }
 
-    var recheckExising by remember { mutableStateOf(0) }
-
-    val searchContext = remember(modContext, recheckExising) {
+    val searchContext = remember(modContext) {
         SearchContext.from(
             modContext,
-            recheckExising
-        ) {
-            recheckExising++
-        }
+        )
     }
 
-    LaunchedEffect(searching) {
+    LaunchedEffect(searching, searchContext) {
         if(searching) {
             Thread {
                 try {
@@ -83,6 +79,11 @@ fun ModsSearch(
                                 FormatString.distance(tfValue, o2.name) +
                                 log10((o2.downloadsCount / o1.downloadsCount).toDouble())
                         ).roundToInt()
+                    }.map {
+                        ModDataSearchDisplay(
+                            it,
+                            searchContext
+                        )
                     }
                 } catch (e: FileDownloadException) {
                     AppContext.error(e)
@@ -139,10 +140,11 @@ fun ModsSearch(
                         modifier = Modifier.weight(1f, false)
                     ) {
                         items(it) { mod ->
-                            ModSearchButton(
-                                mod,
-                                searchContext
-                            )
+                            ModDataProvider(
+                                mod
+                            ) {
+                                ModSearchButton()
+                            }
                         }
                     }
                 }
@@ -167,14 +169,20 @@ data class SearchContext(
     val types: List<VersionType>,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
-    val recheck: Int,
-    val requestRecheck: () -> Unit,
 ) {
+    private var recheckCallbacks: MutableList<() -> Unit> = mutableListOf()
+
+    fun registerRecheck(onRecheck: () -> Unit) {
+        recheckCallbacks.add(onRecheck)
+    }
+
+    fun recheck() {
+        recheckCallbacks.forEach { it() }
+    }
+
     companion object {
         fun from(
-            modContext: ModContext,
-            recheck: Int,
-            requestRecheck: () -> Unit
+            modContext: ModContext
         ): SearchContext = SearchContext(
             modContext.autoUpdate,
             modContext.disableNoVersion,
@@ -182,9 +190,7 @@ data class SearchContext(
             modContext.versions,
             modContext.types,
             modContext.directory,
-            modContext.registerChangingJob,
-            recheck,
-            requestRecheck
+            modContext.registerChangingJob
         )
     }
 }

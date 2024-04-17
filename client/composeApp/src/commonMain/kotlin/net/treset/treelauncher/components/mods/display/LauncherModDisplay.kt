@@ -1,4 +1,4 @@
-package net.treset.treelauncher.components.mods
+package net.treset.treelauncher.components.mods.display
 
 import androidx.compose.ui.graphics.painter.Painter
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -10,13 +10,9 @@ import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.loadNetworkImage
+import net.treset.treelauncher.components.mods.ModContext
 import java.io.IOException
 import java.time.LocalDateTime
-
-abstract class ModDisplay {
-    var onRecomposeData: (data: ModDisplayData) -> Unit = { _: ModDisplayData -> }
-    abstract fun recomposeData(): ModDisplayData
-}
 
 class LauncherModDisplay(
     val mod: LauncherMod,
@@ -43,18 +39,28 @@ class LauncherModDisplay(
             recomposeData()
         }
     var modrinthStatus = if(mod.currentProvider == "modrinth") {
-            ModProviderStatus.CURRENT
-        } else if(mod.downloads.any { it.provider == "modrinth" }) {
-            ModProviderStatus.AVAILABLE
-        } else {
-            ModProviderStatus.UNAVAILABLE
+        ModProviderStatus.CURRENT
+    } else if(mod.downloads.any { it.provider == "modrinth" }) {
+        ModProviderStatus.AVAILABLE
+    } else {
+        ModProviderStatus.UNAVAILABLE
+    }
+        private set(value) {
+            field = value
+            recomposeData()
         }
+
+
     var curseforgeStatus = if(mod.currentProvider == "curseforge") {
-            ModProviderStatus.CURRENT
-        } else if(mod.downloads.any { it.provider == "curseforge" }) {
-            ModProviderStatus.AVAILABLE
-        } else {
-            ModProviderStatus.UNAVAILABLE
+        ModProviderStatus.CURRENT
+    } else if(mod.downloads.any { it.provider == "curseforge" }) {
+        ModProviderStatus.AVAILABLE
+    } else {
+        ModProviderStatus.UNAVAILABLE
+    }
+        private set(value) {
+            field = value
+            recomposeData()
         }
 
     var versions: List<ModVersionData>? = null
@@ -95,9 +101,11 @@ class LauncherModDisplay(
     fun loadImage() {
         Thread {
             mod.iconUrl?.let { url ->
-                loadNetworkImage(url)?.let {
-                    image = it
-                }
+                try {
+                    loadNetworkImage(url)?.let {
+                        image = it
+                    }
+                } catch(ignored: IOException) {}
             }
         }.start()
     }
