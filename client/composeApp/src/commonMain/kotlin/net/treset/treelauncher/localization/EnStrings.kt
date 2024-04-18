@@ -119,7 +119,7 @@ class EnStrings : Strings(
     login = Login(
         browserTitle = { state -> "Login: ${state.pageTitle ?: "Loading..."} (${state.lastLoadedUrl ?: "Getting url..."})" },
         button = { "Login with Microsoft" },
-        hint = { "Hint: ${
+        tip = { "TIP: ${
             arrayOf(
                 "Drag and Drop files into Saves or Resourcepack components to import them.",
                 "Directly start a world or server by selecting it and clicking the play button.",

@@ -13,13 +13,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
-import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.checkUpdateOnStart
 
@@ -77,31 +77,6 @@ fun LoginScreen(
                 },
                 { browserUrl = it }
             )
-        }
-    }
-
-    val notificationColor = MaterialTheme.colorScheme.secondaryContainer
-    var notification: NotificationData? by remember { mutableStateOf(null) }
-    DisposableEffect(loginState) {
-        notification = (if(loginState == LoginState.AUTHENTICATING) {
-            NotificationData(
-                color = notificationColor,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
-                ) {
-                    Text(strings().login.hint())
-                }
-            }
-        } else null)?.also {
-            AppContext.addNotification(it)
-        }
-
-        onDispose {
-            notification?.also {
-                AppContext.dismissNotification(it)
-            }
         }
     }
 
@@ -231,6 +206,19 @@ fun LoginScreen(
                 selected = language,
                 toDisplayString = { displayName() },
                 decorated = false
+            )
+        }
+
+        val tip = remember { strings().login.tip() }
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 6.dp),
+        ) {
+            Text(
+                tip,
+                color = MaterialTheme.colorScheme.onBackground.disabledContent(),
             )
         }
 

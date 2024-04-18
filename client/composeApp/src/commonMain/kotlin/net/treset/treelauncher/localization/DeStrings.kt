@@ -119,7 +119,7 @@ class DeStrings : Strings(
     login = Login(
         browserTitle = { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
         button = { "Login mit Microsoft" },
-        hint = { "Tipp: ${
+        tip = { "TIPP: ${
             arrayOf(
                 "Dateien können in Welten oder Ressourcenpaket Komponenten gezogen werden, um diese zu importieren.",
                 "Welten oder Server können direkt gestartet werden. Diese auswählen und den Spielen Knopf klicken.",
