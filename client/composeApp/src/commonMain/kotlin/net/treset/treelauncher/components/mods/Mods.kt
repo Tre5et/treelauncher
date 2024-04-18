@@ -1,14 +1,19 @@
 package net.treset.treelauncher.components.mods
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
@@ -49,7 +54,7 @@ fun Mods() {
     var selected: Pair<LauncherManifest, LauncherModsDetails>? by remember { mutableStateOf(null) }
 
     var showSearch by remember(selected) { mutableStateOf(false) }
-    var checkUpdates by remember(selected) { mutableStateOf(false) }
+    var checkUpdates by remember(selected) { mutableStateOf(0) }
 
     var sort: LauncherModSortType by remember { mutableStateOf(appSettings().modSortType) }
     var reverse by remember { mutableStateOf(appSettings().isModSortReverse) }
@@ -201,8 +206,10 @@ fun Mods() {
             }
 
             LaunchedEffect(checkUpdates) {
-                filteredMods.forEach {
-                    it.selectLatest = checkUpdates
+                if(checkUpdates > 0) {
+                    filteredMods.forEach {
+                        it.checkForUpdates()
+                    }
                 }
             }
 
@@ -393,6 +400,10 @@ fun Mods() {
         detailsScrollable = false,
         actionBarSpecial = { _, settingsOpen, _, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
+                var dropDownOpen by remember { mutableStateOf(false) }
+
+                val arrowRotation by animateFloatAsState(if(dropDownOpen) 180f else 0f)
+
                 IconButton(
                     onClick = {
                         showSearch = true
@@ -402,15 +413,83 @@ fun Mods() {
                     tooltip = strings().manager.mods.add()
                 )
 
-                IconButton(
-                    onClick = {
-                        checkUpdates = true
-                    },
-                    icon = icons().update,
-                    size = 32.dp,
-                    tooltip = strings().manager.mods.update.tooltip(),
-                    enabled = !checkUpdates
-                )
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(end = 20.dp)
+                ) {
+                    IconButton(
+                        onClick = {
+                            dropDownOpen = !dropDownOpen
+                        },
+                        icon = icons().expand,
+                        size = 24.dp,
+                        tooltip = strings().manager.mods.update.settings(),
+                        modifier = Modifier
+                            .offset(x = 20.dp)
+                            .rotate(arrowRotation)
+                    )
+
+                    IconButton(
+                        onClick = {
+                            checkUpdates++
+                        },
+                        icon = icons().update,
+                        size = 32.dp,
+                        tooltip = strings().manager.mods.update.tooltip(),
+                    )
+
+                    DropdownMenu(
+                        expanded = dropDownOpen,
+                        onDismissRequest = { dropDownOpen = false },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(end = 8.dp)
+                    ) {
+                        ProvideTextStyle(
+                            MaterialTheme.typography.bodyMedium
+                        ) {
+
+                            var update by remember { mutableStateOf(appSettings().isModsUpdate) }
+                            var enable by remember { mutableStateOf(appSettings().isModsEnable) }
+                            var disable by remember { mutableStateOf(appSettings().isModsDisable) }
+
+                            TitledCheckBox(
+                                strings().manager.mods.update.auto(),
+                                update,
+                                {
+                                    update = it
+                                    appSettings().isModsUpdate = it
+                                    if (!it) {
+                                        enable = false
+                                        appSettings().isModsEnable = false
+                                    }
+                                }
+                            )
+
+                            if(update) {
+                                TitledCheckBox(
+                                    strings().manager.mods.update.enable(),
+                                    enable,
+                                    {
+                                        enable = it
+                                        appSettings().isModsEnable = it
+                                    }
+                                )
+                            }
+
+                            TitledCheckBox(
+                                strings().manager.mods.update.disable(),
+                                disable,
+                                {
+                                    disable = it
+                                    appSettings().isModsDisable = it
+                                }
+                            )
+                        }
+                    }
+                }
+
             }
         },
         actionBarBoxContent = { _, settingsOpen, _, _ ->

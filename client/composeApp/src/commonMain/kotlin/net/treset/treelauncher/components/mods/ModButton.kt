@@ -118,7 +118,7 @@ fun ModDisplayData.ModButton(
                                 selectedVersion = it
                             },
                             selected = selectedVersion,
-                            loading = versions == null,// && checkUpdates,
+                            loading = versions == null && selectLatest,
                         )
                     }
 

@@ -379,6 +379,7 @@ open class Strings(
                 val auto: () -> String,
                 val disable: () -> String,
                 val enable: () -> String,
+                val settings: () -> String,
                 val tooltip: () -> String
             )
         }

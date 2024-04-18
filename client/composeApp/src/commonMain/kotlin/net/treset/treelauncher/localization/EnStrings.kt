@@ -256,6 +256,7 @@ class EnStrings : Strings(
                 auto = { "Automatically Update" },
                 disable = { "Disable Mods without appropriate version" },
                 enable = { "Enable disabled Mods"},
+                settings = { "Update Settings" },
                 tooltip = { "Check for Updates" }
             ),
             version = { "Game Version" }

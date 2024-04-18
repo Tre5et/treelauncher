@@ -256,6 +256,7 @@ class DeStrings : Strings(
                 auto = { "Automatisch aktualisieren" },
                 disable = { "Mods ohne passende Version deaktivieren" },
                 enable = { "Deaktivierte Mods aktivieren"},
+                settings = { "Aktualisierungseinstellungen" },
                 tooltip = { "Nach Updates suchen" }
             ),
             version = { "Spielversion" }

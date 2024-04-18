@@ -6,6 +6,7 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.*
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -98,6 +99,24 @@ class LauncherModDisplay(
         loadVersions()
     }
 
+    fun checkForUpdates() {
+        versions?.let {
+            if (it.isNotEmpty()) {
+                if (appSettings().isModsUpdate) {
+                    if (currentVersion.versionNumber != it.first().versionNumber) {
+                        downloadVersion(it.first())
+                    }
+                    if(appSettings().isModsEnable && !enabled) {
+                        changeEnabled()
+                    }
+                }
+            } else if(appSettings().isModsDisable && enabled) {
+                changeEnabled()
+            }
+        }
+        selectLatest = true
+    }
+
     fun loadImage() {
         Thread {
             mod.iconUrl?.let { url ->
@@ -138,7 +157,7 @@ class LauncherModDisplay(
         }.start()
     }
 
-    fun startDownload(version: ModVersionData) {
+    fun downloadVersion(version: ModVersionData) {
         downloading = true
         modContext.registerChangingJob { currentMods ->
             LOGGER.debug { "Downloading mod ${mod.fileName} version ${version.versionNumber}" }
@@ -162,7 +181,6 @@ class LauncherModDisplay(
             currentVersion = version
 
             downloading = false
-
         }
     }
 
@@ -230,7 +248,7 @@ class LauncherModDisplay(
             versions = this.versions,
             currentVersion = this.currentVersion,
             modData = this.modData,
-            startDownload = this::startDownload,
+            startDownload = this::downloadVersion,
             changeEnabled = this::changeEnabled,
             deleteMod = this::deleteMod,
         ).also(onRecomposeData)
