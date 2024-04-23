@@ -43,7 +43,7 @@ fun VersionSelector(
     showChange: Boolean = true,
     setCurrentState: (VersionState) -> Unit = {_->}
 ) {
-    var showSnapshots by remember { mutableStateOf(false) }
+    var showSnapshots by remember { mutableStateOf(defaultVersionId?.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")) == false) }
     var minecraftVersions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
     var minecraftVersion: MinecraftVersion? by remember { mutableStateOf(null) }
     var versionType: VersionType by remember { mutableStateOf(defaultVersionType) }
