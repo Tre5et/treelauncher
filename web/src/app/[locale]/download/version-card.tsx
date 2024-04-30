@@ -20,12 +20,11 @@ export function VersionContent({
         return(
             <Collapsible
                 trigger={(
-                    <div className="flex flex-row justify-center items-center relative w-full">
+                    <div className="flex flex-row justify-center items-center relative w-full cursor-default">
                         <motion.span 
                             initial={{rotate: -90, translateY: "0.05rem"}} 
                             animate={{rotate: open? 0 : -90}} 
-                        
-                            className="text-3xl material-symbols-rounded select-none absolute left-0"
+                            className="text-3xl material-symbols-rounded select-none absolute left-0 cursor-pointer"
                         >expand_more</motion.span>
                         <div className="flex-col top-0">
                             <div className={`flex flex-row items-center justify-center gap-1 text-center ${current ? "text-2xl" : "text-xl"}`}>
@@ -38,10 +37,10 @@ export function VersionContent({
                             <div className="flex flex-row gap-x-8 gap-y-1 flex-wrap justify-center items-center">
                                 {release.assets.map((asset) => {
                                     if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                        return (<p key={asset.name}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
+                                        return (<p key={asset.name} onClick={()=>window.open(asset.browser_download_url, "_blank")}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
                                     }
                                     if(asset.name.endsWith(".zip")) {
-                                        return (<p key={asset.name} className="text-sm"><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
+                                        return (<p key={asset.name} className="text-sm" onClick={()=>window.open(asset.browser_download_url, "_blank")}><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
                                     }
                                     return ""
                                 })}
