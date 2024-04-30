@@ -52,16 +52,18 @@ fn parse_arg() -> Result<Args, String> {
     let args: Vec<String> = env::args().collect();
 
     let input = get_arg(args.clone(), vec!["-i", "--input="]);
-    if input.is_none() {
-        return Err("Input not specified!".to_string());
-    }
-    let input = input.unwrap();
+    let input = if input.is_none() {
+        //Temporary change for v2.2.2 -> v2.2.3
+        "update.json".to_string()
+        //return Err("Input not specified!".to_string());
+    } else { input.unwrap() };
 
     let output = get_arg(args.clone(), vec!["-o", "--output="]);
-    if output.is_none() {
-        return Err("Output not specified!".to_string());
-    }
-    let output = output.unwrap();
+    let output = if output.is_none() {
+        //Temporary change for v2.2.2 -> v2.2.3
+        "updater.json".to_string()
+        //return Err("Output not specified!".to_string());
+    } else { output.unwrap() };
 
     let restart = get_arg(args.clone(), vec!["-r", "--restart="]);
     let mut restart_dir: Option<String> = None;
