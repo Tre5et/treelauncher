@@ -211,7 +211,7 @@ fun ModsCreation(
                 },
                 placeholder = strings().creator.component(),
                 toDisplayString = { first.name },
-                enabled = mode == CreationMode.INHERIT
+                enabled = mode == CreationMode.USE
             )
         }
 
