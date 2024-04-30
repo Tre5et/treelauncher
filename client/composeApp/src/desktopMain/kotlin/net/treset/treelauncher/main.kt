@@ -163,7 +163,9 @@ actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {
     val commandBuilder = StringBuilder()
     commandBuilder.append(updaterFile.absolutePath)
     return if(OsUtil.isOsName("windows")) {
-        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(appSettings().isDebug) "/k" else "/c", commandBuilder.toString())
+        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(appSettings().isDebug) "/k" else "/c",
+            "$commandBuilder $updaterArgs"
+        )
     } else {
         //TODO
         ProcessBuilder("UNIMPLEMENTED")
