@@ -9,6 +9,7 @@ import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
@@ -114,6 +115,7 @@ fun Resourcepacks() {
                         try {
                             Resourcepack.from(this)
                         } catch (e: IOException) {
+                            LOGGER.warn(e) { "Unable to parse imported resourcepack: ${this.name}" }
                             null
                         }
                     },
@@ -216,3 +218,5 @@ fun Resourcepacks() {
         )
     )
 }
+
+private val LOGGER = KotlinLogging.logger {  }

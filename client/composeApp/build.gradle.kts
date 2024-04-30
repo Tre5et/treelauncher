@@ -32,7 +32,7 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
-            implementation("net.treset:mc-version-loader:5.0.0")
+            implementation("net.treset:mc-version-loader:5.0.1")
             implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
             implementation("io.github.oshai:kotlin-logging:6.0.3")
@@ -53,7 +53,7 @@ kotlin {
 }
 
 
-val version = "2.2.2"
+val version = "2.2.3"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
