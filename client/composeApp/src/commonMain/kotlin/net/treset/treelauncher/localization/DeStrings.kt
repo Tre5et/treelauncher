@@ -116,6 +116,11 @@ class DeStrings : Strings(
             restartRequired = { "Neustart erforderlich. Bitte neu starten." }
         )
     ),
+    list = List(
+        full = { "Komfortabel" },
+        compact = { "Kompakt" },
+        minimal = { "Minimal" }
+    ),
     login = Login(
         browserTitle = { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
         button = { "Login mit Microsoft" },

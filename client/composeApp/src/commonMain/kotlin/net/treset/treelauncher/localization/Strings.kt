@@ -55,6 +55,7 @@ open class Strings(
     val game: Game,
     val language: Language,
     val launcher: Launcher,
+    val list: List,
     val login: Login,
     val manager: Manager,
     val nav: Nav,
@@ -213,6 +214,12 @@ open class Strings(
             val restartRequired: () -> String
         )
     }
+
+    data class List(
+        val compact: () -> String,
+        val full: () -> String,
+        val minimal: () -> String
+    )
 
     data class Login(
         val browserTitle: (WebViewState) -> String,

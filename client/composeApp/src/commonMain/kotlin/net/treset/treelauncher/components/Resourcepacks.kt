@@ -20,9 +20,11 @@ import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.ListViewBox
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
 import java.net.URI
 
@@ -39,6 +41,7 @@ fun Resourcepacks() {
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
 
+    var listDisplay by remember { mutableStateOf(appSettings().resourcepacksDetailsListDisplay) }
 
     val reloadResourcepacks = {
         selected?.let { current ->
@@ -161,7 +164,8 @@ fun Resourcepacks() {
                 } else {
                     resourcepacks.forEach {
                         ResourcepackButton(
-                            it.first
+                            it.first,
+                            display = listDisplay
                         ) {
                             try {
                                 it.second.remove()
@@ -199,6 +203,20 @@ fun Resourcepacks() {
                         size = 32.dp,
                         tooltip = strings().manager.component.import.back(),
                         modifier = Modifier.align(Alignment.CenterStart)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(end = 6.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    ListViewBox(
+                        DetailsListDisplay.entries,
+                        listDisplay,
+                        {
+                            listDisplay = it
+                            appSettings().resourcepacksDetailsListDisplay = it
+                        }
                     )
                 }
             }

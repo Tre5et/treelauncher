@@ -27,6 +27,7 @@ import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.DetailsListDisplay
 import net.treset.treelauncher.util.launchGame
 import java.io.IOException
 import java.net.URI
@@ -49,6 +50,8 @@ fun Saves() {
 
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
+
+    var listDisplay by remember { mutableStateOf(appSettings().savesDetailsListDisplay) }
 
     LaunchedEffect(showAdd) {
         if(!showAdd) {
@@ -122,6 +125,7 @@ fun Saves() {
             }
         },
         detailsContent = { current, _, _ ->
+
             DisposableEffect(current) {
                 selected = current
                 reloadSaves()
@@ -190,6 +194,7 @@ fun Saves() {
                         SaveButton(
                             it.first,
                             selectedSave == it.first,
+                            display = listDisplay,
                             onDelete = {
                                 try {
                                     it.second.remove()
@@ -317,6 +322,20 @@ fun Saves() {
                         size = 32.dp,
                         tooltip = strings().manager.component.import.back(),
                         modifier = Modifier.align(Alignment.CenterStart)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(end = 6.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    ListViewBox(
+                        DetailsListDisplay.entries,
+                        listDisplay,
+                        {
+                            listDisplay = it
+                            appSettings().savesDetailsListDisplay = it
+                        }
                     )
                 }
             }

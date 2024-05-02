@@ -14,6 +14,7 @@ import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.style.AccentColor
 import net.treset.treelauncher.style.Theme
+import net.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
 
 enum class InstanceDataSortType(val comparator: Comparator<InstanceData>) {
@@ -58,6 +59,8 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isInstanceSortReverse = false
     var savesComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
     var isSavesComponentSortReverse = false
+    var savesDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
+    var resourcepacksDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
     var resourcepacksComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
     var isResourcepacksComponentSortReverse = false
     var optionsComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME

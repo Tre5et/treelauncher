@@ -116,6 +116,11 @@ class EnStrings : Strings(
             restartRequired = { "Restart required. Please restart." }
         )
     ),
+    list = List(
+        compact = { "Compact" },
+        full = { "Comfortable" },
+        minimal = { "Minimal" }
+    ),
     login = Login(
         browserTitle = { state -> "Login: ${state.pageTitle ?: "Loading..."} (${state.lastLoadedUrl ?: "Getting url..."})" },
         button = { "Login with Microsoft" },

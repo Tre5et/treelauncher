@@ -7,16 +7,14 @@ import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import net.treset.treelauncher.backend.util.ModProviderStatus
 
-@Composable
-fun icons() = rememberSaveable { Icons() }
+fun icons() = net.treset.treelauncher.style.Icons
 
-class Icons {
+object Icons {
     val instances = Icons.Rounded.Dashboard
     val saves = Icons.Rounded.Save
     val resourcePacks = Icons.Rounded.Inventory2
@@ -57,6 +55,7 @@ class Icons {
     val darkMode = Icons.Rounded.DarkMode
     val lightMode = Icons.Rounded.LightMode
     val systemMode = Icons.Rounded.BrightnessMedium
+    val list = Icons.Rounded.ViewStream
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {
