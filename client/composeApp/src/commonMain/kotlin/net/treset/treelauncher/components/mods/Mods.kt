@@ -35,6 +35,7 @@ import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.DetailsListDisplay
 
 data class ModContext(
     val autoUpdate: Boolean,
@@ -60,6 +61,8 @@ fun Mods() {
     var reverse by remember { mutableStateOf(appSettings().isModSortReverse) }
 
     var editingMod: LauncherMod? by remember(selected) { mutableStateOf(null) }
+
+    var listDisplay by remember { mutableStateOf(appSettings().modDetailsListDisplay) }
 
     Components(
         title = strings().selector.mods.title(),
@@ -289,7 +292,10 @@ fun Mods() {
                                 ModDataProvider(
                                     element = mod
                                 ) {
-                                    ModButton {
+                                    ModButton(
+                                        display = listDisplay
+                                    ) {
+
                                         editingMod = mod.mod
                                     }
                                 }
@@ -507,6 +513,18 @@ fun Mods() {
                         reverse = !reverse
                         appSettings().isModSortReverse = reverse
                     }
+                )
+
+                ListDisplayBox(
+                    displays = DetailsListDisplay.entries,
+                    selected = listDisplay,
+                    onSelected = {
+                        listDisplay = it
+                        appSettings().modDetailsListDisplay = it
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 18.dp)
                 )
             } else if((showSearch || editingMod != null) && !settingsOpen) {
                 Box(

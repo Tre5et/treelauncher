@@ -330,7 +330,7 @@ fun Saves() {
                     modifier = Modifier.fillMaxWidth().padding(end = 6.dp),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    ListViewBox(
+                    ListDisplayBox(
                         DetailsListDisplay.entries,
                         listDisplay,
                         {

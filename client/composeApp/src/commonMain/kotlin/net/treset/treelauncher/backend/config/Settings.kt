@@ -65,6 +65,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isResourcepacksComponentSortReverse = false
     var optionsComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
     var isOptionsComponentSortReverse = false
+    var modDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
     var modComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
     var isModComponentSortReverse = false
     var modSortType: LauncherModSortType = LauncherModSortType.NAME

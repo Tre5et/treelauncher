@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.style.icons
 
 @Composable
-fun <T> ListViewBox(
+fun <T> ListDisplayBox(
     displays: List<T>,
     selected: T,
     onSelected: (T) -> Unit,

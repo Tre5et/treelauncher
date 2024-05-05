@@ -31,6 +31,7 @@ fun SelectorButton(
     selected: Boolean,
     onClick: () -> Unit,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
     val backgroundColor by animateColorAsState(
@@ -46,7 +47,7 @@ fun SelectorButton(
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
             .background(backgroundColor)
@@ -196,12 +197,14 @@ fun CompactSelectorButton(
     title: String? = null,
     subtitle: String? = null,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier,
     overlayContent: @Composable BoxScope.() -> Unit = {}
 ) {
     SelectorButton(
         selected = selected,
         onClick = onClick,
-        enabled = enabled
+        enabled = enabled,
+        modifier = modifier,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

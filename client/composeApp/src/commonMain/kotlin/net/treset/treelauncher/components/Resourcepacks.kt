@@ -20,7 +20,7 @@ import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.IconButton
-import net.treset.treelauncher.generic.ListViewBox
+import net.treset.treelauncher.generic.ListDisplayBox
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -210,7 +210,7 @@ fun Resourcepacks() {
                     modifier = Modifier.fillMaxWidth().padding(end = 6.dp),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    ListViewBox(
+                    ListDisplayBox(
                         DetailsListDisplay.entries,
                         listDisplay,
                         {

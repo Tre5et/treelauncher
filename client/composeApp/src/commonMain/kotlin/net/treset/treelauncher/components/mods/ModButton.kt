@@ -26,9 +26,11 @@ import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.DownloadingIcon
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.util.DetailsListDisplay
 
 @Composable
 fun ModDisplayData.ModButton(
+    display: DetailsListDisplay,
     onEdit: () -> Unit
 ) {
     var selectedVersion: ModVersionData by rememberSaveable(currentVersion!!) { mutableStateOf(currentVersion)}
@@ -41,10 +43,11 @@ fun ModDisplayData.ModButton(
         }
     }
 
-    SelectorButton(
-        selected = false,
-        onClick = {}
-    ) {
+    when(display) {
+        DetailsListDisplay.FULL -> SelectorButton(
+            selected = false,
+            onClick = {}
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,5 +180,198 @@ fun ModDisplayData.ModButton(
                     }
                 }
             }
+        }
+
+        DetailsListDisplay.COMPACT -> SelectorButton(
+            selected = false,
+            onClick = {}
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Text(
+                        mod?.name?: "",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    mod?.description?.let {
+                        Text(
+                            it,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.End,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if(!downloading && currentVersion?.versionNumber != selectedVersion.versionNumber) {
+                            IconButton(
+                                onClick = {
+                                    startDownload(selectedVersion)
+                                },
+                                icon = icons().download,
+                                tooltip = strings().manager.mods.card.download(),
+                            )
+                        }
+
+                        if(downloading) {
+                            DownloadingIcon(
+                                "Downloading",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        ComboBox(
+                            items = versions?: emptyList(),
+                            onSelected = {
+                                selectedVersion = it
+                            },
+                            selected = selectedVersion,
+                            loading = versions == null && selectLatest,
+                        )
+                    }
+
+                    Row {
+                        mod?.url?.let {
+                            IconButton(
+                                onClick = {
+                                    it.openInBrowser()
+                                },
+                                icon = icons().browser,
+                                tooltip = strings().manager.mods.card.openBrowser()
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                onEdit()
+                            },
+                            icon = icons().edit,
+                            tooltip = strings().manager.mods.card.edit(),
+                        )
+
+                        IconButton(
+                            onClick = {
+                                changeEnabled()
+                            },
+                            icon = icons().enabled(enabled),
+                            tooltip = strings().manager.mods.card.changeUsed(enabled),
+                        )
+
+                        IconButton(
+                            onClick = {
+                                deleteMod()
+                            },
+                            icon = icons().delete,
+                            interactionTint = MaterialTheme.colorScheme.error,
+                            tooltip = strings().manager.mods.card.delete(),
+                        )
+
+                    }
+                }
+            }
+        }
+
+        DetailsListDisplay.MINIMAL -> SelectorButton(
+            selected = false,
+            onClick = {}
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    mod?.name?: "",
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 16.dp)
+                )
+
+                if(!downloading && currentVersion?.versionNumber != selectedVersion.versionNumber) {
+                    IconButton(
+                        onClick = {
+                            startDownload(selectedVersion)
+                        },
+                        icon = icons().download,
+                        tooltip = strings().manager.mods.card.download(),
+                    )
+                }
+
+                if(downloading) {
+                    DownloadingIcon(
+                        "Downloading",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                ComboBox(
+                    items = versions?: emptyList(),
+                    onSelected = {
+                        selectedVersion = it
+                    },
+                    selected = selectedVersion,
+                    loading = versions == null && selectLatest,
+                    modifier = Modifier.padding(end = 6.dp)
+                )
+
+                mod?.url?.let {
+                    IconButton(
+                        onClick = {
+                            it.openInBrowser()
+                        },
+                        icon = icons().browser,
+                        tooltip = strings().manager.mods.card.openBrowser()
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        onEdit()
+                    },
+                    icon = icons().edit,
+                    tooltip = strings().manager.mods.card.edit(),
+                )
+
+                IconButton(
+                    onClick = {
+                        changeEnabled()
+                    },
+                    icon = icons().enabled(enabled),
+                    tooltip = strings().manager.mods.card.changeUsed(enabled),
+                )
+
+                IconButton(
+                    onClick = {
+                        deleteMod()
+                    },
+                    icon = icons().delete,
+                    interactionTint = MaterialTheme.colorScheme.error,
+                    tooltip = strings().manager.mods.card.delete(),
+                )
+            }
+        }
+
     }
 }
