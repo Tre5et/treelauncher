@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.style.disabledContainer
@@ -181,6 +182,48 @@ fun ImageSelectorButton(
                         textAlign = TextAlign.Start
                     )
                 }
+            }
+        }
+
+        overlayContent()
+    }
+}
+
+@Composable
+fun CompactSelectorButton(
+    selected: Boolean,
+    onClick: () -> Unit,
+    title: String? = null,
+    subtitle: String? = null,
+    enabled: Boolean = true,
+    overlayContent: @Composable BoxScope.() -> Unit = {}
+) {
+    SelectorButton(
+        selected = selected,
+        onClick = onClick,
+        enabled = enabled
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            title?.let {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 18.dp, end = 36.dp)
+                )
+            }
+            subtitle?.let {
+                Text(
+                    it,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 18.dp, end = 36.dp)
+                )
             }
         }
 

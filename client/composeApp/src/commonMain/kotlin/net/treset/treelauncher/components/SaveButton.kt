@@ -1,6 +1,6 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.saves.Save
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
@@ -48,29 +46,15 @@ fun SaveButton(
             }
         }
 
-        DetailsListDisplay.COMPACT -> SelectorButton(
+        DetailsListDisplay.COMPACT -> CompactSelectorButton(
             selected = selected,
             onClick = onClick,
+            title = save.name,
+            subtitle = save.fileName
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    Text(
-                        save.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(start = 18.dp, end = 36.dp)
-                    )
-                    Text(save.fileName)
-                }
-
                 IconButton(
                     onClick = {
                         showDeleteDialog = true
@@ -82,24 +66,14 @@ fun SaveButton(
             }
         }
 
-        DetailsListDisplay.MINIMAL -> SelectorButton(
+        DetailsListDisplay.MINIMAL -> CompactSelectorButton(
             selected = selected,
             onClick = onClick,
+            title = save.name,
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Text(
-                    save.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .padding(start = 18.dp, end = 36.dp)
-                        .align(Alignment.Center)
-                )
-
                 IconButton(
                     onClick = {
                         showDeleteDialog = true

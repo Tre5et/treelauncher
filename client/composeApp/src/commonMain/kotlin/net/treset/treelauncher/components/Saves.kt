@@ -222,10 +222,10 @@ fun Saves() {
                         style = MaterialTheme.typography.titleMedium
                     )
                     servers.forEach {
-                        // TODO: make conform to list display
                         ServerButton(
                             it,
-                            selectedServer == it
+                            selectedServer == it,
+                            display = listDisplay,
                         ) {
                             selectedSave = null
                             selectedServer = if (selectedServer == it) {

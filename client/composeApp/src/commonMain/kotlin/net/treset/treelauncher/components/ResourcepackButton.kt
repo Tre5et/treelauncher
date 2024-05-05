@@ -1,6 +1,6 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
@@ -46,35 +44,15 @@ fun ResourcepackButton(
             }
         }
 
-        DetailsListDisplay.COMPACT -> SelectorButton(
+        DetailsListDisplay.COMPACT -> CompactSelectorButton(
             selected = false,
             onClick = { },
+            title = resourcepack.name,
+            subtitle = resourcepack.packMcmeta?.pack?.description
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    Text(
-                        resourcepack.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(start = 18.dp, end = 36.dp)
-                    )
-                    resourcepack.packMcmeta?.pack?.description?.let {
-                        Text(
-                            it,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-
                 IconButton(
                     onClick = {
                         showDeleteDialog = true
@@ -86,24 +64,14 @@ fun ResourcepackButton(
             }
         }
 
-        DetailsListDisplay.MINIMAL -> SelectorButton(
+        DetailsListDisplay.MINIMAL -> CompactSelectorButton(
             selected = false,
             onClick = { },
+            title = resourcepack.name,
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Text(
-                    resourcepack.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .padding(start = 18.dp, end = 36.dp)
-                        .align(Alignment.Center)
-                )
-
                 IconButton(
                     onClick = {
                         showDeleteDialog = true
