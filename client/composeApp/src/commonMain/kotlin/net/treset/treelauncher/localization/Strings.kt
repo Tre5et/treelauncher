@@ -486,6 +486,10 @@ open class Strings(
                 val tooltip: () -> String
             )
             data class Game(
+                val cleanupFailCancel: () -> String,
+                val cleanupFailMessage: () -> String,
+                val cleanupFailRetry: () -> String,
+                val cleanupFailTitle: () -> String,
                 val errorMessage: (message: String) -> String,
                 val errorTitle: () -> String,
                 val exitingMessage: () -> String,

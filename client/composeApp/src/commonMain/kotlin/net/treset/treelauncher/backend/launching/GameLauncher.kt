@@ -18,6 +18,7 @@ class GameLauncher(
     val minecraftUser: User,
     val quickPlayData: QuickPlayData? = null,
     var onExit: (String?) -> Unit = { _ -> },
+    var onResourceCleanupFailed:  (Exception, (retry: Boolean) -> Unit) -> Unit  = { _, _ -> },
     var onExited: (String?) -> Unit = { _ -> },
 ) {
     private var resourceManager: ResourceManager? = null
@@ -144,7 +145,6 @@ class GameLauncher(
         }
     }
 
-    @Throws(GameResourceException::class)
     private fun cleanupResources(playDuration: Long, error: String?) {
         LOGGER.info { "Cleaning up resources" }
         onExit(error)
@@ -154,9 +154,18 @@ class GameLauncher(
             LOGGER.error(e) { "Unable to add play duration to statistics: duration=$playDuration" }
         }
 
-        resourceManager?.cleanupGameFiles()
-
-        onExited(error)
+        try {
+            resourceManager?.cleanupGameFiles()
+            onExited(error)
+        } catch (e: GameResourceException) {
+            onResourceCleanupFailed(e) { retry ->
+                if(retry) {
+                    cleanupResources(playDuration, error)
+                } else {
+                    onExited(error)
+                }
+            }
+        }
     }
 
     companion object {

@@ -54,7 +54,8 @@ data class AppContextData(
     val setGlobalPopup: (PopupData?) -> Unit,
     val openNews: () -> Unit,
     val error: (Exception) -> Unit,
-    val severeError: (Exception) -> Unit
+    val severeError: (Exception) -> Unit,
+    val silentError: (Exception) -> Unit
 )
 
 lateinit var AppContext: AppContextData
@@ -143,6 +144,9 @@ fun App(
             severeError = {
                 LOGGER.error(it) { "A severe error occurred!" }
                 fatalExceptions = fatalExceptions + it
+            },
+            silentError = {
+                LOGGER.error(it) { "An error occurred!" }
             }
         )
     }

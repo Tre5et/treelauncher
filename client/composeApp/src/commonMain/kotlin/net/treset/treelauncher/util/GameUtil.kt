@@ -1,5 +1,6 @@
 package net.treset.treelauncher.util
 
+import androidx.compose.material3.MaterialTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
@@ -30,6 +31,7 @@ class GameLaunchHelper(
     init {
         onPrep()
         launcher.onExit = { onGameExit() }
+        launcher.onResourceCleanupFailed = this::onCleanupFail
         launcher.onExited = this::onGameExited
         try {
             launcher.launch(false) { onLaunchDone(it) }
@@ -104,6 +106,28 @@ class GameLaunchHelper(
         AppContext.setGlobalPopup(null)
         LOGGER.info { "Game exited normally!" }
         onExit()
+    }
+    
+    private fun onCleanupFail(e: Exception, callback: (Boolean) -> Unit) {
+        AppContext.silentError(e)
+        AppContext.setGlobalPopup(
+            PopupData(
+                type = PopupType.ERROR,
+                titleRow = { Text(strings().selector.instance.game.cleanupFailTitle()) },
+                content =  { Text(strings().selector.instance.game.cleanupFailMessage()) },
+                buttonRow = {
+                    Button(
+                        onClick = { callback(false) },
+                        content = { Text(strings().selector.instance.game.cleanupFailCancel()) },
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Button(
+                        onClick = { callback(true) },
+                        content = { Text(strings().selector.instance.game.cleanupFailRetry()) },
+                    )
+                }
+            )
+        )
     }
 
     private fun onCrash(
