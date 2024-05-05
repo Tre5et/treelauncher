@@ -202,6 +202,8 @@ fun ModDisplayData.ModButton(
                     Text(
                         mod?.name?: "",
                         style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     mod?.description?.let {
                         Text(

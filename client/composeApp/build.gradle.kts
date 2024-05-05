@@ -53,7 +53,7 @@ kotlin {
 }
 
 
-val version = "2.2.3"
+val version = "2.2.4"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
