@@ -1,9 +1,6 @@
 package net.treset.treelauncher.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +9,7 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
@@ -63,7 +61,10 @@ fun ResourcepackButton(
                 ) {
                     Text(
                         resourcepack.name,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(start = 18.dp, end = 36.dp)
                     )
                     resourcepack.packMcmeta?.pack?.description?.let {
                         Text(
@@ -96,7 +97,11 @@ fun ResourcepackButton(
                 Text(
                     resourcepack.name,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.align(Alignment.Center)
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .padding(start = 18.dp, end = 36.dp)
+                        .align(Alignment.Center)
                 )
 
                 IconButton(

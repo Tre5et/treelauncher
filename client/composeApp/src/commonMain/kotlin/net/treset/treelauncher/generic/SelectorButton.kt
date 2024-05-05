@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.style.disabledContainer
@@ -170,11 +171,15 @@ fun ImageSelectorButton(
                 title?.let {
                     Text(
                         it,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Start
                     )
                 }
                 subtitle?.let {
-                    Text(it)
+                    Text(
+                        it,
+                        textAlign = TextAlign.Start
+                    )
                 }
             }
         }
