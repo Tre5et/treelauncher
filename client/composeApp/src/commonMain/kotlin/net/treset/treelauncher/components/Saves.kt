@@ -346,7 +346,7 @@ fun Saves() {
                 showAdd = true
             }
         },
-        detailsScrollable = saves.isNotEmpty() || servers.isNotEmpty(),
+        detailsScrollable = saves.isNotEmpty() || servers.isNotEmpty() || showAdd,
         sortContext = SortContext(
             getSortType = { appSettings().savesComponentSortType },
             setSortType = { appSettings().savesComponentSortType = it },
