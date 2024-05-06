@@ -52,7 +52,7 @@ fun SelectorButton(
             .fillMaxWidth()
             .background(backgroundColor)
             .pointerHoverIcon(if(enabled) PointerIcon.Hand else PointerIcon.Default)
-            .clickable(enabled = enabled) { onClick() }
+            .clickable { if(enabled) onClick() else { } }
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {

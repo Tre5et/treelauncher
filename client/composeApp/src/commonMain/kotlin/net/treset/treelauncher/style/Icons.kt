@@ -40,8 +40,8 @@ object Icons {
     val back = Icons.AutoMirrored.Rounded.ArrowBack
     val language = Icons.Rounded.Language
     val download = Icons.Rounded.CloudDownload
-    val enable = Icons.Rounded.ExtensionOff
-    val disable = Icons.Rounded.Extension
+    val enable = Icons.Rounded.PowerOff
+    val disable = Icons.Rounded.Power
     val enabled = { enabled: Boolean -> if (enabled) disable else enable }
     val browser = Icons.Rounded.OpenInBrowser
     val search = Icons.Rounded.Search

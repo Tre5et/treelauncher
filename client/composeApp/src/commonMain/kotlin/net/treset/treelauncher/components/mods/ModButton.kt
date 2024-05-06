@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +26,7 @@ import net.treset.treelauncher.generic.SelectorButton
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.DownloadingIcon
+import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.DetailsListDisplay
 
@@ -46,7 +48,8 @@ fun ModDisplayData.ModButton(
     when(display) {
         DetailsListDisplay.FULL -> SelectorButton(
             selected = false,
-            onClick = {}
+            onClick = {},
+            enabled = enabled
         ) {
             Row(
                 modifier = Modifier
@@ -67,6 +70,7 @@ fun ModDisplayData.ModButton(
                         "Mod Icon",
                         modifier = Modifier
                             .fillMaxSize()
+                            .alpha(if(enabled) 1f else 0.38f)
                     )
                 }
 
@@ -168,13 +172,17 @@ fun ModDisplayData.ModButton(
                         Icon(
                             icons().modrinth,
                             "Modrinth",
-                            tint = icons().modrinthColor(modrinthStatus),
+                            tint = icons().modrinthColor(modrinthStatus).let {
+                                if(enabled) it else it.disabledContent()
+                            },
                             modifier = Modifier.size(32.dp)
                         )
                         Icon(
                             icons().curseforge,
                             "Curseforge",
-                            tint = icons().curseforgeColor(curseforgeStatus),
+                            tint = icons().curseforgeColor(curseforgeStatus).let {
+                                if(enabled) it else it.disabledContent()
+                            },
                             modifier = Modifier.size(32.dp)
                         )
                     }
