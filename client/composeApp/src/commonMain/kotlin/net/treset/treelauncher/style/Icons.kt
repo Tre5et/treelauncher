@@ -56,6 +56,9 @@ object Icons {
     val lightMode = Icons.Rounded.LightMode
     val systemMode = Icons.Rounded.BrightnessMedium
     val list = Icons.Rounded.ViewStream
+    val plus = Icons.Rounded.AddCircle
+    val minus = Icons.Rounded.RemoveCircle
+    val warning = Icons.Rounded.Warning
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.AccentColor
 import net.treset.treelauncher.style.Theme
+import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.HsvColor
 import org.jetbrains.jewel.ui.util.toRgbaHexString
@@ -44,7 +46,7 @@ fun Appearance() {
             .fillMaxWidth()
     ) {
         Text(
-            strings().settings.appearance(),
+            strings().settings.appearance.title(),
             style = MaterialTheme.typography.titleSmall
         )
 
@@ -178,6 +180,66 @@ fun Appearance() {
                 }
             }
         }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(strings().settings.appearance.displayScale())
+            IconButton(
+                onClick = {
+                    (appSettings().displayScale - 0.1f).let {
+                        if(it >= 0.5f) {
+                            appSettings().displayScale = it
+                        } else {
+                            appSettings().displayScale = 0.5f
+                        }
+                    }
+                },
+                icon = icons().minus,
+                tooltip = strings().settings.appearance.decrement(),
+                enabled = appSettings().displayScale > 0.5f
+            )
+            Text(strings().settings.appearance.scaling(appSettings().displayScale))
+            IconButton(
+                onClick = {
+                    (appSettings().displayScale + 0.1f).let {
+                        if(it <= 2f) {
+                            appSettings().displayScale = it
+                        } else {
+                            appSettings().displayScale = 2f
+                        }
+                    }
+                },
+                icon = icons().plus,
+                tooltip = strings().settings.appearance.increment(),
+                enabled = appSettings().displayScale < 2f
+            )
+        }
+
+        if(appSettings().displayScale < 1f || appSettings().displayScale > 1.3f) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    icons().warning,
+                    "",
+                    tint = LocalContentColor.current.disabledContent(),
+                    modifier = Modifier.size(18.dp).offset(y = (-1).dp)
+                )
+                Text(
+                    if(appSettings().displayScale < 1f)
+                        strings().settings.appearance.smallHint()
+                    else
+                        strings().settings.appearance.largeHint(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = LocalContentColor.current.disabledContent()
+                )
+            }
+        }
+
+        // Font scale seems too useless and complicated
     }
 
     if(showColorPicker) {

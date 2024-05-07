@@ -429,7 +429,15 @@ class EnStrings : Strings(
         )
     ),
     settings = Settings(
-        appearance = { "Appearance" },
+        appearance = Settings.Appearance(
+            decrement = { "Decrease by 0.1" },
+            displayScale = { "Display Scale:" },
+            fontScale = { "Font Scale:" },
+            increment = { "Increase by 0.1" },
+            largeHint = { "Large display scaling may cut off content" },
+            smallHint = { "Small display scaling may compromise readability" },
+            title = { "Appearance" }
+        ),
         cleanup = Settings.Cleanup(
             button = { "Delete unused Files" },
             cancel = { "Cancel" },

@@ -10,6 +10,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
 import java.io.IOException
 import java.util.*
+import kotlin.math.roundToInt
 
 enum class Language(val locale: Locale, val strings: Strings, val displayName: () -> String) {
     ENGLISH(Locale.ENGLISH, EnStrings(), { strings().language.english(language().systemLanguage == ENGLISH) }),
@@ -554,7 +555,7 @@ open class Strings(
     }
 
     data class Settings(
-        val appearance: () -> String,
+        val appearance: Appearance,
         val cleanup: Cleanup,
         val debugNotification: (enabled: Boolean) -> String,
         val language: () -> String,
@@ -570,6 +571,19 @@ open class Strings(
         val user: () -> String,
         val version: () -> String
     ) {
+        data class Appearance(
+            val decrement: () -> String,
+            val displayScale: () -> String,
+            val fontScale: () -> String,
+            val increment: () -> String,
+            val largeHint: () -> String,
+            val scaling: (Float) -> String = {
+                "%.1fx".format((it * 10f).roundToInt() / 10f)
+            },
+            val smallHint: () -> String,
+            val title: () -> String,
+        )
+
         data class Theme(
             var cancel: () -> String,
             var confirm: () -> String,

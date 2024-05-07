@@ -428,7 +428,15 @@ class DeStrings : Strings(
         )
     ),
     settings = Settings(
-        appearance = { "Darstellung" },
+        appearance = Settings.Appearance(
+            decrement = { "Um 0.1 erhöhen" },
+            displayScale = { "Anzeigegröße:" },
+            fontScale = { "Schriftgröße:" },
+            increment = { "Um 0.1 verringern" },
+            largeHint = { "Große Anzeigegrößen können Inhalt abschneiden" },
+            smallHint = { "Kleine Anzeigegrößen können die Lesbarkeit einschränken" },
+            title = { "Darstellung" }
+        ),
         cleanup = Settings.Cleanup(
             button = { "Ungenutzte Dateien löschen" },
             cancel = { "Abbrechen" },

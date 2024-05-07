@@ -50,10 +50,17 @@ fun typography() = rememberSaveable {
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp
         ),
-        labelLarge = TextStyle(
+        labelSmall = TextStyle(
             fontFamily = Exo2Font,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp
-        ),
+            fontWeight = FontWeight.Normal,
+            fontSize = 11.sp,
+            fontStyle = FontStyle.Italic,
+        )       ,
+        labelMedium = TextStyle(
+            fontFamily = Exo2Font,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            fontStyle = FontStyle.Italic,
+        )
     )
 }

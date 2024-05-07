@@ -155,76 +155,79 @@ fun App(
         colors = colors,
         typography = typography()
     ) {
-        CompositionLocalProvider(
-            LocalAppContext provides AppContext
-        ) {
-            ProvideTextStyle(
-                MaterialTheme.typography.bodyMedium
+
+        ScalingProvider {
+            CompositionLocalProvider(
+                LocalAppContext provides AppContext
             ) {
-                Scaffold {
-                    Column(
-                        Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        notificationsChanged.let {
-                            for(notification in notifications) {
-                                LaunchedEffect(Unit) {
-                                    notification.visible = true
-                                    notificationsChanged++
+                ProvideTextStyle(
+                    MaterialTheme.typography.bodyMedium
+                ) {
+                    Scaffold {
+                        Column(
+                            Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            notificationsChanged.let {
+                                for (notification in notifications) {
+                                    LaunchedEffect(Unit) {
+                                        notification.visible = true
+                                        notificationsChanged++
+                                    }
+                                    NotificationBanner(
+                                        visible = notification.visible,
+                                        onDismissed = {
+                                            //Strange behavior when removing, downstream notifications get dismissed too, so keep them in the list
+                                            //notifications -= notification
+                                        },
+                                        data = notification.data
+                                    )
                                 }
-                                NotificationBanner(
-                                    visible = notification.visible,
-                                    onDismissed = {
-                                        //Strange behavior when removing, downstream notifications get dismissed too, so keep them in the list
-                                        //notifications -= notification
-                                    },
-                                    data = notification.data
-                                )
+                            }
+
+                            LoginScreen {
+                                News(openNews)
+                                FixFiles()
+
+                                NavigationContainer {
+                                    when (NavigationContext.navigationState) {
+                                        NavigationState.INSTANCES -> Instances()
+                                        NavigationState.ADD -> Create()
+                                        NavigationState.SAVES -> Saves()
+                                        NavigationState.RESSOURCE_PACKS -> Resourcepacks()
+                                        NavigationState.OPTIONS -> Options()
+                                        NavigationState.MODS -> Mods()
+                                        NavigationState.SETTINGS -> Settings()
+                                    }
+                                }
                             }
                         }
 
-                        LoginScreen {
-                            News(openNews)
-                            FixFiles()
-
-                            NavigationContainer {
-                                when (NavigationContext.navigationState) {
-                                    NavigationState.INSTANCES -> Instances()
-                                    NavigationState.ADD -> Create()
-                                    NavigationState.SAVES -> Saves()
-                                    NavigationState.RESSOURCE_PACKS -> Resourcepacks()
-                                    NavigationState.OPTIONS -> Options()
-                                    NavigationState.MODS -> Mods()
-                                    NavigationState.SETTINGS -> Settings()
-                                }
-                            }
+                        popupData?.let {
+                            PopupOverlay(it)
                         }
-                    }
 
-                    popupData?.let {
-                        PopupOverlay(it)
-                    }
-
-                    fatalExceptions.forEach { e ->
-                        AlertDialog(
-                            onDismissRequest = {},
-                            title = { Text(strings().error.severeTitle()) },
-                            text = {
-                                Text(
-                                    strings().error.severeMessage(e),
-                                    textAlign = TextAlign.Start
-                                )
-                            },
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            confirmButton = {
-                                Button(
-                                    onClick = { app().exit(force = true) },
-                                    color = MaterialTheme.colorScheme.error
-                                ) {
-                                    Text(strings().error.severeClose())
+                        fatalExceptions.forEach { e ->
+                            AlertDialog(
+                                onDismissRequest = {},
+                                title = { Text(strings().error.severeTitle()) },
+                                text = {
+                                    Text(
+                                        strings().error.severeMessage(e),
+                                        textAlign = TextAlign.Start
+                                    )
+                                },
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                confirmButton = {
+                                    Button(
+                                        onClick = { app().exit(force = true) },
+                                        color = MaterialTheme.colorScheme.error
+                                    ) {
+                                        Text(strings().error.severeClose())
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
