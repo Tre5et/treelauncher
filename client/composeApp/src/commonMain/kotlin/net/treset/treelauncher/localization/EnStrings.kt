@@ -135,7 +135,8 @@ class EnStrings : Strings(
                 "Files can be stored in different locations. Change the data path in the settings.",
                 "You can change the sorting of all component menus. Click the sort button next to the title.",
                 "You can navigate all of the Launcher by using the Tab key.",
-                "Drag and Drop files or folders into component settings to add the to included files."
+                "Drag and Drop files or folders into component settings to add the to included files.",
+                "You can change how much space list items in a component take up by clicking the list display button next to the title."
             ).random()
         }" },
         label = Login.Label(

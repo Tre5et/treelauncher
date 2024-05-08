@@ -135,7 +135,8 @@ class DeStrings : Strings(
                 "Launcher-Dateien können an einem anderen Speicherort gespeichert werden. Der Ort wird in den Einstellungen ausgewählt.",
                 "Die Sortierung von Komponenten kann durch Klicken auf den Sortierknopf neben dem Zeilenkopf geändert werden.",
                 "Der Launcher kann komplett durch benutzen der Tabulator-Taste verwendet werden.",
-                "Dateien können in die Komponenteneinstellungen gezogen werden, um diese den Einbegriffenen Dateien hinzuzufügen."
+                "Dateien können in die Komponenteneinstellungen gezogen werden, um diese den Einbegriffenen Dateien hinzuzufügen.",
+                "Die größe von Listenelementen in Komponenten kann durch klicken auf den Listenanzeige-Knopf neben dem Titel angepasst werden"
             ).random()
         }" },
         label = Login.Label(
