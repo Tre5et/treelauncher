@@ -24,11 +24,13 @@ fun SaveButton(
 ) {
     var showDeleteDialog by remember(save) { mutableStateOf(false) }
 
+    val image = save.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) }
+
     when(display) {
         DetailsListDisplay.FULL -> ImageSelectorButton(
             selected = selected,
             onClick = onClick,
-            image = save.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) },
+            image = image,
             title = save.name,
             subtitle = save.fileName
         ) {
@@ -49,6 +51,7 @@ fun SaveButton(
         DetailsListDisplay.COMPACT -> CompactSelectorButton(
             selected = selected,
             onClick = onClick,
+            image = image,
             title = save.name,
             subtitle = save.fileName
         ) {

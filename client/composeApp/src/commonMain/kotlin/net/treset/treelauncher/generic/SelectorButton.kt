@@ -194,6 +194,7 @@ fun ImageSelectorButton(
 fun CompactSelectorButton(
     selected: Boolean,
     onClick: () -> Unit,
+    image: ImageBitmap? = null,
     title: String? = null,
     subtitle: String? = null,
     enabled: Boolean = true,
@@ -206,27 +207,51 @@ fun CompactSelectorButton(
         enabled = enabled,
         modifier = modifier,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.align(Alignment.Center)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            title?.let {
-                Text(
-                    it,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 18.dp, end = 36.dp)
-                )
+            image?.let {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(LocalContentColor.current)
+                        .size(56.dp)
+                        .padding(3.dp)
+                ) {
+                    Image(
+                        it,
+                        "Icon",
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
             }
-            subtitle?.let {
-                Text(
-                    it,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 18.dp, end = 36.dp)
-                )
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(4.dp)
+            ) {
+                title?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(end = 36.dp)
+                    )
+                }
+                subtitle?.let {
+                    Text(
+                        it,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(end = 36.dp)
+                    )
+                }
             }
         }
 

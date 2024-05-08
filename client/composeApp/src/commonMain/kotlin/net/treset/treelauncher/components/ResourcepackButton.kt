@@ -22,11 +22,13 @@ fun ResourcepackButton(
 ) {
     var showDeleteDialog by remember(resourcepack) { mutableStateOf(false) }
 
+    val image = resourcepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) }
+
     when(display) {
         DetailsListDisplay.FULL -> ImageSelectorButton(
             selected = false,
             onClick = {},
-            image = resourcepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) },
+            image = image,
             title = resourcepack.name,
             subtitle = resourcepack.packMcmeta?.pack?.description
         ) {
@@ -47,6 +49,7 @@ fun ResourcepackButton(
         DetailsListDisplay.COMPACT -> CompactSelectorButton(
             selected = false,
             onClick = { },
+            image = image,
             title = resourcepack.name,
             subtitle = resourcepack.packMcmeta?.pack?.description
         ) {

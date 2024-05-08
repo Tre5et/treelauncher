@@ -199,8 +199,22 @@ fun ModDisplayData.ModButton(
                     .fillMaxWidth()
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(LocalContentColor.current)
+                        .size(64.dp)
+                        .padding(3.dp)
+                ) {
+                    Image(
+                        image ?: painterResource("img/default_mod.png"),
+                        "Icon",
+                        modifier = Modifier.size(58.dp)
+                    )
+                }
+
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start,
