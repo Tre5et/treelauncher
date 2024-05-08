@@ -25,6 +25,7 @@ import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.HsvColor
 import org.jetbrains.jewel.ui.util.toRgbaHexString
+import kotlin.math.abs
 
 @Composable
 fun Appearance() {
@@ -181,6 +182,19 @@ fun Appearance() {
             }
         }
 
+        val displayScales = remember { arrayOf(500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1200, 1300, 1500, 1750, 2000) }
+        val currentScalingIndex = remember(appSettings().displayScale) {
+            var nearest = 7
+            var distance = Int.MAX_VALUE
+            displayScales.forEachIndexed { index, displayScale ->
+                if(abs(appSettings().displayScale - displayScale) < distance) {
+                    distance = appSettings().displayScale - displayScale
+                    nearest = index
+                }
+            }
+            nearest
+        }
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -188,36 +202,28 @@ fun Appearance() {
             Text(strings().settings.appearance.displayScale())
             IconButton(
                 onClick = {
-                    (appSettings().displayScale - 0.1f).let {
-                        if(it >= 0.5f) {
-                            appSettings().displayScale = it
-                        } else {
-                            appSettings().displayScale = 0.5f
-                        }
+                    if(currentScalingIndex > 0) {
+                        appSettings().displayScale = displayScales[currentScalingIndex - 1]
                     }
                 },
                 icon = icons().minus,
                 tooltip = strings().settings.appearance.decrement(),
-                enabled = appSettings().displayScale > 0.5f
+                enabled = currentScalingIndex > 0
             )
             Text(strings().settings.appearance.scaling(appSettings().displayScale))
             IconButton(
                 onClick = {
-                    (appSettings().displayScale + 0.1f).let {
-                        if(it <= 2f) {
-                            appSettings().displayScale = it
-                        } else {
-                            appSettings().displayScale = 2f
-                        }
+                    if(currentScalingIndex < displayScales.size - 1) {
+                        appSettings().displayScale = displayScales[currentScalingIndex + 1]
                     }
                 },
                 icon = icons().plus,
                 tooltip = strings().settings.appearance.increment(),
-                enabled = appSettings().displayScale < 2f
+                enabled = currentScalingIndex < displayScales.size - 1
             )
         }
 
-        if(appSettings().displayScale < 1f || appSettings().displayScale > 1.3f) {
+        if(appSettings().displayScale < 1000 || appSettings().displayScale > 1300) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -229,7 +235,7 @@ fun Appearance() {
                     modifier = Modifier.size(18.dp).offset(y = (-1).dp)
                 )
                 Text(
-                    if(appSettings().displayScale < 1f)
+                    if(appSettings().displayScale < 1000)
                         strings().settings.appearance.smallHint()
                     else
                         strings().settings.appearance.largeHint(),

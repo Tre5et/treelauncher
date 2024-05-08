@@ -430,10 +430,9 @@ class EnStrings : Strings(
     ),
     settings = Settings(
         appearance = Settings.Appearance(
-            decrement = { "Decrease by 0.1" },
+            decrement = { "Decrease by 10%" },
             displayScale = { "Display Scale:" },
-            fontScale = { "Font Scale:" },
-            increment = { "Increase by 0.1" },
+            increment = { "Increase by 10%" },
             largeHint = { "Large display scaling may cut off content" },
             smallHint = { "Small display scaling may compromise readability" },
             title = { "Appearance" }

@@ -574,11 +574,10 @@ open class Strings(
         data class Appearance(
             val decrement: () -> String,
             val displayScale: () -> String,
-            val fontScale: () -> String,
             val increment: () -> String,
             val largeHint: () -> String,
-            val scaling: (Float) -> String = {
-                "%.1fx".format((it * 10f).roundToInt() / 10f)
+            val scaling: (Int) -> String = {
+                "${(it / 10f).roundToInt()}%"
             },
             val smallHint: () -> String,
             val title: () -> String,

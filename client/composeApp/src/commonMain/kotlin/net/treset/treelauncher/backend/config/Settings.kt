@@ -14,6 +14,8 @@ import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.style.AccentColor
 import net.treset.treelauncher.style.Theme
+import net.treset.treelauncher.style.setDisplayScale
+import net.treset.treelauncher.style.setFontScale
 import net.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
 
@@ -52,6 +54,16 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var theme: Theme = Theme.SYSTEM
     var accentColor: AccentColor = AccentColor.GREEN
     var customColor: Color = Color.White
+    var displayScale: Int = 1000
+        set(value) {
+            field = value
+            setDisplayScale(value)
+        }
+    var fontScale: Int = 1000
+        set(value) {
+            field = value
+            setFontScale(value)
+        }
     var syncUrl: String? = null
     var syncPort: String? = null
     var syncKey: String? = null

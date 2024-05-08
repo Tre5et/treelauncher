@@ -429,10 +429,9 @@ class DeStrings : Strings(
     ),
     settings = Settings(
         appearance = Settings.Appearance(
-            decrement = { "Um 0.1 erhöhen" },
+            decrement = { "Um 10% erhöhen" },
             displayScale = { "Anzeigegröße:" },
-            fontScale = { "Schriftgröße:" },
-            increment = { "Um 0.1 verringern" },
+            increment = { "Um 10% verringern" },
             largeHint = { "Große Anzeigegrößen können Inhalt abschneiden" },
             smallHint = { "Kleine Anzeigegrößen können die Lesbarkeit einschränken" },
             title = { "Darstellung" }

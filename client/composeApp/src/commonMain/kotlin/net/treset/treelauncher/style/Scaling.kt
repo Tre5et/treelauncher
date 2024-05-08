@@ -5,8 +5,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import net.treset.treelauncher.backend.config.appSettings
 
-var setDisplayScale: (Float) -> Unit = {}
-var setFontScale: (Float) -> Unit = {}
+var setDisplayScale: (Int) -> Unit = {}
+var setFontScale: (Int) -> Unit = {}
 
 @Composable
 fun ScalingProvider(
@@ -25,8 +25,8 @@ fun ScalingProvider(
 
     CompositionLocalProvider(
         LocalDensity provides Density(
-            density = LocalDensity.current.density * displayScale,
-            fontScale = LocalDensity.current.fontScale * fontScale
+            density = LocalDensity.current.density * displayScale / 1000f,
+            fontScale = LocalDensity.current.fontScale * fontScale / 1000f
         ),
     ) {
         content()
