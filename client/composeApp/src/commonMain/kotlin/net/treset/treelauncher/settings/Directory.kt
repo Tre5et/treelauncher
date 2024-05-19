@@ -28,7 +28,7 @@ import java.io.IOException
 @Composable
 fun Directory() {
     var popupContent: PopupData? by remember { mutableStateOf(null) }
-    val instanceRunning = remember { AppContext.runningInstance != null }
+    val instanceRunning = remember(AppContext.runningInstance) { AppContext.runningInstance != null }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
