@@ -452,12 +452,14 @@ class DeStrings : Strings(
         ),
         debugNotification = { "Debug-Modus ${if(it) "aktiviert" else "deaktiviert"}!" },
         discord = Settings.Discord(
+            instanceExample = { "MeineInstanz"},
+            instanceToggle = { "Instanznamen anzeigen" },
+            modLoaderToggle = { "Mod-Loader anzeigen" },
+            timeSuffix = { " vergangen" },
+            timeToggle = { "Spielzeit anzeigen" },
             title = { "Discord Integration" },
-            instance = { "Instanznamen anzeigen" },
-            version = { "Spielversion anzeigen" },
-            modLoader = { "Mod-Loader anzeigen" },
-            time = { "Spielzeit anzeigen" },
-            watermark = { "Launchernamen anzeigen" }
+            versionToggle = { "Spielversion anzeigen" },
+            watermarkToggle = { "Launchernamen anzeigen" }
         ),
         language = { "Sprache:" },
         logout = { "Ausloggen" },

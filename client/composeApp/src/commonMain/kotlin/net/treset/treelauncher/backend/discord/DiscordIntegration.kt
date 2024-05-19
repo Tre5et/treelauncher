@@ -6,6 +6,7 @@ import de.jcm.discordgamesdk.activity.Activity
 import de.jcm.discordgamesdk.activity.ActivityType
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.localization.strings
 import java.time.Instant
 
 class DiscordIntegration {
@@ -51,7 +52,7 @@ class DiscordIntegration {
     }
 
     private fun constructDetailsString(instance: InstanceData): String {
-        return Companion.constructDetailsString(instance.instance.first.name, instance.versionComponents[0].second.versionNumber, instance.versionComponents[0].second.versionType)
+        return strings().settings.discord.details(instance.instance.first.name, instance.versionComponents[0].second.versionNumber, instance.versionComponents[0].second.versionType)
     }
 
     fun clearActivity() {
@@ -62,41 +63,5 @@ class DiscordIntegration {
 
     fun close() {
         core.close()
-    }
-
-    companion object {
-        fun constructDetailsString(name: String, version: String, modLoader: String): String {
-            val builder = StringBuilder()
-            if(appSettings().discordShowInstance) {
-                builder.append(name)
-                if(appSettings().discordShowVersion || appSettings().discordShowModLoader && modLoader != "vanilla") {
-                    builder.append(" (")
-                    builder.append(constructVersionString(version, modLoader))
-                    builder.append(")")
-                }
-            } else {
-                builder.append(constructVersionString(version, modLoader))
-            }
-            if(appSettings().discordShowWatermark) {
-                builder.append(" via TreeLauncher")
-            }
-            return builder.toString()
-        }
-
-        fun constructVersionString(version: String, modLoader: String): String {
-            val builder = StringBuilder()
-            if(appSettings().discordShowVersion) {
-                builder.append(version)
-            }
-
-            if(appSettings().discordShowVersion && appSettings().discordShowModLoader && modLoader != "vanilla") {
-                builder.append(" ")
-            }
-
-            if(appSettings().discordShowModLoader && modLoader != "vanilla") {
-                builder.append(modLoader)
-            }
-            return builder.toString()
-        }
     }
 }

@@ -651,12 +651,50 @@ open class Strings(
         )
 
         data class Discord(
+            val versionLoader: (String, String) -> String = {version, modLoader ->
+                val builder = StringBuilder()
+                if(appSettings().discordShowVersion) {
+                    builder.append(version)
+                }
+
+                if(appSettings().discordShowVersion && appSettings().discordShowModLoader && modLoader != "vanilla") {
+                    builder.append(" ")
+                }
+
+                if(appSettings().discordShowModLoader && modLoader != "vanilla") {
+                    builder.append(modLoader)
+                }
+                builder.toString()
+            },
+            val details: (String, String, String) -> String = { name, version, modLoader ->
+                val builder = StringBuilder()
+                if(appSettings().discordShowInstance) {
+                    builder.append(name)
+                    if(appSettings().discordShowVersion || appSettings().discordShowModLoader && modLoader != "vanilla") {
+                        builder.append(" (")
+                        builder.append(versionLoader(version, modLoader))
+                        builder.append(")")
+                    }
+                } else {
+                    builder.append(versionLoader(version, modLoader))
+                }
+                if(appSettings().discordShowWatermark) {
+                    builder.append(strings().settings.discord.watermark())
+                }
+                builder.toString()
+            },
+            val instanceExample: () -> String = { "MyInstance" },
+            val instanceToggle: () -> String = { "Show instance name" },
+            val modLoaderExample: () -> String = { "Fabric" },
+            val modLoaderToggle: () -> String = { "Show mod loader" },
+            val timeExample: () -> String = { "01:36" },
+            val timeSuffix: () -> String = { " elapsed" },
+            val timeToggle: () -> String = { "Show playtime" },
             val title: () -> String = { "Discord Integration" },
-            val instance: () -> String = { "Show instance name" },
-            val version: () -> String = { "Show game version" },
-            val modLoader: () -> String = { "Show mod loader" },
-            val time: () -> String = { "Show playtime" },
-            val watermark: () -> String = { "Show launcher name" }
+            val versionExample: () -> String = { "1.20.5" },
+            val versionToggle: () -> String = { "Show game version" },
+            val watermark: () -> String = { " via TreeLauncher" },
+            val watermarkToggle: () -> String = { "Show launcher name" }
         )
 
         data class Path(

@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.discord.DiscordIntegration
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledSwitch
 import net.treset.treelauncher.localization.strings
@@ -81,7 +80,7 @@ fun Discord() {
                     modifier = Modifier.width(IntrinsicSize.Max)
                 ) {
                     TitledSwitch(
-                        strings().settings.discord.instance(),
+                        strings().settings.discord.instanceToggle(),
                         checked = instance,
                         onCheckedChange = {
                             instance = it
@@ -92,7 +91,7 @@ fun Discord() {
                     )
 
                     TitledSwitch(
-                        strings().settings.discord.version(),
+                        strings().settings.discord.versionToggle(),
                         checked = version,
                         onCheckedChange = {
                             version = it
@@ -103,7 +102,7 @@ fun Discord() {
                     )
 
                     TitledSwitch(
-                        strings().settings.discord.modLoader(),
+                        strings().settings.discord.modLoaderToggle(),
                         checked = modLoader,
                         onCheckedChange = {
                             modLoader = it
@@ -114,7 +113,7 @@ fun Discord() {
                     )
 
                     TitledSwitch(
-                        strings().settings.discord.time(),
+                        strings().settings.discord.timeToggle(),
                         checked = time,
                         onCheckedChange = {
                             time = it
@@ -125,7 +124,7 @@ fun Discord() {
                     )
 
                     TitledSwitch(
-                        strings().settings.discord.watermark(),
+                        strings().settings.discord.watermarkToggle(),
                         checked = watermark,
                         onCheckedChange = {
                             watermark = it
@@ -179,7 +178,11 @@ fun Discord() {
                             fontSize = 14.sp
                         )
 
-                        val details = remember(instance, version, modLoader, watermark) { DiscordIntegration.constructDetailsString("MyInstance", "1.20.5", "Fabric") }
+                        val details = remember(instance, version, modLoader, watermark) { strings().settings.discord.details(
+                            strings().settings.discord.instanceExample(),
+                            strings().settings.discord.versionExample(),
+                            strings().settings.discord.modLoaderExample()
+                        ) }
 
                         if(details.isNotBlank()) {
                             Text(
@@ -192,7 +195,7 @@ fun Discord() {
                         }
                         if(time) {
                             Text(
-                                "01:36 elapsed",
+                                strings().settings.discord.timeExample() + strings().settings.discord.timeSuffix(),
                                 style = textStyle,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
