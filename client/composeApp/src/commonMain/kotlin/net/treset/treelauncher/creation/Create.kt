@@ -1,5 +1,8 @@
 package net.treset.treelauncher.creation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -164,13 +167,17 @@ fun Create() {
                     modifier = Modifier.offset(y = (-1).dp),
                 )
 
-                if (hasMods) {
+                AnimatedVisibility(
+                    visible = hasMods,
+                    enter = expandHorizontally(),
+                    exit = shrinkHorizontally()
+                ) {
                     ModsCreation(
                         existing = AppContext.files.modsComponents.toList(),
                         showCreate = false,
                         setCurrentState = { modsState = it },
                         defaultVersion = versionState?.minecraftVersion,
-                        defaultType = versionState?.versionType?.let { if(it == VersionType.VANILLA) null else it },
+                        defaultType = versionState?.versionType?.let { if (it == VersionType.VANILLA) null else it },
                     )
                 }
             }
