@@ -48,6 +48,8 @@ kotlin {
 
             implementation("com.darkrockstudios:mpfilepicker:3.1.0")
             implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.4")
+
+            implementation("com.github.JnCrMx:discord-game-sdk4j:70b1e9dda6189cd9fbdce113527a915f892bc154")
         }
     }
 }

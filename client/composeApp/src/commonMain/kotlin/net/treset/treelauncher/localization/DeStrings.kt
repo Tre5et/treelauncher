@@ -451,6 +451,14 @@ class DeStrings : Strings(
             title = { "Ungenutzte Dateien löschen?" }
         ),
         debugNotification = { "Debug-Modus ${if(it) "aktiviert" else "deaktiviert"}!" },
+        discord = Settings.Discord(
+            title = { "Discord Integration" },
+            instance = { "Instanznamen anzeigen" },
+            version = { "Spielversion anzeigen" },
+            modLoader = { "Mod-Loader anzeigen" },
+            time = { "Spielzeit anzeigen" },
+            watermark = { "Launchernamen anzeigen" }
+        ),
         language = { "Sprache:" },
         logout = { "Ausloggen" },
         path = Settings.Path(

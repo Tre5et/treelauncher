@@ -19,6 +19,7 @@ dependencyResolutionManagement {
         maven("https://raw.githubusercontent.com/Tre5et/maven/main/")
         maven("https://jogamp.org/deployment/maven")
         maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+        maven("https://jitpack.io")
 
         flatDir {
             dirs("libs")

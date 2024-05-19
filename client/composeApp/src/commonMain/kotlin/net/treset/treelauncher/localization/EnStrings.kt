@@ -452,6 +452,14 @@ class EnStrings : Strings(
             title = { "Delete unused Files" }
         ),
         debugNotification = { "Debug mode ${if(it) "enabled" else "disabled"}!" },
+        discord = Settings.Discord(
+            title = { "Discord Integration" },
+            instance = { "Show instance name" },
+            version = { "Show game version" },
+            modLoader = { "Show mod loader" },
+            time = { "Show playtime" },
+            watermark = { "Show launcher name" }
+        ),
         language = { "Language:" },
         logout = { "Logout" },
         path = Settings.Path(

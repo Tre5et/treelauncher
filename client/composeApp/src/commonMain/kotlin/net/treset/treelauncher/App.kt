@@ -17,6 +17,7 @@ import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.discord.DiscordIntegration
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -55,7 +56,8 @@ data class AppContextData(
     val openNews: () -> Unit,
     val error: (Exception) -> Unit,
     val severeError: (Exception) -> Unit,
-    val silentError: (Exception) -> Unit
+    val silentError: (Exception) -> Unit,
+    val discord: DiscordIntegration
 )
 
 lateinit var AppContext: AppContextData
@@ -71,6 +73,8 @@ fun App(
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
     var fatalExceptions: List<Exception> by remember { mutableStateOf(listOf()) }
+
+    val discord = remember { DiscordIntegration() }
 
     app = launcherApp
 
@@ -147,7 +151,8 @@ fun App(
             },
             silentError = {
                 LOGGER.error(it) { "An error occurred!" }
-            }
+            },
+            discord = discord
         )
     }
 

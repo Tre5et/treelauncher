@@ -1,15 +1,12 @@
 package net.treset.treelauncher.creation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
@@ -157,32 +154,16 @@ fun Create() {
                     .padding(12.dp)
                     .fillMaxHeight()
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .requiredHeight(24.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            hasMods = !hasMods
-                        }
-                ) {
-                    Text(
-                        strings().creator.instance.mods(),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                    Switch(
-                        checked = hasMods,
-                        onCheckedChange = {
-                            hasMods = it
-                        },
-                        modifier = Modifier
-                            .scale(0.7f)
-                            .offset(y = (-2).dp)
-                    )
-                }
+                TitledSwitch(
+                    strings().creator.instance.mods(),
+                    checked = hasMods,
+                    onCheckedChange = {
+                        hasMods = it
+                    },
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.offset(y = (-1).dp),
+                )
+
                 if (hasMods) {
                     ModsCreation(
                         existing = AppContext.files.modsComponents.toList(),

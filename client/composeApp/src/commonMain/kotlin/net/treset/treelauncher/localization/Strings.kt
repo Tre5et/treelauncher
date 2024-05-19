@@ -558,6 +558,7 @@ open class Strings(
         val appearance: Appearance,
         val cleanup: Cleanup,
         val debugNotification: (enabled: Boolean) -> String,
+        val discord: Discord,
         val language: () -> String,
         val logout: () -> String,
         val path: Path,
@@ -583,12 +584,6 @@ open class Strings(
             val title: () -> String,
         )
 
-        data class Theme(
-            var cancel: () -> String,
-            var confirm: () -> String,
-            var title: () -> String
-        )
-
         data class Cleanup(
             val button: () -> String,
             val cancel: () -> String,
@@ -601,6 +596,15 @@ open class Strings(
             val message: () -> String,
             val success: () -> String,
             val title: () -> String
+        )
+
+        data class Discord(
+            val title: () -> String,
+            val instance: () -> String,
+            val version: () -> String,
+            val modLoader: () -> String,
+            val time: () -> String,
+            val watermark: () -> String
         )
 
         data class Path(
@@ -626,6 +630,12 @@ open class Strings(
             val success: () -> String,
             val test: () -> String,
             val url: () -> String,
+        )
+
+        data class Theme(
+            var cancel: () -> String,
+            var confirm: () -> String,
+            var title: () -> String
         )
 
         data class Update(

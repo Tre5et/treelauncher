@@ -27,6 +27,11 @@ val Exo2Font = FontFamily(
     Font("font/Exo2/Exo2-ThinItalic.ttf", FontWeight.Thin, FontStyle.Italic),
 )
 
+val GgSansFont = FontFamily(
+    Font("font/GgSans/GgSans-SemiBold.ttf", FontWeight.SemiBold),
+    Font("font/GgSans/GgSans-Regular.ttf", FontWeight.Normal),
+)
+
 @Composable
 fun typography() = rememberSaveable {
     Typography(
@@ -55,7 +60,7 @@ fun typography() = rememberSaveable {
             fontWeight = FontWeight.Normal,
             fontSize = 11.sp,
             fontStyle = FontStyle.Italic,
-        )       ,
+        ),
         labelMedium = TextStyle(
             fontFamily = Exo2Font,
             fontWeight = FontWeight.Normal,

@@ -87,6 +87,13 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsDisable = false
     var acknowledgedNews = mutableListOf<String>()
     var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
+    var discordIntegration: Boolean = false
+    var discordShowModLoader: Boolean = true
+    var discordShowTime: Boolean = true
+    var discordShowWatermark: Boolean = true
+    var discordShowVersion: Boolean = true
+    var discordShowInstance: Boolean = true
+
     @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null
     var isDebug: Boolean

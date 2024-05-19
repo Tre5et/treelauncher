@@ -24,6 +24,8 @@ fun Settings() {
 
             Directory()
 
+            Discord()
+
             //TODO: Sync()
 
             UpdateUrl()
