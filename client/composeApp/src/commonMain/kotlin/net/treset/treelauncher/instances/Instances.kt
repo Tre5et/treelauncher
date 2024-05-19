@@ -57,7 +57,7 @@ fun Instances() {
         reloadInstances()
     }
 
-    LaunchedEffect(instances, selectedSort, sortReversed) {
+    LaunchedEffect(instances, selectedSort, sortReversed, AppContext.runningInstance) {
         val newInst = instances
             .sortedWith(selectedSort.comparator)
         instances = if(sortReversed) newInst.reversed() else newInst

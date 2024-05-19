@@ -87,7 +87,7 @@ fun <T, C:CreationState<T>> Components(
     var sortType: LauncherManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: LauncherManifestSortType.LAST_USED) }
     var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
 
-    val actualComponents: List<T> = remember(components, sortType, sortReversed) {
+    val actualComponents: List<T> = remember(components, sortType, sortReversed, AppContext.runningInstance) {
         components
             .sortedWith { o1, o2 ->
                 sortType.comparator.compare(o1.getManifest(), o2.getManifest())
