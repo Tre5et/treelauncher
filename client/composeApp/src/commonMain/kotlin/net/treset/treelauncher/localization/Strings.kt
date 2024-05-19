@@ -236,7 +236,9 @@ open class Strings(
                 "You can change the sorting of all component menus. Click the sort button next to the title.",
                 "You can navigate all of the Launcher by using the Tab key.",
                 "Drag and Drop files or folders into component settings to add the to included files.",
-                "You can change how much space list items in a component take up by clicking the list display button next to the title."
+                "You can change how much space list items in a component take up by clicking the list display button next to the title.",
+                "Display scaling can be adjusted in the settings.",
+                "Enable discord integration in the settings to show your friends what you're playing."
             ).random()
         }" },
         val label: Label = Label(),

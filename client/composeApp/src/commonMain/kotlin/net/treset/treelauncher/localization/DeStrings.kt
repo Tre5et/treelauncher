@@ -136,7 +136,9 @@ class DeStrings : Strings(
                 "Die Sortierung von Komponenten kann durch Klicken auf den Sortierknopf neben dem Zeilenkopf geändert werden.",
                 "Der Launcher kann komplett durch benutzen der Tabulator-Taste verwendet werden.",
                 "Dateien können in die Komponenteneinstellungen gezogen werden, um diese den Einbegriffenen Dateien hinzuzufügen.",
-                "Die größe von Listenelementen in Komponenten kann durch klicken auf den Listenanzeige-Knopf neben dem Titel angepasst werden"
+                "Die größe von Listenelementen in Komponenten kann durch klicken auf den Listenanzeige-Knopf neben dem Titel angepasst werden",
+                "Die Anzeigegröße kann in den Einstellungen angepasst werden.",
+                "In den Einstellungen kann die Discord Integration angeschaltet werden, die allen anzeigt, was gerade gespielt wird."
             ).random()
         }" },
         label = Login.Label(
