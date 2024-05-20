@@ -55,7 +55,7 @@ kotlin {
 }
 
 
-val version = "2.2.4"
+val version = "2.3.0"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
@@ -160,7 +160,7 @@ launcherTask(
     val stringsLines = stringsFile.readLines()
     stringsFile.writeText(
         stringsLines.joinToString(System.lineSeparator()) { line ->
-            val match = "(?<=val version: \\(\\) -> String = \\{ \\\")(.*)(?=\\\" \\})".toRegex().find(line)
+            val match = "(?<=val version: \\(\\) -> String = \\{ \\\")([123456789.]*)(?=\\\" \\})".toRegex().find(line)
             match?.let { result ->
                 found = true
                 if(result.value != version) {
