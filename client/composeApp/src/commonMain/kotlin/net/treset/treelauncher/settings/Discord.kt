@@ -145,7 +145,7 @@ fun Discord() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.Top,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .width(295.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color(0xFF111214))
                         .padding(12.dp)
