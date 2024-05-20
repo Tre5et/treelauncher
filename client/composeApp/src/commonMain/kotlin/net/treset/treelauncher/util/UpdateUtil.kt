@@ -77,6 +77,7 @@ fun onUpdate(
                                     } catch(e: IOException) {
                                         setPopup(null)
                                         AppContext.error(e)
+                                        return@Button
                                     }
 
                                     setPopup(
