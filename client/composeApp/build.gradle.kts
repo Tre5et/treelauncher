@@ -160,7 +160,7 @@ launcherTask(
     val stringsLines = stringsFile.readLines()
     stringsFile.writeText(
         stringsLines.joinToString(System.lineSeparator()) { line ->
-            val match = "(?<=val version: \\(\\) -> String = \\{ \\\")([123456789.]*)(?=\\\" \\})".toRegex().find(line)
+            val match = "(?<=val version: \\(\\) -> String = \\{ \\\")([0123456789.]*)(?=\\\" \\})".toRegex().find(line)
             match?.let { result ->
                 found = true
                 if(result.value != version) {
