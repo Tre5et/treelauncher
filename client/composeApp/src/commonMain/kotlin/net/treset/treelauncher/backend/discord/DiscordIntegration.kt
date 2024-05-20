@@ -4,23 +4,19 @@ import de.jcm.discordgamesdk.Core
 import de.jcm.discordgamesdk.CreateParams
 import de.jcm.discordgamesdk.activity.Activity
 import de.jcm.discordgamesdk.activity.ActivityType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.localization.strings
 import java.time.Instant
 
 class DiscordIntegration {
-    val core: Core
+    var core: Core? = null
     init {
-        val params = CreateParams()
-        params.clientID = 1241748395115155486
-        params.flags = CreateParams.getDefaultFlags()
-
-        this.core = Core(params)
-
+        startCore()
         Thread {
             while(true) {
-                core.runCallbacks()
+                core?.runCallbacks()
                 try {
                     Thread.sleep(16)
                 } catch (e: InterruptedException) {
@@ -30,25 +26,50 @@ class DiscordIntegration {
         }.start()
     }
 
+    private fun startCore() {
+        val params = CreateParams()
+        params.clientID = 1241748395115155486
+        params.flags = CreateParams.getDefaultFlags()
+
+        try {
+            this.core = Core(params)
+            LOGGER.debug { "Started discord core" }
+        } catch (e: Exception) {
+            LOGGER.debug(e) { "Failed to start discord core. Is discord running?" }
+        }
+    }
+
     fun activateActivity(instance: InstanceData) {
         if(!appSettings().discordIntegration) {
             return
         }
-        val activity = Activity()
-        activity.type = ActivityType.PLAYING
-        activity.details = constructDetailsString(instance)
 
-        activity.assets().largeImage = "pack"
-        if(appSettings().discordShowModLoader) {
-            activity.assets().smallImage = instance.versionComponents[0].second.versionType
-            activity.assets().smallText = instance.versionComponents[0].second.versionType
+        if(core == null) {
+            startCore()
         }
 
-        if(appSettings().discordShowTime) {
-            activity.timestamps().start = Instant.now()
-        }
+        core?.let { core ->
+            val activity = Activity()
+            activity.type = ActivityType.PLAYING
+            activity.details = constructDetailsString(instance)
 
-        core.activityManager().updateActivity(activity)
+            activity.assets().largeImage = "pack"
+            if (appSettings().discordShowModLoader) {
+                activity.assets().smallImage = instance.versionComponents[0].second.versionType
+                activity.assets().smallText = instance.versionComponents[0].second.versionType
+            }
+
+            if (appSettings().discordShowTime) {
+                activity.timestamps().start = Instant.now()
+            }
+            try {
+                core.activityManager().updateActivity(activity)
+                LOGGER.debug { "Started discord activity" }
+            } catch (e: Exception) {
+                LOGGER.debug(e) { "Failed to update discord activity. Restarting core..." }
+                startCore()
+            }
+        }
     }
 
     private fun constructDetailsString(instance: InstanceData): String {
@@ -56,12 +77,29 @@ class DiscordIntegration {
     }
 
     fun clearActivity() {
-        core.activityManager().clearActivity { result ->
-            println(result.toString())
+        core?.let { core ->
+            try {
+                core.activityManager().clearActivity { result ->
+                    println(result.toString())
+                }
+                LOGGER.debug { "Cleared discord activity" }
+            } catch (e: Exception) {
+                LOGGER.debug(e) { "Failed to clear discord activity. Restarting core..." }
+                startCore()
+            }
         }
     }
 
     fun close() {
-        core.close()
+        try {
+            core?.close()
+            LOGGER.debug { "Closed discord core" }
+        } catch (e: Exception) {
+            LOGGER.debug(e) { "Failed to close discord core" }
+        }
+    }
+
+    companion object {
+        private val LOGGER = KotlinLogging.logger {  }
     }
 }

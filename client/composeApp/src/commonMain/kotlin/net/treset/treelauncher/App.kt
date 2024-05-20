@@ -314,6 +314,8 @@ class LauncherApp(
             LOGGER.error(e) { "Failed to save settings!" }
         }
 
+        AppContext.discord.close()
+
         exitApplication()
     }
 
