@@ -161,9 +161,10 @@ fun ModsEdit(
 
                         if(currentFile?.path != file.path) {
                             LOGGER.debug { "Changing file: ${currentFile?.path} -> ${file.path}" }
+
                             val oldFile = LauncherFile.of(
                                 modContext.directory,
-                                it.fileName
+                                it.fileName.let { name -> if(it.isEnabled) name else "$name.disabled" }
                             )
 
                             val backupFile = LauncherFile.of(
@@ -181,7 +182,7 @@ fun ModsEdit(
                             try {
                                 val newFile = LauncherFile.of(
                                     modContext.directory,
-                                    file.name
+                                    file.name.let { name -> if(it.isEnabled) name else "$name.disabled" }
                                 )
 
                                 LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}"}
@@ -256,7 +257,7 @@ fun ModsEdit(
                 }
             },
             enabled = tfFile.isNotBlank() && tfVersion.isNotBlank()
-                    && currentMod?.let { it.name != tfName || it.version != tfVersion || currentFile?.let { it.path == tfName } ?: true || (currentCurseforge ?: "") != tfCurseforge || (currentModrinth ?: "") != tfModrinth } ?: true
+                    && currentMod?.let { it.name != tfName || it.version != tfVersion || currentFile?.let { it.path != tfFile } ?: true || (currentCurseforge ?: "") != tfCurseforge || (currentModrinth ?: "") != tfModrinth } ?: true
         ) {
             Text(strings().manager.mods.edit.confirm(currentMod))
         }
