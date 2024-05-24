@@ -94,6 +94,7 @@ class DiscordIntegration {
         try {
             core?.close()
             LOGGER.debug { "Closed discord core" }
+            core = null
         } catch (e: Exception) {
             LOGGER.debug(e) { "Failed to close discord core" }
         }
