@@ -29,6 +29,7 @@ fun ServerButton(
             selected = selected,
             onClick = onClick,
             title = server.name,
+            image = server.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) },
             subtitle = server.ip
         )
 
