@@ -192,7 +192,8 @@ fun ModDisplayData.ModButton(
 
         DetailsListDisplay.COMPACT -> SelectorButton(
             selected = false,
-            onClick = {}
+            onClick = {},
+            enabled = enabled
         ) {
             Row(
                 modifier = Modifier
@@ -314,7 +315,8 @@ fun ModDisplayData.ModButton(
 
         DetailsListDisplay.MINIMAL -> SelectorButton(
             selected = false,
-            onClick = {}
+            onClick = {},
+            enabled = enabled
         ) {
             Row(
                 modifier = Modifier
