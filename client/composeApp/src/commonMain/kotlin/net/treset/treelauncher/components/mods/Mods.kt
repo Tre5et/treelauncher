@@ -5,21 +5,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
+import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.LauncherModSortType
 import net.treset.treelauncher.backend.config.appSettings
@@ -33,8 +33,11 @@ import net.treset.treelauncher.components.mods.display.LauncherModDisplay
 import net.treset.treelauncher.components.mods.display.ModDataProvider
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
+import net.treset.treelauncher.generic.Button
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.style.inverted
 import net.treset.treelauncher.util.DetailsListDisplay
 
 data class ModContext(
@@ -43,6 +46,7 @@ data class ModContext(
     val enableOnDownload: Boolean,
     val versions: List<String>,
     val types: List<VersionType>,
+    val providers: List<ModProvider>,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
 )
@@ -63,6 +67,9 @@ fun Mods() {
     var editingMod: LauncherMod? by remember(selected) { mutableStateOf(null) }
 
     var listDisplay by remember { mutableStateOf(appSettings().modDetailsListDisplay) }
+
+    var modrinth by remember { mutableStateOf(appSettings().isModsModrinth) }
+    var curseforge by remember { mutableStateOf(appSettings().isModsCurseforge) }
 
     Components(
         title = strings().selector.mods.title(),
@@ -137,7 +144,7 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, current.second.mods.size, current.second.versions) {
+            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, modrinth, curseforge, current.second.mods.size, current.second.versions) {
                 current.second.mods.sortedWith(sort.comparator).let {
                     if(reverse) it.reversed() else it
                 }
@@ -159,13 +166,17 @@ fun Mods() {
                 }
             }
 
-            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload) {
+            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload, modrinth, curseforge) {
                 ModContext(
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
                     current.second.versions,
                     types,
+                    listOfNotNull(
+                        if(modrinth) ModProvider.MODRINTH else null,
+                        if(curseforge) ModProvider.CURSEFORGE else null
+                    ),
                     LauncherFile.of(current.first.directory)
                 ) { element ->
                     updateQueue.add(element)
@@ -406,9 +417,11 @@ fun Mods() {
         detailsScrollable = false,
         actionBarSpecial = { _, settingsOpen, _, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
-                var dropDownOpen by remember { mutableStateOf(false) }
+                var updateExpanded by remember { mutableStateOf(false) }
+                val updateRotation by animateFloatAsState(if(updateExpanded) 180f else 0f)
 
-                val arrowRotation by animateFloatAsState(if(dropDownOpen) 180f else 0f)
+                var settingsExpanded by remember { mutableStateOf(false) }
+                val settingsRotation by animateFloatAsState(if(settingsExpanded) 90f else 0f)
 
                 IconButton(
                     onClick = {
@@ -419,21 +432,20 @@ fun Mods() {
                     tooltip = strings().manager.mods.add()
                 )
 
-
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(end = 20.dp)
+                    modifier = Modifier.padding(end = 10.dp)
                 ) {
                     IconButton(
                         onClick = {
-                            dropDownOpen = !dropDownOpen
+                            updateExpanded = !updateExpanded
                         },
                         icon = icons().expand,
                         size = 24.dp,
                         tooltip = strings().manager.mods.update.settings(),
                         modifier = Modifier
                             .offset(x = 20.dp)
-                            .rotate(arrowRotation)
+                            .rotate(updateRotation)
                     )
 
                     IconButton(
@@ -446,8 +458,8 @@ fun Mods() {
                     )
 
                     DropdownMenu(
-                        expanded = dropDownOpen,
-                        onDismissRequest = { dropDownOpen = false },
+                        expanded = updateExpanded,
+                        onDismissRequest = { updateExpanded = false },
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.secondaryContainer)
                             .padding(end = 8.dp)
@@ -496,6 +508,115 @@ fun Mods() {
                     }
                 }
 
+                Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    IconButton(
+                        onClick = {
+                            settingsExpanded = !settingsExpanded
+                        },
+                        icon = icons().settings,
+                        size = 24.dp,
+                        tooltip = strings().manager.mods.settings.tooltip(),
+                        modifier = Modifier.rotate(settingsRotation)
+                    )
+
+                    DropdownMenu(
+                        expanded = settingsExpanded,
+                        onDismissRequest = { settingsExpanded = false },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Text(
+                            strings().manager.mods.settings.providers(),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+
+                        ProvideTextStyle(
+                            MaterialTheme.typography.bodyMedium
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        modrinth = !modrinth
+                                        appSettings().isModsModrinth = modrinth
+                                    },
+                                    icon = if(modrinth) icons().minus else icons().plus,
+                                    size = 20.dp,
+                                    tooltip = strings().manager.mods.settings.state(modrinth),
+                                    enabled = !modrinth || curseforge
+                                )
+
+                                Text(
+                                    strings().manager.mods.settings.modrinth(),
+                                    style = LocalTextStyle.current.let {
+                                        if(!modrinth) {
+                                            it.copy(
+                                                color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
+                                                fontStyle = FontStyle.Italic,
+                                                textDecoration = TextDecoration.LineThrough
+                                            )
+                                        } else it
+                                    }
+                                )
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        curseforge = !curseforge
+                                        appSettings().isModsCurseforge = curseforge
+                                    },
+                                    icon = if(curseforge) icons().minus else icons().plus,
+                                    size = 20.dp,
+                                    tooltip = strings().manager.mods.settings.state(curseforge),
+                                    enabled = !curseforge || modrinth
+                                )
+
+                                Text(
+                                    strings().manager.mods.settings.curseforge(),
+                                    style = LocalTextStyle.current.let {
+                                        if(!curseforge) {
+                                            it.copy(
+                                                color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
+                                                fontStyle = FontStyle.Italic,
+                                                textDecoration = TextDecoration.LineThrough
+                                            )
+                                        } else it
+                                    }
+                                )
+                            }
+
+                            /*TitledCheckBox(
+                                strings().manager.mods.modrinth(),
+                                modrinth,
+                                {
+                                    modrinth = it
+                                    appSettings().isModsModrinth = it
+                                },
+                                textColor = if (!modrinth && !curseforge) MaterialTheme.colorScheme.error else LocalContentColor.current
+                            )
+
+                            TitledCheckBox(
+                                strings().manager.mods.curseforge(),
+                                curseforge,
+                                {
+                                    curseforge = it
+                                    appSettings().isModsCurseforge = it
+                                },
+                                textColor = if (!modrinth && !curseforge) MaterialTheme.colorScheme.error else LocalContentColor.current,
+                                modifier = Modifier.offset(y = (-12).dp)
+                            )*/
+                        }
+                    }
+                }
             }
         },
         actionBarBoxContent = { _, settingsOpen, _, _ ->

@@ -78,7 +78,7 @@ class LauncherModDisplay(
             override fun getDownloadUrl(): String? = null
             override fun getModLoaders(): MutableList<String> = mutableListOf()
             override fun getGameVersions(): MutableList<String> = mutableListOf()
-            override fun getRequiredDependencies(p0: List<String>?, p1: List<String>?): MutableList<ModVersionData> = mutableListOf()
+            override fun updateRequiredDependencies(): MutableList<ModVersionData> = mutableListOf()
             override fun getParentMod(): ModData? = null
             override fun setParentMod(p0: ModData?) {}
             override fun getModProviders(): MutableList<ModProvider> = mutableListOf()
@@ -140,8 +140,9 @@ class LauncherModDisplay(
                 }
             }
             modData?.let {
+                it.setVersionConstraints(modContext.versions, modContext.types.map { it.id }, modContext.providers)
                 versions = try {
-                    it.getVersions(modContext.versions, modContext.types.map { it.id })
+                    it.getVersions()
                         .sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
                 } catch (e: FileDownloadException) {
                     AppContext.error(e)
@@ -169,6 +170,7 @@ class LauncherModDisplay(
                     modContext.types,
                     modContext.versions,
                     currentMods,
+                    modContext.providers,
                     false //modContext.enableOnDownload
                 ).download(
                     version

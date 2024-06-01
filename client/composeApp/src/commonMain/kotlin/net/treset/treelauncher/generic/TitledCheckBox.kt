@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,8 @@ fun TitledCheckBox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: CheckboxColors = CheckboxDefaults.colors()
+    colors: CheckboxColors = CheckboxDefaults.colors(),
+    textColor: Color = LocalContentColor.current
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -50,7 +52,7 @@ fun TitledCheckBox(
             text = title,
             modifier = Modifier
                 .offset(x = (-5).dp),
-            color = if(enabled) LocalContentColor.current else LocalContentColor.current.disabledContent()
+            color = if(enabled) textColor else textColor.disabledContent()
         )
     }
 }

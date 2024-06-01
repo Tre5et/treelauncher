@@ -78,6 +78,7 @@ class ModDataSearchDisplay(
                     searchContext.types,
                     searchContext.versions,
                     currentMods,
+                    searchContext.providers,
                     searchContext.enableOnDownload
                 ).download(
                     version
@@ -174,7 +175,8 @@ class ModDataSearchDisplay(
     private fun loadVersions() {
         Thread {
             try {
-                versions = mod.getVersions(searchContext.versions, searchContext.types.map { it.id })
+                mod.setVersionConstraints(searchContext.versions, searchContext.types.map { it.id }, searchContext.providers)
+                versions = mod.versions
                     .sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
             } catch (e: FileDownloadException) {
                 AppContext.error(e)

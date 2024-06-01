@@ -355,6 +355,7 @@ open class Strings(
             val empty: () -> String = { "No mods Found" },
             val import: ImportStrings = ImportStrings(),
             val searchPlaceholder: () -> String = { "Search for a Mod" },
+            val settings: Settings = Settings(),
             val update: Update = Update(),
             val version: () -> String = { "Game Version" }
         ) {
@@ -408,6 +409,14 @@ open class Strings(
                 val tooltipAdd: () -> String = { "Add Mod" },
                 val tooltipExpand: (Boolean) -> String = { expanded -> if(expanded) "Collapse" else "Expand" },
                 val tooltipFile: () -> String = { "Select Mod" }
+            )
+
+            data class Settings(
+                val curseforge: () -> String = { "Curseforge" },
+                val modrinth: () -> String = { "Modrinth" },
+                val providers: () -> String = { "Allowed Mod Sources:" },
+                val state: (Boolean) -> String = { enabled -> if(enabled) "Disallow" else "Allow" },
+                val tooltip: () -> String = { "Open Settings" },
             )
 
             data class Update(

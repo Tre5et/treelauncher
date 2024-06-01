@@ -5,6 +5,7 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModData
+import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.mc_version_loader.mods.ModVersionData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.isSame
@@ -18,6 +19,7 @@ class ModDownloader(
     val versionTypes: List<VersionType>,
     val versions: List<String>,
     val existing: MutableList<LauncherMod>,
+    val modProviders: List<ModProvider>,
     val enableOnDownload: Boolean = false,
 ) {
     @Throws(FileDownloadException::class, IOException::class)
@@ -136,7 +138,8 @@ class ModDownloader(
             existing.add(newMod)
         }
 
-        for (d in versionData.getRequiredDependencies(versions, versionTypes.map { it.id })) {
+        versionData.setDependencyConstraints(versions, versionTypes.map { it.id }, modProviders)
+        for (d in versionData.requiredDependencies) {
             if (d == null) {
                 continue
             }

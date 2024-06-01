@@ -85,6 +85,8 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsUpdate = true
     var isModsEnable = false
     var isModsDisable = false
+    var isModsModrinth = true
+    var isModsCurseforge = true
     var acknowledgedNews = mutableListOf<String>()
     var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
     var discordIntegration: Boolean = false

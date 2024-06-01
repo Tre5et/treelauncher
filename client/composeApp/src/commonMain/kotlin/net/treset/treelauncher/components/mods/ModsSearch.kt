@@ -15,10 +15,12 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.exception.FileDownloadException
+import net.treset.mc_version_loader.format.FormatUtils
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.mods.MinecraftMods
+import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -67,12 +69,32 @@ fun ModsSearch(
         if(searching) {
             Thread {
                 try {
-                    results = MinecraftMods.searchCombinedMods(
-                        tfValue,
-                        modContext.versions,
-                        modContext.types.map { it.id },
-                        25,
-                        0
+                    results = (
+                        if(searchContext.providers.isEmpty() || searchContext.providers.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
+                            MinecraftMods.searchCombinedMods(
+                                tfValue,
+                                modContext.versions,
+                                modContext.types.map { it.id },
+                            25,
+                            0
+                            )
+                        } else if(searchContext.providers.contains(ModProvider.MODRINTH)) {
+                            MinecraftMods.searchModrinth(
+                                tfValue,
+                                modContext.versions,
+                                modContext.types.map { it.id },
+                                25,
+                                0
+                            ).hits
+                        } else {
+                            MinecraftMods.searchCurseforge(
+                                tfValue,
+                                modContext.versions,
+                                FormatUtils.modLoadersToCurseforgeModLoaders(modContext.types.map { it.id }),
+                                25,
+                                0
+                            ).data
+                        }
                     ).sortedWith { o1, o2 ->
                         (
                             FormatString.distance(tfValue, o1.name) -
@@ -167,6 +189,7 @@ data class SearchContext(
     val enableOnDownload: Boolean,
     val versions: List<String>,
     val types: List<VersionType>,
+    val providers: List<ModProvider>,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
 ) {
@@ -189,6 +212,7 @@ data class SearchContext(
             modContext.enableOnDownload,
             modContext.versions,
             modContext.types,
+            modContext.providers,
             modContext.directory,
             modContext.registerChangingJob
         )
