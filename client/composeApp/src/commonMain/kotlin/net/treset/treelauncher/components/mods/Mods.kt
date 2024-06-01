@@ -68,8 +68,7 @@ fun Mods() {
 
     var listDisplay by remember { mutableStateOf(appSettings().modDetailsListDisplay) }
 
-    var modrinth by remember { mutableStateOf(appSettings().isModsModrinth) }
-    var curseforge by remember { mutableStateOf(appSettings().isModsCurseforge) }
+    var providers by remember { mutableStateOf(appSettings().modProviders) }
 
     Components(
         title = strings().selector.mods.title(),
@@ -144,7 +143,7 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, modrinth, curseforge, current.second.mods.size, current.second.versions) {
+            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, providers, current.second.mods.size, current.second.versions) {
                 current.second.mods.sortedWith(sort.comparator).let {
                     if(reverse) it.reversed() else it
                 }
@@ -166,17 +165,14 @@ fun Mods() {
                 }
             }
 
-            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload, modrinth, curseforge) {
+            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload, providers) {
                 ModContext(
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
                     current.second.versions,
                     types,
-                    listOfNotNull(
-                        if(modrinth) ModProvider.MODRINTH else null,
-                        if(curseforge) ModProvider.CURSEFORGE else null
-                    ),
+                    providers.filter { it.second }.map { it.first },
                     LauncherFile.of(current.first.directory)
                 ) { element ->
                     updateQueue.add(element)
@@ -536,62 +532,96 @@ fun Mods() {
                         ProvideTextStyle(
                             MaterialTheme.typography.bodyMedium
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        modrinth = !modrinth
-                                        appSettings().isModsModrinth = modrinth
-                                    },
-                                    icon = if(modrinth) icons().minus else icons().plus,
-                                    size = 20.dp,
-                                    tooltip = strings().manager.mods.settings.state(modrinth),
-                                    enabled = !modrinth || curseforge
-                                )
-
-                                Text(
-                                    strings().manager.mods.settings.modrinth(),
-                                    style = LocalTextStyle.current.let {
-                                        if(!modrinth) {
-                                            it.copy(
-                                                color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
-                                                fontStyle = FontStyle.Italic,
-                                                textDecoration = TextDecoration.LineThrough
+                            providers.forEachIndexed { i,  provider ->
+                                when(provider.first) {
+                                    ModProvider.MODRINTH -> Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                        ) {
+                                            IconButton(
+                                                onClick = {
+                                                    providers = providers.reversed()
+                                                    appSettings().modProviders = providers
+                                                },
+                                                icon = icons().down,
+                                                size = 20.dp,
+                                                tooltip = strings().manager.mods.settings.order(i == 0),
+                                                modifier = Modifier.rotate(if(i == 0) 0f else 180f)
                                             )
-                                        } else it
-                                    }
-                                )
-                            }
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        curseforge = !curseforge
-                                        appSettings().isModsCurseforge = curseforge
-                                    },
-                                    icon = if(curseforge) icons().minus else icons().plus,
-                                    size = 20.dp,
-                                    tooltip = strings().manager.mods.settings.state(curseforge),
-                                    enabled = !curseforge || modrinth
-                                )
-
-                                Text(
-                                    strings().manager.mods.settings.curseforge(),
-                                    style = LocalTextStyle.current.let {
-                                        if(!curseforge) {
-                                            it.copy(
-                                                color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
-                                                fontStyle = FontStyle.Italic,
-                                                textDecoration = TextDecoration.LineThrough
+                                            IconButton(
+                                                onClick = {
+                                                    providers = providers.map {
+                                                        if(it.first == ModProvider.MODRINTH) {
+                                                            it.first to !it.second
+                                                        } else it
+                                                    }
+                                                    appSettings().modProviders = providers
+                                                },
+                                                icon = if(provider.second) icons().minus else icons().plus,
+                                                size = 20.dp,
+                                                tooltip = strings().manager.mods.settings.state(provider.second),
+                                                enabled = !provider.second || providers.firstOrNull { it.first == ModProvider.CURSEFORGE }?.second ?: false
                                             )
-                                        } else it
+
+                                            Text(
+                                                strings().manager.mods.settings.modrinth(),
+                                                style = LocalTextStyle.current.let {
+                                                    if(!provider.second) {
+                                                        it.copy(
+                                                            color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
+                                                            fontStyle = FontStyle.Italic,
+                                                            textDecoration = TextDecoration.LineThrough
+                                                        )
+                                                    } else it
+                                                }
+                                            )
+                                        }
+
+                                    ModProvider.CURSEFORGE -> Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                    ) {
+                                        IconButton(
+                                            onClick = {
+                                                providers = providers.reversed()
+                                                appSettings().modProviders = providers
+                                            },
+                                            icon = icons().down,
+                                            size = 20.dp,
+                                            tooltip = strings().manager.mods.settings.order(i == 0),
+                                            modifier = Modifier.rotate(if(i == 0) 0f else 180f)
+                                        )
+
+                                        IconButton(
+                                            onClick = {
+                                                providers = providers.map {
+                                                    if(it.first == ModProvider.CURSEFORGE) {
+                                                        it.first to !it.second
+                                                    } else it
+                                                }
+                                                appSettings().modProviders = providers
+                                            },
+                                            icon = if(provider.second) icons().minus else icons().plus,
+                                            size = 20.dp,
+                                            tooltip = strings().manager.mods.settings.state(provider.second),
+                                            enabled = !provider.second || providers.firstOrNull { it.first == ModProvider.MODRINTH }?.second ?: false
+                                        )
+
+                                        Text(
+                                            strings().manager.mods.settings.curseforge(),
+                                            style = LocalTextStyle.current.let {
+                                                if(!provider.second) {
+                                                    it.copy(
+                                                        color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
+                                                        fontStyle = FontStyle.Italic,
+                                                        textDecoration = TextDecoration.LineThrough
+                                                    )
+                                                } else it
+                                            }
+                                        )
                                     }
-                                )
+                                }
                             }
 
                             /*TitledCheckBox(

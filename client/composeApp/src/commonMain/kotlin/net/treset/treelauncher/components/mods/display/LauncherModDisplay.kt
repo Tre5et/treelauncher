@@ -160,6 +160,7 @@ class LauncherModDisplay(
 
     fun downloadVersion(version: ModVersionData) {
         downloading = true
+        version.downloadProviders = modContext.providers
         modContext.registerChangingJob { currentMods ->
             LOGGER.debug { "Downloading mod ${mod.fileName} version ${version.versionNumber}" }
 

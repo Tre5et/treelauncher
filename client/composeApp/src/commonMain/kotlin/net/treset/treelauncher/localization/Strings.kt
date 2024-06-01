@@ -414,6 +414,7 @@ open class Strings(
             data class Settings(
                 val curseforge: () -> String = { "Curseforge" },
                 val modrinth: () -> String = { "Modrinth" },
+                val order: (Boolean) -> String = { down -> if(down) "Deprioritize" else "Prioritize" },
                 val providers: () -> String = { "Allowed Mod Sources:" },
                 val state: (Boolean) -> String = { enabled -> if(enabled) "Disallow" else "Allow" },
                 val tooltip: () -> String = { "Open Settings" },

@@ -7,6 +7,7 @@ import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
 import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.sort.*
@@ -85,8 +86,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsUpdate = true
     var isModsEnable = false
     var isModsDisable = false
-    var isModsModrinth = true
-    var isModsCurseforge = true
+    var modProviders = listOf(ModProvider.MODRINTH to true, ModProvider.CURSEFORGE to true)
     var acknowledgedNews = mutableListOf<String>()
     var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
     var discordIntegration: Boolean = false

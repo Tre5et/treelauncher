@@ -121,6 +121,7 @@ class ModDownloader(
         LOGGER.debug {
             "Downloading mod file: ${versionData.name}"
         }
+        versionData.downloadProviders = modProviders
         val newMod = MinecraftMods.downloadModFile(versionData, directory)
         if(!enabled) {
             LOGGER.debug { "Disabling new mod file: ${newMod.fileName}" }

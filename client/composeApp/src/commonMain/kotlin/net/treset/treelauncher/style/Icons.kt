@@ -59,6 +59,7 @@ object Icons {
     val plus = Icons.Rounded.AddCircle
     val minus = Icons.Rounded.RemoveCircle
     val warning = Icons.Rounded.Warning
+    val down = Icons.Rounded.KeyboardDoubleArrowDown
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {
