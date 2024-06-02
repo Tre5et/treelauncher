@@ -91,6 +91,7 @@ class ModDataSearchDisplay(
 
             downloading = false
 
+            updateModProviders()
             searchContext.recheck()
         }
     }

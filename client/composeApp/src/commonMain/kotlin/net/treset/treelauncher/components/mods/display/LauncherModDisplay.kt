@@ -39,26 +39,14 @@ class LauncherModDisplay(
             field = value
             recomposeData()
         }
-    var modrinthStatus = if(mod.currentProvider == "modrinth") {
-        ModProviderStatus.CURRENT
-    } else if(mod.downloads.any { it.provider == "modrinth" }) {
-        ModProviderStatus.AVAILABLE
-    } else {
-        ModProviderStatus.UNAVAILABLE
-    }
+    var modrinthStatus = ModProviderStatus.UNAVAILABLE
         private set(value) {
             field = value
             recomposeData()
         }
 
 
-    var curseforgeStatus = if(mod.currentProvider == "curseforge") {
-        ModProviderStatus.CURRENT
-    } else if(mod.downloads.any { it.provider == "curseforge" }) {
-        ModProviderStatus.AVAILABLE
-    } else {
-        ModProviderStatus.UNAVAILABLE
-    }
+    var curseforgeStatus = ModProviderStatus.UNAVAILABLE
         private set(value) {
             field = value
             recomposeData()
@@ -95,6 +83,7 @@ class LauncherModDisplay(
         }
 
     init {
+        updateModProviders()
         loadImage()
         loadVersions()
     }
@@ -184,6 +173,8 @@ class LauncherModDisplay(
             currentVersion = version
 
             downloading = false
+
+            updateModProviders()
         }
     }
 
@@ -236,6 +227,24 @@ class LauncherModDisplay(
             }
             mods.remove(mod)
             LOGGER.debug { "Mod file deleted" }
+        }
+    }
+
+    fun updateModProviders() {
+        modrinthStatus = if(mod.currentProvider == "modrinth") {
+            ModProviderStatus.CURRENT
+        } else if(mod.downloads.any { it.provider == "modrinth" }) {
+            ModProviderStatus.AVAILABLE
+        } else {
+            ModProviderStatus.UNAVAILABLE
+        }
+
+        curseforgeStatus = if(mod.currentProvider == "curseforge") {
+            ModProviderStatus.CURRENT
+        } else if(mod.downloads.any { it.provider == "curseforge" }) {
+            ModProviderStatus.AVAILABLE
+        } else {
+            ModProviderStatus.UNAVAILABLE
         }
     }
 

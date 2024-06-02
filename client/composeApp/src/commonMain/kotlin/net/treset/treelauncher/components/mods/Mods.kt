@@ -184,7 +184,7 @@ fun Mods() {
                 }
             }
 
-            val filteredMods = remember(mods, searchContent, modContext) {
+            val filteredMods = remember(mods, searchContent, modContext, showSearch) {
                 mods.filter {
                     it.name.contains(searchContent, true)
                 }.map {
