@@ -86,7 +86,21 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var isModsUpdate = true
     var isModsEnable = false
     var isModsDisable = false
-    var modProviders = listOf(ModProvider.MODRINTH to true, ModProvider.CURSEFORGE to true)
+    var modrinthStatus = 0 to true
+    var curseforgeSatus = 1 to true
+    var modProviders: List<Pair<ModProvider, Boolean>>
+        get() {
+            val result = mutableListOf<Pair<ModProvider, Boolean>>()
+            result.add(ModProvider.MODRINTH to modrinthStatus.second)
+            result.add(curseforgeSatus.first, ModProvider.CURSEFORGE to curseforgeSatus.second)
+            return result
+        }
+        set(value) = value.forEachIndexed { i, provider ->
+            when(provider.first) {
+                ModProvider.MODRINTH -> modrinthStatus = i to provider.second
+                ModProvider.CURSEFORGE -> curseforgeSatus = i to provider.second
+            }
+        }
     var acknowledgedNews = mutableListOf<String>()
     var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
     var discordIntegration: Boolean = false
