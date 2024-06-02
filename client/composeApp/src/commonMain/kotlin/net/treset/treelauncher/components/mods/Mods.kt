@@ -1,7 +1,12 @@
 package net.treset.treelauncher.components.mods
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,7 +56,7 @@ data class ModContext(
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
 )
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Mods() {
     var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.first.name }) }
@@ -524,10 +529,61 @@ fun Mods() {
                             .background(MaterialTheme.colorScheme.secondaryContainer)
                             .padding(horizontal = 8.dp)
                     ) {
-                        Text(
-                            strings().manager.mods.settings.providers(),
-                            style = MaterialTheme.typography.titleSmall,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                strings().manager.mods.settings.providers(),
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+
+                            val interactionSource = remember { MutableInteractionSource() }
+
+                            val pressed by interactionSource.collectIsPressedAsState()
+                            val hovered by interactionSource.collectIsHoveredAsState()
+                            val nativeFocused by interactionSource.collectIsFocusedAsState()
+                            val focused by remember(nativeFocused) { mutableStateOf(if(pressed) false else nativeFocused) }
+
+                            val tooltipState = rememberTooltipState(
+                                isPersistent = true
+                            )
+
+                            LaunchedEffect(focused) {
+                                if(focused) {
+                                    tooltipState.show(MutatePriority.UserInput)
+                                } else {
+                                    tooltipState.dismiss()
+                                }
+                            }
+
+                            LaunchedEffect(hovered) {
+                                if(hovered) {
+                                    tooltipState.show(MutatePriority.UserInput)
+                                } else {
+                                    tooltipState.dismiss()
+                                }
+                            }
+
+                            TooltipBox(
+                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                tooltip = {
+                                    PlainTooltip(
+                                        caretProperties = TooltipDefaults.caretProperties,
+                                    ) {
+                                        Text(strings().manager.mods.settings.help())
+                                    }
+                                },
+                                state = tooltipState,
+                                enableUserInput = false,
+                            ) {
+                                IconButton(
+                                    onClick = {},
+                                    icon = icons().help,
+                                    size = 20.dp,
+                                    interactionSource = interactionSource,
+                                )
+                            }
+                        }
 
                         ProvideTextStyle(
                             MaterialTheme.typography.bodyMedium

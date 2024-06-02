@@ -2,6 +2,7 @@ package net.treset.treelauncher.style
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.*
@@ -60,6 +61,7 @@ object Icons {
     val minus = Icons.Rounded.RemoveCircle
     val warning = Icons.Rounded.Warning
     val down = Icons.Rounded.KeyboardDoubleArrowDown
+    val help = Icons.AutoMirrored.Rounded.Help
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

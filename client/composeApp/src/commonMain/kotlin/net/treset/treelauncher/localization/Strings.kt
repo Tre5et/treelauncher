@@ -415,7 +415,8 @@ open class Strings(
                 val curseforge: () -> String = { "Curseforge" },
                 val modrinth: () -> String = { "Modrinth" },
                 val order: (Boolean) -> String = { down -> if(down) "Deprioritize" else "Prioritize" },
-                val providers: () -> String = { "Allowed Mod Sources:" },
+                val providers: () -> String = { "Mod Source Priority" },
+                val help: () -> String = { "If available, mods will be downloaded from the topmost source.\nIf a source is disallowed, versions will never be downloaded or searched from there." },
                 val state: (Boolean) -> String = { enabled -> if(enabled) "Disallow" else "Allow" },
                 val tooltip: () -> String = { "Open Settings" },
             )
