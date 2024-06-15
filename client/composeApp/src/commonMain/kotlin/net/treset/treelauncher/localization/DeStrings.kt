@@ -260,6 +260,13 @@ class DeStrings : Strings(
                 tooltipFile = { "Moddatei auswählen" }
             ),
             searchPlaceholder = { "Nach einer Mod suchen" },
+            settings = Manager.Mods.Settings(
+                order = { down -> if(down) "Priorität verringern" else "Priorität erhöhen" },
+                providers = { "Mod-Quellen Priorität"},
+                help = { "Wenn möglich, werden mods von der höchst-priorisierten Quelle heruntergeladen.\nWenn eine Quelle verboten ist, werden Mods niemals von dort heruntergeladen." },
+                state = { enabled -> if(enabled) "Verbieten" else "Erlauben" },
+                tooltip = { "Einstellungen öffnen" }
+            ),
             update = Manager.Mods.Update(
                 auto = { "Automatisch aktualisieren" },
                 disable = { "Mods ohne passende Version deaktivieren" },
