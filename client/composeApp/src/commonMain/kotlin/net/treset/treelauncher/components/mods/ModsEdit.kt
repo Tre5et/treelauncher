@@ -53,12 +53,13 @@ fun ModsEdit(
     }
 
     LaunchedEffect(tfFile) {
-        if(tfFile.endsWith(".jar")) {
-            val firstNum = tfFile.indexOfFirst { it.isDigit() }
+        if(tfFile != currentFile?.path && tfFile.endsWith(".jar")) {
+            val filePart = tfFile.split("[/\\\\]".toRegex()).last()
+            val firstNum = filePart.indexOfFirst { it.isDigit() }
             if(firstNum >= -1) {
                 for(i in firstNum downTo 0) {
-                    if(tfFile[i] == '-' || tfFile[i] == '_' || tfFile[i] == '/' || tfFile[i] == '\\' || tfFile[i] == ' ') {
-                        tfVersion = tfFile.substring(i + 1, tfFile.length - 4)
+                    if(filePart[i] == '-' || filePart[i] == '_' || filePart[i] == ' ') {
+                        tfVersion = filePart.substring(i + 1, filePart.length - 4)
                         break
                     }
                 }
