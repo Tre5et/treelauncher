@@ -226,7 +226,7 @@ open class Strings(
         val button: () -> String = { "Login with Microsoft" },
         val tip: () -> String = { "TIP: ${
             arrayOf(
-                "Drag and Drop files into Saves or Resourcepack components to import them.",
+                "Drag and Drop files into Saves, Resourcepack or Mods components to import them.",
                 "Directly start a world or server by selecting it and clicking the play button.",
                 "Customize the color of the Launcher in the settings.",
                 "Click the news button at the top of the screen to view the latest news.",

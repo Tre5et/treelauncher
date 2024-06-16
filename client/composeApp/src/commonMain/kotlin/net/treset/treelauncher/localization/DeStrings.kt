@@ -126,7 +126,7 @@ class DeStrings : Strings(
         button = { "Login mit Microsoft" },
         tip = { "TIPP: ${
             arrayOf(
-                "Dateien können in Welten oder Ressourcenpaket Komponenten gezogen werden, um diese zu importieren.",
+                "Dateien können in Welten, Ressourcenpaket oder Mod Komponenten gezogen werden, um diese zu importieren.",
                 "Welten oder Server können direkt gestartet werden. Diese auswählen und den Spielen Knopf klicken.",
                 "Die Farbe des Launchers kann in den Einstellungen angepasst werden.",
                 "Den Nachrichten Knopf am oberen Bildschirmrand klicken, um die neuesten Neuigkeiten zu sehen.",
