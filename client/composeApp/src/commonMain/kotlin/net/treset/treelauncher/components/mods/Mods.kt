@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -44,6 +45,7 @@ import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.style.inverted
 import net.treset.treelauncher.util.DetailsListDisplay
+import java.net.URI
 
 data class ModContext(
     val autoUpdate: Boolean,
@@ -74,6 +76,8 @@ fun Mods() {
     var listDisplay by remember { mutableStateOf(appSettings().modDetailsListDisplay) }
 
     var providers by remember { mutableStateOf(appSettings().modProviders) }
+
+    var droppedFile by remember { mutableStateOf<LauncherFile?>(null) }
 
     Components(
         title = strings().selector.mods.title(),
@@ -229,21 +233,32 @@ fun Mods() {
             }
 
             editingMod?.let {
-                ModsEdit(
-                    modContext,
-                    it
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter
                 ) {
-                    editingMod = null
+                    ModsEdit(
+                        modContext,
+                        it,
+                        droppedFile = droppedFile
+                    ) {
+                        editingMod = null
+                    }
                 }
             } ?: if(showSearch) {
                 ModsSearch(
                     current,
                     modContext,
-                    AppContext
+                    AppContext,
+                    droppedFile = droppedFile
                 ) {
                     showSearch = false
                 }
             } else {
+                LaunchedEffect(current) {
+                    droppedFile = null
+                }
+
                 if(mods.isEmpty()) {
                     Column(
                         modifier = Modifier.weight(1f, true).fillMaxWidth(),
@@ -746,6 +761,16 @@ fun Mods() {
                         size = 32.dp,
                         tooltip = strings().manager.mods.addMods.back()
                     )
+                }
+            }
+        },
+        detailsOnDrop = {
+            if(it is DragData.FilesList) {
+                it.readFiles().firstOrNull()?.let {
+                    droppedFile = LauncherFile.of(URI(it).path)
+                    if(editingMod == null && !showSearch) {
+                        showSearch = true
+                    }
                 }
             }
         },

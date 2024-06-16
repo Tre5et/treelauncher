@@ -38,6 +38,7 @@ fun ModsSearch(
     component: Pair<LauncherManifest, LauncherModsDetails>,
     modContext: ModContext,
     appContext: AppContextData,
+    droppedFile: LauncherFile? = null,
     closeSearch: () -> Unit
 ) {
     var showLocal by remember { mutableStateOf(false) }
@@ -46,7 +47,8 @@ fun ModsSearch(
         ModsImport(
             component,
             modContext,
-            appContext
+            appContext,
+            droppedFile = droppedFile,
         ) {
             closeSearch()
         }
@@ -63,6 +65,14 @@ fun ModsSearch(
         SearchContext.from(
             modContext,
         )
+    }
+
+    LaunchedEffect(droppedFile) {
+        droppedFile?.let {
+            if(!showLocal) {
+                showLocal = true
+            }
+        }
     }
 
     LaunchedEffect(searching, searchContext) {

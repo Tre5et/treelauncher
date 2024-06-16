@@ -42,6 +42,7 @@ fun ModsImport(
     component: Pair<LauncherManifest, LauncherModsDetails>,
     modContext: ModContext,
     appContext: AppContextData,
+    droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
     var selectedMods: List<Pair<LauncherMod, LauncherFile>> by remember(component) { mutableStateOf(emptyList()) }
@@ -188,6 +189,7 @@ fun ModsImport(
             ModsEdit(
                 modContext,
                 onNewMod = { mod, file -> selectedMods += mod to file },
+                droppedFile = droppedFile
             ) {}
         }
 

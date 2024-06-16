@@ -244,7 +244,7 @@ fun <T, C:CreationState<T>> Components(
                 modifier = Modifier.padding(12.dp),
                 scrollable = false
             ) {
-                val columnContent = @Composable {
+                val columnContent: @Composable () -> Unit = {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {

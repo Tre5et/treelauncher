@@ -28,6 +28,7 @@ fun ModsEdit(
     modContext: ModContext,
     currentMod: LauncherMod? = null,
     onNewMod: ((LauncherMod, LauncherFile) -> Unit)? = null,
+    droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
     val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.let { LauncherFile.of(modContext.directory, it) } }
@@ -44,6 +45,26 @@ fun ModsEdit(
     var modrinthError by remember(currentMod) { mutableStateOf(false) }
 
     var showFilePicker by remember(currentMod) { mutableStateOf(false) }
+
+    LaunchedEffect(droppedFile) {
+        droppedFile?.let {
+            tfFile = it.absolutePath
+        }
+    }
+
+    LaunchedEffect(tfFile) {
+        if(tfFile.endsWith(".jar")) {
+            val firstNum = tfFile.indexOfFirst { it.isDigit() }
+            if(firstNum >= -1) {
+                for(i in firstNum downTo 0) {
+                    if(tfFile[i] == '-' || tfFile[i] == '_' || tfFile[i] == '/' || tfFile[i] == '\\' || tfFile[i] == ' ') {
+                        tfVersion = tfFile.substring(i + 1, tfFile.length - 4)
+                        break
+                    }
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.width(IntrinsicSize.Min),
