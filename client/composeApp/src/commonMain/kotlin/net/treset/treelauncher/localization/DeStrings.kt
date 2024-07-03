@@ -150,7 +150,7 @@ class DeStrings : Strings(
         logout = { "Gespeichertes Logindaten löschen" },
         keepLoggedIn = { "Eingeloggt bleiben" },
         offline = { "Im Offline-Modus starten" },
-        offlineNotification = { "Offline-Modus aktiv. Spielfunktionalität eingeschränkt. Fehler können auftreten." },
+        offlineNotification = { "Offline-Modus aktiv. Funktionalität eingeschränkt." },
     ),
     manager = Manager(
         component = Manager.Component(

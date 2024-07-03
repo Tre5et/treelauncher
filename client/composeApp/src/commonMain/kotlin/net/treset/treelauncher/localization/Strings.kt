@@ -245,7 +245,7 @@ open class Strings(
         val logout: () -> String = { "Delete Saved Login Data" },
         val keepLoggedIn: () -> String = { "Stay logged in" },
         val offline: () -> String = { "Start in Offline Mode" },
-        val offlineNotification: () -> String = { "Offline Mode. Game functionality limited. Errors may occur." }
+        val offlineNotification: () -> String = { "Offline Mode active. Functionality limited." }
     ) {
         data class Label(
             val authenticating: () -> String = { "Logging you in..." },
