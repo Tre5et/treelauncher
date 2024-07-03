@@ -243,12 +243,14 @@ open class Strings(
         }" },
         val label: Label = Label(),
         val logout: () -> String = { "Delete Saved Login Data" },
-        val keepLoggedIn: () -> String = { "Stay logged in" }
+        val keepLoggedIn: () -> String = { "Stay logged in" },
+        val offline: () -> String = { "Start in Offline Mode" },
     ) {
         data class Label(
             val authenticating: () -> String = { "Logging you in..." },
             val failure: () -> String = { "Login failed. Please try again!" },
-            val success: (String?) -> String = { user -> "Welcome, ${user ?: "Anonymous User"}!" }
+            val success: (String?) -> String = { user -> "Welcome, ${user ?: "Anonymous User"}!" },
+            val offline: () -> String = { "Started in offline mode" }
         )
     }
 

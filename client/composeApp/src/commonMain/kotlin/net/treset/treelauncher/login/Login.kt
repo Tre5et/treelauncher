@@ -1,5 +1,6 @@
 package net.treset.treelauncher.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -9,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
@@ -27,13 +30,14 @@ enum class LoginState(val actionAllowed: Boolean) {
     NOT_LOGGED_IN(true),
     AUTHENTICATING(false),
     LOGGED_IN(false),
+    OFFLINE(false),
     FAILED(true)
 }
 
 data class LoginContextData(
     val loginState: LoginState,
     val userAuth: UserAuth,
-    val logout: () -> Unit
+    val logout: () -> Unit,
 )
 
 lateinit var LoginContext: LoginContextData
@@ -152,6 +156,23 @@ fun LoginScreen(
                     onCheckedChange = { keepLoggedIn = it },
                     enabled = loginState.actionAllowed
                 )
+
+                Text(
+                    strings().login.offline(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f).let { if (loginState.actionAllowed) it else it.disabledContent() },
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .clickable(
+                            enabled = loginState.actionAllowed,
+                        ) {
+                            loginState = LoginState.OFFLINE
+                            showContent = true
+                        }
+                        .pointerHoverIcon(PointerIcon.Hand)
+                )
             }
 
             Box(
@@ -167,6 +188,7 @@ fun LoginScreen(
                             LoginState.NOT_LOGGED_IN -> ""
                             LoginState.AUTHENTICATING -> strings().login.label.authenticating()
                             LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                            LoginState.OFFLINE -> strings().login.label.offline()
                             LoginState.FAILED -> strings().login.label.failure()
                         },
                         style = MaterialTheme.typography.titleMedium,

@@ -174,7 +174,7 @@ class UserAuth {
     private var userIcon: BufferedImage? = null
 
     @Throws(FileDownloadException::class)
-    fun getUserIcon(): BufferedImage {
+    fun getUserIcon(): BufferedImage? {
         userIcon?.let {
             return it
         }?: loadUserIcon().let {
@@ -184,7 +184,10 @@ class UserAuth {
     }
 
     @Throws(FileDownloadException::class)
-    fun loadUserIcon(): BufferedImage {
+    fun loadUserIcon(): BufferedImage? {
+        if (minecraftUser == null) {
+            return null
+        }
         val profile: MinecraftProfile = MojangData.getMinecraftProfile(minecraftUser!!.uuid())
         if (profile.properties == null || profile.properties.isEmpty()) {
             throw FileDownloadException("No properties found for user " + minecraftUser!!.name())

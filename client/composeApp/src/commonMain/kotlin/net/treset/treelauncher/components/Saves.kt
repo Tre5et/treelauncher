@@ -26,6 +26,7 @@ import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
+import net.treset.treelauncher.login.LoginState
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.DetailsListDisplay
 import net.treset.treelauncher.util.launchGame
@@ -254,7 +255,8 @@ fun Saves() {
                     val launcher = GameLauncher(
                         instanceData,
                         AppContext.files,
-                        LoginContext.userAuth.minecraftUser!!,
+                        LoginContext.loginState == LoginState.OFFLINE,
+                        LoginContext.userAuth.minecraftUser,
                         playData
                     )
 
