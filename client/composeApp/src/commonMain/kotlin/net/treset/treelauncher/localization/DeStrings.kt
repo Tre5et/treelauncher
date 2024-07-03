@@ -144,10 +144,13 @@ class DeStrings : Strings(
         label = Login.Label(
             authenticating = { "Einloggen..." },
             failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
-            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
+            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" },
+            offline = { "Im Offline-Modus gestartet." }
         ),
         logout = { "Gespeichertes Logindaten löschen" },
-        keepLoggedIn = { "Eingeloggt bleiben" }
+        keepLoggedIn = { "Eingeloggt bleiben" },
+        offline = { "Im Offline-Modus starten" },
+        offlineNotification = { "Offline-Modus aktiv. Spielfunktionalität eingeschränkt. Fehler können auftreten." },
     ),
     manager = Manager(
         component = Manager.Component(
