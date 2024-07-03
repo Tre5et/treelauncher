@@ -33,9 +33,14 @@ fun onUpdate(
         )
     )
     coroutineScope.launch {
-        try {
-            val update = updater().getUpdate()
+        val update = try {
+            updater().getUpdate()
+        } catch (e: IOException) {
+            AppContext.errorIfOnline(e)
+            return@launch
+        }
 
+        try {
             update.id?.let {
                 setPopup(
                     PopupData(

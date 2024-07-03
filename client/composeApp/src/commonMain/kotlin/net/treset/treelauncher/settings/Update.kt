@@ -36,7 +36,7 @@ fun Update() {
         try {
             updater().getUpdate()
         } catch(e: IOException) {
-            AppContext.error(e)
+            AppContext.errorIfOnline(e)
             null
         }
     }

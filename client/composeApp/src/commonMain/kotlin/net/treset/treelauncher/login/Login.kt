@@ -40,7 +40,10 @@ data class LoginContextData(
     val loginState: LoginState,
     val userAuth: UserAuth,
     val logout: () -> Unit,
-)
+) {
+    fun isOffline() = loginState == LoginState.OFFLINE
+    fun isLoggedIn() = loginState == LoginState.LOGGED_IN
+}
 
 lateinit var LoginContext: LoginContextData
 
