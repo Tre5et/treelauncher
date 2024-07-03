@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.*
@@ -24,6 +25,7 @@ import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.style.info
 import net.treset.treelauncher.util.checkUpdateOnStart
 
 enum class LoginState(val actionAllowed: Boolean) {
@@ -62,6 +64,19 @@ fun LoginScreen(
 
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
+    val notificationColor = MaterialTheme.colorScheme.info
+    val offlineNotification = remember {
+        NotificationData(
+            color = notificationColor,
+            content = {
+                Text(
+                    strings().login.offlineNotification(),
+                    softWrap = true
+                )
+            }
+        )
+    }
+
     LaunchedEffect(Unit) {
         checkUpdateOnStart(
             coroutineScope,
@@ -81,6 +96,12 @@ fun LoginScreen(
                 },
                 { browserUrl = it }
             )
+        }
+    }
+
+    LaunchedEffect(showContent) {
+        if(!showContent) {
+            AppContext.dismissNotification(offlineNotification)
         }
     }
 
@@ -169,6 +190,7 @@ fun LoginScreen(
                             enabled = loginState.actionAllowed,
                         ) {
                             loginState = LoginState.OFFLINE
+                            AppContext.addNotification(offlineNotification)
                             showContent = true
                         }
                         .pointerHoverIcon(PointerIcon.Hand)
