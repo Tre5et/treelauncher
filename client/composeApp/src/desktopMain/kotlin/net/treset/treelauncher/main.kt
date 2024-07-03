@@ -134,15 +134,13 @@ fun main() = application {
                         text = strings().launcher.status.restartRequired(),
                         color = colors.material.onBackground
                     )
+                } else if(downloading > 0) {
+                    Text(
+                        text = strings().launcher.status.preparing(downloading.roundToInt()),
+                        color = colors.material.onBackground
+                    )
                 } else {
-                    if (initialized) {
-                        App(app)
-                    } else if(downloading > 0) {
-                        Text(
-                            text = strings().launcher.status.preparing(downloading.roundToInt()),
-                            color = colors.material.onBackground
-                        )
-                    }
+                    App(app)
                 }
             }
 

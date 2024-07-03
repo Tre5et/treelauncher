@@ -13,8 +13,8 @@ import java.time.Instant
 class DiscordIntegration {
     var core: Core? = null
     init {
-        startCore()
         Thread {
+            startCore()
             while(true) {
                 core?.runCallbacks()
                 try {
