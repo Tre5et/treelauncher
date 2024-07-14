@@ -1,3 +1,4 @@
+import { logPageView } from "@/app/logging";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -11,6 +12,8 @@ export default function Page({
    } : {
      params: { locale: string }
    }) {
+    logPageView(locale, '/about')
+
     return (
         <div className="flex flex-col items-center w-full">
             <div className="flex flex-col items-center p-4 text-center max-w-2xl">
