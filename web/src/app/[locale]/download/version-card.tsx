@@ -5,6 +5,7 @@ import { Release } from "./version-page";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Markdown from "react-markdown";
+import { logDownload } from "@/app/logging";
 
 export function VersionContent({
         release,
@@ -37,10 +38,23 @@ export function VersionContent({
                             <div className="flex flex-row gap-x-8 gap-y-1 flex-wrap justify-center items-center">
                                 {release.assets.map((asset) => {
                                     if(asset.name.endsWith(".msi") || asset.name.endsWith(".exe")) {
-                                        return (<p key={asset.name} onClick={()=>window.open(asset.browser_download_url, "_blank")}><a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a></p>)
+                                        return (
+                                            <p key={asset.name} onClick={()=> {
+                                                logDownload(release.name, "win/ins")
+                                                window.open(asset.browser_download_url, "_blank")
+                                            }}>
+                                                <a href={asset.browser_download_url}>{{"de": "Windows Installationsdatei"}[locale] || "Windows Installer"}</a>
+                                            </p>
+                                        )
                                     }
                                     if(asset.name.endsWith(".zip")) {
-                                        return (<p key={asset.name} className="text-sm" onClick={()=>window.open(asset.browser_download_url, "_blank")}><a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a></p>)
+                                        return (
+                                            <p key={asset.name} className="text-sm" onClick={()=>{
+                                                logDownload(release.name, "win/zip")
+                                                window.open(asset.browser_download_url, "_blank")
+                                            }}>
+                                            <a href={asset.browser_download_url}>{{"de": "Windows Portable"}[locale] || "Windows Portable"}</a>
+                                        </p>)
                                     }
                                     return ""
                                 })}

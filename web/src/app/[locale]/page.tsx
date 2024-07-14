@@ -3,6 +3,8 @@ import { Button } from "./ui/button";
 import { Title } from "./title";
 import { ContentCard } from "./content-card";
 import { Metadata } from "next";
+import { useEffect } from "react";
+import { logDownload, logPageView } from "../logging";
 
 export const metadata: Metadata = {
   description: "TreeLauncher is a modern Minecraft launcher that introduces the concept of components for managing instances to streamline instance management and creation.",
@@ -14,6 +16,8 @@ export default function Home({
   } : {
     params: { locale: string }
   }) {
+  logPageView(locale, '/')
+
   return (
     <main className="mb-20">
       <Title params={{locale}}/>
