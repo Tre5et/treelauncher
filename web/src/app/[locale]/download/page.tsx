@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { VersionPage } from "./version-page";
-import { logPageView } from "@/app/logging";
 
 export const metadata: Metadata = {
     title: "Download",
@@ -12,8 +11,6 @@ export default function Page({
    } : {
      params: { locale: string }
    }) {
-    logPageView(locale, '/download')
-
     return (
         <VersionPage params={{locale}}/>
     )
