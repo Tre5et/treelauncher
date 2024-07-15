@@ -5,6 +5,7 @@ import { ContentCard } from "./content-card";
 import { Metadata } from "next";
 import { useEffect } from "react";
 import { logDownload, logPageView } from "../logging";
+import { Logging } from "./ui/logging";
 
 export const metadata: Metadata = {
   description: "TreeLauncher is a modern Minecraft launcher that introduces the concept of components for managing instances to streamline instance management and creation.",
@@ -16,10 +17,10 @@ export default function Home({
   } : {
     params: { locale: string }
   }) {
-  logPageView(locale, '/')
 
   return (
     <main className="mb-20">
+      <Logging/>
       <Title params={{locale}}/>
       <div className="flex flex-col w-dvh items-center gap-6 mt-16">
         <p className="text-4xl text-center">{

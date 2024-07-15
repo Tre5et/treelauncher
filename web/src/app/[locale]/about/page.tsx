@@ -1,6 +1,7 @@
 import { logPageView } from "@/app/logging";
 import { Metadata } from "next";
 import Image from "next/image";
+import { Logging } from "../ui/logging";
 
 export const metadata: Metadata = {
     title: "About",
@@ -12,10 +13,10 @@ export default function Page({
    } : {
      params: { locale: string }
    }) {
-    logPageView(locale, '/about')
 
     return (
         <div className="flex flex-col items-center w-full">
+            <Logging/>
             <div className="flex flex-col items-center p-4 text-center max-w-2xl">
                 <p className="text-3xl">{{"de": "Über TreeLauncher:"}[locale] || "About Treelauncher:"}</p>
                 <p className="text-xl mt-2">{{"de": "Kurzgefasst:"}[locale] || "In Short:"}</p>

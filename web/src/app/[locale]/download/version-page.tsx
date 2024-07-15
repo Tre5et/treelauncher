@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
 import { VersionContent } from "./version-card";
+import { Logging } from "../ui/logging";
 
 export function VersionPage({
     params: { locale }
@@ -29,6 +30,7 @@ export function VersionPage({
 
     return (
         <div className="flex flex-col items-center gap-8 p-4">
+            <Logging/>
             {
                 releases!.map((release, index) => {
                     if(index == firstReleaseIndex) {
