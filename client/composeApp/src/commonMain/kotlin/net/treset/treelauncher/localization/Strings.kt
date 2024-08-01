@@ -226,7 +226,7 @@ open class Strings(
         val button: () -> String = { "Login with Microsoft" },
         val tip: () -> String = { "TIP: ${
             arrayOf(
-                "Drag and Drop files into Saves or Resourcepack components to import them.",
+                "Drag and Drop files into Saves, Resourcepack or Mods components to import them.",
                 "Directly start a world or server by selecting it and clicking the play button.",
                 "Customize the color of the Launcher in the settings.",
                 "Click the news button at the top of the screen to view the latest news.",
@@ -243,12 +243,15 @@ open class Strings(
         }" },
         val label: Label = Label(),
         val logout: () -> String = { "Delete Saved Login Data" },
-        val keepLoggedIn: () -> String = { "Stay logged in" }
+        val keepLoggedIn: () -> String = { "Stay logged in" },
+        val offline: () -> String = { "Start in Offline Mode" },
+        val offlineNotification: () -> String = { "Offline Mode active. Functionality limited." }
     ) {
         data class Label(
             val authenticating: () -> String = { "Logging you in..." },
             val failure: () -> String = { "Login failed. Please try again!" },
-            val success: (String?) -> String = { user -> "Welcome, ${user ?: "Anonymous User"}!" }
+            val success: (String?) -> String = { user -> "Welcome, ${user ?: "Anonymous User"}!" },
+            val offline: () -> String = { "Started in offline mode" }
         )
     }
 
@@ -575,7 +578,7 @@ open class Strings(
 
         data class Mods(
             val content: Content = Content(),
-            val empty: () -> Pair<String, String> = { "Click the" to "at the top to add a mod." },
+            val empty: () -> Pair<String, String> = { "Drag and Drop Mods here or click the" to "at the top to add a mod." },
             val emptyTitle: () -> String = { "No Mods added yet." },
             val title: () -> String = { "Mods" }
         ) {

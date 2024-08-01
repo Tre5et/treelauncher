@@ -15,7 +15,8 @@ import java.io.IOException
 class GameLauncher(
     val instance: InstanceData,
     val files: LauncherFiles,
-    val minecraftUser: User,
+    val offline: Boolean,
+    val minecraftUser: User?,
     val quickPlayData: QuickPlayData? = null,
     var onExit: (String?) -> Unit = { _ -> },
     var onResourceCleanupFailed:  (Exception, (retry: Boolean) -> Unit) -> Unit  = { _, _ -> },
@@ -77,7 +78,7 @@ class GameLauncher(
     @Throws(GameLaunchException::class)
     private fun finishLaunch() {
         val pb = ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE)
-        val commandBuilder = CommandBuilder(pb, instance, minecraftUser, quickPlayData)
+        val commandBuilder = CommandBuilder(pb, instance, offline, minecraftUser, quickPlayData)
         try {
             commandBuilder.makeStartCommand()
         } catch (e: GameCommandException) {

@@ -54,7 +54,7 @@ fun News(
                 }
             }
         } catch (e: IOException) {
-            AppContext.error(IOException("Unable to load News", e))
+            AppContext.errorIfOnline(IOException("Unable to load News", e))
         }
     }
 

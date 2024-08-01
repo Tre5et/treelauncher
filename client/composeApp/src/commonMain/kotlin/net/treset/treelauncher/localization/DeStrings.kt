@@ -126,7 +126,7 @@ class DeStrings : Strings(
         button = { "Login mit Microsoft" },
         tip = { "TIPP: ${
             arrayOf(
-                "Dateien können in Welten oder Ressourcenpaket Komponenten gezogen werden, um diese zu importieren.",
+                "Dateien können in Welten, Ressourcenpaket oder Mod Komponenten gezogen werden, um diese zu importieren.",
                 "Welten oder Server können direkt gestartet werden. Diese auswählen und den Spielen Knopf klicken.",
                 "Die Farbe des Launchers kann in den Einstellungen angepasst werden.",
                 "Den Nachrichten Knopf am oberen Bildschirmrand klicken, um die neuesten Neuigkeiten zu sehen.",
@@ -144,10 +144,13 @@ class DeStrings : Strings(
         label = Login.Label(
             authenticating = { "Einloggen..." },
             failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
-            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
+            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" },
+            offline = { "Im Offline-Modus gestartet." }
         ),
         logout = { "Gespeichertes Logindaten löschen" },
-        keepLoggedIn = { "Eingeloggt bleiben" }
+        keepLoggedIn = { "Eingeloggt bleiben" },
+        offline = { "Im Offline-Modus starten" },
+        offlineNotification = { "Offline-Modus aktiv. Funktionalität eingeschränkt." },
     ),
     manager = Manager(
         component = Manager.Component(
@@ -400,7 +403,7 @@ class DeStrings : Strings(
             version = { "Version" }
         ),
         mods = Selector.Mods(
-            empty = { "Auf den" to "Knopf oben drücken, um Mods hinzuzufügen." },
+            empty = { "Mods hierher ziehen oder auf den" to "Knopf oben drücken, um Mods hinzuzufügen." },
             emptyTitle = { "Keine Mods hinzugefügt." },
             content = Selector.Mods.Content(
                 delete = { "Mod löschen" },

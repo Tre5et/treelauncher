@@ -254,7 +254,8 @@ fun Saves() {
                     val launcher = GameLauncher(
                         instanceData,
                         AppContext.files,
-                        LoginContext.userAuth.minecraftUser!!,
+                        LoginContext.isOffline(),
+                        LoginContext.userAuth.minecraftUser,
                         playData
                     )
 

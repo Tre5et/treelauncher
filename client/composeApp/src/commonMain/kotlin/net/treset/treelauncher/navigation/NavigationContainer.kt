@@ -70,7 +70,7 @@ fun NavigationContainer(
         try {
             updateAvailable = updater().getUpdate().id != null
         } catch (e: IOException) {
-            AppContext.error(e)
+            AppContext.errorIfOnline(e)
         }
     }
 

@@ -31,6 +31,7 @@ import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
 import net.treset.treelauncher.navigation.NavigationContext
@@ -57,6 +58,7 @@ data class AppContextData(
     val error: (Exception) -> Unit,
     val severeError: (Exception) -> Unit,
     val silentError: (Exception) -> Unit,
+    val errorIfOnline: (Exception) -> Unit,
     val discord: DiscordIntegration
 )
 
@@ -122,7 +124,7 @@ fun App(
                 )
             },
             dismissNotification = {toRemove ->
-                notifications.firstOrNull { it.data === toRemove }?.visible = false
+                notifications.firstOrNull { it.data === toRemove && it.visible }?.visible = false
                 notificationsChanged++
             },
             openNews = {
@@ -151,6 +153,13 @@ fun App(
             },
             silentError = {
                 LOGGER.error(it) { "An error occurred!" }
+            },
+            errorIfOnline = {
+                if(LoginContext.isOffline()) {
+                    AppContext.silentError(it)
+                } else {
+                    AppContext.error(it)
+                }
             },
             discord = discord
         )

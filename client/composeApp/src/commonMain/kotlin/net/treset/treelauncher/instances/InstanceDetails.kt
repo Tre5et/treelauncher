@@ -52,7 +52,8 @@ fun InstanceDetails(
                             val launcher = GameLauncher(
                                 instance,
                                 AppContext.files,
-                                LoginContext.userAuth.minecraftUser!!
+                                LoginContext.isOffline(),
+                                LoginContext.userAuth.minecraftUser
                             )
                             launchGame(
                                 launcher
