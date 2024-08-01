@@ -578,7 +578,7 @@ open class Strings(
 
         data class Mods(
             val content: Content = Content(),
-            val empty: () -> Pair<String, String> = { "Click the" to "at the top to add a mod." },
+            val empty: () -> Pair<String, String> = { "Drag and Drop Mods here or click the" to "at the top to add a mod." },
             val emptyTitle: () -> String = { "No Mods added yet." },
             val title: () -> String = { "Mods" }
         ) {

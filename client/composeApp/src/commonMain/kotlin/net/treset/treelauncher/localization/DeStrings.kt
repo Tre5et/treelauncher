@@ -403,7 +403,7 @@ class DeStrings : Strings(
             version = { "Version" }
         ),
         mods = Selector.Mods(
-            empty = { "Auf den" to "Knopf oben drücken, um Mods hinzuzufügen." },
+            empty = { "Mods hierher ziehen oder auf den" to "Knopf oben drücken, um Mods hinzuzufügen." },
             emptyTitle = { "Keine Mods hinzugefügt." },
             content = Selector.Mods.Content(
                 delete = { "Mod löschen" },
