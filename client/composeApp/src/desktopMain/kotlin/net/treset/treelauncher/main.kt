@@ -134,7 +134,7 @@ fun main() = application {
                         text = strings().launcher.status.restartRequired(),
                         color = colors.material.onBackground
                     )
-                } else if(downloading > 0) {
+                } else if(downloading > 0 && !initialized) {
                     Text(
                         text = strings().launcher.status.preparing(downloading.roundToInt()),
                         color = colors.material.onBackground
