@@ -8,9 +8,9 @@ import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.GameCommandException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.strings
+import java.io.File
 
 class CommandContext(
-    val javaDir: String,
     val offline: Boolean,
     val minecraftUser: User?,
     val gameDataDir: String,
@@ -19,6 +19,7 @@ class CommandContext(
     val assetsIndex: String,
     val libraries: List<String>,
     val librariesDir: String,
+    val nativesDir: String,
     val versionName: String,
     val versionType: String,
     val resX: String?,
@@ -78,6 +79,17 @@ class CommandBuilder(
             }
         }
 
+        val natives: MutableList<String> = mutableListOf()
+        for(v in instanceData.versionComponents) {
+            if(v.second.natives != null && v.second.natives.isNotBlank()) {
+                natives.add(LauncherFile.of(v.first.directory, v.second.natives).absolutePath)
+            }
+        }
+        if(natives.isEmpty()) {
+            natives.add(LauncherFile.of(instanceData.javaComponent.directory, "libs").absolutePath)
+        }
+        val nativesDir = natives.joinToString(File.pathSeparator)
+
         var resX: String? = null
         var resY: String? = null
         for (f in instanceData.instance.second.features) {
@@ -95,9 +107,7 @@ class CommandBuilder(
 
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
-        processBuilder.command()
-            .add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
-
+        processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
         val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvmArguments.toTypedArray())
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.jvmArguments.toTypedArray())
@@ -116,7 +126,6 @@ class CommandBuilder(
         }
 
         val context = CommandContext(
-            instanceData.javaComponent.directory,
             offline,
             minecraftUser,
             instanceData.gameDataDir.absolutePath,
@@ -125,6 +134,7 @@ class CommandBuilder(
             assetsIndex,
             libraries,
             instanceData.librariesDir.absolutePath,
+            nativesDir,
             strings().game.versionName(instanceData),
             strings().game.versionType(instanceData),
             resX,
@@ -223,7 +233,7 @@ class CommandBuilder(
     ): String {
         return when (key) {
             "natives_directory" -> {
-                "${context.javaDir}/lib"
+                context.nativesDir
             }
 
             "launcher_name" -> {
@@ -243,7 +253,7 @@ class CommandBuilder(
             }
 
             "classpath_separator" -> {
-                System.getProperty("path.separator")
+                File.pathSeparator
             }
 
             "library_directory" -> {
@@ -271,6 +281,10 @@ class CommandBuilder(
             }
 
             "assets_root" -> {
+                context.assetsDir
+            }
+
+            "game_assets" -> {
                 context.assetsDir
             }
 
@@ -315,6 +329,14 @@ class CommandBuilder(
                     context.minecraftUser.type()
                 } else {
                     ""
+                }
+            }
+
+            "auth_session" -> {
+                if(context.minecraftUser != null && !context.offline) {
+                    "token:${context.minecraftUser.accessToken()}:${context.minecraftUser.uuid()}"
+                } else {
+                    "token::00000000000000000000000000000000"
                 }
             }
 

@@ -100,6 +100,8 @@ class ForgeVersionCreator(
                         "forge",
                         versionId,
                         null,
+                        null,
+                        null,
                         dependsId,
                         null,
                         null,
@@ -173,7 +175,8 @@ class ForgeVersionCreator(
                 MinecraftForge.downloadForgeLibraries(
                     librariesDir,
                     versionId,
-                    libraries
+                    libraries,
+                    LauncherFile.of(newManifest!!.directory, appConfig().nativesDirName)
                 ) {
                     setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FORGE_LIBRARIES, it))
                 }

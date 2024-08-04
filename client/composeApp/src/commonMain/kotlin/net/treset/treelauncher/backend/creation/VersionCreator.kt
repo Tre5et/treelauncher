@@ -77,7 +77,11 @@ abstract class VersionCreator(
             }
             result.add(LauncherLaunchArgument(a.name, feature, osName, osVersion, osArch))
         }
-        result.addAll(defaultArgs)
+        for(a in defaultArgs) {
+            if(result.none { it.argument == a.argument }) {
+                result.add(a)
+            }
+        }
         LOGGER.debug { "Translated arguments: $result" }
         return result
     }

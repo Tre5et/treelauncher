@@ -90,6 +90,8 @@ class FabricVersionCreator(
                     "fabric",
                     fabricVersion.loader.version,
                     null,
+                    null,
+                    null,
                     dependsId,
                     null,
                     null,

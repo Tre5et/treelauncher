@@ -91,6 +91,10 @@ class InstanceData(
         @Throws(FileLoadException::class)
         fun of(instance: Pair<LauncherManifest, LauncherInstanceDetails>, files: LauncherFiles): InstanceData {
             val versionComponents = getVersionComponents(instance, files)
+            val virtualDir = versionComponents.firstOrNull{it.second.virtualAssets != null}?.second?.virtualAssets
+            val assetsDir = virtualDir?.let {
+                LauncherFile.ofData(files.launcherDetails.assetsDir, it)
+            } ?: LauncherFile.ofData(files.launcherDetails.assetsDir)
 
             val gameDataExcludedFiles: ArrayList<PatternString> = ArrayList()
             for (c in files.gameDetailsManifest.components) {
@@ -113,7 +117,7 @@ class InstanceData(
                 getSavesComponent(instance, files),
                 getModsComponent(instance, files),
                 LauncherFile.ofData(files.launcherDetails.gamedataDir),
-                LauncherFile.ofData(files.launcherDetails.assetsDir),
+                assetsDir,
                 LauncherFile.ofData(files.launcherDetails.librariesDir),
                 files.modsManifest.prefix,
                 files.savesManifest.prefix,

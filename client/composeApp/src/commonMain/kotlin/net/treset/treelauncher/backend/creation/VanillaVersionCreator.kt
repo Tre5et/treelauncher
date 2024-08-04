@@ -52,12 +52,14 @@ class VanillaVersionCreator(
             null,
             null,
             null,
+            null,
+            null,
             mcVersion.mainClass,
             null,
             mcVersion.id
         )
         try {
-            downloadAssets()
+            createAssets(details)
             addArguments(details)
             addJava(details)
             addLibraries(details)
@@ -81,17 +83,17 @@ class VanillaVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun downloadAssets() {
+    private fun createAssets(details: LauncherVersionDetails) {
         LOGGER.debug { "Downloading assets..." }
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, null))
         val assetIndexUrl: String = mcVersion.assetIndex.url
         val index: AssetIndex = try {
             MinecraftAssets.getAssetIndex(assetIndexUrl)
         } catch (e: FileDownloadException) {
-            throw ComponentCreationException("Unable to download assets: failed to download asset index", e)
+            throw ComponentCreationException("Unable to create assets: failed to download asset index", e)
         }
         if (index.objects == null || index.objects.isEmpty()) {
-            throw ComponentCreationException("Unable to download assets: invalid index contents")
+            throw ComponentCreationException("Unable to create assets: invalid index contents")
         }
         val baseDir: LauncherFile = LauncherFile.ofData(files.launcherDetails.assetsDir)
         try {
@@ -109,8 +111,18 @@ class VanillaVersionCreator(
                 )
             }
         } catch (e: FileDownloadException) {
-            throw ComponentCreationException("Unable to download assets: failed to download assets", e)
+            throw ComponentCreationException("Unable to create assets: failed to download assets", e)
         }
+        if(index.isMapToResources) {
+            val virtualDir = try {
+                MinecraftAssets.createVirtualAssets(mcVersion.assets, baseDir)
+            } catch (e: IOException) {
+                throw ComponentCreationException("Unable to create assets: failed to extract virtual assets", e)
+            }
+
+            details.virtualAssets = virtualDir.relativeTo(baseDir).path
+        }
+
         LOGGER.debug { "Downloaded assets" }
     }
 
@@ -165,11 +177,14 @@ class VanillaVersionCreator(
                 )
             }
         }
+
+        val nativesDir = LauncherFile.of(newManifest!!.directory, appConfig().nativesDirName)
         val result: List<String> = try {
             MinecraftGame.downloadVersionLibraries(
                 mcVersion.libraries,
                 librariesDir,
-                listOf<String>()
+                listOf<String>(),
+                nativesDir
             ) { status: DownloadStatus? ->
                 setStatus(
                     CreationStatus(
@@ -182,6 +197,9 @@ class VanillaVersionCreator(
             throw ComponentCreationException("Unable to add libraries: failed to download libraries", e)
         }
         details.libraries = result
+        if(nativesDir.isDirectory()) {
+            details.natives = appConfig().nativesDirName
+        }
         LOGGER.debug { "Added libraries: $result" }
     }
 
