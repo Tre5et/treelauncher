@@ -2,11 +2,12 @@ package net.treset.treelauncher.backend.sync
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.mc_version_loader.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.backend.util.string.UrlString
@@ -14,7 +15,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-open class ManifestSynchronizer(var manifest: LauncherManifest, protected var files: LauncherFiles, callback: SyncCallback?) :
+open class ManifestSynchronizer(var manifest: ComponentManifest, protected var files: LauncherFiles, callback: SyncCallback?) :
     FileSynchronizer(callback) {
     @Throws(IOException::class)
     override fun upload() {
@@ -78,7 +79,7 @@ open class ManifestSynchronizer(var manifest: LauncherManifest, protected var fi
             Files.createDirectories(dir.toPath())
         }
         downloadDifference(0)
-        val parent: LauncherManifest = parentManifest
+        val parent: ParentManifest = parentManifest
         LOGGER.debug { "Adding component to parent manifest" }
         parent.components.add(manifest.id)
         var fileName: String = appConfig().manifestFileName
@@ -91,7 +92,7 @@ open class ManifestSynchronizer(var manifest: LauncherManifest, protected var fi
     }
 
     @get:Throws(IOException::class)
-    protected val parentManifest: LauncherManifest
+    protected val parentManifest: ParentManifest
         get() = when (manifest.type) {
             LauncherManifestType.SAVES_COMPONENT -> {
                 files.savesManifest

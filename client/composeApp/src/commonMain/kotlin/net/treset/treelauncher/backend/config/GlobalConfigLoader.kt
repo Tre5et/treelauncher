@@ -2,8 +2,8 @@ package net.treset.treelauncher.backend.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.Manifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.File
 import java.io.IOException
@@ -89,8 +89,8 @@ class GlobalConfigLoader {
         if (contents.isBlank()) {
             return false
         }
-        val manifest: LauncherManifest = try {
-            LauncherManifest.fromJson(contents)
+        val manifest: Manifest = try {
+            Manifest.fromJson(contents)
         } catch (e: SerializationException) {
             return false
         }

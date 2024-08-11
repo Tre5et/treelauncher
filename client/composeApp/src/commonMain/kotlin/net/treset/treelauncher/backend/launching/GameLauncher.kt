@@ -32,7 +32,7 @@ class GameLauncher(
         } catch (e: FileLoadException) {
             throw GameLaunchException("Unable to launch game: file reload failed", e)
         }
-        if (files.launcherDetails.activeInstance != null && files.launcherDetails.activeInstance.isNotBlank()) {
+        if (!files.launcherDetails.activeInstance.isNullOrBlank()) {
             if (!cleanupActiveInstance) {
                 throw GameLaunchException("Unable to launch game: active instance already exists")
             }

@@ -20,9 +20,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherMod
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.mc_version_loader.mods.ModProvider
@@ -30,6 +27,9 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.LauncherModSortType
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ModsCreator
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.EmptyingJobQueue
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -63,7 +63,7 @@ data class ModContext(
 fun Mods() {
     var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.first.name }) }
 
-    var selected: Pair<LauncherManifest, LauncherModsDetails>? by remember { mutableStateOf(null) }
+    var selected: Pair<ComponentManifest, LauncherModsDetails>? by remember { mutableStateOf(null) }
 
     var showSearch by remember(selected) { mutableStateOf(false) }
     var checkUpdates by remember(selected) { mutableStateOf(0) }
@@ -131,7 +131,7 @@ fun Mods() {
         },
         detailsContent = { current, _, _ ->
             val types = remember(current.second.types) {
-                VersionType.fromIds(current.second.types)
+                VersionType.fromIds(current.second.types!!)
             }
 
             var redrawMods by remember(current) { mutableStateOf(0) }
@@ -163,7 +163,7 @@ fun Mods() {
                     onEmptied = {
                         LauncherFile.of(
                             current.first.directory,
-                            current.first.details
+                            current.first.details!!
                         ).write(
                             current.second
                         )
@@ -179,7 +179,7 @@ fun Mods() {
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
-                    current.second.versions,
+                    current.second.versions!!,
                     types,
                     providers.filter { it.second }.map { it.first },
                     LauncherFile.of(current.first.directory)
@@ -212,7 +212,7 @@ fun Mods() {
                         MinecraftGame.getReleases()
                     }.also { v ->
                         selectedVersion = v.firstOrNull {
-                            it.id == current.second.versions[0]
+                            it.id == current.second.versions?.let {it[0]}
                         }
                     }
                 }.start()
@@ -403,7 +403,7 @@ fun Mods() {
 
                                                     LauncherFile.of(
                                                         current.first.directory,
-                                                        current.first.details
+                                                        current.first.details!!
                                                     ).write(current.second)
 
                                                     popupData = null
@@ -417,7 +417,7 @@ fun Mods() {
                             }
                         },
                         icon = icons().change,
-                        enabled = selectedVersion?.let { it.id != current.second.versions[0] } ?: false
+                        enabled = selectedVersion?.let { it.id != current.second.versions?.let {it[0]} } ?: false
                                 || selectedType != types[0]
                                 || includeAlternateLoader != types.size > 1,
                         modifier = Modifier

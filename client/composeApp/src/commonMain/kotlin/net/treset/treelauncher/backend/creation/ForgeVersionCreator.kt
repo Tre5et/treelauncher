@@ -5,14 +5,15 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.forge.ForgeVersion
 import net.treset.mc_version_loader.forge.MinecraftForge
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.mc_version_loader.launcher.LauncherVersionDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
 import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.data.LauncherVersionDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -21,7 +22,7 @@ import java.io.IOException
 
 class ForgeVersionCreator(
     typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: LauncherManifest,
+    componentsManifest: ParentManifest,
     var versionId: String,
     files: LauncherFiles,
     var librariesDir: LauncherFile
@@ -103,12 +104,12 @@ class ForgeVersionCreator(
                         null,
                         null,
                         dependsId,
-                        null,
-                        null,
-                        null,
-                        null,
+                        listOf(),
+                        listOf(),
+                        "",
+                        listOf(),
                         forgeVersion.mainClass,
-                        null,
+                        "",
                         versionId
                     )
 
@@ -123,7 +124,7 @@ class ForgeVersionCreator(
                     }
 
                     try {
-                        LauncherFile.of(newManifest!!.directory, newManifest!!.details).write(details)
+                        LauncherFile.of(newManifest!!.directory, newManifest!!.details!!).write(details)
                     } catch (e: IOException) {
                         throw ComponentCreationException("Unable to create fabric version: failed to write version details: versionId=${forgeVersion.inheritsFrom}", e)
                     }
@@ -189,7 +190,7 @@ class ForgeVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun createClient(details: LauncherVersionDetails, vanillaManifest: LauncherManifest?) {
+    private fun createClient(details: LauncherVersionDetails, vanillaManifest: ComponentManifest?) {
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FORGE_FILE, null))
         LOGGER.debug { "Creating forge client..." }
         newManifest?.let { newManifest ->

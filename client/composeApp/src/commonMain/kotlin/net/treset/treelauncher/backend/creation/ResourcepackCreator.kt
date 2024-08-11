@@ -1,15 +1,16 @@
 package net.treset.treelauncher.backend.creation
 
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 
 class ResourcepackCreator : GenericComponentCreator {
     constructor(
         name: String,
         typeConversion: Map<String, LauncherManifestType>,
-        componentsManifest: LauncherManifest
+        componentsManifest: ParentManifest
     ) : super(
         LauncherManifestType.RESOURCEPACKS_COMPONENT,
         null,
@@ -23,7 +24,7 @@ class ResourcepackCreator : GenericComponentCreator {
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
     }
 
-    constructor(name: String, inheritsFrom: LauncherManifest, componentsManifest: LauncherManifest) : super(
+    constructor(name: String, inheritsFrom: ComponentManifest, componentsManifest: ParentManifest) : super(
         LauncherManifestType.RESOURCEPACKS_COMPONENT,
         null,
         inheritsFrom,
@@ -36,7 +37,7 @@ class ResourcepackCreator : GenericComponentCreator {
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
     }
 
-    constructor(uses: LauncherManifest) : super(
+    constructor(uses: ComponentManifest) : super(
         LauncherManifestType.RESOURCEPACKS_COMPONENT,
         uses,
         null,

@@ -7,15 +7,15 @@ import net.treset.mc_version_loader.fabric.FabricLoader
 import net.treset.mc_version_loader.fabric.FabricProfile
 import net.treset.mc_version_loader.fabric.FabricVersionDetails
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.mc_version_loader.launcher.LauncherVersionDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
 import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.data.LauncherVersionDetails
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -25,7 +25,7 @@ import java.io.IOException
 
 class FabricVersionCreator(
     typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: LauncherManifest,
+    componentsManifest: ParentManifest,
     var fabricVersion: FabricVersionDetails,
     var fabricProfile: FabricProfile,
     files: LauncherFiles,
@@ -89,16 +89,16 @@ class FabricVersionCreator(
                     fabricProfile.inheritsFrom,
                     "fabric",
                     fabricVersion.loader.version,
-                    null,
+                    "",
                     null,
                     null,
                     dependsId,
-                    null,
-                    null,
-                    null,
-                    null,
+                    listOf(),
+                    listOf(),
+                    "",
+                    listOf(),
                     fabricProfile.mainClass,
-                    null,
+                    "",
                     fabricProfile.id
                 )
                 try {
@@ -111,7 +111,7 @@ class FabricVersionCreator(
                     throw ComponentCreationException("Unable to create fabric version: versionId=${fabricProfile.inheritsFrom}", e)
                 }
                 try {
-                    LauncherFile.of(newManifest!!.directory, newManifest!!.details).write(details)
+                    LauncherFile.of(newManifest!!.directory, newManifest!!.details!!).write(details)
                 } catch (e: IOException) {
                     throw ComponentCreationException("Unable to create fabric version: failed to write version details: versionId=${fabricProfile.inheritsFrom}", e)
                 }

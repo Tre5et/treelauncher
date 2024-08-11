@@ -2,8 +2,8 @@ package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.hycrafthd.minecraft_authenticator.login.User
-import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.GameCommandException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -41,7 +41,7 @@ class CommandBuilder(
         }
         var assetsIndex: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.assets != null && v.second.assets.isNotBlank()) {
+            if (v.second.assets?.isNotBlank() == true) {
                 assetsIndex = v.second.assets
                 break
             }
@@ -52,7 +52,7 @@ class CommandBuilder(
 
         var mainClass: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.mainClass != null && v.second.mainClass.isNotBlank()) {
+            if (v.second.mainClass.isNotBlank()) {
                 mainClass = v.second.mainClass
                 break
             }
@@ -74,15 +74,15 @@ class CommandBuilder(
         }
 
         for (v in instanceData.versionComponents) {
-            if (v.second.mainFile != null && v.second.mainFile.isNotBlank()) {
-                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile).absolutePath)
+            if (v.second.mainFile?.isNotBlank() == true) {
+                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile!!).absolutePath)
             }
         }
 
         val natives: MutableList<String> = mutableListOf()
         for(v in instanceData.versionComponents) {
-            if(v.second.natives != null && v.second.natives.isNotBlank()) {
-                natives.add(LauncherFile.of(v.first.directory, v.second.natives).absolutePath)
+            if(v.second.natives?.isNotBlank() == true) {
+                natives.add(LauncherFile.of(v.first.directory, v.second.natives!!).absolutePath)
             }
         }
         if(natives.isEmpty()) {
@@ -113,13 +113,7 @@ class CommandBuilder(
             argOrder.add(v.second.jvmArguments.toTypedArray())
         }
         argOrder.add(arrayOf(
-            LauncherLaunchArgument(
-                mainClass,
-                null,
-                null,
-                null,
-                null
-            )
+            LauncherLaunchArgument(mainClass)
         ))
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.gameArguments.toTypedArray())

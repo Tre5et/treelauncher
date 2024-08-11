@@ -11,9 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.creation.*
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.components.mods.ModsCreation
 import net.treset.treelauncher.components.mods.ModsCreationState
@@ -27,9 +27,9 @@ fun Create() {
     var instanceName by remember { mutableStateOf("") }
 
     var versionState: VersionState? by remember { mutableStateOf(null) }
-    var savesState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
-    var resourcepackState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
-    var optionsState: CreationState<LauncherManifest>? by remember { mutableStateOf(null) }
+    var savesState: CreationState<ComponentManifest>? by remember { mutableStateOf(null) }
+    var resourcepackState: CreationState<ComponentManifest>? by remember { mutableStateOf(null) }
+    var optionsState: CreationState<ComponentManifest>? by remember { mutableStateOf(null) }
     var modsState: ModsCreationState? by remember { mutableStateOf(null) }
 
     var hasMods by remember(versionState?.versionType == VersionType.VANILLA || versionState?.versionType == null) { mutableStateOf(

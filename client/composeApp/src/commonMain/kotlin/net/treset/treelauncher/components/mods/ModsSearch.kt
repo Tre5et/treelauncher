@@ -16,13 +16,13 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.format.FormatUtils
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherMod
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.components.mods.display.ModDataProvider
@@ -35,7 +35,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ModsSearch(
-    component: Pair<LauncherManifest, LauncherModsDetails>,
+    component: Pair<ComponentManifest, LauncherModsDetails>,
     modContext: ModContext,
     appContext: AppContextData,
     droppedFile: LauncherFile? = null,

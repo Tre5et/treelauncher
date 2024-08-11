@@ -13,10 +13,10 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.sun.management.OperatingSystemMXBean
-import net.treset.mc_version_loader.launcher.LauncherFeature
-import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherFeature
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 import net.treset.treelauncher.generic.IconButton
@@ -220,7 +220,7 @@ fun InstanceSettings(
 
                 IconButton(
                     onClick = {
-                        args = args + LauncherLaunchArgument(newArg, null, null, null, null)
+                        args = args + LauncherLaunchArgument(newArg)
                         newArg = ""
                     },
                     icon = icons().add,
@@ -333,6 +333,6 @@ private fun save(
     saveArgs(instance, args, startArgs)
     LauncherFile.of(
         instance.instance.first.directory,
-        instance.instance.first.details
+        instance.instance.first.details!!
     ).write(instance.instance.second)
 }

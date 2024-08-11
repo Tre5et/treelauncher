@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.GenericJsonParsable
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.sort.*
 import net.treset.treelauncher.localization.Language
@@ -39,9 +39,9 @@ enum class LauncherModSortType(val comparator: Comparator<LauncherMod>) {
     }
 }
 
-enum class LauncherManifestSortType(val comparator: Comparator<LauncherManifest>) {
-    NAME(LauncherManifestNameComparator()),
-    LAST_USED(LauncherManifestLastUsedComparator());
+enum class ComponentManifestSortType(val comparator: Comparator<ComponentManifest>) {
+    NAME(ComponentManifestNameComparator()),
+    LAST_USED(ComponentManifestLastUsedComparator());
 
     override fun toString(): String {
         return comparator.toString()
@@ -70,16 +70,16 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var syncKey: String? = null
     var instanceSortType: InstanceDataSortType = InstanceDataSortType.NAME
     var isInstanceSortReverse = false
-    var savesComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var savesComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
     var isSavesComponentSortReverse = false
     var savesDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
     var resourcepacksDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
-    var resourcepacksComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var resourcepacksComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
     var isResourcepacksComponentSortReverse = false
-    var optionsComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var optionsComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
     var isOptionsComponentSortReverse = false
     var modDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
-    var modComponentSortType: LauncherManifestSortType = LauncherManifestSortType.NAME
+    var modComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
     var isModComponentSortReverse = false
     var modSortType: LauncherModSortType = LauncherModSortType.NAME
     var isModSortReverse = false

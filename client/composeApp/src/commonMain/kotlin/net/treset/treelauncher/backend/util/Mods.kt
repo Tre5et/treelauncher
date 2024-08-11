@@ -2,8 +2,8 @@ package net.treset.treelauncher.backend.util
 
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toPainter
-import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.ModData
+import net.treset.treelauncher.backend.data.LauncherMod
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.MalformedURLException

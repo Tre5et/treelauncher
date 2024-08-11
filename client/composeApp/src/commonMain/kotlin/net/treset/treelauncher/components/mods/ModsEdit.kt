@@ -8,11 +8,11 @@ import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.launcher.LauncherMod
-import net.treset.mc_version_loader.launcher.LauncherModDownload
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.LauncherModDownload
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.IconButton

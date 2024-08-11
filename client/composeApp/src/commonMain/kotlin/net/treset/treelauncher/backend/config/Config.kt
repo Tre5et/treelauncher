@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.config
 
-import net.treset.mc_version_loader.launcher.LauncherFeature
-import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
+import net.treset.treelauncher.backend.data.LauncherFeature
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 
@@ -53,14 +53,14 @@ class Config(baseDir: String, val updateUrl: String?) {
         )
     val versionsDefaultDetails = "version.json"
     val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf(
-        LauncherLaunchArgument("--resourcePackDir", null, null, null, null),
-        LauncherLaunchArgument("\${resourcepack_directory}", null, null, null, null)
+        LauncherLaunchArgument("--resourcePackDir"),
+        LauncherLaunchArgument("\${resourcepack_directory}")
     )
     val minecraftDefaultFileName = "client.jar"
     val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf(
-        LauncherLaunchArgument("-Djava.library.path=\${natives_directory}", null, null, null, null),
-        LauncherLaunchArgument("-cp", null, null, null, null),
-        LauncherLaunchArgument("\${classpath}", null, null, null, null),
+        LauncherLaunchArgument("-Djava.library.path=\${natives_directory}"),
+        LauncherLaunchArgument("-cp"),
+        LauncherLaunchArgument("\${classpath}"),
     )
     val fabricDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()

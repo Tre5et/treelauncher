@@ -10,12 +10,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.CreationMode
@@ -33,7 +33,7 @@ import java.net.URI
 fun Resourcepacks() {
     var components by remember { mutableStateOf(AppContext.files.resourcepackComponents.sortedBy { it.name }) }
 
-    var selected: LauncherManifest? by remember { mutableStateOf(null) }
+    var selected: ComponentManifest? by remember { mutableStateOf(null) }
 
     var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var loading by remember { mutableStateOf(true) }

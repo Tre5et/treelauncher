@@ -1,10 +1,11 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -13,15 +14,15 @@ import java.io.IOException
 class ModsCreator : GenericComponentCreator {
     private val types: List<String>?
     private val versions: List<String>?
-    private var gameManifest: LauncherManifest? = null
+    private var gameManifest: ParentManifest? = null
 
     constructor(
         name: String?,
         typeConversion: Map<String, LauncherManifestType>,
-        componentsManifest: LauncherManifest,
+        componentsManifest: ParentManifest,
         types: List<String>?,
         versions: List<String>?,
-        gameManifest: LauncherManifest?
+        gameManifest: ParentManifest?
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
         null,
@@ -40,9 +41,9 @@ class ModsCreator : GenericComponentCreator {
 
     constructor(
         name: String?,
-        inheritsFrom: Pair<LauncherManifest?, LauncherModsDetails?>,
-        componentsManifest: LauncherManifest,
-        gameManifest: LauncherManifest?
+        inheritsFrom: Pair<ComponentManifest?, LauncherModsDetails?>,
+        componentsManifest: ParentManifest,
+        gameManifest: ParentManifest?
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
         null,
@@ -59,7 +60,7 @@ class ModsCreator : GenericComponentCreator {
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
 
-    constructor(uses: Pair<LauncherManifest?, LauncherModsDetails?>) : super(
+    constructor(uses: Pair<ComponentManifest?, LauncherModsDetails?>) : super(
         LauncherManifestType.MODS_COMPONENT,
         uses.first,
         null,
@@ -78,7 +79,7 @@ class ModsCreator : GenericComponentCreator {
     override fun createComponent(): String {
         val result: String = super.createComponent()
         newManifest?.let {
-            val details = LauncherModsDetails(types, versions, listOf())
+            val details = LauncherModsDetails(types, versions, mutableListOf())
             try {
                 LauncherFile.of(it.directory, appConfig().modsDefaultDetails).write(details)
             } catch (e: IOException) {

@@ -10,11 +10,11 @@ import java.math.BigInteger
 import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 import java.util.function.Function
+import kotlin.io.path.isDirectory
 
 class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
@@ -47,13 +47,16 @@ class LauncherFile(pathname: String) : File(pathname) {
                 Files.walk(Path.of(path)).use { stream ->
                     val exceptions: MutableList<IOException> = ArrayList()
                     val sourceLength = path.length
-                    stream.forEach { sourceF: Path ->
-                        if (!copyChecker.apply(sourceF.fileName.toString()) || sourceF.toString() == absolutePath) {
+                    stream.forEach { src: Path ->
+                        if (!copyChecker.apply(src.fileName.toString()) || src.toString() == absolutePath) {
                             return@forEach
                         }
-                        val destinationF = Paths.get(dst.path, sourceF.toString().substring(sourceLength))
+                        val destinationF = of(dst.path, src.toString().substring(sourceLength))
+                        if(src.isDirectory() && destinationF.isDirectory) {
+                            return@forEach
+                        }
                         try {
-                            Files.copy(sourceF, destinationF, *options)
+                            Files.copy(src, destinationF.toPath(), *options)
                         } catch (e: IOException) {
                             exceptions.add(e)
                         }

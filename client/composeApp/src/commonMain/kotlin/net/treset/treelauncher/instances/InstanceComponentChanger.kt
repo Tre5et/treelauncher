@@ -7,9 +7,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
@@ -26,11 +26,11 @@ fun InstanceComponentChanger(
     appContext: AppContextData,
     redrawSelected: () -> Unit
 ) {
-    var components: Array<LauncherManifest> by remember { mutableStateOf(emptyArray()) }
+    var components: Array<ComponentManifest> by remember { mutableStateOf(emptyArray()) }
 
-    var current: LauncherManifest? by remember(type) { mutableStateOf(null) }
+    var current: ComponentManifest? by remember(type) { mutableStateOf(null) }
 
-    var selected: LauncherManifest? by remember(current) { mutableStateOf(current) }
+    var selected: ComponentManifest? by remember(current) { mutableStateOf(current) }
 
     val loadCurrent = {
         current = when (type) {
@@ -95,16 +95,22 @@ fun InstanceComponentChanger(
                 onClick = {
                     when(type) {
                         InstanceDetails.SAVES -> {
-                            instance.instance.second.savesComponent = selected?.id
-                            instance.reloadSavesComponent(appContext.files)
+                            selected?.id?.let { id ->
+                                instance.instance.second.savesComponent = id
+                                instance.reloadSavesComponent(appContext.files)
+                            }
                         }
                         InstanceDetails.RESOURCE_PACKS -> {
-                            instance.instance.second.resourcepacksComponent = selected?.id
-                            instance.reloadResourcepacksComponent(appContext.files)
+                            selected?.id?.let { id ->
+                                instance.instance.second.resourcepacksComponent = id
+                                instance.reloadResourcepacksComponent(appContext.files)
+                            }
                         }
                         InstanceDetails.OPTIONS -> {
-                            instance.instance.second.optionsComponent = selected?.id
-                            instance.reloadOptionsComponent(appContext.files)
+                            selected?.id?.let { id ->
+                                instance.instance.second.optionsComponent = id
+                                instance.reloadOptionsComponent(appContext.files)
+                            }
                         }
                         InstanceDetails.MODS -> {
                             instance.instance.second.modsComponent = selected?.id
@@ -113,7 +119,7 @@ fun InstanceComponentChanger(
                         else -> {}
                     }
                     loadCurrent()
-                    LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
+                    LauncherFile.of(instance.instance.first.directory, instance.instance.first.details!!).write(instance.instance.second)
                     redrawSelected()
                 },
                 icon = icons().change,

@@ -23,11 +23,11 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherMod
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.IconButton
@@ -39,7 +39,7 @@ import java.io.IOException
 
 @Composable
 fun ModsImport(
-    component: Pair<LauncherManifest, LauncherModsDetails>,
+    component: Pair<ComponentManifest, LauncherModsDetails>,
     modContext: ModContext,
     appContext: AppContextData,
     droppedFile: LauncherFile? = null,

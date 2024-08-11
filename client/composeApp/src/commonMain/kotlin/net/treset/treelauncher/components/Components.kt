@@ -12,13 +12,14 @@ import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.LauncherManifestSortType
+import net.treset.treelauncher.backend.config.ComponentManifestSortType
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.GenericComponentCreator
+import net.treset.treelauncher.backend.data.LauncherInstanceDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -31,8 +32,8 @@ import net.treset.treelauncher.style.icons
 import java.io.IOException
 
 data class SortContext(
-    val getSortType: () -> LauncherManifestSortType,
-    val setSortType: (LauncherManifestSortType) -> Unit,
+    val getSortType: () -> ComponentManifestSortType,
+    val setSortType: (ComponentManifestSortType) -> Unit,
     val getReverse: () -> Boolean,
     val setReverse: (Boolean) -> Unit
 )
@@ -42,9 +43,9 @@ data class SortContext(
 fun <T, C:CreationState<T>> Components(
     title: String,
     components: List<T>,
-    componentManifest: LauncherManifest,
-    checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
-    getManifest: T.() -> LauncherManifest,
+    componentManifest: ParentManifest,
+    checkHasComponent: (LauncherInstanceDetails, ComponentManifest) -> Boolean,
+    getManifest: T.() -> ComponentManifest,
     isEnabled: T.() -> Boolean = {true},
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
@@ -84,7 +85,7 @@ fun <T, C:CreationState<T>> Components(
         }
     }
 
-    var sortType: LauncherManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: LauncherManifestSortType.LAST_USED) }
+    var sortType: ComponentManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: ComponentManifestSortType.LAST_USED) }
     var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
 
     val actualComponents: List<T> = remember(components, sortType, sortReversed, AppContext.runningInstance) {
@@ -115,7 +116,7 @@ fun <T, C:CreationState<T>> Components(
 
                 sortContext?.let {
                     SortBox(
-                        sorts = LauncherManifestSortType.entries,
+                        sorts = ComponentManifestSortType.entries,
                         reversed = it.getReverse(),
                         selected = it.getSortType(),
                         onReversed = {
@@ -321,7 +322,7 @@ fun <T, C:CreationState<T>> Components(
                     checkHasComponent = { details -> checkHasComponent(details, it.getManifest()) },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        componentManifest.components.remove(it.getManifest().id)
+                        componentManifest.components!!.remove(it.getManifest().id)
                         try {
                             LauncherFile.of(
                                 componentManifest.directory,
@@ -382,26 +383,26 @@ fun <T, C:CreationState<T>> Components(
 @Composable
 fun Components(
     title: String,
-    componentManifest: LauncherManifest,
-    components: List<LauncherManifest>,
-    checkHasComponent: (LauncherInstanceDetails, LauncherManifest) -> Boolean,
-    isEnabled: LauncherManifest.() -> Boolean = {true},
-    getCreator: (CreationState<LauncherManifest>) -> GenericComponentCreator?,
+    componentManifest: ParentManifest,
+    components: List<ComponentManifest>,
+    checkHasComponent: (LauncherInstanceDetails, ComponentManifest) -> Boolean,
+    isEnabled: ComponentManifest.() -> Boolean = {true},
+    getCreator: (CreationState<ComponentManifest>) -> GenericComponentCreator?,
     reload: () -> Unit,
     actionBarSpecial: @Composable RowScope.(
-        LauncherManifest,
+        ComponentManifest,
         Boolean,
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_,_->},
     actionBarBoxContent: @Composable BoxScope.(
-        selected: LauncherManifest,
+        selected: ComponentManifest,
         settingsOpen: Boolean,
         redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
-        selected: LauncherManifest,
+        selected: ComponentManifest,
         redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_->},

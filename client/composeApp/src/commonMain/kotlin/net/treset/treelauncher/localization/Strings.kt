@@ -1,11 +1,11 @@
 package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
 import java.util.*
@@ -521,7 +521,7 @@ open class Strings(
                 val title: () -> String = { "You are about to delete this Component!" },
                 val tooltip: () -> String = { "Delete Component" },
                 val unableClose: () -> String = { "Close" },
-                val unableMessage: (LauncherManifest) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
+                val unableMessage: (ComponentManifest) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
                 val unableTitle: () -> String = { "Unable to delete this component!" },
             )
 

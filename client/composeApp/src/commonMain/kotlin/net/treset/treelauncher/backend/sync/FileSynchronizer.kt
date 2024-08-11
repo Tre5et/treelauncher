@@ -1,8 +1,8 @@
 package net.treset.treelauncher.backend.sync
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.mc_version_loader.util.DownloadStatus
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import java.io.IOException
 
 abstract class FileSynchronizer(var callback: SyncCallback?) {
