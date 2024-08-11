@@ -568,6 +568,8 @@ open class Strings(
                 val preparingTitle: () -> String = { "Preparing Game Resources..." },
                 val runningMessage: () -> String = { "Close the game to be able to perform actions in the launcher." },
                 val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.first.name}" },
+                val runningOpen: () -> String = { "Open Game folder" },
+                val runningStop: () -> String = { "Kill Game process" },
                 val runningTitle: () -> String = { "The Game is running..." },
                 val crashClose: () -> String = { "Close" },
                 val crashMessage: (String) -> String = { message -> "Error:\n$message\nThis might be unrelated to the launcher." },

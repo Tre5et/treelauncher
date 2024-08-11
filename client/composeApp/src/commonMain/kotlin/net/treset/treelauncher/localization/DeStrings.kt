@@ -388,6 +388,8 @@ class DeStrings : Strings(
                 preparingTitle ={ "Spielressourcen werden vorbereitet..." },
                 runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
                 runningNotification = { instance -> "Aktuell läuft: ${instance.instance.first.name}" },
+                runningOpen = { "Spielordner öffnen" },
+                runningStop = { "Spielprozess beenden" },
                 runningTitle = { "Das Spiel läuft..." },
                 crashClose = { "Schließen" },
                 crashMessage = { message -> "Fehler:\n$message\nDies wurde vermutlich nicht durch den Launcher verursacht." },

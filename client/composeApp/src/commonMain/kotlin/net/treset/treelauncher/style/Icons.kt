@@ -62,6 +62,7 @@ object Icons {
     val warning = Icons.Rounded.Warning
     val down = Icons.Rounded.KeyboardDoubleArrowDown
     val help = Icons.AutoMirrored.Rounded.Help
+    val close = Icons.Rounded.Close
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

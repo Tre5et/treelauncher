@@ -124,7 +124,7 @@ class ForgeVersionCreator(
                     }
 
                     try {
-                        LauncherFile.of(newManifest!!.directory, newManifest!!.details!!).write(details)
+                        LauncherFile.of(newManifest!!.directory, newManifest!!.details).write(details)
                     } catch (e: IOException) {
                         throw ComponentCreationException("Unable to create fabric version: failed to write version details: versionId=${forgeVersion.inheritsFrom}", e)
                     }
@@ -209,8 +209,6 @@ class ForgeVersionCreator(
 
             LOGGER.debug { "Finding minecraft jar..." }
             val minecraftBaseDir = vanillaManifest.directory
-                ?: files.versionComponents.firstOrNull { it.first.id == details.depends }?.first?.directory
-                ?: throw ComponentCreationException("Unable to create forge version: failed to find mc version: versionId=${details.depends}")
             val minecraftFileName = files.versionComponents.firstOrNull { it.second.versionId == details.depends }?.second?.mainFile
                 ?: appConfig().minecraftDefaultFileName
             val minecraftFile = LauncherFile.of(minecraftBaseDir, minecraftFileName)
@@ -227,9 +225,6 @@ class ForgeVersionCreator(
                 throw ComponentCreationException("Unable to create forge version: failed to read mc version details: versionId=${details.depends}", e)
             }
             val javaFile = LauncherFile.ofData(files.launcherDetails.javasDir, files.javaManifest.prefix + "_" + vanillaDetails.java, "bin", "java")
-            /*if(!javaFile.isFile) {
-                throw ComponentCreationException("Unable to create forge version: mc version java file doesn't exist: file=${javaFile} versionId=${details.depends}")
-            }*/
             LOGGER.debug { "Found minecraft java" }
 
             LOGGER.debug { "Patching forge client..."}
