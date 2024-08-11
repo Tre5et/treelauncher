@@ -16,10 +16,7 @@ class Config(baseDir: String, val updateUrl: String?) {
     val includedFilesDirName = ".included_files"
     val instanceDefaultFeatures: Array<LauncherFeature> = arrayOf()
     val instanceDefaultIncludedFiles: Array<PatternString> = arrayOf()
-    val instanceDefaultIgnoredFiles: Array<PatternString> = PatternString.toPattern(
-        ".*backup.*",
-        ".*BACKUP.*"
-    )
+    val instanceDefaultIgnoredFiles: Array<PatternString> = arrayOf()
     val instanceDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val instanceDefaultDetails = "instance.json"
     val optionsDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
@@ -46,7 +43,8 @@ class Config(baseDir: String, val updateUrl: String?) {
     val savesDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
             "servers.dat",
             "realms_persistence.json",
-            "stats/"
+            "stats/",
+            "backups/",
         )
     val resourcepacksDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
             "texturepacks/"
