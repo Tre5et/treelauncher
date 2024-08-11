@@ -79,6 +79,7 @@ abstract class GenericComponentCreator(
             if (it.type != type || it.id.isBlank()) {
                 throw ComponentCreationException("Unable to use ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
             }
+            newManifest = uses
             LOGGER.debug { "Using ${type.toString().lowercase(Locale.getDefault())} component: id=${it.id}" }
             return it.id
         }?: throw ComponentCreationException("Unable to use ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
