@@ -114,10 +114,10 @@ class LauncherFiles {
     @Throws(FileLoadException::class)
     fun reloadLauncherDetails() {
         _mainManifest?.let {
-            it.details?: throw FileLoadException("Unable to load launcher details: invalid main file")
+            it.details
 
             val detailsFile: String = try {
-                LauncherFile.of(appConfig().baseDir, it.details!!).readString()
+                LauncherFile.of(appConfig().baseDir, it.details).readString()
             } catch (e: IOException) {
                 throw FileLoadException("Unable to load launcher details: file error", e)
             }
@@ -127,7 +127,7 @@ class LauncherFiles {
             } catch (e: SerializationException) {
                 throw FileLoadException("Unable to load launcher details: json error", e)
             }.also { details ->
-                if (details.versionDir == null || details.versionType == null || details.versionComponentType == null || details.savesType == null || details.savesComponentType == null || details.resourcepacksType == null || details.resourcepacksComponentType == null || details.resourcepacksDir == null || details.assetsDir == null || details.gamedataDir == null || details.gamedataType == null || details.instancesDir == null || details.instanceComponentType == null || details.instancesType == null || details.javaComponentType == null || details.javasDir == null || details.javasType == null || details.librariesDir == null || details.modsComponentType == null || details.modsType == null || details.optionsDir == null || details.optionsComponentType == null || details.optionsType == null || details.savesComponentType == null || details.savesType == null) {
+                if (details.versionDir == null || details.savesType == null || details.savesComponentType == null || details.resourcepacksType == null || details.resourcepacksComponentType == null || details.resourcepacksDir == null || details.assetsDir == null || details.gamedataDir == null || details.gamedataType == null || details.instancesDir == null || details.instanceComponentType == null || details.instancesType == null || details.javaComponentType == null || details.javasDir == null || details.javasType == null || details.librariesDir == null || details.modsComponentType == null || details.modsType == null || details.optionsDir == null || details.optionsComponentType == null || details.optionsType == null || details.savesComponentType == null || details.savesType == null) {
                     throw FileLoadException("Unable to load launcher details: incorrect contents")
                 }
                 LOGGER.debug { "Loaded launcher details" }
@@ -651,6 +651,10 @@ class LauncherFiles {
         }
         LOGGER.debug { "Finished deleting unused libraries" }
         LOGGER.debug { "Finished cleaning up libraries" }
+    }
+
+    fun isComplete(): Boolean {
+        return _mainManifest != null && _launcherDetails != null && _gameDetailsManifest != null && _modsManifest != null && _modsComponents != null && _savesManifest != null && _savesComponents != null && _instanceManifest != null && _instanceComponents != null && _javaManifest != null && _javaComponents != null && _optionsManifest != null && _optionsComponents != null && _resourcepackManifest != null && _resourcepackComponents != null && _versionManifest != null && _versionComponents != null
     }
 
     companion object {

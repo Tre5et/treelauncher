@@ -109,6 +109,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var discordShowWatermark: Boolean = true
     var discordShowVersion: Boolean = true
     var discordShowInstance: Boolean = true
+    var version: String = "2.5.0"
 
     @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null

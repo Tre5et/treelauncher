@@ -201,6 +201,27 @@ launcherTask(
         throw IllegalStateException("Could not find version string in Config.kt")
     }
 
+    val settingsFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/backend/config/Settings.kt")
+    found = false
+    val settingsLines = settingsFile.readLines()
+    settingsFile.writeText(
+        settingsLines.joinToString(System.lineSeparator()) { line ->
+            val match = "(?<=var version: String = \\\")(.*)(?=\\\")".toRegex().find(line)
+            match?.let { result ->
+                found = true
+                if(result.value != version) {
+                    line.replace(result.value, version).also {
+                        println("Replaced version in Settings: ${result.value} -> $version")
+                    }
+                } else {
+                    line
+                }
+            } ?: line
+        }
+    )
+    if(!found) {
+        throw IllegalStateException("Could not find version string in Settings.kt")
+    }
 }
 
 launcherTask(
