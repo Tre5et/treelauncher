@@ -4,12 +4,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.data.DataUpgrader
+import net.treset.treelauncher.backend.data.DataPatcher
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
 @Composable
-fun DataUpgrade(
+fun DataPatcher(
     content: @Composable () -> Unit
 ) {
     var upgraded by rememberSaveable{ mutableStateOf(false) }
@@ -18,7 +18,7 @@ fun DataUpgrade(
     LaunchedEffect(Unit) {
         if(!upgraded) {
             try {
-                DataUpgrader(
+                DataPatcher(
                     strings().launcher.version(),
                     appSettings().version,
                 ).performUpgrade { _ -> }

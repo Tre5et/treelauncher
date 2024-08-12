@@ -38,7 +38,7 @@ import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.*
-import net.treset.treelauncher.util.DataUpgrade
+import net.treset.treelauncher.util.DataPatcher
 import net.treset.treelauncher.util.FixFiles
 import net.treset.treelauncher.util.News
 import java.io.IOException
@@ -180,7 +180,7 @@ fun App(
                     MaterialTheme.typography.bodyMedium
                 ) {
                     Scaffold {
-                        DataUpgrade {
+                        DataPatcher {
                             Column(
                                 Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally

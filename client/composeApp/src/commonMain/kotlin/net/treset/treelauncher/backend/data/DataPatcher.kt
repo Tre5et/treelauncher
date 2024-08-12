@@ -7,7 +7,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
-class DataUpgrader(
+class DataPatcher(
     currentVersion: String,
     previousVersion: String
 ) {
