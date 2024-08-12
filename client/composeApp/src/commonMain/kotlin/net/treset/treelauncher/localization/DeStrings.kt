@@ -489,6 +489,7 @@ class DeStrings : Strings(
             success = { "Dateipfad geändert" },
             title = { "Launcher Dateipfad"}
         ),
+        resetWindow = { "Fenstergröße und -position zurücksetzen" },
         source = { "Quellcode Repository" },
         sourceTooltip = { "Quellcode Repository öffnen" },
         sync = Settings.Sync(

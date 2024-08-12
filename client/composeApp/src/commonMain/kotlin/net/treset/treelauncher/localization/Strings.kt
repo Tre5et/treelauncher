@@ -632,6 +632,7 @@ open class Strings(
         val language: () -> String = { "Language:" },
         val logout: () -> String = { "Logout" },
         val path: Path = Path(),
+        val resetWindow: () -> String = { "Reset Window Position and Size" },
         val source: () -> String = { "Source Repository" },
         val sourceTooltip: () -> String = { "Open Source Repository" },
         val sync: Sync = Sync(),

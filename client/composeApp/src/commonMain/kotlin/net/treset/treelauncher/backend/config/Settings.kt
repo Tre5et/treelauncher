@@ -1,6 +1,7 @@
 package net.treset.treelauncher.backend.config
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import com.google.gson.annotations.SerializedName
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.GenericJsonParsable
@@ -47,6 +48,14 @@ enum class ComponentManifestSortType(val comparator: Comparator<ComponentManifes
         return comparator.toString()
     }
 }
+
+data class Window(
+    val x: Dp,
+    val y: Dp,
+    val width: Dp,
+    val height: Dp,
+    val isMaximized: Boolean
+)
 
 
 class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
@@ -109,6 +118,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var discordShowWatermark: Boolean = true
     var discordShowVersion: Boolean = true
     var discordShowInstance: Boolean = true
+    var window: Window? = null
     var version: String = "2.5.0"
 
     @SerializedName("is_debug")

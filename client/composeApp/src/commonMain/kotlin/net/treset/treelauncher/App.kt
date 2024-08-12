@@ -60,6 +60,7 @@ data class AppContextData(
     val severeError: (Exception) -> Unit,
     val silentError: (Exception) -> Unit,
     val errorIfOnline: (Exception) -> Unit,
+    val resetWindowSize: () -> Unit,
     val discord: DiscordIntegration
 )
 
@@ -162,6 +163,7 @@ fun App(
                     AppContext.error(it)
                 }
             },
+            resetWindowSize = ::resetWindow,
             discord = discord
         )
     }
@@ -353,3 +355,5 @@ internal data class NotificationBannerData(
 private val LOGGER = KotlinLogging.logger {  }
 
 expect fun getUpdaterProcess(updaterArgs: String): ProcessBuilder
+
+expect fun resetWindow()
