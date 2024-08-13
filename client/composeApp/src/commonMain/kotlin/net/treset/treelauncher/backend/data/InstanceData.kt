@@ -97,9 +97,6 @@ class InstanceData(
             } ?: LauncherFile.ofData(files.launcherDetails.assetsDir)
 
             val gameDataExcludedFiles: ArrayList<PatternString> = ArrayList()
-            files.gameDetailsManifest.components.forEach {
-                gameDataExcludedFiles.add(PatternString(it))
-            }
             gameDataExcludedFiles.add(PatternString(files.modsManifest.prefix + ".*"))
             gameDataExcludedFiles.add(PatternString(files.savesManifest.prefix + ".*"))
 
@@ -107,7 +104,7 @@ class InstanceData(
                 files.launcherDetails,
                 LauncherFile.of(
                     files.mainManifest.directory,
-                    files.mainManifest.details!!
+                    files.mainManifest.details
                 ),
                 instance,
                 versionComponents,

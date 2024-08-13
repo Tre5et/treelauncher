@@ -10,26 +10,23 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 import java.util.*
 
-class LauncherFiles {
+open class LauncherFiles {
     private var _mainManifest: MainManifest? = null
     val mainManifest: MainManifest
         get() = _mainManifest!!
     private var _launcherDetails: LauncherDetails? = null
     val launcherDetails: LauncherDetails
         get() = _launcherDetails!!
-    private var _gameDetailsManifest: ParentManifest? = null
-    val gameDetailsManifest: ParentManifest
-        get() = _gameDetailsManifest!!
-    private var _modsManifest: ParentManifest? = null
+    protected var _modsManifest: ParentManifest? = null
     val modsManifest: ParentManifest
         get() = _modsManifest!!
-    private var _modsComponents: Array<Pair<ComponentManifest, LauncherModsDetails>>? = null
+    protected var _modsComponents: Array<Pair<ComponentManifest, LauncherModsDetails>>? = null
     val modsComponents: Array<Pair<ComponentManifest, LauncherModsDetails>>
         get() = _modsComponents!!
-    private var _savesManifest: ParentManifest? = null
+    protected var _savesManifest: ParentManifest? = null
     val savesManifest: ParentManifest
         get() = _savesManifest!!
-    private var _savesComponents: Array<ComponentManifest>? = null
+    protected var _savesComponents: Array<ComponentManifest>? = null
     val savesComponents: Array<ComponentManifest>
         get() = _savesComponents!!
     private var _instanceManifest: ParentManifest? = null
@@ -73,7 +70,6 @@ class LauncherFiles {
     fun reloadAll() {
         reloadMainManifest()
         reloadLauncherDetails()
-        reloadGameDetailsManifest()
         reloadModsManifest()
         reloadModsComponents()
         reloadSavesManifest()
@@ -132,28 +128,20 @@ class LauncherFiles {
         }?: throw FileLoadException("Unable to load launcher details: invalid main file")
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadGameDetailsManifest() {
-        _gameDetailsManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load game details manifest: invalid configuration")),
-            LauncherManifestType.GAME
-        )
-    }
 
     @Throws(FileLoadException::class)
-    fun reloadModsManifest() {
+    open fun reloadModsManifest() {
         _modsManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods manifest: invalid configuration")),
-            _gameDetailsManifest?.components?.get(0)?: throw FileLoadException("Unable to load mods manifest: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.modsDir ?: throw FileLoadException("Unable to load mods manifest: invalid configuration")),
             LauncherManifestType.MODS
         )
     }
 
     @Throws(FileLoadException::class)
-    fun reloadModsComponents() {
+    open fun reloadModsComponents() {
         _modsComponents = reloadComponents(
             _modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
+            LauncherFile.ofData(_launcherDetails?.modsDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
             LauncherManifestType.MODS_COMPONENT,
             LauncherModsDetails::fromJson,
             {
@@ -170,19 +158,18 @@ class LauncherFiles {
     }
 
     @Throws(FileLoadException::class)
-    fun reloadSavesManifest() {
+    open fun reloadSavesManifest() {
         _savesManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration")),
-            _gameDetailsManifest?.components?.get(1)?: throw FileLoadException("Unable to load saves manifest: invalid configuration"),
+            LauncherFile.ofData(_launcherDetails?.savesDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration")),
             LauncherManifestType.SAVES
         )
     }
 
     @Throws(FileLoadException::class)
-    fun reloadSavesComponents() {
+    open fun reloadSavesComponents() {
         _savesComponents = reloadComponents(
             _savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration")),
+            LauncherFile.ofData(_launcherDetails?.savesDir ?: throw FileLoadException("Unable to load saves components: invalid configuration")),
             LauncherManifestType.SAVES_COMPONENT,
             LauncherFile.ofData(
                 _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration"),
@@ -333,7 +320,7 @@ class LauncherFiles {
             throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: json error", e)
         }
         if (out.type != expectedType) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: incorrect contents")
+            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: incorrect type: type=${out.type}")
         }
         out.directory = path.absolutePath
         LOGGER.debug { "Loaded " + expectedType.name.lowercase(Locale.getDefault()) + " manifest" }

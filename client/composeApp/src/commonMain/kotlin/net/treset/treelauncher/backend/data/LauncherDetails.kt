@@ -17,6 +17,7 @@ class LauncherDetails(
     var javasType: String,
     var librariesDir: String,
     var modsComponentType: String,
+    modsDir: String,
     var modsType: String,
     var optionsComponentType: String,
     var optionsDir: String,
@@ -25,11 +26,22 @@ class LauncherDetails(
     var resourcepacksDir: String,
     var resourcepacksType: String,
     var savesComponentType: String,
+    savesDir: String,
     var savesType: String,
     var versionComponentType: String,
     var versionDir: String,
     var versionType: String
 ) : GenericJsonParsable() {
+    val modsDir: String = modsDir
+        get() {
+            return field ?: "mods_data"
+        }
+
+    val savesDir: String = savesDir
+        get() {
+            return field ?: "saves_data"
+        }
+
     val typeConversion: Map<String, LauncherManifestType>
         get() {
             val typeConversion: MutableMap<String, LauncherManifestType> = HashMap()

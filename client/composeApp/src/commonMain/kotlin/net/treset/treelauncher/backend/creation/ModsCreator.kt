@@ -14,7 +14,6 @@ import java.io.IOException
 class ModsCreator : GenericComponentCreator {
     private val types: List<String>?
     private val versions: List<String>?
-    private var gameManifest: ParentManifest? = null
 
     constructor(
         name: String?,
@@ -22,7 +21,6 @@ class ModsCreator : GenericComponentCreator {
         componentsManifest: ParentManifest,
         types: List<String>?,
         versions: List<String>?,
-        gameManifest: ParentManifest?
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
         null,
@@ -35,7 +33,6 @@ class ModsCreator : GenericComponentCreator {
     ) {
         this.types = types
         this.versions = versions
-        this.gameManifest = gameManifest
         this.defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
 
@@ -43,7 +40,6 @@ class ModsCreator : GenericComponentCreator {
         name: String?,
         inheritsFrom: Pair<ComponentManifest?, LauncherModsDetails?>,
         componentsManifest: ParentManifest,
-        gameManifest: ParentManifest?
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
         null,
@@ -56,7 +52,6 @@ class ModsCreator : GenericComponentCreator {
     ) {
         types = null
         versions = null
-        this.gameManifest = gameManifest
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
 
@@ -92,9 +87,6 @@ class ModsCreator : GenericComponentCreator {
         attemptCleanup()
         throw ComponentCreationException("Failed to create mods component: invalid data")
     }
-
-    override val parentManifestFileName: String
-        get() = gameManifest?.components?.get(0)?: super.parentManifestFileName
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}

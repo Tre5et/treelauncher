@@ -100,16 +100,14 @@ fun Saves() {
                     SavesCreator(
                         state.name,
                         AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.savesManifest,
-                        AppContext.files.gameDetailsManifest
+                        AppContext.files.savesManifest
                     )
                 }
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     SavesCreator(
                         state.name,
                         state.existing,
-                        AppContext.files.savesManifest,
-                        AppContext.files.gameDetailsManifest
+                        AppContext.files.savesManifest
                     )
                 }}
                 CreationMode.USE -> null

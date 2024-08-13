@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.data.DataPatcher
+import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 

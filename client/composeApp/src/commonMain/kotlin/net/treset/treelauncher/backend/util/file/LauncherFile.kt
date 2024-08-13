@@ -13,7 +13,6 @@ import java.nio.file.Path
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import java.util.function.Function
 import kotlin.io.path.isDirectory
 
 class LauncherFile(pathname: String) : File(pathname) {
@@ -23,7 +22,6 @@ class LauncherFile(pathname: String) : File(pathname) {
         return Files.readAllBytes(toPath())
     }
 
-    @Suppress("CheckedExceptionsKotlin")
     @Throws(IOException::class)
     fun readString(): String {
         return String(read())
@@ -34,13 +32,29 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, vararg options: CopyOption?) {
+    fun copyTo(dst: LauncherFile, vararg options: CopyOption) {
         copyTo(dst, { true }, *options)
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, copyChecker: Function<String?, Boolean>, vararg options: CopyOption?) {
+    fun copyTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption) {
+        moveOrCopy(dst, copyChecker, false, *options)
+    }
+
+    @Throws(IOException::class)
+    fun moveTo(dst: LauncherFile, vararg options: CopyOption) {
+        moveTo(dst, { true }, *options)
+    }
+
+    @Throws(IOException::class)
+    fun moveTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption) {
+        moveOrCopy(dst, copyChecker, true, *options)
+    }
+
+    @Throws(IOException::class)
+    private fun moveOrCopy(dst: LauncherFile, copyChecker: (String) -> Boolean, move: Boolean, vararg options: CopyOption) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
+        Files.createDirectories(dst.parentFile.toPath())
         if (isDirectory()) {
             dst.createDir()
             try {
@@ -48,7 +62,7 @@ class LauncherFile(pathname: String) : File(pathname) {
                     val exceptions: MutableList<IOException> = ArrayList()
                     val sourceLength = path.length
                     stream.forEach { src: Path ->
-                        if (!copyChecker.apply(src.fileName.toString()) || src.toString() == absolutePath) {
+                        if (!copyChecker(src.fileName.toString()) || src.toString() == absolutePath) {
                             return@forEach
                         }
                         val destinationF = of(dst.path, src.toString().substring(sourceLength))
@@ -74,11 +88,9 @@ class LauncherFile(pathname: String) : File(pathname) {
         } else {
             Files.copy(toPath(), dst.toPath(), *options)
         }
-    }
-
-    @Throws(IOException::class)
-    fun moveTo(dst: File, vararg options: CopyOption?) {
-        Files.move(toPath(), dst.toPath(), *options)
+        if(move) {
+            remove()
+        }
     }
 
     @Throws(IOException::class)

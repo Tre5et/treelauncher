@@ -7,13 +7,10 @@ import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 
 class SavesCreator : GenericComponentCreator {
-    private var gameManifest: ParentManifest? = null
-
     constructor(
         name: String,
         typeConversion: Map<String, LauncherManifestType>,
-        componentsManifest: ParentManifest,
-        gameManifest: ParentManifest
+        componentsManifest: ParentManifest
     ) : super(
         LauncherManifestType.SAVES_COMPONENT,
         null,
@@ -24,7 +21,6 @@ class SavesCreator : GenericComponentCreator {
         null,
         componentsManifest
     ) {
-        this.gameManifest = gameManifest
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.SAVES, null)
     }
 
@@ -32,9 +28,7 @@ class SavesCreator : GenericComponentCreator {
         name: String,
         inheritsFrom: ComponentManifest,
         componentsManifest: ParentManifest,
-        gameManifest: ParentManifest
     ) : super(LauncherManifestType.SAVES_COMPONENT, null, inheritsFrom, name, null, null, null, componentsManifest) {
-        this.gameManifest = gameManifest
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.SAVES, null)
     }
 
@@ -50,7 +44,4 @@ class SavesCreator : GenericComponentCreator {
     ) {
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.SAVES, null)
     }
-
-    override val parentManifestFileName: String
-        get() = gameManifest?.components?.get(1)?: super.parentManifestFileName
 }

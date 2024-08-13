@@ -193,8 +193,7 @@ fun Create() {
                             SavesCreator(
                                 saves.name,
                                 AppContext.files.launcherDetails.typeConversion,
-                                AppContext.files.savesManifest,
-                                AppContext.files.gameDetailsManifest
+                                AppContext.files.savesManifest
                             )
                         }
 
@@ -203,7 +202,6 @@ fun Create() {
                                     saves.name,
                                     saves.existing,
                                     AppContext.files.savesManifest,
-                                    AppContext.files.gameDetailsManifest
                                 )
                             }
                         }
@@ -266,7 +264,6 @@ fun Create() {
                                             listOf(mods.type.id)
                                         },
                                         listOf(mods.version.id),
-                                        AppContext.files.gameDetailsManifest
                                     )
                                 }}}}
                                 CreationMode.INHERIT -> mods.name?.let {
@@ -275,7 +272,6 @@ fun Create() {
                                             mods.name,
                                             mods.existing,
                                             AppContext.files.modsManifest,
-                                            AppContext.files.gameDetailsManifest
                                         )
                                     }
                                 }

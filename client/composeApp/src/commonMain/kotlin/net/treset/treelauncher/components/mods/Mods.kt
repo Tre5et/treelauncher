@@ -99,7 +99,6 @@ fun Mods() {
                             listOf(state.type.id)
                         },
                         listOf(state.version.id),
-                        AppContext.files.gameDetailsManifest
                     )
                 }}}}
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
@@ -107,7 +106,6 @@ fun Mods() {
                         state.name,
                         state.existing,
                         AppContext.files.modsManifest,
-                        AppContext.files.gameDetailsManifest
                     )
                 }}
                 CreationMode.USE -> null
@@ -163,7 +161,7 @@ fun Mods() {
                     onEmptied = {
                         LauncherFile.of(
                             current.first.directory,
-                            current.first.details!!
+                            current.first.details
                         ).write(
                             current.second
                         )
@@ -403,7 +401,7 @@ fun Mods() {
 
                                                     LauncherFile.of(
                                                         current.first.directory,
-                                                        current.first.details!!
+                                                        current.first.details
                                                     ).write(current.second)
 
                                                     popupData = null

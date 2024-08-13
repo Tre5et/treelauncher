@@ -16,6 +16,11 @@ class ResourceManager(private var instanceData: InstanceData) {
 
     @Throws(GameResourceException::class)
     fun prepareResources() {
+        try {
+            instanceData.setActive(true)
+        } catch (e: IOException) {
+            throw GameResourceException("Failed to prepare resources: unable to set instance active", e)
+        }
         addIncludedFiles(
             listOf(
                 instanceData.instance.first,
@@ -26,11 +31,6 @@ class ResourceManager(private var instanceData: InstanceData) {
         )
         instanceData.modsComponent?.let { addIncludedFiles(listOf(it.first)) }
         renameComponents()
-        try {
-            instanceData.setActive(true)
-        } catch (e: IOException) {
-            throw GameResourceException("Failed to prepare resources: unable to set instance active", e)
-        }
         LOGGER.info {"Prepared resources for launch, instance=${instanceData.instance.first.id}"}
     }
 
@@ -112,7 +112,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         LOGGER.debug { "Renaming components: instance=${instanceData.instance.first.id}" }
         try {
             val savesLocation = LauncherFile.of(instanceData.gameDataDir, "saves")
-            LauncherFile.of(instanceData.savesComponent.directory).moveTo(savesLocation, StandardCopyOption.ATOMIC_MOVE)
+            LauncherFile.of(instanceData.savesComponent.directory).moveTo(savesLocation)
             instanceData.savesComponent.directory = savesLocation.path
         } catch (e: IOException) {
             throw GameResourceException("Unable to rename saves file", e)
@@ -121,7 +121,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         instanceData.modsComponent?.let { modsComponents ->
             try {
                 val modsLocation = LauncherFile.of(instanceData.gameDataDir, "mods")
-                LauncherFile.of(modsComponents.first.directory).moveTo(modsLocation, StandardCopyOption.ATOMIC_MOVE)
+                LauncherFile.of(modsComponents.first.directory).moveTo(modsLocation)
                 modsComponents.first.directory = modsLocation.path
             } catch (e: IOException) {
                 throw GameResourceException("Unable to rename mods file", e)
@@ -186,7 +186,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     @Throws(GameResourceException::class)
     private fun undoRenameComponents() {
         LOGGER.debug { "Undoing component renames: instance=${instanceData.instance.first.id}" }
-        val newSavesDir = LauncherFile.of(instanceData.gameDataDir, "${instanceData.savesPrefix}_${instanceData.savesComponent.id}")
+        val newSavesDir = LauncherFile.ofData(instanceData.launcherDetails.savesDir, "${instanceData.savesPrefix}_${instanceData.savesComponent.id}")
         try {
             LauncherFile.of(instanceData.savesComponent.directory).moveTo(newSavesDir)
             instanceData.savesComponent.directory = newSavesDir.path
@@ -195,7 +195,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         }
         instanceData.savesComponent.directory = newSavesDir.path
         instanceData.modsComponent?.let { modsComponents ->
-            val newModsDir = LauncherFile.of(instanceData.gameDataDir, "${instanceData.modsPrefix}_${modsComponents.first.id}")
+            val newModsDir = LauncherFile.ofData(instanceData.launcherDetails.modsDir, "${instanceData.modsPrefix}_${modsComponents.first.id}")
             try {
                 LauncherFile.of(modsComponents.first.directory).moveTo(newModsDir)
                 instanceData.modsComponent?.first?.directory = newModsDir.path

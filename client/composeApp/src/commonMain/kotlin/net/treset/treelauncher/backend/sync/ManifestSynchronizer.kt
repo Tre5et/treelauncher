@@ -83,11 +83,6 @@ open class ManifestSynchronizer(var manifest: ComponentManifest, protected var f
         LOGGER.debug { "Adding component to parent manifest" }
         parent.components.add(manifest.id)
         var fileName: String = appConfig().manifestFileName
-        if (manifest.type == LauncherManifestType.MODS_COMPONENT) {
-            fileName = files.gameDetailsManifest.components[0]
-        } else if (manifest.type == LauncherManifestType.SAVES_COMPONENT) {
-            fileName = files.gameDetailsManifest.components[1]
-        }
         LauncherFile.of(parent.directory, fileName).write(parent)
     }
 
