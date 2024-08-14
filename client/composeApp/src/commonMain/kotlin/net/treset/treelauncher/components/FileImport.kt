@@ -37,6 +37,7 @@ import java.io.IOException
 fun <T> FileImport(
     component: ComponentManifest,
     components: Array<ComponentManifest>,
+    fileDirectory: String,
     toFile: LauncherFile.() -> T?,
     getDisplayName: T.() -> String,
     icon: ImageVector,
@@ -139,7 +140,7 @@ fun <T> FileImport(
                     var files: List<Pair<T, LauncherFile>> by remember(component) { mutableStateOf(emptyList()) }
 
                     LaunchedEffect(component) {
-                        files = LauncherFile.of(component.directory)
+                        files = LauncherFile.of(component.directory, fileDirectory)
                             .listFiles()
                             .mapNotNull { raw ->
                                 raw.toFile()?.let { Pair(it, raw) }
@@ -396,7 +397,7 @@ fun <T> FileImport(
                     selectedFiles.forEach { file ->
                         LOGGER.debug { "Importing file: ${file.second.path}" }
 
-                        var newDir = LauncherFile.of(component.directory, file.second.name)
+                        var newDir = LauncherFile.of(component.directory, fileDirectory, file.second.name)
                         var found = false
                         for(i in 1..100) {
                             if(!newDir.exists()) {

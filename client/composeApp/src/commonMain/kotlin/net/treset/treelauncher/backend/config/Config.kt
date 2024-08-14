@@ -13,7 +13,7 @@ class Config(baseDir: String, val updateUrl: String?) {
     val settingsFile: LauncherFile = LauncherFile.of(".launcher", "settings.json")
     val manifestFileName = "manifest.json"
     val nativesDirName = "natives"
-    val includedFilesDirName = ".included_files"
+    val includedFilesBackupDir = ".included_files.bak"
     val instanceDefaultFeatures: Array<LauncherFeature> = arrayOf()
     val instanceDefaultIncludedFiles: Array<PatternString> = arrayOf()
     val instanceDefaultIgnoredFiles: Array<PatternString> = arrayOf()
@@ -24,6 +24,7 @@ class Config(baseDir: String, val updateUrl: String?) {
         "usercache.json"
     )
     val modsDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+        "mods/",
         ".fabric/",
         "config/",
         "schematics/",
@@ -41,19 +42,18 @@ class Config(baseDir: String, val updateUrl: String?) {
     )
     val modsDefaultDetails = "mods.json"
     val savesDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+            "saves/",
             "servers.dat",
             "realms_persistence.json",
             "stats/",
             "backups/",
         )
     val resourcepacksDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+            "resourcepacks/",
             "texturepacks/"
         )
     val versionsDefaultDetails = "version.json"
-    val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf(
-        LauncherLaunchArgument("--resourcePackDir"),
-        LauncherLaunchArgument("\${resourcepack_directory}")
-    )
+    val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val minecraftDefaultFileName = "client.jar"
     val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf(
         LauncherLaunchArgument("-Djava.library.path=\${natives_directory}"),

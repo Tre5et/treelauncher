@@ -197,6 +197,10 @@ class LauncherFile(pathname: String) : File(pathname) {
         return if(isDirectory()) { "${name}/" } else { name }
     }
 
+    fun existsOrNull(): LauncherFile? {
+        return if(exists()) this else null
+    }
+
     companion object {
         val LOGGER = KotlinLogging.logger {  }
 

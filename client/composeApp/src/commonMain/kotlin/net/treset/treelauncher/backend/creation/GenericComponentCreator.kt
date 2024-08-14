@@ -171,13 +171,6 @@ abstract class GenericComponentCreator(
                         e
                     )
                 }
-                if (it.includedFiles.isNotEmpty()) {
-                    try {
-                        LauncherFile.of(it.directory, appConfig().includedFilesDirName).createDir()
-                    } catch (e: IOException) {
-                        throw ComponentCreationException("Unable to write manifest: unable to create included files directory: id=${it.id}, path=${it.directory}/${appConfig().includedFilesDirName}")
-                    }
-                }
                 LOGGER.debug {
                     "Wrote manifest: path=${it.directory}/${appConfig().manifestFileName}"
                 }

@@ -180,7 +180,7 @@ fun Mods() {
                     current.second.versions!!,
                     types,
                     providers.filter { it.second }.map { it.first },
-                    LauncherFile.of(current.first.directory)
+                    LauncherFile.of(current.first.directory, "mods")
                 ) { element ->
                     updateQueue.add(element)
                 }

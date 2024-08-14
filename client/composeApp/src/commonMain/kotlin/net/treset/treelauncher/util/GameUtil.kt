@@ -3,7 +3,6 @@ package net.treset.treelauncher.util
 import androidx.compose.material3.MaterialTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.exception.GameLaunchException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -164,7 +163,7 @@ class GameLaunchHelper(
                         content = { Text(strings().selector.instance.game.crashClose()) }
                     )
                     Button(
-                        onClick = { LauncherFile.of(launcher.instance.instance.first.directory, appConfig().includedFilesDirName, "crash-reports").open() },
+                        onClick = { LauncherFile.of(launcher.instance.instance.first.directory, "crash-reports").open() },
                         content = { Text(strings().selector.instance.game.crashReports()) }
                     )
                 }

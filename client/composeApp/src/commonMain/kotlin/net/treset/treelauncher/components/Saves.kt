@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
@@ -61,17 +60,13 @@ fun Saves() {
 
     val reloadSaves = {
         selected?.let {
-            saves = LauncherFile.of(it.directory).listFiles()
+            saves = LauncherFile.of(it.directory, "saves").listFiles()
                 .filter { it.isDirectory }
                 .mapNotNull { file ->
                     try {
                         Save.from(file)
                     } catch (e: IOException) {
-                        if(!file.name.startsWith(appConfig().includedFilesDirName)) {
-                            Save(file.name, null, null)
-                        } else {
-                            null
-                        }
+                        Save(file.name, null, null)
                     }?.let { it to file }
                 }
                 .sortedBy { it.first.name }
@@ -137,6 +132,7 @@ fun Saves() {
                 FileImport(
                     current,
                     AppContext.files.savesComponents,
+                    "saves",
                     {
                         try {
                             Save.from(this)

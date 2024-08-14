@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
 import net.treset.treelauncher.backend.data.manifest.ComponentManifest
@@ -45,16 +44,12 @@ fun Resourcepacks() {
 
     val reloadResourcepacks = {
         selected?.let { current ->
-            resourcepacks = LauncherFile.of(current.directory).listFiles()
+            resourcepacks = LauncherFile.of(current.directory, "resourcepacks").listFiles()
                 .mapNotNull { file ->
                     try {
                         Resourcepack.from(file)
                     } catch (e: Exception) {
-                        if(!file.name.startsWith(appConfig().includedFilesDirName) && !file.name.startsWith(appConfig().manifestFileName)) {
-                            Resourcepack(file.name, null, null)
-                        } else {
-                            null
-                        }
+                        Resourcepack(file.name, null, null)
                     }?.let { it to file }
                 }
         }
@@ -114,6 +109,7 @@ fun Resourcepacks() {
                 FileImport(
                     current,
                     AppContext.files.resourcepackComponents,
+                    "resourcepacks",
                     {
                         try {
                             Resourcepack.from(this)

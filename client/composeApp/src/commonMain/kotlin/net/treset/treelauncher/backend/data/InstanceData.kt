@@ -5,7 +5,6 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class InstanceData(
@@ -20,10 +19,7 @@ class InstanceData(
     var modsComponent: Pair<ComponentManifest, LauncherModsDetails>?,
     var gameDataDir: LauncherFile,
     var assetsDir: LauncherFile,
-    var librariesDir: LauncherFile,
-    var modsPrefix: String,
-    var savesPrefix: String,
-    var gameDataExcludedFiles: Array<PatternString>
+    var librariesDir: LauncherFile
 ) {
     @Throws(FileLoadException::class)
     fun reloadVersionComponent(files: LauncherFiles) {
@@ -96,10 +92,6 @@ class InstanceData(
                 LauncherFile.ofData(files.launcherDetails.assetsDir, it)
             } ?: LauncherFile.ofData(files.launcherDetails.assetsDir)
 
-            val gameDataExcludedFiles: ArrayList<PatternString> = ArrayList()
-            gameDataExcludedFiles.add(PatternString(files.modsManifest.prefix + ".*"))
-            gameDataExcludedFiles.add(PatternString(files.savesManifest.prefix + ".*"))
-
             return InstanceData(
                 files.launcherDetails,
                 LauncherFile.of(
@@ -115,10 +107,7 @@ class InstanceData(
                 getModsComponent(instance, files),
                 LauncherFile.ofData(files.launcherDetails.gamedataDir),
                 assetsDir,
-                LauncherFile.ofData(files.launcherDetails.librariesDir),
-                files.modsManifest.prefix,
-                files.savesManifest.prefix,
-                gameDataExcludedFiles.toTypedArray()
+                LauncherFile.ofData(files.launcherDetails.librariesDir)
             )
         }
 

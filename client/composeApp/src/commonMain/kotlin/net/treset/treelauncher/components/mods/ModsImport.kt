@@ -256,7 +256,7 @@ fun ModsImport(
                         val file = orgMod.second
                         LOGGER.debug { "Importing mod: ${file.path}" }
 
-                        var newFile = LauncherFile.of(component.first.directory, file.name)
+                        var newFile = LauncherFile.of(component.first.directory, "mods", file.name)
                         var found = false
                         for (i in 1..100) {
                             if (!newFile.exists()) {

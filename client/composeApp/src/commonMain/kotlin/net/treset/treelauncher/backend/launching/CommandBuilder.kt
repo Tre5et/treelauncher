@@ -270,10 +270,6 @@ class CommandBuilder(
                 context.gameDataDir
             }
 
-            "resourcepack_directory" -> {
-                context.resourcepacksDir
-            }
-
             "assets_root" -> {
                 context.assetsDir
             }
