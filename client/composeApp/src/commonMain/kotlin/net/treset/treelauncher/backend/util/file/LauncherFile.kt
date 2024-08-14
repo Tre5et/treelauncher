@@ -10,6 +10,7 @@ import java.math.BigInteger
 import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
@@ -91,6 +92,13 @@ class LauncherFile(pathname: String) : File(pathname) {
         if(move) {
             remove()
         }
+    }
+
+    @Throws(IOException::class)
+    fun atomicMoveTo(dst: LauncherFile, vararg options: CopyOption) {
+        if (!exists()) throw IOException("File does not exist: $absolutePath")
+        Files.createDirectories(dst.parentFile.toPath())
+        Files.move(toPath(), dst.toPath(), StandardCopyOption.ATOMIC_MOVE, *options)
     }
 
     @Throws(IOException::class)

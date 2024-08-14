@@ -166,8 +166,7 @@ class DataPatcher(
         }
         dir.remove()
 
-        LauncherFile.of(component.directory, ".included_files_old").existsOrNull()
-            ?.moveTo(LauncherFile.of(component.directory, appConfig().includedFilesBackupDir))
+        LauncherFile.of(component.directory, ".included_files_old").existsOrNull()?.remove()
         LOGGER.info { "Upgraded included files for ${component.type}: ${component.id}" }
     }
 

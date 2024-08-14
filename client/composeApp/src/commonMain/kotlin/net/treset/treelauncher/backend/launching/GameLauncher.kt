@@ -151,7 +151,7 @@ class GameLauncher(
         }
     }
 
-    private fun cleanupResources(playDuration: Long, error: String?, mergeFiles: Boolean = false) {
+    private fun cleanupResources(playDuration: Long, error: String?) {
         LOGGER.info { "Cleaning up resources" }
         onExit(error)
         try {
@@ -161,12 +161,12 @@ class GameLauncher(
         }
 
         try {
-            resourceManager?.cleanupGameFiles(mergeFiles)
+            resourceManager?.cleanupGameFiles()
             onExited(error)
         } catch (e: GameResourceException) {
             onResourceCleanupFailed(e) { retry ->
                 if(retry) {
-                    cleanupResources(playDuration, error, true)
+                    cleanupResources(playDuration, error)
                 } else {
                     onExited(error)
                 }
