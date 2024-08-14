@@ -435,6 +435,8 @@ open class Strings(
 
         data class Resourcepacks(
             val delete: () -> String = { "Delete Resourcepack" },
+            val deleteTexturepack: () -> String = { "Delete Texturepack" },
+            val deleteTexturepackTitle: () -> String = { "You are about to delete this texturepack!" },
             val deleteTitle: () -> String = { "You are about to delete this resourcepack!" },
             val deleteMessage: () -> String = { "This action cannot be undone!" },
             val deleteConfirm: () -> String = { "Yes, delete" },
@@ -600,6 +602,8 @@ open class Strings(
         data class Resourcepacks(
             val empty: () -> Pair<String, String> = { "Drag and Drop Resourcepacks here or click the" to "at the top to import some." },
             val emptyTitle: () -> String = { "No Resourcepacks added yet." },
+            val resourcepacks: () -> String = { "Resourcepacks:" },
+            val texturepacks: () -> String = { "Texturepacks:" },
             val title: () -> String = { "Resourcepacks" }
         )
 

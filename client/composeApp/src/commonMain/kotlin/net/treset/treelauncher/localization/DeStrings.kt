@@ -281,7 +281,9 @@ class DeStrings : Strings(
         ),
         resourcepacks = Manager.Resourcepacks(
             delete = { "Ressourcenpaket löschen" },
-            deleteTitle = { "Die Ressourcenpaket wirklich löschen?" },
+            deleteTexturepack = { "Texturenpaket löschen" },
+            deleteTexturepackTitle = { "Das Texturenpaket wirklich löschen?" },
+            deleteTitle = { "Das Ressourcenpaket wirklich löschen?" },
             deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden." },
             deleteConfirm = { "Ja, löschen" },
             deleteCancel = { "Abbrechen" },

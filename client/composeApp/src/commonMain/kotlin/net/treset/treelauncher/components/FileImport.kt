@@ -37,7 +37,42 @@ import java.io.IOException
 fun <T> FileImport(
     component: ComponentManifest,
     components: Array<ComponentManifest>,
-    fileDirectory: String,
+    directoryName: String,
+    toFile: LauncherFile.() -> T?,
+    getDisplayName: T.() -> String,
+    icon: ImageVector,
+    stringPackage: Strings.Manager.Component.ImportStrings,
+    allowFilePicker: Boolean = true,
+    allowDirectoryPicker: Boolean = false,
+    fileExtensions: List<String> = listOf(),
+    filesToAdd: List<LauncherFile> = emptyList(),
+    clearFilesToAdd: () -> Unit = {},
+    close: () -> Unit
+) {
+    FileImport(
+        component = component,
+        components = components,
+        directoryNames = arrayOf(directoryName),
+        getDirectoryName = { 0 },
+        toFile = toFile,
+        getDisplayName = getDisplayName,
+        icon = icon,
+        stringPackage = stringPackage,
+        allowFilePicker = allowFilePicker,
+        allowDirectoryPicker = allowDirectoryPicker,
+        fileExtensions = fileExtensions,
+        filesToAdd = filesToAdd,
+        clearFilesToAdd = clearFilesToAdd,
+        close = close
+    )
+}
+
+@Composable
+fun <T> FileImport(
+    component: ComponentManifest,
+    components: Array<ComponentManifest>,
+    directoryNames: Array<String>,
+    getDirectoryName: T?.() -> Int,
     toFile: LauncherFile.() -> T?,
     getDisplayName: T.() -> String,
     icon: ImageVector,
@@ -140,11 +175,18 @@ fun <T> FileImport(
                     var files: List<Pair<T, LauncherFile>> by remember(component) { mutableStateOf(emptyList()) }
 
                     LaunchedEffect(component) {
-                        files = LauncherFile.of(component.directory, fileDirectory)
-                            .listFiles()
-                            .mapNotNull { raw ->
-                                raw.toFile()?.let { Pair(it, raw) }
-                            }
+                        val mutableFiles: MutableList<Pair<T, LauncherFile>> = mutableListOf()
+                        for(directoryName in directoryNames) {
+                            LauncherFile.of(component.directory, directoryName)
+                                .listFiles()
+                                .mapNotNull { raw ->
+                                    raw.toFile()?.let { Pair(it, raw) }
+                                }
+                                .forEach {
+                                    mutableFiles += it
+                                }
+                        }
+                        files = mutableFiles.toList()
                     }
 
                     if(files.isNotEmpty()) {
@@ -397,7 +439,7 @@ fun <T> FileImport(
                     selectedFiles.forEach { file ->
                         LOGGER.debug { "Importing file: ${file.second.path}" }
 
-                        var newDir = LauncherFile.of(component.directory, fileDirectory, file.second.name)
+                        var newDir = LauncherFile.of(component.directory, directoryNames[file.first.getDirectoryName()], file.second.name)
                         var found = false
                         for(i in 1..100) {
                             if(!newDir.exists()) {

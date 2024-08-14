@@ -24,7 +24,8 @@ class DataPatcher(
         UPGRADE_GAME_DATA_COMPONENTS,
         UPGRADE_INCLUDED_FILES,
         REMOVE_RESOURCEPACKS_ARGUMENT,
-        ADD_NEW_INCLUDED_FILES
+        ADD_NEW_INCLUDED_FILES,
+        TEXTUREPACKS_INCLUDED_FILES
     }
 
     private class UpgradeFunction(
@@ -43,6 +44,7 @@ class DataPatcher(
         UpgradeFunction(this::upgradeIncludedFiles) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
         UpgradeFunction(this::addNewIncludedFilesToManifest) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
         UpgradeFunction(this::removeResourcepacksDirGameArguments) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
+        UpgradeFunction(this::upgradeTexturePacksIncludedFiles) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
         UpgradeFunction(this::removeBackupExcludedFiles) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
         UpgradeFunction(this::upgradeSettings) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) }
     )
@@ -171,6 +173,22 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
+    fun upgradeTexturePacksIncludedFiles(onStep: (UpgradeStep) -> Unit) {
+        LOGGER.info { "Upgrading texturepacks included files..." }
+        onStep(UpgradeStep.TEXTUREPACKS_INCLUDED_FILES)
+        val files = LauncherFiles()
+        files.reloadAll()
+
+        for(resourcepacks in files.resourcepackComponents) {
+            if(!resourcepacks.includedFiles.contains("texturepacks/")) {
+                resourcepacks.includedFiles += "texturepacks/"
+                LauncherFile.of(resourcepacks.directory, appConfig().manifestFileName).write(resourcepacks)
+            }
+        }
+        LOGGER.info { "Upgraded texturepacks included files" }
+    }
+
+    @Throws(IOException::class)
     fun removeResourcepacksDirGameArguments(onStep: (UpgradeStep) -> Unit) {
         LOGGER.info { "Removing resourcepacks directory game arguments..." }
         onStep(UpgradeStep.REMOVE_RESOURCEPACKS_ARGUMENT)
@@ -193,17 +211,17 @@ class DataPatcher(
         files.reloadAll()
 
         for(saves in files.savesComponents) {
-            saves.includedFiles = saves.includedFiles.plus("saves/")
+            saves.includedFiles += "saves/"
             LauncherFile.of(saves.directory, appConfig().manifestFileName).write(saves)
         }
 
         for(resourcepacks in files.resourcepackComponents) {
-            resourcepacks.includedFiles = resourcepacks.includedFiles.plus("resourcepacks/")
+            resourcepacks.includedFiles += "resourcepacks/"
             LauncherFile.of(resourcepacks.directory, appConfig().manifestFileName).write(resourcepacks)
         }
 
         for(mods in files.modsComponents) {
-            mods.first.includedFiles = mods.first.includedFiles.plus("mods/")
+            mods.first.includedFiles += "mods/"
             LauncherFile.of(mods.first.directory, appConfig().manifestFileName).write(mods.first)
         }
     }

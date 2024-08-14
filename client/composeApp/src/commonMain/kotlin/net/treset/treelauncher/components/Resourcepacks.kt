@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.resoucepacks.Resourcepack
+import net.treset.mc_version_loader.resoucepacks.Texturepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
@@ -35,6 +36,7 @@ fun Resourcepacks() {
     var selected: ComponentManifest? by remember { mutableStateOf(null) }
 
     var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
+    var texturepacks: List<Pair<Texturepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var loading by remember { mutableStateOf(true) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
@@ -42,7 +44,7 @@ fun Resourcepacks() {
 
     var listDisplay by remember { mutableStateOf(appSettings().resourcepacksDetailsListDisplay) }
 
-    val reloadResourcepacks = {
+    val reloadPacks = {
         selected?.let { current ->
             resourcepacks = LauncherFile.of(current.directory, "resourcepacks").listFiles()
                 .mapNotNull { file ->
@@ -50,6 +52,14 @@ fun Resourcepacks() {
                         Resourcepack.from(file)
                     } catch (e: Exception) {
                         Resourcepack(file.name, null, null)
+                    }?.let { it to file }
+                }
+            texturepacks = LauncherFile.of(current.directory, "texturepacks").listFiles()
+                .mapNotNull { file ->
+                    try {
+                        Texturepack.from(file)
+                    } catch (e: Exception) {
+                        Texturepack(file.name, null, null)
                     }?.let { it to file }
                 }
         }
@@ -98,7 +108,7 @@ fun Resourcepacks() {
         detailsContent = { current, _, _ ->
             DisposableEffect(current) {
                 selected = current
-                reloadResourcepacks()
+                reloadPacks()
 
                 onDispose {
                     selected = null
@@ -109,17 +119,20 @@ fun Resourcepacks() {
                 FileImport(
                     current,
                     AppContext.files.resourcepackComponents,
-                    "resourcepacks",
+                    arrayOf("resourcepacks", "texturepacks"),
                     {
-                        try {
-                            Resourcepack.from(this)
-                        } catch (e: IOException) {
-                            LOGGER.warn(e) { "Unable to parse imported resourcepack: ${this.name}" }
-                            null
+                        when(this) {
+                            is Texturepack -> 1
+                            else -> 0
                         }
                     },
+                    { this.toPack() },
                     {
-                        this.name
+                        when(this) {
+                            is Resourcepack -> this.name
+                            is Texturepack -> this.name
+                            else -> ""
+                        }
                     },
                     icons().resourcePacks,
                     strings().manager.resourcepacks.import,
@@ -129,10 +142,10 @@ fun Resourcepacks() {
                     clearFilesToAdd = { filesToAdd = emptyList() }
                 ) {
                     showAdd = false
-                    reloadResourcepacks()
+                    reloadPacks()
                 }
             } else {
-                if(resourcepacks.isEmpty() && !loading) {
+                if(resourcepacks.isEmpty() && texturepacks.isEmpty() && !loading) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -158,16 +171,41 @@ fun Resourcepacks() {
                         }
                     }
                 } else {
-                    resourcepacks.forEach {
-                        ResourcepackButton(
-                            it.first,
-                            display = listDisplay
-                        ) {
-                            try {
-                                it.second.remove()
-                                reloadResourcepacks()
-                            } catch (e: IOException) {
-                                AppContext.error(e)
+                    if(resourcepacks.isNotEmpty()) {
+                        Text(
+                            strings().selector.resourcepacks.resourcepacks(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        resourcepacks.forEach {
+                            ResourcepackButton(
+                                it.first,
+                                display = listDisplay
+                            ) {
+                                try {
+                                    it.second.remove()
+                                    reloadPacks()
+                                } catch (e: IOException) {
+                                    AppContext.error(e)
+                                }
+                            }
+                        }
+                    }
+                    if(texturepacks.isNotEmpty()) {
+                        Text(
+                            strings().selector.resourcepacks.texturepacks(),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        texturepacks.forEach {
+                            TexturepackButton(
+                                it.first,
+                                display = listDisplay
+                            ) {
+                                try {
+                                    it.second.remove()
+                                    reloadPacks()
+                                } catch (e: IOException) {
+                                    AppContext.error(e)
+                                }
                             }
                         }
                     }
@@ -231,6 +269,19 @@ fun Resourcepacks() {
             setReverse = { appSettings().isResourcepacksComponentSortReverse = it }
         )
     )
+}
+
+fun LauncherFile.toPack(): Any? {
+    return try {
+        Resourcepack.from(this)
+    } catch (e: IOException) {
+        try {
+            Texturepack.from(this)
+        } catch (e: IOException) {
+            LOGGER.warn(e) { "Unable to parse imported resourcepack: ${this.name}" }
+            null
+        }
+    }
 }
 
 private val LOGGER = KotlinLogging.logger {  }
