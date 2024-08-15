@@ -41,13 +41,13 @@ class DataPatcher(
     }
 
     private val upgradeMap: Array<UpgradeFunction> = arrayOf(
-        UpgradeFunction(this::moveGameDataComponents) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
-        UpgradeFunction(this::upgradeIncludedFiles) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
-        UpgradeFunction(this::addNewIncludedFilesToManifest) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
-        UpgradeFunction(this::removeResourcepacksDirGameArguments) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
-        UpgradeFunction(this::upgradeTexturePacksIncludedFiles) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
-        UpgradeFunction(this::removeBackupExcludedFiles) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) },
-        UpgradeFunction(this::upgradeSettings) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) }
+        UpgradeFunction(this::moveGameDataComponents) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
+        UpgradeFunction(this::upgradeIncludedFiles) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
+        UpgradeFunction(this::addNewIncludedFilesToManifest) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
+        UpgradeFunction(this::removeResourcepacksDirGameArguments) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
+        UpgradeFunction(this::upgradeTexturePacksIncludedFiles) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
+        UpgradeFunction(this::removeBackupExcludedFiles) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
+        UpgradeFunction(this::upgradeSettings) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) }
     )
 
     fun upgradeNeeded(): Boolean {
