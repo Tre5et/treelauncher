@@ -17,17 +17,22 @@ class DataPatcher(
     private val currVer = Version.fromString(currentVersion)
     private val prevVer = Version.fromString(previousVersion)
 
-    enum class UpgradeStep {
+    enum class PatchStep {
+        CREATE_BACKUP,
         REMOVE_BACKUP_EXCLUDED_FILES,
         UPGRADE_SETTINGS,
-        UPDATE_GAME_DATA_COMPONENTS
+        GAME_DATA_COMPONENTS,
+        GAME_DATA_INCLUDED_FILES,
+        REMOVE_RESOURCEPACKS_ARGUMENT,
+        ADD_GAME_DATA_INCLUDED_FILES,
+        TEXTUREPACKS_INCLUDED_FILES
     }
 
     private class UpgradeFunction(
-        val function: (onStep: (UpgradeStep) -> Unit) -> Unit,
+        val function: (onStep: (PatchStep) -> Unit) -> Unit,
         val condition: () -> Boolean
     ) {
-        fun execute(onStep: (UpgradeStep) -> Unit) {
+        fun execute(onStep: (PatchStep) -> Unit) {
             if(condition()) {
                 function(onStep)
             }
@@ -40,13 +45,33 @@ class DataPatcher(
         UpgradeFunction(this::upgradeSettings) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) }
     )
 
+    fun upgradeNeeded(): Boolean {
+        return currVer > prevVer
+    }
+
     @Throws(IOException::class)
-    fun performUpgrade(onStep: (UpgradeStep) -> Unit) {
+    fun backupFiles(setStep: (PatchStep) -> Unit) {
+        LOGGER.info { "Creating backup..." }
+        setStep(PatchStep.CREATE_BACKUP)
+        val dir = LauncherFile.ofData()
+        val backupDir = LauncherFile.ofData(".backup")
+        if(backupDir.exists()) {
+            backupDir.remove()
+        }
+        dir.copyTo(backupDir)
+        LOGGER.info { "Created backup" }
+    }
+
+    @Throws(IOException::class)
+    fun performUpgrade(backup: Boolean, onStep: (PatchStep) -> Unit) {
         if(currVer <= prevVer) {
             return
         }
 
         LOGGER.info { "Performing data upgrade: v${prevVer} -> v${currVer} " }
+        if(backup) {
+            backupFiles(onStep)
+        }
         for(upgrade in upgradeMap) {
             upgrade.execute(onStep)
         }
@@ -54,12 +79,12 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun moveGameDataComponents(onStep: (UpgradeStep) -> Unit) {
+    fun moveGameDataComponents(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Moving game data components..."}
+        onStep(PatchStep.GAME_DATA_COMPONENTS)
+
         val files = Pre2_5LauncherFiles()
         files.reloadAll()
-
-        onStep(UpgradeStep.UPDATE_GAME_DATA_COMPONENTS)
         val gameDataDir = LauncherFile.ofData(files.launcherDetails.gamedataDir)
 
         LOGGER.info { "Moving mods components..." }
@@ -87,19 +112,19 @@ class DataPatcher(
         LOGGER.info { "Moved saves components" }
 
         LOGGER.info { "Removing old manifest..." }
-        LauncherFile.of(files.launcherDetails.gamedataDir, appConfig().manifestFileName).remove()
+        LauncherFile.ofData(files.launcherDetails.gamedataDir, appConfig().manifestFileName).remove()
         LOGGER.info { "Removed old manifest" }
 
         LOGGER.info { "Moved game data components" }
     }
 
     @Throws(IOException::class)
-    fun removeBackupExcludedFiles(onStep: (UpgradeStep) -> Unit) {
+    fun removeBackupExcludedFiles(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Removing backup excluded files from instances..." }
+        onStep(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES)
+
         val files = LauncherFiles()
         files.reloadAll()
-
-        onStep(UpgradeStep.REMOVE_BACKUP_EXCLUDED_FILES)
         files.instanceComponents.forEach {
             it.second.ignoredFiles = it.second.ignoredFiles.filter { file ->
                 !PatternString(file, true).matches("backups/")
@@ -109,10 +134,12 @@ class DataPatcher(
         LOGGER.info { "Removed backup excluded files from instances" }
     }
 
-    fun upgradeSettings(onStep: (UpgradeStep) -> Unit) {
+    @Throws(IOException::class)
+    fun upgradeSettings(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Upgrading settings..." }
-        onStep(UpgradeStep.UPGRADE_SETTINGS)
+        onStep(PatchStep.UPGRADE_SETTINGS)
         appSettings().version = currVer.toString()
+        appSettings().save()
         LOGGER.info { "Upgraded settings" }
     }
 
