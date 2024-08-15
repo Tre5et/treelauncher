@@ -105,7 +105,7 @@ class QuiltVersionCreator(
                     throw ComponentCreationException("Unable to create quilt version: versionId=${quiltProfile.id}", e)
                 }
                 try {
-                    LauncherFile.of(newManifest!!.directory, newManifest!!.details!!).write(details)
+                    LauncherFile.of(newManifest!!.directory, newManifest!!.details).write(details)
                 } catch (e: IOException) {
                     throw ComponentCreationException("Unable to create quilt version: failed to write version details: versionId=${quiltProfile.id}", e)
                 }

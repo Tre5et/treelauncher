@@ -119,7 +119,7 @@ fun InstanceComponentChanger(
                         else -> {}
                     }
                     loadCurrent()
-                    LauncherFile.of(instance.instance.first.directory, instance.instance.first.details!!).write(instance.instance.second)
+                    LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
                     redrawSelected()
                 },
                 icon = icons().change,

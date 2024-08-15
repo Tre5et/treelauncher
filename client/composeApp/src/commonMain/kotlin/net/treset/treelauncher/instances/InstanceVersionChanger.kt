@@ -86,7 +86,7 @@ fun InstanceVersionChanger(
                             instance.instance.second.versionComponent = id
                             LauncherFile.of(
                                 instance.instance.first.directory,
-                                instance.instance.first.details!!
+                                instance.instance.first.details
                             ).write(instance.instance.second)
                             appContext.files.reloadVersionManifest()
                             appContext.files.reloadVersionComponents()

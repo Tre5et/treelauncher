@@ -1,6 +1,5 @@
 package net.treset.treelauncher.util
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import net.treset.treelauncher.AppContext
@@ -17,7 +16,7 @@ import java.io.IOException
 fun DataPatcher(
     content: @Composable () -> Unit
 ) {
-    val dataPatcher = remember { DataPatcher(strings().launcher.version(), appSettings().version,) }
+    val dataPatcher = remember { DataPatcher(strings().launcher.version(), appSettings().version) }
 
     var upgraded by rememberSaveable{ mutableStateOf(!dataPatcher.upgradeNeeded()) }
     var error by remember { mutableStateOf<Exception?>(null) }
@@ -64,10 +63,7 @@ fun DataPatcher(
                 },
                 title = strings().launcher.patch.backup()
             )
-            Text(
-                strings().launcher.patch.backupHint(),
-                style = MaterialTheme.typography.labelSmall
-            )
+            Text(strings().launcher.patch.backupHint())
         }
     }
 }

@@ -23,7 +23,7 @@ class DataPatcher(
         REMOVE_BACKUP_EXCLUDED_FILES,
         UPGRADE_SETTINGS,
         GAME_DATA_COMPONENTS,
-        GAME_DATA_INCLUDED_FILES,
+        INCLUDED_FILES,
         REMOVE_RESOURCEPACKS_ARGUMENT,
         ADD_GAME_DATA_INCLUDED_FILES,
         TEXTUREPACKS_INCLUDED_FILES
@@ -126,7 +126,7 @@ class DataPatcher(
     @Throws(IOException::class)
     fun upgradeIncludedFiles(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Upgrading included files..." }
-        onStep(PatchStep.GAME_DATA_INCLUDED_FILES)
+        onStep(PatchStep.INCLUDED_FILES)
 
         val files = LauncherFiles()
         files.reloadAll()

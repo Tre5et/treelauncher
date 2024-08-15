@@ -333,6 +333,6 @@ private fun save(
     saveArgs(instance, args, startArgs)
     LauncherFile.of(
         instance.instance.first.directory,
-        instance.instance.first.details!!
+        instance.instance.first.details
     ).write(instance.instance.second)
 }

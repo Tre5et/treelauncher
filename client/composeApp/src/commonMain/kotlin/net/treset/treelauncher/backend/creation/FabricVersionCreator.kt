@@ -111,7 +111,7 @@ class FabricVersionCreator(
                     throw ComponentCreationException("Unable to create fabric version: versionId=${fabricProfile.inheritsFrom}", e)
                 }
                 try {
-                    LauncherFile.of(newManifest!!.directory, newManifest!!.details!!).write(details)
+                    LauncherFile.of(newManifest!!.directory, newManifest!!.details).write(details)
                 } catch (e: IOException) {
                     throw ComponentCreationException("Unable to create fabric version: failed to write version details: versionId=${fabricProfile.inheritsFrom}", e)
                 }

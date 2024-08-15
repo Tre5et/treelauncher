@@ -229,7 +229,7 @@ open class Strings(
                     DataPatcher.PatchStep.REMOVE_BACKUP_EXCLUDED_FILES -> "Removing Backup from instance excluded files"
                     DataPatcher.PatchStep.UPGRADE_SETTINGS -> "Upgrading Version in Settings"
                     DataPatcher.PatchStep.GAME_DATA_COMPONENTS -> "Moving Game Data Components"
-                    DataPatcher.PatchStep.GAME_DATA_INCLUDED_FILES -> "Moving included files in Game Data Components"
+                    DataPatcher.PatchStep.INCLUDED_FILES -> "Restructuring included files"
                     DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Removing resoucepacks directory version arguments"
                     DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Adding included files to Game Data Components"
                     DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Adding texturepacks to included files"
