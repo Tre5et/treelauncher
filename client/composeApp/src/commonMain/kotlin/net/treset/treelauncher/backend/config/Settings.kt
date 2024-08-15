@@ -119,7 +119,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var discordShowVersion: Boolean = true
     var discordShowInstance: Boolean = true
     var window: Window? = null
-    var version: String = "2.5.0"
+    var version: String = "2.6.0"
 
     @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null
