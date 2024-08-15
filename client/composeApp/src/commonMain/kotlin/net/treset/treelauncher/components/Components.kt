@@ -322,7 +322,7 @@ fun <T, C:CreationState<T>> Components(
                     checkHasComponent = { details -> checkHasComponent(details, it.getManifest()) },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        componentManifest.components!!.remove(it.getManifest().id)
+                        componentManifest.components.remove(it.getManifest().id)
                         try {
                             LauncherFile.of(
                                 componentManifest.directory,

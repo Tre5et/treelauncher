@@ -70,7 +70,7 @@ class VanillaVersionCreator(
         }
         newManifest?.let {newManifest ->
             try {
-                LauncherFile.of(newManifest.directory, newManifest.details!!).write(details)
+                LauncherFile.of(newManifest.directory, newManifest.details).write(details)
             } catch (e: IOException) {
                 attemptCleanup()
                 throw ComponentCreationException("Unable to write version details to file", e)

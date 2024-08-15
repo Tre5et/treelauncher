@@ -69,7 +69,7 @@ class InstanceCreator(
             }
             setStatus(CreationStatus(CreationStatus.DownloadStep.FINISHING, null))
             try {
-                LauncherFile.of(newManifest.directory, newManifest.details!!).write(details)
+                LauncherFile.of(newManifest.directory, newManifest.details).write(details)
             } catch (e: IOException) {
                 attemptCleanup()
                 throw ComponentCreationException(
