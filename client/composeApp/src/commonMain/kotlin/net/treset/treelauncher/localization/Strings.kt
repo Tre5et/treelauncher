@@ -6,6 +6,7 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
 import java.util.*
@@ -205,6 +206,7 @@ open class Strings(
 
     data class Launcher(
         val name: () -> String = { "TreeLauncher" },
+        val patch: Patch = Patch(),
         val slug: () -> String = { "treelauncher" },
         val status: Status = Status(),
         val version: () -> String = { "2.5.0" }
@@ -212,6 +214,27 @@ open class Strings(
         data class Status(
             val preparing: (Int) -> String = { progress -> "Performing first time setup... $progress%" },
             val restartRequired: () -> String = { "Restart required. Please restart." }
+        )
+
+        data class Patch(
+            val running: () -> String = { "Upgrading data..." },
+            val message: () -> String = { "The data needs to be upgraded in order to work with this version of the launcher." },
+            val title: () -> String = { "Launcher Data needs to be upgraded" },
+            val backup: () -> String = { "Create Data Backup before upgrading" },
+            val backupHint: () -> String = { "Depending on the amount of launcher data this may take a significant amount of time and storage." },
+            val start: () -> String = { "Start Upgrade" },
+            val status: (DataPatcher.PatchStep) -> String = {
+                when(it) {
+                    DataPatcher.PatchStep.CREATE_BACKUP -> "Creating Backup"
+                    DataPatcher.PatchStep.REMOVE_BACKUP_EXCLUDED_FILES -> "Removing Backup from instance excluded files"
+                    DataPatcher.PatchStep.UPGRADE_SETTINGS -> "Upgrading Version in Settings"
+                    DataPatcher.PatchStep.GAME_DATA_COMPONENTS -> "Moving Game Data Components"
+                    DataPatcher.PatchStep.GAME_DATA_INCLUDED_FILES -> "Moving included files in Game Data Components"
+                    DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Removing resoucepacks directory version arguments"
+                    DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Adding included files to Game Data Components"
+                    DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Adding texturepacks to included files"
+                }
+            }
         )
     }
 

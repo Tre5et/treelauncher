@@ -18,21 +18,22 @@ class DataPatcher(
     private val currVer = Version.fromString(currentVersion)
     private val prevVer = Version.fromString(previousVersion)
 
-    enum class UpgradeStep {
+    enum class PatchStep {
+        CREATE_BACKUP,
         REMOVE_BACKUP_EXCLUDED_FILES,
         UPGRADE_SETTINGS,
-        UPGRADE_GAME_DATA_COMPONENTS,
-        UPGRADE_INCLUDED_FILES,
+        GAME_DATA_COMPONENTS,
+        GAME_DATA_INCLUDED_FILES,
         REMOVE_RESOURCEPACKS_ARGUMENT,
-        ADD_NEW_INCLUDED_FILES,
+        ADD_GAME_DATA_INCLUDED_FILES,
         TEXTUREPACKS_INCLUDED_FILES
     }
 
     private class UpgradeFunction(
-        val function: (onStep: (UpgradeStep) -> Unit) -> Unit,
+        val function: (onStep: (PatchStep) -> Unit) -> Unit,
         val condition: () -> Boolean
     ) {
-        fun execute(onStep: (UpgradeStep) -> Unit) {
+        fun execute(onStep: (PatchStep) -> Unit) {
             if(condition()) {
                 function(onStep)
             }
@@ -49,13 +50,33 @@ class DataPatcher(
         UpgradeFunction(this::upgradeSettings) { currVer >= Version(2, 5, 0) && prevVer < Version(2, 5, 0) }
     )
 
+    fun upgradeNeeded(): Boolean {
+        return currVer > prevVer
+    }
+
     @Throws(IOException::class)
-    fun performUpgrade(onStep: (UpgradeStep) -> Unit) {
+    fun backupFiles(setStep: (PatchStep) -> Unit) {
+        LOGGER.info { "Creating backup..." }
+        setStep(PatchStep.CREATE_BACKUP)
+        val dir = LauncherFile.ofData()
+        val backupDir = LauncherFile.ofData(".backup")
+        if(backupDir.exists()) {
+            backupDir.remove()
+        }
+        dir.copyTo(backupDir)
+        LOGGER.info { "Created backup" }
+    }
+
+    @Throws(IOException::class)
+    fun performUpgrade(backup: Boolean, onStep: (PatchStep) -> Unit) {
         if(currVer <= prevVer) {
             return
         }
 
         LOGGER.info { "Performing data upgrade: v${prevVer} -> v${currVer} " }
+        if(backup) {
+            backupFiles(onStep)
+        }
         for(upgrade in upgradeMap) {
             upgrade.execute(onStep)
         }
@@ -63,9 +84,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun moveGameDataComponents(onStep: (UpgradeStep) -> Unit) {
+    fun moveGameDataComponents(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Moving game data components..."}
-        onStep(UpgradeStep.UPGRADE_GAME_DATA_COMPONENTS)
+        onStep(PatchStep.GAME_DATA_COMPONENTS)
 
         val files = Pre2_5LauncherFiles()
         files.reloadAll()
@@ -103,9 +124,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun upgradeIncludedFiles(onStep: (UpgradeStep) -> Unit) {
+    fun upgradeIncludedFiles(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Upgrading included files..." }
-        onStep(UpgradeStep.UPGRADE_INCLUDED_FILES)
+        onStep(PatchStep.GAME_DATA_INCLUDED_FILES)
 
         val files = LauncherFiles()
         files.reloadAll()
@@ -173,9 +194,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun upgradeTexturePacksIncludedFiles(onStep: (UpgradeStep) -> Unit) {
+    fun upgradeTexturePacksIncludedFiles(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Upgrading texturepacks included files..." }
-        onStep(UpgradeStep.TEXTUREPACKS_INCLUDED_FILES)
+        onStep(PatchStep.TEXTUREPACKS_INCLUDED_FILES)
         val files = LauncherFiles()
         files.reloadAll()
 
@@ -189,9 +210,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun removeResourcepacksDirGameArguments(onStep: (UpgradeStep) -> Unit) {
+    fun removeResourcepacksDirGameArguments(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Removing resourcepacks directory game arguments..." }
-        onStep(UpgradeStep.REMOVE_RESOURCEPACKS_ARGUMENT)
+        onStep(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT)
         val files = LauncherFiles()
         files.reloadAll()
         files.versionComponents.forEach {
@@ -204,9 +225,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun addNewIncludedFilesToManifest(onStep: (UpgradeStep) -> Unit) {
+    fun addNewIncludedFilesToManifest(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Adding new included files..." }
-        onStep(UpgradeStep.ADD_NEW_INCLUDED_FILES)
+        onStep(PatchStep.ADD_GAME_DATA_INCLUDED_FILES)
         val files = LauncherFiles()
         files.reloadAll()
 
@@ -227,9 +248,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun removeBackupExcludedFiles(onStep: (UpgradeStep) -> Unit) {
+    fun removeBackupExcludedFiles(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Removing backup excluded files from instances..." }
-        onStep(UpgradeStep.REMOVE_BACKUP_EXCLUDED_FILES)
+        onStep(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES)
 
         val files = LauncherFiles()
         files.reloadAll()
@@ -243,9 +264,9 @@ class DataPatcher(
     }
 
     @Throws(IOException::class)
-    fun upgradeSettings(onStep: (UpgradeStep) -> Unit) {
+    fun upgradeSettings(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Upgrading settings..." }
-        onStep(UpgradeStep.UPGRADE_SETTINGS)
+        onStep(PatchStep.UPGRADE_SETTINGS)
         appSettings().version = currVer.toString()
         appSettings().save()
         LOGGER.info { "Upgraded settings" }
