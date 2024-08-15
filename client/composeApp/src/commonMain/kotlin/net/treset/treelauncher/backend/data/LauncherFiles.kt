@@ -149,10 +149,7 @@ open class LauncherFiles {
                 it.versions = versions
                 it.mods = mods
             },
-            LauncherFile.ofData(
-                _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration"),
-                "mods"
-            ),
+            null,
             _modsComponents?: emptyArray()
         )
     }
@@ -171,10 +168,7 @@ open class LauncherFiles {
             _savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
             LauncherFile.ofData(_launcherDetails?.savesDir ?: throw FileLoadException("Unable to load saves components: invalid configuration")),
             LauncherManifestType.SAVES_COMPONENT,
-            LauncherFile.ofData(
-                _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load saves components: invalid configuration"),
-                "saves"
-            ),
+            null,
             _savesComponents?: emptyArray()
         )
     }

@@ -32,12 +32,12 @@ class LauncherDetails(
     var versionDir: String,
     var versionType: String
 ) : GenericJsonParsable() {
-    val modsDir: String = modsDir
+    var modsDir: String = modsDir
         get() {
             return field ?: "mods_data"
         }
 
-    val savesDir: String = savesDir
+    var savesDir: String = savesDir
         get() {
             return field ?: "saves_data"
         }

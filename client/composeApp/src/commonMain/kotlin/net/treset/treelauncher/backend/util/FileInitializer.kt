@@ -20,6 +20,8 @@ class FileInitializer(directory: LauncherFile) {
             LauncherFile.of(directory, "game_data"),
             LauncherFile.of(directory, "instance_data"),
             LauncherFile.of(directory, "java_data"),
+            LauncherFile.of(directory, "mods_data"),
+            LauncherFile.of(directory, "saves_data"),
             LauncherFile.of(directory, "options_data"),
             LauncherFile.of(directory, "resourcepack_data"),
             LauncherFile.of(directory, "version_data"),
@@ -61,9 +63,8 @@ class FileInitializer(directory: LauncherFile) {
                     "versions"
                 ), "launcher.json"
             ),
-            InitializingManifest("game", "", arrayOf("mods.json", "saves.json"), "game_data", "manifest.json"),
-            InitializingManifest("mods", "mods", "game_data", "mods.json"),
-            InitializingManifest("saves", "saves", "game_data", "saves.json"),
+            InitializingManifest("mods", "mods", "mods_data", "manifest.json"),
+            InitializingManifest("saves", "saves", "saves_data", "manifest.json"),
             InitializingManifest("instances", "instance", "instance_data", "manifest.json"),
             InitializingManifest("javas", "java", "java_data", "manifest.json"),
             InitializingManifest("options", "options", "options_data", "manifest.json"),
