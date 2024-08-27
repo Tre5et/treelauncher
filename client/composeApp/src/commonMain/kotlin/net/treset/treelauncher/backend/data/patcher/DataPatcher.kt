@@ -5,6 +5,7 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.Pre2_5LauncherFiles
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.Version
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -23,8 +24,8 @@ class DataPatcher() {
     }
 
     private class UpgradeFunction(
-        val function: (onStep: (UpgradeStep) -> Unit) -> Unit,
-        val condition: () -> Boolean
+        val function: (onStep: (PatchStep) -> Unit) -> Unit,
+        val applies: () -> Boolean
     ) {
         constructor(function: (onStep: (PatchStep) -> Unit) -> Unit, vararg version: Version) : this(function, {
             version.any { appConfig().dataVersion >= it && Version.fromString(appSettings().dataVersion) < it }
@@ -39,12 +40,12 @@ class DataPatcher() {
 
     private val upgradeMap: Array<UpgradeFunction> = arrayOf(
         UpgradeFunction(this::moveGameDataComponents, Version(1,0,0)),
+        UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
         UpgradeFunction(this::upgradeIncludedFiles, Version(2,0,0)),
         UpgradeFunction(this::addNewIncludedFilesToManifest, Version(2,0,0)),
         UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0)),
         UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
         UpgradeFunction(this::upgradeSettings, Version(2,0,0)),
-        UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
         UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0))
     )
 
