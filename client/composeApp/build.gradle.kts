@@ -32,7 +32,7 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
-            implementation("net.treset:mc-version-loader:7.0.0-alpha.4")
+            implementation("net.treset:mc-version-loader:7.0.0")
             implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
             implementation("io.github.oshai:kotlin-logging:6.0.3")
@@ -199,28 +199,6 @@ launcherTask(
     )
     if(!found) {
         throw IllegalStateException("Could not find version string in Config.kt")
-    }
-
-    val settingsFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/backend/config/Settings.kt")
-    found = false
-    val settingsLines = settingsFile.readLines()
-    settingsFile.writeText(
-        settingsLines.joinToString(System.lineSeparator()) { line ->
-            val match = "(?<=var version: String = \\\")(.*)(?=\\\")".toRegex().find(line)
-            match?.let { result ->
-                found = true
-                if(result.value != version) {
-                    line.replace(result.value, version).also {
-                        println("Replaced version in Settings: ${result.value} -> $version")
-                    }
-                } else {
-                    line
-                }
-            } ?: line
-        }
-    )
-    if(!found) {
-        throw IllegalStateException("Could not find version string in Settings.kt")
     }
 }
 

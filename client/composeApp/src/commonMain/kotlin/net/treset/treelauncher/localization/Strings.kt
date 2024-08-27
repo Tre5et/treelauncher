@@ -209,7 +209,7 @@ open class Strings(
         val patch: Patch = Patch(),
         val slug: () -> String = { "treelauncher" },
         val status: Status = Status(),
-        val version: () -> String = { "2.5.0" }
+        val version: () -> String = { "2.5.1" }
     ) {
         data class Status(
             val preparing: (Int) -> String = { progress -> "Performing first time setup... $progress%" },
