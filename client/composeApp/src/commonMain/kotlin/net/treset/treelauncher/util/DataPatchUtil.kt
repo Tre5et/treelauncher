@@ -3,7 +3,6 @@ package net.treset.treelauncher.util
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupOverlay
@@ -16,7 +15,7 @@ import java.io.IOException
 fun DataPatcher(
     content: @Composable () -> Unit
 ) {
-    val dataPatcher = remember { DataPatcher(strings().launcher.version(), appSettings().version) }
+    val dataPatcher = remember { DataPatcher() }
 
     var upgraded by rememberSaveable{ mutableStateOf(!dataPatcher.upgradeNeeded()) }
     var error by remember { mutableStateOf<Exception?>(null) }
