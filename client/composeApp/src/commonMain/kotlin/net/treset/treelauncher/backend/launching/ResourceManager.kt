@@ -1,9 +1,9 @@
 package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.exception.GameResourceException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -16,6 +16,11 @@ class ResourceManager(private var instanceData: InstanceData) {
 
     @Throws(GameResourceException::class)
     fun prepareResources() {
+        try {
+            instanceData.setActive(true)
+        } catch (e: IOException) {
+            throw GameResourceException("Failed to prepare resources: unable to set instance active", e)
+        }
         addIncludedFiles(
             listOf(
                 instanceData.instance.first,
@@ -26,11 +31,6 @@ class ResourceManager(private var instanceData: InstanceData) {
         )
         instanceData.modsComponent?.let { addIncludedFiles(listOf(it.first)) }
         renameComponents()
-        try {
-            instanceData.setActive(true)
-        } catch (e: IOException) {
-            throw GameResourceException("Failed to prepare resources: unable to set instance active", e)
-        }
         LOGGER.info {"Prepared resources for launch, instance=${instanceData.instance.first.id}"}
     }
 
@@ -38,11 +38,11 @@ class ResourceManager(private var instanceData: InstanceData) {
     fun setLastPlayedTime() {
         LOGGER.debug { "Setting last played time: instance=${instanceData.instance.first.id}" }
         val time = LocalDateTime.now()
-        instanceData.instance.first.setLastUsedTime(time)
-        instanceData.savesComponent.setLastUsedTime(time)
-        instanceData.resourcepacksComponent.setLastUsedTime(time)
-        instanceData.optionsComponent.setLastUsedTime(time)
-        instanceData.modsComponent?.first?.setLastUsedTime(time)
+        instanceData.instance.first.lastUsedTime = time
+        instanceData.savesComponent.lastUsedTime = time
+        instanceData.resourcepacksComponent.lastUsedTime = time
+        instanceData.optionsComponent.lastUsedTime = time
+        instanceData.modsComponent?.first?.lastUsedTime = time
         LauncherFile.of(
             instanceData.instance.first.directory,
             appConfig().manifestFileName
@@ -82,17 +82,17 @@ class ResourceManager(private var instanceData: InstanceData) {
     }
 
     @Throws(GameResourceException::class)
-    fun cleanupGameFiles() {
+    fun cleanupGameFiles(mergeFiles: Boolean = false) {
         try {
             LOGGER.debug { "Cleaning up game files: instance=${instanceData.instance.first.id}" }
             try {
                 undoRenameComponents()
                 val gameDataFilesList = gameDataFiles
                 removeExcludedFiles(gameDataFilesList)
-                removeIncludedFiles(arrayOf(instanceData.savesComponent), gameDataFilesList)
-                instanceData.modsComponent?.let { removeIncludedFiles(arrayOf(it.first), gameDataFilesList) }
-                removeIncludedFiles(arrayOf(instanceData.optionsComponent, instanceData.resourcepacksComponent), gameDataFilesList)
-                removeRemainingFiles(gameDataFilesList)
+                removeIncludedFiles(arrayOf(instanceData.savesComponent), gameDataFilesList, mergeFiles)
+                instanceData.modsComponent?.let { removeIncludedFiles(arrayOf(it.first), gameDataFilesList, mergeFiles) }
+                removeIncludedFiles(arrayOf(instanceData.optionsComponent, instanceData.resourcepacksComponent), gameDataFilesList, mergeFiles)
+                removeIncludedFiles(instanceData.instance.first, gameDataFilesList, mergeFiles, true)
             } catch (e: GameResourceException) {
                 throw GameResourceException("Unable to cleanup game files", e)
             }
@@ -112,7 +112,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         LOGGER.debug { "Renaming components: instance=${instanceData.instance.first.id}" }
         try {
             val savesLocation = LauncherFile.of(instanceData.gameDataDir, "saves")
-            LauncherFile.of(instanceData.savesComponent.directory).moveTo(savesLocation, StandardCopyOption.ATOMIC_MOVE)
+            LauncherFile.of(instanceData.savesComponent.directory).moveTo(savesLocation)
             instanceData.savesComponent.directory = savesLocation.path
         } catch (e: IOException) {
             throw GameResourceException("Unable to rename saves file", e)
@@ -121,7 +121,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         instanceData.modsComponent?.let { modsComponents ->
             try {
                 val modsLocation = LauncherFile.of(instanceData.gameDataDir, "mods")
-                LauncherFile.of(modsComponents.first.directory).moveTo(modsLocation, StandardCopyOption.ATOMIC_MOVE)
+                LauncherFile.of(modsComponents.first.directory).moveTo(modsLocation)
                 modsComponents.first.directory = modsLocation.path
             } catch (e: IOException) {
                 throw GameResourceException("Unable to rename mods file", e)
@@ -131,7 +131,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     }
 
     @Throws(GameResourceException::class)
-    private fun addIncludedFiles(components: List<LauncherManifest>) {
+    private fun addIncludedFiles(components: List<ComponentManifest>) {
         LOGGER.debug { "Adding included files: instance=${instanceData.instance.first.id}" }
         val exceptionQueue: MutableList<GameResourceException> = mutableListOf()
         for (c in components) {
@@ -149,10 +149,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     }
 
     @Throws(GameResourceException::class)
-    private fun addIncludedFiles(manifest: LauncherManifest) {
-        if (manifest.includedFiles == null) {
-            throw GameResourceException("Unable to get included files: unmet requirements")
-        }
+    private fun addIncludedFiles(manifest: ComponentManifest) {
         val includedFilesDir: LauncherFile = LauncherFile.of(manifest.directory, appConfig().includedFilesDirName)
         if (!includedFilesDir.isDirectory()) {
             try {
@@ -163,7 +160,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         }
         val files = includedFilesDir.listFiles()
         LOGGER.debug { "Adding included files: ${manifest.type}, id=${manifest.id}, includedFiles=$files" }
-        val exceptionQueue: MutableList<IOException> = ArrayList<IOException>()
+        val exceptionQueue: MutableList<Exception> = ArrayList<Exception>()
         for (f in files) {
             LOGGER.debug { "Moving file: ${f.name}" }
             if (f.isFile() || f.isDirectory()) {
@@ -172,7 +169,7 @@ class ResourceManager(private var instanceData: InstanceData) {
                         LauncherFile.of(instanceData.gameDataDir, f.getName()),
                         StandardCopyOption.REPLACE_EXISTING
                     )
-                } catch (e: IOException) {
+                } catch (e: Exception) {
                     exceptionQueue.add(e)
                     LOGGER.warn(e) { "Unable to move included files: unable to copy file: manifestId=${manifest.id}" }
                 }
@@ -189,7 +186,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     @Throws(GameResourceException::class)
     private fun undoRenameComponents() {
         LOGGER.debug { "Undoing component renames: instance=${instanceData.instance.first.id}" }
-        val newSavesDir = LauncherFile.of(instanceData.gameDataDir, "${instanceData.savesPrefix}_${instanceData.savesComponent.id}")
+        val newSavesDir = LauncherFile.ofData(instanceData.launcherDetails.savesDir, "${instanceData.savesPrefix}_${instanceData.savesComponent.id}")
         try {
             LauncherFile.of(instanceData.savesComponent.directory).moveTo(newSavesDir)
             instanceData.savesComponent.directory = newSavesDir.path
@@ -198,7 +195,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         }
         instanceData.savesComponent.directory = newSavesDir.path
         instanceData.modsComponent?.let { modsComponents ->
-            val newModsDir = LauncherFile.of(instanceData.gameDataDir, "${instanceData.modsPrefix}_${modsComponents.first.id}")
+            val newModsDir = LauncherFile.ofData(instanceData.launcherDetails.modsDir, "${instanceData.modsPrefix}_${modsComponents.first.id}")
             try {
                 LauncherFile.of(modsComponents.first.directory).moveTo(newModsDir)
                 instanceData.modsComponent?.first?.directory = newModsDir.path
@@ -249,16 +246,16 @@ class ResourceManager(private var instanceData: InstanceData) {
     }
 
     @Throws(GameResourceException::class)
-    private fun removeIncludedFiles(components: Array<LauncherManifest>, files: MutableList<LauncherFile>) {
+    private fun removeIncludedFiles(components: Array<ComponentManifest>, files: MutableList<LauncherFile>, mergeFiles: Boolean) {
         LOGGER.debug { "Removing included files: instance=${instanceData.instance.first.id}, files=$files" }
         val exceptionQueue: MutableList<GameResourceException> = mutableListOf()
         for (component in components) {
-            if (component.includedFiles == null || component.includedFiles.isEmpty()) {
+            if (component.includedFiles.isEmpty()) {
                 LOGGER.debug { "No included files: ${component.type.name.lowercase()}, manifestId=${component.id}" }
                 continue
             }
             try {
-                removeIncludedFiles(component, files)
+                removeIncludedFiles(component, files, mergeFiles)
             } catch (e: GameResourceException) {
                 exceptionQueue.add(e)
                 LOGGER.warn(e) { "Unable to remove included files: ${component.type.name.lowercase()}, manifestId=${component.id}" }
@@ -271,7 +268,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     }
 
     @Throws(GameResourceException::class)
-    private fun removeIncludedFiles(component: LauncherManifest, files: MutableList<LauncherFile>) {
+    private fun removeIncludedFiles(component: ComponentManifest, files: MutableList<LauncherFile>, mergeFiles: Boolean, allFiles: Boolean = false) {
         LOGGER.debug { "Removing included files: ${component.type.name.lowercase()}, id=${component.id}, includedFiles=${component.includedFiles}, files=$files" }
         val includedFilesDir: LauncherFile =
             LauncherFile.of(component.directory, appConfig().includedFilesDirName)
@@ -282,7 +279,11 @@ class ResourceManager(private var instanceData: InstanceData) {
                 if (oldIncludedFilesDir.exists()) {
                     oldIncludedFilesDir.remove()
                 }
-                includedFilesDir.moveTo(oldIncludedFilesDir, StandardCopyOption.REPLACE_EXISTING)
+                if(mergeFiles) {
+                    includedFilesDir.copyTo(oldIncludedFilesDir, StandardCopyOption.REPLACE_EXISTING)
+                } else {
+                    includedFilesDir.moveTo(oldIncludedFilesDir, StandardCopyOption.REPLACE_EXISTING)
+                }
             } catch (e: IOException) {
                 throw GameResourceException("Unable to remove included files: unable to move included files directory: component_type=${component.type.name.lowercase()}, component=${component.id}", e)
             }
@@ -298,7 +299,7 @@ class ResourceManager(private var instanceData: InstanceData) {
         val toRemove: MutableList<LauncherFile> = mutableListOf()
         val exceptionQueue: MutableList<IOException> = mutableListOf()
         for (f in files) {
-            if(PatternString.matchesAny(f.getLauncherName(), currentFiles)) {
+            if(allFiles || PatternString.matchesAny(f.getLauncherName(), currentFiles)) {
                 toRemove.add(f)
 
                 LOGGER.debug { "Moving file: ${f.name}" }
@@ -315,51 +316,6 @@ class ResourceManager(private var instanceData: InstanceData) {
             throw GameResourceException("Unable to remove included files: unable to move ${exceptionQueue.size} files: component_type=${component.type.name.lowercase()}, component=${component.id}", exceptionQueue[0])
         }
         LOGGER.debug { "Removed included files: manifestId=${component.id}}" }
-    }
-
-    @Throws(GameResourceException::class)
-    private fun removeRemainingFiles(files: MutableList<LauncherFile>) {
-        LOGGER.debug { "Removing remaining files: instance=${instanceData.instance.first.id}, files=$files" }
-        val includedFilesDir = LauncherFile.of(instanceData.instance.first.directory, appConfig().includedFilesDirName)
-        if (includedFilesDir.exists()) {
-            try {
-                includedFilesDir.remove()
-            } catch (e: IOException) {
-                throw GameResourceException("Unable to cleanup launch resources: unable to delete instance included files directory", e)
-            }
-        }
-        try {
-            includedFilesDir.createDir()
-        } catch (e: IOException) {
-            throw GameResourceException("Unable to cleanup launch resources: unable to create instance included files directory", e)
-        }
-
-        val currentFiles = instanceData.instance.second.ignoredFiles.map { p -> PatternString(p, true).changeDirectoryEnding() }.toTypedArray()
-
-        val exceptionQueue: MutableList<IOException> = mutableListOf()
-        for (f in files) {
-            if (PatternString.matchesAny(f.getLauncherName(), currentFiles)) {
-                LOGGER.debug { "Deleting ignored file: ${f.name}" }
-                try {
-                    f.remove()
-                } catch (e: IOException) {
-                    exceptionQueue.add(e)
-                    LOGGER.warn { "Unable to cleanup launch resources: unable to delete non-included file: ${f.name}" }
-                }
-            } else {
-                LOGGER.debug { "Moving file: ${f.name}" }
-                try {
-                    f.moveTo(LauncherFile.of(instanceData.instance.first.directory, appConfig().includedFilesDirName, f.name), StandardCopyOption.REPLACE_EXISTING)
-                } catch (e: IOException) {
-                    exceptionQueue.add(e)
-                    LOGGER.warn { "Unable to cleanup launch resources: unable to move non-included file: ${f.name}" }
-                }
-            }
-        }
-        if (exceptionQueue.isNotEmpty()) {
-            throw GameResourceException("Unable to cleanup launch resources: unable to cleanup ${exceptionQueue.size} non-included files", exceptionQueue[0])
-        }
-        LOGGER.debug { "Removed remaining files: instance=${instanceData.instance.first.id}" }
     }
 
     companion object {

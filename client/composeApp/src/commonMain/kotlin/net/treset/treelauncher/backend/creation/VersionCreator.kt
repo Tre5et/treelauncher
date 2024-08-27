@@ -1,18 +1,18 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.mc_version_loader.minecraft.MinecraftLaunchArgument
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 
 abstract class VersionCreator(
     id: String,
     typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: LauncherManifest,
+    componentsManifest: ParentManifest,
     var files: LauncherFiles,
 ) : GenericComponentCreator(
     LauncherManifestType.VERSION_COMPONENT,
@@ -27,7 +27,7 @@ abstract class VersionCreator(
     @Throws(ComponentCreationException::class)
     override fun createComponent(): String {
         for (v in files.versionComponents) {
-            if (v.second.versionId != null && matchesVersion(v.second.versionId)) {
+            if (v.second.versionId.isNotBlank() && matchesVersion(v.second.versionId)) {
                 LOGGER.debug { "Matching version already exists, using instead: versionId=${v.second.versionId}, usingId=${v.first.id}" }
                 uses = v.first
                 return useComponent()
@@ -77,7 +77,11 @@ abstract class VersionCreator(
             }
             result.add(LauncherLaunchArgument(a.name, feature, osName, osVersion, osArch))
         }
-        result.addAll(defaultArgs)
+        for(a in defaultArgs) {
+            if(result.none { it.argument == a.argument }) {
+                result.add(a)
+            }
+        }
         LOGGER.debug { "Translated arguments: $result" }
         return result
     }

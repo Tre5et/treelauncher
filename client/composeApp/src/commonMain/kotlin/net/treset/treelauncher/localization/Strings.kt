@@ -1,11 +1,12 @@
 package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
 import java.util.*
@@ -205,13 +206,35 @@ open class Strings(
 
     data class Launcher(
         val name: () -> String = { "TreeLauncher" },
+        val patch: Patch = Patch(),
         val slug: () -> String = { "treelauncher" },
         val status: Status = Status(),
-        val version: () -> String = { "2.5.0" }
+        val version: () -> String = { "2.5.1" }
     ) {
         data class Status(
             val preparing: (Int) -> String = { progress -> "Performing first time setup... $progress%" },
             val restartRequired: () -> String = { "Restart required. Please restart." }
+        )
+
+        data class Patch(
+            val running: () -> String = { "Upgrading data..." },
+            val message: () -> String = { "The data needs to be upgraded in order to work with this version of the launcher." },
+            val title: () -> String = { "Launcher Data needs to be upgraded" },
+            val backup: () -> String = { "Create Data Backup before upgrading" },
+            val backupHint: () -> String = { "Depending on the amount of launcher data this may take a significant amount of time and storage." },
+            val start: () -> String = { "Start Upgrade" },
+            val status: (DataPatcher.PatchStep) -> String = {
+                when(it) {
+                    DataPatcher.PatchStep.CREATE_BACKUP -> "Creating Backup"
+                    DataPatcher.PatchStep.REMOVE_BACKUP_EXCLUDED_FILES -> "Removing Backup from instance excluded files"
+                    DataPatcher.PatchStep.UPGRADE_SETTINGS -> "Upgrading Version in Settings"
+                    DataPatcher.PatchStep.GAME_DATA_COMPONENTS -> "Moving Game Data Components"
+                    DataPatcher.PatchStep.INCLUDED_FILES -> "Restructuring included files"
+                    DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Removing resoucepacks directory version arguments"
+                    DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Adding included files to Game Data Components"
+                    DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Adding texturepacks to included files"
+                }
+            }
         )
     }
 
@@ -521,7 +544,7 @@ open class Strings(
                 val title: () -> String = { "You are about to delete this Component!" },
                 val tooltip: () -> String = { "Delete Component" },
                 val unableClose: () -> String = { "Close" },
-                val unableMessage: (LauncherManifest) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
+                val unableMessage: (ComponentManifest) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
                 val unableTitle: () -> String = { "Unable to delete this component!" },
             )
 
@@ -568,6 +591,8 @@ open class Strings(
                 val preparingTitle: () -> String = { "Preparing Game Resources..." },
                 val runningMessage: () -> String = { "Close the game to be able to perform actions in the launcher." },
                 val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.first.name}" },
+                val runningOpen: () -> String = { "Open Game folder" },
+                val runningStop: () -> String = { "Kill Game process" },
                 val runningTitle: () -> String = { "The Game is running..." },
                 val crashClose: () -> String = { "Close" },
                 val crashMessage: (String) -> String = { message -> "Error:\n$message\nThis might be unrelated to the launcher." },
@@ -630,6 +655,7 @@ open class Strings(
         val language: () -> String = { "Language:" },
         val logout: () -> String = { "Logout" },
         val path: Path = Path(),
+        val resetWindow: () -> String = { "Reset Window Position and Size" },
         val source: () -> String = { "Source Repository" },
         val sourceTooltip: () -> String = { "Open Source Repository" },
         val sync: Sync = Sync(),

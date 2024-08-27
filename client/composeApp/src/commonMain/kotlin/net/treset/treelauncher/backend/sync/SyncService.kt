@@ -1,10 +1,10 @@
 package net.treset.treelauncher.backend.sync
 
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.Manifest
 import net.treset.treelauncher.backend.util.HttpService
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.UrlString
@@ -66,7 +66,7 @@ class SyncService @JvmOverloads constructor(
     }
 
     companion object {
-        fun isSyncing(manifest: LauncherManifest): Boolean {
+        fun isSyncing(manifest: Manifest): Boolean {
             return LauncherFile.of(manifest.directory, appConfig().syncFileName).isFile()
         }
 

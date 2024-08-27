@@ -38,6 +38,7 @@ import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
 import net.treset.treelauncher.style.*
+import net.treset.treelauncher.util.DataPatcher
 import net.treset.treelauncher.util.FixFiles
 import net.treset.treelauncher.util.News
 import java.io.IOException
@@ -59,6 +60,7 @@ data class AppContextData(
     val severeError: (Exception) -> Unit,
     val silentError: (Exception) -> Unit,
     val errorIfOnline: (Exception) -> Unit,
+    val resetWindowSize: () -> Unit,
     val discord: DiscordIntegration
 )
 
@@ -161,6 +163,7 @@ fun App(
                     AppContext.error(it)
                 }
             },
+            resetWindowSize = ::resetWindow,
             discord = discord
         )
     }
@@ -169,7 +172,6 @@ fun App(
         colors = colors,
         typography = typography()
     ) {
-
         ScalingProvider {
             CompositionLocalProvider(
                 LocalAppContext provides AppContext
@@ -178,40 +180,42 @@ fun App(
                     MaterialTheme.typography.bodyMedium
                 ) {
                     Scaffold {
-                        Column(
-                            Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            notificationsChanged.let {
-                                for (notification in notifications) {
-                                    LaunchedEffect(Unit) {
-                                        notification.visible = true
-                                        notificationsChanged++
+                        DataPatcher {
+                            Column(
+                                Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                notificationsChanged.let {
+                                    for (notification in notifications) {
+                                        LaunchedEffect(Unit) {
+                                            notification.visible = true
+                                            notificationsChanged++
+                                        }
+                                        NotificationBanner(
+                                            visible = notification.visible,
+                                            onDismissed = {
+                                                //Strange behavior when removing, downstream notifications get dismissed too, so keep them in the list
+                                                //notifications -= notification
+                                            },
+                                            data = notification.data
+                                        )
                                     }
-                                    NotificationBanner(
-                                        visible = notification.visible,
-                                        onDismissed = {
-                                            //Strange behavior when removing, downstream notifications get dismissed too, so keep them in the list
-                                            //notifications -= notification
-                                        },
-                                        data = notification.data
-                                    )
                                 }
-                            }
 
-                            LoginScreen {
-                                News(openNews)
-                                FixFiles()
+                                LoginScreen {
+                                    News(openNews)
+                                    FixFiles()
 
-                                NavigationContainer {
-                                    when (NavigationContext.navigationState) {
-                                        NavigationState.INSTANCES -> Instances()
-                                        NavigationState.ADD -> Create()
-                                        NavigationState.SAVES -> Saves()
-                                        NavigationState.RESSOURCE_PACKS -> Resourcepacks()
-                                        NavigationState.OPTIONS -> Options()
-                                        NavigationState.MODS -> Mods()
-                                        NavigationState.SETTINGS -> Settings()
+                                    NavigationContainer {
+                                        when (NavigationContext.navigationState) {
+                                            NavigationState.INSTANCES -> Instances()
+                                            NavigationState.ADD -> Create()
+                                            NavigationState.SAVES -> Saves()
+                                            NavigationState.RESSOURCE_PACKS -> Resourcepacks()
+                                            NavigationState.OPTIONS -> Options()
+                                            NavigationState.MODS -> Mods()
+                                            NavigationState.SETTINGS -> Settings()
+                                        }
                                     }
                                 }
                             }
@@ -351,3 +355,5 @@ internal data class NotificationBannerData(
 private val LOGGER = KotlinLogging.logger {  }
 
 expect fun getUpdaterProcess(updaterArgs: String): ProcessBuilder
+
+expect fun resetWindow()

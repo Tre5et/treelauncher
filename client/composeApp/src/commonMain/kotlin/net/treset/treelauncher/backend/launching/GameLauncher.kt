@@ -32,7 +32,7 @@ class GameLauncher(
         } catch (e: FileLoadException) {
             throw GameLaunchException("Unable to launch game: file reload failed", e)
         }
-        if (files.launcherDetails.activeInstance != null && files.launcherDetails.activeInstance.isNotBlank()) {
+        if (!files.launcherDetails.activeInstance.isNullOrBlank()) {
             if (!cleanupActiveInstance) {
                 throw GameLaunchException("Unable to launch game: active instance already exists")
             }
@@ -75,9 +75,14 @@ class GameLauncher(
         }).start()
     }
 
+    fun stop() {
+        gameListener?.stop()
+    }
+
     @Throws(GameLaunchException::class)
     private fun finishLaunch() {
         val pb = ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE)
+        pb.inheritIO()
         val commandBuilder = CommandBuilder(pb, instance, offline, minecraftUser, quickPlayData)
         try {
             commandBuilder.makeStartCommand()
@@ -89,7 +94,7 @@ class GameLauncher(
         LOGGER.debug { "command=" + pb.command() }
         try {
             val p = pb.start()
-            resourceManager?.let { resourceManager ->
+            resourceManager?.let { _ ->
                 GameListener(p, this::cleanupResources).let {
                     gameListener = it
                     it.start()
@@ -146,7 +151,7 @@ class GameLauncher(
         }
     }
 
-    private fun cleanupResources(playDuration: Long, error: String?) {
+    private fun cleanupResources(playDuration: Long, error: String?, mergeFiles: Boolean = false) {
         LOGGER.info { "Cleaning up resources" }
         onExit(error)
         try {
@@ -156,12 +161,12 @@ class GameLauncher(
         }
 
         try {
-            resourceManager?.cleanupGameFiles()
+            resourceManager?.cleanupGameFiles(mergeFiles)
             onExited(error)
         } catch (e: GameResourceException) {
             onResourceCleanupFailed(e) { retry ->
                 if(retry) {
-                    cleanupResources(playDuration, error)
+                    cleanupResources(playDuration, error, true)
                 } else {
                     onExited(error)
                 }

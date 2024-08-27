@@ -9,8 +9,6 @@ import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.mc_version_loader.saves.Save
 import net.treset.mc_version_loader.saves.Server
 import net.treset.treelauncher.AppContext
@@ -18,6 +16,8 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherInstanceDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -37,7 +37,7 @@ import java.net.URI
 fun Saves() {
     var components by remember { mutableStateOf(AppContext.files.savesComponents.sortedBy { it.name }) }
 
-    var selected: LauncherManifest? by remember { mutableStateOf(null) }
+    var selected: ComponentManifest? by remember { mutableStateOf(null) }
 
     var saves: List<Pair<Save, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var servers: List<Server> by remember { mutableStateOf(emptyList()) }
@@ -100,16 +100,14 @@ fun Saves() {
                     SavesCreator(
                         state.name,
                         AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.savesManifest,
-                        AppContext.files.gameDetailsManifest
+                        AppContext.files.savesManifest
                     )
                 }
                 CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
                     SavesCreator(
                         state.name,
                         state.existing,
-                        AppContext.files.savesManifest,
-                        AppContext.files.gameDetailsManifest
+                        AppContext.files.savesManifest
                     )
                 }}
                 CreationMode.USE -> null
@@ -360,12 +358,12 @@ fun Saves() {
 
 @Composable
 private fun PlayPopup(
-    component: LauncherManifest,
+    component: ComponentManifest,
     quickPlayData: QuickPlayData,
     onClose: () -> Unit,
-    onConfirm: (QuickPlayData, Pair<LauncherManifest, LauncherInstanceDetails>) -> Unit
+    onConfirm: (QuickPlayData, Pair<ComponentManifest, LauncherInstanceDetails>) -> Unit
 ) {
-    var instances: List<Pair<LauncherManifest, LauncherInstanceDetails>> by remember(component) { mutableStateOf(listOf()) }
+    var instances: List<Pair<ComponentManifest, LauncherInstanceDetails>> by remember(component) { mutableStateOf(listOf()) }
 
     LaunchedEffect(component) {
         try {

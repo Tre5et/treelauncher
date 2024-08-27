@@ -32,6 +32,8 @@ fun Settings() {
 
             //TODO: Sync()
 
+            WindowReset()
+
             UpdateUrl()
 
             User()

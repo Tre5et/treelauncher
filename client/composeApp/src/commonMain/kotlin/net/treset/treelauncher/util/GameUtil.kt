@@ -9,6 +9,8 @@ import net.treset.treelauncher.backend.util.exception.GameLaunchException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.hovered
+import net.treset.treelauncher.style.icons
 
 fun launchGame(
     launcher: GameLauncher,
@@ -63,6 +65,22 @@ class GameLaunchHelper(
         notification = NotificationData(
             content = {
                 Text(strings().selector.instance.game.runningNotification(launcher.instance))
+                IconButton(
+                    onClick = {
+                        LauncherFile.ofData(AppContext.files.launcherDetails.gamedataDir).open()
+                    },
+                    icon = icons().folder,
+                    tooltip = strings().selector.instance.game.runningOpen(),
+                    interactionTint = MaterialTheme.colorScheme.onPrimary.hovered()
+                )
+                IconButton(
+                    onClick = {
+                        launcher.stop()
+                    },
+                    icon = icons().close,
+                    tooltip = strings().selector.instance.game.runningStop(),
+                    interactionTint = MaterialTheme.colorScheme.error.hovered()
+                )
             },
         ).also { AppContext.addNotification(it) }
         AppContext.setGlobalPopup(null)

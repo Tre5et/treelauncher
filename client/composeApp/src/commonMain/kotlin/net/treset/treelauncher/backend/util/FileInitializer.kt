@@ -2,8 +2,9 @@ package net.treset.treelauncher.backend.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.JsonParsable
-import net.treset.mc_version_loader.launcher.LauncherDetails
-import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.treelauncher.backend.data.LauncherDetails
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
@@ -27,7 +28,7 @@ class FileInitializer(directory: LauncherFile) {
         )
         files = arrayOf(
             InitializingManifest(
-                LauncherManifest("launcher", null, null, "launcher.json", null, null, null, null),
+                ParentManifest(LauncherManifestType.LAUNCHER, LauncherManifestType.defaultConversion, "launcher.json", "", mutableListOf()),
                 "manifest.json"
             ),
             InitializingManifest(
@@ -44,6 +45,7 @@ class FileInitializer(directory: LauncherFile) {
                     "javas",
                     "libraries",
                     "mods_component",
+                    "mods_data",
                     "mods",
                     "options_component",
                     "options_data",
@@ -52,13 +54,14 @@ class FileInitializer(directory: LauncherFile) {
                     "resourcepack_data",
                     "resourcepacks",
                     "saves_component",
+                    "saves_data",
                     "saves",
                     "version_component",
                     "version_data",
                     "versions"
                 ), "launcher.json"
             ),
-            InitializingManifest("game", null, arrayOf("mods.json", "saves.json"), "game_data", "manifest.json"),
+            InitializingManifest("game", "", arrayOf("mods.json", "saves.json"), "game_data", "manifest.json"),
             InitializingManifest("mods", "mods", "game_data", "mods.json"),
             InitializingManifest("saves", "saves", "game_data", "saves.json"),
             InitializingManifest("instances", "instance", "instance_data", "manifest.json"),
@@ -85,12 +88,12 @@ class FileInitializer(directory: LauncherFile) {
 
     inner class InitializingManifest(val file: LauncherFile, val manifest: JsonParsable) {
         constructor(manifest: JsonParsable, vararg path: String) : this(LauncherFile.of(directory, *path), manifest)
-        constructor(type: String?, prefix: String?, components: Array<String?>?, vararg path: String) : this(
-            LauncherManifest(type, null, null, null, prefix, null, null, components?.toList()),
+        constructor(type: String, prefix: String, components: Array<String>, vararg path: String) : this(
+            ParentManifest(LauncherManifestType.UNKNOWN, mapOf(type to LauncherManifestType.UNKNOWN), "", prefix, components.toMutableList()),
             *path
         )
 
-        constructor(type: String?, prefix: String?, vararg path: String) : this(type, prefix, arrayOf(), *path)
+        constructor(type: String, prefix: String, vararg path: String) : this(type, prefix, arrayOf(), *path)
 
         @Throws(IOException::class)
         fun make() {

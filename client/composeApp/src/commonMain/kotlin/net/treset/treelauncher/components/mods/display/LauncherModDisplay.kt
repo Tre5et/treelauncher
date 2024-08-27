@@ -3,10 +3,10 @@ package net.treset.treelauncher.components.mods.display
 import androidx.compose.ui.graphics.painter.Painter
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.*
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
+import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.mods.ModDownloader
 import net.treset.treelauncher.backend.util.ModProviderStatus
 import net.treset.treelauncher.backend.util.file.LauncherFile

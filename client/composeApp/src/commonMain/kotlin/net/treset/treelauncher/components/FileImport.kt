@@ -25,8 +25,8 @@ import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Strings
@@ -35,8 +35,8 @@ import java.io.IOException
 
 @Composable
 fun <T> FileImport(
-    component: LauncherManifest,
-    components: Array<LauncherManifest>,
+    component: ComponentManifest,
+    components: Array<ComponentManifest>,
     toFile: LauncherFile.() -> T?,
     getDisplayName: T.() -> String,
     icon: ImageVector,

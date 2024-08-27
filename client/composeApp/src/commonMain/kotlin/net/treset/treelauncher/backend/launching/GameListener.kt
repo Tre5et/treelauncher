@@ -28,6 +28,22 @@ class GameListener(
         t.start()
     }
 
+    fun stop() {
+        Thread {
+            if (isRunning) {
+                gameProcess.destroy()
+            }
+            try {
+                Thread.sleep(5000)
+            } catch (e: InterruptedException) {
+                LOGGER.warn(e) { "Game listener interrupted, restarting: pid=${gameProcess.pid()}" }
+            }
+            if (isRunning) {
+                gameProcess.destroyForcibly()
+            }
+        }.start()
+    }
+
     private fun listenToGameOutput() {
         isRunning = true
         LOGGER.info { "Listening to game process: pid=${gameProcess.pid()}" }

@@ -2,15 +2,15 @@ package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.hycrafthd.minecraft_authenticator.login.User
-import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.GameCommandException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.strings
+import java.io.File
 
 class CommandContext(
-    val javaDir: String,
     val offline: Boolean,
     val minecraftUser: User?,
     val gameDataDir: String,
@@ -19,6 +19,7 @@ class CommandContext(
     val assetsIndex: String,
     val libraries: List<String>,
     val librariesDir: String,
+    val nativesDir: String,
     val versionName: String,
     val versionType: String,
     val resX: String?,
@@ -40,7 +41,7 @@ class CommandBuilder(
         }
         var assetsIndex: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.assets != null && v.second.assets.isNotBlank()) {
+            if (v.second.assets?.isNotBlank() == true) {
                 assetsIndex = v.second.assets
                 break
             }
@@ -51,7 +52,7 @@ class CommandBuilder(
 
         var mainClass: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.mainClass != null && v.second.mainClass.isNotBlank()) {
+            if (v.second.mainClass.isNotBlank()) {
                 mainClass = v.second.mainClass
                 break
             }
@@ -73,10 +74,21 @@ class CommandBuilder(
         }
 
         for (v in instanceData.versionComponents) {
-            if (v.second.mainFile != null && v.second.mainFile.isNotBlank()) {
-                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile).absolutePath)
+            if (v.second.mainFile?.isNotBlank() == true) {
+                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile!!).absolutePath)
             }
         }
+
+        val natives: MutableList<String> = mutableListOf()
+        for(v in instanceData.versionComponents) {
+            if(v.second.natives?.isNotBlank() == true) {
+                natives.add(LauncherFile.of(v.first.directory, v.second.natives!!).absolutePath)
+            }
+        }
+        if(natives.isEmpty()) {
+            natives.add(LauncherFile.of(instanceData.javaComponent.directory, "libs").absolutePath)
+        }
+        val nativesDir = natives.joinToString(File.pathSeparator)
 
         var resX: String? = null
         var resY: String? = null
@@ -95,28 +107,19 @@ class CommandBuilder(
 
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
-        processBuilder.command()
-            .add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
-
+        processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
         val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvmArguments.toTypedArray())
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.jvmArguments.toTypedArray())
         }
         argOrder.add(arrayOf(
-            LauncherLaunchArgument(
-                mainClass,
-                null,
-                null,
-                null,
-                null
-            )
+            LauncherLaunchArgument(mainClass)
         ))
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.gameArguments.toTypedArray())
         }
 
         val context = CommandContext(
-            instanceData.javaComponent.directory,
             offline,
             minecraftUser,
             instanceData.gameDataDir.absolutePath,
@@ -125,6 +128,7 @@ class CommandBuilder(
             assetsIndex,
             libraries,
             instanceData.librariesDir.absolutePath,
+            nativesDir,
             strings().game.versionName(instanceData),
             strings().game.versionType(instanceData),
             resX,
@@ -223,7 +227,7 @@ class CommandBuilder(
     ): String {
         return when (key) {
             "natives_directory" -> {
-                "${context.javaDir}/lib"
+                context.nativesDir
             }
 
             "launcher_name" -> {
@@ -243,7 +247,7 @@ class CommandBuilder(
             }
 
             "classpath_separator" -> {
-                System.getProperty("path.separator")
+                File.pathSeparator
             }
 
             "library_directory" -> {
@@ -271,6 +275,10 @@ class CommandBuilder(
             }
 
             "assets_root" -> {
+                context.assetsDir
+            }
+
+            "game_assets" -> {
                 context.assetsDir
             }
 
@@ -315,6 +323,14 @@ class CommandBuilder(
                     context.minecraftUser.type()
                 } else {
                     ""
+                }
+            }
+
+            "auth_session" -> {
+                if(context.minecraftUser != null && !context.offline) {
+                    "token:${context.minecraftUser.accessToken()}:${context.minecraftUser.uuid()}"
+                } else {
+                    "token::00000000000000000000000000000000"
                 }
             }
 

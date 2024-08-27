@@ -5,14 +5,15 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.forge.ForgeVersion
 import net.treset.mc_version_loader.forge.MinecraftForge
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.mc_version_loader.launcher.LauncherVersionDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
 import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.data.LauncherVersionDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -21,7 +22,7 @@ import java.io.IOException
 
 class ForgeVersionCreator(
     typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: LauncherManifest,
+    componentsManifest: ParentManifest,
     var versionId: String,
     files: LauncherFiles,
     var librariesDir: LauncherFile
@@ -100,20 +101,22 @@ class ForgeVersionCreator(
                         "forge",
                         versionId,
                         null,
+                        null,
+                        null,
                         dependsId,
-                        null,
-                        null,
-                        null,
-                        null,
+                        listOf(),
+                        listOf(),
+                        "",
+                        listOf(),
                         forgeVersion.mainClass,
-                        null,
+                        "",
                         versionId
                     )
 
                     try {
                         addArguments(details)
                         addLibraries(details)
-                        createClient(details, mcCreator.newManifest)
+                        createClient(details, mcCreator.newManifest!!)
                     } catch (e: ComponentCreationException) {
                         mcCreator.attemptCleanup()
                         attemptCleanup()
@@ -173,7 +176,8 @@ class ForgeVersionCreator(
                 MinecraftForge.downloadForgeLibraries(
                     librariesDir,
                     versionId,
-                    libraries
+                    libraries,
+                    LauncherFile.of(newManifest!!.directory, appConfig().nativesDirName)
                 ) {
                     setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FORGE_LIBRARIES, it))
                 }
@@ -186,7 +190,7 @@ class ForgeVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun createClient(details: LauncherVersionDetails, vanillaManifest: LauncherManifest?) {
+    private fun createClient(details: LauncherVersionDetails, vanillaManifest: ComponentManifest) {
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FORGE_FILE, null))
         LOGGER.debug { "Creating forge client..." }
         newManifest?.let { newManifest ->
@@ -204,9 +208,7 @@ class ForgeVersionCreator(
             LOGGER.debug { "Fetched installer profile" }
 
             LOGGER.debug { "Finding minecraft jar..." }
-            val minecraftBaseDir = vanillaManifest?.directory
-                ?: files.versionComponents.firstOrNull { it.first.id == details.depends }?.first?.directory
-                ?: throw ComponentCreationException("Unable to create forge version: failed to find mc version: versionId=${details.depends}")
+            val minecraftBaseDir = vanillaManifest.directory
             val minecraftFileName = files.versionComponents.firstOrNull { it.second.versionId == details.depends }?.second?.mainFile
                 ?: appConfig().minecraftDefaultFileName
             val minecraftFile = LauncherFile.of(minecraftBaseDir, minecraftFileName)
@@ -215,13 +217,24 @@ class ForgeVersionCreator(
             }
             LOGGER.debug { "Found minecraft jar" }
 
+            LOGGER.debug { "Finding minecraft java..." }
+            val vanillaDetailsFile = LauncherFile.of(vanillaManifest.directory, vanillaManifest.details)
+            val vanillaDetails = try {
+                LauncherVersionDetails.fromJson(vanillaDetailsFile.readString())
+            } catch (e: Exception) {
+                throw ComponentCreationException("Unable to create forge version: failed to read mc version details: versionId=${details.depends}", e)
+            }
+            val javaFile = LauncherFile.ofData(files.launcherDetails.javasDir, files.javaManifest.prefix + "_" + vanillaDetails.java, "bin", "java")
+            LOGGER.debug { "Found minecraft java" }
+
             LOGGER.debug { "Patching forge client..."}
             try {
                 MinecraftForge.createForgeClient(
                     versionId,
                     LauncherFile.ofData(files.launcherDetails.librariesDir),
                     profile,
-                    minecraftFile
+                    minecraftFile,
+                    javaFile
                 ) {
                     setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FORGE_FILE, it))
                 }

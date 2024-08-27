@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
@@ -18,11 +18,11 @@ import net.treset.treelauncher.localization.strings
 class ModsCreationState(
     mode: CreationMode,
     name: String?,
-    existing: Pair<LauncherManifest, LauncherModsDetails>?,
+    existing: Pair<ComponentManifest, LauncherModsDetails>?,
     val version: MinecraftVersion?,
     val type: VersionType?,
     val alternateLoader: Boolean?
-) : CreationState<Pair<LauncherManifest, LauncherModsDetails>>(
+) : CreationState<Pair<ComponentManifest, LauncherModsDetails>>(
     mode,
     name,
     existing
@@ -41,8 +41,8 @@ class ModsCreationState(
             newType: VersionType?,
             alternateLoader: Boolean?,
             inheritName: String?,
-            inheritSelected: Pair<LauncherManifest, LauncherModsDetails>?,
-            useSelected: Pair<LauncherManifest, LauncherModsDetails>?
+            inheritSelected: Pair<ComponentManifest, LauncherModsDetails>?,
+            useSelected: Pair<ComponentManifest, LauncherModsDetails>?
         ): ModsCreationState = ModsCreationState(
             mode,
             when(mode) {
@@ -64,7 +64,7 @@ class ModsCreationState(
 
 @Composable
 fun ModsCreation(
-    existing: List<Pair<LauncherManifest, LauncherModsDetails>>,
+    existing: List<Pair<ComponentManifest, LauncherModsDetails>>,
     showCreate: Boolean = true,
     showUse: Boolean = true,
     setCurrentState: (ModsCreationState) -> Unit = {},
@@ -81,9 +81,9 @@ fun ModsCreation(
     var alternateLoader by remember(existing, defaultAlternate) { mutableStateOf(defaultAlternate) }
 
     var inheritName by remember(existing) { mutableStateOf("") }
-    var inheritSelected: Pair<LauncherManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var inheritSelected: Pair<ComponentManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
 
-    var useSelected: Pair<LauncherManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var useSelected: Pair<ComponentManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
 
     var showSnapshots by remember(existing) { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
