@@ -25,7 +25,7 @@ enum class LauncherManifestType {
                 return key
             }
         }
-        return this.name.toLowerCase()
+        return this.name.lowercase()
     }
 
     companion object {

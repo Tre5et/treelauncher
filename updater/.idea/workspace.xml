@@ -11,8 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Changed Updater to wait for launcher while deleting">
-      <change beforePath="$PROJECT_DIR$/../update-server/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../update-server/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +28,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Tre5et"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Tre5et/treelauncher.git",
+    "accountId": "7f2857bf-4ae5-4fcd-8e50-1998039f2bd6"
+  }
+}]]></component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="k7wf2hw5" />
   </component>
@@ -48,7 +59,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "D:/Hannes/Coding/gits/treelauncher/updater",
     "node.js.detected.package.eslint": "true",
@@ -74,7 +85,7 @@
       <recent name="D:\Hannes\Coding\gits\treelauncher\updater\target\debug" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Build">
+  <component name="RunManager" selected="Cargo.Run">
     <configuration name="Build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
       <option name="command" value="build --release" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -135,6 +146,7 @@
       <workItem from="1711290074416" duration="1862000" />
       <workItem from="1713033296348" duration="2228000" />
       <workItem from="1714476885562" duration="1484000" />
+      <workItem from="1723730137999" duration="1126000" />
     </task>
     <task id="LOCAL-00001" summary="Changed Updater to Rust Project">
       <option name="closed" value="true" />

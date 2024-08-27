@@ -5,19 +5,12 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.Pre2_5LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.Version
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
-class DataPatcher(
-    currentVersion: String,
-    previousVersion: String
-) {
-    private val currVer = Version.fromString(currentVersion)
-    private val prevVer = Version.fromString(previousVersion)
-
+class DataPatcher() {
     enum class PatchStep {
         CREATE_BACKUP,
         REMOVE_BACKUP_EXCLUDED_FILES,
@@ -30,28 +23,49 @@ class DataPatcher(
     }
 
     private class UpgradeFunction(
-        val function: (onStep: (PatchStep) -> Unit) -> Unit,
+        val function: (onStep: (UpgradeStep) -> Unit) -> Unit,
         val condition: () -> Boolean
     ) {
+        constructor(function: (onStep: (PatchStep) -> Unit) -> Unit, vararg version: Version) : this(function, {
+            version.any { appConfig().dataVersion >= it && Version.fromString(appSettings().dataVersion) < it }
+        })
+
         fun execute(onStep: (PatchStep) -> Unit) {
-            if(condition()) {
+            if(applies()) {
                 function(onStep)
             }
         }
     }
 
     private val upgradeMap: Array<UpgradeFunction> = arrayOf(
-        UpgradeFunction(this::moveGameDataComponents) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
-        UpgradeFunction(this::upgradeIncludedFiles) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
-        UpgradeFunction(this::addNewIncludedFilesToManifest) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
-        UpgradeFunction(this::removeResourcepacksDirGameArguments) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
-        UpgradeFunction(this::upgradeTexturePacksIncludedFiles) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
-        UpgradeFunction(this::removeBackupExcludedFiles) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) },
-        UpgradeFunction(this::upgradeSettings) { currVer >= Version(2, 6, 0) && prevVer < Version(2, 6, 0) }
+        UpgradeFunction(this::moveGameDataComponents, Version(1,0,0)),
+        UpgradeFunction(this::upgradeIncludedFiles, Version(2,0,0)),
+        UpgradeFunction(this::addNewIncludedFilesToManifest, Version(2,0,0)),
+        UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0)),
+        UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
+        UpgradeFunction(this::upgradeSettings, Version(2,0,0)),
+        UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
+        UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0))
     )
 
     fun upgradeNeeded(): Boolean {
-        return currVer > prevVer
+        return upgradeMap.any { it.applies() }
+    }
+
+    @Throws(IOException::class)
+    fun performUpgrade(backup: Boolean, onStep: (PatchStep) -> Unit) {
+        if(!upgradeNeeded()) {
+            return
+        }
+
+        LOGGER.info { "Performing data upgrade: v${appSettings().dataVersion} -> v${appConfig().dataVersion} " }
+        if(backup) {
+            backupFiles(onStep)
+        }
+        for(upgrade in upgradeMap) {
+            upgrade.execute(onStep)
+        }
+        LOGGER.info { "Data upgrade complete" }
     }
 
     @Throws(IOException::class)
@@ -65,22 +79,6 @@ class DataPatcher(
         }
         dir.copyTo(backupDir)
         LOGGER.info { "Created backup" }
-    }
-
-    @Throws(IOException::class)
-    fun performUpgrade(backup: Boolean, onStep: (PatchStep) -> Unit) {
-        if(currVer <= prevVer) {
-            return
-        }
-
-        LOGGER.info { "Performing data upgrade: v${prevVer} -> v${currVer} " }
-        if(backup) {
-            backupFiles(onStep)
-        }
-        for(upgrade in upgradeMap) {
-            upgrade.execute(onStep)
-        }
-        LOGGER.info { "Data upgrade complete" }
     }
 
     @Throws(IOException::class)
@@ -267,7 +265,7 @@ class DataPatcher(
     fun upgradeSettings(onStep: (PatchStep) -> Unit) {
         LOGGER.info { "Upgrading settings..." }
         onStep(PatchStep.UPGRADE_SETTINGS)
-        appSettings().version = currVer.toString()
+        appSettings().dataVersion = appConfig().dataVersion.toString()
         appSettings().save()
         LOGGER.info { "Upgraded settings" }
     }

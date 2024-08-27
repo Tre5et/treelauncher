@@ -16,7 +16,7 @@ import java.io.IOException
 fun DataPatcher(
     content: @Composable () -> Unit
 ) {
-    val dataPatcher = remember { DataPatcher(strings().launcher.version(), appSettings().version) }
+    val dataPatcher = remember { DataPatcher() }
 
     var upgraded by rememberSaveable{ mutableStateOf(!dataPatcher.upgradeNeeded()) }
     var error by remember { mutableStateOf<Exception?>(null) }
