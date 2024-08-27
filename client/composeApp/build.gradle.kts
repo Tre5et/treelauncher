@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
 
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -40,16 +41,16 @@ kotlin {
             implementation("org.slf4j:slf4j-api:2.0.12")
             implementation("ch.qos.logback:logback-classic:1.5.3")
 
-            api("io.github.kevinnzou:compose-webview-multiplatform:1.9.0")
-            implementation("dev.datlag:kcef:2024.01.07.1")
+            api("io.github.kevinnzou:compose-webview-multiplatform:1.9.20")
+            implementation("dev.datlag:kcef:2024.04.20.1")
 
-            implementation("org.jetbrains.jewel:jewel-int-ui-standalone:0.15.2")
-            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window:0.15.2")
+            implementation("org.jetbrains.jewel:jewel-int-ui-standalone-241:0.19.5")
+            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window-241:0.19.5")
 
             implementation("com.darkrockstudios:mpfilepicker:3.1.0")
-            implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.4")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.5")
 
-            implementation("com.github.JnCrMx:discord-game-sdk4j:70b1e9dda6189cd9fbdce113527a915f892bc154")
+            implementation("com.github.JnCrMx:discord-game-sdk4j:ae841453bd58af8279d0d43d8c65f997523f976d")
         }
     }
 }
@@ -65,6 +66,8 @@ val uuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
 compose.desktop {
     application {
         mainClass = "net.treset.treelauncher.MainKt"
+
+        javaHome = "${System.getProperty("user.home")}\\.jdks\\jbr-17.0.11"
 
         nativeDistributions {
             modules("java.instrument", "java.naming", "java.net.http", "java.sql", "jdk.management", "jdk.unsupported")
