@@ -1,7 +1,7 @@
 package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
-import net.treset.mc_version_loader.saves.Save
+import net.treset.mcdl.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod

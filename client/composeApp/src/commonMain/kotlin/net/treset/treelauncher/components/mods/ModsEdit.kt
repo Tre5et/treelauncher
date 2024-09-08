@@ -7,8 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.mods.MinecraftMods
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.mods.ModsDL
+import net.treset.mcdl.mods.curseforge.CurseforgeMod
+import net.treset.mcdl.mods.modrinth.ModrinthMod
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherMod
@@ -288,7 +290,7 @@ fun ModsEdit(
 
 private fun checkCurseforge(id: String): Boolean {
     try {
-        if (id.isNotBlank() && (!id.matches("[0-9]+".toRegex()) || !MinecraftMods.checkCurseforgeValid(id.toLong()))) {
+        if (id.isNotBlank() && (!id.matches("[0-9]+".toRegex()) || !ModsDL.checkCurseforgeValid(id.toLong()))) {
             return false
         }
     } catch (e: Exception) {
@@ -299,7 +301,7 @@ private fun checkCurseforge(id: String): Boolean {
 
 private fun checkModrinth(id: String): Boolean {
     try {
-        if (id.isNotBlank() && !MinecraftMods.checkModrinthValid(id)) {
+        if (id.isNotBlank() && !ModsDL.checkModrinthValid(id)) {
             return false
         }
     } catch (e: Exception) {
@@ -338,7 +340,7 @@ private fun getDescriptionIconUrl(
 ): Pair<String?, String?> {
     if (modrinthId.isNotEmpty()) {
         try {
-            MinecraftMods.getModrinthMod(modrinthId).let {
+            ModrinthMod.get(modrinthId).let {
                 return Pair(it.description, it.iconUrl)
             }
         } catch (ignored: FileDownloadException) {
@@ -346,7 +348,7 @@ private fun getDescriptionIconUrl(
     }
     if (curseforgeId.isNotEmpty()) {
         try {
-            MinecraftMods.getCurseforgeMod(curseforgeId.toLong()).let {
+            CurseforgeMod.get(curseforgeId.toLong()).let {
                 return Pair(it.description, it.iconUrl)
             }
         } catch (ignored: FileDownloadException) {

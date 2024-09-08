@@ -24,6 +24,21 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
         }
+
+        val mcdlModules = listOf(
+            "assets",
+            "auth",
+            "fabric",
+            "forge",
+            "java",
+            "minecraft",
+            "mods",
+            "mojang",
+            "quiltmc",
+            "resourcepacks",
+            "saves"
+        )
+        val mcdlVersion = "1.0.0-alpha.1"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -33,11 +48,15 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
-            implementation("net.treset:mc-version-loader:7.0.0")
+
+            implementation("net.treset.mcdl:mcdl:$mcdlVersion")
+            mcdlModules.forEach {
+                implementation("net.treset.mcdl:mcdl-$it:$mcdlVersion")
+            }
             implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
-            implementation("io.github.oshai:kotlin-logging:6.0.3")
-            implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
+            implementation("io.github.oshai:kotlin-logging:7.0.0")
+            implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
             implementation("org.slf4j:slf4j-api:2.0.12")
             implementation("ch.qos.logback:logback-classic:1.5.3")
 

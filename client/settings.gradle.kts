@@ -24,6 +24,8 @@ dependencyResolutionManagement {
         flatDir {
             dirs("libs")
         }
+
+        maven("libs")
     }
 }
 

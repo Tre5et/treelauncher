@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.update
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.json.JsonUtils
+import net.treset.mcdl.json.JsonUtils
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.getUpdaterProcess

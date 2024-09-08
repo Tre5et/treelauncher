@@ -1,16 +1,13 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.minecraft.MinecraftVersion
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
-import net.treset.mc_version_loader.quiltmc.QuiltLibrary
-import net.treset.mc_version_loader.quiltmc.QuiltMC
-import net.treset.mc_version_loader.quiltmc.QuiltProfile
-import net.treset.mc_version_loader.quiltmc.QuiltVersion
-import net.treset.mc_version_loader.util.FileUtil
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.json.SerializationException
+import net.treset.mcdl.minecraft.MinecraftVersion
+import net.treset.mcdl.minecraft.MinecraftVersionDetails
+import net.treset.mcdl.quiltmc.QuiltLibrary
+import net.treset.mcdl.quiltmc.QuiltProfile
+import net.treset.mcdl.quiltmc.QuiltVersion
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherVersionDetails
@@ -49,15 +46,15 @@ class QuiltVersionCreator(
 
         LOGGER.debug { "Creating minecraft version..." }
         val versions: List<MinecraftVersion> = try {
-            MinecraftGame.getVersions()
+            MinecraftVersion.getAll()
         } catch (e: FileDownloadException) {
             throw ComponentCreationException("Unable to create quilt version: failed to get mc versions", e)
         }
 
         for (m in versions) {
             if (quiltProfile.inheritsFrom == m.id) {
-                val mcJson: String = try {
-                    FileUtil.getStringFromUrl(m.url)
+                val versionDetails= try {
+                    MinecraftVersionDetails.get(m.url)
                 } catch (e: FileDownloadException) {
                     throw ComponentCreationException("Unable to create quilt version: failed to download mc version details: versionId=${quiltProfile.id}", e)
                 }
@@ -65,7 +62,7 @@ class QuiltVersionCreator(
                     VanillaVersionCreator(
                         typeConversion!!,
                         componentsManifest!!,
-                        MinecraftVersionDetails.fromJson(mcJson),
+                        versionDetails,
                         files,
                         librariesDir
                     )
@@ -143,9 +140,9 @@ class QuiltVersionCreator(
                 }
             }
             val libs: List<String> = try {
-                QuiltMC.downloadQuiltLibraries(
-                    librariesDir,
-                    libraries
+                QuiltLibrary.downloadAll(
+                    libraries,
+                    librariesDir
                 ) {
                     setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_QUILT_LIBRARIES, it))
                 }

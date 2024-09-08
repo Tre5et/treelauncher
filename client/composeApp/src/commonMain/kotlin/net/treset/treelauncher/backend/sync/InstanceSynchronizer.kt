@@ -1,13 +1,11 @@
 package net.treset.treelauncher.backend.sync
 
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.fabric.FabricLoader
-import net.treset.mc_version_loader.fabric.FabricProfile
-import net.treset.mc_version_loader.fabric.FabricVersionDetails
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.minecraft.MinecraftVersion
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
-import net.treset.mc_version_loader.util.DownloadStatus
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.fabric.FabricProfile
+import net.treset.mcdl.fabric.FabricVersion
+import net.treset.mcdl.minecraft.MinecraftVersion
+import net.treset.mcdl.minecraft.MinecraftVersionDetails
+import net.treset.mcdl.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.FabricVersionCreator
 import net.treset.treelauncher.backend.creation.VanillaVersionCreator
@@ -195,7 +193,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     @Throws(IOException::class, ComponentCreationException::class, FileDownloadException::class)
     private fun downloadVersion() {
         val service = SyncService()
-        setStatus(SyncStatus(SyncStep.DOWNLOADING, DownloadStatus(0, 0, "version.json", false)))
+        setStatus(SyncStatus(SyncStep.DOWNLOADING, DownloadStatus(0, 0, "version.json")))
         val details: LauncherVersionDetails = LauncherVersionDetails.fromJson(
             String(service.downloadFile("instance", instanceData.instance.first.id, "version.json"))
         )
@@ -220,11 +218,10 @@ class InstanceSynchronizer : ManifestSynchronizer {
 
     @Throws(IOException::class, FileDownloadException::class)
     private fun getVanillaCreator(details: LauncherVersionDetails): VersionCreator {
-        val version: MinecraftVersion = MinecraftGame.getReleases()
+        val version: MinecraftVersion = MinecraftVersion.getAll()
             .firstOrNull { it.id == details.versionId || it.id == details.versionNumber }?:
             throw IOException("Failed to find version: " + details.versionId)
-        val url: String = version.url
-        val versionDetails: MinecraftVersionDetails = MinecraftGame.getVersionDetails(url)
+        val versionDetails = MinecraftVersionDetails.get(version.url)
         return VanillaVersionCreator(
             instanceData.instance.first.typeConversion,
             files.versionManifest,
@@ -236,10 +233,8 @@ class InstanceSynchronizer : ManifestSynchronizer {
 
     @Throws(IOException::class, FileDownloadException::class)
     private fun getFabricCreator(details: LauncherVersionDetails): VersionCreator {
-        val version: FabricVersionDetails =
-            FabricLoader.getFabricVersionDetails(details.versionNumber, details.loaderVersion)
-        val profile: FabricProfile =
-            FabricLoader.getFabricProfile(details.versionNumber, details.loaderVersion)
+        val version = FabricVersion.get(details.versionNumber, details.loaderVersion)
+        val profile = FabricProfile.get(details.versionNumber, details.loaderVersion)
         return FabricVersionCreator(
             instanceData.instance.first.typeConversion,
             files.versionManifest,
@@ -277,7 +272,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
             instanceData.versionComponents[0].second.versionId
         )
         val service = SyncService()
-        setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(0, 0, "version.json", false)))
+        setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(0, 0, "version.json")))
         service.uploadFile(
             "instance",
             instanceData.instance.first.id,

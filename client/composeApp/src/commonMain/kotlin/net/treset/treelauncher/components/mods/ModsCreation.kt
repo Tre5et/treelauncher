@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.minecraft.MinecraftVersion
+import net.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.treelauncher.backend.data.LauncherModsDetails
 import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.creation.CreationMode
@@ -103,9 +102,9 @@ fun ModsCreation(
 
     LaunchedEffect(showSnapshots) {
         versions = if(showSnapshots) {
-            MinecraftGame.getVersions()
+            MinecraftVersion.getAll()
         } else {
-            MinecraftGame.getReleases()
+            MinecraftVersion.getAll().filter { it.isRelease }
         }
     }
 

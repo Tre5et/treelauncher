@@ -1,11 +1,10 @@
 package net.treset.treelauncher.backend.mods
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.mods.MinecraftMods
-import net.treset.mc_version_loader.mods.ModData
-import net.treset.mc_version_loader.mods.ModProvider
-import net.treset.mc_version_loader.mods.ModVersionData
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.mods.ModData
+import net.treset.mcdl.mods.ModProvider
+import net.treset.mcdl.mods.ModVersionData
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.data.toLauncherMod
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -123,7 +122,7 @@ class ModDownloader(
             "Downloading mod file: ${versionData.name}"
         }
         versionData.downloadProviders = modProviders
-        val newMod = MinecraftMods.downloadModFile(versionData, directory).toLauncherMod()
+        val newMod = versionData.download(directory).toLauncherMod()
         if(!enabled) {
             LOGGER.debug { "Disabling new mod file: ${newMod.fileName}" }
             val file = LauncherFile.of(directory, newMod.fileName)

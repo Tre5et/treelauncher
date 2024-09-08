@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.data.manifest.Manifest
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.util.file.LauncherFile

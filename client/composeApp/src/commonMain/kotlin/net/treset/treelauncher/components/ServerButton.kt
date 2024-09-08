@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import net.treset.mc_version_loader.saves.Server
+import net.treset.mcdl.saves.Server
 import net.treset.treelauncher.generic.CompactSelectorButton
 import net.treset.treelauncher.generic.ImageSelectorButton
 import net.treset.treelauncher.util.DetailsListDisplay

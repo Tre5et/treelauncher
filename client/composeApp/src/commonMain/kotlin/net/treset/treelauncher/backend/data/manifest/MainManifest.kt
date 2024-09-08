@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.SerializationException
 
 class MainManifest(
     type: LauncherManifestType,

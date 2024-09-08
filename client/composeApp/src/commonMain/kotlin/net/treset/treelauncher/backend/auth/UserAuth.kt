@@ -4,11 +4,10 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile
 import net.hycrafthd.minecraft_authenticator.login.Authenticator
 import net.hycrafthd.minecraft_authenticator.login.User
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.mojang.MinecraftProfile
-import net.treset.mc_version_loader.mojang.MinecraftProfileTextures
-import net.treset.mc_version_loader.mojang.MojangData
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.json.SerializationException
+import net.treset.mcdl.mojang.MinecraftProfile
+import net.treset.mcdl.mojang.MinecraftProfileTextures
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.Images
 import java.awt.image.BufferedImage
@@ -188,7 +187,7 @@ class UserAuth {
         if (minecraftUser == null) {
             return null
         }
-        val profile: MinecraftProfile = MojangData.getMinecraftProfile(minecraftUser!!.uuid())
+        val profile: MinecraftProfile = MinecraftProfile.get(minecraftUser!!.uuid())
         if (profile.properties == null || profile.properties.isEmpty()) {
             throw FileDownloadException("No properties found for user " + minecraftUser!!.name())
         }

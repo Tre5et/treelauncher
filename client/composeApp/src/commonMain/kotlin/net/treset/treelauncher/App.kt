@@ -9,11 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.fabric.FabricLoader
-import net.treset.mc_version_loader.forge.MinecraftForge
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.mods.MinecraftMods
-import net.treset.mc_version_loader.util.FileUtil
+import net.treset.mcdl.mods.ModsDL
 import net.treset.treelauncher.backend.config.*
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
@@ -294,13 +290,8 @@ class LauncherApp(
     }
 
     private fun configureVersionLoader() {
-        MinecraftMods.setModrinthUserAgent(appConfig().modrinthUserAgent)
-        MinecraftMods.setCurseforgeApiKey(appConfig().curseforgeApiKey)
-
-        MinecraftGame.useVersionCache(true)
-        FabricLoader.useVersionCache(true)
-        MinecraftForge.useVersionCache(true)
-        FileUtil.useWebRequestCache(true)
+        ModsDL.setModrinthUserAgent(appConfig().modrinthUserAgent)
+        ModsDL.setCurseforgeApiKey(appConfig().curseforgeApiKey)
     }
 
     fun exit(

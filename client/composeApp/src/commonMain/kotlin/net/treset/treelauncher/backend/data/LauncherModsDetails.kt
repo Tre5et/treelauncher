@@ -1,8 +1,8 @@
 package net.treset.treelauncher.backend.data
 
-import net.treset.mc_version_loader.json.GenericJsonParsable
-import net.treset.mc_version_loader.json.JsonUtils
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.JsonUtils
+import net.treset.mcdl.json.SerializationException
 
 class LauncherModsDetails(
     var types: List<String>?,

@@ -1,6 +1,7 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.SerializationException
 
 class ComponentManifest(
     type: LauncherManifestType,
@@ -52,7 +53,7 @@ class ComponentManifest(
             json: String?,
             typeConversion: Map<String, LauncherManifestType> = LauncherManifestType.defaultConversion
         ): ComponentManifest {
-            val componentManifest = fromJson(json, ComponentManifest::class.java)
+            val componentManifest = GenericJsonParsable.fromJson(json, ComponentManifest::class.java)
             componentManifest.typeConversion = typeConversion
             return componentManifest
         }

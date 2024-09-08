@@ -14,10 +14,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.format.FormatUtils
-import net.treset.mc_version_loader.mods.MinecraftMods
-import net.treset.mc_version_loader.mods.ModProvider
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.format.FormatUtils
+import net.treset.mcdl.mods.ModData
+import net.treset.mcdl.mods.ModProvider
+import net.treset.mcdl.mods.curseforge.CurseforgeSearch
+import net.treset.mcdl.mods.modrinth.ModrinthSearch
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.LauncherMod
@@ -81,7 +83,7 @@ fun ModsSearch(
                 try {
                     results = (
                         if(searchContext.providers.isEmpty() || searchContext.providers.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
-                            MinecraftMods.searchCombinedMods(
+                            ModData.searchCombined(
                                 tfValue,
                                 modContext.versions,
                                 modContext.types.map { it.id },
@@ -89,7 +91,7 @@ fun ModsSearch(
                             0
                             )
                         } else if(searchContext.providers.contains(ModProvider.MODRINTH)) {
-                            MinecraftMods.searchModrinth(
+                            ModrinthSearch.search(
                                 tfValue,
                                 modContext.versions,
                                 modContext.types.map { it.id },
@@ -97,7 +99,7 @@ fun ModsSearch(
                                 0
                             ).hits
                         } else {
-                            MinecraftMods.searchCurseforge(
+                            CurseforgeSearch.search(
                                 tfValue,
                                 modContext.versions,
                                 FormatUtils.modLoadersToCurseforgeModLoaders(modContext.types.map { it.id }),

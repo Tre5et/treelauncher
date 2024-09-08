@@ -1,16 +1,13 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.fabric.FabricLibrary
-import net.treset.mc_version_loader.fabric.FabricLoader
-import net.treset.mc_version_loader.fabric.FabricProfile
-import net.treset.mc_version_loader.fabric.FabricVersionDetails
-import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.minecraft.MinecraftVersion
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
-import net.treset.mc_version_loader.util.FileUtil
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.fabric.FabricLibrary
+import net.treset.mcdl.fabric.FabricProfile
+import net.treset.mcdl.fabric.FabricVersion
+import net.treset.mcdl.json.SerializationException
+import net.treset.mcdl.minecraft.MinecraftVersion
+import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherVersionDetails
@@ -26,7 +23,7 @@ import java.io.IOException
 class FabricVersionCreator(
     typeConversion: Map<String, LauncherManifestType>,
     componentsManifest: ParentManifest,
-    var fabricVersion: FabricVersionDetails,
+    var fabricVersion: FabricVersion,
     var fabricProfile: FabricProfile,
     files: LauncherFiles,
     var librariesDir: LauncherFile
@@ -54,15 +51,15 @@ class FabricVersionCreator(
         }
 
         LOGGER.debug { "Creating minecraft version..." }
-        val versions: List<MinecraftVersion> = try {
-            MinecraftGame.getVersions()
+        val versions = try {
+            MinecraftVersion.getAll()
         } catch (e: FileDownloadException) {
             throw ComponentCreationException("Unable to create fabric version: failed to get mc versions", e)
         }
         for (m in versions) {
             if (fabricProfile.inheritsFrom == m.id) {
-                val mcJson: String = try {
-                    FileUtil.getStringFromUrl(m.url)
+                val versionDetails = try {
+                    MinecraftVersionDetails.get(m.url)
                 } catch (e: FileDownloadException) {
                     throw ComponentCreationException("Unable to create fabric version: failed to download mc version details: versionId=${fabricProfile.inheritsFrom}", e)
                 }
@@ -70,7 +67,7 @@ class FabricVersionCreator(
                     VanillaVersionCreator(
                         typeConversion!!,
                         componentsManifest!!,
-                        MinecraftVersionDetails.fromJson(mcJson),
+                        versionDetails,
                         files,
                         librariesDir
                     )
@@ -151,9 +148,9 @@ class FabricVersionCreator(
             val loaderPattern = PatternString(":fabric-loader:", true)
             val clientLibs = libraries.filter { !loaderPattern.matches(it.name) }
             val libs: List<String> = try {
-                FabricLoader.downloadFabricLibraries(
-                    librariesDir,
-                    clientLibs
+                FabricLibrary.downloadAll(
+                    clientLibs,
+                    librariesDir
                 ) {
                     setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FABRIC_LIBRARIES, it))
                 }
@@ -175,7 +172,7 @@ class FabricVersionCreator(
                 throw ComponentCreationException("Unable to add fabric client: base dir is not a directory")
             }
             try {
-                FabricLoader.downloadFabricClient(File(baseDir, appConfig().fabricDefaultClientFileName), fabricVersion.loader)
+                fabricVersion.downloadClient(File(baseDir, appConfig().fabricDefaultClientFileName))
             } catch (e: FileDownloadException) {
                 throw ComponentCreationException("Unable to add fabric client: failed to download fabric loader", e)
             }

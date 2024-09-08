@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.news
 
-import net.treset.mc_version_loader.json.GenericJsonParsable
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.config.appSettings
 import java.io.IOException
 

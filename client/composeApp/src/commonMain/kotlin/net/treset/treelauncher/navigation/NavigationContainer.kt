@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.exception.FileDownloadException
+import net.treset.mcdl.exception.FileDownloadException
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton

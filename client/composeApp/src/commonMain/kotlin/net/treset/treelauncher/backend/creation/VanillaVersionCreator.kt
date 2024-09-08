@@ -1,12 +1,10 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.assets.AssetIndex
-import net.treset.mc_version_loader.assets.MinecraftAssets
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
-import net.treset.mc_version_loader.util.DownloadStatus
+import net.treset.mcdl.assets.AssetIndex
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.minecraft.MinecraftLibrary
+import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherVersionDetails
@@ -87,8 +85,8 @@ class VanillaVersionCreator(
         LOGGER.debug { "Downloading assets..." }
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, null))
         val assetIndexUrl: String = mcVersion.assetIndex.url
-        val index: AssetIndex = try {
-            MinecraftAssets.getAssetIndex(assetIndexUrl)
+        val index = try {
+            AssetIndex.get(assetIndexUrl)
         } catch (e: FileDownloadException) {
             throw ComponentCreationException("Unable to create assets: failed to download asset index", e)
         }
@@ -97,12 +95,10 @@ class VanillaVersionCreator(
         }
         val baseDir: LauncherFile = LauncherFile.ofData(files.launcherDetails.assetsDir)
         try {
-            MinecraftAssets.downloadAssets(
+            index.downloadAll(
                 baseDir,
-                index,
-                assetIndexUrl,
                 false
-            ) { status: DownloadStatus? ->
+            ) { status ->
                 setStatus(
                     CreationStatus(
                         CreationStatus.DownloadStep.VERSION_ASSETS,
@@ -115,7 +111,7 @@ class VanillaVersionCreator(
         }
         if(index.isMapToResources) {
             val virtualDir = try {
-                MinecraftAssets.createVirtualAssets(mcVersion.assets, baseDir)
+                index.resolveAll(baseDir)
             } catch (e: IOException) {
                 throw ComponentCreationException("Unable to create assets: failed to extract virtual assets", e)
             }
@@ -180,12 +176,13 @@ class VanillaVersionCreator(
 
         val nativesDir = LauncherFile.of(newManifest!!.directory, appConfig().nativesDirName)
         val result: List<String> = try {
-            MinecraftGame.downloadVersionLibraries(
+            MinecraftLibrary.downloadAll(
                 mcVersion.libraries,
                 librariesDir,
+                null,
                 listOf<String>(),
                 nativesDir
-            ) { status: DownloadStatus? ->
+            ) { status ->
                 setStatus(
                     CreationStatus(
                         CreationStatus.DownloadStep.VERSION_LIBRARIES,
@@ -213,7 +210,7 @@ class VanillaVersionCreator(
                 throw ComponentCreationException("Unable to add client: base dir is not a directory: dir=${newManifest.directory}")
             }
             try {
-                MinecraftGame.downloadVersionDownload(mcVersion.downloads.client, File(baseDir, appConfig().minecraftDefaultFileName))
+                mcVersion.downloads.client.download(File(baseDir, appConfig().minecraftDefaultFileName))
             } catch (e: FileDownloadException) {
                 throw ComponentCreationException("Unable to add client: Failed to download client: url=${mcVersion.downloads.client.url}", e)
             }

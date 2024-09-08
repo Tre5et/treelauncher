@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import net.treset.mc_version_loader.util.OsUtil
+import net.treset.mcdl.util.OsUtil
 import net.treset.treelauncher.backend.config.Window
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.generic.IconButton

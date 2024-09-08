@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.sync
 
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType

@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.update
 
-import net.treset.mc_version_loader.json.GenericJsonParsable
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.generic.PopupType
 import net.treset.treelauncher.localization.strings
 

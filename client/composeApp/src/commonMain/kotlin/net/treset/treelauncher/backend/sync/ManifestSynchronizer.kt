@@ -1,8 +1,8 @@
 package net.treset.treelauncher.backend.sync
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.util.DownloadStatus
+import net.treset.mcdl.json.SerializationException
+import net.treset.mcdl.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.ComponentManifest
@@ -154,7 +154,7 @@ open class ManifestSynchronizer(var manifest: ComponentManifest, protected var f
             }?: {
                 LOGGER.debug { "Uploading file: ${child.path}" }
                 current++
-                setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(current, totalAmount, child.path, false)))
+                setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(current, totalAmount, child.path)))
                 val file: LauncherFile = LauncherFile.of(basePath, filePath, child.path)
                 val content: ByteArray = file.read()
                 service.uploadFile(type, id, file.path, content)
@@ -174,7 +174,7 @@ open class ManifestSynchronizer(var manifest: ComponentManifest, protected var f
         var index = 0
         for (path in difference) {
             index++
-            setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(index, difference.size, path, false)))
+            setStatus(SyncStatus(SyncStep.UPLOADING, DownloadStatus(index, difference.size, path)))
             LOGGER.debug { "Difference: $path" }
             val file: LauncherFile = LauncherFile.of(manifest.directory, path)
             val content: ByteArray = if (file.isFile()) {
@@ -313,7 +313,7 @@ open class ManifestSynchronizer(var manifest: ComponentManifest, protected var f
                 rawPath
             }
             LOGGER.debug { "Downloading file: $path" }
-            setStatus(SyncStatus(SyncStep.DOWNLOADING, DownloadStatus(amount + 1, difference.size, path, false)))
+            setStatus(SyncStatus(SyncStep.DOWNLOADING, DownloadStatus(amount + 1, difference.size, path)))
             val content = service.downloadFile(type, manifest.id, path)
             val file: LauncherFile = LauncherFile.of(basePath, path)
             if (content.isEmpty()) {

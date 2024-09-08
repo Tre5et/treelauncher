@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.google.gson.annotations.SerializedName
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.json.GenericJsonParsable
-import net.treset.mc_version_loader.json.SerializationException
-import net.treset.mc_version_loader.mods.ModProvider
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.SerializationException
+import net.treset.mcdl.mods.ModProvider
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.data.manifest.ComponentManifest

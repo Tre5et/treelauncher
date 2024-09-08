@@ -20,9 +20,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.minecraft.MinecraftGame
-import net.treset.mc_version_loader.minecraft.MinecraftVersion
-import net.treset.mc_version_loader.mods.ModProvider
+import net.treset.mcdl.minecraft.MinecraftVersion
+import net.treset.mcdl.mods.ModProvider
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.LauncherModSortType
 import net.treset.treelauncher.backend.config.appSettings
@@ -205,9 +204,9 @@ fun Mods() {
             LaunchedEffect(current, showSnapshots) {
                 Thread {
                     versions = if (showSnapshots) {
-                        MinecraftGame.getVersions()
+                        MinecraftVersion.getAll()
                     } else {
-                        MinecraftGame.getReleases()
+                        MinecraftVersion.getAll().filter { it.isRelease }
                     }.also { v ->
                         selectedVersion = v.firstOrNull {
                             it.id == current.second.versions?.let {it[0]}

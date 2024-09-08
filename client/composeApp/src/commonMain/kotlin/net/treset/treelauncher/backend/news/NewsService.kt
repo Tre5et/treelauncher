@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.news
 
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.util.HttpService
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings

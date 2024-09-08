@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.sync
 
-import net.treset.mc_version_loader.json.GenericJsonParsable
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.SerializationException
 
 class ComponentData(var version: Int, var fileAmount: Int, var hashTree: List<HashEntry>) : GenericJsonParsable() {
     class HashEntry {

@@ -1,9 +1,9 @@
 package net.treset.treelauncher.backend.creation
 
-import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.java.*
-import net.treset.mc_version_loader.util.DownloadStatus
-import net.treset.mc_version_loader.util.OsUtil
+import net.treset.mcdl.exception.FileDownloadException
+import net.treset.mcdl.java.JavaFile
+import net.treset.mcdl.java.JavaRuntimes
+import net.treset.mcdl.util.OsUtil
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
@@ -35,8 +35,8 @@ class JavaComponentCreator(
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: invalid data")
         }
-        val java: JavaRuntimes = try {
-            MinecraftJava.getJavaRuntimes()
+        val java = try {
+            JavaRuntimes.get()
         } catch (e: FileDownloadException) {
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to download java runtime json", e)
@@ -58,17 +58,17 @@ class JavaComponentCreator(
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get release")
         }
-        val files: List<JavaFile> = try {
-            MinecraftJava.getJavaFiles(release.manifest.url)
+        val files = try {
+            JavaFile.getAll(release.manifest.url)
         } catch (e: FileDownloadException) {
             throw ComponentCreationException("Failed to create java component: failed to download java file manifest", e)
         }
         val baseDir = LauncherFile(newManifest!!.directory)
         try {
-            MinecraftJava.downloadJavaFiles(
-                baseDir,
-                files
-            ) { status: DownloadStatus? ->
+            JavaFile.downloadAll(
+                files,
+                baseDir
+            ) { status ->
                 setStatus(
                     CreationStatus(
                         CreationStatus.DownloadStep.JAVA,

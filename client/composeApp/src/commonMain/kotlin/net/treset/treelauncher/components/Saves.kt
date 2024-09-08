@@ -9,8 +9,8 @@ import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.saves.Save
-import net.treset.mc_version_loader.saves.Server
+import net.treset.mcdl.saves.Save
+import net.treset.mcdl.saves.Server
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
@@ -64,7 +64,7 @@ fun Saves() {
                 .filter { it.isDirectory }
                 .mapNotNull { file ->
                     try {
-                        Save.from(file)
+                        Save.get(file)
                     } catch (e: IOException) {
                         Save(file.name, null, null)
                     }?.let { it to file }
@@ -73,7 +73,7 @@ fun Saves() {
             val serversFile = LauncherFile.of(it.directory, ".included_files", "servers.dat")
             servers = if (serversFile.exists()) {
                 try {
-                    Server.from(serversFile)
+                    Server.getAll(serversFile)
                 } catch (e: IOException) {
                     emptyList()
                 }
@@ -135,7 +135,7 @@ fun Saves() {
                     "saves",
                     {
                         try {
-                            Save.from(this)
+                            Save.get(this)
                         } catch (e: IOException) {
                             null
                         }

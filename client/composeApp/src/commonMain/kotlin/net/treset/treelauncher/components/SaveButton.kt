@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import net.treset.mc_version_loader.saves.Save
+import net.treset.mcdl.saves.Save
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons

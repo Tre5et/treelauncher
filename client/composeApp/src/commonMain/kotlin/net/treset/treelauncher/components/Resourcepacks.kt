@@ -10,8 +10,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.resoucepacks.Resourcepack
-import net.treset.mc_version_loader.resoucepacks.Texturepack
+import net.treset.mcdl.resourcepacks.Resourcepack
+import net.treset.mcdl.resourcepacks.Texturepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
@@ -49,7 +49,7 @@ fun Resourcepacks() {
             resourcepacks = LauncherFile.of(current.directory, "resourcepacks").listFiles()
                 .mapNotNull { file ->
                     try {
-                        Resourcepack.from(file)
+                        Resourcepack.get(file)
                     } catch (e: Exception) {
                         Resourcepack(file.name, null, null)
                     }?.let { it to file }
@@ -57,7 +57,7 @@ fun Resourcepacks() {
             texturepacks = LauncherFile.of(current.directory, "texturepacks").listFiles()
                 .mapNotNull { file ->
                     try {
-                        Texturepack.from(file)
+                        Texturepack.get(file)
                     } catch (e: Exception) {
                         Texturepack(file.name, null, null)
                     }?.let { it to file }
@@ -273,10 +273,10 @@ fun Resourcepacks() {
 
 fun LauncherFile.toPack(): Any? {
     return try {
-        Resourcepack.from(this)
+        Resourcepack.get(this)
     } catch (e: IOException) {
         try {
-            Texturepack.from(this)
+            Texturepack.get(this)
         } catch (e: IOException) {
             LOGGER.warn(e) { "Unable to parse imported resourcepack: ${this.name}" }
             null

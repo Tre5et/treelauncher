@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.json.JsonParsable
+import net.treset.mcdl.json.JsonParsable
 import net.treset.treelauncher.backend.data.LauncherDetails
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest

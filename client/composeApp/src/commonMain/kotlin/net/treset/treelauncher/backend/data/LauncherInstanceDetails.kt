@@ -1,8 +1,8 @@
 package net.treset.treelauncher.backend.data
 
-import net.treset.mc_version_loader.format.FormatUtils
-import net.treset.mc_version_loader.json.GenericJsonParsable
-import net.treset.mc_version_loader.json.SerializationException
+import net.treset.mcdl.format.FormatUtils
+import net.treset.mcdl.json.GenericJsonParsable
+import net.treset.mcdl.json.SerializationException
 import java.time.LocalDateTime
 
 class LauncherInstanceDetails(
