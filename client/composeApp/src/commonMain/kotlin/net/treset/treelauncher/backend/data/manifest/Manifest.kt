@@ -13,7 +13,7 @@ open class  Manifest(
     @field:SerializedName("details") var _details: String?,
     @field:SerializedName("prefix") var _prefix: String?,
     @field:SerializedName("name") var _name: String?,
-    @field:SerializedName("includedFiles") var _includedFiles: List<String>?,
+    @field:SerializedName("included_files") var _includedFiles: List<String>?,
     @field:SerializedName("components") var _components: MutableList<String>?,
     @field:Transient val expectedType: LauncherManifestType? = null
 ) : GenericJsonParsable() {
