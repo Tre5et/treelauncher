@@ -108,16 +108,26 @@ class CommandBuilder(
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
         processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
-        val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvmArguments.toTypedArray())
-        for (v in instanceData.versionComponents) {
-            argOrder.add(v.second.jvmArguments.toTypedArray())
+
+        val jvmArgs = instanceData.instance.second.jvmArguments.toMutableList()
+        for(v in instanceData.versionComponents) {
+            v.second.jvmArguments.forEach {
+                if(!jvmArgs.contains(it)) {
+                    jvmArgs.add(it)
+                }
+            }
         }
-        argOrder.add(arrayOf(
-            LauncherLaunchArgument(mainClass)
-        ))
-        for (v in instanceData.versionComponents) {
-            argOrder.add(v.second.gameArguments.toTypedArray())
+
+        val gameArgs = mutableListOf<LauncherLaunchArgument>()
+        for(v in instanceData.versionComponents) {
+            v.second.gameArguments.forEach {
+                if(!gameArgs.contains(it)) {
+                    gameArgs.add(it)
+                }
+            }
         }
+
+        val args = jvmArgs + LauncherLaunchArgument(mainClass) + gameArgs
 
         val context = CommandContext(
             offline,
@@ -139,7 +149,7 @@ class CommandBuilder(
         try {
             appendArguments(
                 processBuilder,
-                argOrder.toTypedArray(),
+                args,
                 context
             )
         } catch (e: GameCommandException) {
@@ -151,22 +161,7 @@ class CommandBuilder(
     @Throws(GameCommandException::class)
     private fun appendArguments(
         pb: ProcessBuilder,
-        argOrder: Array<Array<LauncherLaunchArgument>>,
-        context: CommandContext
-    ) {
-        for(args in argOrder) {
-            appendArguments(
-                pb,
-                args,
-                context,
-            )
-        }
-    }
-
-    @Throws(GameCommandException::class)
-    private fun appendArguments(
-        pb: ProcessBuilder,
-        args: Array<LauncherLaunchArgument>,
+        args: List<LauncherLaunchArgument>,
         context: CommandContext
     ) {
         val exceptionQueue: MutableList<GameCommandException> = mutableListOf()

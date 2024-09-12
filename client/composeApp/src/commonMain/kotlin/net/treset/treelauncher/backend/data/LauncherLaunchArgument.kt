@@ -68,4 +68,21 @@ class LauncherLaunchArgument(
 
     val isFinished: Boolean
         get() = replacementValues.isEmpty()
+
+    override fun equals(other: Any?): Boolean {
+        return argument == (other as? LauncherLaunchArgument)?.argument
+                && feature == (other as? LauncherLaunchArgument)?.feature
+                && osName == (other as? LauncherLaunchArgument)?.osName
+                && osVersion == (other as? LauncherLaunchArgument)?.osVersion
+                && osArch == (other as? LauncherLaunchArgument)?.osArch
+    }
+
+    override fun hashCode(): Int {
+        var result = argument.hashCode()
+        result = 31 * result + (feature?.hashCode() ?: 0)
+        result = 31 * result + (osName?.hashCode() ?: 0)
+        result = 31 * result + (osVersion?.hashCode() ?: 0)
+        result = 31 * result + (osArch?.hashCode() ?: 0)
+        return result
+    }
 }

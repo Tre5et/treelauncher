@@ -137,9 +137,9 @@ class ForgeVersionCreator(
     @Throws(ComponentCreationException::class)
     private fun addArguments(details: LauncherVersionDetails) {
         LOGGER.debug { "Adding forge arguments..." }
-        forgeInstaller?.let { forgeVersion ->
+        forgeInstaller?.let { forgeInstaller ->
             details.jvmArguments = translateArguments(
-                forgeVersion.installData.arguments.jvm,
+                forgeInstaller.installData.arguments.jvm,
                 appConfig().forgeDefaultJvmArguments
             ).map {
                 // Hack because forge uses ${version_name} in a questionable way in some versions
@@ -150,7 +150,7 @@ class ForgeVersionCreator(
             }
 
             details.gameArguments = translateArguments(
-                forgeVersion.installData.arguments.game,
+                forgeInstaller.installData.arguments.game,
                 appConfig().forgeDefaultGameArguments
             )
         }?: throw ComponentCreationException("Unable to create forge version: invalid data")

@@ -38,7 +38,7 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "1.0.0-alpha.1"
+        val mcdlVersion = "1.0.0-alpha.4"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -55,8 +55,8 @@ kotlin {
             }
             implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
-            implementation("io.github.oshai:kotlin-logging:7.0.0")
-            implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
+            implementation("io.github.oshai:kotlin-logging:6.0.3")
+            implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
             implementation("org.slf4j:slf4j-api:2.0.12")
             implementation("ch.qos.logback:logback-classic:1.5.3")
 

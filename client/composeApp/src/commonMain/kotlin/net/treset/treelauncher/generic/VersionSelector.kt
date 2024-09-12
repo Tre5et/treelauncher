@@ -109,7 +109,7 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it == default }
                         }
                     }
-            }
+            }.start()
         }
     }
 
