@@ -1,7 +1,8 @@
 package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.hycrafthd.minecraft_authenticator.login.User
+import net.treset.mcdl.auth.data.UserData
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.QuickPlayData
@@ -12,7 +13,7 @@ import java.io.File
 
 class CommandContext(
     val offline: Boolean,
-    val minecraftUser: User?,
+    val minecraftUser: UserData?,
     val gameDataDir: String,
     val resourcepacksDir: String,
     val assetsDir: String,
@@ -31,7 +32,7 @@ class CommandBuilder(
     var processBuilder: ProcessBuilder,
     private var instanceData: InstanceData,
     var offline: Boolean,
-    var minecraftUser: User?,
+    var minecraftUser: UserData?,
     private var quickPlayData: QuickPlayData?
 ) {
     @Throws(GameCommandException::class)
@@ -251,7 +252,7 @@ class CommandBuilder(
 
             "auth_player_name" -> {
                 if(context.minecraftUser != null && !context.offline) {
-                    context.minecraftUser.name()
+                    context.minecraftUser.username
                 } else {
                     "LocalPlayer"
                 }
@@ -279,7 +280,7 @@ class CommandBuilder(
 
             "auth_uuid" -> {
                 if(context.minecraftUser != null && !context.offline) {
-                    context.minecraftUser.uuid()
+                    context.minecraftUser.uuid
                 } else {
                     "00000000000000000000000000000000"
                 }
@@ -287,7 +288,7 @@ class CommandBuilder(
 
             "auth_xuid" -> {
                 if(context.minecraftUser != null && !context.offline) {
-                    context.minecraftUser.xuid()
+                    context.minecraftUser.xuid
                 } else {
                     ""
                 }
@@ -295,23 +296,19 @@ class CommandBuilder(
 
             "auth_access_token" -> {
                 if(context.minecraftUser != null && !context.offline) {
-                    context.minecraftUser.accessToken()
+                    context.minecraftUser.accessToken
                 } else {
                     ""
                 }
             }
 
             "clientid" -> {
-                if(context.minecraftUser != null && !context.offline) {
-                    context.minecraftUser.clientId()
-                } else {
-                    ""
-                }
+                appSettings().clientId
             }
 
             "user_type" -> {
                 if(context.minecraftUser != null && !context.offline) {
-                    context.minecraftUser.type()
+                    "msa"
                 } else {
                     ""
                 }
@@ -319,7 +316,7 @@ class CommandBuilder(
 
             "auth_session" -> {
                 if(context.minecraftUser != null && !context.offline) {
-                    "token:${context.minecraftUser.accessToken()}:${context.minecraftUser.uuid()}"
+                    "token:${context.minecraftUser.accessToken}:${context.minecraftUser.uuid}"
                 } else {
                     "token::00000000000000000000000000000000"
                 }

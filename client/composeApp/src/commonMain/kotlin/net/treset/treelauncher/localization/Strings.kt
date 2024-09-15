@@ -1,6 +1,7 @@
 package net.treset.treelauncher.localization
 
 import com.multiplatform.webview.web.WebViewState
+import net.treset.mcdl.auth.AuthenticationStep
 import net.treset.mcdl.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
@@ -247,6 +248,13 @@ open class Strings(
     data class Login(
         val browserTitle: (WebViewState) -> String = { state -> "Login: ${state.pageTitle ?: "Loading..."} (${state.lastLoadedUrl ?: "Getting url..."})" },
         val button: () -> String = { "Login with Microsoft" },
+        val cancel: () -> String = { "Cancel Login" },
+        val keepLoggedIn: () -> String = { "Stay logged in" },
+        val label: Label = Label(),
+        val logout: () -> String = { "Delete Saved Login Data" },
+        val offline: () -> String = { "Start in Offline Mode" },
+        val offlineNotification: () -> String = { "Offline Mode active. Functionality limited." },
+        val popup: Popup = Popup(),
         val tip: () -> String = { "TIP: ${
             arrayOf(
                 "Drag and Drop files into Saves, Resourcepack or Mods components to import them.",
@@ -263,18 +271,37 @@ open class Strings(
                 "Display scaling can be adjusted in the settings.",
                 "Enable discord integration in the settings to show your friends what you're playing."
             ).random()
-        }" },
-        val label: Label = Label(),
-        val logout: () -> String = { "Delete Saved Login Data" },
-        val keepLoggedIn: () -> String = { "Stay logged in" },
-        val offline: () -> String = { "Start in Offline Mode" },
-        val offlineNotification: () -> String = { "Offline Mode active. Functionality limited." }
+        }" }
     ) {
         data class Label(
-            val authenticating: () -> String = { "Logging you in..." },
+            val authenticating: (state: AuthenticationStep?) -> String = {
+                "Logging you in..."
+            },
+            val authenticatingSub: (state: AuthenticationStep?) -> String = { state ->
+                state?.let {
+                    when(it) {
+                        AuthenticationStep.MICROSOFT -> "Logging in with Microsoft"
+                        AuthenticationStep.XBOX_LIVE -> "Obtaining Xbox Live Token"
+                        AuthenticationStep.XBOX_SECURITY -> "Obtaining Xbox Security Token"
+                        AuthenticationStep.MOJANG -> "Logging in with Mojang"
+                        AuthenticationStep.MINECRAFT -> "Obtaining Minecraft Profile"
+                    }
+                } ?: ""
+            },
             val failure: () -> String = { "Login failed. Please try again!" },
             val success: (String?) -> String = { user -> "Welcome, ${user ?: "Anonymous User"}!" },
             val offline: () -> String = { "Started in offline mode" }
+        )
+
+        data class Popup(
+            val close: () -> String = { "Close" },
+            val content: () -> Pair<String, String> = {
+                "Open the following URL in your browser:" to
+                        "and enter the code:"
+            },
+            val copyContent: () -> String = { "Copy" },
+            val open: () -> String = { "Open URL and copy Code" },
+            val title: () -> String = { "Login with Microsoft" }
         )
     }
 

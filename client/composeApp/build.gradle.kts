@@ -38,7 +38,7 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "1.0.0-alpha.4"
+        val mcdlVersion = "1.0.0-alpha.8"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -53,7 +53,6 @@ kotlin {
             mcdlModules.forEach {
                 implementation("net.treset.mcdl:mcdl-$it:$mcdlVersion")
             }
-            implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
 
             implementation("io.github.oshai:kotlin-logging:6.0.3")
             implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")

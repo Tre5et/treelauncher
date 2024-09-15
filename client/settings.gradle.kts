@@ -14,6 +14,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://repo.u-team.info")
         maven("https://raw.githubusercontent.com/Tre5et/maven/main/")
@@ -24,8 +25,6 @@ dependencyResolutionManagement {
         flatDir {
             dirs("libs")
         }
-
-        maven("libs")
     }
 }
 

@@ -11,7 +11,7 @@ class Config(baseDir: String, val updateUrl: String?) {
     var baseDir: LauncherFile = LauncherFile.of(baseDir)
     val syncFileName = "data.sync"
     val metaDir: LauncherFile = LauncherFile.of(baseDir, ".launcher")
-    val authFile: LauncherFile = LauncherFile.of(metaDir, "secrets.auth")
+    val tokenFile: LauncherFile = LauncherFile.of(metaDir, "tokens.json")
     val settingsFile: LauncherFile = LauncherFile.of(".launcher", "settings.json")
     val manifestFileName = "manifest.json"
     val nativesDirName = "natives"
@@ -69,6 +69,7 @@ class Config(baseDir: String, val updateUrl: String?) {
     val fabricDefaultClientFileName = "fabric-client.jar"
     val modrinthUserAgent = "TreSet/treelauncher/v2.6.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"
+    val msClientId = "389304a5-70a6-4013-907f-98c4eb4b51fb"
 }
 
 private lateinit var config: Config

@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.hycrafthd.minecraft_authenticator.login.User
+import net.treset.mcdl.auth.data.UserData
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.util.QuickPlayData
@@ -16,7 +16,7 @@ class GameLauncher(
     val instance: InstanceData,
     val files: LauncherFiles,
     val offline: Boolean,
-    val minecraftUser: User?,
+    val minecraftUser: UserData?,
     val quickPlayData: QuickPlayData? = null,
     var onExit: (String?) -> Unit = { _ -> },
     var onResourceCleanupFailed:  (Exception, (retry: Boolean) -> Unit) -> Unit  = { _, _ -> },

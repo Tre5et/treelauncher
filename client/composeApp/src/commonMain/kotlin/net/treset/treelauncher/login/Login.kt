@@ -13,12 +13,13 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Window
-import com.multiplatform.webview.web.WebView
-import com.multiplatform.webview.web.rememberWebViewState
+import net.treset.mcdl.auth.AuthenticationStep
+import net.treset.mcdl.auth.InteractiveData
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
+import net.treset.treelauncher.backend.util.string.copyToClipboard
+import net.treset.treelauncher.backend.util.string.openInBrowser
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
@@ -59,7 +60,8 @@ fun LoginScreen(
 
     var keepLoggedIn by remember { mutableStateOf(true) }
     var loginState by remember { mutableStateOf(LoginState.NOT_LOGGED_IN) }
-    var browserUrl: String? by remember { mutableStateOf(null) }
+    var interactiveData by remember { mutableStateOf<InteractiveData?>(null) }
+    var loginStep by remember { mutableStateOf<AuthenticationStep?>(null) }
     var showContent by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(language().appLanguage) }
 
@@ -92,12 +94,16 @@ fun LoginScreen(
         if(userAuth().hasFile()) {
             startLogin(true,
                 {
+                    userAuth().cancelAuthentication()
+
+                },
+                {
                     loginState = it
                     if(it == LoginState.LOGGED_IN && updateChecked) {
                         showContent = true
                     }
                 },
-                { browserUrl = it }
+                { loginStep = it }
             )
         }
     }
@@ -129,19 +135,9 @@ fun LoginScreen(
         return
     }
 
-    browserUrl?.let {
-        LoginBrowserWindow(it) { url ->
-            if(
-                userAuth().checkUserUrl(url, keepLoggedIn) { success ->
-                    loginState = if (success) {
-                        LoginState.LOGGED_IN
-                    } else {
-                        LoginState.FAILED
-                    }
-                }
-            ) {
-                browserUrl = null
-            }
+    interactiveData?.let {
+        LoginPopup(it) {
+            interactiveData = null
         }
     }
 
@@ -163,8 +159,17 @@ fun LoginScreen(
                     onClick = {
                         startLogin(
                             keepLoggedIn,
-                            { loginState = it },
-                            { browserUrl = it }
+                            { interactiveData = it },
+                            {
+                                loginState = it
+                                interactiveData = null
+                            },
+                            {
+                                loginStep = it
+                                if(it != null && it != AuthenticationStep.MICROSOFT) {
+                                    interactiveData = null
+                                }
+                            }
                         )
                     },
                     enabled = loginState.actionAllowed,
@@ -211,13 +216,31 @@ fun LoginScreen(
                     Text(
                         text = when (loginState) {
                             LoginState.NOT_LOGGED_IN -> ""
-                            LoginState.AUTHENTICATING -> strings().login.label.authenticating()
-                            LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                            LoginState.AUTHENTICATING -> strings().login.label.authenticating(loginStep)
+                            LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.username)
                             LoginState.OFFLINE -> strings().login.label.offline()
                             LoginState.FAILED -> strings().login.label.failure()
                         },
                         style = MaterialTheme.typography.titleMedium,
                     )
+
+                    if(loginState == LoginState.AUTHENTICATING) {
+                        Text(
+                            text = strings().login.label.authenticatingSub(loginStep),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+
+                        Button(
+                            onClick = {
+                                loginState = LoginState.FAILED
+                                userAuth().cancelAuthentication()
+                                showContent = false
+                            },
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                        ) {
+                            Text(strings().login.cancel())
+                        }
+                    }
 
                     if (loginState == LoginState.FAILED) {
                         Button(
@@ -297,51 +320,84 @@ fun LoginScreen(
 }
 
 @Composable
-private fun LoginBrowserWindow(
-    url: String,
-    onUrl: (String?) -> Unit
+private fun LoginPopup(
+    data: InteractiveData,
+    close: () -> Unit
 ) {
-    val webViewState = rememberWebViewState(url)
-
-    LaunchedEffect(Unit) {
-        webViewState.webSettings.apply {
-            isJavaScriptEnabled = true
+    PopupOverlay(
+        type = PopupType.NONE,
+        titleRow = { Text(strings().login.popup.title() ) },
+        buttonRow = {
+            Button(
+                onClick = close,
+                color = MaterialTheme.colorScheme.error
+            ) {
+                Text(strings().login.popup.close())
+            }
+            Button(
+                onClick = {
+                    data.url.openInBrowser()
+                    data.userCode.copyToClipboard()
+                }
+            ) {
+                Text(strings().login.popup.open())
+            }
         }
-    }
-
-    webViewState.lastLoadedUrl?.let {
-        onUrl(webViewState.lastLoadedUrl)
-    }
-
-    Window(
-        onCloseRequest = { onUrl(null) },
-        title = strings().login.browserTitle(webViewState)
     ) {
-        Column(Modifier.fillMaxSize()) {
-            WebView(
-                state = webViewState,
-                modifier = Modifier.fillMaxSize(),
-            )
+        strings().login.popup.content().let {
+            Text(it.first)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    data.url,
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                IconButton(
+                    onClick = { data.url.copyToClipboard() },
+                    icon = icons().copy,
+                    tooltip = strings().login.popup.copyContent(),
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+            }
+            Text(it.second)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    data.userCode,
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                IconButton(
+                    onClick = { data.userCode.copyToClipboard() },
+                    icon = icons().copy,
+                    tooltip = strings().login.popup.copyContent(),
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+            }
         }
     }
 }
 
 private fun startLogin(
     keepLoggedIn: Boolean,
+    onInteractiveData: (InteractiveData) -> Unit,
     onState: (LoginState) -> Unit,
-    onUrl: (String) -> Unit
+    onStep: (AuthenticationStep?) -> Unit
 ) {
     onState(LoginState.AUTHENTICATING)
-    Thread {
-        val url = userAuth().startAuthentication(keepLoggedIn) {
-            onState(
-                if (it) {
-                    LoginState.LOGGED_IN
-                } else {
-                    LoginState.FAILED
-                }
-            )
+    userAuth().authenticate(
+        keepLoggedIn,
+        onInteractiveData,
+        onStep
+    ) {
+        it?.let {
+            onStep(null)
+            onState(LoginState.FAILED)
+            AppContext.error(it)
+        } ?: run {
+            onStep(null)
+            onState(LoginState.LOGGED_IN)
         }
-        url?.let { onUrl(it) }
-    }.start()
+    }
 }

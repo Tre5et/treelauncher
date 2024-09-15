@@ -20,6 +20,7 @@ import net.treset.treelauncher.style.setDisplayScale
 import net.treset.treelauncher.style.setFontScale
 import net.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
+import java.util.*
 
 enum class InstanceDataSortType(val comparator: Comparator<InstanceData>) {
     NAME(InstanceDetailsNameComparator()),
@@ -120,6 +121,7 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var discordShowInstance: Boolean = true
     var window: Window? = null
     var dataVersion: String = "0.0.1"
+    val clientId: String = UUID.randomUUID().toString()
 
     @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null

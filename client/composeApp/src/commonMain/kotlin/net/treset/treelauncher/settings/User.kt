@@ -43,7 +43,7 @@ fun User() {
             strings().settings.user()
         )
         Text(
-            userAuth().minecraftUser?.name ?: "UNKNOWN",
+            userAuth().minecraftUser?.username ?: "UNKNOWN",
             style = MaterialTheme.typography.titleMedium
         )
         userImage?.let {

@@ -63,6 +63,7 @@ object Icons {
     val down = Icons.Rounded.KeyboardDoubleArrowDown
     val help = Icons.AutoMirrored.Rounded.Help
     val close = Icons.Rounded.Close
+    val copy = Icons.Rounded.ContentCopy
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {
