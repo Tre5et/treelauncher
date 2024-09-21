@@ -1,5 +1,6 @@
 package net.treset.treelauncher.util
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import net.treset.treelauncher.AppContext
@@ -19,7 +20,7 @@ fun DataPatcher(
 
     var upgraded by rememberSaveable{ mutableStateOf(!dataPatcher.upgradeNeeded()) }
     var error by remember { mutableStateOf<Exception?>(null) }
-    var status: DataPatcher.PatchStep? by remember { mutableStateOf(null) }
+    var status: DataPatcher.PatchStatus? by remember { mutableStateOf(null) }
     var backup by remember { mutableStateOf(true) }
 
 
@@ -32,7 +33,11 @@ fun DataPatcher(
             PopupOverlay(
                 titleRow = { Text(strings().launcher.patch.running()) },
             ) {
-                Text(strings().launcher.patch.status(it))
+                Text(strings().launcher.patch.status(it.step))
+                Text(
+                    it.message,
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
         } ?: PopupOverlay(
             titleRow = { Text(strings().launcher.patch.title()) },

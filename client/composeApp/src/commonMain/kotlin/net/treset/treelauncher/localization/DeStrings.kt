@@ -133,6 +133,7 @@ class DeStrings : Strings(
                     DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Ressourcenpaket Versionsargumente werden entfernt"
                     DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Einbegriffene Dateien werden Spieldaten Komponenten hinzugefügt"
                     DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Texturenpakete werden zu einbegriffenen Dateien hinzugefügt"
+                    DataPatcher.PatchStep.REMOVE_LOGIN -> "Alte Login-Daten werden entfernt"
                 }
             }
         ),

@@ -234,6 +234,7 @@ open class Strings(
                     DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Removing resoucepacks directory version arguments"
                     DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Adding included files to Game Data Components"
                     DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Adding texturepacks to included files"
+                    DataPatcher.PatchStep.REMOVE_LOGIN -> "Removing old login storage"
                 }
             }
         )
