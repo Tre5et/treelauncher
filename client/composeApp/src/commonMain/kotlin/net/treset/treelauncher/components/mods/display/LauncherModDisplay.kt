@@ -23,6 +23,7 @@ class LauncherModDisplay(
         private set(value) {
             field = value
             recomposeData()
+            onDownloading(value)
         }
     var image: Painter? = null
         private set(value) {
@@ -57,6 +58,16 @@ class LauncherModDisplay(
             field = value
             recomposeData()
         }
+
+    var visible = false
+        private set(value) {
+            if(field != value) {
+                field = value
+                onVisibility(value)
+                recomposeData()
+            }
+        }
+
     var currentVersion: ModVersionData =
         object: GenericModVersion() {
             override fun getDatePublished(): LocalDateTime? = null
@@ -88,7 +99,7 @@ class LauncherModDisplay(
         loadVersions()
     }
 
-    fun checkForUpdates() {
+    fun checkForUpdates(): Boolean {
         versions?.let {
             if (it.isNotEmpty()) {
                 if (appSettings().isModsUpdate) {
@@ -104,6 +115,7 @@ class LauncherModDisplay(
             }
         }
         selectLatest = true
+        return versions?.getOrNull(0)?.versionNumber?.let { it != currentVersion.versionNumber } ?: false
     }
 
     fun loadImage() {
@@ -263,6 +275,7 @@ class LauncherModDisplay(
             startDownload = this::downloadVersion,
             changeEnabled = this::changeEnabled,
             deleteMod = this::deleteMod,
+            setVisible = { visible = it }
         ).also(onRecomposeData)
     }
 }

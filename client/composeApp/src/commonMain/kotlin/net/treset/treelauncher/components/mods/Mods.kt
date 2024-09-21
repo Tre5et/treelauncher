@@ -1,8 +1,13 @@
 package net.treset.treelauncher.components.mods
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -10,12 +15,14 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -41,6 +48,7 @@ import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.disabledContainer
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.style.inverted
 import net.treset.treelauncher.util.DetailsListDisplay
@@ -193,6 +201,27 @@ fun Mods() {
                 }
             }
 
+            var notViewedMods: List<LauncherModDisplay> by remember(filteredMods) { mutableStateOf(emptyList()) }
+            val updateNotViewed = {
+                notViewedMods = notViewedMods.filter { !it.visible }
+            }
+
+            var toUpdateMods: List<LauncherModDisplay> by remember(filteredMods) { mutableStateOf(emptyList()) }
+            val updateToUpdate = {
+                toUpdateMods = toUpdateMods.filter { it.downloading }
+            }
+
+            LaunchedEffect(filteredMods) {
+                filteredMods.forEach {
+                    it.onVisibility = {
+                        updateNotViewed()
+                    }
+                    it.onDownloading = {
+                        updateToUpdate()
+                    }
+                }
+            }
+
             DisposableEffect(current) {
                 selected = current
 
@@ -221,10 +250,30 @@ fun Mods() {
                 }
             }
 
+            var displayNoUpdates by remember(current) { mutableStateOf(false) }
+
             LaunchedEffect(checkUpdates) {
                 if(checkUpdates > 0) {
-                    filteredMods.forEach {
+                    filteredMods.filter {
                         it.checkForUpdates()
+                    }.let {
+                        if(it.isEmpty()) {
+                            Thread {
+                                displayNoUpdates = true
+                                Thread.sleep(3000)
+                                displayNoUpdates = false
+                            }.start()
+                        }
+
+                        if(appSettings().isModsUpdate) {
+                            notViewedMods = emptyList()
+                            toUpdateMods = it
+                            updateToUpdate()
+                        } else {
+                            toUpdateMods = emptyList()
+                            notViewedMods = it
+                            updateNotViewed()
+                        }
                     }
                 }
             }
@@ -317,12 +366,85 @@ fun Mods() {
                                     element = mod
                                 ) {
                                     ModButton(
-                                        display = listDisplay
+                                        display = listDisplay,
                                     ) {
-
                                         editingMod = mod.mod
                                     }
                                 }
+                            }
+                        }
+
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = notViewedMods.isNotEmpty(),
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp, 4.dp, 0.dp, 0.dp))
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .padding(start = 4.dp, end = 8.dp)
+                            ) {
+                                Icon(
+                                    icons().down,
+                                    "Down",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                )
+                                Text(
+                                    strings().manager.mods.update.notViewed(notViewedMods.size),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
+                        }
+
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = toUpdateMods.isNotEmpty(),
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp, 4.dp, 0.dp, 0.dp))
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .padding(horizontal = 8.dp)
+                            ) {
+                                Text(
+                                    strings().manager.mods.update.remaining(toUpdateMods.size),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
+                        }
+
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = displayNoUpdates,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp, 4.dp, 0.dp, 0.dp))
+                                    .border(2.dp, MaterialTheme.colorScheme.background.disabledContainer())
+                                    .offset(y = 2.dp)
+                                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                                    .padding(horizontal = 8.dp)
+                                    .padding(bottom = 2.dp)
+                            ) {
+                                Text(
+                                    strings().manager.mods.update.noUpdates(),
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                )
                             }
                         }
                     }

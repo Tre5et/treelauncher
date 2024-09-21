@@ -20,5 +20,6 @@ data class ModDisplayData(
 
     val startDownload: (version: ModVersionData) -> Unit,
     val changeEnabled: () -> Unit,
-    val deleteMod: () -> Unit
+    val deleteMod: () -> Unit,
+    val setVisible: (Boolean) -> Unit,
 )

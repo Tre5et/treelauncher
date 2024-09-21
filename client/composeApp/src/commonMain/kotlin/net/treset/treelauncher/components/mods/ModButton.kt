@@ -37,6 +37,14 @@ fun ModDisplayData.ModButton(
 ) {
     var selectedVersion: ModVersionData by rememberSaveable(currentVersion!!) { mutableStateOf(currentVersion)}
 
+    DisposableEffect(Unit) {
+        setVisible(true)
+
+        onDispose {
+            setVisible(false)
+        }
+    }
+
     LaunchedEffect(selectLatest, versions) {
         versions?.let {
             if(selectLatest && it.isNotEmpty()) {
@@ -49,7 +57,7 @@ fun ModDisplayData.ModButton(
         DetailsListDisplay.FULL -> SelectorButton(
             selected = false,
             onClick = {},
-            enabled = enabled
+            enabled = enabled,
         ) {
             Row(
                 modifier = Modifier

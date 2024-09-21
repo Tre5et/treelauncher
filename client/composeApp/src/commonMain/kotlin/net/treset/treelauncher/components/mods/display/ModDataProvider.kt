@@ -7,7 +7,9 @@ fun ModDataProvider(
     element: ModDisplay,
     content: @Composable ModDisplayData.() -> Unit
 ) {
-    var displayData by remember { mutableStateOf(element.recomposeData()) }
+    var displayData by remember {
+        mutableStateOf(element.recomposeData())
+    }
     LaunchedEffect(element) {
         element.onRecomposeData = { displayData = it }
     }

@@ -478,6 +478,9 @@ open class Strings(
                 val auto: () -> String = { "Automatically Update" },
                 val disable: () -> String = { "Disable Mods without appropriate version" },
                 val enable: () -> String = { "Enable disabled Mods"},
+                val noUpdates: () -> String = { "No updates available" },
+                val notViewed: (Int) -> String = { "$it more Update${if(it > 1) "s" else ""} available" },
+                val remaining: (Int) -> String = { "Updating $it more Mod${if(it > 1) "s" else ""}..." },
                 val settings: () -> String = { "Update Settings" },
                 val tooltip: () -> String = { "Check for Updates" }
             )

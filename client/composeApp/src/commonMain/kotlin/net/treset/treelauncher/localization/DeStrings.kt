@@ -295,6 +295,8 @@ class DeStrings : Strings(
                 auto = { "Automatisch aktualisieren" },
                 disable = { "Mods ohne passende Version deaktivieren" },
                 enable = { "Deaktivierte Mods aktivieren"},
+                notViewed = { "$it weitere Update${if(it > 1) "s" else ""} verfügbar" },
+                remaining = { "$it Update${if(it > 1) "s" else ""} verbleiben..."},
                 settings = { "Aktualisierungseinstellungen" },
                 tooltip = { "Nach Updates suchen" }
             ),

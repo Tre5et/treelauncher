@@ -60,6 +60,14 @@ class ModDataSearchDisplay(
             recomposeData()
         }
 
+    var visible = false
+        private set(value) {
+            if(field != value) {
+                field = value
+                onVisibility(value)
+            }
+        }
+
     init {
         registerRecheck()
         loadImage()
@@ -200,7 +208,8 @@ class ModDataSearchDisplay(
             modData = mod,
             startDownload = ::startDownload,
             changeEnabled = {},
-            deleteMod = {}
+            deleteMod = {},
+            setVisible = { visible = it }
         ).also(onRecomposeData)
     }
 }
