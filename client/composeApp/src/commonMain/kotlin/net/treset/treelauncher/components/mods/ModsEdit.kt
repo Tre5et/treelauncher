@@ -188,7 +188,7 @@ fun ModsEdit(
 
                             val oldFile = LauncherFile.of(
                                 modContext.directory,
-                                it.fileName.let { name -> if(it.isEnabled) name else "$name.disabled" }
+                                it.fileName.let { name -> if(it.enabled) name else "$name.disabled" }
                             )
 
                             val backupFile = LauncherFile.of(
@@ -206,7 +206,7 @@ fun ModsEdit(
                             try {
                                 val newFile = LauncherFile.of(
                                     modContext.directory,
-                                    file.name.let { name -> if(it.isEnabled) name else "$name.disabled" }
+                                    file.name.let { name -> if(it.enabled) name else "$name.disabled" }
                                 )
 
                                 LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}"}

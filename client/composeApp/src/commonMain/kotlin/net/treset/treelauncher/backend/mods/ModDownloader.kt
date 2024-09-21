@@ -29,7 +29,7 @@ class ModDownloader(
         LOGGER.debug { "Downloading mod: name=${versionData.name}, version=${versionData.versionNumber}" }
 
         launcherMod?.let {
-            val fileName = "${it.fileName}${if (it.isEnabled) "" else ".disabled"}"
+            val fileName = "${it.fileName}${if (it.enabled) "" else ".disabled"}"
 
             val oldFile: LauncherFile = LauncherFile.of(
                 directory,
@@ -54,12 +54,12 @@ class ModDownloader(
         val newMod = try {
             downloadRequired(
                 versionData,
-                launcherMod?.isEnabled != false || enableOnDownload,
+                launcherMod?.enabled != false || enableOnDownload,
                 !existing.contains(launcherMod)
             )
         } catch(e: FileDownloadException) {
             launcherMod?.let {
-                val fileName = "${it.fileName}${if (it.isEnabled) "" else ".disabled"}"
+                val fileName = "${it.fileName}${if (it.enabled) "" else ".disabled"}"
 
                 val newFile = LauncherFile.of(
                     directory,
@@ -83,10 +83,10 @@ class ModDownloader(
         }
 
         launcherMod?.let {
-            val oldFileName = "${it.fileName}${if (it.isEnabled) "" else ".disabled"}.old"
+            val oldFileName = "${it.fileName}${if (it.enabled) "" else ".disabled"}.old"
 
             it.version = newMod.version
-            it.isEnabled = newMod.isEnabled
+            it.enabled = newMod.enabled
             it.downloads = newMod.downloads
             it.fileName = newMod.fileName
             it.name = newMod.name
@@ -133,7 +133,7 @@ class ModDownloader(
                 throw FileDownloadException("Failed to disable new mod file: ${file.name}", e)
             }
         }
-        newMod.isEnabled = enabled
+        newMod.enabled = enabled
 
         if(addToList) {
             existing.add(newMod)

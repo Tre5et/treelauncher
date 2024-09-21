@@ -29,7 +29,7 @@ class LauncherModDisplay(
             field = value
             recomposeData()
         }
-    var enabled = mod.isEnabled
+    var enabled = mod.enabled
         private set(value) {
             field = value
             recomposeData()
@@ -192,7 +192,7 @@ class LauncherModDisplay(
             )
             if(!modFile.exists() && newFile.exists()) {
                 LOGGER.debug { "Mod is already in correct state, not changing" }
-                mod.isEnabled = !enabled
+                mod.enabled = !enabled
                 enabled = !enabled
                 return@registerChangingJob
             }
@@ -205,7 +205,7 @@ class LauncherModDisplay(
                 AppContext.error(IOException("Failed to move mod file", e))
             }
 
-            mod.isEnabled = !enabled
+            mod.enabled = !enabled
             enabled = !enabled
 
             LOGGER.debug { "Mod state changed" }

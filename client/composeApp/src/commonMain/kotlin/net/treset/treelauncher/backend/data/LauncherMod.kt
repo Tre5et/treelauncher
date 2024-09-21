@@ -1,5 +1,6 @@
 package net.treset.treelauncher.backend.data
 
+import com.google.gson.annotations.SerializedName
 import net.treset.mcdl.exception.FileDownloadException
 import net.treset.mcdl.mods.CombinedModData
 import net.treset.mcdl.mods.ModData
@@ -10,7 +11,8 @@ import net.treset.mcdl.mods.modrinth.ModrinthMod
 class LauncherMod(
     var currentProvider: String?,
     var description: String?,
-    var isEnabled: Boolean,
+    @SerializedName("enabled", alternate = ["is_enabled"])
+    var enabled: Boolean,
     var url: String?,
     var iconUrl: String?,
     var name: String,

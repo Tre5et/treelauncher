@@ -6,7 +6,7 @@ fun LocalModVersion.toLauncherMod(): LauncherMod {
     return LauncherMod(
         currentProvider = this.activeProvider.toString(),
         description = this.version.parentMod.description,
-        isEnabled = true,
+        enabled = true,
         url = this.version.parentMod.url,
         iconUrl = this.version.parentMod.iconUrl,
         name = this.version.parentMod.name,

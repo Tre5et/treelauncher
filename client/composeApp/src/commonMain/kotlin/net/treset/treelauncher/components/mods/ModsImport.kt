@@ -298,6 +298,6 @@ fun ModsImport(
     }
 }
 
-fun LauncherMod.clone() = LauncherMod(currentProvider, description, isEnabled, url, iconUrl, name, fileName, version, downloads)
+fun LauncherMod.clone() = LauncherMod(currentProvider, description, enabled, url, iconUrl, name, fileName, version, downloads)
 
 private val LOGGER = KotlinLogging.logger {}
