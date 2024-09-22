@@ -59,46 +59,33 @@ enum class AccentColor(val primary: (dark: Boolean) -> Color, val onPrimary: (da
 }
 
 data class Colors(
-    val warning: Color,
-    val onWarning: Color,
-    val info: Color,
-    val onInfo: Color,
+    val warning: Color = Color.Yellow,
+    val onWarning: Color = Color.Black,
+    val info: Color = Color.Cyan,
+    val onInfo: Color = Color.Black,
+    val popupScrim: Color = Color.Black.copy(alpha = 0.8f),
     val material: ColorScheme
-) {
-    companion object {
-        fun new(
-            warning: Color = Color.Yellow,
-            onWarning: Color = Color.Black,
-            info: Color = Color.Cyan,
-            onInfo: Color = Color.Black,
-            material: ColorScheme
-        ) = Colors(
-            warning = warning,
-            onWarning = onWarning,
-            info = info,
-            onInfo = onInfo,
-            material = material
-        )
-    }
-}
+)
 
 fun darkColors() = darkColors(AccentColor.GREEN)
 
 fun lightColors() = lightColors(AccentColor.GREEN)
 
-fun darkColors(primary: AccentColor) = Colors.new(
+fun darkColors(primary: AccentColor) = Colors(
     warning = Color(0xFFEBDC02),
     material = darkColorScheme(
         primary = primary.primary(true),
         onPrimary = primary.onPrimary(true),
+        secondaryContainer = Color(0xFF373342),
         error = Color(0xFFE20505),
         onError = Color.White,
         tertiary = Color(0xFF43454A),
-        onBackground = Color.White
+        onBackground = Color.White,
+        scrim = Color.Black.copy(alpha = 0.85f)
     )
 )
 
-fun lightColors(primary: AccentColor) = Colors.new(
+fun lightColors(primary: AccentColor) = Colors(
     warning = Color(0xFFD0A000),
     material = lightColorScheme(
         primary = primary.primary(false),
@@ -106,7 +93,8 @@ fun lightColors(primary: AccentColor) = Colors.new(
         error = Color(0xFFD00000),
         onError = Color.White,
         tertiary = Color(0xFFB4B6BB),
-        onBackground = Color.Black
+        onBackground = Color.Black,
+        scrim = Color.White.copy(alpha = 0.85f)
     )
 )
 
