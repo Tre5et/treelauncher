@@ -5,7 +5,7 @@ import net.treset.mcdl.json.SerializationException
 import net.treset.mcdl.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -15,7 +15,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-open class ManifestSynchronizer(var manifest: ComponentManifest, protected var files: LauncherFiles, callback: SyncCallback?) :
+open class ManifestSynchronizer(var manifest: Component, protected var files: LauncherFiles, callback: SyncCallback?) :
     FileSynchronizer(callback) {
     @Throws(IOException::class)
     override fun upload() {

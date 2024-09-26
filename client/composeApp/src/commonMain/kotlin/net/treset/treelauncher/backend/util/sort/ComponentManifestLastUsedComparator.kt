@@ -1,10 +1,10 @@
 package net.treset.treelauncher.backend.util.sort
 
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.localization.strings
 
-class ComponentManifestLastUsedComparator : Comparator<ComponentManifest> {
-    override fun compare(o1: ComponentManifest, o2: ComponentManifest): Int {
+class ComponentManifestLastUsedComparator : Comparator<Component> {
+    override fun compare(o1: Component, o2: Component): Int {
         if (o1.lastUsed == o2.lastUsed) {
             return 0
         }

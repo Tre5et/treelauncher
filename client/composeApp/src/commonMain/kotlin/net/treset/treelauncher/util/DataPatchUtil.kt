@@ -47,7 +47,7 @@ fun DataPatcher(
                         Thread {
                             try {
                                 dataPatcher.performUpgrade(backup) { state -> status = state }
-                                AppContext.files.reloadAll()
+                                AppContext.files.reload()
                             } catch (e: Exception) {
                                 error = IOException("Failed to upgrade launcher data", e)
                             }

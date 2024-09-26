@@ -1,6 +1,8 @@
 package net.treset.treelauncher.backend.util.exception
 
-class GameResourceException : Exception {
+import java.io.IOException
+
+class GameResourceException : IOException {
     constructor(message: String?, cause: Exception?) : super(message, cause)
     constructor(message: String?) : super(message)
 }

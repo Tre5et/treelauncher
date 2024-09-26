@@ -15,9 +15,11 @@ import net.treset.mcdl.resourcepacks.Texturepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
+import net.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.creation.ComponentCreator
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.ListDisplayBox
@@ -33,10 +35,9 @@ import java.net.URI
 fun Resourcepacks() {
     var components by remember { mutableStateOf(AppContext.files.resourcepackComponents.sortedBy { it.name }) }
 
-    var selected: ComponentManifest? by remember { mutableStateOf(null) }
+    var selected: ResourcepackComponent? by remember { mutableStateOf(null) }
 
-    var resourcepacks: List<Pair<Resourcepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
-    var texturepacks: List<Pair<Texturepack, LauncherFile>> by remember { mutableStateOf(emptyList()) }
+    var displayData: ResourcepacksDisplayData by remember(selected) { mutableStateOf(ResourcepacksDisplayData(mapOf(), mapOf(), {}, {})) }
     var loading by remember { mutableStateOf(true) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
@@ -45,23 +46,8 @@ fun Resourcepacks() {
     var listDisplay by remember { mutableStateOf(appSettings().resourcepacksDetailsListDisplay) }
 
     val reloadPacks = {
-        selected?.let { current ->
-            resourcepacks = LauncherFile.of(current.directory, "resourcepacks").listFiles()
-                .mapNotNull { file ->
-                    try {
-                        Resourcepack.get(file)
-                    } catch (e: Exception) {
-                        Resourcepack(file.name, null, null)
-                    }?.let { it to file }
-                }
-            texturepacks = LauncherFile.of(current.directory, "texturepacks").listFiles()
-                .mapNotNull { file ->
-                    try {
-                        Texturepack.get(file)
-                    } catch (e: Exception) {
-                        Texturepack(file.name, null, null)
-                    }?.let { it to file }
-                }
+        selected?.let {
+            displayData = it.getDisplayData(AppContext.files.gameDataDir)
         }
         loading = false
     }
@@ -98,8 +84,7 @@ fun Resourcepacks() {
         },
         reload = {
             try {
-                AppContext.files.reloadResourcepackManifest()
-                AppContext.files.reloadResourcepackComponents()
+                AppContext.files.reloadResourcepacks()
                 components = AppContext.files.resourcepackComponents.sortedBy { it.name }
             } catch (e: FileLoadException) {
                 AppContext.severeError(e)
@@ -145,7 +130,7 @@ fun Resourcepacks() {
                     reloadPacks()
                 }
             } else {
-                if(resourcepacks.isEmpty() && texturepacks.isEmpty() && !loading) {
+                if(displayData.resourcepacks.isEmpty() && displayData.texturepacks.isEmpty() && !loading) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -171,18 +156,18 @@ fun Resourcepacks() {
                         }
                     }
                 } else {
-                    if(resourcepacks.isNotEmpty()) {
+                    if(displayData.resourcepacks.isNotEmpty()) {
                         Text(
                             strings().selector.resourcepacks.resourcepacks(),
                             style = MaterialTheme.typography.titleMedium
                         )
-                        resourcepacks.forEach {
+                        displayData.resourcepacks.forEach {
                             ResourcepackButton(
-                                it.first,
+                                it.key,
                                 display = listDisplay
                             ) {
                                 try {
-                                    it.second.remove()
+                                    it.value.remove()
                                     reloadPacks()
                                 } catch (e: IOException) {
                                     AppContext.error(e)
@@ -190,18 +175,18 @@ fun Resourcepacks() {
                             }
                         }
                     }
-                    if(texturepacks.isNotEmpty()) {
+                    if(displayData.texturepacks.isNotEmpty()) {
                         Text(
                             strings().selector.resourcepacks.texturepacks(),
                             style = MaterialTheme.typography.titleMedium
                         )
-                        texturepacks.forEach {
+                        displayData.texturepacks.forEach {
                             TexturepackButton(
-                                it.first,
+                                it.key,
                                 display = listDisplay
                             ) {
                                 try {
-                                    it.second.remove()
+                                    it.value.remove()
                                     reloadPacks()
                                 } catch (e: IOException) {
                                     AppContext.error(e)
@@ -261,13 +246,21 @@ fun Resourcepacks() {
                 showAdd = true
             }
         },
-        detailsScrollable = resourcepacks.isNotEmpty() || showAdd,
+        detailsScrollable = displayData.resourcepacks.isNotEmpty() || showAdd,
         sortContext = SortContext(
             getSortType = { appSettings().resourcepacksComponentSortType },
             setSortType = { appSettings().resourcepacksComponentSortType = it },
             getReverse = { appSettings().isResourcepacksComponentSortReverse },
             setReverse = { appSettings().isResourcepacksComponentSortReverse = it }
-        )
+        ),
+        createContent = { onCreate ->
+            ComponentCreator(
+                existing = components.toList(),
+                toDisplayString = { name },
+                onCreate = onCreate,
+                allowUse = false
+            )
+        }
     )
 }
 

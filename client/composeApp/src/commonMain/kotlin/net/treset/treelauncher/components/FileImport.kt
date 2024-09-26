@@ -26,7 +26,7 @@ import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Strings
@@ -35,8 +35,8 @@ import java.io.IOException
 
 @Composable
 fun <T> FileImport(
-    component: ComponentManifest,
-    components: Array<ComponentManifest>,
+    component: Component,
+    components: Array<out Component>,
     directoryName: String,
     toFile: LauncherFile.() -> T?,
     getDisplayName: T.() -> String,
@@ -69,8 +69,8 @@ fun <T> FileImport(
 
 @Composable
 fun <T> FileImport(
-    component: ComponentManifest,
-    components: Array<ComponentManifest>,
+    component: Component,
+    components: Array<out Component>,
     directoryNames: Array<String>,
     getDirectoryName: T?.() -> Int,
     toFile: LauncherFile.() -> T?,

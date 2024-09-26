@@ -1,12 +1,11 @@
 package net.treset.treelauncher.backend.data
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.json.GenericJsonParsable
-import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.manifest.*
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 
@@ -14,524 +13,211 @@ open class LauncherFiles {
     private var _mainManifest: MainManifest? = null
     val mainManifest: MainManifest
         get() = _mainManifest!!
-    private var _launcherDetails: LauncherDetails? = null
-    val launcherDetails: LauncherDetails
-        get() = _launcherDetails!!
     protected var _modsManifest: ParentManifest? = null
     val modsManifest: ParentManifest
         get() = _modsManifest!!
-    protected var _modsComponents: Array<Pair<ComponentManifest, LauncherModsDetails>>? = null
-    val modsComponents: Array<Pair<ComponentManifest, LauncherModsDetails>>
+    protected var _modsComponents: Array<ModsComponent>? = null
+    val modsComponents: Array<ModsComponent>
         get() = _modsComponents!!
     protected var _savesManifest: ParentManifest? = null
     val savesManifest: ParentManifest
         get() = _savesManifest!!
-    protected var _savesComponents: Array<ComponentManifest>? = null
-    val savesComponents: Array<ComponentManifest>
+    protected var _savesComponents: Array<SavesComponent>? = null
+    val savesComponents: Array<SavesComponent>
         get() = _savesComponents!!
     private var _instanceManifest: ParentManifest? = null
     val instanceManifest: ParentManifest
         get() = _instanceManifest!!
-    private var _instanceComponents: Array<Pair<ComponentManifest, LauncherInstanceDetails>>? = null
-    val instanceComponents: Array<Pair<ComponentManifest, LauncherInstanceDetails>>
+    private var _instanceComponents: Array<InstanceComponent>? = null
+    val instanceComponents: Array<InstanceComponent>
         get() = _instanceComponents!!
     private var _javaManifest: ParentManifest? = null
     val javaManifest: ParentManifest
         get() = _javaManifest!!
-    private var _javaComponents: Array<ComponentManifest>? = null
-    val javaComponents: Array<ComponentManifest>
+    private var _javaComponents: Array<JavaComponent>? = null
+    val javaComponents: Array<JavaComponent>
         get() = _javaComponents!!
     private var _optionsManifest: ParentManifest? = null
     val optionsManifest: ParentManifest
         get() = _optionsManifest!!
-    private var _optionsComponents: Array<ComponentManifest>? = null
-    val optionsComponents: Array<ComponentManifest>
+    private var _optionsComponents: Array<OptionsComponent>? = null
+    val optionsComponents: Array<OptionsComponent>
         get() = _optionsComponents!!
     private var _resourcepackManifest: ParentManifest? = null
     val resourcepackManifest: ParentManifest
         get() = _resourcepackManifest!!
-    private var _resourcepackComponents: Array<ComponentManifest>? = null
-    val resourcepackComponents: Array<ComponentManifest>
+    private var _resourcepackComponents: Array<ResourcepackComponent>? = null
+    val resourcepackComponents: Array<ResourcepackComponent>
         get() = _resourcepackComponents!!
     private var _versionManifest: ParentManifest? = null
     val versionManifest: ParentManifest
         get() = _versionManifest!!
-    private var _versionComponents: Array<Pair<ComponentManifest, LauncherVersionDetails>>? = null
-    val versionComponents: Array<Pair<ComponentManifest, LauncherVersionDetails>>
+    private var _versionComponents: Array<VersionComponent>? = null
+    val versionComponents: Array<VersionComponent>
         get() = _versionComponents!!
 
+    private var _gameDataDir: LauncherFile? = null
+    val gameDataDir: LauncherFile
+        get() = _gameDataDir!!
+
     init {
-        reloadMainManifest()
-        reloadLauncherDetails()
-        LOGGER.debug { "Loaded launcher details" }
+        reloadMain()
+        LOGGER.debug { "Loaded Main manifest" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadAll() {
-        reloadMainManifest()
-        reloadLauncherDetails()
-        reloadModsManifest()
-        reloadModsComponents()
-        reloadSavesManifest()
-        reloadSavesComponents()
-        reloadInstanceManifest()
-        reloadInstanceComponents()
-        reloadJavaManifest()
-        reloadJavaComponents()
-        reloadOptionsManifest()
-        reloadOptionsComponents()
-        reloadResourcepackManifest()
-        reloadResourcepackComponents()
-        reloadVersionManifest()
-        reloadVersionComponents()
+    @Throws(IOException::class)
+    fun reload() {
+        LOGGER.debug { "Reloading all components..." }
+        reloadMain()
+        reloadMods()
+        reloadSaves()
+        reloadInstances()
+        reloadJavas()
+        reloadOptions()
+        reloadResourcepacks()
+        reloadVersions()
+        LOGGER.debug { "Finished reloading all components" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadMainManifest() {
-        val versionFile: String = try {
-            LauncherFile.of(appConfig().baseDir, appConfig().manifestFileName).readString()
-        } catch (e: IOException) {
-            throw FileLoadException("Unable to load launcher manifest: file error", e)
-        }
-
-        _mainManifest = try {
-            MainManifest.fromJson(versionFile)
-        } catch (e: SerializationException) {
-            throw FileLoadException("Unable to load launcher manifest: json error", e)
-        }.also {
-            if (it.type != LauncherManifestType.LAUNCHER) {
-                throw FileLoadException("Unable to load launcher manifest: incorrect contents")
-            }
-            it.directory = appConfig().baseDir.absolutePath
-            LOGGER.debug { "Loaded launcher manifest" }
-        }
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadLauncherDetails() {
-        _mainManifest?.let {
-            it.details
-
-            val detailsFile: String = try {
-                LauncherFile.of(appConfig().baseDir, it.details).readString()
-            } catch (e: IOException) {
-                throw FileLoadException("Unable to load launcher details: file error", e)
-            }
-
-            _launcherDetails = try {
-                LauncherDetails.fromJson(detailsFile)
-            } catch (e: SerializationException) {
-                throw FileLoadException("Unable to load launcher details: json error", e)
-            }
-            LOGGER.debug { "Loaded launcher details" }
-
-        }?: throw FileLoadException("Unable to load launcher details: invalid main file")
+    @Throws(IOException::class)
+    fun reloadMain() {
+        LOGGER.debug { "Reloading main manifest..." }
+        val file = LauncherFile.ofData(appConfig().manifestFileName)
+        _mainManifest = MainManifest.readFile(file)
+        _gameDataDir = LauncherFile.ofData(_mainManifest?.gameDataDir ?: throw FileLoadException("Unable to load main manifest: invalid configuration"))
+        LOGGER.debug { "Finished reloading main manifest" }
     }
 
 
-    @Throws(FileLoadException::class)
-    open fun reloadModsManifest() {
-        _modsManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.modsDir ?: throw FileLoadException("Unable to load mods manifest: invalid configuration")),
-            LauncherManifestType.MODS
-        )
-    }
+    @Throws(IOException::class)
+    open fun reloadMods() {
+        LOGGER.debug { "Reloading mods..." }
+        val file = LauncherFile.ofData(_mainManifest?.modsDir ?: throw IOException("Unable to load mods manifest: invalid configuration"))
+        _modsManifest = ParentManifest.readFile(file, LauncherManifestType.MODS)
 
-    @Throws(FileLoadException::class)
-    open fun reloadModsComponents() {
         _modsComponents = reloadComponents(
-            _modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.modsDir ?: throw FileLoadException("Unable to load mods components: invalid configuration")),
-            LauncherManifestType.MODS_COMPONENT,
-            LauncherModsDetails::fromJson,
-            {
-                it.types = types
-                it.versions = versions
-                it.mods = mods
-            },
-            null,
-            _modsComponents?: emptyArray()
+            _modsManifest ?: throw FileNotFoundException("Unable to load mods components: parent manifest not loaded"),
+            ModsComponent::readFile,
+            _modsComponents ?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading mods" }
     }
 
-    @Throws(FileLoadException::class)
-    open fun reloadSavesManifest() {
-        _savesManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.savesDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration")),
-            LauncherManifestType.SAVES
-        )
-    }
+    @Throws(IOException::class)
+    open fun reloadSaves() {
+        LOGGER.debug { "Reloading saves..." }
+        val file = LauncherFile.ofData(_mainManifest?.savesDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration"))
+        _savesManifest = ParentManifest.readFile(file, LauncherManifestType.SAVES)
 
-    @Throws(FileLoadException::class)
-    open fun reloadSavesComponents() {
         _savesComponents = reloadComponents(
-            _savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.savesDir ?: throw FileLoadException("Unable to load saves components: invalid configuration")),
-            LauncherManifestType.SAVES_COMPONENT,
-            null,
+            _savesManifest ?: throw FileNotFoundException("Unable to load saves components: parent manifest not loaded"),
+            SavesComponent::readFile,
             _savesComponents?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading saves" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadInstanceManifest() {
-        _instanceManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance manifest: invalid configuration")),
-            LauncherManifestType.INSTANCES
-        )
-    }
+    @Throws(IOException::class)
+    fun reloadInstances() {
+        LOGGER.debug { "Reloading instances..." }
+        val file = LauncherFile.ofData(_mainManifest?.instancesDir ?: throw FileLoadException("Unable to load instance manifest: invalid configuration"))
+        _instanceManifest = ParentManifest.readFile(file, LauncherManifestType.INSTANCES)
 
-    @Throws(FileLoadException::class)
-    fun reloadInstanceComponents() {
         _instanceComponents = reloadComponents(
-            _instanceManifest?: throw FileLoadException("Unable to load instance components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.instancesDir ?: throw FileLoadException("Unable to load instance components: invalid configuration")),
-            LauncherManifestType.INSTANCE_COMPONENT,
-            LauncherInstanceDetails::fromJson,
-            {
-                it.features = features
-                it.ignoredFiles = ignoredFiles
-                it.jvmArguments = jvmArguments
-                it.lastPlayed = lastPlayed
-                it.totalTime = totalTime
-                it.modsComponent = modsComponent
-                it.optionsComponent = optionsComponent
-                it.resourcepacksComponent = resourcepacksComponent
-                it.savesComponent = savesComponent
-                it.versionComponent = versionComponent
-            },
-            null,
+            _instanceManifest ?: throw FileNotFoundException("Unable to load instance components: parent manifest not loaded"),
+            InstanceComponent::readFile,
             _instanceComponents?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading instances" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadJavaManifest() {
-        _javaManifest =
-            reloadParentManifest(
-                LauncherFile.ofData(_launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java manifest: invalid configuration")),
-                LauncherManifestType.JAVAS
-            )
-    }
+    @Throws(IOException::class)
+    fun reloadJavas() {
+        LOGGER.debug { "Reloading javas..." }
+        val file = LauncherFile.ofData(_mainManifest?.javasDir ?: throw FileLoadException("Unable to load java manifest: invalid configuration"))
+        _javaManifest = ParentManifest.readFile(file, LauncherManifestType.JAVAS)
 
-    @Throws(FileLoadException::class)
-    fun reloadJavaComponents() {
         _javaComponents = reloadComponents(
-            _javaManifest?: throw FileLoadException("Unable to load java components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.javasDir ?: throw FileLoadException("Unable to load java components: invalid configuration")),
-            LauncherManifestType.JAVA_COMPONENT,
-            null,
+            _javaManifest ?: throw FileNotFoundException("Unable to load java components: parent manifest not loaded"),
+            JavaComponent::readFile,
             _javaComponents?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading javas" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadOptionsManifest() {
-        _optionsManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options manifest: invalid configuration")),
-            LauncherManifestType.OPTIONS
-        )
-    }
+    @Throws(IOException::class)
+    fun reloadOptions() {
+        LOGGER.debug { "Reloading options..." }
+        val file = LauncherFile.ofData(_mainManifest?.optionsDir ?: throw FileLoadException("Unable to load options manifest: invalid configuration"))
+        _optionsManifest = ParentManifest.readFile(file, LauncherManifestType.OPTIONS)
 
-    @Throws(FileLoadException::class)
-    fun reloadOptionsComponents() {
         _optionsComponents = reloadComponents(
-            _optionsManifest?: throw FileLoadException("Unable to load options components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.optionsDir ?: throw FileLoadException("Unable to load options components: invalid configuration")),
-            LauncherManifestType.OPTIONS_COMPONENT,
-            null,
+            _optionsManifest ?: throw FileNotFoundException("Unable to load options components: parent manifest not loaded"),
+            OptionsComponent::readFile,
             _optionsComponents?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading options" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadResourcepackManifest() {
-        _resourcepackManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.resourcepacksDir ?: throw FileLoadException("Unable to load resourcepack manifest: invalid configuration")),
-            LauncherManifestType.RESOURCEPACKS
-        )
-    }
+    @Throws(IOException::class)
+    fun reloadResourcepacks() {
+        LOGGER.debug { "Reloading resourcepacks..." }
+        val file = LauncherFile.ofData(_mainManifest?.resourcepacksDir ?: throw FileLoadException("Unable to load resourcepack manifest: invalid configuration"))
+        _resourcepackManifest = ParentManifest.readFile(file, LauncherManifestType.RESOURCEPACKS)
 
-    @Throws(FileLoadException::class)
-    fun reloadResourcepackComponents() {
         _resourcepackComponents = reloadComponents(
-            _resourcepackManifest?: throw FileLoadException("Unable to load resourcepack components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.resourcepacksDir?: throw FileLoadException("Unable to load resourcepack components: invalid configuration")),
-            LauncherManifestType.RESOURCEPACKS_COMPONENT,
-            null,
+            _resourcepackManifest ?: throw FileNotFoundException("Unable to load resourcepack components: parent manifest not loaded"),
+            ResourcepackComponent::readFile,
             _resourcepackComponents?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading resourcepacks" }
     }
-    @Throws(FileLoadException::class)
-    fun reloadVersionManifest() {
-        _versionManifest = reloadParentManifest(
-            LauncherFile.ofData(_launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version manifest: invalid configuration")),
-            LauncherManifestType.VERSIONS
-        )
-    }
+    @Throws(IOException::class)
+    fun reloadVersions() {
+        LOGGER.debug { "Reloading versions..." }
+        val file = LauncherFile.ofData(_mainManifest?.versionDir ?: throw FileLoadException("Unable to load version manifest: invalid configuration"))
+        _versionManifest = ParentManifest.readFile(file, LauncherManifestType.VERSIONS)
 
-    @Throws(FileLoadException::class)
-    fun reloadVersionComponents() {
         _versionComponents = reloadComponents(
-            _versionManifest?: throw FileLoadException("Unable to load version components: invalid configuration"),
-            LauncherFile.ofData(_launcherDetails?.versionDir ?: throw FileLoadException("Unable to load version components: invalid configuration")),
-            LauncherManifestType.VERSION_COMPONENT,
-            LauncherVersionDetails::fromJson,
-            {
-                it.versionNumber = versionNumber
-                it.versionType = versionType
-                it.loaderVersion = loaderVersion
-                it.assets = assets
-                it.depends = depends
-                it.gameArguments = gameArguments
-                it.jvmArguments = jvmArguments
-                it.java = java
-                it.libraries = libraries
-                it.mainClass = mainClass
-                it.mainFile = mainFile
-                it.versionId = versionId
-            },
-            null,
+            _versionManifest ?: throw FileNotFoundException("Unable to load version components: parent manifest not loaded"),
+            VersionComponent::readFile,
             _versionComponents?: emptyArray()
         )
+        LOGGER.debug { "Finished reloading versions" }
     }
 
-    @Throws(FileLoadException::class)
-    fun reloadParentManifest(path: LauncherFile, expectedType: LauncherManifestType): ParentManifest {
-        return reloadParentManifest(path, appConfig().manifestFileName, expectedType)
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadParentManifest(path: LauncherFile, filename: String, expectedType: LauncherManifestType): ParentManifest {
-        val versionFile: String = try {
-            LauncherFile.of(path, filename).readString()
-        } catch (e: IOException) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: file error", e)
-        }
-        val out = try {
-            ParentManifest.fromJson(versionFile, launcherDetails.typeConversion)
-        } catch (e: SerializationException) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: json error", e)
-        }
-        if (out.type != expectedType) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} manifest: incorrect type: type=${out.type}")
-        }
-        out.directory = path.absolutePath
-        LOGGER.debug { "Loaded " + expectedType.name.lowercase(Locale.getDefault()) + " manifest" }
-        return out
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadComponents(
+    @Throws(IOException::class)
+    inline fun <reified T: Component> reloadComponents(
         parentManifest: ParentManifest,
-        parentPath: LauncherFile,
-        expectedType: LauncherManifestType,
-        fallbackPath: LauncherFile?,
-        currentComponents: Array<ComponentManifest>
-    ): Array<ComponentManifest> {
-        return reloadComponents(
-            parentManifest,
-            parentPath,
-            appConfig().manifestFileName,
-            expectedType,
-            fallbackPath,
-            currentComponents
-        )
-    }
+        load: (LauncherFile) -> T,
+        currentComponents: Array<T>
+    ): Array<T> {
+        val out = mutableListOf<T>()
 
-    @Throws(FileLoadException::class)
-    fun reloadComponents(
-        parentManifest: ParentManifest,
-        parentPath: LauncherFile,
-        filename: String,
-        expectedType: LauncherManifestType,
-        fallbackPath: LauncherFile?,
-        currentComponents: Array<ComponentManifest>
-    ): Array<ComponentManifest> {
-        val out: MutableList<ComponentManifest> = mutableListOf()
-        for (c in parentManifest.components) {
-            try {
-                val manifest = getComponent(
-                    out,
-                    LauncherFile.of(parentPath, "${parentManifest.prefix}_$c"),
-                    filename,
-                    expectedType,
-                    c,
-                    fallbackPath
-                )
-                currentComponents.filter { it.id == manifest.id }.firstOrNull() ?.let {
-                    it.name = manifest.name
-                    it.directory = manifest.directory
-                    it.lastUsed = manifest.lastUsed
-                    it.includedFiles = manifest.includedFiles
-                    it.typeConversion = manifest.typeConversion
-                    out.add(it)
-                } ?: out.add(manifest)
-            } catch (e: FileLoadException) {
-                throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} components: component error: id=$c")
-            }
+        for(id in parentManifest.components) {
+            val file = LauncherFile.of(parentManifest.directory, "${parentManifest.prefix}_$id", appConfig().manifestFileName)
+            val component = load(file)
+            currentComponents.filter { it.id == component.id }.firstOrNull() ?.let {
+                component.copyTo(it)
+                out.add(it)
+            } ?: out.add(component)
         }
-        LOGGER.debug { "Loaded ${expectedType.name.lowercase(Locale.getDefault())} components" }
+
         return out.toTypedArray()
     }
 
-    @Throws(FileLoadException::class)
-    private fun getComponent(
-        list: MutableList<ComponentManifest>,
-        path: LauncherFile,
-        filename: String,
-        expectedType: LauncherManifestType,
-        expectedId: String,
-        fallbackPath: LauncherFile?
-    ): ComponentManifest {
-        val manifestFile: String = try {
-            LauncherFile.of(path, filename).readString()
-        } catch (e: IOException) {
-            fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId", e)
-            LOGGER.debug { "Falling back to fallback path loading " + expectedType.name.lowercase(Locale.getDefault()) + " component: file error: id=" + expectedId }
-            return getComponent(list, fallbackPath, filename, expectedType, expectedId, null)
-        }
-        val manifest = try {
-            ComponentManifest.fromJson(manifestFile, _launcherDetails?.typeConversion?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: invalid configuration"))
-        } catch (e: SerializationException) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: json error: id=$expectedId", e)
-        }
-        if (manifest.type != expectedType || manifest.id != expectedId) {
-            fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: incorrect contents: id=$expectedId")
-            LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            return getComponent(list, fallbackPath, filename, expectedType, expectedId, null)
-        }
-        manifest.directory = path.absolutePath
-        return manifest
-    }
-
-    @Throws(FileLoadException::class)
-    fun <T : GenericJsonParsable?> reloadComponents(
-        parentManifest: ParentManifest,
-        parentDir: LauncherFile,
-        expectedType: LauncherManifestType,
-        toType: (String) -> T,
-        copyTo: T.(T) -> Unit,
-        fallbackPath: LauncherFile?,
-        currentComponents: Array<Pair<ComponentManifest, T>>
-    ): Array<Pair<ComponentManifest, T>> {
-        return reloadComponents(
-            parentManifest,
-            parentDir,
-            appConfig().manifestFileName,
-            expectedType,
-            toType,
-            copyTo,
-            fallbackPath,
-            currentComponents
-        )
-    }
-
-    @Throws(FileLoadException::class)
-    fun <T : GenericJsonParsable?> reloadComponents(
-        parentManifest: ParentManifest,
-        parentPath: LauncherFile,
-        filename: String,
-        expectedType: LauncherManifestType,
-        toType: (String) -> T,
-        copyTo: T.(T) -> Unit,
-        fallbackPath: LauncherFile?,
-        currentComponents: Array<Pair<ComponentManifest, T>>
-    ): Array<Pair<ComponentManifest, T>> {
-        val out: MutableList<Pair<ComponentManifest, T>> = mutableListOf()
-        val exceptionQueue: MutableList<FileLoadException> = mutableListOf()
-        for (c in parentManifest.components) {
-            try {
-                val component = getComponent(
-                    LauncherFile.of(parentPath, "${parentManifest.prefix}_$c"),
-                    filename,
-                    expectedType,
-                    toType,
-                    fallbackPath,
-                    c
-                )
-                currentComponents.filter { it.first.id == component.first.id }.firstOrNull() ?.let {
-                    it.first.name = component.first.name
-                    it.first.directory = component.first.directory
-                    it.first.lastUsed = component.first.lastUsed
-                    it.first.includedFiles = component.first.includedFiles
-                    it.first.typeConversion = component.first.typeConversion
-
-                    component.second.copyTo(it.second)
-                    out.add(it)
-                } ?: out.add(component)
-            } catch (e: FileLoadException) {
-                exceptionQueue.add(e)
-            }
-        }
-        if (exceptionQueue.isNotEmpty()) {
-            throw FileLoadException("Unable to load ${exceptionQueue.size} components: component error", exceptionQueue[0])
-        }
-        LOGGER.debug { "Loaded ${expectedType.name.lowercase(Locale.getDefault())} components" }
-        return out.toTypedArray()
-    }
-
-    @Throws(FileLoadException::class)
-    private fun <T : GenericJsonParsable?> getComponent(
-        path: LauncherFile,
-        filename: String,
-        expectedType: LauncherManifestType,
-        toType: (String) -> T,
-        fallbackPath: LauncherFile?,
-        expectedId: String
-    ): Pair<ComponentManifest, T> {
-        val manifestFile: String = try {
-            LauncherFile.of(path, filename).readString()
-        } catch (e: IOException) {
-            fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId", e)
-            LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component: file error: id=$expectedId" }
-            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
-        }
-        val manifest = try {
-            ComponentManifest.fromJson(manifestFile, launcherDetails.typeConversion)
-        } catch (e: SerializationException) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: json error: id=$expectedId, e")
-        }
-        if (manifest.type != expectedType || manifest.id != expectedId) {
-            fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component: incorrect contents: id=$expectedId")
-            LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
-        }
-
-        manifest.directory = path.absolutePath
-        val detailsFile = try {
-            LauncherFile.of(path, manifest.details).readString()
-        } catch (e: IOException) {
-            fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: file error: id=$expectedId", e)
-            LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
-        }
-
-        val details: T = try {
-            toType(detailsFile)
-        } catch (e: Exception) {
-            throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: json error: id=$expectedId", e)
-        }
-        if (details == null) {
-            fallbackPath?: throw FileLoadException("Unable to load ${expectedType.name.lowercase(Locale.getDefault())} component details: incorrect contents: id=$expectedId")
-            LOGGER.debug { "Falling back to fallback path loading ${expectedType.name.lowercase(Locale.getDefault())} component id=$expectedId" }
-            return getComponent(fallbackPath, filename, expectedType, toType, null, expectedId)
-        }
-        return Pair(manifest, details)
-    }
-
-    @Throws(FileLoadException::class)
+    @Throws(IOException::class)
     fun cleanupVersions(
         includeLibraries: Boolean
     ) {
-        reloadAll()
+        reload()
 
         LOGGER.debug { "Cleaning up versions..." }
         LOGGER.debug { "Checking for used versions..." }
         val usedVersions: MutableList<String> = mutableListOf()
         for (instance in instanceComponents) {
-            usedVersions.add(instance.second.versionComponent)
-            LOGGER.debug { "Used version: ${instance.second.versionComponent}" }
+            usedVersions.add(instance.versionComponent)
+            LOGGER.debug { "Used version: ${instance.versionComponent}" }
         }
 
         var newFound: Boolean
@@ -539,12 +225,12 @@ open class LauncherFiles {
             LOGGER.debug { "Checking for dependencies..." }
             newFound = false
             for (version in versionComponents) {
-                if (usedVersions.contains(version.first.id)) {
-                    version.second.depends?.let {
+                if (usedVersions.contains(version.id)) {
+                    version.depends?.let {
                         if (!usedVersions.contains(it)) {
                             usedVersions.add(it)
                             newFound = true
-                            LOGGER.debug { "Used version: ${version.first.id}" }
+                            LOGGER.debug { "Used version: ${version.id}" }
                         }
                     }
                 }
@@ -555,11 +241,11 @@ open class LauncherFiles {
 
         LOGGER.debug { "Deleting unused versions..."}
         for (version in versionComponents) {
-            if (!usedVersions.contains(version.first.id)) {
-                LOGGER.debug { "Deleting unused version: ${version.first.id}" }
-                versionManifest.components.remove(version.first.id)
+            if (!usedVersions.contains(version.id)) {
+                LOGGER.debug { "Deleting unused version: ${version.id}" }
+                versionManifest.components.remove(version.id)
                 try {
-                    LauncherFile.of(version.first.directory).remove()
+                    LauncherFile.of(version.directory).remove()
                 } catch(e: IOException) {
                     throw FileLoadException("Unable to remove unused version: file error", e)
                 }
@@ -593,17 +279,17 @@ open class LauncherFiles {
         LOGGER.debug { "Collecting libraries in unused versions..." }
         val unusedLibraries: MutableList<String> = mutableListOf()
         for(version in versionComponents) {
-            if(!usedVersions.contains(version.first.id)) {
-                unusedLibraries.addAll(version.second.libraries)
-                LOGGER.debug { "Unused libraries: ${version.second.libraries}" }
+            if(!usedVersions.contains(version.id)) {
+                unusedLibraries.addAll(version.libraries)
+                LOGGER.debug { "Unused libraries: ${version.libraries}" }
             }
         }
         LOGGER.debug { "Finished collecting libraries in unused versions" }
 
         LOGGER.debug { "Checking unused libraries against used versions..." }
         for(version in versionComponents) {
-            if(usedVersions.contains(version.first.id)) {
-                val libsToRemove = unusedLibraries.filter { version.second.libraries.contains(it) }
+            if(usedVersions.contains(version.id)) {
+                val libsToRemove = unusedLibraries.filter { version.libraries.contains(it) }
                 if(libsToRemove.isNotEmpty()) {
                     unusedLibraries.removeAll(libsToRemove)
                     LOGGER.debug { "Removing used libraries from unused list: $libsToRemove" }

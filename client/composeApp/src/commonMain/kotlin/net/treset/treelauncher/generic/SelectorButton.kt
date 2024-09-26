@@ -22,7 +22,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.style.disabledContainer
 import net.treset.treelauncher.style.disabledContent
 
@@ -67,7 +67,7 @@ fun SelectorButton(
 @Composable
 fun SelectorButton(
     title: String,
-    component: ComponentManifest? = null,
+    component: Component? = null,
     icon: ImageVector,
     selected: Boolean,
     enabled: Boolean = true,
@@ -107,7 +107,7 @@ fun SelectorButton(
 
 @Composable
 fun ComponentButton(
-    component: ComponentManifest,
+    component: Component,
     selected: Boolean,
     enabled: Boolean = true,
     onClick: () -> Unit

@@ -1,52 +1,31 @@
 package net.treset.treelauncher.backend.creation
 
-import net.treset.treelauncher.backend.config.appConfig
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
-import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
-import net.treset.treelauncher.backend.util.CreationStatus
+import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
+import net.treset.treelauncher.backend.util.FormatStringProvider
+import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StringProvider
 
-class ResourcepackCreator : GenericComponentCreator {
-    constructor(
-        name: String,
-        typeConversion: Map<String, LauncherManifestType>,
-        componentsManifest: ParentManifest
-    ) : super(
-        LauncherManifestType.RESOURCEPACKS_COMPONENT,
-        null,
-        null,
-        name,
-        typeConversion,
-        appConfig().resourcepacksDefaultIncludedFiles,
-        null,
-        componentsManifest
-    ) {
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
+class ResourcepackCreator(
+    parent: ParentManifest,
+    onStatus: (Status) -> Unit
+) : ComponentCreator<ResourcepackComponent, CreationData>(parent, onStatus) {
+    override fun createNew(data: CreationData, statusProvider: CreationProvider): ResourcepackComponent {
+        return ResourcepackComponent(
+            id = id,
+            name = data.name,
+            file = file
+        )
     }
 
-    constructor(name: String, inheritsFrom: ComponentManifest, componentsManifest: ParentManifest) : super(
-        LauncherManifestType.RESOURCEPACKS_COMPONENT,
-        null,
-        inheritsFrom,
-        name,
-        null,
-        null,
-        null,
-        componentsManifest
-    ) {
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
+    override fun createInherit(data: CreationData, statusProvider: CreationProvider): ResourcepackComponent {
+        return createNew(data, statusProvider)
     }
 
-    constructor(uses: ComponentManifest) : super(
-        LauncherManifestType.RESOURCEPACKS_COMPONENT,
-        uses,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-    ) {
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.RESOURCEPACKS, null)
-    }
+    override val step: StringProvider = RESOURCEPACKS
+    override val newTotal: Int = 0
+    override val inheritTotal: Int = 0
+
 }
+
+val RESOURCEPACKS = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.resourcepacks() }

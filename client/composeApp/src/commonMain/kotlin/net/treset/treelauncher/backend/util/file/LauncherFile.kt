@@ -43,6 +43,23 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
+    fun copyUniqueTo(dest: LauncherFile) {
+        val isFile = this.isFile
+        var fileName = this.name
+        while (of(dest, fileName).exists()) {
+            fileName = if(isFile) {
+                fileName.split(".").toMutableList().apply {
+                    set(size - 2, get(size - 2) + "-")
+                }.joinToString(".")
+            } else {
+                "$fileName-"
+            }
+        }
+        val target = LauncherFile.of(dest, fileName)
+        copyTo(target)
+    }
+
+    @Throws(IOException::class)
     fun moveTo(dst: LauncherFile, vararg options: CopyOption) {
         moveTo(dst, { true }, *options)
     }

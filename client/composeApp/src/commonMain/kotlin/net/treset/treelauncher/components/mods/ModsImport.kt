@@ -27,7 +27,7 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.IconButton
@@ -39,7 +39,7 @@ import java.io.IOException
 
 @Composable
 fun ModsImport(
-    component: Pair<ComponentManifest, LauncherModsDetails>,
+    component: Pair<Component, LauncherModsDetails>,
     modContext: ModContext,
     appContext: AppContextData,
     droppedFile: LauncherFile? = null,

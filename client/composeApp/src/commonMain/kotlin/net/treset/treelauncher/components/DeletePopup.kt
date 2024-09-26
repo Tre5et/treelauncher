@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.data.LauncherInstanceDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.PopupType
@@ -14,7 +14,7 @@ import net.treset.treelauncher.localization.strings
 
 @Composable
 fun DeletePopup(
-    component: ComponentManifest,
+    component: Component,
     checkHasComponent: (LauncherInstanceDetails) -> Boolean,
     onClose: () -> Unit,
     onConfirm: () -> Unit

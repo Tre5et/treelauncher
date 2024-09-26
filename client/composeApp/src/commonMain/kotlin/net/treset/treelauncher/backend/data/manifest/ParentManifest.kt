@@ -1,53 +1,50 @@
 package net.treset.treelauncher.backend.data.manifest
 
+import net.treset.mcdl.json.GenericJsonParsable
 import net.treset.mcdl.json.SerializationException
+import net.treset.treelauncher.backend.util.file.LauncherFile
+import java.io.IOException
 
-class ParentManifest(
-    type: LauncherManifestType,
-    typeConversion: Map<String, LauncherManifestType>,
-    details: String,
-    prefix: String,
-    components: MutableList<String>,
-    expectedType: LauncherManifestType? = null
-) : Manifest(
-    type,
-    typeConversion,
-    null,
-    details,
-    prefix,
-    null,
-    null,
-    components,
-    expectedType
-) {
-    var details: String
-        get() = _details ?: ""
-        set(details) {
-            _details = details
-        }
+open class ParentManifest(
+    val type: LauncherManifestType,
+    var prefix: String,
+    var components: MutableList<String>,
+    @Transient var file: LauncherFile
+): GenericJsonParsable() {
+    val directory: LauncherFile
+        get() = LauncherFile.of(file.parentFile)
 
-    var prefix: String
-        get() = _prefix ?: ""
-        set(prefix) {
-            _prefix = prefix
-        }
-
-    var components: MutableList<String>
-        get() = _components ?: mutableListOf()
-        set(components) {
-            _components = components
-        }
+    @Throws(IOException::class)
+    fun write() {
+        file.write(this)
+    }
 
     companion object {
-        @JvmOverloads
         @Throws(SerializationException::class)
-        fun fromJson(
+        inline fun <reified T: ParentManifest> fromJson(
             json: String?,
-            typeConversion: Map<String, LauncherManifestType> = LauncherManifestType.defaultConversion
-        ): ParentManifest {
-            val parentManifest = fromJson(json, ParentManifest::class.java)
-            parentManifest.typeConversion = typeConversion
+            expectedType: LauncherManifestType
+        ): T {
+            val parentManifest = fromJson(json, T::class.java)
+            if(parentManifest.type != expectedType) {
+                throw SerializationException("Expected type $expectedType, got ${parentManifest.type}")
+            }
             return parentManifest
+        }
+
+        @Throws(IOException::class)
+        inline fun <reified T: ParentManifest> readFile(
+            file: LauncherFile,
+            expectedType: LauncherManifestType
+        ): T {
+            val json = file.readString()
+            val manifest = try {
+                fromJson<T>(json, expectedType)
+            } catch (e: SerializationException) {
+                throw IOException("Failed to parse component manifest: $file", e)
+            }
+            manifest.file = file
+            return manifest
         }
     }
 }

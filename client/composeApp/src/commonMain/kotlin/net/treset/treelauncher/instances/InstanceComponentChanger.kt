@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.InstanceData
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
@@ -26,11 +26,11 @@ fun InstanceComponentChanger(
     appContext: AppContextData,
     redrawSelected: () -> Unit
 ) {
-    var components: Array<ComponentManifest> by remember { mutableStateOf(emptyArray()) }
+    var components: Array<Component> by remember { mutableStateOf(emptyArray()) }
 
-    var current: ComponentManifest? by remember(type) { mutableStateOf(null) }
+    var current: Component? by remember(type) { mutableStateOf(null) }
 
-    var selected: ComponentManifest? by remember(current) { mutableStateOf(current) }
+    var selected: Component? by remember(current) { mutableStateOf(current) }
 
     val loadCurrent = {
         current = when (type) {

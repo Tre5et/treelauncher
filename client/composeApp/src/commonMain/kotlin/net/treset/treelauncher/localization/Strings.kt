@@ -6,7 +6,6 @@ import net.treset.mcdl.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
@@ -69,7 +68,8 @@ open class Strings(
     val theme: Theme = Theme(),
     val units: Units = Units(),
     val updater: Updater = Updater(),
-    val version: Version = Version()
+    val version: Version = Version(),
+    val statusDetailsMessage: (String, Int, Int) -> String = { file, current, total -> "$file ($current/$total)" },
 ) {
     data class Components(
         val create: () -> String = { "Create New" },
@@ -577,7 +577,7 @@ open class Strings(
                 val title: () -> String = { "You are about to delete this Component!" },
                 val tooltip: () -> String = { "Delete Component" },
                 val unableClose: () -> String = { "Close" },
-                val unableMessage: (ComponentManifest) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
+                val unableMessage: (net.treset.treelauncher.backend.data.manifest.Component) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
                 val unableTitle: () -> String = { "Unable to delete this component!" },
             )
 
@@ -813,7 +813,6 @@ open class Strings(
             val checkingTitle: () -> String = { "Checking for updates..." },
             val close: () -> String = { "Close" },
             val download: () -> String = { "Download" },
-            val downloadingMessage: (String, Int, Int) -> String = { file, current, total -> "$file ($current/$total)" },
             val downloadingTitle: () -> String = { "Downloading Update..." },
             val latestMessage: () -> String = { "Current Version: v${strings().launcher.version()}" },
             val latestTitle: () -> String = { "Everything is up to date!" },

@@ -29,7 +29,7 @@ fun Instances() {
 
     val reloadInstances = {
         try {
-            AppContext.files.reloadAll()
+            AppContext.files.reload()
         } catch (e: FileLoadException) {
             AppContext.severeError(e)
         }

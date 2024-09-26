@@ -14,7 +14,7 @@ import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherInstanceDetails
 import net.treset.treelauncher.backend.data.LauncherVersionDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
@@ -126,7 +126,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
             instanceData.instance.first.id,
             appConfig().manifestFileName
         )
-        val manifest = ComponentManifest.fromJson(String(out))
+        val manifest = Component.fromJson(String(out))
         LauncherFile.of(instanceData.instance.first.directory, appConfig().manifestFileName).write(manifest)
         return manifest.details
     }
@@ -135,8 +135,8 @@ class InstanceSynchronizer : ManifestSynchronizer {
     private fun downloadDependency(id: String?, type: LauncherManifestType): String? {
         id?.let {
             val parentManifest: ParentManifest
-            val otherComponents: Array<ComponentManifest>
-            val currentManifest: ComponentManifest?
+            val otherComponents: Array<Component>
+            val currentManifest: Component?
             when (type) {
                 LauncherManifestType.SAVES_COMPONENT -> {
                     parentManifest = files.savesManifest
@@ -165,14 +165,14 @@ class InstanceSynchronizer : ManifestSynchronizer {
                 else -> throw IOException("Unknown component type: $type")
             }
             if (currentManifest == null || id != currentManifest.id) {
-                val existingManifest: ComponentManifest? = otherComponents.firstOrNull { it.id == id }
+                val existingManifest: Component? = otherComponents.firstOrNull { it.id == id }
                 if (existingManifest != null) {
                     if (isUpdateEverything) {
                         val synchronizer = ManifestSynchronizer(existingManifest, files, callback)
                         synchronizer.download()
                     }
                 } else {
-                    val fakeManifest = ComponentManifest(
+                    val fakeManifest = Component(
                         type,
                         files.launcherDetails.typeConversion,
                         id,
@@ -246,7 +246,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    private fun uploadDependency(manifest: ComponentManifest?) {
+    private fun uploadDependency(manifest: Component?) {
         if (manifest != null && (isUpdateEverything || !SyncService.isSyncing(manifest))) {
             val synchronizer = ManifestSynchronizer(manifest, files, callback)
             synchronizer.upload()

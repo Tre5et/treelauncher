@@ -2,7 +2,7 @@ package net.treset.treelauncher.backend.sync
 
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import java.io.IOException
 
@@ -42,12 +42,12 @@ class AllSynchronizer(private val files: LauncherFiles, callback: SyncCallback?)
                 exceptions.add(e)
             }
         }
-        val manifests: MutableList<ComponentManifest> = mutableListOf()
+        val manifests: MutableList<Component> = mutableListOf()
         manifests.addAll(files.savesComponents)
         manifests.addAll(files.resourcepackComponents)
         manifests.addAll(files.optionsComponents)
         manifests.addAll(files.modsComponents.map{it.first}.toList())
-        manifests.parallelStream().forEach { manifest: ComponentManifest ->
+        manifests.parallelStream().forEach { manifest: Component ->
             if (!SyncService.isSyncing(manifest)) {
                 return@forEach
             }

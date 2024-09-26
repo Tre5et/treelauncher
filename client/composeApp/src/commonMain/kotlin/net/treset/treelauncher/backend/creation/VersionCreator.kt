@@ -2,53 +2,38 @@ package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mcdl.minecraft.MinecraftLaunchArgument
-import net.treset.treelauncher.backend.config.appConfig
-import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
-import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
-import net.treset.treelauncher.backend.util.exception.ComponentCreationException
+import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.Status
+import java.io.IOException
 
-abstract class VersionCreator(
-    id: String,
-    typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: ParentManifest,
-    var files: LauncherFiles,
-) : GenericComponentCreator(
-    LauncherManifestType.VERSION_COMPONENT,
-    null,
-    null,
-    id,
-    typeConversion,
-    null,
-    appConfig().versionsDefaultDetails,
-    componentsManifest
-) {
-    @Throws(ComponentCreationException::class)
-    override fun createComponent(): String {
-        for (v in files.versionComponents) {
-            if (v.second.versionId.isNotBlank() && matchesVersion(v.second.versionId)) {
-                LOGGER.debug { "Matching version already exists, using instead: versionId=${v.second.versionId}, usingId=${v.first.id}" }
-                uses = v.first
-                return useComponent()
-            }
+abstract class VersionCreator<D: VersionCreationData>(
+    parentManifest: ParentManifest,
+    onStatus: (Status) -> Unit
+) : ComponentCreator<VersionComponent, D>(parentManifest, onStatus) {
+
+    @Throws(IOException::class)
+    override fun new(data: D): String {
+        data.currentVersions.firstOrNull { it.versionId == data.versionId }?.let {
+            LOGGER.debug { "Matching version already exists, using instead: versionId=${data.versionId}" }
+            return use(it)
         }
-        val result = super.createComponent()
-        if (newManifest == null) {
-            attemptCleanup()
-            throw ComponentCreationException("Failed to create version component: invalid data")
-        }
-        makeVersion()
-        LOGGER.debug { "Created version component: id=${newManifest!!.id}" }
-        return result
+        return super.new(data)
     }
 
-    @Throws(ComponentCreationException::class)
-    override fun inheritComponent(): String {
-        throw ComponentCreationException("Unable to inherit version: not supported")
+    @Throws(IOException::class)
+    override fun inherit(component: VersionComponent, data: D): String {
+        throw IOException("Version inheritance not supported")
     }
 
-    @Throws(ComponentCreationException::class)
+    @Throws(IOException::class)
+    override fun createInherit(data: D, statusProvider: CreationProvider): VersionComponent {
+        throw IOException("Version inheritance not supported")
+    }
+
+    override val inheritTotal = -1
+
     protected fun translateArguments(
         args: List<MinecraftLaunchArgument>,
         defaultArgs: Array<LauncherLaunchArgument>
@@ -86,12 +71,13 @@ abstract class VersionCreator(
         return result
     }
 
-    protected abstract fun matchesVersion(id: String): Boolean
-
-    @Throws(ComponentCreationException::class)
-    protected abstract fun makeVersion()
-
     companion object {
         private val LOGGER = KotlinLogging.logger {}
     }
 }
+
+open class VersionCreationData(
+    name: String,
+    val versionId: String,
+    val currentVersions: Array<VersionComponent>
+): CreationData(name)

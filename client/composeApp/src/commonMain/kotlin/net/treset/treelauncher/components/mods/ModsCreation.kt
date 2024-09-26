@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import net.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
@@ -17,11 +17,11 @@ import net.treset.treelauncher.localization.strings
 class ModsCreationState(
     mode: CreationMode,
     name: String?,
-    existing: Pair<ComponentManifest, LauncherModsDetails>?,
+    existing: Pair<Component, LauncherModsDetails>?,
     val version: MinecraftVersion?,
     val type: VersionType?,
     val alternateLoader: Boolean?
-) : CreationState<Pair<ComponentManifest, LauncherModsDetails>>(
+) : CreationState<Pair<Component, LauncherModsDetails>>(
     mode,
     name,
     existing
@@ -40,8 +40,8 @@ class ModsCreationState(
             newType: VersionType?,
             alternateLoader: Boolean?,
             inheritName: String?,
-            inheritSelected: Pair<ComponentManifest, LauncherModsDetails>?,
-            useSelected: Pair<ComponentManifest, LauncherModsDetails>?
+            inheritSelected: Pair<Component, LauncherModsDetails>?,
+            useSelected: Pair<Component, LauncherModsDetails>?
         ): ModsCreationState = ModsCreationState(
             mode,
             when(mode) {
@@ -63,7 +63,7 @@ class ModsCreationState(
 
 @Composable
 fun ModsCreation(
-    existing: List<Pair<ComponentManifest, LauncherModsDetails>>,
+    existing: List<Pair<Component, LauncherModsDetails>>,
     showCreate: Boolean = true,
     showUse: Boolean = true,
     setCurrentState: (ModsCreationState) -> Unit = {},
@@ -80,9 +80,9 @@ fun ModsCreation(
     var alternateLoader by remember(existing, defaultAlternate) { mutableStateOf(defaultAlternate) }
 
     var inheritName by remember(existing) { mutableStateOf("") }
-    var inheritSelected: Pair<ComponentManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var inheritSelected: Pair<Component, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
 
-    var useSelected: Pair<ComponentManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var useSelected: Pair<Component, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
 
     var showSnapshots by remember(existing) { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }

@@ -35,7 +35,7 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ModsCreator
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.EmptyingJobQueue
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -70,7 +70,7 @@ data class ModContext(
 fun Mods() {
     var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.first.name }) }
 
-    var selected: Pair<ComponentManifest, LauncherModsDetails>? by remember { mutableStateOf(null) }
+    var selected: Pair<Component, LauncherModsDetails>? by remember { mutableStateOf(null) }
 
     var showSearch by remember(selected) { mutableStateOf(false) }
     var checkUpdates by remember(selected) { mutableStateOf(0) }

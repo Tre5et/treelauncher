@@ -2,7 +2,7 @@ package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.config.appConfig
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
@@ -16,17 +16,18 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 
-abstract class GenericComponentCreator(
+abstract class GenericComponentCreator<T: Component>(
     var type: LauncherManifestType,
-    var uses: ComponentManifest?,
-    var inheritsFrom: ComponentManifest?,
+    var uses: T?,
+    var inheritsFrom: T?,
+    val createNew: (LauncherFile) -> T,
+    val createEmpty: (LauncherFile) -> T,
     var name: String?,
-    var typeConversion: Map<String, LauncherManifestType>?,
     var includedFiles: Array<PatternString>?,
     var details: String?,
-    var componentsManifest: ParentManifest?
-) : ComponentCreator {
-    var newManifest: ComponentManifest? = null
+    var componentsManifest: ParentManifest
+) : ComponentCreator_o {
+    var newManifest: Component? = null
     open var statusCallback: (CreationStatus) -> Unit = {}
     var defaultStatus: CreationStatus? = null
 
@@ -52,7 +53,7 @@ abstract class GenericComponentCreator(
 
     @Throws(ComponentCreationException::class)
     protected open fun createComponent(): String {
-        ComponentManifest(
+        Component(
             type = type,
             id = "",
             typeConversion = typeConversion!!,
@@ -92,36 +93,27 @@ abstract class GenericComponentCreator(
                 throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
             }
 
-            ComponentManifest(
-                type = type,
-                typeConversion = it.typeConversion,
-                id = "",
-                name = name!!,
-                includedFiles = it.includedFiles,
-                details = it.details,
-            ).let { manifest ->
-                manifest.id = hash(manifest)
-                newManifest = manifest
-                try {
-                    writeNewManifest()
-                } catch (e: ComponentCreationException) {
-                    attemptCleanup()
-                    throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: unable to write manifest: id=${manifest.id}", e)
-                }
-                try {
-                    copyFiles(it, manifest)
-                } catch (e: ComponentCreationException) {
-                    attemptCleanup()
-                    throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: unable to copy files: id=${manifest.id}", e)
-                }
-                LOGGER.debug { "Inherited ${type.toString().lowercase(Locale.getDefault())} component: id=${manifest.id}" }
-                return manifest.id
+            val new = createEmpty(LauncherFile.of(
+                componentsManifest.directory,
+                "${componentsManifest.prefix}_${hash(it)}"
+            ))
+
+            it.copyTo(new)
+            new.id = hash(new)
+            newManifest = new
+            try {
+                new.write()
+                copyFiles(it, new)
+            } catch (e: IOException) {
+                attemptCleanup()
+                throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: unable to write manifest", e)
             }
+            return new.id
         }?: throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
     }
 
     @Throws(ComponentCreationException::class)
-    fun copyFiles(oldManifest: ComponentManifest, newManifest: ComponentManifest) {
+    fun copyFiles(oldManifest: Component, newManifest: Component) {
         if (!isValid) {
             throw ComponentCreationException("Unable to copy files: invalid parameters")
         }

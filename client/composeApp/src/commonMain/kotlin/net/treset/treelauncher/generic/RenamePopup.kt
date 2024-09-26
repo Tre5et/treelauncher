@@ -6,12 +6,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.localization.strings
 
 @Composable
 fun RenamePopup(
-    manifest: ComponentManifest,
+    manifest: Component,
     editValid: (String) -> Boolean,
     onDone: (String?) -> Unit
 ) {

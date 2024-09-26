@@ -2,21 +2,20 @@ package net.treset.treelauncher.backend.data
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.config.appConfig
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.*
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class InstanceData(
-    var launcherDetails: LauncherDetails,
-    var launcherDetailsFile: LauncherFile,
-    var instance: Pair<ComponentManifest, LauncherInstanceDetails>,
-    var versionComponents: Array<Pair<ComponentManifest, LauncherVersionDetails>>,
-    var javaComponent: ComponentManifest,
-    var optionsComponent: ComponentManifest,
-    var resourcepacksComponent: ComponentManifest,
-    var savesComponent: ComponentManifest,
-    var modsComponent: Pair<ComponentManifest, LauncherModsDetails>?,
+    var mainManifest: MainManifest,
+    var instance: InstanceComponent,
+    var versionComponents: Array<VersionComponent>,
+    var javaComponent: JavaComponent,
+    var optionsComponent: OptionsComponent,
+    var resourcepacksComponent: ResourcepackComponent,
+    var savesComponent: SavesComponent,
+    var modsComponent: ModsComponent?,
     var gameDataDir: LauncherFile,
     var assetsDir: LauncherFile,
     var librariesDir: LauncherFile
@@ -53,9 +52,9 @@ class InstanceData(
 
     @Throws(IOException::class)
     fun setActive(active: Boolean) {
-        launcherDetails.activeInstance = if (active) instance.first.id else null
+        mainManifest.activeInstance = if (active) instance.id else null
         try {
-            launcherDetailsFile.write(launcherDetails)
+            mainManifest.write()
         } catch (e: IOException) {
             throw IOException("Unable to set instance active: unable to write launcher details", e)
         }
@@ -64,7 +63,7 @@ class InstanceData(
     @Throws(IOException::class)
     fun delete(files: LauncherFiles) {
         files.instanceManifest.components.let {comp ->
-            if (!comp.remove(instance.first.id)) {
+            if (!comp.remove(instance.id)) {
                 throw IOException("Unable to delete instance: unable to remove instance from launcher manifest")
             }
             try {
@@ -74,30 +73,26 @@ class InstanceData(
             }
         }
         try {
-            LauncherFile.of(instance.first.directory).remove()
+            LauncherFile.of(instance.directory).remove()
         } catch (e: IOException) {
             throw IOException("Unable to delete instance: unable to delete instance directory", e)
         }
-        LOGGER.debug { "Instance deleted: id=${instance.first.id}" }
+        LOGGER.debug { "Instance deleted: id=${instance.id}" }
     }
 
     companion object {
         private val LOGGER = KotlinLogging.logger{}
 
         @Throws(FileLoadException::class)
-        fun of(instance: Pair<ComponentManifest, LauncherInstanceDetails>, files: LauncherFiles): InstanceData {
+        fun of(instance: InstanceComponent, files: LauncherFiles): InstanceData {
             val versionComponents = getVersionComponents(instance, files)
-            val virtualDir = versionComponents.firstOrNull{it.second.virtualAssets != null}?.second?.virtualAssets
+            val virtualDir = versionComponents.firstOrNull{it.virtualAssets != null}?.virtualAssets
             val assetsDir = virtualDir?.let {
-                LauncherFile.ofData(files.launcherDetails.assetsDir, it)
-            } ?: LauncherFile.ofData(files.launcherDetails.assetsDir)
+                LauncherFile.ofData(files.mainManifest.assetsDir, it)
+            } ?: LauncherFile.ofData(files.mainManifest.assetsDir)
 
             return InstanceData(
-                files.launcherDetails,
-                LauncherFile.of(
-                    files.mainManifest.directory,
-                    files.mainManifest.details
-                ),
+                files.mainManifest,
                 instance,
                 versionComponents,
                 getJavaComponent(versionComponents, files),
@@ -105,37 +100,37 @@ class InstanceData(
                 getResourcepacksComponent(instance, files),
                 getSavesComponent(instance, files),
                 getModsComponent(instance, files),
-                LauncherFile.ofData(files.launcherDetails.gamedataDir),
+                LauncherFile.ofData(files.mainManifest.gameDataDir),
                 assetsDir,
-                LauncherFile.ofData(files.launcherDetails.librariesDir)
+                LauncherFile.ofData(files.mainManifest.librariesDir)
             )
         }
 
         @Throws(FileLoadException::class)
-        private fun getVersionComponents(instance: Pair<ComponentManifest, LauncherInstanceDetails>, files: LauncherFiles): Array<Pair<ComponentManifest, LauncherVersionDetails>> {
-            val versionComponents: MutableList<Pair<ComponentManifest, LauncherVersionDetails>> = mutableListOf()
+        private fun getVersionComponents(instance: InstanceComponent, files: LauncherFiles): Array<VersionComponent> {
+            val versionComponents: MutableList<VersionComponent> = mutableListOf()
 
-            var firstComponent: Pair<ComponentManifest, LauncherVersionDetails>? = null
+            var firstComponent: VersionComponent? = null
             for (v in files.versionComponents) {
-                if (v.first.id == instance.second.versionComponent) {
+                if (v.id == instance.versionComponent) {
                     firstComponent = v
                     break
                 }
             }
-            firstComponent?: throw FileLoadException("Failed to load instance data: unable to find version component: versionId=${instance.second.versionComponent}")
-            var currentComponent: Pair<ComponentManifest, LauncherVersionDetails> = firstComponent
+            firstComponent?: throw FileLoadException("Failed to load instance data: unable to find version component: versionId=${instance.versionComponent}")
+            var currentComponent: VersionComponent = firstComponent
             versionComponents.add(currentComponent)
-            while (currentComponent.second.depends?.isNotBlank() == true) {
+            while (currentComponent.depends?.isNotBlank() == true) {
                 var found = false
                 for (v in files.versionComponents) {
-                    if (v.first.id == currentComponent.second.depends) {
+                    if (v.id == currentComponent.depends) {
                         currentComponent = v
                         found = true
                         break
                     }
                 }
                 if (!found) {
-                    throw FileLoadException("Failed to load instance data: unable to find dependent version component: versionId=${currentComponent.second.depends}")
+                    throw FileLoadException("Failed to load instance data: unable to find dependent version component: versionId=${currentComponent.depends}")
                 }
                 versionComponents.add(currentComponent)
             }
@@ -144,72 +139,61 @@ class InstanceData(
         }
 
         @Throws(FileLoadException::class)
-        private fun getJavaComponent(versionComponents: Array<Pair<ComponentManifest, LauncherVersionDetails>>, files: LauncherFiles): ComponentManifest {
-            var javaComponent: ComponentManifest? = null
+        private fun getJavaComponent(versionComponents: Array<VersionComponent>, files: LauncherFiles): JavaComponent {
             for (v in versionComponents) {
-                if (v.second.java?.isNotBlank() == true) {
+                if (v.java?.isNotBlank() == true) {
                     for (j in files.javaComponents) {
-                        if (j.id == v.second.java) {
-                            javaComponent = j
-                            break
+                        if (j.id == v.java) {
+                            return j
                         }
                     }
-                    break
+                    throw FileLoadException("Failed to load instance data: unable to find java component: javaId=" + v.java)
                 }
             }
-            javaComponent ?: throw FileLoadException("Failed to load instance data: unable to find suitable java component")
-            return javaComponent
+            throw FileLoadException("Failed to load instance data: unable to find version with java component")
         }
 
         @Throws(FileLoadException::class)
-        private fun getOptionsComponent(instance: Pair<ComponentManifest, LauncherInstanceDetails>, files: LauncherFiles): ComponentManifest {
-            var optionsComponent: ComponentManifest? = null
+        private fun getOptionsComponent(instance: InstanceComponent, files: LauncherFiles): OptionsComponent {
             for (o in files.optionsComponents) {
-                if (o.id == instance.second.optionsComponent) {
-                    optionsComponent = o
-                    break
+                if (o.id == instance.optionsComponent) {
+                    return o
                 }
             }
-            optionsComponent ?: throw FileLoadException("Failed to load instance data: unable to find options component: optionsId=" + instance.second.optionsComponent)
-            return optionsComponent
+            throw FileLoadException("Failed to load instance data: unable to find options component: optionsId=" + instance.optionsComponent)
         }
 
         @Throws(FileLoadException::class)
-        private fun getResourcepacksComponent(instance: Pair<ComponentManifest, LauncherInstanceDetails>, files: LauncherFiles): ComponentManifest {
-            var resourcepacksComponent: ComponentManifest? = null
+        private fun getResourcepacksComponent(instance: InstanceComponent, files: LauncherFiles): ResourcepackComponent {
             for (r in files.resourcepackComponents) {
-                if (r.id == instance.second.resourcepacksComponent) {
-                    resourcepacksComponent = r
-                    break
+                if (r.id == instance.resourcepacksComponent) {
+                    return r
                 }
             }
-            resourcepacksComponent ?: throw FileLoadException("Failed to load instance data: unable to find resourcepacks component: resourcepacksId=" + instance.second.resourcepacksComponent)
-            return resourcepacksComponent
+            throw FileLoadException("Failed to load instance data: unable to find resourcepacks component: resourcepacksId=" + instance.resourcepacksComponent)
         }
 
         @Throws(FileLoadException::class)
-        private fun getSavesComponent(instance: Pair<ComponentManifest, LauncherInstanceDetails>, files: LauncherFiles): ComponentManifest {
+        private fun getSavesComponent(instance: InstanceComponent, files: LauncherFiles): SavesComponent {
             for (s in files.savesComponents) {
-                if (s.id == instance.second.savesComponent) {
+                if (s.id == instance.savesComponent) {
                     return s
                 }
             }
-            throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.second.savesComponent)
+            throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.savesComponent)
         }
 
         @Throws(FileLoadException::class)
-        private fun getModsComponent(instance: Pair<ComponentManifest, LauncherInstanceDetails>, files: LauncherFiles): Pair<ComponentManifest, LauncherModsDetails>? {
-            var modsComponent: Pair<ComponentManifest, LauncherModsDetails>? = null
-            if (instance.second.modsComponent?.isNotBlank() == true) {
+        private fun getModsComponent(instance: InstanceComponent, files: LauncherFiles): ModsComponent? {
+            if (instance.modsComponent?.isNotBlank() == true) {
                 for (m in files.modsComponents) {
-                    if (m.first.id == instance.second.modsComponent) {
-                        modsComponent = m
-                        break
+                    if (m.id == instance.modsComponent) {
+                        return m
                     }
                 }
-                modsComponent ?: throw FileLoadException("Failed to load instance data: unable to find mods component: modsId=" + instance.second.modsComponent)
+                throw FileLoadException("Failed to load instance data: unable to find mods component: modsId=" + instance.modsComponent)
             }
-            return modsComponent
+            return null
         }
     }
 }

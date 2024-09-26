@@ -5,7 +5,7 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.Pre2_5LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.Version
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -94,7 +94,7 @@ class DataPatcher {
         onStatus(PatchStatus(PatchStep.GAME_DATA_COMPONENTS, ""))
 
         val files = Pre2_5LauncherFiles()
-        files.reloadAll()
+        files.reload()
         val gameDataDir = LauncherFile.ofData(files.launcherDetails.gamedataDir)
 
         LOGGER.info { "Moving mods components..." }
@@ -136,7 +136,7 @@ class DataPatcher {
         onStatus(PatchStatus(PatchStep.INCLUDED_FILES, ""))
 
         val files = LauncherFiles()
-        files.reloadAll()
+        files.reload()
 
         for(instance in files.instanceComponents) {
             onStatus(PatchStatus(PatchStep.INCLUDED_FILES, "instance: ${instance.first.id}"))
@@ -170,7 +170,7 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun moveRootFilesToDirectory(component: ComponentManifest, dirName: String) {
+    fun moveRootFilesToDirectory(component: Component, dirName: String) {
         LOGGER.info { "Moving root files to directory for ${component.type}: ${component.id}..." }
 
         val dir = LauncherFile.of(component.directory)
@@ -191,7 +191,7 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun upgradeIncludedFiles(component: ComponentManifest) {
+    fun upgradeIncludedFiles(component: Component) {
         LOGGER.info { "Upgrading included files for ${component.type}: ${component.id}..." }
 
         val dir = LauncherFile.of(component.directory, ".included_files")
@@ -210,7 +210,7 @@ class DataPatcher {
         LOGGER.info { "Upgrading texturepacks included files..." }
         onStatus(PatchStatus(PatchStep.TEXTUREPACKS_INCLUDED_FILES, ""))
         val files = LauncherFiles()
-        files.reloadAll()
+        files.reload()
 
         for(resourcepacks in files.resourcepackComponents) {
             onStatus(PatchStatus(PatchStep.TEXTUREPACKS_INCLUDED_FILES, resourcepacks.id))
@@ -227,7 +227,7 @@ class DataPatcher {
         LOGGER.info { "Removing resourcepacks directory game arguments..." }
         onStatus(PatchStatus(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT, ""))
         val files = LauncherFiles()
-        files.reloadAll()
+        files.reload()
         files.versionComponents.forEach {
             onStatus(PatchStatus(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT, it.first.name))
             it.second.gameArguments = it.second.gameArguments.filter { arg ->
@@ -243,7 +243,7 @@ class DataPatcher {
         LOGGER.info { "Adding new included files..." }
         onStatus(PatchStatus(PatchStep.ADD_GAME_DATA_INCLUDED_FILES, ""))
         val files = LauncherFiles()
-        files.reloadAll()
+        files.reload()
 
         for(saves in files.savesComponents) {
             onStatus(PatchStatus(PatchStep.ADD_GAME_DATA_INCLUDED_FILES, "saves: ${saves.id}"))
@@ -270,7 +270,7 @@ class DataPatcher {
         onStatus(PatchStatus(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES, ""))
 
         val files = LauncherFiles()
-        files.reloadAll()
+        files.reload()
         files.instanceComponents.forEach {
             onStatus(PatchStatus(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES, it.first.id))
             it.second.ignoredFiles = it.second.ignoredFiles.filter { file ->

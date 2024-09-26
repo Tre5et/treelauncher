@@ -28,7 +28,7 @@ class GameLauncher(
     @Throws(GameLaunchException::class)
     fun launch(cleanupActiveInstance: Boolean, doneCallback: (Exception?) -> Unit) {
         try {
-            files.reloadAll()
+            files.reload()
         } catch (e: FileLoadException) {
             throw GameLaunchException("Unable to launch game: file reload failed", e)
         }
@@ -120,7 +120,7 @@ class GameLauncher(
 
                 val resourceManager = ResourceManager(instanceData)
                 try {
-                    resourceManager.cleanupGameFiles()
+                    resourceManager.cleanupResources()
                 } catch (e: GameResourceException) {
                     throw GameLaunchException("Unable to cleanup old instance: unable to cleanup resources", e)
                 }
@@ -139,7 +139,7 @@ class GameLauncher(
     private fun abortLaunch() {
         LOGGER.warn { "Aborting launch" }
         try {
-            resourceManager?.cleanupGameFiles() ?: throw GameLaunchException("Unable to abort launch correctly: no resource manager")
+            resourceManager?.cleanupResources() ?: throw GameLaunchException("Unable to abort launch correctly: no resource manager")
         } catch (e: GameResourceException) {
             throw GameLaunchException("Unable to abort launch correctly: failed to cleanup game files")
         }
@@ -161,7 +161,7 @@ class GameLauncher(
         }
 
         try {
-            resourceManager?.cleanupGameFiles()
+            resourceManager?.cleanupResources()
             onExited(error)
         } catch (e: GameResourceException) {
             onResourceCleanupFailed(e) { retry ->

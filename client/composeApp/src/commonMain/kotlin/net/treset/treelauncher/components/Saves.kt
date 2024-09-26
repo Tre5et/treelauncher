@@ -16,7 +16,7 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherInstanceDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -36,7 +36,7 @@ import java.net.URI
 fun Saves() {
     var components by remember { mutableStateOf(AppContext.files.savesComponents.sortedBy { it.name }) }
 
-    var selected: ComponentManifest? by remember { mutableStateOf(null) }
+    var selected: Component? by remember { mutableStateOf(null) }
 
     var saves: List<Pair<Save, LauncherFile>> by remember { mutableStateOf(emptyList()) }
     var servers: List<Server> by remember { mutableStateOf(emptyList()) }
@@ -354,16 +354,16 @@ fun Saves() {
 
 @Composable
 private fun PlayPopup(
-    component: ComponentManifest,
+    component: Component,
     quickPlayData: QuickPlayData,
     onClose: () -> Unit,
-    onConfirm: (QuickPlayData, Pair<ComponentManifest, LauncherInstanceDetails>) -> Unit
+    onConfirm: (QuickPlayData, Pair<Component, LauncherInstanceDetails>) -> Unit
 ) {
-    var instances: List<Pair<ComponentManifest, LauncherInstanceDetails>> by remember(component) { mutableStateOf(listOf()) }
+    var instances: List<Pair<Component, LauncherInstanceDetails>> by remember(component) { mutableStateOf(listOf()) }
 
     LaunchedEffect(component) {
         try {
-            AppContext.files.reloadAll()
+            AppContext.files.reload()
         } catch (e: FileLoadException) {
             AppContext.severeError(e)
         }

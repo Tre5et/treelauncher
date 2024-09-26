@@ -9,7 +9,7 @@ import net.treset.mcdl.json.SerializationException
 import net.treset.mcdl.mods.ModProvider
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.sort.*
 import net.treset.treelauncher.localization.Language
@@ -41,7 +41,7 @@ enum class LauncherModSortType(val comparator: Comparator<LauncherMod>) {
     }
 }
 
-enum class ComponentManifestSortType(val comparator: Comparator<ComponentManifest>) {
+enum class ComponentManifestSortType(val comparator: Comparator<Component>) {
     NAME(ComponentManifestNameComparator()),
     LAST_USED(ComponentManifestLastUsedComparator());
 

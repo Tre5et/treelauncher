@@ -17,7 +17,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.config.appConfig
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 import net.treset.treelauncher.generic.*
@@ -28,7 +28,7 @@ import java.net.URI
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.ComponentSettings(
-    component: ComponentManifest
+    component: Component
 ) {
     var includedFiles: List<String> by remember { mutableStateOf(emptyList()) }
 

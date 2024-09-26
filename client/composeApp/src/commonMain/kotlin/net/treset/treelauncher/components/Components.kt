@@ -17,13 +17,12 @@ import net.treset.treelauncher.backend.config.ComponentManifestSortType
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.GenericComponentCreator
 import net.treset.treelauncher.backend.data.LauncherInstanceDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.creation.ComponentCreator
 import net.treset.treelauncher.creation.CreationPopup
 import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
@@ -40,12 +39,11 @@ data class SortContext(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun <T, C:CreationState<T>> Components(
+fun <T: Component, C:CreationState<T>> Components(
     title: String,
     components: List<T>,
     componentManifest: ParentManifest,
-    checkHasComponent: (LauncherInstanceDetails, ComponentManifest) -> Boolean,
-    getManifest: T.() -> ComponentManifest,
+    checkHasComponent: (LauncherInstanceDetails, T) -> Boolean,
     isEnabled: T.() -> Boolean = {true},
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
@@ -91,7 +89,7 @@ fun <T, C:CreationState<T>> Components(
     val actualComponents: List<T> = remember(components, sortType, sortReversed, AppContext.runningInstance) {
         components
             .sortedWith { o1, o2 ->
-                sortType.comparator.compare(o1.getManifest(), o2.getManifest())
+                sortType.comparator.compare(o1, o2)
             }.let {
                 if (sortReversed) {
                     it.reversed()
@@ -145,7 +143,7 @@ fun <T, C:CreationState<T>> Components(
                 ) {
                     items(actualComponents) { component ->
                         ComponentButton(
-                            component = component.getManifest(),
+                            component = component,
                             selected = component == selected,
                             enabled = component.isEnabled(),
                             onClick = {
@@ -205,7 +203,7 @@ fun <T, C:CreationState<T>> Components(
                             reload
                         )
 
-                        Text(it.getManifest().name)
+                        Text(it.name)
 
                         IconButton(
                             onClick = {
@@ -217,7 +215,7 @@ fun <T, C:CreationState<T>> Components(
                         )
                         IconButton(
                             onClick = {
-                                LauncherFile.of(it.getManifest().directory).open()
+                                LauncherFile.of(it.directory).open()
                             },
                             icon = icons().folder,
                             size = 32.dp,
@@ -278,9 +276,7 @@ fun <T, C:CreationState<T>> Components(
                 }
 
                 if(showSettings) {
-                    ComponentSettings(
-                        it.getManifest(),
-                    )
+                    ComponentSettings(it)
                 } else {
                     detailsOnDrop?.let {
                         DroppableArea(
@@ -296,17 +292,14 @@ fun <T, C:CreationState<T>> Components(
 
             if (showRename) {
                 RenamePopup(
-                    manifest = it.getManifest(),
-                    editValid = { name -> name.isNotBlank() && name != it.getManifest().name },
+                    manifest = it,
+                    editValid = { name -> name.isNotBlank() && name != it.name },
                     onDone = { name ->
                         showRename = false
                         name?.let { newName ->
-                            it.getManifest().name = newName
+                            it.name = newName
                             try {
-                                LauncherFile.of(
-                                    it.getManifest().directory,
-                                    appConfig().manifestFileName
-                                ).write(it.getManifest())
+                                it.write()
                             } catch (e: IOException) {
                                 AppContext.severeError(e)
                             }
@@ -318,11 +311,11 @@ fun <T, C:CreationState<T>> Components(
 
             if (showDelete) {
                 DeletePopup(
-                    component = it.getManifest(),
-                    checkHasComponent = { details -> checkHasComponent(details, it.getManifest()) },
+                    component = it,
+                    checkHasComponent = { details -> checkHasComponent(details, it) },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        componentManifest.components.remove(it.getManifest().id)
+                        componentManifest.components.remove(it.id)
                         try {
                             LauncherFile.of(
                                 componentManifest.directory,
@@ -332,7 +325,7 @@ fun <T, C:CreationState<T>> Components(
                                     else -> appConfig().manifestFileName
                                 }
                             ).write(componentManifest)
-                            LauncherFile.of(it.getManifest().directory).remove()
+                            LauncherFile.of(it.directory).remove()
                         } catch(e: IOException) {
                             AppContext.severeError(e)
                         }
@@ -379,7 +372,7 @@ fun <T, C:CreationState<T>> Components(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+/*@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Components(
     title: String,
@@ -434,4 +427,4 @@ fun Components(
     detailsScrollable,
     settingsDefault,
     sortContext
-)
+)*/

@@ -91,7 +91,7 @@ fun FixFiles() {
                         showPopup = false
 
                         try {
-                            AppContext.files.reloadAll()
+                            AppContext.files.reload()
                         } catch (e: FileLoadException) {
                             AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE
@@ -117,7 +117,7 @@ fun FixFiles() {
                         val resourceManager = ResourceManager(instanceData)
 
                         try {
-                            resourceManager.cleanupGameFiles()
+                            resourceManager.cleanupResources()
                         } catch (e: GameResourceException) {
                             AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE

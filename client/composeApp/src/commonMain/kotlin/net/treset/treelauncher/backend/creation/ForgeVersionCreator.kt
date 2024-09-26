@@ -9,7 +9,7 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherVersionDetails
-import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
@@ -186,7 +186,7 @@ class ForgeVersionCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    private fun createClient(vanillaManifest: ComponentManifest) {
+    private fun createClient(vanillaManifest: Component) {
         setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FORGE_FILE, null))
         LOGGER.debug { "Creating forge client..." }
         newManifest?.let { newManifest ->

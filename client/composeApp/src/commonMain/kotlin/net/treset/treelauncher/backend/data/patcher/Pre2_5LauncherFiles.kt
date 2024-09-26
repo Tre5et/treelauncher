@@ -1,6 +1,5 @@
 package net.treset.treelauncher.backend.data
 
-import net.treset.treelauncher.backend.data.LauncherModsDetails
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -31,7 +30,7 @@ class Pre2_5LauncherFiles : LauncherFiles() {
 
     @Throws(FileLoadException::class)
     override fun reloadModsComponents() {
-        _modsComponents = reloadComponents(
+        _modsComponents = reload(
             _modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
             LauncherFile.ofData(launcherDetails.gamedataDir),
             LauncherManifestType.MODS_COMPONENT,
@@ -60,7 +59,7 @@ class Pre2_5LauncherFiles : LauncherFiles() {
 
     @Throws(FileLoadException::class)
     override fun reloadSavesComponents() {
-        _savesComponents = reloadComponents(
+        _savesComponents = reload(
             _savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
             LauncherFile.ofData(launcherDetails.gamedataDir),
             LauncherManifestType.SAVES_COMPONENT,

@@ -7,220 +7,185 @@ import net.treset.mcdl.minecraft.MinecraftLibrary
 import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.LauncherVersionDetails
-import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
-import net.treset.treelauncher.backend.util.CreationStatus
-import net.treset.treelauncher.backend.util.exception.ComponentCreationException
+import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.FormatStringProvider
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import java.io.File
 import java.io.IOException
 
 class VanillaVersionCreator(
-    typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: ParentManifest,
-    var mcVersion: MinecraftVersionDetails,
-    files: LauncherFiles,
-    var librariesDir: LauncherFile
-) : VersionCreator(
-    mcVersion.id,
-    typeConversion,
-    componentsManifest,
-    files
-) {
-    init {
-        defaultStatus = CreationStatus(CreationStatus.DownloadStep.VERSION, null)
-    }
+    parent: ParentManifest,
+    onStatus: (Status) -> Unit
+) : VersionCreator<VanillaCreationData>(parent, onStatus) {
 
-    override fun matchesVersion(id: String): Boolean {
-        return id == mcVersion.id
-    }
-
-    @Throws(ComponentCreationException::class)
-    override fun makeVersion() {
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_VANILLA, null))
-        LOGGER.debug { "Creating minecraft version..." }
-        val details = LauncherVersionDetails(
-            mcVersion.id,
-            "vanilla",
-            null,
-            mcVersion.assets,
-            null,
-            null,
-            null,
-            listOf(),
-            listOf(),
-            "",
-            listOf(),
-            mcVersion.mainClass,
-            null,
-            mcVersion.id
+    @Throws(IOException::class)
+    override fun createNew(data: VanillaCreationData, statusProvider: CreationProvider): VersionComponent {
+        LOGGER.debug { "Creating new vanilla version: id=${data.versionId}..." }
+        statusProvider.next("Creating vanilla version") // TODO: make localized
+        val version = VersionComponent(
+            id = id,
+            name = data.name,
+            versionNumber = data.version.id,
+            versionType = "vanilla",
+            loaderVersion = null,
+            assets = data.version.assets,
+            virtualAssets = null,
+            natives = null,
+            depends = null,
+            gameArguments = translateArguments(
+                data.version.launchArguments.game,
+                appConfig().minecraftDefaultGameArguments
+            ),
+            jvmArguments = translateArguments(
+                data.version.launchArguments.jvm,
+                appConfig().minecraftDefaultJvmArguments
+            ),
+            java = null,
+            libraries = listOf(),
+            mainClass = data.version.mainClass,
+            mainFile = null,
+            versionId = data.version.id,
+            file = file,
         )
+
         try {
-            createAssets(details)
-            addArguments(details)
-            addJava(details)
-            addLibraries(details)
-            addClient(details)
-        } catch (e: ComponentCreationException) {
-            attemptCleanup()
-            throw ComponentCreationException("Unable to create minecraft version", e)
+            createAssets(data, version, statusProvider)
+            addJava(data, version)
+            addLibraries(data, version, statusProvider)
+            addClient(data, version, statusProvider)
+        } catch (e: IOException) {
+            throw IOException("Unable to create vanilla version", e)
         }
-        newManifest?.let {newManifest ->
-            try {
-                LauncherFile.of(newManifest.directory, newManifest.details).write(details)
-            } catch (e: IOException) {
-                attemptCleanup()
-                throw ComponentCreationException("Unable to write version details to file", e)
-            }
-            LOGGER.debug { "${"Created minecraft version: id={}"} ${newManifest.id}" }
-        }?: run{
-            attemptCleanup()
-            throw ComponentCreationException("Unable to create minecraft version: invalid data")
-        }
+
+        return version
     }
 
-    @Throws(ComponentCreationException::class)
-    private fun createAssets(details: LauncherVersionDetails) {
+    override val step = VERSION_VANILLA
+    override val newTotal = 1
+
+    @Throws(IOException::class)
+    private fun createAssets(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
         LOGGER.debug { "Downloading assets..." }
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_ASSETS, null))
-        val assetIndexUrl: String = mcVersion.assetIndex.url
+        val assetsProvider = statusProvider.subStep(VERSION_ASSETS, 3)
+        assetsProvider.next("Downloading assets") // TODO: make localized
+        val assetIndexUrl = data.version.assetIndex.url
         val index = try {
             AssetIndex.get(assetIndexUrl)
         } catch (e: FileDownloadException) {
-            throw ComponentCreationException("Unable to create assets: failed to download asset index", e)
+            throw IOException("Unable to create assets: failed to download asset index", e)
         }
         if (index.objects == null || index.objects.isEmpty()) {
-            throw ComponentCreationException("Unable to create assets: invalid index contents")
+            throw IOException("Unable to create assets: invalid index contents")
         }
-        val baseDir: LauncherFile = LauncherFile.ofData(files.launcherDetails.assetsDir)
         try {
             index.downloadAll(
-                baseDir,
+                data.assetsDir,
                 false
-            ) { status ->
-                setStatus(
-                    CreationStatus(
-                        CreationStatus.DownloadStep.VERSION_ASSETS,
-                        status
-                    )
-                )
+            ) {
+                assetsProvider.download(it, 1, 2)
             }
         } catch (e: FileDownloadException) {
-            throw ComponentCreationException("Unable to create assets: failed to download assets", e)
+            throw IOException("Unable to create assets: failed to download assets", e)
         }
         if(index.isMapToResources) {
+            assetsProvider.next("Mapping virtual assets") // TODO: make localized
             val virtualDir = try {
-                index.resolveAll(baseDir)
+                index.resolveAll(data.assetsDir)
             } catch (e: IOException) {
-                throw ComponentCreationException("Unable to create assets: failed to extract virtual assets", e)
+                throw IOException("Unable to create assets: failed to extract virtual assets", e)
             }
 
-            details.virtualAssets = virtualDir.relativeTo(baseDir).path
+            version.virtualAssets = virtualDir.relativeTo(data.assetsDir).path
         }
 
+        assetsProvider.finish("Done") // TODO: make localized
         LOGGER.debug { "Downloaded assets" }
     }
 
-    @Throws(ComponentCreationException::class)
-    private fun addArguments(details: LauncherVersionDetails) {
-        details.gameArguments = translateArguments(
-            mcVersion.launchArguments.game,
-            appConfig().minecraftDefaultGameArguments
-        )
-        details.jvmArguments = translateArguments(
-            mcVersion.launchArguments.jvm,
-            appConfig().minecraftDefaultJvmArguments
-        )
-        LOGGER.debug { "Added arguments" }
-    }
-
-    @Throws(ComponentCreationException::class)
-    private fun addJava(details: LauncherVersionDetails) {
+    @Throws(IOException::class)
+    private fun addJava(data: VanillaCreationData, version: VersionComponent) {
         LOGGER.debug { "Adding java component..." }
-        val javaName: String = mcVersion.javaVersion.getComponent() ?: throw ComponentCreationException("Unable to add java component: java name is null")
-        for (j in files.javaComponents) {
-            if (javaName == j.name) {
-                details.java = j.id
-                LOGGER.debug { "Using existing java component: id=§{j.id}" }
-                return
-            }
-        }
-        val javaCreator = JavaComponentCreator(javaName, typeConversion!!, files.javaManifest)
-        javaCreator.statusCallback = statusCallback
-        try {
-            details.java = javaCreator.id
-        } catch (e: ComponentCreationException) {
-            throw ComponentCreationException("Unable to add java component: failed to create java component", e)
-        }
-        LOGGER.debug { "Added java component: id=${details.java}" }
+        val javaName: String = data.version.javaVersion.getComponent()
+
+        val javaCreator = JavaComponentCreator(data.files.javaManifest, onStatus)
+
+        version.java = javaCreator.new(JavaCreationData(javaName, data.files.javaComponents))
+        LOGGER.debug { "Added java component: id=${version.java}" }
     }
 
-    @Throws(ComponentCreationException::class)
-    private fun addLibraries(details: LauncherVersionDetails) {
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_LIBRARIES, null))
+    @Throws(IOException::class)
+    private fun addLibraries(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
         LOGGER.debug { "Adding libraries..." }
-        if (mcVersion.libraries == null) {
-            throw ComponentCreationException("Unable to add libraries: libraries is null")
-        }
-        if (!librariesDir.isDirectory()) {
+        val librariesProvider = statusProvider.subStep(VERSION_LIBRARIES, 2)
+        librariesProvider.next("Downloading libraries...") // TODO: make localized
+
+        if (!data.librariesDir.isDirectory()) {
             try {
-                librariesDir.createDir()
+                data.librariesDir.createDir()
             } catch (e: IOException) {
-                throw ComponentCreationException(
-                    "Unable to add libraries: failed to create libraries directory: path=$librariesDir",
-                    e
-                )
+                throw IOException("Unable to add libraries: failed to create libraries directory: path=${data.librariesDir}", e)
             }
         }
 
-        val nativesDir = LauncherFile.of(newManifest!!.directory, appConfig().nativesDirName)
+        val nativesDir = LauncherFile.of(directory, appConfig().nativesDirName)
         val result: List<String> = try {
             MinecraftLibrary.downloadAll(
-                mcVersion.libraries,
-                librariesDir,
+                data.version.libraries,
+                data.librariesDir,
                 null,
                 listOf<String>(),
                 nativesDir
-            ) { status ->
-                setStatus(
-                    CreationStatus(
-                        CreationStatus.DownloadStep.VERSION_LIBRARIES,
-                        status
-                    )
-                )
+            ) {
+                librariesProvider.download(it, 1, 1)
             }
         } catch (e: FileDownloadException) {
-            throw ComponentCreationException("Unable to add libraries: failed to download libraries", e)
+            throw IOException("Unable to add libraries: failed to download libraries", e)
         }
-        details.libraries = result
+        version.libraries = result
         if(nativesDir.isDirectory()) {
-            details.natives = appConfig().nativesDirName
+            version.natives = appConfig().nativesDirName
         }
+        librariesProvider.finish("Done") // TODO: make localized
         LOGGER.debug { "Added libraries: $result" }
     }
 
-    @Throws(ComponentCreationException::class)
-    private fun addClient(details: LauncherVersionDetails) {
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_FILE, null))
+    @Throws(IOException::class)
+    private fun addClient(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
         LOGGER.debug { "Adding client..." }
-        newManifest?.let { newManifest ->
-            val baseDir = File(newManifest.directory)
-            if (!baseDir.isDirectory()) {
-                throw ComponentCreationException("Unable to add client: base dir is not a directory: dir=${newManifest.directory}")
-            }
-            try {
-                mcVersion.downloads.client.download(File(baseDir, appConfig().minecraftDefaultFileName))
-            } catch (e: FileDownloadException) {
-                throw ComponentCreationException("Unable to add client: Failed to download client: url=${mcVersion.downloads.client.url}", e)
-            }
-            val urlParts: Array<String> = mcVersion.downloads.client.url.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            details.mainFile = urlParts[urlParts.size - 1]
-            LOGGER.debug { "Added client: mainFile=${details.mainFile}" }
-        }?: throw ComponentCreationException("Unable to add client: newManifest is null")
+        val clientProvider = statusProvider.subStep(VERSION_FILE, 2)
+        clientProvider.next("Downloading client...") // TODO: make localized
+
+        val baseDir = directory
+        if (!baseDir.isDirectory()) {
+            throw IOException("Unable to add client: base dir is not a directory: dir=${baseDir}")
+        }
+        try {
+            data.version.downloads.client.download(
+                LauncherFile.of(baseDir, appConfig().minecraftDefaultFileName)
+            )
+        } catch (e: FileDownloadException) {
+            throw IOException("Unable to add client: failed to download client: url=${data.version.downloads.client.url}", e)
+        }
+        val urlParts = data.version.downloads.client.url.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        version.mainFile = urlParts[urlParts.size - 1]
+        clientProvider.finish("Done") // TODO: make localized
+        LOGGER.debug { "Added client: mainFile=${version.mainFile}" }
     }
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
     }
 }
+
+class VanillaCreationData(
+    val version: MinecraftVersionDetails,
+    val librariesDir: LauncherFile,
+    val assetsDir: LauncherFile,
+    val files: LauncherFiles
+): VersionCreationData(version.id, version.id, files.versionComponents)
+
+val VERSION_VANILLA = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.vanilla() }
+val VERSION_ASSETS = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.assets() }
+val VERSION_LIBRARIES = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.libraries() }
+val VERSION_FILE = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.file() }
