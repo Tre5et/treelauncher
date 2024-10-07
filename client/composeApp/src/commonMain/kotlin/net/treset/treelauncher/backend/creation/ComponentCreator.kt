@@ -31,7 +31,7 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
     @Throws(IOException::class)
     open fun new(
         data: D
-    ): String {
+    ): T {
         LOGGER.debug { "Creating new component ${data.name}" }
 
         val statusProvider = CreationProvider(step, newTotal + 2, onStatus)
@@ -44,7 +44,7 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
         parent.write()
 
         statusProvider.finish("Done") //TODO: make localized
-        return new.id
+        return new
     }
 
     abstract fun createNew(
@@ -58,7 +58,7 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
     open fun inherit(
         component: T,
         data: D
-    ): String {
+    ): T {
         LOGGER.debug { "Inheriting component ${component.id} -> $id" }
 
         val statusProvider = CreationProvider(step, inheritTotal + 2, onStatus)
@@ -79,7 +79,7 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
 
         parent.components += new.id
         parent.write()
-        return new.id
+        return new
     }
 
     abstract fun createInherit(
@@ -89,10 +89,10 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
 
     open fun use(
         component: T
-    ): String {
+    ): T {
         LOGGER.debug { "Using component ${component.id}" }
         onStatus(Status(step, DetailsProvider("Done", 1, 1))) // TODO: make localized
-        return component.id
+        return component
     }
 
     fun createHash(): String {
@@ -119,12 +119,7 @@ open class CreationData(
 )
 
 object CreationStep {
-    val STARTING = FormatStringProvider({ net.treset.treelauncher.localization.strings().creator.status.starting() })
-    val VERSION_FORGE = FormatStringProvider({ net.treset.treelauncher.localization.strings().creator.status.version.forge() })
-    val VERSION_FORGE_LIBRARIES = FormatStringProvider({ net.treset.treelauncher.localization.strings().creator.status.version.forgeLibraries() })
-    val VERSION_FORGE_FILE = FormatStringProvider({ net.treset.treelauncher.localization.strings().creator.status.version.forgeFile() })
-    val VERSION_QUILT = FormatStringProvider({ net.treset.treelauncher.localization.strings().creator.status.version.quilt() })
-    val VERSION_QUILT_LIBRARIES = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.quiltLibraries() }
+    val STARTING = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.starting() }
     val FINISHING = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.finishing() }
 }
 

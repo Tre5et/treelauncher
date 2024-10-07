@@ -21,9 +21,10 @@ class OptionsCreator(
         return createNew(data, statusProvider)
     }
 
-    override val step = OPTIONS
+    override val step = CreationStep.OPTIONS
     override val newTotal = 0
     override val inheritTotal = 0
 }
 
-val OPTIONS = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.options() }
+val CreationStep.OPTIONS: FormatStringProvider
+    get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.options() }

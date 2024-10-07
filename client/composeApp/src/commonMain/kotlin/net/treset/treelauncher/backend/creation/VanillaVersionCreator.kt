@@ -110,7 +110,7 @@ class VanillaVersionCreator(
 
         val javaCreator = JavaComponentCreator(data.files.javaManifest, onStatus)
 
-        version.java = javaCreator.new(JavaCreationData(javaName, data.files.javaComponents))
+        version.java = javaCreator.new(JavaCreationData(javaName, data.files.javaComponents)).id
         LOGGER.debug { "Added java component: id=${version.java}" }
     }
 

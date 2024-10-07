@@ -14,7 +14,7 @@ abstract class VersionCreator<D: VersionCreationData>(
 ) : ComponentCreator<VersionComponent, D>(parentManifest, onStatus) {
 
     @Throws(IOException::class)
-    override fun new(data: D): String {
+    override fun new(data: D): VersionComponent {
         data.currentVersions.firstOrNull { it.versionId == data.versionId }?.let {
             LOGGER.debug { "Matching version already exists, using instead: versionId=${data.versionId}" }
             return use(it)
@@ -23,7 +23,7 @@ abstract class VersionCreator<D: VersionCreationData>(
     }
 
     @Throws(IOException::class)
-    override fun inherit(component: VersionComponent, data: D): String {
+    override fun inherit(component: VersionComponent, data: D): VersionComponent {
         throw IOException("Version inheritance not supported")
     }
 

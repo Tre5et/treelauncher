@@ -23,7 +23,7 @@ class ModsCreator(
         return createNew(data, statusProvider)
     }
 
-    override val step = MODS
+    override val step = CreationStep.MODS
     override val newTotal = 0
     override val inheritTotal = 0
 }
@@ -34,4 +34,5 @@ class ModsCreationData(
     val versions: List<String> = listOf()
 ): CreationData(name)
 
-val MODS = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.mods() }
+val CreationStep.MODS: FormatStringProvider
+    get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.mods() }

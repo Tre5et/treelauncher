@@ -42,7 +42,6 @@ class Config(baseDir: String, val updateUrl: String?) {
         "optionsviveprofiles.txt",
         "g4mespeed"
     )
-    val modsDefaultDetails = "mods.json"
     val savesDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
             "saves/",
             "servers.dat",
@@ -54,7 +53,6 @@ class Config(baseDir: String, val updateUrl: String?) {
             "resourcepacks/",
             "texturepacks/"
         )
-    val versionsDefaultDetails = "version.json"
     val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val minecraftDefaultFileName = "client.jar"
     val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf(
@@ -66,6 +64,8 @@ class Config(baseDir: String, val updateUrl: String?) {
     val fabricDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val forgeDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val forgeDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val quiltDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val quiltDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultClientFileName = "fabric-client.jar"
     val modrinthUserAgent = "TreSet/treelauncher/v2.6.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"

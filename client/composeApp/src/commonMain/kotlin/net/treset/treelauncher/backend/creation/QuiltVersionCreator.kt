@@ -2,7 +2,6 @@ package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.json.SerializationException
 import net.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.mcdl.quiltmc.QuiltLibrary
@@ -10,151 +9,127 @@ import net.treset.mcdl.quiltmc.QuiltProfile
 import net.treset.mcdl.quiltmc.QuiltVersion
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.LauncherVersionDetails
-import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
-import net.treset.treelauncher.backend.util.CreationStatus
-import net.treset.treelauncher.backend.util.exception.ComponentCreationException
+import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.FormatStringProvider
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class QuiltVersionCreator(
-    typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: ParentManifest,
-    var quiltVersion: QuiltVersion,
-    var quiltProfile: QuiltProfile,
-    files: LauncherFiles,
-    var librariesDir: LauncherFile
-) : VersionCreator(
-    quiltProfile.id,
-    typeConversion,
-    componentsManifest,
-    files
-) {
-    override fun matchesVersion(id: String): Boolean {
-        return id == quiltProfile.id
-    }
+    parent: ParentManifest,
+    onStatus: (Status) -> Unit
+) : VersionCreator<QuiltCreationData>(parent, onStatus) {
 
-    @Throws(ComponentCreationException::class)
-    override fun makeVersion() {
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_QUILT, null))
+    @Throws(IOException::class)
+    override fun createNew(data: QuiltCreationData, statusProvider: CreationProvider): VersionComponent {
         LOGGER.debug { "Creating quilt version..." }
+        statusProvider.next("Creating parent version") // TODO: make localized
 
-        if (quiltProfile.inheritsFrom == null) {
-            throw ComponentCreationException("Unable to create quilt version: no valid quilt profile")
+        if (data.profile.inheritsFrom == null) {
+            throw IOException("Unable to create quilt version: no valid quilt profile")
         }
 
         LOGGER.debug { "Creating minecraft version..." }
-        val versions: List<MinecraftVersion> = try {
-            MinecraftVersion.getAll()
+
+        val inheritVersion = MinecraftVersion.get(data.profile.inheritsFrom)?: throw IOException("Unable to create quilt version: failed to find mc version: versionId=${data.profile.inheritsFrom}")
+        val versionDetails = try {
+            MinecraftVersionDetails.get(inheritVersion.url)
         } catch (e: FileDownloadException) {
-            throw ComponentCreationException("Unable to create quilt version: failed to get mc versions", e)
+            throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.profile.inheritsFrom}", e)
         }
 
-        for (m in versions) {
-            if (quiltProfile.inheritsFrom == m.id) {
-                val versionDetails= try {
-                    MinecraftVersionDetails.get(m.url)
-                } catch (e: FileDownloadException) {
-                    throw ComponentCreationException("Unable to create quilt version: failed to download mc version details: versionId=${quiltProfile.id}", e)
-                }
-                val mcCreator: VersionCreator = try {
-                    VanillaVersionCreator(
-                        typeConversion!!,
-                        componentsManifest!!,
-                        versionDetails,
-                        files,
-                        librariesDir
-                    )
-                } catch (e: SerializationException) {
-                    throw ComponentCreationException("Unable to create quilt version: failed to parse mc version details: versionId=${quiltProfile.id}", e)
-                }
-                mcCreator.statusCallback = statusCallback
-                val dependsId: String = try {
-                    mcCreator.id
-                } catch (e: ComponentCreationException) {
-                    throw ComponentCreationException("Unable to create quilt version: failed to create mc version: versionId=${quiltProfile.id}", e)
-                }
-                LOGGER.debug { "Created minecraft version: id=$dependsId" }
-
-                val details = LauncherVersionDetails(
-                    quiltProfile.inheritsFrom,
-                    "quilt",
-                    quiltVersion.loader.version,
-                    null,
-                    null,
-                    null,
-                    dependsId,
-                    listOf(),
-                    listOf(),
-                    "",
-                    listOf(),
-                    quiltProfile.mainClass,
-                    null,
-                    quiltProfile.id
-                )
-                try {
-                    addArguments(details)
-                    addLibraries(details)
-                } catch (e: ComponentCreationException) {
-                    mcCreator.attemptCleanup()
-                    attemptCleanup()
-                    throw ComponentCreationException("Unable to create quilt version: versionId=${quiltProfile.id}", e)
-                }
-                try {
-                    LauncherFile.of(newManifest!!.directory, newManifest!!.details).write(details)
-                } catch (e: IOException) {
-                    throw ComponentCreationException("Unable to create quilt version: failed to write version details: versionId=${quiltProfile.id}", e)
-                }
-                LOGGER.debug { "Created fabric version: id=${newManifest?.id}" }
-                return
-            }
+        val creator = VanillaVersionCreator(parent, onStatus)
+        val mc = try {
+            creator.new(VanillaCreationData(versionDetails, data.librariesDir, data.assetsDir, data.files))
+        } catch (e: IOException) {
+            throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.profile.inheritsFrom}", e)
         }
-        throw ComponentCreationException("Unable to create quilt version: failed to find mc version: versionId=${quiltProfile.inheritsFrom}")
+
+        LOGGER.debug { "Created minecraft version: id=${mc.id}" }
+
+        val version = VersionComponent(
+            id = id,
+            name = data.name,
+            versionNumber = data.profile.inheritsFrom,
+            versionType = "quilt",
+            loaderVersion = data.version.loader.version,
+            assets = null,
+            virtualAssets = null,
+            natives = null,
+            depends = mc.id,
+            gameArguments = translateArguments(
+                data.profile.arguments.game,
+                appConfig().quiltDefaultGameArguments
+            ),
+            jvmArguments = translateArguments(
+                data.profile.arguments.jvm,
+                appConfig().quiltDefaultJvmArguments
+            ),
+            java = null,
+            libraries = listOf(),
+            mainClass = data.profile.mainClass,
+            mainFile = null,
+            versionId = data.versionId,
+            file = file,
+        )
+
+        try {
+            addLibraries(data, version, statusProvider)
+        } catch (e: IOException) {
+            throw IOException("Unable to create quilt version: versionId=${data.profile.id}", e)
+        }
+        LOGGER.debug { "Created fabric version: id=${version.id}" }
+        return version
     }
 
-    @Throws(ComponentCreationException::class)
-    private fun addArguments(details: LauncherVersionDetails) {
-        LOGGER.debug { "Adding quilt arguments..." }
-        details.jvmArguments = translateArguments(
-            quiltProfile.arguments.jvm,
-            appConfig().fabricDefaultJvmArguments
-        )
-        details.gameArguments = translateArguments(
-            quiltProfile.arguments.game,
-            appConfig().fabricDefaultGameArguments
-        )
-        LOGGER.debug { "Added quilt arguments" }
-    }
-
-    @Throws(ComponentCreationException::class)
-    private fun addLibraries(details: LauncherVersionDetails) {
-        setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_QUILT_LIBRARIES, null))
+    @Throws(IOException::class)
+    private fun addLibraries(data: QuiltCreationData, version: VersionComponent, statusProvider: CreationProvider) {
         LOGGER.debug { "Adding quilt libraries..." }
-        quiltProfile.libraries?.let { libraries: List<QuiltLibrary> ->
-            if (!librariesDir.isDirectory()) {
+        val librariesProvider = statusProvider.subStep(CreationStep.VERSION_QUILT_LIBRARIES, 3)
+        librariesProvider.next("Downloading quilt libraries") // TODO: make localized
+        data.profile.libraries?.let { libraries: List<QuiltLibrary> ->
+            if (!data.librariesDir.isDirectory()) {
                 try {
-                    librariesDir.createDir()
+                    data.librariesDir.createDir()
                 } catch (e: IOException) {
-                    throw ComponentCreationException("Unable to add quilt libraries: failed to create libraries directory: path=$librariesDir", e)
+                    throw IOException("Unable to add quilt libraries: failed to create libraries directory: path=${data.librariesDir}", e)
                 }
             }
             val libs: List<String> = try {
                 QuiltLibrary.downloadAll(
                     libraries,
-                    librariesDir
+                    data.librariesDir
                 ) {
-                    setStatus(CreationStatus(CreationStatus.DownloadStep.VERSION_QUILT_LIBRARIES, it))
+                    LOGGER.debug { "Downloading quilt library: ${it.currentFile}" }
+                    librariesProvider.download(it, 1, 1)
                 }
             } catch (e: FileDownloadException) {
-                throw ComponentCreationException("Unable to add quilt libraries: failed to download libraries", e)
+                throw IOException("Unable to add quilt libraries: failed to download libraries", e)
             }
-            details.libraries = libs
+            version.libraries = libs
+            librariesProvider.finish("Done") // TODO: make localized
             LOGGER.debug { "Added quilt libraries" }
-        }?: throw ComponentCreationException("Unable to add quilt libraries: libraries invalid")
+        }?: throw IOException("Unable to add quilt libraries: libraries invalid")
     }
+
+    override val step = CreationStep.VERSION_QUILT
+    override val newTotal = 1
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
     }
 }
+
+class QuiltCreationData(
+    val version: QuiltVersion,
+    val profile: QuiltProfile,
+    val librariesDir: LauncherFile,
+    val assetsDir: LauncherFile,
+    val files: LauncherFiles
+): VersionCreationData(profile.id, profile.id, files.versionComponents)
+
+val CreationStep.VERSION_QUILT: FormatStringProvider
+    get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.quilt() }
+val CreationStep.VERSION_QUILT_LIBRARIES: FormatStringProvider
+    get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.quiltLibraries() }

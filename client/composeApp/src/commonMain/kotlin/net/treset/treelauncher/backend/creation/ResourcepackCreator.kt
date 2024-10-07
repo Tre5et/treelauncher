@@ -22,10 +22,11 @@ class ResourcepackCreator(
         return createNew(data, statusProvider)
     }
 
-    override val step: StringProvider = RESOURCEPACKS
+    override val step: StringProvider = CreationStep.RESOURCEPACKS
     override val newTotal: Int = 0
     override val inheritTotal: Int = 0
 
 }
 
-val RESOURCEPACKS = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.resourcepacks() }
+val CreationStep.RESOURCEPACKS: FormatStringProvider
+    get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.resourcepacks() }

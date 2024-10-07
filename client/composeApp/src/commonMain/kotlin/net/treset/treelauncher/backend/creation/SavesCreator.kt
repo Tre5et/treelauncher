@@ -21,9 +21,10 @@ class SavesCreator(
         return createNew(data, statusProvider)
     }
 
-    override val step = SAVES
+    override val step = CreationStep.SAVES
     override val newTotal = 0
     override val inheritTotal = 0
 }
 
-val SAVES = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.saves() }
+val CreationStep.SAVES: FormatStringProvider
+    get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.saves() }

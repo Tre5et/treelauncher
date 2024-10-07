@@ -15,7 +15,7 @@ class JavaComponentCreator(
     onStatus: (Status) -> Unit
 ) : ComponentCreator<JavaComponent, JavaCreationData>(parent, onStatus) {
     @Throws(IOException::class)
-    override fun new(data: JavaCreationData): String {
+    override fun new(data: JavaCreationData): JavaComponent {
         data.currentComponents.firstOrNull { it.name == data.name }?.let {
             LOGGER.debug { "Matching java component already exists, using instead: name=${data.name}" }
             return use(it)
