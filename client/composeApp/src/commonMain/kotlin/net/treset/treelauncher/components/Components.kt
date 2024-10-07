@@ -14,17 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.ComponentManifestSortType
-import net.treset.treelauncher.backend.config.appConfig
-import net.treset.treelauncher.backend.creation.GenericComponentCreator
-import net.treset.treelauncher.backend.data.LauncherInstanceDetails
 import net.treset.treelauncher.backend.data.manifest.Component
-import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.InstanceComponent
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
-import net.treset.treelauncher.backend.util.CreationStatus
-import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.creation.CreationPopup
-import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -39,15 +32,14 @@ data class SortContext(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun <T: Component, C:CreationState<T>> Components(
+fun <T: Component> Components(
     title: String,
     components: List<T>,
     componentManifest: ParentManifest,
-    checkHasComponent: (LauncherInstanceDetails, T) -> Boolean,
+    checkHasComponent: (InstanceComponent, T) -> Boolean,
     isEnabled: T.() -> Boolean = {true},
-    getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
-    createContent: @Composable ColumnScope.(onCreate: (C) -> Unit) -> Unit,
+    createContent: @Composable ColumnScope.(onDone: () -> Unit) -> Unit,
     actionBarSpecial: @Composable RowScope.(
         selected: T,
         settingsOpen: Boolean,
@@ -73,8 +65,6 @@ fun <T: Component, C:CreationState<T>> Components(
     var selected: T? by remember(components) { mutableStateOf(null) }
 
     var creatorSelected by remember { mutableStateOf(false) }
-
-    var creationStatus: CreationStatus? by remember { mutableStateOf(null) }
 
     val redrawSelected: () -> Unit = {
         selected?.let {
@@ -317,15 +307,7 @@ fun <T: Component, C:CreationState<T>> Components(
                     onConfirm = {
                         componentManifest.components.remove(it.id)
                         try {
-                            LauncherFile.of(
-                                componentManifest.directory,
-                                when(componentManifest.type) {
-                                    LauncherManifestType.SAVES -> "saves.json"
-                                    LauncherManifestType.MODS -> "mods.json"
-                                    else -> appConfig().manifestFileName
-                                }
-                            ).write(componentManifest)
-                            LauncherFile.of(it.directory).remove()
+                            it.delete(componentManifest)
                         } catch(e: IOException) {
                             AppContext.severeError(e)
                         }
@@ -344,30 +326,11 @@ fun <T: Component, C:CreationState<T>> Components(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(12.dp)
             ) {
-                createContent { state ->
-                    val creator = getCreator(state)
-
-                    creator?.let { creation ->
-                        creation.statusCallback = {
-                            creationStatus = it
-                        }
-
-                        Thread {
-                            try {
-                                creation.execute()
-                            } catch (e: ComponentCreationException) {
-                                AppContext.error(e)
-                            }
-                            reload()
-                            creationStatus = null
-                        }.start()
-                    }
+                createContent {
+                    reload()
+                    creatorSelected = false
                 }
             }
-        }
-
-        creationStatus?.let {
-            CreationPopup(it)
         }
     }
 }

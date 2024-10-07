@@ -26,8 +26,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.LauncherMod
-import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.data.manifest.ModsComponent
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.IconButton
@@ -39,7 +38,7 @@ import java.io.IOException
 
 @Composable
 fun ModsImport(
-    component: Pair<Component, LauncherModsDetails>,
+    component: ModsComponent,
     modContext: ModContext,
     appContext: AppContextData,
     droppedFile: LauncherFile? = null,
@@ -86,7 +85,7 @@ fun ModsImport(
                     .padding(4.dp)
             ) {
                 filteredComponents.forEach { component ->
-                    val files: List<LauncherMod> by remember(component) { mutableStateOf(component.second.mods) }
+                    val files: List<LauncherMod> by remember(component) { mutableStateOf(component.mods) }
 
                     if (files.isNotEmpty()) {
                         LaunchedEffect(Unit) {
@@ -114,7 +113,7 @@ fun ModsImport(
                                 tooltip = strings().manager.mods.import.tooltipExpand(expanded)
                             )
 
-                            Text(component.first.name)
+                            Text(component.name)
                         }
 
                         AnimatedVisibility(
@@ -161,7 +160,7 @@ fun ModsImport(
 
                                             IconButton(
                                                 onClick = {
-                                                    selectedMods += it to LauncherFile.of(component.first.directory, it.fileName)
+                                                    selectedMods += it to LauncherFile.of(component.directory, it.fileName)
                                                 },
                                                 icon = icons().add,
                                                 tooltip = strings().manager.mods.import.tooltipAdd(),
@@ -249,14 +248,14 @@ fun ModsImport(
                 popupContent = PopupData(
                     titleRow = { Text(strings().manager.mods.import.importing()) }
                 )
-                LOGGER.debug { "Importing mods into component: ${component.first.name}" }
+                LOGGER.debug { "Importing mods into component: ${component.name}" }
                 modContext.registerChangingJob { mods ->
                     selectedMods.forEach { orgMod ->
                         val mod = orgMod.first.clone()
                         val file = orgMod.second
                         LOGGER.debug { "Importing mod: ${file.path}" }
 
-                        var newFile = LauncherFile.of(component.first.directory, "mods", file.name)
+                        var newFile = LauncherFile.of(component.directory, "mods", file.name)
                         var found = false
                         for (i in 1..100) {
                             if (!newFile.exists()) {
@@ -270,7 +269,7 @@ fun ModsImport(
                             } else {
                                 "${nameParts.dropLast(1).joinToString(".")}-.${nameParts.last()}"
                             }
-                            newFile = LauncherFile.of(component.first.directory, newName)
+                            newFile = LauncherFile.of(component.directory, newName)
                             mod.fileName = newName
                         }
                         if (!found) {

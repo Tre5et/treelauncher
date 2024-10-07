@@ -42,8 +42,8 @@ class CommandBuilder(
         }
         var assetsIndex: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.assets?.isNotBlank() == true) {
-                assetsIndex = v.second.assets
+            if (v.assets?.isNotBlank() == true) {
+                assetsIndex = v.assets
                 break
             }
         }
@@ -53,8 +53,8 @@ class CommandBuilder(
 
         var mainClass: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.mainClass.isNotBlank()) {
-                mainClass = v.second.mainClass
+            if (v.mainClass.isNotBlank()) {
+                mainClass = v.mainClass
                 break
             }
         }
@@ -64,7 +64,7 @@ class CommandBuilder(
 
         val libraries: MutableList<String> = mutableListOf()
         for (v in instanceData.versionComponents) {
-            for (l in v.second.libraries) {
+            for (l in v.libraries) {
                 val library = LauncherFile.of(instanceData.librariesDir, l).absolutePath
                 if(libraries.any { it == library }) continue
                 libraries.add(library)
@@ -75,15 +75,15 @@ class CommandBuilder(
         }
 
         for (v in instanceData.versionComponents) {
-            if (v.second.mainFile?.isNotBlank() == true) {
-                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile!!).absolutePath)
+            if (v.mainFile?.isNotBlank() == true) {
+                libraries.add(LauncherFile.of(v.directory, v.mainFile!!).absolutePath)
             }
         }
 
         val natives: MutableList<String> = mutableListOf()
         for(v in instanceData.versionComponents) {
-            if(v.second.natives?.isNotBlank() == true) {
-                natives.add(LauncherFile.of(v.first.directory, v.second.natives!!).absolutePath)
+            if(v.natives?.isNotBlank() == true) {
+                natives.add(LauncherFile.of(v.directory, v.natives!!).absolutePath)
             }
         }
         if(natives.isEmpty()) {
@@ -93,7 +93,7 @@ class CommandBuilder(
 
         var resX: String? = null
         var resY: String? = null
-        for (f in instanceData.instance.second.features) {
+        for (f in instanceData.instance.features) {
             if (f.feature == "resolution_x") {
                 resX = f.value
             }
@@ -110,9 +110,9 @@ class CommandBuilder(
         processBuilder.command(mutableListOf())
         processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
 
-        val jvmArgs = instanceData.instance.second.jvmArguments.toMutableList()
+        val jvmArgs = instanceData.instance.jvmArguments.toMutableList()
         for(v in instanceData.versionComponents) {
-            v.second.jvmArguments.forEach {
+            v.jvmArguments.forEach {
                 if(!jvmArgs.contains(it)) {
                     jvmArgs.add(it)
                 }
@@ -121,7 +121,7 @@ class CommandBuilder(
 
         val gameArgs = mutableListOf<LauncherLaunchArgument>()
         for(v in instanceData.versionComponents) {
-            v.second.gameArguments.forEach {
+            v.gameArguments.forEach {
                 if(!gameArgs.contains(it)) {
                     gameArgs.add(it)
                 }
@@ -134,7 +134,7 @@ class CommandBuilder(
             offline,
             minecraftUser,
             instanceData.gameDataDir.absolutePath,
-            instanceData.resourcepacksComponent.directory,
+            instanceData.resourcepacksComponent.directory.absolutePath,
             instanceData.assetsDir.absolutePath,
             assetsIndex,
             libraries,
@@ -156,7 +156,7 @@ class CommandBuilder(
         } catch (e: GameCommandException) {
             throw GameCommandException("Unable to create start command: unable to append arguments", e)
         }
-        LOGGER.info { "Created start command, instance=${instanceData.instance.first.id}" }
+        LOGGER.info { "Created start command, instance=${instanceData.instance.id}" }
     }
 
     @Throws(GameCommandException::class)
@@ -189,7 +189,7 @@ class CommandBuilder(
         a: LauncherLaunchArgument,
         context: CommandContext
     ) {
-        if (a.isActive(instanceData.instance.second.features)) {
+        if (a.isActive(instanceData.instance.features)) {
             val replacements: MutableMap<String, String> = mutableMapOf()
             val exceptionQueue: MutableList<GameCommandException> = mutableListOf()
             for (r in a.replacementValues) {

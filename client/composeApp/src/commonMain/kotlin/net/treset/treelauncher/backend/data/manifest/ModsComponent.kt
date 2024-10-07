@@ -3,7 +3,6 @@ package net.treset.treelauncher.backend.data.manifest
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class ModsComponent(
@@ -12,7 +11,7 @@ class ModsComponent(
     var types: List<String>?,
     var versions: List<String>?,
     file: LauncherFile,
-    includedFiles: Array<PatternString> = appConfig().modsDefaultIncludedFiles,
+    includedFiles: Array<String> = appConfig().modsDefaultIncludedFiles,
     lastUsed: String = "",
     active: Boolean = false,
     type: LauncherManifestType = LauncherManifestType.MODS_COMPONENT,

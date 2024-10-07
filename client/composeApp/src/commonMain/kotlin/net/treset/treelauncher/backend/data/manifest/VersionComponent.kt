@@ -1,8 +1,8 @@
 package net.treset.treelauncher.backend.data.manifest
 
+import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class VersionComponent(
@@ -24,7 +24,7 @@ class VersionComponent(
     var versionId: String,
     file: LauncherFile,
     type: LauncherManifestType = LauncherManifestType.VERSION_COMPONENT,
-    includedFiles: Array<PatternString> = emptyArray(),
+    includedFiles: Array<String> = appConfig().versionDefaultIncludedFiles,
     lastUsed: String = "",
     active: Boolean = false
 ): Component(

@@ -4,8 +4,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.data.LauncherInstanceDetails
 import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.data.manifest.InstanceComponent
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.PopupType
@@ -15,14 +15,14 @@ import net.treset.treelauncher.localization.strings
 @Composable
 fun DeletePopup(
     component: Component,
-    checkHasComponent: (LauncherInstanceDetails) -> Boolean,
+    checkHasComponent: (InstanceComponent) -> Boolean,
     onClose: () -> Unit,
     onConfirm: () -> Unit
 ) {
     val usedBy = remember(component) {
         AppContext.files.instanceComponents
             .firstOrNull {
-                checkHasComponent(it.second)
+                checkHasComponent(it)
             }
     }
 
@@ -30,7 +30,7 @@ fun DeletePopup(
         PopupOverlay(
             type = PopupType.ERROR,
             titleRow = { Text(strings().selector.component.delete.unableTitle()) },
-            content = { Text(strings().selector.component.delete.unableMessage(it.first)) },
+            content = { Text(strings().selector.component.delete.unableMessage(it)) },
             buttonRow = {
                 Button (
                     onClick = onClose

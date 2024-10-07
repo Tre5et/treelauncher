@@ -32,18 +32,14 @@ import net.treset.mcdl.mods.ModProvider
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.LauncherModSortType
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.creation.ModsCreator
 import net.treset.treelauncher.backend.data.LauncherMod
-import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.data.manifest.ModsComponent
 import net.treset.treelauncher.backend.util.EmptyingJobQueue
-import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.components.Components
 import net.treset.treelauncher.components.SortContext
 import net.treset.treelauncher.components.mods.display.LauncherModDisplay
 import net.treset.treelauncher.components.mods.display.ModDataProvider
-import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.Text
@@ -52,6 +48,7 @@ import net.treset.treelauncher.style.disabledContainer
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.style.inverted
 import net.treset.treelauncher.util.DetailsListDisplay
+import java.io.IOException
 import java.net.URI
 
 data class ModContext(
@@ -68,9 +65,9 @@ data class ModContext(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Mods() {
-    var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.first.name }) }
+    var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.name }) }
 
-    var selected: Pair<Component, LauncherModsDetails>? by remember { mutableStateOf(null) }
+    var selected: ModsComponent? by remember { mutableStateOf(null) }
 
     var showSearch by remember(selected) { mutableStateOf(false) }
     var checkUpdates by remember(selected) { mutableStateOf(0) }
@@ -91,52 +88,25 @@ fun Mods() {
         components = components,
         componentManifest = AppContext.files.modsManifest,
         checkHasComponent = { details, component -> details.modsComponent == component.id },
-        getManifest = { first },
-        isEnabled = { first.id != AppContext.runningInstance?.modsComponent?.first?.id },
-        getCreator = { state: ModsCreationState ->
-            when(state.mode) {
-                CreationMode.NEW -> state.name?.let{ state.version?.let { state.type?.let { state.alternateLoader?.let {
-                    ModsCreator(
-                        state.name,
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.modsManifest,
-                        if(state.alternateLoader && state.type == VersionType.QUILT) {
-                            listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
-                        } else {
-                            listOf(state.type.id)
-                        },
-                        listOf(state.version.id),
-                    )
-                }}}}
-                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
-                    ModsCreator(
-                        state.name,
-                        state.existing,
-                        AppContext.files.modsManifest,
-                    )
-                }}
-                CreationMode.USE -> null
-            }
-        },
+        isEnabled = { id != AppContext.runningInstance?.modsComponent?.id },
         reload = {
             try {
-                AppContext.files.reloadModsManifest()
-                AppContext.files.reloadModsComponents()
-                components = AppContext.files.modsComponents.sortedBy { it.first.name }
-            } catch (e: FileLoadException) {
+                AppContext.files.reloadMods()
+                components = AppContext.files.modsComponents.sortedBy { it.name }
+            } catch (e: IOException) {
                 AppContext.severeError(e)
             }
         },
-        createContent =  { onCreate: (ModsCreationState) -> Unit ->
+        createContent =  { onDone ->
             ModsCreation(
-                components,
+                existing = components,
                 showUse = false,
-                onCreate = onCreate
+                onDone = { onDone() }
             )
         },
         detailsContent = { current, _, _ ->
-            val types = remember(current.second.types) {
-                VersionType.fromIds(current.second.types!!)
+            val types = remember(current.types) {
+                VersionType.fromIds(current.types!!)
             }
 
             var redrawMods by remember(current) { mutableStateOf(0) }
@@ -157,8 +127,8 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, providers, current.second.mods.size, current.second.versions) {
-                current.second.mods.sortedWith(sort.comparator).let {
+            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, providers, current.mods.size, current.versions) {
+                current.mods.sortedWith(sort.comparator).let {
                     if(reverse) it.reversed() else it
                 }
             }
@@ -166,28 +136,23 @@ fun Mods() {
             val updateQueue = remember(current) {
                 EmptyingJobQueue(
                     onEmptied = {
-                        LauncherFile.of(
-                            current.first.directory,
-                            current.first.details
-                        ).write(
-                            current.second
-                        )
+                        current.write()
                         redrawMods++
                     }
                 ) {
-                    current.second.mods
+                    current.mods
                 }
             }
 
-            val modContext = remember(current, current.second.versions, types, autoUpdate, disableNoVersion, enableOnDownload, providers) {
+            val modContext = remember(current, current.versions, types, autoUpdate, disableNoVersion, enableOnDownload, providers) {
                 ModContext(
                     autoUpdate,
                     disableNoVersion,
                     enableOnDownload,
-                    current.second.versions!!,
+                    current.versions!!,
                     types,
                     providers.filter { it.second }.map { it.first },
-                    LauncherFile.of(current.first.directory, "mods")
+                    LauncherFile.of(current.directory, "mods")
                 ) { element ->
                     updateQueue.add(element)
                 }
@@ -238,7 +203,7 @@ fun Mods() {
                         MinecraftVersion.getAll().filter { it.isRelease }
                     }.also { v ->
                         selectedVersion = v.firstOrNull {
-                            it.id == current.second.versions?.let {it[0]}
+                            it.id == current.versions?.let {it[0]}
                         }
                     }
                 }.start()
@@ -513,17 +478,12 @@ fun Mods() {
                                         Button(
                                             onClick = {
                                                 modContext.registerChangingJob {
-                                                    current.second.versions = listOf(v.id)
-                                                    current.second.types = if(selectedType == VersionType.QUILT && includeAlternateLoader) {
+                                                    current.versions = listOf(v.id)
+                                                    current.types = if(selectedType == VersionType.QUILT && includeAlternateLoader) {
                                                         listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
                                                     } else {
                                                         listOf(selectedType.id)
                                                     }
-
-                                                    LauncherFile.of(
-                                                        current.first.directory,
-                                                        current.first.details
-                                                    ).write(current.second)
 
                                                     popupData = null
                                                 }
@@ -536,7 +496,7 @@ fun Mods() {
                             }
                         },
                         icon = icons().change,
-                        enabled = selectedVersion?.let { it.id != current.second.versions?.let {it[0]} } ?: false
+                        enabled = selectedVersion?.let { it.id != current.versions?.let {it[0]} } ?: false
                                 || selectedType != types[0]
                                 || includeAlternateLoader != types.size > 1,
                         modifier = Modifier

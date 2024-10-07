@@ -317,3 +317,8 @@ open class LauncherFiles {
         private val LOGGER = KotlinLogging.logger{}
     }
 }
+
+@Throws(IOException::class)
+fun Array<out Component>.getId(id: String): Component {
+    return this.firstOrNull { it.id == id } ?: throw FileNotFoundException("Unable to find component: id=$id")
+}

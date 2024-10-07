@@ -6,7 +6,6 @@ import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.launching.resources.ComponentResourceProvider
 import net.treset.treelauncher.backend.launching.resources.GenericResourceProvider
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.FormatString
 import java.io.IOException
 import java.time.LocalDateTime
 
@@ -14,7 +13,7 @@ open class Component(
     val type: LauncherManifestType,
     var id: String,
     var name: String,
-    var includedFiles: Array<out FormatString>,
+    var includedFiles: Array<String>,
     var lastUsed: String = "",
     var active: Boolean = false,
     @Transient var file: LauncherFile
@@ -46,6 +45,13 @@ open class Component(
         other.includedFiles = includedFiles
         other.lastUsed = lastUsed
         other.active = active
+    }
+
+    @Throws(IOException::class)
+    open fun delete(parent: ParentManifest) {
+        parent.components.remove(id)
+        parent.write()
+        directory.remove()
     }
 
     @Throws(IOException::class)

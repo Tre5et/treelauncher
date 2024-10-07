@@ -4,7 +4,8 @@ import net.treset.treelauncher.localization.strings
 
 class Status(
     private val stepProvider: StringProvider,
-    private val detailsProvider: StringProvider
+    private val detailsProvider: StringProvider,
+    val progress: Float? = null
 ) {
     val step: String
         get() = stepProvider.get()

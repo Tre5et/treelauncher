@@ -132,7 +132,7 @@ class CreationProvider(
 
     fun next(
         message: () -> String
-    ) = onStatus(Status(step, DetailsProvider(message, index++, if(total >= index) total else index)))
+    ) = onStatus(Status(step, DetailsProvider(message, index++, if(total >= index) total else index), index / total.toFloat()))
 
     fun next(
         message: String
@@ -141,12 +141,12 @@ class CreationProvider(
     fun download(status: DownloadStatus, before: Int, after: Int) {
         index = status.currentAmount + before
         total = status.totalAmount + before + after
-        onStatus(Status(step, DetailsProvider(status.currentFile, index, total)))
+        onStatus(Status(step, DetailsProvider(status.currentFile, index, total), index / total.toFloat()))
     }
 
     fun finish(
         message: () -> String
-    ) = onStatus(Status(step, DetailsProvider(message, total, total)))
+    ) = onStatus(Status(step, DetailsProvider(message, total, total), 1f))
 
     fun finish(
         message: String

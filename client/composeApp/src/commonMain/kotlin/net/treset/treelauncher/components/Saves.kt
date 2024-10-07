@@ -15,13 +15,14 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.SavesCreator
 import net.treset.treelauncher.backend.data.InstanceData
-import net.treset.treelauncher.backend.data.LauncherInstanceDetails
 import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.data.manifest.InstanceComponent
+import net.treset.treelauncher.backend.data.manifest.SavesComponent
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.creation.CreationMode
+import net.treset.treelauncher.creation.ComponentCreator
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
@@ -89,31 +90,19 @@ fun Saves() {
         components = components,
         componentManifest = AppContext.files.savesManifest,
         checkHasComponent = { details, component -> details.savesComponent == component.id },
-        getCreator = { state ->
-            when(state.mode) {
-                CreationMode.NEW -> state.name?.let{
-                    SavesCreator(
-                        state.name,
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.savesManifest
-                    )
-                }
-                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
-                    SavesCreator(
-                        state.name,
-                        state.existing,
-                        AppContext.files.savesManifest
-                    )
-                }}
-                CreationMode.USE -> null
-            }
+        createContent = { onDone ->
+            ComponentCreator(
+                existing = components,
+                allowUse = false,
+                getCreator = { SavesCreator(AppContext.files.savesManifest, it) },
+                onDone = { onDone() }
+            )
         },
         reload = {
             try {
-                AppContext.files.reloadSavesManifest()
-                AppContext.files.reloadSavesComponents()
+                AppContext.files.reloadSaves()
                 components = AppContext.files.savesComponents.sortedBy { it.name }
-            } catch (e: FileLoadException) {
+            } catch (e: IOException) {
                 AppContext.severeError(e)
             }
         },
@@ -354,23 +343,23 @@ fun Saves() {
 
 @Composable
 private fun PlayPopup(
-    component: Component,
+    component: SavesComponent,
     quickPlayData: QuickPlayData,
     onClose: () -> Unit,
-    onConfirm: (QuickPlayData, Pair<Component, LauncherInstanceDetails>) -> Unit
+    onConfirm: (QuickPlayData, InstanceComponent) -> Unit
 ) {
-    var instances: List<Pair<Component, LauncherInstanceDetails>> by remember(component) { mutableStateOf(listOf()) }
+    var instances: List<InstanceComponent> by remember(component) { mutableStateOf(listOf()) }
 
     LaunchedEffect(component) {
         try {
             AppContext.files.reload()
-        } catch (e: FileLoadException) {
+        } catch (e: IOException) {
             AppContext.severeError(e)
         }
 
         instances = AppContext.files.instanceComponents
             .filter {
-                it.second.savesComponent == component.id
+                it.savesComponent == component.id
             }
     }
 
@@ -399,7 +388,7 @@ private fun PlayPopup(
                     items = instances,
                     selected = selectedInstance,
                     onSelected = { selectedInstance = it },
-                    toDisplayString = { first.name }
+                    toDisplayString = { name }
                 )
             },
             buttonRow = {

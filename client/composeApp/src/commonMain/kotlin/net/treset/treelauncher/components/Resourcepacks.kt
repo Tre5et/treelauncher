@@ -17,10 +17,8 @@ import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.ResourcepackCreator
 import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import net.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
-import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.ComponentCreator
-import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.ListDisplayBox
 import net.treset.treelauncher.generic.Text
@@ -63,30 +61,19 @@ fun Resourcepacks() {
         components = components,
         componentManifest = AppContext.files.resourcepackManifest,
         checkHasComponent = { details, component -> details.resourcepacksComponent == component.id },
-        getCreator = { state ->
-            when(state.mode) {
-                CreationMode.NEW -> state.name?.let {
-                    ResourcepackCreator(
-                        state.name,
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.resourcepackManifest
-                    )
-                }
-                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
-                    ResourcepackCreator(
-                        state.name,
-                        state.existing,
-                        AppContext.files.resourcepackManifest
-                    )
-                }}
-                CreationMode.USE -> null
-            }
+        createContent = { onDone ->
+            ComponentCreator(
+                existing = components,
+                allowUse = false,
+                getCreator = { ResourcepackCreator(AppContext.files.resourcepackManifest, it) },
+                onDone = { onDone() }
+            )
         },
         reload = {
             try {
                 AppContext.files.reloadResourcepacks()
                 components = AppContext.files.resourcepackComponents.sortedBy { it.name }
-            } catch (e: FileLoadException) {
+            } catch (e: IOException) {
                 AppContext.severeError(e)
             }
         },
@@ -252,15 +239,7 @@ fun Resourcepacks() {
             setSortType = { appSettings().resourcepacksComponentSortType = it },
             getReverse = { appSettings().isResourcepacksComponentSortReverse },
             setReverse = { appSettings().isResourcepacksComponentSortReverse = it }
-        ),
-        createContent = { onCreate ->
-            ComponentCreator(
-                existing = components.toList(),
-                toDisplayString = { name },
-                onCreate = onCreate,
-                allowUse = false
-            )
-        }
+        )
     )
 }
 

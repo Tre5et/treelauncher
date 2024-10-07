@@ -5,7 +5,6 @@ import net.treset.mcdl.saves.Server
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.resources.SavesDisplayData
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class SavesComponent(
@@ -13,7 +12,7 @@ class SavesComponent(
     name: String,
     file: LauncherFile,
     type: LauncherManifestType = LauncherManifestType.SAVES_COMPONENT,
-    includedFiles: Array<PatternString> = appConfig().savesDefaultIncludedFiles,
+    includedFiles: Array<String> = appConfig().savesDefaultIncludedFiles,
     lastUsed: String = "",
     active: Boolean = false
 ): Component(

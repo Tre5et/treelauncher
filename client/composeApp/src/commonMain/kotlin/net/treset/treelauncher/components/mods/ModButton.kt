@@ -150,7 +150,7 @@ fun ModDisplayData.ModButton(
                             onClick = {
                                 changeEnabled()
                             },
-                            icon = icons().enabled(enabled),
+                            icon = icons().enabled.invoke(enabled),
                             tooltip = strings().manager.mods.card.changeUsed(enabled),
                         )
 

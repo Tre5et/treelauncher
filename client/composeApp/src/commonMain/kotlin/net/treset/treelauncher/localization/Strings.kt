@@ -195,8 +195,8 @@ open class Strings(
     )
 
     data class Game(
-        val versionName: (instance: InstanceData) -> String = { instance -> "${strings().launcher.slug()}:${strings().launcher.version()}:${instance.instance.first.id.substring(0,3)}...${instance.instance.first.id.substring(instance.instance.first.id.length - 2)}"},
-        val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.first.name }
+        val versionName: (instance: InstanceData) -> String = { instance -> "${strings().launcher.slug()}:${strings().launcher.version()}:${instance.instance.id.substring(0,3)}...${instance.instance.id.substring(instance.instance.id.length - 2)}"},
+        val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.name }
     )
 
     data class Language(
@@ -623,7 +623,7 @@ open class Strings(
                 val preparingMessage: () -> String = { "The Game will start shortly." },
                 val preparingTitle: () -> String = { "Preparing Game Resources..." },
                 val runningMessage: () -> String = { "Close the game to be able to perform actions in the launcher." },
-                val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.first.name}" },
+                val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.name}" },
                 val runningOpen: () -> String = { "Open Game folder" },
                 val runningStop: () -> String = { "Kill Game process" },
                 val runningTitle: () -> String = { "The Game is running..." },

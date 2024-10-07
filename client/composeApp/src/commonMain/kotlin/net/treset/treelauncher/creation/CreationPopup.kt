@@ -8,29 +8,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.backend.util.CreationStatus
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.generic.PopupOverlay
 import net.treset.treelauncher.generic.Text
-import net.treset.treelauncher.localization.strings
 
 @Composable
 fun CreationPopup(
-    status: CreationStatus
+    status: Status
 ) {
     PopupOverlay(
-        titleRow = { Text(status.currentStep.message()) },
+        titleRow = { Text(status.step) },
         content = {
-            status.downloadStatus?.let {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                status.progress?.let {
                     LinearProgressIndicator(
-                        progress = { it.currentAmount.toFloat() / it.totalAmount },
+                        progress = { it },
                         modifier = Modifier.width(250.dp),
                     )
-                    Text(strings().settings.update.downloadingMessage(it.currentFile, it.currentAmount, it.totalAmount))
                 }
+                Text(status.details)
             }
         }
     )

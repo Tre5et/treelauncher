@@ -9,7 +9,6 @@ import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.exception.GameCommandException
 import net.treset.treelauncher.backend.util.exception.GameLaunchException
 import net.treset.treelauncher.backend.util.exception.GameResourceException
-import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class GameLauncher(
@@ -29,10 +28,10 @@ class GameLauncher(
     fun launch(cleanupActiveInstance: Boolean, doneCallback: (Exception?) -> Unit) {
         try {
             files.reload()
-        } catch (e: FileLoadException) {
+        } catch (e: IOException) {
             throw GameLaunchException("Unable to launch game: file reload failed", e)
         }
-        if (!files.launcherDetails.activeInstance.isNullOrBlank()) {
+        if (!files.mainManifest.activeInstance.isNullOrBlank()) {
             if (!cleanupActiveInstance) {
                 throw GameLaunchException("Unable to launch game: active instance already exists")
             }
@@ -108,10 +107,10 @@ class GameLauncher(
 
     @Throws(GameLaunchException::class)
     private fun cleanUpOldInstance() {
-        LOGGER.debug { "Cleaning up old instance resources: id=${files.launcherDetails.activeInstance}" }
+        LOGGER.debug { "Cleaning up old instance resources: id=${files.mainManifest.activeInstance}" }
         var found = false
         for (i in files.instanceComponents) {
-            if (i.first.id == files.launcherDetails.activeInstance) {
+            if (i.id == files.mainManifest.activeInstance) {
                 val instanceData: InstanceData = try {
                     InstanceData.of(i, files)
                 } catch (e: FileLoadException) {
@@ -121,7 +120,7 @@ class GameLauncher(
                 val resourceManager = ResourceManager(instanceData)
                 try {
                     resourceManager.cleanupResources()
-                } catch (e: GameResourceException) {
+                } catch (e: IOException) {
                     throw GameLaunchException("Unable to cleanup old instance: unable to cleanup resources", e)
                 }
 
@@ -140,12 +139,12 @@ class GameLauncher(
         LOGGER.warn { "Aborting launch" }
         try {
             resourceManager?.cleanupResources() ?: throw GameLaunchException("Unable to abort launch correctly: no resource manager")
-        } catch (e: GameResourceException) {
+        } catch (e: IOException) {
             throw GameLaunchException("Unable to abort launch correctly: failed to cleanup game files")
         }
-        files.launcherDetails.activeInstance = null
+        files.mainManifest.activeInstance = null
         try {
-            LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).write(files.launcherDetails)
+            files.mainManifest.write()
         } catch (e: IOException) {
             throw GameLaunchException("Unable to abort launch correctly: failed to write launcher details")
         }
@@ -163,7 +162,7 @@ class GameLauncher(
         try {
             resourceManager?.cleanupResources()
             onExited(error)
-        } catch (e: GameResourceException) {
+        } catch (e: IOException) {
             onResourceCleanupFailed(e) { retry ->
                 if(retry) {
                     cleanupResources(playDuration, error)

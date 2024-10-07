@@ -5,14 +5,13 @@ import net.treset.mcdl.resourcepacks.Texturepack
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class ResourcepackComponent(
     id: String,
     name: String,
     file: LauncherFile,
-    includedFiles: Array<PatternString> = appConfig().resourcepacksDefaultIncludedFiles,
+    includedFiles: Array<String> = appConfig().resourcepacksDefaultIncludedFiles,
     lastUsed: String = "",
     active: Boolean = false
 ): Component(

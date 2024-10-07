@@ -5,9 +5,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.OptionsCreator
-import net.treset.treelauncher.backend.util.exception.FileLoadException
-import net.treset.treelauncher.creation.CreationMode
+import net.treset.treelauncher.creation.ComponentCreator
 import net.treset.treelauncher.localization.strings
+import java.io.IOException
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -19,31 +19,19 @@ fun Options() {
         components = components,
         componentManifest = AppContext.files.optionsManifest,
         checkHasComponent = { details, component -> details.optionsComponent == component.id },
-        getCreator = { state ->
-            when(state.mode) {
-                CreationMode.NEW -> state.name?.let {
-                    OptionsCreator(
-                        state.name,
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.optionsManifest
-                    )
-                }
-                CreationMode.INHERIT -> state.name?.let{ state.existing?.let {
-                    OptionsCreator(
-                        state.name,
-                        state.existing,
-                        AppContext.files.optionsManifest
-                    )
-                }}
-                CreationMode.USE -> null
-            }
+        createContent = { onDone ->
+            ComponentCreator(
+                existing = components,
+                allowUse = false,
+                getCreator = { OptionsCreator(AppContext.files.optionsManifest, it) },
+                onDone = { onDone() }
+            )
         },
         reload = {
             try {
-                AppContext.files.reloadOptionsManifest()
-                AppContext.files.reloadOptionsComponents()
+                AppContext.files.reloadOptions()
                 components = AppContext.files.optionsComponents.sortedBy { it.name }
-            } catch (e: FileLoadException) {
+            } catch (e: IOException) {
                 AppContext.severeError(e)
             }
         },

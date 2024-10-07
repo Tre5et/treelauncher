@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.data.manifest
 
+import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class JavaComponent(
@@ -9,7 +9,7 @@ class JavaComponent(
     name: String,
     file: LauncherFile,
     type: LauncherManifestType = LauncherManifestType.JAVA_COMPONENT,
-    includedFiles: Array<PatternString> = emptyArray(),
+    includedFiles: Array<String> = appConfig().javaDefaultIncludedFiles,
     lastUsed: String = "",
     active: Boolean = false
 ): Component(

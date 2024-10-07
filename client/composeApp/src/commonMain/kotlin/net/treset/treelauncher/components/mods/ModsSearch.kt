@@ -23,8 +23,7 @@ import net.treset.mcdl.mods.modrinth.ModrinthSearch
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.LauncherMod
-import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.data.manifest.ModsComponent
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
 import net.treset.treelauncher.components.mods.display.ModDataProvider
@@ -37,7 +36,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ModsSearch(
-    component: Pair<Component, LauncherModsDetails>,
+    component: ModsComponent,
     modContext: ModContext,
     appContext: AppContextData,
     droppedFile: LauncherFile? = null,

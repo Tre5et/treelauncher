@@ -16,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -30,7 +29,7 @@ import java.net.URI
 fun ColumnScope.ComponentSettings(
     component: Component
 ) {
-    var includedFiles: List<String> by remember { mutableStateOf(emptyList()) }
+    var includedFiles: Array<String> by remember { mutableStateOf(emptyArray()) }
 
     LaunchedEffect(component) {
         includedFiles = component.includedFiles
@@ -39,10 +38,7 @@ fun ColumnScope.ComponentSettings(
     DisposableEffect(component) {
         onDispose {
             component.includedFiles = includedFiles
-            LauncherFile.of(
-                component.directory,
-                appConfig().manifestFileName
-            ).write(component)
+            component.write()
         }
     }
 
@@ -52,7 +48,7 @@ fun ColumnScope.ComponentSettings(
                 data.readFiles()
                     .map { LauncherFile.of(URI(it).path) }
                     .forEach {
-                        includedFiles = includedFiles + PatternString("${it.name}${if (it.isDirectory) "/" else ""}").get()
+                        includedFiles += PatternString("${it.name}${if (it.isDirectory) "/" else ""}").get()
                     }
             }
         },
@@ -100,7 +96,7 @@ fun ColumnScope.ComponentSettings(
 
                         IconButton(
                             onClick = {
-                                includedFiles = includedFiles.filter { file -> file != it }
+                                includedFiles = includedFiles.filter { file -> file != it }.toTypedArray()
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,

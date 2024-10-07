@@ -2,14 +2,13 @@ package net.treset.treelauncher.backend.data.manifest
 
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.IOException
 
 class OptionsComponent(
     id: String,
     name: String,
     file: LauncherFile,
-    includedFiles: Array<PatternString> = appConfig().optionsDefaultIncludedFiles,
+    includedFiles: Array<String> = appConfig().optionsDefaultIncludedFiles,
     lastUsed: String = "",
     type: LauncherManifestType = LauncherManifestType.OPTIONS_COMPONENT,
     active: Boolean = false

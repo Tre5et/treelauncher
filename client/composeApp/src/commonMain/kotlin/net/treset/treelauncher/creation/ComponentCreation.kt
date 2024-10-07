@@ -4,52 +4,39 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
+import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.backend.creation.ComponentCreator
+import net.treset.treelauncher.backend.creation.CreationData
+import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
-
-
-open class CreationState<T> (
-    val mode: CreationMode,
-    val name: String?,
-    val existing: T?
-) {
-    open fun isValid(): Boolean = when(mode) {
-        CreationMode.NEW -> !name.isNullOrBlank()
-        CreationMode.INHERIT -> !name.isNullOrBlank() && existing != null
-        CreationMode.USE -> existing != null
-    }
-
-    companion object {
-        fun <T> of(
-            mode: CreationMode,
-            newName: String?,
-            inheritName: String?,
-            inheritSelected: T?,
-            useSelected: T?
-        ): CreationState<T> = CreationState(
-            mode,
-            when(mode) {
-                CreationMode.NEW -> newName?.ifBlank { null }
-                CreationMode.INHERIT -> inheritName?.ifBlank { null }
-                CreationMode.USE -> null
-            },
-            when(mode) {
-                CreationMode.NEW -> null
-                CreationMode.INHERIT -> inheritSelected
-                CreationMode.USE -> useSelected
-            }
-        )
-    }
-}
+import java.io.IOException
 
 @Composable
-fun <T> ComponentCreator(
+fun <T: Component, C: ComponentCreator<T, CreationData>> ComponentCreator(
+    existing: List<T>,
+    getCreator: (onStatus: (Status) -> Unit) -> C,
+    allowUse: Boolean = true,
+    showCreate: Boolean = true,
+    onDone: (T) -> Unit
+) = ComponentCreator(
+    existing = existing,
+    allowUse = allowUse,
+    showCreate = showCreate,
+    getCreator = getCreator,
+    getData = { CreationData(it ?: "") },
+    onDone = onDone
+)
+
+@Composable
+fun <T: Component, C: ComponentCreator<T, D>, D: CreationData> ComponentCreator(
     existing: List<T>,
     allowUse: Boolean = true,
     showCreate: Boolean = true,
-    toDisplayString: T.() -> String = { toString() },
-    onCreate: (CreationState<T>) -> Unit = { _->},
-    setCurrentState: (CreationState<T>) -> Unit = {_->}
+    getCreator: (onStatus: (Status) -> Unit) -> C,
+    getData: (name: String?) -> D,
+    onDone: (T) -> Unit
 ) {
     var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
 
@@ -60,14 +47,14 @@ fun <T> ComponentCreator(
 
     var useSelected: T? by remember(existing) { mutableStateOf(null) }
 
-    val creationState = remember(existing, mode, newName, inheritName, inheritSelected, useSelected) {
-        CreationState.of(
-            mode,
-            newName,
-            inheritName,
-            inheritSelected,
-            useSelected
-        ).also(setCurrentState)
+    var creationStatus: Status? by remember { mutableStateOf(null) }
+
+    val valid = remember(existing, mode, newName, inheritName, inheritSelected, useSelected) {
+        when(mode) {
+            CreationMode.NEW -> newName.isNotBlank()
+            CreationMode.INHERIT -> inheritName.isNotBlank() && inheritSelected != null
+            CreationMode.USE -> useSelected != null
+        }
     }
 
     Column(
@@ -107,7 +94,7 @@ fun <T> ComponentCreator(
                 inheritSelected = it
             },
             placeholder = strings().creator.component(),
-            toDisplayString = toDisplayString,
+            toDisplayString = { name },
             enabled = mode == CreationMode.INHERIT
         )
 
@@ -124,20 +111,48 @@ fun <T> ComponentCreator(
                     useSelected = it
                 },
                 placeholder = strings().creator.component(),
-                toDisplayString = toDisplayString,
+                toDisplayString = { name },
                 enabled = mode == CreationMode.USE
             )
         }
 
         if(showCreate) {
             Button(
-                enabled = creationState.isValid(),
+                enabled = valid,
                 onClick = {
-                    if(creationState.isValid()) onCreate(creationState)
+                    if(valid) {
+                        val creator = getCreator {
+                            creationStatus = it
+                        }
+                        val data = getData(
+                            when(mode) {
+                                CreationMode.NEW -> newName
+                                CreationMode.INHERIT -> inheritName
+                                CreationMode.USE -> null
+                            }
+                        )
+
+                        Thread {
+                            try {
+                                val component = when (mode) {
+                                    CreationMode.NEW -> creator.new(data)
+                                    CreationMode.INHERIT -> creator.inherit(inheritSelected!!, data)
+                                    CreationMode.USE -> creator.use(useSelected!!)
+                                }
+                                onDone(component)
+                            } catch (e: IOException) {
+                                AppContext.error(e)
+                            }
+                        }.start()
+                    }
                 }
             ) {
                 Text(strings().creator.buttonCreate())
             }
+        }
+
+        creationStatus?.let {
+            CreationPopup(it)
         }
     }
 }

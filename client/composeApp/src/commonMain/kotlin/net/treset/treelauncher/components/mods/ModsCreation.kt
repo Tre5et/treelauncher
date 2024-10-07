@@ -7,70 +7,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import net.treset.mcdl.minecraft.MinecraftVersion
-import net.treset.treelauncher.backend.data.LauncherModsDetails
-import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.backend.creation.ModsCreationData
+import net.treset.treelauncher.backend.creation.ModsCreator
+import net.treset.treelauncher.backend.data.manifest.ModsComponent
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.creation.CreationMode
-import net.treset.treelauncher.creation.CreationState
+import net.treset.treelauncher.creation.CreationPopup
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
-
-class ModsCreationState(
-    mode: CreationMode,
-    name: String?,
-    existing: Pair<Component, LauncherModsDetails>?,
-    val version: MinecraftVersion?,
-    val type: VersionType?,
-    val alternateLoader: Boolean?
-) : CreationState<Pair<Component, LauncherModsDetails>>(
-    mode,
-    name,
-    existing
-) {
-    override fun isValid(): Boolean = when(mode) {
-        CreationMode.NEW -> !name.isNullOrBlank() && version != null && type != null && alternateLoader != null
-        CreationMode.INHERIT -> !name.isNullOrBlank() && existing != null
-        CreationMode.USE -> existing != null
-    }
-
-    companion object {
-        fun of(
-            mode: CreationMode,
-            newName: String?,
-            newVersion: MinecraftVersion?,
-            newType: VersionType?,
-            alternateLoader: Boolean?,
-            inheritName: String?,
-            inheritSelected: Pair<Component, LauncherModsDetails>?,
-            useSelected: Pair<Component, LauncherModsDetails>?
-        ): ModsCreationState = ModsCreationState(
-            mode,
-            when(mode) {
-                CreationMode.NEW -> newName?.ifBlank { null }
-                CreationMode.INHERIT -> inheritName?.ifBlank { null }
-                CreationMode.USE -> null
-            },
-            when(mode) {
-                CreationMode.NEW -> null
-                CreationMode.INHERIT -> inheritSelected
-                CreationMode.USE -> useSelected
-            },
-            if(mode == CreationMode.NEW) newVersion else null,
-            if(mode == CreationMode.NEW) newType else null,
-            if(mode == CreationMode.NEW) alternateLoader else null
-        )
-    }
-}
+import java.io.IOException
 
 @Composable
 fun ModsCreation(
-    existing: List<Pair<Component, LauncherModsDetails>>,
+    existing: List<ModsComponent>,
     showCreate: Boolean = true,
     showUse: Boolean = true,
-    setCurrentState: (ModsCreationState) -> Unit = {},
     defaultVersion: MinecraftVersion? = null,
     defaultType: VersionType? = null,
     defaultAlternate: Boolean = true,
-    onCreate: (ModsCreationState) -> Unit = { _->}
+    onDone: (ModsComponent) -> Unit = { _->}
 ) {
     var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
 
@@ -80,24 +36,21 @@ fun ModsCreation(
     var alternateLoader by remember(existing, defaultAlternate) { mutableStateOf(defaultAlternate) }
 
     var inheritName by remember(existing) { mutableStateOf("") }
-    var inheritSelected: Pair<Component, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var inheritSelected: ModsComponent? by remember(existing) { mutableStateOf(null) }
 
-    var useSelected: Pair<Component, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var useSelected: ModsComponent? by remember(existing) { mutableStateOf(null) }
 
     var showSnapshots by remember(existing) { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
 
-    val currentState = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
-        ModsCreationState.of(
-            mode,
-            newName,
-            newVersion,
-            newType,
-            alternateLoader,
-            inheritName,
-            inheritSelected,
-            useSelected
-        ).also(setCurrentState)
+    var creationStatus: Status? by remember(existing) { mutableStateOf(null) }
+
+    val valid = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
+        when(mode) {
+            CreationMode.NEW -> newName.isNotBlank() && newVersion != null && newType != null
+            CreationMode.INHERIT -> inheritName.isNotBlank() && inheritSelected != null
+            CreationMode.USE -> useSelected != null
+        }
     }
 
     LaunchedEffect(showSnapshots) {
@@ -192,7 +145,7 @@ fun ModsCreation(
                 inheritSelected = it
             },
             placeholder = strings().creator.component(),
-            toDisplayString = { first.name },
+            toDisplayString = { name },
             enabled = mode == CreationMode.INHERIT
         )
 
@@ -209,18 +162,52 @@ fun ModsCreation(
                     useSelected = it
                 },
                 placeholder = strings().creator.component(),
-                toDisplayString = { first.name },
+                toDisplayString = { name },
                 enabled = mode == CreationMode.USE
             )
         }
 
         if(showCreate) {
             Button(
-                enabled = currentState.isValid(),
-                onClick = { if (currentState.isValid()) onCreate(currentState) }
+                enabled = valid,
+                onClick = {
+                    if(valid) {
+                        val creator = ModsCreator(
+                            AppContext.files.modsManifest
+                        ) { creationStatus = it }
+
+                        val additionalLoader = if(newType == VersionType.QUILT && alternateLoader) VersionType.FABRIC else null
+                        val data = ModsCreationData(
+                            name = when(mode) {
+                                CreationMode.NEW -> newName
+                                CreationMode.INHERIT -> inheritName
+                                CreationMode.USE -> ""
+                            },
+                            types = newType?.let { additionalLoader?.let { add -> listOf(it.id, add.id) }?: listOf(it.id) } ?: emptyList(),
+                            versions = newVersion?.let { listOf(it.id) } ?: emptyList()
+                        )
+
+                        Thread {
+                            try {
+                                val component = when (mode) {
+                                    CreationMode.NEW -> creator.new(data)
+                                    CreationMode.INHERIT -> creator.inherit(inheritSelected!!, data)
+                                    CreationMode.USE -> creator.use(useSelected!!)
+                                }
+                                onDone(component)
+                            } catch (e: IOException) {
+                                AppContext.error(e)
+                            }
+                        }.start()
+                    }
+                }
             ) {
                 Text(strings().creator.buttonCreate())
             }
+        }
+
+        creationStatus?.let {
+            CreationPopup(it)
         }
     }
 }

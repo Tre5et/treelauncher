@@ -95,8 +95,6 @@ class ResourceManager(private var instanceData: InstanceData) {
         for(component in components) {
             undoable.add(component)
             try {
-                component.active = true
-                component.write()
                 component.getResourceProvider(instanceData.gameDataDir).includeResources()
             } catch (e: IOException) {
                 try {
@@ -116,8 +114,6 @@ class ResourceManager(private var instanceData: InstanceData) {
         for(component in components) {
             try {
                 component.getResourceProvider(instanceData.gameDataDir).removeResources(files, unexpected)
-                component.active = false
-                component.write()
             } catch (e: IOException) {
                 LOGGER.error(e) { "Unable to clean resources: component=${component.id}" }
                 exceptions.add(e)

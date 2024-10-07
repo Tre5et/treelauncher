@@ -4,7 +4,6 @@ import net.treset.treelauncher.backend.data.LauncherFeature
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.Version
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.backend.util.string.PatternString
 
 class Config(baseDir: String, val updateUrl: String?) {
     val dataVersion: Version = Version(2, 0, 0)
@@ -17,15 +16,15 @@ class Config(baseDir: String, val updateUrl: String?) {
     val nativesDirName = "natives"
     val includedFilesBackupDir = ".included_files.bak"
     val instanceDefaultFeatures: Array<LauncherFeature> = arrayOf()
-    val instanceDefaultIncludedFiles: Array<PatternString> = arrayOf()
-    val instanceDefaultIgnoredFiles: Array<PatternString> = arrayOf()
+    val instanceDefaultIncludedFiles: Array<String> = arrayOf()
+    val instanceDefaultIgnoredFiles: Array<String> = arrayOf()
     val instanceDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val instanceDefaultDetails = "instance.json"
-    val optionsDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+    val optionsDefaultIncludedFiles: Array<String> = arrayOf(
         "options.txt",
         "usercache.json"
     )
-    val modsDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+    val modsDefaultIncludedFiles: Array<String> = arrayOf(
         "mods/",
         ".fabric/",
         "config/",
@@ -42,18 +41,20 @@ class Config(baseDir: String, val updateUrl: String?) {
         "optionsviveprofiles.txt",
         "g4mespeed"
     )
-    val savesDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+    val savesDefaultIncludedFiles: Array<String> = arrayOf(
             "saves/",
             "servers.dat",
             "realms_persistence.json",
             "stats/",
             "backups/",
         )
-    val resourcepacksDefaultIncludedFiles: Array<PatternString> = PatternString.toPattern(
+    val resourcepacksDefaultIncludedFiles: Array<String> = arrayOf(
             "resourcepacks/",
             "texturepacks/"
         )
-    val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val javaDefaultIncludedFiles: Array<String> = arrayOf()
+    val versionDefaultIncludedFiles: Array<String> = arrayOf()
+    val minecraftDefaultGameArguments: Array<String> = arrayOf()
     val minecraftDefaultFileName = "client.jar"
     val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf(
         LauncherLaunchArgument("-Djava.library.path=\${natives_directory}"),
