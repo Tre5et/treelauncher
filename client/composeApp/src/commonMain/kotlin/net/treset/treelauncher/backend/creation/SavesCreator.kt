@@ -1,19 +1,20 @@
 package net.treset.treelauncher.backend.creation
 
 import net.treset.treelauncher.backend.data.manifest.SavesComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 
 class NewSavesCreator(
     data: NewCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): NewComponentCreator<SavesComponent, NewCreationData>(data, statusProvider) {
     constructor(
         data: NewCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createNew(statusProvider: CreationProvider): SavesComponent {
+    override fun createNew(statusProvider: StatusProvider): SavesComponent {
         return SavesComponent(
             id = id,
             name = data.name,
@@ -26,14 +27,14 @@ class NewSavesCreator(
 
 class InheritSavesCreator(
     data: InheritCreationData<SavesComponent>,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): InheritComponentCreator<SavesComponent, InheritCreationData<SavesComponent>>(data, statusProvider) {
     constructor(
         data: InheritCreationData<SavesComponent>,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createInherit(statusProvider: CreationProvider): SavesComponent {
+    override fun createInherit(statusProvider: StatusProvider): SavesComponent {
         return SavesComponent(
             id = id,
             name = data.name,
@@ -46,12 +47,12 @@ class InheritSavesCreator(
 
 class UseSaveCreator(
     data: UseCreationData<SavesComponent>,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): UseComponentCreator<SavesComponent, UseCreationData<SavesComponent>>(data, statusProvider) {
     constructor(
         data: UseCreationData<SavesComponent>,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.SAVES
 }

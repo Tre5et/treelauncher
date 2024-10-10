@@ -4,42 +4,56 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.Pre2_5LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.util.FormatStringProvider
+import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.Version
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
+import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
 class DataPatcher {
-    data class PatchStatus(
-        val step: PatchStep,
-        val message: String
-    )
 
-    enum class PatchStep {
-        CREATE_BACKUP,
-        REMOVE_BACKUP_EXCLUDED_FILES,
-        UPGRADE_SETTINGS,
-        GAME_DATA_COMPONENTS,
-        INCLUDED_FILES,
-        REMOVE_RESOURCEPACKS_ARGUMENT,
-        ADD_GAME_DATA_INCLUDED_FILES,
-        TEXTUREPACKS_INCLUDED_FILES,
-        REMOVE_LOGIN
+    object PatchStep {
+        val CREATE_BACKUP = FormatStringProvider { strings().launcher.patch.status.createBackup() }
+        val UPGRADE_SETTINGS = FormatStringProvider { strings().launcher.patch.status.upgradeSettings() }
+        val GAME_DATA_COMPONENTS = FormatStringProvider { strings().launcher.patch.status.gameDataComponents() }
+        val GAME_DATA_SAVES = FormatStringProvider { strings().launcher.patch.status.gameDataSaves() }
+        val GAME_DATA_MODS = FormatStringProvider { strings().launcher.patch.status.gameDataMods() }
+        val REMOVE_BACKUP_EXCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.removeBackupIncludedFiles() }
+        val UPGRADE_COMPONENTS = FormatStringProvider { strings().launcher.patch.status.upgradeComponents() }
+        val UPGRADE_MAIN_MANIFEST = FormatStringProvider { strings().launcher.patch.status.upgradeMainManifest() }
+        val UPGRADE_INSTANCES = FormatStringProvider { strings().launcher.patch.status.upgradeInstances() }
+        val UPGRADE_SAVES = FormatStringProvider { strings().launcher.patch.status.upgradeSaves() }
+        val UPGRADE_RESOURCEPACKS = FormatStringProvider { strings().launcher.patch.status.upgradeResourcepacks() }
+        val UPGRADE_OPTIONS = FormatStringProvider { strings().launcher.patch.status.upgradeOptions() }
+        val UPGRADE_MODS = FormatStringProvider { strings().launcher.patch.status.upgradeMods() }
+        val UPGRADE_VERSIONS = FormatStringProvider { strings().launcher.patch.status.upgradeVersions() }
+        val UPGRADE_JAVA = FormatStringProvider { strings().launcher.patch.status.upgradeJavas() }
+        val INCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.includedFiles() }
+        val INCLUDED_FILES_INSTANCE = FormatStringProvider { strings().launcher.patch.status.includedFilesInstances() }
+        val INCLUDED_FILES_SAVES = FormatStringProvider { strings().launcher.patch.status.includedFilesSaves() }
+        val INCLUDED_FILES_RESOURCEPACKS = FormatStringProvider { strings().launcher.patch.status.includedFilesResourcepacks() }
+        val INCLUDED_FILES_OPTIONS = FormatStringProvider { strings().launcher.patch.status.includedFilesOptions() }
+        val INCLUDED_FILES_MODS = FormatStringProvider { strings().launcher.patch.status.includedFilesMods() }
+        val REMOVE_RESOURCEPACKS_ARGUMENT = FormatStringProvider { strings().launcher.patch.status.removeResourcepacksArgument() }
+        val TEXTUREPACKS_INCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.texturepacksIncludedFiles() }
+        val REMOVE_LOGIN = FormatStringProvider { strings().launcher.patch.status.removeLogin() }
     }
 
     private class UpgradeFunction(
-        val function: (onStatus: (PatchStatus) -> Unit) -> Unit,
+        val function: (StatusProvider) -> Unit,
         val applies: () -> Boolean
     ) {
-        constructor(function: (onStatus: (PatchStatus) -> Unit) -> Unit, vararg version: Version) : this(function, {
+        constructor(function: (StatusProvider) -> Unit, vararg version: Version) : this(function, {
             version.any { appConfig().dataVersion >= it && Version.fromString(appSettings().dataVersion) < it }
         })
 
-        fun execute(onStatus: (PatchStatus) -> Unit) {
+        fun execute(statusProvider: StatusProvider) {
             if(applies()) {
-                function(onStatus)
+                function(statusProvider)
             }
         }
     }
@@ -47,8 +61,8 @@ class DataPatcher {
     private val upgradeMap: Array<UpgradeFunction> = arrayOf(
         UpgradeFunction(this::moveGameDataComponents, Version(1,0,0)),
         UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
+        UpgradeFunction(this::upgradeComponents, Version(2,0,0)),
         UpgradeFunction(this::upgradeIncludedFiles, Version(2,0,0)),
-        UpgradeFunction(this::addNewIncludedFilesToManifest, Version(2,0,0)),
         UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0)),
         UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
         UpgradeFunction(this::removeLoginFile, Version(2,0,0)),
@@ -60,112 +74,270 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun performUpgrade(backup: Boolean, onStatus: (PatchStatus) -> Unit) {
+    fun performUpgrade(backup: Boolean, onStatus: (Status) -> Unit) {
         if(!upgradeNeeded()) {
             return
         }
 
+        val statusProvider = StatusProvider(null, 0, onStatus)
+
         LOGGER.info { "Performing data upgrade: v${appSettings().dataVersion} -> v${appConfig().dataVersion} " }
         if(backup) {
-            backupFiles(onStatus)
+            backupFiles(statusProvider)
         }
         for(upgrade in upgradeMap) {
-            upgrade.execute(onStatus)
+            upgrade.execute(statusProvider)
         }
         LOGGER.info { "Data upgrade complete" }
     }
 
     @Throws(IOException::class)
-    fun backupFiles(onStatus: (PatchStatus) -> Unit) {
+    fun backupFiles(statusProvider: StatusProvider) {
         LOGGER.info { "Creating backup..." }
-        onStatus(PatchStatus(PatchStep.CREATE_BACKUP, ""))
+        val backupProvider = statusProvider.subStep(PatchStep.CREATE_BACKUP, 1)
+        backupProvider.next("")
         val dir = LauncherFile.ofData()
         val backupDir = LauncherFile.ofData(".backup")
         if(backupDir.exists()) {
             backupDir.remove()
         }
         dir.copyTo(backupDir)
+        backupProvider.finish("")
         LOGGER.info { "Created backup" }
     }
 
     @Throws(IOException::class)
-    fun moveGameDataComponents(onStatus: (PatchStatus) -> Unit) {
+    fun moveGameDataComponents(statusProvider: StatusProvider) {
         LOGGER.info { "Moving game data components..."}
-        onStatus(PatchStatus(PatchStep.GAME_DATA_COMPONENTS, ""))
+        val gameDataComponentsProvider = statusProvider.subStep(PatchStep.GAME_DATA_COMPONENTS, 4)
+        gameDataComponentsProvider.next("")
 
-        val files = Pre2_5LauncherFiles()
-        files.reload()
+        val files = Pre1_0LauncherFiles()
+        files.reloadAll()
         val gameDataDir = LauncherFile.ofData(files.launcherDetails.gamedataDir)
 
-        LOGGER.info { "Moving mods components..." }
-        val modsDir = LauncherFile.ofData(files.launcherDetails.modsDir)
-        LauncherFile.of(files.modsManifest.directory, files.gameDetailsManifest.components[0]).moveTo(
-            LauncherFile.of(modsDir, appConfig().manifestFileName)
-        )
-        for(file in gameDataDir.listFiles()) {
-            if(file.isDirectory && file.name.startsWith(files.modsManifest.prefix)) {
-                onStatus(PatchStatus(PatchStep.GAME_DATA_COMPONENTS, file.name))
-                file.moveTo(LauncherFile.of(modsDir, file.name))
-            }
-        }
-        LOGGER.info { "Moved mods components" }
-
         LOGGER.info { "Moving saves components..." }
+        gameDataComponentsProvider.next("saves")
         val savesDir = LauncherFile.ofData(files.launcherDetails.savesDir)
         LauncherFile.of(files.savesManifest.directory, files.gameDetailsManifest.components[1]).moveTo(
             LauncherFile.of(savesDir, appConfig().manifestFileName)
         )
+
+        val savesProvider = gameDataComponentsProvider.subStep(PatchStep.GAME_DATA_SAVES, files.savesComponents.size)
         for(file in gameDataDir.listFiles()) {
             if(file.isDirectory && file.name.startsWith(files.savesManifest.prefix)) {
-                onStatus(PatchStatus(PatchStep.GAME_DATA_COMPONENTS, file.name))
+                savesProvider.next(file.name)
                 file.moveTo(LauncherFile.of(savesDir, file.name))
             }
         }
+        savesProvider.finish("")
         LOGGER.info { "Moved saves components" }
 
+        LOGGER.info { "Moving mods components..." }
+        gameDataComponentsProvider.next("mods")
+        val modsDir = LauncherFile.ofData(files.launcherDetails.modsDir)
+        LauncherFile.of(files.modsManifest.directory, files.gameDetailsManifest.components[0]).moveTo(
+            LauncherFile.of(modsDir, appConfig().manifestFileName)
+        )
+
+        val modsProvider = gameDataComponentsProvider.subStep(PatchStep.GAME_DATA_MODS, files.modsComponents.size)
+        for(file in gameDataDir.listFiles()) {
+            if(file.isDirectory && file.name.startsWith(files.modsManifest.prefix)) {
+                modsProvider.next(file.name)
+                file.moveTo(LauncherFile.of(modsDir, file.name))
+            }
+        }
+        modsProvider.finish("")
+        LOGGER.info { "Moved mods components" }
+
         LOGGER.info { "Removing old manifest..." }
+        gameDataComponentsProvider.next("")
         LauncherFile.ofData(files.launcherDetails.gamedataDir, appConfig().manifestFileName).remove()
         LOGGER.info { "Removed old manifest" }
 
+        gameDataComponentsProvider.finish("")
         LOGGER.info { "Moved game data components" }
     }
 
     @Throws(IOException::class)
-    fun upgradeIncludedFiles(onStatus: (PatchStatus) -> Unit) {
+    fun removeBackupExcludedFiles(statusProvider: StatusProvider) {
+        LOGGER.info { "Removing backup excluded files from instances..." }
+        val backupExcludedFilesProvider = statusProvider.subStep(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES, 2)
+        backupExcludedFilesProvider.next()
+
+        val files = Pre2_0LauncherFiles()
+        files.reloadAll()
+
+        backupExcludedFilesProvider.total = files.instanceComponents.size + 1
+        files.instanceComponents.forEach {
+            backupExcludedFilesProvider.next(it.first.name)
+            it.second.ignoredFiles = it.second.ignoredFiles.filter { file ->
+                !PatternString(file, true).matches("backups/")
+            }
+            LauncherFile.of(it.first.directory, it.first.details).write(it.second)
+        }
+        backupExcludedFilesProvider.finish()
+        LOGGER.info { "Removed backup excluded files from instances" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeComponents(statusProvider: StatusProvider) {
+        LOGGER.info { "Upgrading components..." }
+        val componentStatusProvider = statusProvider.subStep(PatchStep.UPGRADE_COMPONENTS, 9)
+        componentStatusProvider.next("")
+
+        val files = Pre2_0LauncherFiles()
+        files.reloadAll()
+
+        upgradeMainManifest(files, statusProvider)
+
+        componentStatusProvider.next("instances")
+        val instancesStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_INSTANCES, files.instanceComponents.size)
+        for(instance in files.instanceComponents) {
+            instancesStatusProvider.next(instance.first.name)
+            upgradeComponent(instance.first) { instance.toInstanceComponent() }
+        }
+        instancesStatusProvider.finish("")
+
+        componentStatusProvider.next("saves")
+        val savesStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_SAVES, files.savesComponents.size)
+        for(saves in files.savesComponents) {
+            savesStatusProvider.next(saves.name)
+            upgradeComponent(saves) { saves.toSavesComponent() }
+        }
+        savesStatusProvider.finish("")
+
+        componentStatusProvider.next("resourcepacks")
+        val resourcepacksStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_RESOURCEPACKS, files.resourcepackComponents.size)
+        for(resourcepacks in files.resourcepackComponents) {
+            resourcepacksStatusProvider.next(resourcepacks.name)
+            upgradeComponent(resourcepacks) { resourcepacks.toResourcepackComponent() }
+        }
+        resourcepacksStatusProvider.finish("")
+
+        componentStatusProvider.next("options")
+        val optionsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_OPTIONS, files.optionsComponents.size)
+        for(options in files.optionsComponents) {
+            optionsStatusProvider.next(options.name)
+            upgradeComponent(options) { options.toOptionsComponent() }
+        }
+        optionsStatusProvider.finish("")
+
+        componentStatusProvider.next("mods")
+        val modsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_MODS, files.modsComponents.size)
+        for(mods in files.modsComponents) {
+            modsStatusProvider.next(mods.first.name)
+            upgradeComponent(mods.first) { mods.toModsComponent() }
+        }
+
+        componentStatusProvider.next("versions")
+        val versionsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_VERSIONS, files.versionComponents.size)
+        for(version in files.versionComponents) {
+            versionsStatusProvider.next(version.first.name)
+            upgradeComponent(version.first) { version.toVersionComponent() }
+        }
+        versionsStatusProvider.finish("")
+
+        componentStatusProvider.next("java")
+        val javaStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_JAVA, files.javaComponents.size)
+        for(java in files.javaComponents) {
+            javaStatusProvider.next(java.name)
+            upgradeComponent(java) { java.toJavaComponent() }
+        }
+        javaStatusProvider.finish("")
+
+        componentStatusProvider.finish("")
+        LOGGER.info { "Upgraded components" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeMainManifest(files: Pre2_0LauncherFiles, statusProvider: StatusProvider) {
+        LOGGER.info { "Upgrading launcher details..." }
+        val mainManifestProvider = statusProvider.subStep(PatchStep.UPGRADE_MAIN_MANIFEST, 1)
+        mainManifestProvider.next("manifest")
+        val oldFile = LauncherFile.of(files.mainManifest.directory, appConfig().manifestFileName)
+        val backupFile = LauncherFile.of(files.mainManifest.directory, appConfig().manifestFileName + ".old")
+        oldFile.moveTo(backupFile)
+
+        val mainManifest = files.launcherDetails.toMainManifest()
+        mainManifest.write()
+
+        backupFile.remove()
+        LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).remove()
+        mainManifestProvider.finish("")
+        LOGGER.info { "Upgraded launcher details" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeComponent(component: Pre2_0ComponentManifest, toComponent: () -> Component) {
+        LOGGER.info { "Upgrading component: ${component.type}: ${component.id}" }
+        val oldFile = LauncherFile.of(component.directory, appConfig().manifestFileName)
+        val backupFile = LauncherFile.of(component.directory, appConfig().manifestFileName + ".old")
+        oldFile.moveTo(backupFile)
+
+        val newComponent = toComponent()
+        newComponent.write()
+
+        backupFile.remove()
+        if(!component._details.isNullOrBlank()) {
+            LauncherFile.of(component.directory, component.details).remove()
+        }
+        LOGGER.info { "Upgraded component: ${component.type}: ${component.id}" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeIncludedFiles(statusProvider: StatusProvider) {
         LOGGER.info { "Upgrading included files..." }
-        onStatus(PatchStatus(PatchStep.INCLUDED_FILES, ""))
+        val includedFilesProvider = statusProvider.subStep(PatchStep.INCLUDED_FILES, 6)
+        includedFilesProvider.next("")
 
         val files = LauncherFiles()
         files.reload()
 
+        includedFilesProvider.next("instances")
+        val instanceProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_INSTANCE, files.instanceComponents.size)
         for(instance in files.instanceComponents) {
-            onStatus(PatchStatus(PatchStep.INCLUDED_FILES, "instance: ${instance.first.id}"))
-            upgradeIncludedFiles(instance.first)
+            instanceProvider.next(instance.name)
+            upgradeIncludedFiles(instance)
         }
+        instanceProvider.finish("")
 
-        for(mods in files.modsComponents) {
-            onStatus(PatchStatus(PatchStep.INCLUDED_FILES, "mods: ${mods.first.id}"))
-            moveRootFilesToDirectory(mods.first, "mods")
-            upgradeIncludedFiles(mods.first)
-        }
-
+        includedFilesProvider.next("saves")
+        val savesProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_SAVES, files.savesComponents.size)
         for(saves in files.savesComponents) {
-            onStatus(PatchStatus(PatchStep.INCLUDED_FILES, "saves: ${saves.id}"))
+            savesProvider.next(saves.name)
             moveRootFilesToDirectory(saves, "saves")
             upgradeIncludedFiles(saves)
         }
+        savesProvider.finish("")
 
+        includedFilesProvider.next("resourcepacks")
+        val resourcepacksProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_RESOURCEPACKS, files.resourcepackComponents.size)
         for(resourcepacks in files.resourcepackComponents) {
-            onStatus(PatchStatus(PatchStep.INCLUDED_FILES, "resourcepacks: ${resourcepacks.id}"))
+            resourcepacksProvider.next(resourcepacks.name)
             moveRootFilesToDirectory(resourcepacks, "resourcepacks")
             upgradeIncludedFiles(resourcepacks)
         }
+        resourcepacksProvider.finish("")
 
+        includedFilesProvider.next("options")
+        val optionsProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_OPTIONS, files.optionsComponents.size)
         for(options in files.optionsComponents) {
-            onStatus(PatchStatus(PatchStep.INCLUDED_FILES, "options: ${options.id}"))
+            optionsProvider.next(options.name)
             upgradeIncludedFiles(options)
         }
+        optionsProvider.finish("")
 
+        includedFilesProvider.next("mods")
+        val modsProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_MODS, files.modsComponents.size)
+        for(mods in files.modsComponents) {
+            modsProvider.next(mods.name)
+            moveRootFilesToDirectory(mods, "mods")
+            upgradeIncludedFiles(mods)
+        }
+        modsProvider.finish("")
+
+        includedFilesProvider.finish("")
         LOGGER.info { "Upgraded included files" }
     }
 
@@ -174,17 +346,23 @@ class DataPatcher {
         LOGGER.info { "Moving root files to directory for ${component.type}: ${component.id}..." }
 
         val dir = LauncherFile.of(component.directory)
+        val target = dir.child(dirName)
         val files = dir.listFiles()
         for(file in files) {
             if(file.name != dirName
                 && file.name != appConfig().manifestFileName
-                && file.name != component.details
                 && file.name != appConfig().syncFileName
                 && file.name != ".included_files_old"
                 && file.name != ".included_files"
             ) {
-                file.moveTo(LauncherFile.of(dir, dirName, file.name))
+                file.moveTo(target.child(file.name))
             }
+        }
+
+        val toAdd = target.launcherName
+        if(!component.includedFiles.contains(toAdd)) {
+            component.includedFiles += toAdd
+            component.write()
         }
 
         LOGGER.info { "Moved root files to directory for ${component.type}: ${component.id}" }
@@ -206,99 +384,69 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun upgradeTexturePacksIncludedFiles(onStatus: (PatchStatus) -> Unit) {
+    fun upgradeTexturePacksIncludedFiles(statusProvider: StatusProvider) {
         LOGGER.info { "Upgrading texturepacks included files..." }
-        onStatus(PatchStatus(PatchStep.TEXTUREPACKS_INCLUDED_FILES, ""))
+        val texturepacksProvider = statusProvider.subStep(PatchStep.TEXTUREPACKS_INCLUDED_FILES, 2)
+        texturepacksProvider.next()
         val files = LauncherFiles()
         files.reload()
 
+        texturepacksProvider.total = files.resourcepackComponents.size + 1
         for(resourcepacks in files.resourcepackComponents) {
-            onStatus(PatchStatus(PatchStep.TEXTUREPACKS_INCLUDED_FILES, resourcepacks.id))
+            texturepacksProvider.next(resourcepacks.name)
             if(!resourcepacks.includedFiles.contains("texturepacks/")) {
                 resourcepacks.includedFiles += "texturepacks/"
-                LauncherFile.of(resourcepacks.directory, appConfig().manifestFileName).write(resourcepacks)
+                resourcepacks.write()
             }
         }
+        texturepacksProvider.finish()
         LOGGER.info { "Upgraded texturepacks included files" }
     }
 
     @Throws(IOException::class)
-    fun removeResourcepacksDirGameArguments(onStatus: (PatchStatus) -> Unit) {
+    fun removeResourcepacksDirGameArguments(statusProvider: StatusProvider) {
         LOGGER.info { "Removing resourcepacks directory game arguments..." }
-        onStatus(PatchStatus(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT, ""))
+        val resourcepacksProvider = statusProvider.subStep(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT, 2)
+        resourcepacksProvider.next()
+
         val files = LauncherFiles()
         files.reload()
+
+        resourcepacksProvider.total = files.versionComponents.size + 1
+
         files.versionComponents.forEach {
-            onStatus(PatchStatus(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT, it.first.name))
-            it.second.gameArguments = it.second.gameArguments.filter { arg ->
+            resourcepacksProvider.next(it.name)
+            it.gameArguments = it.gameArguments.filter { arg ->
                 arg.argument != "--resourcePackDir" && arg.argument != "\${resourcepack_directory}"
             }
-            LauncherFile.of(it.first.directory, it.first.details).write(it.second)
+            it.write()
         }
+        resourcepacksProvider.finish()
         LOGGER.info { "Removed resourcepacks directory game arguments" }
     }
 
     @Throws(IOException::class)
-    fun addNewIncludedFilesToManifest(onStatus: (PatchStatus) -> Unit) {
-        LOGGER.info { "Adding new included files..." }
-        onStatus(PatchStatus(PatchStep.ADD_GAME_DATA_INCLUDED_FILES, ""))
-        val files = LauncherFiles()
-        files.reload()
-
-        for(saves in files.savesComponents) {
-            onStatus(PatchStatus(PatchStep.ADD_GAME_DATA_INCLUDED_FILES, "saves: ${saves.id}"))
-            saves.includedFiles += "saves/"
-            LauncherFile.of(saves.directory, appConfig().manifestFileName).write(saves)
-        }
-
-        for(resourcepacks in files.resourcepackComponents) {
-            onStatus(PatchStatus(PatchStep.ADD_GAME_DATA_INCLUDED_FILES, "resourcepacks: ${resourcepacks.id}"))
-            resourcepacks.includedFiles += "resourcepacks/"
-            LauncherFile.of(resourcepacks.directory, appConfig().manifestFileName).write(resourcepacks)
-        }
-
-        for(mods in files.modsComponents) {
-            onStatus(PatchStatus(PatchStep.ADD_GAME_DATA_INCLUDED_FILES, "mods: ${mods.first.id}"))
-            mods.first.includedFiles += "mods/"
-            LauncherFile.of(mods.first.directory, appConfig().manifestFileName).write(mods.first)
-        }
-    }
-
-    @Throws(IOException::class)
-    fun removeBackupExcludedFiles(onStatus: (PatchStatus) -> Unit) {
-        LOGGER.info { "Removing backup excluded files from instances..." }
-        onStatus(PatchStatus(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES, ""))
-
-        val files = LauncherFiles()
-        files.reload()
-        files.instanceComponents.forEach {
-            onStatus(PatchStatus(PatchStep.REMOVE_BACKUP_EXCLUDED_FILES, it.first.id))
-            it.second.ignoredFiles = it.second.ignoredFiles.filter { file ->
-                !PatternString(file, true).matches("backups/")
-            }
-            LauncherFile.of(it.first.directory, it.first.details).write(it.second)
-        }
-        LOGGER.info { "Removed backup excluded files from instances" }
-    }
-
-    @Throws(IOException::class)
-    fun upgradeSettings(onStatus: (PatchStatus) -> Unit) {
-        LOGGER.info { "Upgrading settings..." }
-        onStatus(PatchStatus(PatchStep.UPGRADE_SETTINGS, ""))
-        appSettings().dataVersion = appConfig().dataVersion.toString()
-        appSettings().save()
-        LOGGER.info { "Upgraded settings" }
-    }
-
-    @Throws(IOException::class)
-    fun removeLoginFile(onStatus: (PatchStatus) -> Unit) {
+    fun removeLoginFile(statusProvider: StatusProvider) {
         LOGGER.info { "Removing login file..." }
-        onStatus(PatchStatus(PatchStep.REMOVE_LOGIN, ""))
+        val loginFileProvider = statusProvider.subStep(PatchStep.REMOVE_LOGIN, 1)
+        loginFileProvider.next()
         val loginFile = LauncherFile.of(appConfig().metaDir, "secrets.auth")
         if(loginFile.exists()) {
             loginFile.remove()
         }
+        loginFileProvider.finish()
         LOGGER.info { "Removed login file" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeSettings(statusProvider: StatusProvider) {
+        LOGGER.info { "Upgrading settings..." }
+        val upgradeSettingsProvider = statusProvider.subStep(PatchStep.UPGRADE_SETTINGS, 1)
+        upgradeSettingsProvider.next()
+        appSettings().dataVersion = appConfig().dataVersion.toString()
+        appSettings().save()
+        upgradeSettingsProvider.finish()
+        LOGGER.info { "Upgraded settings" }
     }
 
     companion object {

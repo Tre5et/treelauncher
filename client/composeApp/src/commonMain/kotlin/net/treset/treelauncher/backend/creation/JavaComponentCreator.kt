@@ -6,18 +6,19 @@ import net.treset.mcdl.java.JavaRuntimes
 import net.treset.mcdl.util.OsUtil
 import net.treset.treelauncher.backend.data.manifest.JavaComponent
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import java.io.IOException
 
 class JavaComponentCreator(
     data: JavaCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : NewComponentCreator<JavaComponent, JavaCreationData>(data, statusProvider) {
     constructor(
         data: JavaCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
     override fun create(): JavaComponent {
@@ -29,7 +30,7 @@ class JavaComponentCreator(
     }
 
     @Throws(IOException::class)
-    override fun createNew(statusProvider: CreationProvider): JavaComponent {
+    override fun createNew(statusProvider: StatusProvider): JavaComponent {
         statusProvider.next("Retrieving java version") //TODO: localize
         val java = try {
             JavaRuntimes.get()

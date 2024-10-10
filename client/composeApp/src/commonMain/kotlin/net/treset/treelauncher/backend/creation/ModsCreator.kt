@@ -2,19 +2,20 @@ package net.treset.treelauncher.backend.creation
 
 import net.treset.treelauncher.backend.data.manifest.ModsComponent
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 
 class NewModsCreator(
     data: NewModsCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : NewComponentCreator<ModsComponent, NewModsCreationData>(data, statusProvider) {
     constructor(
         data: NewModsCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createNew(statusProvider: CreationProvider): ModsComponent {
+    override fun createNew(statusProvider: StatusProvider): ModsComponent {
         return ModsComponent(
             id = id,
             name = data.name,
@@ -29,14 +30,14 @@ class NewModsCreator(
 
 class InheritModsCreator(
     data: InheritModsCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : InheritComponentCreator<ModsComponent, InheritModsCreationData>(data, statusProvider) {
     constructor(
         data: InheritModsCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createInherit(statusProvider: CreationProvider): ModsComponent {
+    override fun createInherit(statusProvider: StatusProvider): ModsComponent {
         return ModsComponent(
             id = id,
             name = data.name,
@@ -51,12 +52,12 @@ class InheritModsCreator(
 
 class UseModsCreator(
     data: UseModsCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : UseComponentCreator<ModsComponent, UseModsCreationData>(data, statusProvider) {
     constructor(
         data: UseModsCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.MODS
 }

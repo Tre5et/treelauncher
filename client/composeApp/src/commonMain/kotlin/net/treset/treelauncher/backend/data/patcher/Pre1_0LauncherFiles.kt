@@ -1,13 +1,13 @@
-package net.treset.treelauncher.backend.data
+package net.treset.treelauncher.backend.data.patcher
 
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
+import net.treset.treelauncher.backend.data.patcher.Pre2_0LauncherModsDetails
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 
-class Pre2_5LauncherFiles : LauncherFiles() {
-    private var _gameDetailsManifest: ParentManifest? = null
-    val gameDetailsManifest: ParentManifest
+class Pre1_0LauncherFiles : Pre2_0LauncherFiles() {
+    private var _gameDetailsManifest: Pre2_0ParentManifest? = null
+    val gameDetailsManifest: Pre2_0ParentManifest
         get() = _gameDetailsManifest!!
 
     @Throws(FileLoadException::class)
@@ -30,11 +30,11 @@ class Pre2_5LauncherFiles : LauncherFiles() {
 
     @Throws(FileLoadException::class)
     override fun reloadModsComponents() {
-        _modsComponents = reload(
+        _modsComponents = reloadComponents(
             _modsManifest?: throw FileLoadException("Unable to load mods components: invalid configuration"),
             LauncherFile.ofData(launcherDetails.gamedataDir),
             LauncherManifestType.MODS_COMPONENT,
-            LauncherModsDetails::fromJson,
+            Pre2_0LauncherModsDetails::fromJson,
             {
                 it.types = types
                 it.versions = versions
@@ -59,7 +59,7 @@ class Pre2_5LauncherFiles : LauncherFiles() {
 
     @Throws(FileLoadException::class)
     override fun reloadSavesComponents() {
-        _savesComponents = reload(
+        _savesComponents = reloadComponents(
             _savesManifest?: throw FileLoadException("Unable to load saves components: invalid configuration"),
             LauncherFile.ofData(launcherDetails.gamedataDir),
             LauncherManifestType.SAVES_COMPONENT,

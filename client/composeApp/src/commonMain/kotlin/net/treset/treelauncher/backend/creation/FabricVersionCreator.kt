@@ -10,6 +10,7 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.string.PatternString
@@ -18,15 +19,15 @@ import java.io.IOException
 
 class FabricVersionCreator(
     data: FabricCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : VersionCreator<FabricCreationData>(data, statusProvider) {
     constructor(
         data: FabricCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun createNew(statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new fabric version: id=${data.profile.id}..." }
         statusProvider.next("Creating parent version") // TODO: make localized
 
@@ -91,7 +92,7 @@ class FabricVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun addLibraries(data: FabricCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun addLibraries(data: FabricCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding fabric libraries..." }
         val libraryProvider = statusProvider.subStep(CreationStep.VERSION_FABRIC_LIBRARIES, 3)
         libraryProvider.next("Downloading fabric libraries") // TODO: make localized
@@ -120,7 +121,7 @@ class FabricVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun addClient(data: FabricCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun addClient(data: FabricCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding fabric client..." }
         val clientProvider = statusProvider.subStep(CreationStep.VERSION_FABRIC_FILE, 3)
         clientProvider.next("Downloading fabric client") // TODO: make localized

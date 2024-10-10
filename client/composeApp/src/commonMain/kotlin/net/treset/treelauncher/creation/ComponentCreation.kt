@@ -179,7 +179,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
         }
 
         creationStatus?.let {
-            CreationPopup(it)
+            StatusPopup(it)
         }
     }
 }

@@ -5,17 +5,18 @@ import net.treset.mcdl.minecraft.MinecraftLaunchArgument
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.Status
 import java.io.IOException
 
 abstract class VersionCreator<D: VersionCreationData>(
     data: D,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : NewComponentCreator<VersionComponent, D>(data, statusProvider) {
     constructor(
         data: D,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
     override fun create(): VersionComponent {

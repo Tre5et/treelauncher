@@ -6,7 +6,6 @@ import net.treset.mcdl.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod
-import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.instances.InstanceDetails
 import java.util.*
@@ -69,7 +68,7 @@ open class Strings(
     val units: Units = Units(),
     val updater: Updater = Updater(),
     val version: Version = Version(),
-    val statusDetailsMessage: (String, Int, Int) -> String = { file, current, total -> "$file ($current/$total)" },
+    val statusDetailsMessage: (String, Int, Int) -> String = { file, current, total -> if(file.isBlank()) "$current / $total" else "$file ($current/$total)" },
 ) {
     data class Components(
         val create: () -> String = { "Create New" },
@@ -225,20 +224,35 @@ open class Strings(
             val backup: () -> String = { "Create Data Backup before upgrading" },
             val backupHint: () -> String = { "Depending on the amount of launcher data this may take a significant amount of time and storage." },
             val start: () -> String = { "Start Upgrade" },
-            val status: (DataPatcher.PatchStep) -> String = {
-                when(it) {
-                    DataPatcher.PatchStep.CREATE_BACKUP -> "Creating Backup"
-                    DataPatcher.PatchStep.REMOVE_BACKUP_EXCLUDED_FILES -> "Removing Backup from instance excluded files"
-                    DataPatcher.PatchStep.UPGRADE_SETTINGS -> "Upgrading Version in Settings"
-                    DataPatcher.PatchStep.GAME_DATA_COMPONENTS -> "Moving Game Data Components"
-                    DataPatcher.PatchStep.INCLUDED_FILES -> "Restructuring included files"
-                    DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Removing resoucepacks directory version arguments"
-                    DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Adding included files to Game Data Components"
-                    DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Adding texturepacks to included files"
-                    DataPatcher.PatchStep.REMOVE_LOGIN -> "Removing old login storage"
-                }
-            }
-        )
+            val status: Status = Status()
+        ) {
+            data class Status(
+                val createBackup: () -> String = { "Creating backup" },
+                val gameDataComponents: () -> String = { "Moving game data components" },
+                val gameDataSaves: () -> String = { "Moving game data save components" },
+                val gameDataMods: () -> String = { "Moving game data mod components" },
+                val removeBackupIncludedFiles: () -> String = { "Removing backup from instance excluded files" },
+                val upgradeComponents: () -> String = { "Upgrading components" },
+                val upgradeMainManifest: () -> String = { "Upgrading launcher manifest" },
+                val upgradeInstances: () -> String = { "Upgrading instances" },
+                val upgradeSaves: () -> String = { "Upgrading save components" },
+                val upgradeResourcepacks: () -> String = { "Upgrading resourcepack components" },
+                val upgradeOptions: () -> String = { "Upgrading option components" },
+                val upgradeMods: () -> String = { "Upgrading mod components" },
+                val upgradeVersions: () -> String = { "Upgrading version components" },
+                val upgradeJavas: () -> String = { "Upgrading java components" },
+                val includedFiles: () -> String = { "Restructuring included files" },
+                val includedFilesInstances: () -> String = { "Restructuring included files of instances" },
+                val includedFilesSaves: () -> String = { "Restructuring included files of saves" },
+                val includedFilesResourcepacks: () -> String = { "Restructuring included files of resourcepacks" },
+                val includedFilesOptions: () -> String = { "Restructuring included files of options" },
+                val includedFilesMods: () -> String = { "Restructuring included files of mods" },
+                val removeResourcepacksArgument: () -> String = { "Removing resoucepacks directory version arguments" },
+                val texturepacksIncludedFiles: () -> String = { "Adding texturepacks to included files" },
+                val removeLogin: () -> String = { "Removing old login storage" },
+                val upgradeSettings: () -> String = { "Upgrading Version in Settings" }
+            )
+        }
     }
 
     data class List(

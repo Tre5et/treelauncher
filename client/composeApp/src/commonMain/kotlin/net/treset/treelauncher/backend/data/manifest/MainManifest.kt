@@ -5,7 +5,6 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class MainManifest(
-    val type: LauncherManifestType,
     var activeInstance: String?,
     var assetsDir: String,
     var librariesDir: String,
@@ -17,6 +16,7 @@ class MainManifest(
     var modsDir: String,
     var versionDir: String,
     var javasDir: String,
+    val type: LauncherManifestType = LauncherManifestType.LAUNCHER,
     @Transient var file: LauncherFile
 ): Manifest() {
     val directory: LauncherFile

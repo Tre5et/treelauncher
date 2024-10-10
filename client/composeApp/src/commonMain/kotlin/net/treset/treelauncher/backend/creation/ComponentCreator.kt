@@ -1,7 +1,6 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
@@ -16,12 +15,12 @@ import kotlin.random.Random
 
 abstract class ComponentCreator<T: Component, D: CreationData>(
     val data: D,
-    var statusProvider: CreationProvider
+    var statusProvider: StatusProvider
 ) {
     constructor(
         data: D,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     var id = createHash()
     val directory: LauncherFile
@@ -56,12 +55,12 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
 
 abstract class NewComponentCreator<T: Component, D: NewCreationData>(
     data: D,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): ComponentCreator<T, D>(data, statusProvider) {
     constructor(
         data: D,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
     override fun create(): T {
@@ -81,18 +80,18 @@ abstract class NewComponentCreator<T: Component, D: NewCreationData>(
     }
 
     protected abstract fun createNew(
-        statusProvider: CreationProvider
+        statusProvider: StatusProvider
     ): T
 }
 
 abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
     data: D,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): ComponentCreator<T, D>(data, statusProvider) {
     constructor(
         data: D,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
     override fun create(): T {
@@ -120,18 +119,18 @@ abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
     }
 
     protected abstract fun createInherit(
-        statusProvider: CreationProvider
+        statusProvider: StatusProvider
     ): T
 }
 
 abstract class UseComponentCreator<T: Component, D: UseCreationData<T>>(
     data: D,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): ComponentCreator<T, D>(data, statusProvider) {
     constructor(
         data: D,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
     override fun create(): T {
@@ -166,47 +165,3 @@ object CreationStep {
     val FINISHING = FormatStringProvider { strings().creator.status.finishing() }
 }
 
-class CreationProvider(
-    val step: StringProvider?,
-    var total: Int,
-    val onStatus: (Status) -> Unit
-) {
-    var index = 1
-
-    fun next(
-        message: () -> String
-    ) {
-        step?.let {
-            onStatus(Status(step, DetailsProvider(message, index++, if(total >= index) total else index), index / total.toFloat()))
-        }
-    }
-
-    fun next(
-        message: String
-    ) = next { message }
-
-    fun download(status: DownloadStatus, before: Int, after: Int) {
-        step?.let {
-            index = status.currentAmount + before
-            total = status.totalAmount + before + after
-            onStatus(Status(step, DetailsProvider(status.currentFile, index, total), index / total.toFloat()))
-        }
-    }
-
-    fun finish(
-        message: () -> String
-    ) {
-        step?.let {
-            onStatus(Status(step, DetailsProvider(message, total, total), 1f))
-        }
-    }
-
-    fun finish(
-        message: String
-    ) = finish { message }
-
-    fun subStep(
-        step: StringProvider,
-        total: Int
-    ) = CreationProvider(step, total, onStatus)
-}

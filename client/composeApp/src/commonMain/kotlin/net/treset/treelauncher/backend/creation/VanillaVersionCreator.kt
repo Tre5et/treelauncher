@@ -8,6 +8,7 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -15,15 +16,15 @@ import java.io.IOException
 
 class VanillaVersionCreator(
     data: VanillaCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : VersionCreator<VanillaCreationData>(data, statusProvider) {
     constructor(
         data: VanillaCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun createNew(statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new vanilla version: id=${data.versionId}..." }
         statusProvider.next("Creating vanilla version") // TODO: make localized
         val version = VersionComponent(
@@ -68,7 +69,7 @@ class VanillaVersionCreator(
     override val total = 1
 
     @Throws(IOException::class)
-    private fun createAssets(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun createAssets(data: VanillaCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Downloading assets..." }
         val assetsProvider = statusProvider.subStep(VERSION_ASSETS, 3)
         assetsProvider.next("Downloading assets") // TODO: make localized
@@ -121,7 +122,7 @@ class VanillaVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun addLibraries(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun addLibraries(data: VanillaCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding libraries..." }
         val librariesProvider = statusProvider.subStep(VERSION_LIBRARIES, 2)
         librariesProvider.next("Downloading libraries...") // TODO: make localized
@@ -157,7 +158,7 @@ class VanillaVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun addClient(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun addClient(data: VanillaCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding client..." }
         val clientProvider = statusProvider.subStep(VERSION_FILE, 2)
         clientProvider.next("Downloading client...") // TODO: make localized

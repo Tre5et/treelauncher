@@ -93,7 +93,7 @@ open class GenericResourceProvider<T: Component>(
     }
 
     open fun shouldRemove(file: LauncherFile): Boolean {
-        return PatternString.matchesAny(file.getLauncherName(), includedFiles)
+        return PatternString.matchesAny(file.launcherName, includedFiles)
     }
 
     companion object {

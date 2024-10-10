@@ -15,7 +15,6 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 import kotlin.io.path.isDirectory
-
 class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
     fun read(): ByteArray {
@@ -55,7 +54,7 @@ class LauncherFile(pathname: String) : File(pathname) {
                 "$fileName-"
             }
         }
-        val target = LauncherFile.of(dest, fileName)
+        val target = of(dest, fileName)
         copyTo(target)
     }
 
@@ -218,9 +217,13 @@ class LauncherFile(pathname: String) : File(pathname) {
         }
     }
 
-    fun getLauncherName(): String {
-        return if(isDirectory()) { "${name}/" } else { name }
+    fun child(vararg path: String): LauncherFile {
+        return of(this, *path)
     }
+
+    val launcherName: String
+        get() = if(isDirectory()) { "${name}/" } else { name }
+
 
     fun existsOrNull(): LauncherFile? {
         return if(exists()) this else null

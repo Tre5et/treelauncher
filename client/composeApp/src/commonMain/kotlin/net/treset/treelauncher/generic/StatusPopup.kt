@@ -1,4 +1,4 @@
-package net.treset.treelauncher.creation
+package net.treset.treelauncher.generic
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,11 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.util.Status
-import net.treset.treelauncher.generic.PopupOverlay
-import net.treset.treelauncher.generic.Text
 
 @Composable
-fun CreationPopup(
+fun StatusPopup(
     status: Status
 ) {
     PopupOverlay(

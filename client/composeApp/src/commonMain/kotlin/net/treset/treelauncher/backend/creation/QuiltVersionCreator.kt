@@ -10,21 +10,22 @@ import net.treset.mcdl.quiltmc.QuiltVersion
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import java.io.IOException
 
 class QuiltVersionCreator(
     data: QuiltCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : VersionCreator<QuiltCreationData>(data, statusProvider) {
     constructor(
         data: QuiltCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun createNew(statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating quilt version..." }
         statusProvider.next("Creating parent version") // TODO: make localized
 
@@ -89,7 +90,7 @@ class QuiltVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun addLibraries(data: QuiltCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun addLibraries(data: QuiltCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding quilt libraries..." }
         val librariesProvider = statusProvider.subStep(CreationStep.VERSION_QUILT_LIBRARIES, 3)
         librariesProvider.next("Downloading quilt libraries") // TODO: make localized

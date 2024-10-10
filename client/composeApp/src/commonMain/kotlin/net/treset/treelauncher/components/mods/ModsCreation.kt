@@ -13,7 +13,7 @@ import net.treset.treelauncher.backend.data.manifest.ModsComponent
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.creation.CreationContent
 import net.treset.treelauncher.creation.CreationMode
-import net.treset.treelauncher.creation.CreationPopup
+import net.treset.treelauncher.generic.StatusPopup
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
@@ -253,7 +253,7 @@ fun ModsCreation(
         }
 
         creationStatus?.let {
-            CreationPopup(it)
+            StatusPopup(it)
         }
     }
 }

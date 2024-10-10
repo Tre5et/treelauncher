@@ -2,6 +2,7 @@ package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.data.manifest.*
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
@@ -10,16 +11,16 @@ import java.io.IOException
 
 class InstanceCreator(
     data: InstanceCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : NewComponentCreator<InstanceComponent, InstanceCreationData>(data, statusProvider) {
     constructor(
         data: InstanceCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
 
     @Throws(ComponentCreationException::class)
-    override fun createNew(statusProvider: CreationProvider): InstanceComponent {
+    override fun createNew(statusProvider: StatusProvider): InstanceComponent {
         LOGGER.debug { "Creating new instance: name=${data.name}..." }
         statusProvider.next("Creating instance components") // TODO: make localized
 
@@ -55,11 +56,11 @@ class InstanceCreator(
 }
 
 class InstanceCreationData: NewCreationData {
-    val createVersion: (CreationProvider) -> VersionComponent
-    val createSaves: (CreationProvider) -> SavesComponent
-    val createResourcepack: (CreationProvider) -> ResourcepackComponent
-    val createOptions: (CreationProvider) -> OptionsComponent
-    val createMods: ((CreationProvider) -> ModsComponent)?
+    val createVersion: (StatusProvider) -> VersionComponent
+    val createSaves: (StatusProvider) -> SavesComponent
+    val createResourcepack: (StatusProvider) -> ResourcepackComponent
+    val createOptions: (StatusProvider) -> OptionsComponent
+    val createMods: ((StatusProvider) -> ModsComponent)?
 
     constructor(
         name: String,

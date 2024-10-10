@@ -1,19 +1,20 @@
 package net.treset.treelauncher.backend.creation
 
 import net.treset.treelauncher.backend.data.manifest.OptionsComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 
 class NewOptionCreator(
     data: NewCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): NewComponentCreator<OptionsComponent, NewCreationData>(data, statusProvider) {
     constructor(
         data: NewCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createNew(statusProvider: CreationProvider): OptionsComponent {
+    override fun createNew(statusProvider: StatusProvider): OptionsComponent {
         return OptionsComponent(
             id = id,
             name = data.name,
@@ -26,14 +27,14 @@ class NewOptionCreator(
 
 class InheritOptionsCreator(
     data: InheritCreationData<OptionsComponent>,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): InheritComponentCreator<OptionsComponent, InheritCreationData<OptionsComponent>>(data, statusProvider) {
     constructor(
         data: InheritCreationData<OptionsComponent>,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createInherit(statusProvider: CreationProvider): OptionsComponent {
+    override fun createInherit(statusProvider: StatusProvider): OptionsComponent {
         return OptionsComponent(
             id = id,
             name = data.name,
@@ -46,12 +47,12 @@ class InheritOptionsCreator(
 
 class UseOptionsCreator(
     data: UseCreationData<OptionsComponent>,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ): UseComponentCreator<OptionsComponent, UseCreationData<OptionsComponent>>(data, statusProvider) {
     constructor(
         data: UseCreationData<OptionsComponent>,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.OPTIONS
 }

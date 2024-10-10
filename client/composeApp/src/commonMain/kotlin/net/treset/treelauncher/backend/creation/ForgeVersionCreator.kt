@@ -8,6 +8,7 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -15,15 +16,15 @@ import java.io.IOException
 
 class ForgeVersionCreator(
     data: ForgeCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : VersionCreator<ForgeCreationData>(data, statusProvider) {
     constructor(
         data: ForgeCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun createNew(statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new forge version: id=${data.installer.version}..." }
         statusProvider.next("Creating parent version") // TODO: make localized
 
@@ -96,7 +97,7 @@ class ForgeVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun addLibraries(data: ForgeCreationData, version: VersionComponent, statusProvider: CreationProvider) {
+    private fun addLibraries(data: ForgeCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding forge libraries..." }
         val libraryProvider = statusProvider.subStep(VERSION_FORGE_LIBRARIES, 3)
         libraryProvider.next("Downloading forge libraries") // TODO: make localized
@@ -125,7 +126,7 @@ class ForgeVersionCreator(
     }
 
     @Throws(IOException::class)
-    private fun createClient(data: ForgeCreationData, version: VersionComponent, vanillaVersion: VersionComponent, statusProvider: CreationProvider) {
+    private fun createClient(data: ForgeCreationData, version: VersionComponent, vanillaVersion: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Creating forge client..." }
         val clientProvider = statusProvider.subStep(VERSION_FORGE_FILE, 3)
         clientProvider.next("Creating forge client") // TODO: make localized

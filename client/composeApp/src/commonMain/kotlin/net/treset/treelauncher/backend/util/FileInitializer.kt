@@ -28,7 +28,6 @@ class FileInitializer(val directory: LauncherFile) {
         )
         files = arrayOf(
             MainManifest(
-                LauncherManifestType.LAUNCHER,
                 activeInstance = null,
                 assetsDir = "assets",
                 librariesDir = "libraries",

@@ -1,19 +1,20 @@
 package net.treset.treelauncher.backend.creation
 
 import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 
 class NewResourcepackCreator(
     data: NewCreationData,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : NewComponentCreator<ResourcepackComponent, NewCreationData>(data, statusProvider) {
     constructor(
         data: NewCreationData,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createNew(statusProvider: CreationProvider): ResourcepackComponent {
+    override fun createNew(statusProvider: StatusProvider): ResourcepackComponent {
         return ResourcepackComponent(
             id = id,
             name = data.name,
@@ -26,14 +27,14 @@ class NewResourcepackCreator(
 
 class InheritResourcepackCreator(
     data: InheritCreationData<ResourcepackComponent>,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : InheritComponentCreator<ResourcepackComponent, InheritCreationData<ResourcepackComponent>>(data, statusProvider) {
     constructor(
         data: InheritCreationData<ResourcepackComponent>,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
-    override fun createInherit(statusProvider: CreationProvider): ResourcepackComponent {
+    override fun createInherit(statusProvider: StatusProvider): ResourcepackComponent {
         return ResourcepackComponent(
             id = id,
             name = data.name,
@@ -46,12 +47,12 @@ class InheritResourcepackCreator(
 
 class UseResourcepackCreator(
     data: UseCreationData<ResourcepackComponent>,
-    statusProvider: CreationProvider
+    statusProvider: StatusProvider
 ) : UseComponentCreator<ResourcepackComponent, UseCreationData<ResourcepackComponent>>(data, statusProvider) {
     constructor(
         data: UseCreationData<ResourcepackComponent>,
         onStatus: (Status) -> Unit
-    ) : this(data, CreationProvider(null, 0, onStatus))
+    ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.RESOURCEPACKS
 }

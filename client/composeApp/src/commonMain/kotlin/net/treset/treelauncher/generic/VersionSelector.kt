@@ -17,7 +17,6 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
 import net.treset.treelauncher.backend.util.Status
-import net.treset.treelauncher.creation.CreationPopup
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import java.io.IOException
@@ -282,7 +281,7 @@ fun VersionSelector(
         }
 
         creationStatus?.let {
-            CreationPopup(it)
+            StatusPopup(it)
         }
     }
 }

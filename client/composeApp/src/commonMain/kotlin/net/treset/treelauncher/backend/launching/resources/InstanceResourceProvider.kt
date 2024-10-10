@@ -31,7 +31,7 @@ class InstanceResourceProvider(
         val toRemove: MutableList<LauncherFile> = mutableListOf()
         val exceptionQueue: MutableList<IOException> = mutableListOf()
         for(f in files) {
-            if(PatternString.matchesAny(f.getLauncherName(), excludedFiles)) {
+            if(PatternString.matchesAny(f.launcherName, excludedFiles)) {
                 LOGGER.debug { "Moving file: ${f.name}" }
                 try {
                     toRemove.add(f)

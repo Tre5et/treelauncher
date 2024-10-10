@@ -242,7 +242,7 @@ fun Create() {
     }
 
     creationStatus?.let {
-        CreationPopup(it)
+        StatusPopup(it)
     }
 
     if(showCreationDone) {
