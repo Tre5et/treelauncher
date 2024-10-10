@@ -1,6 +1,5 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mcdl.json.GenericJsonParsable
 import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
@@ -9,22 +8,22 @@ class MainManifest(
     val type: LauncherManifestType,
     var activeInstance: String?,
     var assetsDir: String,
+    var librariesDir: String,
     var gameDataDir: String,
     var instancesDir: String,
-    var javasDir: String,
-    var librariesDir: String,
-    var modsDir: String,
-    var optionsDir: String,
-    var resourcepacksDir: String,
     var savesDir: String,
+    var resourcepacksDir: String,
+    var optionsDir: String,
+    var modsDir: String,
     var versionDir: String,
+    var javasDir: String,
     @Transient var file: LauncherFile
-): GenericJsonParsable() {
+): Manifest() {
     val directory: LauncherFile
         get() = LauncherFile.of(file.parentFile)
 
     @Throws(IOException::class)
-    fun write() {
+    override fun write() {
         file.write(this)
     }
 

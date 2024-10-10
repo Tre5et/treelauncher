@@ -1,6 +1,5 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mcdl.json.GenericJsonParsable
 import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
@@ -10,12 +9,12 @@ open class ParentManifest(
     var prefix: String,
     var components: MutableList<String>,
     @Transient var file: LauncherFile
-): GenericJsonParsable() {
+): Manifest() {
     val directory: LauncherFile
         get() = LauncherFile.of(file.parentFile)
 
     @Throws(IOException::class)
-    fun write() {
+    override fun write() {
         file.write(this)
     }
 
