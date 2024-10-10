@@ -11,20 +11,25 @@ import net.treset.treelauncher.backend.util.Status
 import java.io.IOException
 
 class JavaComponentCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : ComponentCreator<JavaComponent, JavaCreationData>(parent, onStatus) {
+    data: JavaCreationData,
+    statusProvider: CreationProvider
+) : NewComponentCreator<JavaComponent, JavaCreationData>(data, statusProvider) {
+    constructor(
+        data: JavaCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
     @Throws(IOException::class)
-    override fun new(data: JavaCreationData): JavaComponent {
+    override fun create(): JavaComponent {
         data.currentComponents.firstOrNull { it.name == data.name }?.let {
             LOGGER.debug { "Matching java component already exists, using instead: name=${data.name}" }
-            return use(it)
+            return it
         }
-        return super.new(data)
+        return super.create()
     }
 
     @Throws(IOException::class)
-    override fun createNew(data: JavaCreationData, statusProvider: CreationProvider): JavaComponent {
+    override fun createNew(statusProvider: CreationProvider): JavaComponent {
         statusProvider.next("Retrieving java version") //TODO: localize
         val java = try {
             JavaRuntimes.get()
@@ -70,19 +75,14 @@ class JavaComponentCreator(
         )
     }
 
-    @Throws(IOException::class)
-    override fun createInherit(data: JavaCreationData, statusProvider: CreationProvider): JavaComponent {
-        throw IOException("Java inheritance not supported")
-    }
-
     override val step = JAVA
-    override val newTotal = 2
-    override val inheritTotal = 0
+    override val total = 2
 }
 
 class JavaCreationData(
     name: String,
-    val currentComponents: Array<JavaComponent>
-): CreationData(name)
+    val currentComponents: Array<JavaComponent>,
+    parent: ParentManifest
+): NewCreationData(name, parent)
 
 val JAVA = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.java() }

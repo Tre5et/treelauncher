@@ -54,7 +54,7 @@ class Config(baseDir: String, val updateUrl: String?) {
         )
     val javaDefaultIncludedFiles: Array<String> = arrayOf()
     val versionDefaultIncludedFiles: Array<String> = arrayOf()
-    val minecraftDefaultGameArguments: Array<String> = arrayOf()
+    val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val minecraftDefaultFileName = "client.jar"
     val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf(
         LauncherLaunchArgument("-Djava.library.path=\${natives_directory}"),

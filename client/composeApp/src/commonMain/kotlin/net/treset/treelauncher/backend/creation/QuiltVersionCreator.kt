@@ -9,20 +9,22 @@ import net.treset.mcdl.quiltmc.QuiltProfile
 import net.treset.mcdl.quiltmc.QuiltVersion
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
-import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class QuiltVersionCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : VersionCreator<QuiltCreationData>(parent, onStatus) {
+    data: QuiltCreationData,
+    statusProvider: CreationProvider
+) : VersionCreator<QuiltCreationData>(data, statusProvider) {
+    constructor(
+        data: QuiltCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun createNew(data: QuiltCreationData, statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: CreationProvider): VersionComponent {
         LOGGER.debug { "Creating quilt version..." }
         statusProvider.next("Creating parent version") // TODO: make localized
 
@@ -39,9 +41,12 @@ class QuiltVersionCreator(
             throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.profile.inheritsFrom}", e)
         }
 
-        val creator = VanillaVersionCreator(parent, onStatus)
+        val creator = VanillaVersionCreator(
+            VanillaCreationData(versionDetails, data.files),
+            statusProvider
+        )
         val mc = try {
-            creator.new(VanillaCreationData(versionDetails, data.librariesDir, data.assetsDir, data.files))
+            creator.create()
         } catch (e: IOException) {
             throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.profile.inheritsFrom}", e)
         }
@@ -89,17 +94,17 @@ class QuiltVersionCreator(
         val librariesProvider = statusProvider.subStep(CreationStep.VERSION_QUILT_LIBRARIES, 3)
         librariesProvider.next("Downloading quilt libraries") // TODO: make localized
         data.profile.libraries?.let { libraries: List<QuiltLibrary> ->
-            if (!data.librariesDir.isDirectory()) {
+            if (!data.files.librariesDir.isDirectory()) {
                 try {
-                    data.librariesDir.createDir()
+                    data.files.librariesDir.createDir()
                 } catch (e: IOException) {
-                    throw IOException("Unable to add quilt libraries: failed to create libraries directory: path=${data.librariesDir}", e)
+                    throw IOException("Unable to add quilt libraries: failed to create libraries directory: path=${data.files.librariesDir}", e)
                 }
             }
             val libs: List<String> = try {
                 QuiltLibrary.downloadAll(
                     libraries,
-                    data.librariesDir
+                    data.files.librariesDir
                 ) {
                     LOGGER.debug { "Downloading quilt library: ${it.currentFile}" }
                     librariesProvider.download(it, 1, 1)
@@ -114,7 +119,7 @@ class QuiltVersionCreator(
     }
 
     override val step = CreationStep.VERSION_QUILT
-    override val newTotal = 1
+    override val total = 1
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
@@ -124,10 +129,8 @@ class QuiltVersionCreator(
 class QuiltCreationData(
     val version: QuiltVersion,
     val profile: QuiltProfile,
-    val librariesDir: LauncherFile,
-    val assetsDir: LauncherFile,
-    val files: LauncherFiles
-): VersionCreationData(profile.id, profile.id, files.versionComponents)
+    files: LauncherFiles
+): VersionCreationData(profile.id, profile.id, files)
 
 val CreationStep.VERSION_QUILT: FormatStringProvider
     get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.quilt() }

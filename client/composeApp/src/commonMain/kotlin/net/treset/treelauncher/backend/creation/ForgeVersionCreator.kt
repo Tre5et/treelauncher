@@ -7,7 +7,6 @@ import net.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
@@ -15,11 +14,16 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class ForgeVersionCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : VersionCreator<ForgeCreationData>(parent, onStatus) {
+    data: ForgeCreationData,
+    statusProvider: CreationProvider
+) : VersionCreator<ForgeCreationData>(data, statusProvider) {
+    constructor(
+        data: ForgeCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
     @Throws(IOException::class)
-    override fun createNew(data: ForgeCreationData, statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: CreationProvider): VersionComponent {
         LOGGER.debug { "Creating new forge version: id=${data.installer.version}..." }
         statusProvider.next("Creating parent version") // TODO: make localized
 
@@ -36,9 +40,12 @@ class ForgeVersionCreator(
             throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.installer.installData.inheritsFrom}", e)
         }
 
-        val creator = VanillaVersionCreator(parent, onStatus)
+        val creator = VanillaVersionCreator(
+            VanillaCreationData(versionDetails, data.files),
+            statusProvider
+        )
         val mc = try {
-            creator.new(VanillaCreationData(versionDetails, data.librariesDir, data.assetsDir, data.files))
+            creator.create()
         } catch (e: IOException) {
             throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.installer.installData.inheritsFrom}", e)
         }
@@ -93,17 +100,17 @@ class ForgeVersionCreator(
         LOGGER.debug { "Adding forge libraries..." }
         val libraryProvider = statusProvider.subStep(VERSION_FORGE_LIBRARIES, 3)
         libraryProvider.next("Downloading forge libraries") // TODO: make localized
-        if (!data.librariesDir.isDirectory()) {
+        if (!data.files.librariesDir.isDirectory()) {
             try {
-                data.librariesDir.createDir()
+                data.files.librariesDir.createDir()
             } catch (e: IOException) {
-                throw IOException("Unable to add fabric libraries: failed to create libraries directory: path=${data.librariesDir}", e)
+                throw IOException("Unable to add fabric libraries: failed to create libraries directory: path=${data.files.librariesDir}", e)
             }
         }
 
         val libs = try {
             data.installer.downloadLibraries(
-                data.librariesDir,
+                data.files.librariesDir,
                 LauncherFile.of(version.directory, appConfig().nativesDirName)
             ) {
                 LOGGER.debug { "Downloading forge library: ${it.currentFile}" }
@@ -158,7 +165,7 @@ class ForgeVersionCreator(
     }
 
     override val step = VERSION_FORGE
-    override val newTotal = 1
+    override val total = 1
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
@@ -167,10 +174,8 @@ class ForgeVersionCreator(
 
 class ForgeCreationData(
     val installer: ForgeInstaller,
-    val librariesDir: LauncherFile,
-    val assetsDir: LauncherFile,
-    val files: LauncherFiles
-): VersionCreationData(installer.version, installer.version, files.versionComponents)
+    files: LauncherFiles
+): VersionCreationData(installer.version, installer.version, files)
 
 val VERSION_FORGE = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.forge() }
 val VERSION_FORGE_LIBRARIES = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.forgeLibraries() }

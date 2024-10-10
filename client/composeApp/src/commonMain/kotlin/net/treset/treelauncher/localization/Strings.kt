@@ -127,6 +127,7 @@ open class Strings(
 
         data class Status(
             val starting: () -> String = { "Preparing creation..." },
+            val instance: () -> String = { "Creating insatnce" },
             val mods: () -> String = { "Creating mods component..." },
             val options: () -> String = { "Creating options component..." },
             val resourcepacks: () -> String = { "Creating resourcepacks component..." },

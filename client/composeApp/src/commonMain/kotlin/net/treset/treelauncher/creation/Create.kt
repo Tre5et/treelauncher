@@ -13,32 +13,37 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.creation.*
-import net.treset.treelauncher.backend.data.manifest.Component
-import net.treset.treelauncher.backend.util.CreationStatus
+import net.treset.treelauncher.backend.data.manifest.OptionsComponent
+import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
+import net.treset.treelauncher.backend.data.manifest.SavesComponent
+import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.components.get
 import net.treset.treelauncher.components.mods.ModsCreation
-import net.treset.treelauncher.components.mods.ModsCreationState
+import net.treset.treelauncher.components.mods.ModsCreationContent
+import net.treset.treelauncher.components.mods.get
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
+import java.io.IOException
 
 @Composable
 fun Create() {
     var instanceName by remember { mutableStateOf("") }
 
-    var versionState: VersionState? by remember { mutableStateOf(null) }
-    var savesState: CreationState<Component>? by remember { mutableStateOf(null) }
-    var resourcepackState: CreationState<Component>? by remember { mutableStateOf(null) }
-    var optionsState: CreationState<Component>? by remember { mutableStateOf(null) }
-    var modsState: ModsCreationState? by remember { mutableStateOf(null) }
+    var versionContent: VersionCreationContent? by remember { mutableStateOf(null) }
+    var savesContent: CreationContent<SavesComponent>? by remember { mutableStateOf(null) }
+    var resourcepackContent: CreationContent<ResourcepackComponent>? by remember { mutableStateOf(null) }
+    var optionsContent: CreationContent<OptionsComponent>? by remember { mutableStateOf(null) }
+    var modsContent: ModsCreationContent? by remember { mutableStateOf(null) }
 
-    var hasMods by remember(versionState?.versionType == VersionType.VANILLA || versionState?.versionType == null) { mutableStateOf(
-        !((versionState?.versionType == VersionType.VANILLA  || versionState?.versionType == null)
-                && modsState?.name == null && modsState?.existing == null && modsState?.version == versionState?.minecraftVersion
+    var hasMods by remember(versionContent?.versionType == VersionType.VANILLA || versionContent?.versionType == null) { mutableStateOf(
+        !((versionContent?.versionType == VersionType.VANILLA  || versionContent?.versionType == null)
+                && modsContent?.newName == null && modsContent?.inheritName == null && modsContent?.inheritComponent == null && modsContent?.useComponent == null && modsContent?.newVersions?.getOrNull(0) == versionContent?.minecraftVersion?.id
         )
     ) }
 
-    var creationStatus: CreationStatus? by remember { mutableStateOf(null) }
+    var creationStatus: Status? by remember { mutableStateOf(null) }
     var showCreationDone: Boolean by remember { mutableStateOf(false) }
     var creationException: Exception? by remember { mutableStateOf(null) }
 
@@ -82,7 +87,7 @@ fun Create() {
                 )
                 VersionSelector(
                     showChange = false,
-                    setCurrentState = { versionState = it }
+                    setContent = { versionContent = it },
                 )
             }
 
@@ -107,8 +112,8 @@ fun Create() {
                 ComponentCreator(
                     existing = AppContext.files.savesComponents.toList(),
                     showCreate = false,
-                    setCurrentState = { savesState = it },
-                    toDisplayString = { name },
+                    getCreator = SavesCreator::get,
+                    setContent = { savesContent = it },
                 )
             }
 
@@ -126,8 +131,8 @@ fun Create() {
                 ComponentCreator(
                     existing = AppContext.files.resourcepackComponents.toList(),
                     showCreate = false,
-                    setCurrentState = { resourcepackState = it },
-                    toDisplayString = { name },
+                    getCreator = ResourcepackCreator::get,
+                    setContent = { resourcepackContent = it },
                 )
             }
 
@@ -145,8 +150,8 @@ fun Create() {
                 ComponentCreator(
                     existing = AppContext.files.optionsComponents.toList(),
                     showCreate = false,
-                    setCurrentState = { optionsState = it },
-                    toDisplayString = { name },
+                    getCreator = OptionsCreator::get,
+                    setContent = { optionsContent = it },
                 )
             }
 
@@ -175,9 +180,9 @@ fun Create() {
                     ModsCreation(
                         existing = AppContext.files.modsComponents.toList(),
                         showCreate = false,
-                        setCurrentState = { modsState = it },
-                        defaultVersion = versionState?.minecraftVersion,
-                        defaultType = versionState?.versionType?.let { if (it == VersionType.VANILLA) null else it },
+                        setContent = { modsContent = it },
+                        defaultVersion = versionContent?.minecraftVersion,
+                        defaultType = versionContent?.versionType?.let { if (it == VersionType.VANILLA) null else it },
                     )
                 }
             }
@@ -185,138 +190,50 @@ fun Create() {
 
         Button(
             onClick = {
-                versionState?.let { version -> if(version.isValid()) {
-                    val versionCreator = getVersionCreator(version)
-                savesState?.let { saves -> if(saves.isValid()) {
-                    val savesCreator = when(saves.mode) {
-                        CreationMode.NEW -> saves.name?.let {
-                            SavesCreator(
-                                saves.name,
-                                AppContext.files.launcherDetails.typeConversion,
-                                AppContext.files.savesManifest
-                            )
-                        }
+                try {
+                    if (instanceName.isBlank() || versionContent?.isValid() != true || savesContent?.isValid() != true || resourcepackContent?.isValid() != true || optionsContent?.isValid() != true || (hasMods && modsContent?.isValid() != true)) return@Button
 
-                        CreationMode.INHERIT -> saves.name?.let { saves.existing?.let {
-                                SavesCreator(
-                                    saves.name,
-                                    saves.existing,
-                                    AppContext.files.savesManifest,
-                                )
-                            }
-                        }
+                    val versionCreator = VersionCreator.get(versionContent!!, {})
+                    val savesCreator = SavesCreator.get(savesContent!!, {})
+                    val resourcepackCreator = ResourcepackCreator.get(resourcepackContent!!, {})
+                    val optionsCreator = OptionsCreator.get(optionsContent!!, {})
+                    val modsCreator = if (hasMods) ModsCreator.get(modsContent!!, {}) else null
 
-                        CreationMode.USE -> saves.existing?.let {
-                            SavesCreator(saves.existing)
-                        }
+                    val instanceCreator = InstanceCreator(
+                        InstanceCreationData(
+                            instanceName,
+                            versionCreator,
+                            savesCreator,
+                            resourcepackCreator,
+                            optionsCreator,
+                            modsCreator,
+                            AppContext.files.instanceManifest
+                        )
+                    ) { status ->
+                        creationStatus = status
                     }
-                resourcepackState?.let { resourcepacks -> if(resourcepacks.isValid()) {
-                    val resourcepackCreator = when(resourcepacks.mode) {
-                        CreationMode.NEW -> resourcepacks.name?.let{
-                            ResourcepackCreator(
-                                resourcepacks.name,
-                                AppContext.files.launcherDetails.typeConversion,
-                                AppContext.files.resourcepackManifest
-                            )
-                        }
-                        CreationMode.INHERIT -> resourcepacks.name?.let{ resourcepacks.existing?.let {
-                            ResourcepackCreator(
-                                resourcepacks.name,
-                                resourcepacks.existing,
-                                AppContext.files.resourcepackManifest
-                            )
-                        }}
-                        CreationMode.USE -> resourcepacks.existing?.let {
-                            ResourcepackCreator(resourcepacks.existing)
-                        }
-                    }
-                optionsState?.let { options -> if(options.isValid()) {
-                    val optionsCreator = when(options.mode) {
-                        CreationMode.NEW -> options.name?.let {
-                            OptionsCreator(
-                                options.name,
-                                AppContext.files.launcherDetails.typeConversion,
-                                AppContext.files.optionsManifest
-                            )
-                        }
-                        CreationMode.INHERIT -> options.name?.let{ options.existing?.let {
-                            OptionsCreator(
-                                options.name,
-                                options.existing,
-                                AppContext.files.optionsManifest
-                            )
-                        }}
-                        CreationMode.USE -> options.existing?.let {
-                            OptionsCreator(options.existing)
-                        }
-                    }
-                val modsCreator: ModsCreator? = if(hasMods) {
-                    modsState?.let { mods -> if (mods.isValid()) {
-                            when (mods.mode) {
-                                CreationMode.NEW -> mods.name?.let { mods.type?.let { mods.version?.let { mods.alternateLoader?.let {
-                                    ModsCreator(
-                                        mods.name,
-                                        AppContext.files.launcherDetails.typeConversion,
-                                        AppContext.files.modsManifest,
-                                        if(mods.alternateLoader && mods.type == VersionType.QUILT) {
-                                            listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
-                                        } else {
-                                            listOf(mods.type.id)
-                                        },
-                                        listOf(mods.version.id),
-                                    )
-                                }}}}
-                                CreationMode.INHERIT -> mods.name?.let {
-                                    mods.existing?.let {
-                                        ModsCreator(
-                                            mods.name,
-                                            mods.existing,
-                                            AppContext.files.modsManifest,
-                                        )
-                                    }
-                                }
-                                CreationMode.USE -> mods.existing?.let {
-                                    ModsCreator(
-                                        mods.existing
-                                    )
-                                }
-                            }
-                        } else null
-                    }
-                } else null
 
-                val instanceCreator = InstanceCreator(
-                    instanceName,
-                    AppContext.files.launcherDetails.typeConversion,
-                    AppContext.files.instanceManifest,
-                    listOf(),
-                    listOf(),
-                    listOf(),
-                    modsCreator,
-                    optionsCreator?: return@Button,
-                    resourcepackCreator?: return@Button,
-                    savesCreator?: return@Button,
-                    versionCreator?: return@Button
-                )
-                instanceCreator.statusCallback = { creationStatus = it }
-
-                 Thread {
-                    try {
-                        instanceCreator.execute()
-                    } catch(e: Exception) {
-                        creationException = e
-                    }
-                    showCreationDone = true
+                    Thread {
+                        try {
+                            instanceCreator.create()
+                        } catch (e: Exception) {
+                            creationException = e
+                        }
+                        showCreationDone = true
+                        creationStatus = null
+                    }.start()
+                } catch (e: IOException) {
                     creationStatus = null
-                }.start()
-            }}}}}}}}},
+                    AppContext.error(e)
+                }
+            },
             enabled =
                 instanceName.isNotBlank() &&
-                versionState?.isValid() == true &&
-                savesState?.isValid() == true &&
-                resourcepackState?.isValid() == true &&
-                optionsState?.isValid() == true &&
-                (!hasMods || modsState ?.isValid() == true)
+                versionContent?.isValid() ?: false &&
+                savesContent?.isValid() ?: false &&
+                resourcepackContent?.isValid() ?: false &&
+                optionsContent?.isValid() ?: false &&
+                (!hasMods || modsContent?.isValid() ?: false)
         ) {
             Text(
                 strings().creator.buttonCreate()

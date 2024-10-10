@@ -14,11 +14,14 @@ import net.treset.mcdl.resourcepacks.Resourcepack
 import net.treset.mcdl.resourcepacks.Texturepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.creation.ResourcepackCreator
+import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import net.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.ComponentCreator
+import net.treset.treelauncher.creation.CreationContent
+import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.generic.ListDisplayBox
 import net.treset.treelauncher.generic.Text
@@ -65,7 +68,7 @@ fun Resourcepacks() {
             ComponentCreator(
                 existing = components,
                 allowUse = false,
-                getCreator = { ResourcepackCreator(AppContext.files.resourcepackManifest, it) },
+                getCreator = ResourcepackCreator::get,
                 onDone = { onDone() }
             )
         },
@@ -253,6 +256,14 @@ fun LauncherFile.toPack(): Any? {
             LOGGER.warn(e) { "Unable to parse imported resourcepack: ${this.name}" }
             null
         }
+    }
+}
+
+fun ResourcepackCreator.get(content: CreationContent<ResourcepackComponent>, onStatus: (Status) -> Unit): ComponentCreator<ResourcepackComponent, out CreationData> {
+    return when(content.mode) {
+        CreationMode.NEW -> new(NewCreationData(content.newName!!, AppContext.files.resourcepackManifest), onStatus)
+        CreationMode.INHERIT -> inherit(InheritCreationData(content.inheritName!!, content.inheritComponent!!, AppContext.files.resourcepackManifest), onStatus)
+        CreationMode.USE -> use(UseCreationData(content.useComponent!!, AppContext.files.resourcepackManifest), onStatus)
     }
 }
 

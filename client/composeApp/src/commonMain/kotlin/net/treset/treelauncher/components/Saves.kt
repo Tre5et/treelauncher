@@ -13,16 +13,19 @@ import net.treset.mcdl.saves.Save
 import net.treset.mcdl.saves.Server
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.creation.SavesCreator
+import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.InstanceComponent
 import net.treset.treelauncher.backend.data.manifest.SavesComponent
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.QuickPlayData
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.creation.ComponentCreator
+import net.treset.treelauncher.creation.CreationContent
+import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
@@ -94,7 +97,7 @@ fun Saves() {
             ComponentCreator(
                 existing = components,
                 allowUse = false,
-                getCreator = { SavesCreator(AppContext.files.savesManifest, it) },
+                getCreator = SavesCreator::get,
                 onDone = { onDone() }
             )
         },
@@ -407,5 +410,13 @@ private fun PlayPopup(
         )
     } else {
         onConfirm(quickPlayData, instances[0])
+    }
+}
+
+fun SavesCreator.get(content: CreationContent<SavesComponent>, onStatus: (Status) -> Unit): ComponentCreator<SavesComponent, out CreationData> {
+    return when(content.mode) {
+        CreationMode.NEW -> new(NewCreationData(content.newName!!, AppContext.files.savesManifest), onStatus)
+        CreationMode.INHERIT -> inherit(InheritCreationData(content.inheritName!!, content.inheritComponent!!, AppContext.files.savesManifest), onStatus)
+        CreationMode.USE -> use(UseCreationData(content.useComponent!!, AppContext.files.savesManifest), onStatus)
     }
 }

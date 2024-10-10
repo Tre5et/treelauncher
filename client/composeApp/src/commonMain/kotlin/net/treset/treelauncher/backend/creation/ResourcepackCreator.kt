@@ -1,16 +1,19 @@
 package net.treset.treelauncher.backend.creation
 
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
-import net.treset.treelauncher.backend.util.StringProvider
 
-class ResourcepackCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : ComponentCreator<ResourcepackComponent, CreationData>(parent, onStatus) {
-    override fun createNew(data: CreationData, statusProvider: CreationProvider): ResourcepackComponent {
+class NewResourcepackCreator(
+    data: NewCreationData,
+    statusProvider: CreationProvider
+) : NewComponentCreator<ResourcepackComponent, NewCreationData>(data, statusProvider) {
+    constructor(
+        data: NewCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override fun createNew(statusProvider: CreationProvider): ResourcepackComponent {
         return ResourcepackComponent(
             id = id,
             name = data.name,
@@ -18,14 +21,53 @@ class ResourcepackCreator(
         )
     }
 
-    override fun createInherit(data: CreationData, statusProvider: CreationProvider): ResourcepackComponent {
-        return createNew(data, statusProvider)
+    override val step = CreationStep.RESOURCEPACKS
+}
+
+class InheritResourcepackCreator(
+    data: InheritCreationData<ResourcepackComponent>,
+    statusProvider: CreationProvider
+) : InheritComponentCreator<ResourcepackComponent, InheritCreationData<ResourcepackComponent>>(data, statusProvider) {
+    constructor(
+        data: InheritCreationData<ResourcepackComponent>,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override fun createInherit(statusProvider: CreationProvider): ResourcepackComponent {
+        return ResourcepackComponent(
+            id = id,
+            name = data.name,
+            file = file
+        )
     }
 
-    override val step: StringProvider = CreationStep.RESOURCEPACKS
-    override val newTotal: Int = 0
-    override val inheritTotal: Int = 0
+    override val step = CreationStep.RESOURCEPACKS
+}
 
+class UseResourcepackCreator(
+    data: UseCreationData<ResourcepackComponent>,
+    statusProvider: CreationProvider
+) : UseComponentCreator<ResourcepackComponent, UseCreationData<ResourcepackComponent>>(data, statusProvider) {
+    constructor(
+        data: UseCreationData<ResourcepackComponent>,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override val step = CreationStep.RESOURCEPACKS
+}
+
+object ResourcepackCreator {
+    fun new(data: NewCreationData, onStatus: (Status) -> Unit): NewResourcepackCreator {
+        return NewResourcepackCreator(data, onStatus)
+    }
+
+    fun inherit(data: InheritCreationData<ResourcepackComponent>, onStatus: (Status) -> Unit): InheritResourcepackCreator {
+        return InheritResourcepackCreator(data, onStatus)
+    }
+
+    fun use(data: UseCreationData<ResourcepackComponent>, onStatus: (Status) -> Unit): UseResourcepackCreator {
+        return UseResourcepackCreator(data, onStatus)
+    }
 }
 
 val CreationStep.RESOURCEPACKS: FormatStringProvider

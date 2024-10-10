@@ -4,8 +4,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.creation.OptionsCreator
+import net.treset.treelauncher.backend.creation.*
+import net.treset.treelauncher.backend.data.manifest.OptionsComponent
+import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.creation.ComponentCreator
+import net.treset.treelauncher.creation.CreationContent
+import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
@@ -23,7 +27,7 @@ fun Options() {
             ComponentCreator(
                 existing = components,
                 allowUse = false,
-                getCreator = { OptionsCreator(AppContext.files.optionsManifest, it) },
+                getCreator = OptionsCreator::get,
                 onDone = { onDone() }
             )
         },
@@ -43,4 +47,12 @@ fun Options() {
             setReverse = { appSettings().isOptionsComponentSortReverse = it }
         )
     )
+}
+
+fun OptionsCreator.get(content: CreationContent<OptionsComponent>, onStatus: (Status) -> Unit): ComponentCreator<OptionsComponent, out CreationData> {
+    return when(content.mode) {
+        CreationMode.NEW -> new(NewCreationData(content.newName!!, AppContext.files.optionsManifest), onStatus)
+        CreationMode.INHERIT -> inherit(InheritCreationData(content.inheritName!!, content.inheritComponent!!, AppContext.files.optionsManifest), onStatus)
+        CreationMode.USE -> use(UseCreationData(content.useComponent!!, AppContext.files.optionsManifest), onStatus)
+    }
 }

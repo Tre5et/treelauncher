@@ -9,21 +9,24 @@ import net.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
-import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.File
 import java.io.IOException
 
 class FabricVersionCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : VersionCreator<FabricCreationData>(parent, onStatus) {
+    data: FabricCreationData,
+    statusProvider: CreationProvider
+) : VersionCreator<FabricCreationData>(data, statusProvider) {
+    constructor(
+        data: FabricCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
     @Throws(IOException::class)
-    override fun createNew(data: FabricCreationData, statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: CreationProvider): VersionComponent {
         LOGGER.debug { "Creating new fabric version: id=${data.profile.id}..." }
         statusProvider.next("Creating parent version") // TODO: make localized
 
@@ -39,9 +42,12 @@ class FabricVersionCreator(
             throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.profile.inheritsFrom}", e)
         }
 
-        val creator = VanillaVersionCreator(parent, onStatus)
+        val creator = VanillaVersionCreator(
+            VanillaCreationData(versionDetails, data.files),
+            statusProvider
+        )
         val mc = try {
-            creator.new(VanillaCreationData(versionDetails, data.librariesDir, data.assetsDir, data.files))
+            creator.create()
         } catch (e: IOException) {
             throw IOException("Unable to create fabric version: failed to create mc version: versionId=${data.profile.inheritsFrom}", e)
         }
@@ -89,11 +95,11 @@ class FabricVersionCreator(
         LOGGER.debug { "Adding fabric libraries..." }
         val libraryProvider = statusProvider.subStep(CreationStep.VERSION_FABRIC_LIBRARIES, 3)
         libraryProvider.next("Downloading fabric libraries") // TODO: make localized
-        if (!data.librariesDir.isDirectory()) {
+        if (!data.files.librariesDir.isDirectory()) {
             try {
-                data.librariesDir.createDir()
+                data.files.librariesDir.createDir()
             } catch (e: IOException) {
-                throw IOException("Unable to add fabric libraries: failed to create libraries directory: path=${data.librariesDir}", e)
+                throw IOException("Unable to add fabric libraries: failed to create libraries directory: path=${data.files.librariesDir}", e)
             }
         }
         val loaderPattern = PatternString(":fabric-loader:", true)
@@ -101,7 +107,7 @@ class FabricVersionCreator(
         val libs: List<String> = try {
             FabricLibrary.downloadAll(
                 clientLibs,
-                data.librariesDir
+                data.files.librariesDir
             ) {
                 libraryProvider.download(it, 1, 1)
             }
@@ -131,7 +137,7 @@ class FabricVersionCreator(
     }
 
     override val step = CreationStep.VERSION_FABRIC
-    override val newTotal = 1
+    override val total = 1
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
@@ -141,10 +147,8 @@ class FabricVersionCreator(
 class FabricCreationData(
     val version: FabricVersion,
     val profile: FabricProfile,
-    val librariesDir: LauncherFile,
-    val assetsDir: LauncherFile,
-    val files: LauncherFiles
-): VersionCreationData(profile.id, version.loader.version, files.versionComponents)
+    files: LauncherFiles
+): VersionCreationData(profile.id, version.loader.version, files)
 
 val CreationStep.VERSION_FABRIC: FormatStringProvider
     get() = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.fabric() }

@@ -65,6 +65,11 @@ open class LauncherFiles {
         LOGGER.debug { "Loaded Main manifest" }
     }
 
+    val assetsDir: LauncherFile
+        get() = LauncherFile.ofData(mainManifest.assetsDir)
+    val librariesDir: LauncherFile
+        get() = LauncherFile.ofData(mainManifest.librariesDir)
+
     @Throws(IOException::class)
     fun reload() {
         LOGGER.debug { "Reloading all components..." }

@@ -8,24 +8,23 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class InstanceComponent(
-    type: LauncherManifestType,
     id: String,
     name: String,
-    file: LauncherFile,
-    var features: List<LauncherFeature>,
-    var jvmArguments: List<LauncherLaunchArgument>,
-    var modsComponent: String?,
-    var optionsComponent: String,
-    var resourcepacksComponent: String,
-    var savesComponent: String,
     var versionComponent: String,
+    var savesComponent: String,
+    var resourcepacksComponent: String,
+    var optionsComponent: String,
+    var modsComponent: String?,
+    file: LauncherFile,
     active: Boolean = false,
     lastUsed: String = "",
     includedFiles: Array<String> = appConfig().instanceDefaultIncludedFiles,
+    var features: Array<LauncherFeature> = appConfig().instanceDefaultFeatures,
+    var jvmArguments: Array<LauncherLaunchArgument> = appConfig().instanceDefaultJvmArguments,
     var ignoredFiles: Array<String> = appConfig().instanceDefaultIgnoredFiles,
     var totalTime: Long = 0
 ): Component(
-    type,
+    LauncherManifestType.INSTANCE_COMPONENT,
     id,
     name,
     includedFiles,

@@ -7,7 +7,6 @@ import net.treset.mcdl.minecraft.MinecraftLibrary
 import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
@@ -15,12 +14,16 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class VanillaVersionCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : VersionCreator<VanillaCreationData>(parent, onStatus) {
+    data: VanillaCreationData,
+    statusProvider: CreationProvider
+) : VersionCreator<VanillaCreationData>(data, statusProvider) {
+    constructor(
+        data: VanillaCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun createNew(data: VanillaCreationData, statusProvider: CreationProvider): VersionComponent {
+    override fun createNew(statusProvider: CreationProvider): VersionComponent {
         LOGGER.debug { "Creating new vanilla version: id=${data.versionId}..." }
         statusProvider.next("Creating vanilla version") // TODO: make localized
         val version = VersionComponent(
@@ -62,7 +65,7 @@ class VanillaVersionCreator(
     }
 
     override val step = VERSION_VANILLA
-    override val newTotal = 1
+    override val total = 1
 
     @Throws(IOException::class)
     private fun createAssets(data: VanillaCreationData, version: VersionComponent, statusProvider: CreationProvider) {
@@ -80,7 +83,7 @@ class VanillaVersionCreator(
         }
         try {
             index.downloadAll(
-                data.assetsDir,
+                data.files.assetsDir,
                 false
             ) {
                 assetsProvider.download(it, 1, 2)
@@ -91,12 +94,12 @@ class VanillaVersionCreator(
         if(index.isMapToResources) {
             assetsProvider.next("Mapping virtual assets") // TODO: make localized
             val virtualDir = try {
-                index.resolveAll(data.assetsDir)
+                index.resolveAll(data.files.assetsDir)
             } catch (e: IOException) {
                 throw IOException("Unable to create assets: failed to extract virtual assets", e)
             }
 
-            version.virtualAssets = virtualDir.relativeTo(data.assetsDir).path
+            version.virtualAssets = virtualDir.relativeTo(data.files.assetsDir).path
         }
 
         assetsProvider.finish("Done") // TODO: make localized
@@ -108,9 +111,12 @@ class VanillaVersionCreator(
         LOGGER.debug { "Adding java component..." }
         val javaName: String = data.version.javaVersion.getComponent()
 
-        val javaCreator = JavaComponentCreator(data.files.javaManifest, onStatus)
+        val javaCreator = JavaComponentCreator(
+            JavaCreationData(javaName, data.files.javaComponents, data.files.javaManifest),
+            statusProvider
+        )
 
-        version.java = javaCreator.new(JavaCreationData(javaName, data.files.javaComponents)).id
+        version.java = javaCreator.create().id
         LOGGER.debug { "Added java component: id=${version.java}" }
     }
 
@@ -120,11 +126,11 @@ class VanillaVersionCreator(
         val librariesProvider = statusProvider.subStep(VERSION_LIBRARIES, 2)
         librariesProvider.next("Downloading libraries...") // TODO: make localized
 
-        if (!data.librariesDir.isDirectory()) {
+        if (!data.files.librariesDir.isDirectory()) {
             try {
-                data.librariesDir.createDir()
+                data.files.librariesDir.createDir()
             } catch (e: IOException) {
-                throw IOException("Unable to add libraries: failed to create libraries directory: path=${data.librariesDir}", e)
+                throw IOException("Unable to add libraries: failed to create libraries directory: path=${data.files.librariesDir}", e)
             }
         }
 
@@ -132,7 +138,7 @@ class VanillaVersionCreator(
         val result: List<String> = try {
             MinecraftLibrary.downloadAll(
                 data.version.libraries,
-                data.librariesDir,
+                data.files.librariesDir,
                 null,
                 listOf<String>(),
                 nativesDir
@@ -180,10 +186,8 @@ class VanillaVersionCreator(
 
 class VanillaCreationData(
     val version: MinecraftVersionDetails,
-    val librariesDir: LauncherFile,
-    val assetsDir: LauncherFile,
-    val files: LauncherFiles
-): VersionCreationData(version.id, version.id, files.versionComponents)
+    files: LauncherFiles
+): VersionCreationData(version.id, version.id, files)
 
 val VERSION_VANILLA = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.vanilla() }
 val VERSION_ASSETS = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.assets() }

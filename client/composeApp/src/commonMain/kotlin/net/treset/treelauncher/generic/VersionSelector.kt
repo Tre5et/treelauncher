@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import net.treset.mcdl.fabric.FabricProfile
 import net.treset.mcdl.fabric.FabricVersion
+import net.treset.mcdl.forge.ForgeInstaller
 import net.treset.mcdl.forge.ForgeVersion
 import net.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.mcdl.minecraft.MinecraftVersionDetails
@@ -14,33 +15,44 @@ import net.treset.mcdl.quiltmc.QuiltProfile
 import net.treset.mcdl.quiltmc.QuiltVersion
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.creation.*
-import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.backend.data.manifest.VersionComponent
+import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.creation.CreationPopup
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import java.io.IOException
 
-class VersionState(
-    val minecraftVersion: MinecraftVersion?,
+class VersionCreationContent(
     val versionType: VersionType,
+    val minecraftVersion: MinecraftVersion?,
     val fabricVersion: FabricVersion?,
     val forgeVersion: String?,
     val quiltVersion: QuiltVersion?
 ) {
-    fun isValid(): Boolean = when(versionType) {
-        VersionType.VANILLA -> minecraftVersion != null
-        VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
-        VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
-        VersionType.QUILT -> quiltVersion != null
+    fun isValid(): Boolean {
+        return when(versionType) {
+            VersionType.VANILLA -> minecraftVersion != null
+            VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
+            VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
+            VersionType.QUILT -> minecraftVersion != null && quiltVersion != null
+        }
+    }
+
+    fun isNotValid(): Boolean {
+        return !isValid()
     }
 }
 
 @Composable
 fun VersionSelector(
-    onDone: (VersionCreator) -> Unit = {},
     defaultVersionId: String? = null,
     defaultVersionType: VersionType = VersionType.VANILLA,
     defaultLoaderVersion: String? = null,
     showChange: Boolean = true,
-    setCurrentState: (VersionState) -> Unit = {_->}
+    getCreator: (data: VersionCreationContent, onStatus: (Status) -> Unit) -> VersionCreator<*> = {d,s -> VersionCreator.get(d,s) },
+    setExecute: (((onStatus: (Status) -> Unit) -> VersionComponent)?) -> Unit = {},
+    setContent: (VersionCreationContent) -> Unit = {},
+    onDone: (VersionComponent) -> Unit = {}
 ) {
     var showSnapshots by remember { mutableStateOf(defaultVersionId?.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")) == false) }
     var minecraftVersions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
@@ -53,9 +65,48 @@ fun VersionSelector(
     var quiltVersions: List<QuiltVersion> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
     var quiltVersion: QuiltVersion? by remember { mutableStateOf(null) }
 
-    val currentState = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
-        VersionState(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion)
-            .also(setCurrentState)
+    var creationStatus: Status? by remember { mutableStateOf(null) }
+
+    val creationContent: VersionCreationContent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
+        VersionCreationContent(
+            versionType = versionType,
+            minecraftVersion = minecraftVersion,
+            fabricVersion = fabricVersion,
+            forgeVersion = forgeVersion,
+            quiltVersion = quiltVersion
+        ).also {
+            setContent(it)
+        }
+    }
+
+    val execute: (onStatus: (Status) -> Unit) -> VersionComponent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
+        { onStatus ->
+            if(!creationContent.isValid()) {
+                throw IOException("Invalid version creation content")
+            }
+
+            val creator = getCreator(
+                creationContent,
+                onStatus
+            )
+
+            try {
+                val component = creator.create()
+                onDone(component)
+                component
+            } catch (e: IOException) {
+                throw IOException("Unable to create version component", e)
+            }
+        }
+    }
+
+    val valid = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
+        when(versionType) {
+            VersionType.VANILLA -> minecraftVersion != null
+            VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
+            VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
+            VersionType.QUILT -> minecraftVersion != null && quiltVersion != null
+        }.also { setExecute(if(it) execute else null) }
     }
 
     LaunchedEffect(showSnapshots) {
@@ -190,14 +241,20 @@ fun VersionSelector(
         if(showChange) {
             IconButton(
                 onClick = {
-                    getVersionCreator(
-                        currentState
-                    )?.let {
-                        onDone(it)
+                    if(valid) {
+                        Thread {
+                            try {
+                                execute {
+                                    creationStatus = it
+                                }
+                            } catch (e: IOException) {
+                                AppContext.error(e)
+                            }
+                        }
                     }
                 },
                 icon = icons().change,
-                enabled = currentState.isValid()
+                enabled = valid
                         && (
                             minecraftVersions.isNotEmpty() && minecraftVersion?.let { it.id != defaultVersionId } ?: false
                             || versionType != defaultVersionType
@@ -208,62 +265,11 @@ fun VersionSelector(
                 tooltip = strings().changer.apply()
             )
         }
-    }
-}
 
-fun getVersionCreator(
-    versionState: VersionState
-): VersionCreator? {
-    versionState.minecraftVersion?.let { mcVersion ->
-        when(versionState.versionType) {
-            VersionType.VANILLA -> {
-                return VanillaVersionCreator(
-                    AppContext.files.launcherDetails.typeConversion,
-                    AppContext.files.versionManifest,
-                    MinecraftVersionDetails.get(mcVersion.url),
-                    AppContext.files,
-                    LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
-                )
-            }
-            VersionType.FABRIC -> {
-                versionState.fabricVersion?.let {
-                    return FabricVersionCreator(
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.versionManifest,
-                        it,
-                        FabricProfile.get(mcVersion.id, it.loader.version),
-                        AppContext.files,
-                        LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
-                    )
-                }
-            }
-            VersionType.FORGE -> {
-                versionState.forgeVersion?.let { forgeVersion ->
-                    return ForgeVersionCreator(
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.versionManifest,
-                        forgeVersion,
-                        AppContext.files,
-                        LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
-                    )
-                }
-            }
-            VersionType.QUILT -> {
-                versionState.quiltVersion?.let {
-                    return QuiltVersionCreator(
-                        AppContext.files.launcherDetails.typeConversion,
-                        AppContext.files.versionManifest,
-                        it,
-                        QuiltProfile.get(mcVersion.id, it.loader.version),
-                        AppContext.files,
-                        LauncherFile.ofData(AppContext.files.launcherDetails.librariesDir)
-                    )
-                }
-            }
+        creationStatus?.let {
+            CreationPopup(it)
         }
     }
-
-    return null
 }
 
 enum class VersionType(
@@ -288,4 +294,57 @@ enum class VersionType(
             return ids.map { fromId(it) }
         }
     }
+}
+
+@Throws(IOException::class)
+fun VersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    when(data.versionType) {
+        VersionType.VANILLA -> return VanillaVersionCreator.get(data, onStatus)
+        VersionType.FABRIC -> return FabricVersionCreator.get(data, onStatus)
+        VersionType.FORGE -> return ForgeVersionCreator.get(data, onStatus)
+        VersionType.QUILT -> return QuiltVersionCreator.get(data, onStatus)
+    }
+}
+
+@Throws(IOException::class)
+fun VanillaVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    return VanillaVersionCreator(
+        VanillaCreationData(MinecraftVersionDetails.get(data.minecraftVersion!!.url), AppContext.files),
+        onStatus
+    )
+}
+
+@Throws(IOException::class)
+fun FabricVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    return FabricVersionCreator(
+        FabricCreationData(
+            version = data.fabricVersion!!,
+            profile = FabricProfile.get(data.minecraftVersion!!.id, data.fabricVersion.loader.version),
+            files = AppContext.files
+        ),
+        onStatus
+    )
+}
+
+@Throws(IOException::class)
+fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    return ForgeVersionCreator(
+        ForgeCreationData(
+            installer = ForgeInstaller.getForVersion(data.forgeVersion!!),
+            files = AppContext.files
+        ),
+        onStatus
+    )
+}
+
+@Throws(IOException::class)
+fun QuiltVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    return QuiltVersionCreator(
+        QuiltCreationData(
+            version = data.quiltVersion!!,
+            profile = QuiltProfile.get(data.minecraftVersion!!.id, data.quiltVersion.loader.version),
+            files = AppContext.files
+        ),
+        onStatus
+    )
 }

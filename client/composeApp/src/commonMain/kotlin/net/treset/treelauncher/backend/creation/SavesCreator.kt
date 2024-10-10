@@ -1,15 +1,19 @@
 package net.treset.treelauncher.backend.creation
 
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.SavesComponent
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 
-class SavesCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : ComponentCreator<SavesComponent, CreationData>(parent, onStatus) {
-    override fun createNew(data: CreationData, statusProvider: CreationProvider): SavesComponent {
+class NewSavesCreator(
+    data: NewCreationData,
+    statusProvider: CreationProvider
+): NewComponentCreator<SavesComponent, NewCreationData>(data, statusProvider) {
+    constructor(
+        data: NewCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override fun createNew(statusProvider: CreationProvider): SavesComponent {
         return SavesComponent(
             id = id,
             name = data.name,
@@ -17,13 +21,53 @@ class SavesCreator(
         )
     }
 
-    override fun createInherit(data: CreationData, statusProvider: CreationProvider): SavesComponent {
-        return createNew(data, statusProvider)
+    override val step = CreationStep.SAVES
+}
+
+class InheritSavesCreator(
+    data: InheritCreationData<SavesComponent>,
+    statusProvider: CreationProvider
+): InheritComponentCreator<SavesComponent, InheritCreationData<SavesComponent>>(data, statusProvider) {
+    constructor(
+        data: InheritCreationData<SavesComponent>,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override fun createInherit(statusProvider: CreationProvider): SavesComponent {
+        return SavesComponent(
+            id = id,
+            name = data.name,
+            file = file
+        )
     }
 
     override val step = CreationStep.SAVES
-    override val newTotal = 0
-    override val inheritTotal = 0
+}
+
+class UseSaveCreator(
+    data: UseCreationData<SavesComponent>,
+    statusProvider: CreationProvider
+): UseComponentCreator<SavesComponent, UseCreationData<SavesComponent>>(data, statusProvider) {
+    constructor(
+        data: UseCreationData<SavesComponent>,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override val step = CreationStep.SAVES
+}
+
+object SavesCreator {
+    fun new(data: NewCreationData, onStatus: (Status) -> Unit): NewSavesCreator {
+        return NewSavesCreator(data, onStatus)
+    }
+
+    fun inherit(data: InheritCreationData<SavesComponent>, onStatus: (Status) -> Unit): InheritSavesCreator {
+        return InheritSavesCreator(data, onStatus)
+    }
+
+    fun use(data: UseCreationData<SavesComponent>, onStatus: (Status) -> Unit): UseSaveCreator {
+        return UseSaveCreator(data, onStatus)
+    }
 }
 
 val CreationStep.SAVES: FormatStringProvider

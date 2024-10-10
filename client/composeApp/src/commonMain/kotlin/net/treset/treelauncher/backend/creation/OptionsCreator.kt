@@ -1,15 +1,19 @@
 package net.treset.treelauncher.backend.creation
 
 import net.treset.treelauncher.backend.data.manifest.OptionsComponent
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 
-class OptionsCreator(
-    parent: ParentManifest,
-    onStatus: (Status) -> Unit
-) : ComponentCreator<OptionsComponent, CreationData>(parent, onStatus) {
-    override fun createNew(data: CreationData, statusProvider: CreationProvider): OptionsComponent {
+class NewOptionCreator(
+    data: NewCreationData,
+    statusProvider: CreationProvider
+): NewComponentCreator<OptionsComponent, NewCreationData>(data, statusProvider) {
+    constructor(
+        data: NewCreationData,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override fun createNew(statusProvider: CreationProvider): OptionsComponent {
         return OptionsComponent(
             id = id,
             name = data.name,
@@ -17,13 +21,53 @@ class OptionsCreator(
         )
     }
 
-    override fun createInherit(data: CreationData, statusProvider: CreationProvider): OptionsComponent {
-        return createNew(data, statusProvider)
+    override val step = CreationStep.OPTIONS
+}
+
+class InheritOptionsCreator(
+    data: InheritCreationData<OptionsComponent>,
+    statusProvider: CreationProvider
+): InheritComponentCreator<OptionsComponent, InheritCreationData<OptionsComponent>>(data, statusProvider) {
+    constructor(
+        data: InheritCreationData<OptionsComponent>,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override fun createInherit(statusProvider: CreationProvider): OptionsComponent {
+        return OptionsComponent(
+            id = id,
+            name = data.name,
+            file = file
+        )
     }
 
     override val step = CreationStep.OPTIONS
-    override val newTotal = 0
-    override val inheritTotal = 0
+}
+
+class UseOptionsCreator(
+    data: UseCreationData<OptionsComponent>,
+    statusProvider: CreationProvider
+): UseComponentCreator<OptionsComponent, UseCreationData<OptionsComponent>>(data, statusProvider) {
+    constructor(
+        data: UseCreationData<OptionsComponent>,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    override val step = CreationStep.OPTIONS
+}
+
+object OptionsCreator {
+    fun new(data: NewCreationData, onStatus: (Status) -> Unit): NewOptionCreator {
+        return NewOptionCreator(data, onStatus)
+    }
+
+    fun inherit(data: InheritCreationData<OptionsComponent>, onStatus: (Status) -> Unit): InheritOptionsCreator {
+        return InheritOptionsCreator(data, onStatus)
+    }
+
+    fun use(data: UseCreationData<OptionsComponent>, onStatus: (Status) -> Unit): UseOptionsCreator {
+        return UseOptionsCreator(data, onStatus)
+    }
 }
 
 val CreationStep.OPTIONS: FormatStringProvider

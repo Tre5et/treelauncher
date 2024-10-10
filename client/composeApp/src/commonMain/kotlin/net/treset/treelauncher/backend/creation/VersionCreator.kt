@@ -2,37 +2,29 @@ package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mcdl.minecraft.MinecraftLaunchArgument
+import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
-import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
 import net.treset.treelauncher.backend.util.Status
 import java.io.IOException
 
 abstract class VersionCreator<D: VersionCreationData>(
-    parentManifest: ParentManifest,
-    onStatus: (Status) -> Unit
-) : ComponentCreator<VersionComponent, D>(parentManifest, onStatus) {
+    data: D,
+    statusProvider: CreationProvider
+) : NewComponentCreator<VersionComponent, D>(data, statusProvider) {
+    constructor(
+        data: D,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
-    override fun new(data: D): VersionComponent {
-        data.currentVersions.firstOrNull { it.versionId == data.versionId }?.let {
+    override fun create(): VersionComponent {
+        data.files.versionComponents.firstOrNull { it.versionId == data.versionId }?.let {
             LOGGER.debug { "Matching version already exists, using instead: versionId=${data.versionId}" }
-            return use(it)
+            return it
         }
-        return super.new(data)
+        return super.create()
     }
-
-    @Throws(IOException::class)
-    override fun inherit(component: VersionComponent, data: D): VersionComponent {
-        throw IOException("Version inheritance not supported")
-    }
-
-    @Throws(IOException::class)
-    override fun createInherit(data: D, statusProvider: CreationProvider): VersionComponent {
-        throw IOException("Version inheritance not supported")
-    }
-
-    override val inheritTotal = -1
 
     protected fun translateArguments(
         args: List<MinecraftLaunchArgument>,
@@ -79,5 +71,5 @@ abstract class VersionCreator<D: VersionCreationData>(
 open class VersionCreationData(
     name: String,
     val versionId: String,
-    val currentVersions: Array<VersionComponent>
-): CreationData(name)
+    val files: LauncherFiles
+): NewCreationData(name, files.versionManifest)

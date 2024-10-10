@@ -7,6 +7,7 @@ import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.*
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.localization.strings
 import java.io.IOException
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -14,88 +15,27 @@ import java.security.NoSuchAlgorithmException
 import kotlin.random.Random
 
 abstract class ComponentCreator<T: Component, D: CreationData>(
-    val parent: ParentManifest,
-    val onStatus: (Status) -> Unit
-
+    val data: D,
+    var statusProvider: CreationProvider
 ) {
+    constructor(
+        data: D,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
     var id = createHash()
     val directory: LauncherFile
-        get() = LauncherFile.of(parent.directory, "${parent.prefix}_${id}")
+        get() = LauncherFile.of(data.parent.directory, "${data.parent.prefix}_${id}")
     val file: LauncherFile
-        get() = LauncherFile.of(parent.directory, "${parent.prefix}_${id}", appConfig().manifestFileName)
+        get() = LauncherFile.of(data.parent.directory, "${data.parent.prefix}_${id}", appConfig().manifestFileName)
+
+    @Throws(IOException::class)
+    abstract fun create(): T
 
     abstract val step: StringProvider
+    open val total: Int = 0
 
-    abstract val newTotal: Int
-
-    @Throws(IOException::class)
-    open fun new(
-        data: D
-    ): T {
-        LOGGER.debug { "Creating new component ${data.name}" }
-
-        val statusProvider = CreationProvider(step, newTotal + 2, onStatus)
-
-        statusProvider.next("Creating component $id") //TODO: make localized
-
-        val new = createNew(data, statusProvider)
-        new.write()
-        parent.components += new.id
-        parent.write()
-
-        statusProvider.finish("Done") //TODO: make localized
-        return new
-    }
-
-    abstract fun createNew(
-        data: D,
-        statusProvider: CreationProvider
-    ): T
-
-    abstract val inheritTotal: Int
-
-    @Throws(IOException::class)
-    open fun inherit(
-        component: T,
-        data: D
-    ): T {
-        LOGGER.debug { "Inheriting component ${component.id} -> $id" }
-
-        val statusProvider = CreationProvider(step, inheritTotal + 2, onStatus)
-
-        statusProvider.next("Inheriting ${component.name}") // TODO: make localized
-        val new = createInherit(data, statusProvider)
-        component.copyData(new)
-        new.write()
-
-        statusProvider.next("Copying files") // TODO: make localized
-        component.directory.listFiles().forEach {
-            if(it.name != appConfig().manifestFileName) {
-                it.copyTo(LauncherFile.of(new.directory, it.name))
-            }
-        }
-
-        statusProvider.finish("Done") // TODO: make localized
-
-        parent.components += new.id
-        parent.write()
-        return new
-    }
-
-    abstract fun createInherit(
-        data: D,
-        statusProvider: CreationProvider
-    ): T
-
-    open fun use(
-        component: T
-    ): T {
-        LOGGER.debug { "Using component ${component.id}" }
-        onStatus(Status(step, DetailsProvider("Done", 1, 1))) // TODO: make localized
-        return component
-    }
-
-    fun createHash(): String {
+    private fun createHash(): String {
         val md = try {
             MessageDigest.getInstance("SHA-1")
         } catch (e: NoSuchAlgorithmException) {
@@ -114,17 +54,120 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
     }
 }
 
+abstract class NewComponentCreator<T: Component, D: NewCreationData>(
+    data: D,
+    statusProvider: CreationProvider
+): ComponentCreator<T, D>(data, statusProvider) {
+    constructor(
+        data: D,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    @Throws(IOException::class)
+    override fun create(): T {
+        LOGGER.debug { "Creating new component ${data.name}" }
+
+        val newProvider = statusProvider.subStep(step, total + 2)
+
+        newProvider.next("Creating component $id") //TODO: make localized
+
+        val new = createNew(newProvider)
+        new.write()
+        data.parent.components += new.id
+        data.parent.write()
+
+        newProvider.finish("Done") //TODO: make localized
+        return new
+    }
+
+    protected abstract fun createNew(
+        statusProvider: CreationProvider
+    ): T
+}
+
+abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
+    data: D,
+    statusProvider: CreationProvider
+): ComponentCreator<T, D>(data, statusProvider) {
+    constructor(
+        data: D,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    @Throws(IOException::class)
+    override fun create(): T {
+        LOGGER.debug { "Inheriting component ${data.component.id} -> $id" }
+
+        val inheritProvider = statusProvider.subStep(step, total + 2)
+
+        inheritProvider.next("Inheriting ${data.component.name}") // TODO: make localized
+        val new = createInherit(inheritProvider)
+        data.component.copyData(new)
+        new.write()
+
+        inheritProvider.next("Copying files") // TODO: make localized
+        data.component.directory.listFiles().forEach {
+            if(it.name != appConfig().manifestFileName) {
+                it.copyTo(LauncherFile.of(new.directory, it.name))
+            }
+        }
+
+        inheritProvider.finish("Done") // TODO: make localized
+
+        data.parent.components += new.id
+        data.parent.write()
+        return new
+    }
+
+    protected abstract fun createInherit(
+        statusProvider: CreationProvider
+    ): T
+}
+
+abstract class UseComponentCreator<T: Component, D: UseCreationData<T>>(
+    data: D,
+    statusProvider: CreationProvider
+): ComponentCreator<T, D>(data, statusProvider) {
+    constructor(
+        data: D,
+        onStatus: (Status) -> Unit
+    ) : this(data, CreationProvider(null, 0, onStatus))
+
+    @Throws(IOException::class)
+    override fun create(): T {
+        LOGGER.debug { "Using component ${data.component.id}" }
+        statusProvider.subStep(step, 1).finish("Done") // TODO: make localized
+        return data.component
+    }
+}
+
 open class CreationData(
-    val name: String
+    val parent: ParentManifest
 )
 
+open class NewCreationData(
+    val name: String,
+    parent: ParentManifest
+): CreationData(parent)
+
+open class InheritCreationData<T: Component>(
+    val name: String,
+    val component: T,
+    parent: ParentManifest
+): CreationData(parent)
+
+open class UseCreationData<T: Component>(
+    val component: T,
+    parent: ParentManifest
+): CreationData(parent)
+
 object CreationStep {
-    val STARTING = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.starting() }
-    val FINISHING = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.finishing() }
+    val STARTING = FormatStringProvider { strings().creator.status.starting() }
+    val FINISHING = FormatStringProvider { strings().creator.status.finishing() }
 }
 
 class CreationProvider(
-    val step: StringProvider,
+    val step: StringProvider?,
     var total: Int,
     val onStatus: (Status) -> Unit
 ) {
@@ -132,21 +175,31 @@ class CreationProvider(
 
     fun next(
         message: () -> String
-    ) = onStatus(Status(step, DetailsProvider(message, index++, if(total >= index) total else index), index / total.toFloat()))
+    ) {
+        step?.let {
+            onStatus(Status(step, DetailsProvider(message, index++, if(total >= index) total else index), index / total.toFloat()))
+        }
+    }
 
     fun next(
         message: String
     ) = next { message }
 
     fun download(status: DownloadStatus, before: Int, after: Int) {
-        index = status.currentAmount + before
-        total = status.totalAmount + before + after
-        onStatus(Status(step, DetailsProvider(status.currentFile, index, total), index / total.toFloat()))
+        step?.let {
+            index = status.currentAmount + before
+            total = status.totalAmount + before + after
+            onStatus(Status(step, DetailsProvider(status.currentFile, index, total), index / total.toFloat()))
+        }
     }
 
     fun finish(
         message: () -> String
-    ) = onStatus(Status(step, DetailsProvider(message, total, total), 1f))
+    ) {
+        step?.let {
+            onStatus(Status(step, DetailsProvider(message, total, total), 1f))
+        }
+    }
 
     fun finish(
         message: String
