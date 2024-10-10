@@ -66,7 +66,7 @@ class GameLaunchHelper(
                 Text(strings().selector.instance.game.runningNotification(launcher.instance))
                 IconButton(
                     onClick = {
-                        LauncherFile.ofData(AppContext.files.launcherDetails.gamedataDir).open()
+                        AppContext.files.gameDataDir.open()
                     },
                     icon = icons().folder,
                     tooltip = strings().selector.instance.game.runningOpen(),
@@ -163,7 +163,7 @@ class GameLaunchHelper(
                         content = { Text(strings().selector.instance.game.crashClose()) }
                     )
                     Button(
-                        onClick = { LauncherFile.of(launcher.instance.instance.first.directory, "crash-reports").open() },
+                        onClick = { LauncherFile.of(launcher.instance.instance.directory, "crash-reports").open() },
                         content = { Text(strings().selector.instance.game.crashReports()) }
                     )
                 }

@@ -37,10 +37,6 @@ class VersionCreationContent(
             VersionType.QUILT -> minecraftVersion != null && quiltVersion != null
         }
     }
-
-    fun isNotValid(): Boolean {
-        return !isValid()
-    }
 }
 
 @Composable
@@ -52,6 +48,7 @@ fun VersionSelector(
     getCreator: (data: VersionCreationContent, onStatus: (Status) -> Unit) -> VersionCreator<*> = {d,s -> VersionCreator.get(d,s) },
     setExecute: (((onStatus: (Status) -> Unit) -> VersionComponent)?) -> Unit = {},
     setContent: (VersionCreationContent) -> Unit = {},
+    onChange: (execute: () -> Unit) -> Unit = { it() },
     onDone: (VersionComponent) -> Unit = {}
 ) {
     var showSnapshots by remember { mutableStateOf(defaultVersionId?.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")) == false) }
@@ -80,7 +77,7 @@ fun VersionSelector(
     }
 
     val execute: (onStatus: (Status) -> Unit) -> VersionComponent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
-        { onStatus ->
+        @Throws(IOException::class) { onStatus ->
             if(!creationContent.isValid()) {
                 throw IOException("Invalid version creation content")
             }
@@ -111,16 +108,20 @@ fun VersionSelector(
 
     LaunchedEffect(showSnapshots) {
         Thread {
-            minecraftVersions = if (showSnapshots) {
-                MinecraftVersion.getAll()
-            } else {
-                MinecraftVersion.getAll().filter { it.isRelease }
-            }.also { versions ->
-                defaultVersionId?.let { default ->
-                    minecraftVersion = minecraftVersion?.let { current ->
-                        versions.firstOrNull { it.id == current.id }
-                    } ?: versions.firstOrNull { it.id == default }
+            try {
+                minecraftVersions = if (showSnapshots) {
+                    MinecraftVersion.getAll()
+                } else {
+                    MinecraftVersion.getAll().filter { it.isRelease }
+                }.also { versions ->
+                    defaultVersionId?.let { default ->
+                        minecraftVersion = minecraftVersion?.let { current ->
+                            versions.firstOrNull { it.id == current.id }
+                        } ?: versions.firstOrNull { it.id == default }
+                    }
                 }
+            } catch (e: IOException) {
+                AppContext.errorIfOnline(e)
             }
         }.start()
     }
@@ -130,6 +131,7 @@ fun VersionSelector(
         fabricVersion = null
         minecraftVersion?.also { mcVersion ->
             Thread {
+                try {
                 fabricVersions = FabricVersion.getAll(mcVersion.id)
                     .also { versions ->
                         defaultLoaderVersion?.let { default ->
@@ -138,9 +140,13 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it.loader.version == default }
                         }
                     }
+                } catch (e: IOException) {
+                    AppContext.errorIfOnline(e)
+                }
             }.start()
 
             Thread {
+                try {
                 quiltVersions = QuiltVersion.getAll(mcVersion.id)
                     .also { versions ->
                         defaultLoaderVersion?.let { default ->
@@ -149,9 +155,13 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it.loader.version == default }
                         }
                     }
+                } catch (e: IOException) {
+                    AppContext.errorIfOnline(e)
+                }
             }.start()
 
             Thread {
+                try {
                 forgeVersions = ForgeVersion.getAll(mcVersion.id)
                     .also { versions ->
                         defaultLoaderVersion?.let { default ->
@@ -160,6 +170,9 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it == default }
                         }
                     }
+                } catch (e: IOException) {
+                    AppContext.errorIfOnline(e)
+                }
             }.start()
         }
     }
@@ -244,8 +257,10 @@ fun VersionSelector(
                     if(valid) {
                         Thread {
                             try {
-                                execute {
-                                    creationStatus = it
+                                onChange {
+                                    execute {
+                                        creationStatus = it
+                                    }
                                 }
                             } catch (e: IOException) {
                                 AppContext.error(e)

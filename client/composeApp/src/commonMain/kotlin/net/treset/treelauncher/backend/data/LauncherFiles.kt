@@ -56,10 +56,6 @@ open class LauncherFiles {
     val versionComponents: Array<VersionComponent>
         get() = _versionComponents!!
 
-    private var _gameDataDir: LauncherFile? = null
-    val gameDataDir: LauncherFile
-        get() = _gameDataDir!!
-
     init {
         reloadMain()
         LOGGER.debug { "Loaded Main manifest" }
@@ -69,6 +65,8 @@ open class LauncherFiles {
         get() = LauncherFile.ofData(mainManifest.assetsDir)
     val librariesDir: LauncherFile
         get() = LauncherFile.ofData(mainManifest.librariesDir)
+    val gameDataDir: LauncherFile
+        get() = LauncherFile.ofData(mainManifest.gameDataDir)
 
     @Throws(IOException::class)
     fun reload() {
@@ -89,7 +87,6 @@ open class LauncherFiles {
         LOGGER.debug { "Reloading main manifest..." }
         val file = LauncherFile.ofData(appConfig().manifestFileName)
         _mainManifest = MainManifest.readFile(file)
-        _gameDataDir = LauncherFile.ofData(_mainManifest?.gameDataDir ?: throw FileLoadException("Unable to load main manifest: invalid configuration"))
         LOGGER.debug { "Finished reloading main manifest" }
     }
 
@@ -321,9 +318,4 @@ open class LauncherFiles {
     companion object {
         private val LOGGER = KotlinLogging.logger{}
     }
-}
-
-@Throws(IOException::class)
-fun Array<out Component>.getId(id: String): Component {
-    return this.firstOrNull { it.id == id } ?: throw FileNotFoundException("Unable to find component: id=$id")
 }

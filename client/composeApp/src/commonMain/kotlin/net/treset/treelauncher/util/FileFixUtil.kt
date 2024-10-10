@@ -6,8 +6,6 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.ResourceManager
 import net.treset.treelauncher.backend.util.exception.FileLoadException
-import net.treset.treelauncher.backend.util.exception.GameResourceException
-import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
@@ -57,7 +55,7 @@ fun FixFiles() {
 
     val errorColor = MaterialTheme.colorScheme.error
     LaunchedEffect(AppContext.files) {
-        if(AppContext.files.launcherDetails.activeInstance != null) {
+        if(AppContext.files.mainManifest.activeInstance != null) {
             notification = NotificationData(
                 color = errorColor,
                 onClick = {
@@ -92,14 +90,14 @@ fun FixFiles() {
 
                         try {
                             AppContext.files.reload()
-                        } catch (e: FileLoadException) {
+                        } catch (e: IOException) {
                             AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
 
                         val instance = AppContext.files.instanceComponents.firstOrNull {
-                            it.first.id == AppContext.files.launcherDetails.activeInstance
+                            it.id == AppContext.files.mainManifest.activeInstance
                         } ?: run {
                             AppContext.error(IOException("Unable to cleanup old instance: instance not found"))
                             cleanupStatus = CleanupState.FAILURE
@@ -118,21 +116,18 @@ fun FixFiles() {
 
                         try {
                             resourceManager.cleanupResources()
-                        } catch (e: GameResourceException) {
+                        } catch (e: IOException) {
                             AppContext.error(e)
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }
 
-                        AppContext.files.launcherDetails.activeInstance = null
+                        AppContext.files.mainManifest.activeInstance = null
                         try {
-                            LauncherFile.of(
-                                AppContext.files.mainManifest.directory,
-                                AppContext.files.mainManifest.details
-                            ).write(AppContext.files.launcherDetails)
+                            AppContext.files.mainManifest.write()
                         } catch (e: IOException) {
                             AppContext.error(e)
-                            AppContext.files.launcherDetails.activeInstance = instance.first.id
+                            AppContext.files.mainManifest.activeInstance = instance.id
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }

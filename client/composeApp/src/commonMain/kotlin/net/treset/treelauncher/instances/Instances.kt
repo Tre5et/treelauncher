@@ -17,6 +17,7 @@ import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
+import java.io.IOException
 
 @Composable
 fun Instances() {
@@ -30,7 +31,7 @@ fun Instances() {
     val reloadInstances = {
         try {
             AppContext.files.reload()
-        } catch (e: FileLoadException) {
+        } catch (e: IOException) {
             AppContext.severeError(e)
         }
         selectedInstance = null
@@ -121,7 +122,7 @@ fun Instances() {
                 InstanceButton(
                     instance = it,
                     selected = selectedInstance == it,
-                    enabled = AppContext.runningInstance?.instance?.first?.id != it.instance.first.id,
+                    enabled = AppContext.runningInstance?.instance?.id != it.instance.id,
                     onClick = { selectedInstance = if(selectedInstance == it) null else it }
                 )
             }

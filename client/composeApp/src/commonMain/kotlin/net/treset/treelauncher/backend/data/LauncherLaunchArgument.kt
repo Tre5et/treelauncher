@@ -44,9 +44,9 @@ class LauncherLaunchArgument(
         return allReplaced
     }
 
-    fun isActive(features: List<LauncherFeature>): Boolean {
+    fun isActive(features: Array<LauncherFeature>): Boolean {
         if (feature?.isNotBlank() == true) {
-            if (features.stream().noneMatch { f: LauncherFeature -> f.feature == feature }) {
+            if (features.none { f: LauncherFeature -> f.feature == feature }) {
                 return false
             }
         }

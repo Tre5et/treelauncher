@@ -43,7 +43,7 @@ fun InstanceSettings(
     val startRes = remember(instance) { getResolution(instance) }
     var res by remember(instance) { mutableStateOf(startRes) }
 
-    val startArgs = remember { instance.instance.second.jvmArguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
+    val startArgs = remember { instance.instance.jvmArguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
     var args by remember { mutableStateOf(startArgs) }
 
     var systemMemory: Int? by remember { mutableStateOf(null) }
@@ -235,7 +235,7 @@ fun InstanceSettings(
 
 @Throws(IOException::class)
 private fun getCurrentMemory(instance: InstanceData): Int {
-    for (argument in instance.instance.second.jvmArguments) {
+    for (argument in instance.instance.jvmArguments) {
         if ((argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) && argument.argument.endsWith("m")
         ) {
             try {
@@ -272,20 +272,20 @@ private fun getSystemMemory(): Int {
 
 private fun saveMemory(instance: InstanceData, memory: Int, startMemory: Int) {
     if (memory != startMemory) {
-        val newArguments = ArrayList<LauncherLaunchArgument>()
-        for (argument in instance.instance.second.jvmArguments) {
+        val newArguments = mutableListOf<LauncherLaunchArgument>()
+        for (argument in instance.instance.jvmArguments) {
             if (!argument.argument.startsWith("-Xmx") && !argument.argument.startsWith("-Xms")) {
                 newArguments.add(argument)
             }
         }
         newArguments.add(LauncherLaunchArgument("-Xmx${memory}m", null, null, null, null))
         newArguments.add(LauncherLaunchArgument("-Xms${memory}m", null, null, null, null))
-        instance.instance.second.jvmArguments = newArguments
+        instance.instance.jvmArguments = newArguments.toTypedArray()
     }
 }
 
 private fun getResolution(instance: InstanceData): Pair<Int, Int> {
-    val features = instance.instance.second.features
+    val features = instance.instance.features
     val resX = features.firstOrNull { it.feature == "resolution_x" }
     val resY = features.firstOrNull { it.feature == "resolution_y" }
 
@@ -297,24 +297,24 @@ private fun getResolution(instance: InstanceData): Pair<Int, Int> {
 
 private fun saveResolution(instance: InstanceData, res: Pair<Int, Int>, startRes: Pair<Int, Int>) {
     if (res != startRes) {
-        val newFeatures = instance.instance.second.features
+        val newFeatures = instance.instance.features
                 .filter { f -> f.feature != "resolution_x" && f.feature != "resolution_y" }
                 .toMutableList()
         newFeatures.add(LauncherFeature("resolution_x", res.first.toString()))
         newFeatures.add(LauncherFeature("resolution_y", res.second.toString()))
-        instance.instance.second.features = newFeatures
+        instance.instance.features = newFeatures.toTypedArray()
     }
 }
 
 private fun saveArgs(instance: InstanceData, args: List<LauncherLaunchArgument>, startArgs: List<LauncherLaunchArgument>) {
     if (args != startArgs) {
         val mutArgs = args.toMutableList()
-        for (argument in instance.instance.second.jvmArguments) {
+        for (argument in instance.instance.jvmArguments) {
             if (argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) {
                 mutArgs.add(argument)
             }
         }
-        instance.instance.second.jvmArguments = mutArgs
+        instance.instance.jvmArguments = mutArgs.toTypedArray()
     }
 }
 
@@ -331,8 +331,5 @@ private fun save(
     saveMemory(instance, memory, startMemory)
     saveResolution(instance, res, startRes)
     saveArgs(instance, args, startArgs)
-    LauncherFile.of(
-        instance.instance.first.directory,
-        instance.instance.first.details
-    ).write(instance.instance.second)
+    instance.instance.write()
 }

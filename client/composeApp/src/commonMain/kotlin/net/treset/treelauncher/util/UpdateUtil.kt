@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.update.UpdaterStatus
@@ -69,7 +70,7 @@ fun onUpdate(
                                                     titleRow = { Text(strings().settings.update.downloadingTitle()) },
                                                     content = {
                                                         Text(
-                                                            strings().settings.update.downloadingMessage(
+                                                            strings().statusDetailsMessage(
                                                                 file,
                                                                 amount,
                                                                 total
@@ -168,7 +169,14 @@ fun checkUpdateOnStart(
             return@launch
         }
 
-        val status = UpdaterStatus.fromJson(updateFile.readText())
+        val status = try {
+            UpdaterStatus.fromJson(updateFile.readText())
+        } catch (e: SerializationException) {
+            LOGGER.warn(e) { "Failed to read update file" }
+            setPopup(null)
+            onDone()
+            return@launch
+        }
 
         status.exceptions?.let { exs ->
             LOGGER.warn { "Exceptions occurred during update: " + status.message }

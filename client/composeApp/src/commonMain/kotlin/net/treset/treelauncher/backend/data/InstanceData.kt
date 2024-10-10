@@ -1,11 +1,8 @@
 package net.treset.treelauncher.backend.data
 
-import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.manifest.*
 import net.treset.treelauncher.backend.util.exception.FileLoadException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import java.io.IOException
 
 class InstanceData(
     var mainManifest: MainManifest,
@@ -50,39 +47,7 @@ class InstanceData(
         this.modsComponent = getModsComponent(instance, files)
     }
 
-    @Throws(IOException::class)
-    fun setActive(active: Boolean) {
-        mainManifest.activeInstance = if (active) instance.id else null
-        try {
-            mainManifest.write()
-        } catch (e: IOException) {
-            throw IOException("Unable to set instance active: unable to write launcher details", e)
-        }
-    }
-
-    @Throws(IOException::class)
-    fun delete(files: LauncherFiles) {
-        files.instanceManifest.components.let {comp ->
-            if (!comp.remove(instance.id)) {
-                throw IOException("Unable to delete instance: unable to remove instance from launcher manifest")
-            }
-            try {
-                LauncherFile.of(files.instanceManifest.directory, appConfig().manifestFileName).write(files.instanceManifest)
-            } catch (e: IOException) {
-                throw IOException("Unable to delete instance: unable to write launcher manifest", e)
-            }
-        }
-        try {
-            LauncherFile.of(instance.directory).remove()
-        } catch (e: IOException) {
-            throw IOException("Unable to delete instance: unable to delete instance directory", e)
-        }
-        LOGGER.debug { "Instance deleted: id=${instance.id}" }
-    }
-
     companion object {
-        private val LOGGER = KotlinLogging.logger{}
-
         @Throws(FileLoadException::class)
         fun of(instance: InstanceComponent, files: LauncherFiles): InstanceData {
             val versionComponents = getVersionComponents(instance, files)

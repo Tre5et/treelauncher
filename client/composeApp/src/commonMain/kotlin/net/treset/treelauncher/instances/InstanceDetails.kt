@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -19,6 +18,7 @@ import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
 import net.treset.treelauncher.util.launchGame
+import java.io.IOException
 
 @Composable
 fun InstanceDetails(
@@ -65,7 +65,7 @@ fun InstanceDetails(
                         enabled = AppContext.runningInstance == null,
                         tooltip = strings().selector.instance.play()
                     )
-                    Text(instance.instance.first.name)
+                    Text(instance.instance.name)
                     IconButton(
                         onClick = {
                             showRename = true
@@ -76,7 +76,7 @@ fun InstanceDetails(
                     )
                     IconButton(
                         onClick = {
-                            LauncherFile.of(instance.instance.first.directory).open()
+                            LauncherFile.of(instance.instance.directory).open()
                         },
                         icon = icons().folder,
                         size = 32.dp,
@@ -100,7 +100,7 @@ fun InstanceDetails(
     ) {
         SelectorButton(
             title = strings().manager.instance.details.version(),
-            component = instance.versionComponents[0].first,
+            component = instance.versionComponents[0],
             icon = icons().version,
             selected = selectedDetails == InstanceDetails.VERSION,
             onClick = {
@@ -137,7 +137,7 @@ fun InstanceDetails(
         )
         SelectorButton(
             title = strings().manager.instance.details.mods(),
-            component = instance.modsComponent?.first,
+            component = instance.modsComponent,
             icon = instance.modsComponent?.let { icons().mods } ?: icons().add,
             selected = selectedDetails == InstanceDetails.MODS,
             onClick = {
@@ -188,17 +188,18 @@ fun InstanceDetails(
 
     if(showRename) {
         RenamePopup(
-            manifest = instance.instance.first,
-            editValid = { name -> name.isNotBlank() && name != instance.instance.first.name },
+            manifest = instance.instance,
+            editValid = { name -> name.isNotBlank() && name != instance.instance.name },
             onDone = {name ->
-                showRename = false
-                name?.let { newName ->
-                    instance.instance.first.name = newName
-                    LauncherFile.of(
-                        instance.instance.first.directory,
-                        appConfig().manifestFileName
-                    ).write(instance.instance.first)
-                    redrawSelected()
+                try {
+                    showRename = false
+                    name?.let { newName ->
+                        instance.instance.name = newName
+                        instance.instance.write()
+                        redrawSelected()
+                    }
+                } catch (e: IOException) {
+                    AppContext.error(e)
                 }
             }
         )
@@ -226,9 +227,13 @@ private fun deleteDialog(
                 )
                 Button(
                     onClick = {
-                        instance.delete(AppContext.files)
-                        onSuccess()
-                        setPopup(null)
+                        try {
+                            instance.instance.delete(AppContext.files.instanceManifest)
+                            onSuccess()
+                            setPopup(null)
+                        } catch (e: IOException) {
+                            AppContext.error(e)
+                        }
                     },
                     color = MaterialTheme.colorScheme.error
                 ) {
