@@ -1,7 +1,6 @@
 package net.treset.treelauncher.backend.data.manifest
 
 import net.treset.mcdl.format.FormatUtils
-import net.treset.mcdl.json.GenericJsonParsable
 import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.launching.resources.ComponentResourceProvider
 import net.treset.treelauncher.backend.launching.resources.GenericResourceProvider
@@ -17,7 +16,7 @@ open class Component(
     var lastUsed: String = "",
     var active: Boolean = false,
     @Transient var file: LauncherFile
-): GenericJsonParsable() {
+): Manifest() {
     var lastUsedTime: LocalDateTime
         get() = try {
             FormatUtils.parseLocalDateTime(lastUsed)
@@ -55,7 +54,7 @@ open class Component(
     }
 
     @Throws(IOException::class)
-    fun write() {
+    override fun write() {
         file.write(toJson())
     }
 
