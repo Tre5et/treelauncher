@@ -1,75 +1,54 @@
 package net.treset.treelauncher.backend.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.json.JsonParsable
-import net.treset.treelauncher.backend.data.LauncherDetails
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.MainManifest
+import net.treset.treelauncher.backend.data.manifest.Manifest
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
-class FileInitializer(directory: LauncherFile) {
-    private val directory: LauncherFile
+class FileInitializer(val directory: LauncherFile) {
     private val dirs: Array<LauncherFile>
-    private val files: Array<InitializingManifest>
+    private val files: Array<Manifest>
 
     init {
         require(directory.isDirectory() || directory.mkdirs()) { "Cannot create directory" }
-        this.directory = directory
         dirs = arrayOf(
             LauncherFile.of(directory, "game_data"),
-            LauncherFile.of(directory, "instance_data"),
-            LauncherFile.of(directory, "java_data"),
-            LauncherFile.of(directory, "mods_data"),
-            LauncherFile.of(directory, "saves_data"),
-            LauncherFile.of(directory, "options_data"),
-            LauncherFile.of(directory, "resourcepack_data"),
-            LauncherFile.of(directory, "version_data"),
+            LauncherFile.of(directory, "assets"),
             LauncherFile.of(directory, "libraries"),
-            LauncherFile.of(directory, "assets")
+            LauncherFile.of(directory, "instance_components"),
+            LauncherFile.of(directory, "saves_components"),
+            LauncherFile.of(directory, "resourcepack_components"),
+            LauncherFile.of(directory, "options_components"),
+            LauncherFile.of(directory, "mods_components"),
+            LauncherFile.of(directory, "version_components"),
+            LauncherFile.of(directory, "java_components")
         )
         files = arrayOf(
-            InitializingManifest(
-                ParentManifest(LauncherManifestType.LAUNCHER, LauncherManifestType.defaultConversion, "launcher.json", "", mutableListOf()),
-                "manifest.json"
+            MainManifest(
+                LauncherManifestType.LAUNCHER,
+                activeInstance = null,
+                assetsDir = "assets",
+                librariesDir = "libraries",
+                gameDataDir = "game_data",
+                instancesDir = "instances",
+                savesDir = "save_components",
+                resourcepacksDir = "resourcepack_components",
+                optionsDir = "option_components",
+                modsDir = "mod_components",
+                versionDir = "version_components",
+                javasDir = "java_components",
+                file = LauncherFile.of(directory, "manifest.json")
             ),
-            InitializingManifest(
-                LauncherDetails(
-                    null,
-                    "assets",
-                    "game_data",
-                    "game",
-                    "instance_component",
-                    "instance_data",
-                    "instances",
-                    "java_component",
-                    "java_data",
-                    "javas",
-                    "libraries",
-                    "mods_component",
-                    "mods_data",
-                    "mods",
-                    "options_component",
-                    "options_data",
-                    "options",
-                    "resourcepack_component",
-                    "resourcepack_data",
-                    "resourcepacks",
-                    "saves_component",
-                    "saves_data",
-                    "saves",
-                    "version_component",
-                    "version_data",
-                    "versions"
-                ), "launcher.json"
-            ),
-            InitializingManifest("mods", "mods", "mods_data", "manifest.json"),
-            InitializingManifest("saves", "saves", "saves_data", "manifest.json"),
-            InitializingManifest("instances", "instance", "instance_data", "manifest.json"),
-            InitializingManifest("javas", "java", "java_data", "manifest.json"),
-            InitializingManifest("options", "options", "options_data", "manifest.json"),
-            InitializingManifest("resourcepacks", "resourcepacks", "resourcepack_data", "manifest.json"),
-            InitializingManifest("versions", "version", "version_data", "manifest.json")
+            InitializingManifest(LauncherManifestType.INSTANCES, "instance", "instances", "manifest.json"),
+            InitializingManifest(LauncherManifestType.SAVES, "saves", "saves_components", "manifest.json"),
+            InitializingManifest(LauncherManifestType.RESOURCEPACKS, "resourcepacks", "resourcepack_components", "manifest.json"),
+            InitializingManifest(LauncherManifestType.OPTIONS, "options", "options_components", "manifest.json"),
+            InitializingManifest(LauncherManifestType.MODS, "mods", "mods_components", "manifest.json"),
+            InitializingManifest(LauncherManifestType.VERSIONS, "version", "version_components", "manifest.json"),
+            InitializingManifest(LauncherManifestType.JAVAS, "java", "java_components", "manifest.json")
         )
     }
 
@@ -83,24 +62,13 @@ class FileInitializer(directory: LauncherFile) {
             dir.createDir()
         }
         for (file in files) {
-            file.make()
+            file.write()
         }
     }
 
-    inner class InitializingManifest(val file: LauncherFile, val manifest: JsonParsable) {
-        constructor(manifest: JsonParsable, vararg path: String) : this(LauncherFile.of(directory, *path), manifest)
-        constructor(type: String, prefix: String, components: Array<String>, vararg path: String) : this(
-            ParentManifest(LauncherManifestType.UNKNOWN, mapOf(type to LauncherManifestType.UNKNOWN), "", prefix, components.toMutableList()),
-            *path
-        )
-
-        constructor(type: String, prefix: String, vararg path: String) : this(type, prefix, arrayOf(), *path)
-
-        @Throws(IOException::class)
-        fun make() {
-            file.write(manifest)
-        }
-    }
+    inner class InitializingManifest(
+        type: LauncherManifestType, prefix: String, vararg path: String
+    ) : ParentManifest(type, prefix, mutableListOf(), LauncherFile.of(directory, *path))
 
     companion object {
         private val LOGGER = KotlinLogging.logger{}
