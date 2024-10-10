@@ -5,16 +5,13 @@ import net.treset.treelauncher.localization.strings
 
 class InstanceDetailsLastPlayedComparator : Comparator<InstanceData> {
     override fun compare(o1: InstanceData, o2: InstanceData): Int {
-        val firstLastPlayed = o1.instance.first.lastUsed ?: o1.instance.second.lastPlayed
-        val secondLastPlayed = o2.instance.first.lastUsed ?: o2.instance.second.lastPlayed
+        val firstLastPlayed = o1.instance.lastUsed
+        val secondLastPlayed = o2.instance.lastUsed
 
         if (firstLastPlayed == secondLastPlayed) {
             return 0
         }
-        if (firstLastPlayed == null) {
-            return 1
-        }
-        return secondLastPlayed?.compareTo(firstLastPlayed) ?: -1
+        return secondLastPlayed.compareTo(firstLastPlayed)
     }
 
     override fun toString(): String = strings().sortBox.sort.lastPlayed()
