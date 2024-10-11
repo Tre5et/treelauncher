@@ -6,9 +6,9 @@ import net.treset.mcdl.java.JavaRuntimes
 import net.treset.mcdl.util.OsUtil
 import net.treset.treelauncher.backend.data.manifest.JavaComponent
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
-import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
 import java.io.IOException
 
 class JavaComponentCreator(
@@ -31,7 +31,7 @@ class JavaComponentCreator(
 
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): JavaComponent {
-        statusProvider.next("Retrieving java version") //TODO: localize
+        statusProvider.next()
         val java = try {
             JavaRuntimes.get()
         } catch (e: FileDownloadException) {
@@ -51,7 +51,7 @@ class JavaComponentCreator(
             throw IOException("Failed to create java component: failed to get release")
         }
 
-        statusProvider.next("Retrieving files") //TODO: localize
+        statusProvider.next()
         val files = try {
             JavaFile.getAll(release.manifest.url)
         } catch (e: FileDownloadException) {

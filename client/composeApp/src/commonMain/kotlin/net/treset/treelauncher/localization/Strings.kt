@@ -124,6 +124,7 @@ open class Strings(
         data class Status(
             val starting: () -> String = { "Preparing creation..." },
             val instance: () -> String = { "Creating instance..." },
+            val message: Message = Message(),
             val mods: () -> String = { "Creating mods component..." },
             val options: () -> String = { "Creating options component..." },
             val resourcepacks: () -> String = { "Creating resourcepacks component..." },
@@ -146,6 +147,11 @@ open class Strings(
                 val quiltLibraries: () -> String = { "Downloading quilt libraries..." },
                 val value: () -> String = { "Creating version..." },
                 val vanilla: () -> String = { "Creating minecraft version..." }
+            )
+
+            data class Message(
+                val inheritFiles: () -> String = { "Inheriting files..." },
+                val vanillaVersion: () -> String = { "Creating vanilla version..." }
             )
         }
 

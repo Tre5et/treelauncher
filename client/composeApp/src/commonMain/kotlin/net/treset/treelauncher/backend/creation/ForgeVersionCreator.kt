@@ -12,6 +12,7 @@ import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
 class ForgeVersionCreator(
@@ -26,7 +27,7 @@ class ForgeVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new forge version: id=${data.installer.version}..." }
-        statusProvider.next("Creating parent version") // TODO: make localized
+        statusProvider.next(strings().creator.status.message.vanillaVersion())
 
         if(data.installer.installData.inheritsFrom == null) {
             throw IOException("Unable to create forge version: no valid forge version")
@@ -100,7 +101,7 @@ class ForgeVersionCreator(
     private fun addLibraries(data: ForgeCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding forge libraries..." }
         val libraryProvider = statusProvider.subStep(VERSION_FORGE_LIBRARIES, 3)
-        libraryProvider.next("Downloading forge libraries") // TODO: make localized
+        libraryProvider.next()
         if (!data.files.librariesDir.isDirectory()) {
             try {
                 data.files.librariesDir.createDir()
@@ -121,7 +122,7 @@ class ForgeVersionCreator(
             throw IOException("Unable to add forge libraries: failed to download libraries", e)
         }
         version.libraries = libs
-        libraryProvider.finish("Done") // TODO: make localized
+        libraryProvider.finish()
         LOGGER.debug { "Added forge libraries" }
     }
 
@@ -129,7 +130,7 @@ class ForgeVersionCreator(
     private fun createClient(data: ForgeCreationData, version: VersionComponent, vanillaVersion: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Creating forge client..." }
         val clientProvider = statusProvider.subStep(VERSION_FORGE_FILE, 3)
-        clientProvider.next("Creating forge client") // TODO: make localized
+        clientProvider.next()
 
         if (!version.directory.isDirectory()) {
             try {
@@ -165,7 +166,7 @@ class ForgeVersionCreator(
         } catch (e: FileDownloadException) {
             throw IOException("Unable to create forge version: failed to create forge client", e)
         }
-        clientProvider.finish("Done") // TODO: make localized
+        clientProvider.finish()
         LOGGER.debug { "Created forge client" }
     }
 

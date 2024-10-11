@@ -45,10 +45,14 @@ class DeStrings : Strings(
         status = Creator.Status(
             starting = { "Erstellung wird vorbereitet..." },
             instance =  { "Instanz wird erstellt..." },
+            message = Creator.Status.Message(
+                inheritFiles = { "Dateien werden kopiert..." },
+                vanillaVersion = { "Vanilla Version wird erstellt..." },
+            ),
             mods = { "Mods Komponente wird erstellt..." },
-            options = { "Optionskomponente wird erstellt..." },
-            resourcepacks = { "Ressoucenpaketkomponente wird erstellt..." },
-            saves = { "Weltenkomponente wird erstellt..." },
+            options = { "Einstellungskomponente wird erstellt..." },
+            resourcepacks = { "Ressourcenpaket Komponente wird erstellt..." },
+            saves = { "Welten Komponente wird erstellt..." },
             version = Creator.Status.Version(
                 assets = { "Assets werden heruntergeladen..." },
                 fabric = { "Fabric Version wird erstellt..." },
@@ -439,10 +443,10 @@ class DeStrings : Strings(
                 crashTitle = { "Das Spiel wurde unerwartet geschlossen" }
             ),
             mods = { "Mods Komponente" },
-            options = { "Optionskomponente" },
+            options = { "Einstellungskomponente" },
             play = { "Instanz starten" },
             resourcepacks = { "Ressourcenpaketkomponente" },
-            saves = { "Weltenkomponente" },
+            saves = { "Welten Komponente" },
             title = { "Instanzen" },
             version = { "Version" }
         ),
@@ -501,7 +505,7 @@ class DeStrings : Strings(
             close = { "Schließen" },
             confirm = { "Dateien Löschen" },
             deleting = { "Dateien werden gelöscht..." },
-            failureMessage = { "Nicht alle Dateien konnten gelöscht werden.\nDies beeinflusst die funtkionalität des Launchers wahrscheinlich nicht.\nDetails wurden in die Logs geschrieben." },
+            failureMessage = { "Nicht alle Dateien konnten gelöscht werden.\nDies beeinflusst die funktionalität des Launchers wahrscheinlich nicht.\nDetails wurden in die Logs geschrieben." },
             failureTitle = { "Löschen fehlgeschlagen." },
             libraries = { "Auch ungenutzte Bibliotheken löschen" },
             message = { "Alle versionsdateien, die von keiner Instanz genutzt werden, werden gelöscht um Speicherplatz zu sparen.\n Versionen können jederzeit wieder installiert werden." },

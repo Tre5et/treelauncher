@@ -14,6 +14,7 @@ import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.string.PatternString
+import net.treset.treelauncher.localization.strings
 import java.io.File
 import java.io.IOException
 
@@ -29,7 +30,7 @@ class FabricVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new fabric version: id=${data.profile.id}..." }
-        statusProvider.next("Creating parent version") // TODO: make localized
+        statusProvider.next(strings().creator.status.message.vanillaVersion())
 
         if(data.profile.inheritsFrom == null) {
             throw IOException("Unable to create fabric version: no valid fabric profile")
@@ -95,7 +96,7 @@ class FabricVersionCreator(
     private fun addLibraries(data: FabricCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding fabric libraries..." }
         val libraryProvider = statusProvider.subStep(CreationStep.VERSION_FABRIC_LIBRARIES, 3)
-        libraryProvider.next("Downloading fabric libraries") // TODO: make localized
+        libraryProvider.next()
         if (!data.files.librariesDir.isDirectory()) {
             try {
                 data.files.librariesDir.createDir()
@@ -116,7 +117,7 @@ class FabricVersionCreator(
             throw IOException("Unable to add fabric libraries: failed to download libraries", e)
         }
         version.libraries = libs
-        libraryProvider.finish("Done") // TODO: make localized
+        libraryProvider.finish()
         LOGGER.debug { "Added fabric libraries" }
     }
 
@@ -124,7 +125,7 @@ class FabricVersionCreator(
     private fun addClient(data: FabricCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding fabric client..." }
         val clientProvider = statusProvider.subStep(CreationStep.VERSION_FABRIC_FILE, 3)
-        clientProvider.next("Downloading fabric client") // TODO: make localized
+        clientProvider.next()
         if (!directory.isDirectory()) {
             try {
                 directory.createDir()

@@ -12,6 +12,7 @@ import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.file.LauncherFile
+import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
 class VanillaVersionCreator(
@@ -26,7 +27,7 @@ class VanillaVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new vanilla version: id=${data.versionId}..." }
-        statusProvider.next("Creating vanilla version") // TODO: make localized
+        statusProvider.next(strings().creator.status.message.vanillaVersion())
         val version = VersionComponent(
             id = id,
             name = data.name,
@@ -72,7 +73,7 @@ class VanillaVersionCreator(
     private fun createAssets(data: VanillaCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Downloading assets..." }
         val assetsProvider = statusProvider.subStep(VERSION_ASSETS, 3)
-        assetsProvider.next("Downloading assets") // TODO: make localized
+        assetsProvider.next()
         val assetIndexUrl = data.version.assetIndex.url
         val index = try {
             AssetIndex.get(assetIndexUrl)
@@ -93,7 +94,7 @@ class VanillaVersionCreator(
             throw IOException("Unable to create assets: failed to download assets", e)
         }
         if(index.isMapToResources) {
-            assetsProvider.next("Mapping virtual assets") // TODO: make localized
+            assetsProvider.next()
             val virtualDir = try {
                 index.resolveAll(data.files.assetsDir)
             } catch (e: IOException) {
@@ -103,7 +104,7 @@ class VanillaVersionCreator(
             version.virtualAssets = virtualDir.relativeTo(data.files.assetsDir).path
         }
 
-        assetsProvider.finish("Done") // TODO: make localized
+        assetsProvider.finish()
         LOGGER.debug { "Downloaded assets" }
     }
 
@@ -125,7 +126,7 @@ class VanillaVersionCreator(
     private fun addLibraries(data: VanillaCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding libraries..." }
         val librariesProvider = statusProvider.subStep(VERSION_LIBRARIES, 2)
-        librariesProvider.next("Downloading libraries...") // TODO: make localized
+        librariesProvider.next()
 
         if (!data.files.librariesDir.isDirectory()) {
             try {
@@ -153,7 +154,7 @@ class VanillaVersionCreator(
         if(nativesDir.isDirectory()) {
             version.natives = appConfig().nativesDirName
         }
-        librariesProvider.finish("Done") // TODO: make localized
+        librariesProvider.finish()
         LOGGER.debug { "Added libraries: $result" }
     }
 
@@ -161,7 +162,7 @@ class VanillaVersionCreator(
     private fun addClient(data: VanillaCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding client..." }
         val clientProvider = statusProvider.subStep(VERSION_FILE, 2)
-        clientProvider.next("Downloading client...") // TODO: make localized
+        clientProvider.next()
 
         val baseDir = directory
         if (!baseDir.isDirectory()) {
@@ -180,7 +181,7 @@ class VanillaVersionCreator(
         }
         val urlParts = data.version.downloads.client.url.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         version.mainFile = urlParts[urlParts.size - 1]
-        clientProvider.finish("Done") // TODO: make localized
+        clientProvider.finish()
         LOGGER.debug { "Added client: mainFile=${version.mainFile}" }
     }
 

@@ -67,15 +67,14 @@ abstract class NewComponentCreator<T: Component, D: NewCreationData>(
         LOGGER.debug { "Creating new component ${data.name}" }
 
         val newProvider = statusProvider.subStep(step, total + 2)
-
-        newProvider.next("Creating component $id") //TODO: make localized
+        newProvider.next()
 
         val new = createNew(newProvider)
         new.write()
         data.parent.components += new.id
         data.parent.write()
 
-        newProvider.finish("Done") //TODO: make localized
+        newProvider.finish()
         return new
     }
 
@@ -98,20 +97,20 @@ abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
         LOGGER.debug { "Inheriting component ${data.component.id} -> $id" }
 
         val inheritProvider = statusProvider.subStep(step, total + 2)
+        inheritProvider.next()
 
-        inheritProvider.next("Inheriting ${data.component.name}") // TODO: make localized
         val new = createInherit(inheritProvider)
         data.component.copyData(new)
         new.write()
 
-        inheritProvider.next("Copying files") // TODO: make localized
+        inheritProvider.next(strings().creator.status.message.inheritFiles())
         data.component.directory.listFiles().forEach {
             if(it.name != appConfig().manifestFileName) {
                 it.copyTo(LauncherFile.of(new.directory, it.name))
             }
         }
 
-        inheritProvider.finish("Done") // TODO: make localized
+        inheritProvider.finish()
 
         data.parent.components += new.id
         data.parent.write()
@@ -135,7 +134,7 @@ abstract class UseComponentCreator<T: Component, D: UseCreationData<T>>(
     @Throws(IOException::class)
     override fun create(): T {
         LOGGER.debug { "Using component ${data.component.id}" }
-        statusProvider.subStep(step, 1).finish("Done") // TODO: make localized
+        statusProvider.subStep(step, 1).finish()
         return data.component
     }
 }

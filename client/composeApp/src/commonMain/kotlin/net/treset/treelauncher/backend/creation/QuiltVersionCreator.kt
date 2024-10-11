@@ -10,9 +10,10 @@ import net.treset.mcdl.quiltmc.QuiltVersion
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
-import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
+import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
 class QuiltVersionCreator(
@@ -27,7 +28,7 @@ class QuiltVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating quilt version..." }
-        statusProvider.next("Creating parent version") // TODO: make localized
+        statusProvider.next(strings().creator.status.message.vanillaVersion())
 
         if (data.profile.inheritsFrom == null) {
             throw IOException("Unable to create quilt version: no valid quilt profile")
@@ -93,7 +94,7 @@ class QuiltVersionCreator(
     private fun addLibraries(data: QuiltCreationData, version: VersionComponent, statusProvider: StatusProvider) {
         LOGGER.debug { "Adding quilt libraries..." }
         val librariesProvider = statusProvider.subStep(CreationStep.VERSION_QUILT_LIBRARIES, 3)
-        librariesProvider.next("Downloading quilt libraries") // TODO: make localized
+        librariesProvider.next()
         data.profile.libraries?.let { libraries: List<QuiltLibrary> ->
             if (!data.files.librariesDir.isDirectory()) {
                 try {
@@ -114,7 +115,7 @@ class QuiltVersionCreator(
                 throw IOException("Unable to add quilt libraries: failed to download libraries", e)
             }
             version.libraries = libs
-            librariesProvider.finish("Done") // TODO: make localized
+            librariesProvider.finish()
             LOGGER.debug { "Added quilt libraries" }
         }?: throw IOException("Unable to add quilt libraries: libraries invalid")
     }

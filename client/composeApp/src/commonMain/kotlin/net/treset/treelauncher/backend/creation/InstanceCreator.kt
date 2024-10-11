@@ -2,9 +2,9 @@ package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.treelauncher.backend.data.manifest.*
-import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
@@ -22,7 +22,7 @@ class InstanceCreator(
     @Throws(ComponentCreationException::class)
     override fun createNew(statusProvider: StatusProvider): InstanceComponent {
         LOGGER.debug { "Creating new instance: name=${data.name}..." }
-        statusProvider.next("Creating instance components") // TODO: make localized
+        statusProvider.next()
 
         try {
             val version = data.createVersion(statusProvider)
