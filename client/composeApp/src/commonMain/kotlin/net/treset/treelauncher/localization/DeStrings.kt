@@ -131,7 +131,6 @@ class DeStrings : Strings(
         minimal = { "Minimal" }
     ),
     login = Login(
-        browserTitle = { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
         button = { "Login mit Microsoft" },
         tip = { "TIPP: ${
             arrayOf(

@@ -57,9 +57,6 @@ kotlin {
             implementation("org.slf4j:slf4j-api:2.0.12")
             implementation("ch.qos.logback:logback-classic:1.5.3")
 
-            api("io.github.kevinnzou:compose-webview-multiplatform:1.9.20")
-            implementation("dev.datlag:kcef:2024.04.20.1")
-
             implementation("org.jetbrains.jewel:jewel-int-ui-standalone-241:0.19.5")
             implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window-241:0.19.5")
 

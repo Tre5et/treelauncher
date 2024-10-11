@@ -68,7 +68,7 @@ class Config(baseDir: String, val updateUrl: String?) {
     val quiltDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
     val quiltDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
     val fabricDefaultClientFileName = "fabric-client.jar"
-    val modrinthUserAgent = "TreSet/treelauncher/v2.6.0"
+    val modrinthUserAgent = "TreSet/treelauncher/v3.0.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"
     val msClientId = "389304a5-70a6-4013-907f-98c4eb4b51fb"
 }

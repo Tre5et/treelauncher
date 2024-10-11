@@ -10,12 +10,6 @@ class ComponentManifestLastUsedComparator : Comparator<Component> {
         }
         o1.lastUsed.let {  o1Used ->
             o2.lastUsed.let { o2Used ->
-                if(o1Used == null) {
-                    return 1
-                }
-                if(o2Used == null) {
-                    return -1
-                }
                 return o2Used.compareTo(o1Used)
             }
         }

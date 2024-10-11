@@ -1,6 +1,5 @@
 package net.treset.treelauncher.localization
 
-import com.multiplatform.webview.web.WebViewState
 import net.treset.mcdl.auth.AuthenticationStep
 import net.treset.mcdl.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
@@ -210,7 +209,7 @@ open class Strings(
         val patch: Patch = Patch(),
         val slug: () -> String = { "treelauncher" },
         val status: Status = Status(),
-        val version: () -> String = { "2.5.1" }
+        val version: () -> String = { "3.0.0" }
     ) {
         data class Status(
             val preparing: (Int) -> String = { progress -> "Performing first time setup... $progress%" },
@@ -262,7 +261,6 @@ open class Strings(
     )
 
     data class Login(
-        val browserTitle: (WebViewState) -> String = { state -> "Login: ${state.pageTitle ?: "Loading..."} (${state.lastLoadedUrl ?: "Getting url..."})" },
         val button: () -> String = { "Login with Microsoft" },
         val cancel: () -> String = { "Cancel Login" },
         val keepLoggedIn: () -> String = { "Stay logged in" },

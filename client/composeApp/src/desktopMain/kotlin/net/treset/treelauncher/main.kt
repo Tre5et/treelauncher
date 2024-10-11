@@ -17,13 +17,10 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import dev.datlag.kcef.KCEF
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 import net.treset.mcdl.util.OsUtil
 import net.treset.treelauncher.backend.config.Window
 import net.treset.treelauncher.backend.config.appSettings
@@ -44,7 +41,6 @@ import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.io.File
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -159,56 +155,12 @@ fun main() = application {
                 }
             }
 
-            var restartRequired by remember { mutableStateOf(false) }
-            var downloading by remember { mutableStateOf(0F) }
-            var initialized by remember { mutableStateOf(false) }
-
-            LaunchedEffect(Unit) {
-                withContext(Dispatchers.IO) {
-                    KCEF.init(
-                        builder = {
-                            installDir(File("kcef", "bundle"))
-                            progress {
-                                onDownloading {
-                                    downloading = max(it, 0F)
-                                }
-                                onInitialized {
-                                    initialized = true
-                                }
-                            }
-                        }, onError = {
-                            it?.printStackTrace()
-                        }, onRestartRequired = {
-                            restartRequired = true
-                        }
-                    )
-                }
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(colors.material.background)
             ) {
-                if (restartRequired) {
-                    Text(
-                        text = strings().launcher.status.restartRequired(),
-                        color = colors.material.onBackground
-                    )
-                } else if(downloading > 0 && !initialized) {
-                    Text(
-                        text = strings().launcher.status.preparing(downloading.roundToInt()),
-                        color = colors.material.onBackground
-                    )
-                } else {
-                    App(app)
-                }
-            }
-
-            DisposableEffect(Unit) {
-                onDispose {
-                    KCEF.disposeBlocking()
-                }
+                App(app)
             }
         }
     }
