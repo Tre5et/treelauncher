@@ -10,9 +10,9 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
-import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.string.PatternString
 import java.io.File
 import java.io.IOException
@@ -126,7 +126,11 @@ class FabricVersionCreator(
         val clientProvider = statusProvider.subStep(CreationStep.VERSION_FABRIC_FILE, 3)
         clientProvider.next("Downloading fabric client") // TODO: make localized
         if (!directory.isDirectory()) {
-            throw IOException("Unable to add fabric client: base dir is not a directory")
+            try {
+                directory.createDir()
+            } catch (e: IOException) {
+                throw IOException("Unable to add fabric client: base dir is not a directory")
+            }
         }
         try {
             data.version.downloadClient(File(directory, appConfig().fabricDefaultClientFileName))

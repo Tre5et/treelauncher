@@ -38,18 +38,24 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
     allowUse: Boolean = true,
     showCreate: Boolean = true,
     getCreator: (content: CreationContent<T>, onStatus: (Status) -> Unit) -> C,
+    defaultMode: CreationMode = CreationMode.NEW,
+    defaultNewName: String = "",
+    defaultInheritName: String = "",
+    defaultInheritComponent: T? = null,
+    defaultUseComponent: T? = null,
     setExecute: (((onStatus: (Status) -> Unit) -> T)?) -> Unit = {},
     setContent: (CreationContent<T>) -> Unit = {},
     onDone: (T) -> Unit = {}
 ) {
-    var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
+    var mode by remember(existing, defaultMode) { mutableStateOf(defaultMode) }
+    var newName by remember(existing, defaultNewName) {
+        mutableStateOf(defaultNewName)
+    }
 
-    var newName by remember(existing) { mutableStateOf("") }
+    var inheritName by remember(existing, defaultInheritName) { mutableStateOf(defaultInheritName) }
+    var inheritSelected: T? by remember(existing, defaultInheritComponent) { mutableStateOf(defaultInheritComponent) }
 
-    var inheritName by remember(existing) { mutableStateOf("") }
-    var inheritSelected: T? by remember(existing) { mutableStateOf(null) }
-
-    var useSelected: T? by remember(existing) { mutableStateOf(null) }
+    var useSelected: T? by remember(existing, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
 
     var creationStatus: Status? by remember { mutableStateOf(null) }
 
@@ -86,12 +92,8 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
         }
     }
 
-    val valid = remember(existing, mode, newName, inheritName, inheritSelected, useSelected) {
-        when(mode) {
-            CreationMode.NEW -> newName.isNotBlank()
-            CreationMode.INHERIT -> inheritName.isNotBlank() && inheritSelected != null
-            CreationMode.USE -> useSelected != null
-        }.also {
+    val valid = remember(creationContent) {
+        creationContent.isValid().also {
             setExecute(
                 if(it) execute else null
             )

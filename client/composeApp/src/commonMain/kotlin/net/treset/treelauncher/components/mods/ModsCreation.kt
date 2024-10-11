@@ -13,19 +13,18 @@ import net.treset.treelauncher.backend.data.manifest.ModsComponent
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.creation.CreationContent
 import net.treset.treelauncher.creation.CreationMode
-import net.treset.treelauncher.generic.StatusPopup
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
 class ModsCreationContent(
     mode: CreationMode,
-    newName: String,
+    newName: String?,
     val newTypes: List<String>,
     val newVersions: List<String>,
-    inheritName: String,
-    inheritComponent: ModsComponent,
-    useComponent: ModsComponent
+    inheritName: String?,
+    inheritComponent: ModsComponent?,
+    useComponent: ModsComponent?
 ) : CreationContent<ModsComponent>(
     mode = mode,
     newName = newName,
@@ -46,25 +45,32 @@ fun ModsCreation(
     existing: List<ModsComponent>,
     showCreate: Boolean = true,
     showUse: Boolean = true,
-    defaultVersion: MinecraftVersion? = null,
+    defaultMode: CreationMode = CreationMode.NEW,
+    defaultNewName: String = "",
+    defaultVersion: String? = null,
     defaultType: VersionType? = null,
-    defaultAlternate: Boolean = true,
+    defaultAlternateLoader: Boolean = true,
+    defaultInheritName: String = "",
+    defaultInheritComponent: ModsComponent? = null,
+    defaultUseComponent: ModsComponent? = null,
     getCreator: (content: ModsCreationContent, onStatus: (Status) -> Unit) -> ComponentCreator<ModsComponent, *> = ModsCreator::get,
     setExecute: (((onStatus: (Status) -> Unit) -> ModsComponent)?) -> Unit = {},
     setContent: (ModsCreationContent) -> Unit = {},
     onDone: (ModsComponent) -> Unit = { _->}
 ) {
-    var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
+    var mode by remember(existing, defaultMode) { mutableStateOf(defaultMode) }
 
-    var newName by remember(existing) { mutableStateOf("") }
-    var newVersion: MinecraftVersion? by remember(existing, defaultVersion) { mutableStateOf(defaultVersion) }
+    var newName by remember(existing, defaultNewName) { mutableStateOf(defaultNewName) }
+
+    var newVersion: MinecraftVersion? by remember(existing) { mutableStateOf(null) }
+
     var newType: VersionType? by remember(existing, defaultType) { mutableStateOf(defaultType) }
-    var alternateLoader by remember(existing, defaultAlternate) { mutableStateOf(defaultAlternate) }
+    var alternateLoader by remember(existing, defaultAlternateLoader) { mutableStateOf(defaultAlternateLoader) }
 
-    var inheritName by remember(existing) { mutableStateOf("") }
-    var inheritSelected: ModsComponent? by remember(existing) { mutableStateOf(null) }
+    var inheritName by remember(existing, defaultInheritName) { mutableStateOf(defaultInheritName) }
+    var inheritSelected: ModsComponent? by remember(existing, defaultInheritComponent) { mutableStateOf(defaultInheritComponent) }
 
-    var useSelected: ModsComponent? by remember(existing) { mutableStateOf(null) }
+    var useSelected: ModsComponent? by remember(existing, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
 
     var showSnapshots by remember(existing) { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
@@ -81,8 +87,8 @@ fun ModsCreation(
                 ?: emptyList(),
             newVersions = newVersion?.let { listOf(it.id) } ?: emptyList(),
             inheritName = inheritName,
-            inheritComponent = inheritSelected!!,
-            useComponent = useSelected!!
+            inheritComponent = inheritSelected,
+            useComponent = useSelected
         ).also {
             setContent(it)
         }
@@ -117,12 +123,24 @@ fun ModsCreation(
         }.also { setExecute(if(it) execute else null) }
     }
 
-    LaunchedEffect(showSnapshots) {
-        versions = if(showSnapshots) {
-            MinecraftVersion.getAll()
-        } else {
-            MinecraftVersion.getAll().filter { it.isRelease }
-        }
+    LaunchedEffect(showSnapshots, defaultVersion) {
+        try {
+            versions = (if(versions.isEmpty()) {
+                if (showSnapshots) {
+                    MinecraftVersion.getAll()
+                } else {
+                    MinecraftVersion.getAll().filter { it.isRelease }
+                }
+            } else {
+                versions
+            }).also {
+                if(defaultVersion != null) {
+                    it.firstOrNull { it.id == defaultVersion }?.let {
+                        newVersion = it
+                    }
+                }
+            }
+        } catch(_: IOException) {}
     }
 
     Column(

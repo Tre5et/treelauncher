@@ -29,6 +29,7 @@ import java.io.IOException
 
 @Composable
 fun Create() {
+    var prevInstanceName = remember { "" }
     var instanceName by remember { mutableStateOf("") }
 
     var versionContent: VersionCreationContent? by remember { mutableStateOf(null) }
@@ -38,9 +39,7 @@ fun Create() {
     var modsContent: ModsCreationContent? by remember { mutableStateOf(null) }
 
     var hasMods by remember(versionContent?.versionType == VersionType.VANILLA || versionContent?.versionType == null) { mutableStateOf(
-        !((versionContent?.versionType == VersionType.VANILLA  || versionContent?.versionType == null)
-                && modsContent?.newName == null && modsContent?.inheritName == null && modsContent?.inheritComponent == null && modsContent?.useComponent == null && modsContent?.newVersions?.getOrNull(0) == versionContent?.minecraftVersion?.id
-        )
+        !((versionContent?.versionType == VersionType.VANILLA  || versionContent?.versionType == null) && (modsContent?.newName.isNullOrBlank() || modsContent?.newName == instanceName) && modsContent?.inheritName.isNullOrBlank() && modsContent?.inheritComponent == null && modsContent?.useComponent == null && modsContent?.newVersions?.getOrNull(0) == versionContent?.minecraftVersion?.id)
     ) }
 
     var creationStatus: Status? by remember { mutableStateOf(null) }
@@ -69,7 +68,10 @@ fun Create() {
                 )
                 TextBox(
                     text = instanceName,
-                    onTextChanged = { instanceName = it },
+                    onTextChanged = {
+                        prevInstanceName = instanceName
+                        instanceName = it
+                    },
                     placeholder = strings().creator.name()
                 )
             }
@@ -105,6 +107,11 @@ fun Create() {
                     .padding(12.dp)
                     .fillMaxHeight()
             ) {
+                var defaultSavesName by remember { mutableStateOf("") }
+                if(savesContent?.newName?.isBlank() != false || savesContent?.newName == prevInstanceName)  {
+                    defaultSavesName = instanceName
+                }
+
                 Text(
                     strings().creator.instance.saves(),
                     style = MaterialTheme.typography.titleSmall
@@ -113,6 +120,7 @@ fun Create() {
                     existing = AppContext.files.savesComponents.toList(),
                     showCreate = false,
                     getCreator = SavesCreator::get,
+                    defaultNewName = defaultSavesName,
                     setContent = { savesContent = it },
                 )
             }
@@ -124,6 +132,11 @@ fun Create() {
                     .padding(12.dp)
                     .fillMaxHeight()
             ) {
+                var defaultResourcepackName by remember { mutableStateOf("") }
+                if(resourcepackContent?.newName?.isBlank() != false || resourcepackContent?.newName == prevInstanceName)  {
+                    defaultResourcepackName = instanceName
+                }
+
                 Text(
                     strings().creator.instance.resourcepacks(),
                     style = MaterialTheme.typography.titleSmall
@@ -132,6 +145,7 @@ fun Create() {
                     existing = AppContext.files.resourcepackComponents.toList(),
                     showCreate = false,
                     getCreator = ResourcepackCreator::get,
+                    defaultNewName = defaultResourcepackName,
                     setContent = { resourcepackContent = it },
                 )
             }
@@ -143,6 +157,11 @@ fun Create() {
                     .padding(12.dp)
                     .fillMaxHeight()
             ) {
+                var defaultOptionsName by remember { mutableStateOf("") }
+                if(optionsContent?.newName?.isBlank() != false || optionsContent?.newName == prevInstanceName)  {
+                    defaultOptionsName = instanceName
+                }
+
                 Text(
                     strings().creator.instance.options(),
                     style = MaterialTheme.typography.titleSmall
@@ -151,6 +170,7 @@ fun Create() {
                     existing = AppContext.files.optionsComponents.toList(),
                     showCreate = false,
                     getCreator = OptionsCreator::get,
+                    defaultNewName = defaultOptionsName,
                     setContent = { optionsContent = it },
                 )
             }
@@ -177,11 +197,16 @@ fun Create() {
                     enter = expandHorizontally(),
                     exit = shrinkHorizontally()
                 ) {
+                    var defaultModsName by remember { mutableStateOf("") }
+                    if(modsContent?.newName?.isBlank() != false || modsContent?.newName == prevInstanceName)  {
+                        defaultModsName = instanceName
+                    }
                     ModsCreation(
                         existing = AppContext.files.modsComponents.toList(),
                         showCreate = false,
                         setContent = { modsContent = it },
-                        defaultVersion = versionContent?.minecraftVersion,
+                        defaultNewName = defaultModsName,
+                        defaultVersion = versionContent?.minecraftVersion?.id,
                         defaultType = versionContent?.versionType?.let { if (it == VersionType.VANILLA) null else it },
                     )
                 }

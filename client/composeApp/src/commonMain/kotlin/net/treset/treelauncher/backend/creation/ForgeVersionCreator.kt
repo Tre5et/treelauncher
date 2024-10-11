@@ -8,9 +8,9 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
-import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
@@ -132,7 +132,11 @@ class ForgeVersionCreator(
         clientProvider.next("Creating forge client") // TODO: make localized
 
         if (!version.directory.isDirectory()) {
-            throw IOException("Unable to add forge main file: base dir is not a directory")
+            try {
+                version.directory.createDir()
+            } catch (e: IOException) {
+                throw IOException("Unable to add forge main file: failed to create base dir: dir=${version.directory}", e)
+            }
         }
 
         LOGGER.debug { "Finding minecraft jar..." }
@@ -176,7 +180,7 @@ class ForgeVersionCreator(
 class ForgeCreationData(
     val installer: ForgeInstaller,
     files: LauncherFiles
-): VersionCreationData(installer.version, installer.version, files)
+): VersionCreationData(installer.installData.id, installer.version, files)
 
 val VERSION_FORGE = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.forge() }
 val VERSION_FORGE_LIBRARIES = FormatStringProvider { net.treset.treelauncher.localization.strings().creator.status.version.forgeLibraries() }

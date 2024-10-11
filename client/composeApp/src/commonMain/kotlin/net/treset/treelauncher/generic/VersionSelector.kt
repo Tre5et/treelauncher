@@ -139,9 +139,7 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it.loader.version == default }
                         }
                     }
-                } catch (e: IOException) {
-                    AppContext.errorIfOnline(e)
-                }
+                } catch (_: IOException) { }
             }.start()
 
             Thread {
@@ -154,9 +152,7 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it.loader.version == default }
                         }
                     }
-                } catch (e: IOException) {
-                    AppContext.errorIfOnline(e)
-                }
+                } catch (_: IOException) { }
             }.start()
 
             Thread {
@@ -169,9 +165,7 @@ fun VersionSelector(
                             } ?: versions.firstOrNull { it == default }
                         }
                     }
-                } catch (e: IOException) {
-                    AppContext.errorIfOnline(e)
-                }
+                } catch (_: IOException) { }
             }.start()
         }
     }

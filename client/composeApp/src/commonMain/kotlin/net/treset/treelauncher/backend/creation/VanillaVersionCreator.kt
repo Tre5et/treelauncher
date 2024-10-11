@@ -8,9 +8,9 @@ import net.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
-import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
+import net.treset.treelauncher.backend.util.StatusProvider
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
@@ -165,7 +165,11 @@ class VanillaVersionCreator(
 
         val baseDir = directory
         if (!baseDir.isDirectory()) {
-            throw IOException("Unable to add client: base dir is not a directory: dir=${baseDir}")
+            try {
+                baseDir.createDir()
+            } catch (e: IOException) {
+                throw IOException("Unable to add client: base dir is not a directory: dir=${baseDir}")
+            }
         }
         try {
             data.version.downloads.client.download(
