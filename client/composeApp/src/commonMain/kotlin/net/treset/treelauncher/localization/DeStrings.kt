@@ -16,8 +16,6 @@ class DeStrings : Strings(
     creator = Creator(
         buttonCreate = { "Erstellen" },
         component = { "Komponente" },
-        errorName = { "Name darf nicht leer sein." },
-        errorSelect = { "Keine Komponente ausgewählt."},
         instance = Creator.Instance(
             instance = { "Instanz" },
             mods = { "Mods" },
@@ -46,6 +44,7 @@ class DeStrings : Strings(
         radioInherit = { "Vorhandene Komponente kopieren" },
         status = Creator.Status(
             starting = { "Erstellung wird vorbereitet..." },
+            instance =  { "Instanz wird erstellt..." },
             mods = { "Mods Komponente wird erstellt..." },
             options = { "Optionskomponente wird erstellt..." },
             resourcepacks = { "Ressoucenpaketkomponente wird erstellt..." },
@@ -122,7 +121,32 @@ class DeStrings : Strings(
             backup = { "Backup vor dem Aktualisieren erstellen" },
             backupHint = { "Abhängig von der Datengröße kann dies viel Zeit und Speicherplatz in Anspruch nehmen."},
             start = { "Aktualisierung starten" },
-            status = Launcher.Patch.Status()
+            status = Launcher.Patch.Status(
+                createBackup = { "Backup wird erstellt" },
+                gameDataComponents = { "Spieldaten werden bewegt" },
+                gameDataSaves = { "Welten werden bewegt" },
+                gameDataMods = { "Mods werden bewegt" },
+                removeBackupIncludedFiles = { "Backups werden aus einbegriffenen Dateien gelöscht" },
+                upgradeComponents = { "Komponenten werden aktualisiert" },
+                upgradeMainManifest = { "Launchermanifest wird aktualisiert" },
+                upgradeInstances = { "Instanzen werden aktualisiert" },
+                upgradeSaves = { "Welten Komponenten werden aktualisiert" },
+                upgradeResourcepacks = { "Ressourcenpaket Komponenten werden aktualisiert" },
+                upgradeOptions = { "Einstellungskomponenten werden aktualisiert" },
+                upgradeMods = { "Mods Komponenten werden aktualisiert" },
+                upgradeVersions = { "Versionskomponenten werden aktualisiert" },
+                upgradeJavas = { "Java Komponenten werden aktualisiert" },
+                includedFiles = { "Einbegriffene Dateien werden umstrukturiert" },
+                includedFilesInstances = { "Einbegriffene Dateien der Instanzen werden umstrukturiert" },
+                includedFilesSaves = { "Einbegriffene Dateien der Welten Komponenten werden umstrukturiert" },
+                includedFilesResourcepacks = { "Einbegriffene Dateien der Ressourcenpaket Komponenten werden umstrukturiert" },
+                includedFilesOptions = { "Einbegriffene Dateien der Options Komponenten werden umstrukturiert" },
+                includedFilesMods = { "Einbegriffene Dateien der Mods Komponenten werden umstrukturiert" },
+                removeResourcepacksArgument = { "Ressourcenpaket Argumente werden entfernt" },
+                texturepacksIncludedFiles = { "Texturenpakete werden einbegriffenen Dateien hinzugefügt" },
+                removeLogin = { "Gespeicherte Logindaten werden entfernt" },
+                upgradeSettings = { "Einstellungen werden aktualisiert" },
+            )
         ),
     ),
     list = List(
@@ -132,6 +156,24 @@ class DeStrings : Strings(
     ),
     login = Login(
         button = { "Login mit Microsoft" },
+        cancel = { "Login abbrechen" },
+        keepLoggedIn = { "Eingeloggt bleiben" },
+        label = Login.Label(
+            authenticating = { "Einloggen..." },
+            failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
+            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" },
+            offline = { "Im Offline-Modus gestartet." }
+        ),
+        logout = { "Gespeichertes Logindaten löschen" },
+        offline = { "Im Offline-Modus starten" },
+        offlineNotification = { "Offline-Modus aktiv. Funktionalität eingeschränkt." },
+        popup = Login.Popup(
+            close = { "Schließen" },
+            content = { "Zum einloggen den folgenden Link im Browser öffnen:" to "und diesen Code eingeben:" },
+            copyContent = { "Kopieren"},
+            open = { "Link im Browser öffnen und Code kopieren" },
+            title = { "Login mit Microsoft" }
+        ),
         tip = { "TIPP: ${
             arrayOf(
                 "Dateien können in Welten, Ressourcenpaket oder Mod Komponenten gezogen werden, um diese zu importieren.",
@@ -149,16 +191,6 @@ class DeStrings : Strings(
                 "In den Einstellungen kann die Discord Integration angeschaltet werden, die allen anzeigt, was gerade gespielt wird."
             ).random()
         }" },
-        label = Login.Label(
-            authenticating = { "Einloggen..." },
-            failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
-            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" },
-            offline = { "Im Offline-Modus gestartet." }
-        ),
-        logout = { "Gespeichertes Logindaten löschen" },
-        keepLoggedIn = { "Eingeloggt bleiben" },
-        offline = { "Im Offline-Modus starten" },
-        offlineNotification = { "Offline-Modus aktiv. Funktionalität eingeschränkt." },
     ),
     manager = Manager(
         component = Manager.Component(

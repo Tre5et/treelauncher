@@ -86,8 +86,6 @@ open class Strings(
     data class Creator(
         val buttonCreate: () -> String = { "Create" },
         val component: () -> String = { "Component" },
-        val errorName: () -> String = { "Name must not be empty" },
-        val errorSelect: () -> String = { "No Component selected" },
         val instance: Instance = Instance(),
         val mods: Mods = Mods(),
         val name: () -> String = { "Name" },
@@ -125,7 +123,7 @@ open class Strings(
 
         data class Status(
             val starting: () -> String = { "Preparing creation..." },
-            val instance: () -> String = { "Creating insatnce" },
+            val instance: () -> String = { "Creating instance..." },
             val mods: () -> String = { "Creating mods component..." },
             val options: () -> String = { "Creating options component..." },
             val resourcepacks: () -> String = { "Creating resourcepacks component..." },
@@ -309,10 +307,7 @@ open class Strings(
 
         data class Popup(
             val close: () -> String = { "Close" },
-            val content: () -> Pair<String, String> = {
-                "Open the following URL in your browser:" to
-                        "and enter the code:"
-            },
+            val content: () -> Pair<String, String> = { "Open the following URL in your browser:" to "and enter the code:" },
             val copyContent: () -> String = { "Copy" },
             val open: () -> String = { "Open URL and copy Code" },
             val title: () -> String = { "Login with Microsoft" }
