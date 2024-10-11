@@ -22,7 +22,7 @@ interface StringProvider {
 open class FormatStringProvider(
     val get: () -> String
 ) : StringProvider {
-    override fun get(): String = get()
+    override fun get(): String = get.invoke()
 }
 
 class DetailsProvider(

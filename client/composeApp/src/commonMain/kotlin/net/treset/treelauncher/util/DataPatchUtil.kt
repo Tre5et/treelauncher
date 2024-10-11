@@ -15,7 +15,7 @@ fun DataPatcher(
 ) {
     val dataPatcher = remember { DataPatcher() }
 
-    var upgraded by rememberSaveable{ mutableStateOf(!dataPatcher.upgradeNeeded()) }
+    var upgraded by rememberSaveable { mutableStateOf(!dataPatcher.upgradeNeeded()) }
     var error by remember { mutableStateOf<Exception?>(null) }
     var status: Status? by remember { mutableStateOf(null) }
     var backup by remember { mutableStateOf(true) }

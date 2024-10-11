@@ -149,10 +149,7 @@ open class Pre2_0LauncherFiles {
                 it.versions = versions
                 it.mods = mods
             },
-            LauncherFile.ofData(
-                _launcherDetails?.gamedataDir ?: throw FileLoadException("Unable to load mods components: invalid configuration"),
-                "mods"
-            ),
+            null,
             _modsComponents?: emptyArray()
         )
     }

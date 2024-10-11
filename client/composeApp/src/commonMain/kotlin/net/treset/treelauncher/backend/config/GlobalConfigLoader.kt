@@ -1,9 +1,9 @@
 package net.treset.treelauncher.backend.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.mcdl.json.GenericJsonParsable
 import net.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
-import net.treset.treelauncher.backend.data.manifest.MainManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.File
 import java.io.IOException
@@ -89,16 +89,32 @@ class GlobalConfigLoader {
         if (contents.isBlank()) {
             return false
         }
-        val manifest: MainManifest = try {
-            MainManifest.fromJson(contents)
+        try {
+            LauncherManifest.fromJson(contents)
+            return true
         } catch (e: SerializationException) {
             return false
         }
-        return manifest.type == LauncherManifestType.LAUNCHER
     }
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
         private val file: LauncherFile = LauncherFile.of("app", "treelauncher.conf")
+    }
+}
+
+private class LauncherManifest(
+    val type: LauncherManifestType,
+): GenericJsonParsable() {
+
+    companion object {
+        @Throws(SerializationException::class)
+        fun fromJson(json: String): LauncherManifest {
+            val launcherManifest = fromJson(json, LauncherManifest::class.java)
+            if(launcherManifest.type != LauncherManifestType.LAUNCHER) {
+                throw SerializationException("Invalid type: ${launcherManifest.type}")
+            }
+            return launcherManifest
+        }
     }
 }

@@ -58,7 +58,7 @@ open class GenericResourceProvider<T: Component>(
     override fun removeResources(files: MutableList<LauncherFile>, unexpected: Boolean) {
         LOGGER.debug { "Removing resources: ${component.type}, id=${component.id}, unexpected=$unexpected" }
         if(!component.active) {
-            throw GameResourceException("Unable to remove resources: component is already inactive: ${component.type}, id=${component.id}")
+            LOGGER.warn { "Component is already inactive: ${component.type}, id=${component.id}" }
         }
         LOGGER.debug { "Removing resources files: ${component.type}, id=${component.id}, includedFiles=${component.includedFiles}, files=$files" }
 

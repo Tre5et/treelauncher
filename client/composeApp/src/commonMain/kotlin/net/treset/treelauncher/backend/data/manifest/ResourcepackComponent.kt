@@ -43,7 +43,7 @@ class ResourcepackComponent(
         resourcepacks = resourcepacksDirectory.listFiles()
             .mapNotNull {
                 try {
-                    Resourcepack.get(file)
+                    Resourcepack.get(it)
                 } catch (e: Exception) {
                     null
                 }?.let {rp -> rp to it}

@@ -1,6 +1,5 @@
 package net.treset.treelauncher.localization
 
-import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.instances.InstanceDetails
 
 class DeStrings : Strings(
@@ -123,19 +122,7 @@ class DeStrings : Strings(
             backup = { "Backup vor dem Aktualisieren erstellen" },
             backupHint = { "Abhängig von der Datengröße kann dies viel Zeit und Speicherplatz in Anspruch nehmen."},
             start = { "Aktualisierung starten" },
-            status = {
-                when(it) {
-                    DataPatcher.PatchStep.CREATE_BACKUP -> "Backup wird erstellt"
-                    DataPatcher.PatchStep.REMOVE_BACKUP_EXCLUDED_FILES -> "Backup-Dateien werden aus Instanzen entfernt"
-                    DataPatcher.PatchStep.UPGRADE_SETTINGS -> "Version wird in den Einstellungen angewendet"
-                    DataPatcher.PatchStep.GAME_DATA_COMPONENTS -> "Spieldaten Komponenten werden bewegt"
-                    DataPatcher.PatchStep.INCLUDED_FILES -> "Einbegriffene Dateien werden neustrukturiert"
-                    DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Ressourcenpaket Versionsargumente werden entfernt"
-                    DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Einbegriffene Dateien werden Spieldaten Komponenten hinzugefügt"
-                    DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Texturenpakete werden zu einbegriffenen Dateien hinzugefügt"
-                    DataPatcher.PatchStep.REMOVE_LOGIN -> "Alte Login-Daten werden entfernt"
-                }
-            }
+            status = Launcher.Patch.Status()
         ),
     ),
     list = List(

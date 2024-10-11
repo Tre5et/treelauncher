@@ -15,10 +15,10 @@ import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.data.InstanceData
-import net.treset.treelauncher.backend.data.manifest.Component
 import net.treset.treelauncher.backend.data.manifest.InstanceComponent
 import net.treset.treelauncher.backend.data.manifest.SavesComponent
 import net.treset.treelauncher.backend.launching.GameLauncher
+import net.treset.treelauncher.backend.launching.resources.SavesDisplayData
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.exception.FileLoadException
@@ -40,10 +40,9 @@ import java.net.URI
 fun Saves() {
     var components by remember { mutableStateOf(AppContext.files.savesComponents.sortedBy { it.name }) }
 
-    var selected: Component? by remember { mutableStateOf(null) }
+    var selected: SavesComponent? by remember { mutableStateOf(null) }
 
-    var saves: List<Pair<Save, LauncherFile>> by remember { mutableStateOf(emptyList()) }
-    var servers: List<Server> by remember { mutableStateOf(emptyList()) }
+    var displayData by remember { mutableStateOf(SavesDisplayData(mapOf(), listOf(), {})) }
     var loading by remember { mutableStateOf(true) }
 
     var selectedSave: Save? by remember(selected) { mutableStateOf(null) }
@@ -54,6 +53,7 @@ fun Saves() {
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
 
+
     var listDisplay by remember { mutableStateOf(appSettings().savesDetailsListDisplay) }
 
     LaunchedEffect(showAdd) {
@@ -63,29 +63,10 @@ fun Saves() {
     }
 
     val reloadSaves = {
-        selected?.let {
-            saves = LauncherFile.of(it.directory, "saves").listFiles()
-                .filter { it.isDirectory }
-                .mapNotNull { file ->
-                    try {
-                        Save.get(file)
-                    } catch (e: IOException) {
-                        Save(file.name, null, null)
-                    }?.let { it to file }
-                }
-                .sortedBy { it.first.name }
-            val serversFile = LauncherFile.of(it.directory, ".included_files", "servers.dat")
-            servers = if (serversFile.exists()) {
-                try {
-                    Server.getAll(serversFile)
-                } catch (e: IOException) {
-                    emptyList()
-                }
-            } else {
-                emptyList()
-            }
+        Thread {
+            displayData = selected?.getDisplayData(AppContext.files.gameDataDir) ?: SavesDisplayData(mapOf(), listOf(), {})
             loading = false
-        }
+        }.start()
     }
 
     Components(
@@ -110,8 +91,7 @@ fun Saves() {
             }
         },
         detailsContent = { current, _, _ ->
-
-            DisposableEffect(current) {
+            DisposableEffect(current, AppContext.runningInstance) {
                 selected = current
                 reloadSaves()
 
@@ -135,6 +115,9 @@ fun Saves() {
                     {
                         this.name
                     },
+                    {
+                        displayData.addSaves(it.map { it.second })
+                    },
                     icons().saves,
                     strings().manager.saves.import,
                     allowFilePicker = false,
@@ -145,7 +128,7 @@ fun Saves() {
                     showAdd = false
                     reloadSaves()
                 }
-            } else if(saves.isEmpty() && servers.isEmpty() && !loading) {
+            } else if(displayData.saves.isEmpty() && displayData.servers.isEmpty() && !loading) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -171,20 +154,20 @@ fun Saves() {
                     }
                 }
             } else {
-                if (saves.isNotEmpty()) {
+                if (displayData.saves.isNotEmpty()) {
                     Text(
                         strings().selector.saves.worlds(),
                         style = MaterialTheme.typography.titleMedium
                     )
-                    saves.forEach {
+                    displayData.saves.forEach {
                         SaveButton(
-                            it.first,
-                            selectedSave == it.first,
+                            it.key,
+                            selectedSave == it.key,
                             display = listDisplay,
                             onDelete = {
                                 try {
-                                    it.second.remove()
-                                    if (selectedSave == it.first) {
+                                    it.value.remove()
+                                    if (selectedSave == it.key) {
                                         selectedSave = null
                                     }
                                     reloadSaves()
@@ -194,20 +177,20 @@ fun Saves() {
                             },
                         ) {
                             selectedServer = null
-                            selectedSave = if (selectedSave == it.first) {
+                            selectedSave = if (selectedSave == it.key) {
                                 null
                             } else {
-                                it.first
+                                it.key
                             }
                         }
                     }
                 }
-                if (servers.isNotEmpty()) {
+                if (displayData.servers.isNotEmpty()) {
                     Text(
                         strings().selector.saves.servers(),
                         style = MaterialTheme.typography.titleMedium
                     )
-                    servers.forEach {
+                    displayData.servers.forEach {
                         ServerButton(
                             it,
                             selectedServer == it,
@@ -334,7 +317,7 @@ fun Saves() {
                 showAdd = true
             }
         },
-        detailsScrollable = saves.isNotEmpty() || servers.isNotEmpty() || showAdd,
+        detailsScrollable = displayData.saves.isNotEmpty() || displayData.servers.isNotEmpty() || showAdd,
         sortContext = SortContext(
             getSortType = { appSettings().savesComponentSortType },
             setSortType = { appSettings().savesComponentSortType = it },

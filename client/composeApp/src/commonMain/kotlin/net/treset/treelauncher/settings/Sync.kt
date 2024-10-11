@@ -11,8 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.sync.SyncService
-import net.treset.treelauncher.generic.*
+import net.treset.treelauncher.generic.PopupData
+import net.treset.treelauncher.generic.PopupOverlay
+import net.treset.treelauncher.generic.Text
+import net.treset.treelauncher.generic.TextBox
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.disabledContainer
 import net.treset.treelauncher.style.disabledContent
@@ -87,7 +89,7 @@ fun Sync() {
             )
         }
 
-        Button(
+        /*Button(
             onClick = {
                 try {
                     SyncService(
@@ -132,7 +134,7 @@ fun Sync() {
             Text(
                 strings().settings.sync.test()
             )
-        }
+        }*/
     }
 
     popupContent?.let {

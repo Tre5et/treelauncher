@@ -12,12 +12,12 @@ data class ResourcepacksDisplayData(
     private val onAddTexturepack: ResourcepacksDisplayData.(source: List<LauncherFile>) -> Unit
 ) {
     @Throws(IOException::class)
-    fun addResourcepack(vararg source: LauncherFile) {
-        onAddResourcepack(source.toList())
+    fun addResourcepacks(source: List<LauncherFile>) {
+        onAddResourcepack(source)
     }
 
     @Throws(IOException::class)
-    fun addTexturepack(vararg source: LauncherFile) {
-        onAddTexturepack(source.toList())
+    fun addTexturepacks(source: List<LauncherFile>) {
+        onAddTexturepack(source)
     }
 }

@@ -55,6 +55,7 @@ fun FixFiles() {
 
     val errorColor = MaterialTheme.colorScheme.error
     LaunchedEffect(AppContext.files) {
+        AppContext.files.reloadMain()
         if(AppContext.files.mainManifest.activeInstance != null) {
             notification = NotificationData(
                 color = errorColor,

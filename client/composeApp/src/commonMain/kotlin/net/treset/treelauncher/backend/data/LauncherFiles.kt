@@ -56,11 +56,6 @@ open class LauncherFiles {
     val versionComponents: Array<VersionComponent>
         get() = _versionComponents!!
 
-    init {
-        reloadMain()
-        LOGGER.debug { "Loaded Main manifest" }
-    }
-
     val assetsDir: LauncherFile
         get() = LauncherFile.ofData(mainManifest.assetsDir)
     val librariesDir: LauncherFile
@@ -94,7 +89,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     open fun reloadMods() {
         LOGGER.debug { "Reloading mods..." }
-        val file = LauncherFile.ofData(_mainManifest?.modsDir ?: throw IOException("Unable to load mods manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.modsDir ?: throw IOException("Unable to load mods manifest: invalid configuration"), appConfig().manifestFileName)
         _modsManifest = ParentManifest.readFile(file, LauncherManifestType.MODS)
 
         _modsComponents = reloadComponents(
@@ -108,7 +103,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     open fun reloadSaves() {
         LOGGER.debug { "Reloading saves..." }
-        val file = LauncherFile.ofData(_mainManifest?.savesDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.savesDir ?: throw FileLoadException("Unable to load saves manifest: invalid configuration"), appConfig().manifestFileName)
         _savesManifest = ParentManifest.readFile(file, LauncherManifestType.SAVES)
 
         _savesComponents = reloadComponents(
@@ -122,7 +117,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     fun reloadInstances() {
         LOGGER.debug { "Reloading instances..." }
-        val file = LauncherFile.ofData(_mainManifest?.instancesDir ?: throw FileLoadException("Unable to load instance manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.instancesDir ?: throw FileLoadException("Unable to load instance manifest: invalid configuration"), appConfig().manifestFileName)
         _instanceManifest = ParentManifest.readFile(file, LauncherManifestType.INSTANCES)
 
         _instanceComponents = reloadComponents(
@@ -136,7 +131,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     fun reloadJavas() {
         LOGGER.debug { "Reloading javas..." }
-        val file = LauncherFile.ofData(_mainManifest?.javasDir ?: throw FileLoadException("Unable to load java manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.javasDir ?: throw FileLoadException("Unable to load java manifest: invalid configuration"), appConfig().manifestFileName)
         _javaManifest = ParentManifest.readFile(file, LauncherManifestType.JAVAS)
 
         _javaComponents = reloadComponents(
@@ -150,7 +145,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     fun reloadOptions() {
         LOGGER.debug { "Reloading options..." }
-        val file = LauncherFile.ofData(_mainManifest?.optionsDir ?: throw FileLoadException("Unable to load options manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.optionsDir ?: throw FileLoadException("Unable to load options manifest: invalid configuration"), appConfig().manifestFileName)
         _optionsManifest = ParentManifest.readFile(file, LauncherManifestType.OPTIONS)
 
         _optionsComponents = reloadComponents(
@@ -164,7 +159,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     fun reloadResourcepacks() {
         LOGGER.debug { "Reloading resourcepacks..." }
-        val file = LauncherFile.ofData(_mainManifest?.resourcepacksDir ?: throw FileLoadException("Unable to load resourcepack manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.resourcepacksDir ?: throw FileLoadException("Unable to load resourcepack manifest: invalid configuration"), appConfig().manifestFileName)
         _resourcepackManifest = ParentManifest.readFile(file, LauncherManifestType.RESOURCEPACKS)
 
         _resourcepackComponents = reloadComponents(
@@ -177,7 +172,7 @@ open class LauncherFiles {
     @Throws(IOException::class)
     fun reloadVersions() {
         LOGGER.debug { "Reloading versions..." }
-        val file = LauncherFile.ofData(_mainManifest?.versionDir ?: throw FileLoadException("Unable to load version manifest: invalid configuration"))
+        val file = LauncherFile.ofData(_mainManifest?.versionDir ?: throw FileLoadException("Unable to load version manifest: invalid configuration"), appConfig().manifestFileName)
         _versionManifest = ParentManifest.readFile(file, LauncherManifestType.VERSIONS)
 
         _versionComponents = reloadComponents(

@@ -5,6 +5,7 @@ import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.Component
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.FormatStringProvider
 import net.treset.treelauncher.backend.util.Status
 import net.treset.treelauncher.backend.util.StatusProvider
@@ -192,6 +193,7 @@ class DataPatcher {
         upgradeMainManifest(files, statusProvider)
 
         componentStatusProvider.next("instances")
+        upgradeParentManifest(files.instanceManifest)
         val instancesStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_INSTANCES, files.instanceComponents.size)
         for(instance in files.instanceComponents) {
             instancesStatusProvider.next(instance.first.name)
@@ -200,6 +202,7 @@ class DataPatcher {
         instancesStatusProvider.finish("")
 
         componentStatusProvider.next("saves")
+        upgradeParentManifest(files.savesManifest)
         val savesStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_SAVES, files.savesComponents.size)
         for(saves in files.savesComponents) {
             savesStatusProvider.next(saves.name)
@@ -208,6 +211,7 @@ class DataPatcher {
         savesStatusProvider.finish("")
 
         componentStatusProvider.next("resourcepacks")
+        upgradeParentManifest(files.resourcepackManifest)
         val resourcepacksStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_RESOURCEPACKS, files.resourcepackComponents.size)
         for(resourcepacks in files.resourcepackComponents) {
             resourcepacksStatusProvider.next(resourcepacks.name)
@@ -216,6 +220,7 @@ class DataPatcher {
         resourcepacksStatusProvider.finish("")
 
         componentStatusProvider.next("options")
+        upgradeParentManifest(files.optionsManifest)
         val optionsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_OPTIONS, files.optionsComponents.size)
         for(options in files.optionsComponents) {
             optionsStatusProvider.next(options.name)
@@ -224,6 +229,7 @@ class DataPatcher {
         optionsStatusProvider.finish("")
 
         componentStatusProvider.next("mods")
+        upgradeParentManifest(files.modsManifest)
         val modsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_MODS, files.modsComponents.size)
         for(mods in files.modsComponents) {
             modsStatusProvider.next(mods.first.name)
@@ -231,6 +237,7 @@ class DataPatcher {
         }
 
         componentStatusProvider.next("versions")
+        upgradeParentManifest(files.versionManifest)
         val versionsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_VERSIONS, files.versionComponents.size)
         for(version in files.versionComponents) {
             versionsStatusProvider.next(version.first.name)
@@ -239,6 +246,7 @@ class DataPatcher {
         versionsStatusProvider.finish("")
 
         componentStatusProvider.next("java")
+        upgradeParentManifest(files.javaManifest)
         val javaStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_JAVA, files.javaComponents.size)
         for(java in files.javaComponents) {
             javaStatusProvider.next(java.name)
@@ -266,6 +274,25 @@ class DataPatcher {
         LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).remove()
         mainManifestProvider.finish("")
         LOGGER.info { "Upgraded launcher details" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeParentManifest(manifest: Pre2_0ParentManifest) {
+        LOGGER.info { "Upgrading parent manifest: ${manifest.type}..." }
+        val oldFile = LauncherFile.of(manifest.directory, appConfig().manifestFileName)
+        val backupFile = LauncherFile.of(manifest.directory, appConfig().manifestFileName + ".old")
+        oldFile.moveTo(backupFile)
+
+        val newManifest = ParentManifest(
+            manifest.type,
+            manifest.prefix,
+            manifest.components,
+            LauncherFile.of(manifest.directory, appConfig().manifestFileName)
+        )
+        newManifest.write()
+
+        backupFile.remove()
+        LOGGER.info { "Upgraded parent manifest: ${manifest.type}" }
     }
 
     @Throws(IOException::class)

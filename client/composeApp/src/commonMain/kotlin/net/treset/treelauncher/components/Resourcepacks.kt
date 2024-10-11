@@ -38,25 +38,19 @@ fun Resourcepacks() {
 
     var selected: ResourcepackComponent? by remember { mutableStateOf(null) }
 
-    var displayData: ResourcepacksDisplayData by remember(selected) { mutableStateOf(ResourcepacksDisplayData(mapOf(), mapOf(), {}, {})) }
-    var loading by remember { mutableStateOf(true) }
-
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
 
     var listDisplay by remember { mutableStateOf(appSettings().resourcepacksDetailsListDisplay) }
 
-    val reloadPacks = {
-        selected?.let {
-            displayData = it.getDisplayData(AppContext.files.gameDataDir)
-        }
-        loading = false
-    }
+    var displayData: ResourcepacksDisplayData by remember { mutableStateOf(ResourcepacksDisplayData(mapOf(), mapOf(), {}, {})) }
+    var loading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(showAdd) {
-        if(!showAdd) {
-            filesToAdd = emptyList()
-        }
+    val reloadPacks = {
+        Thread {
+            displayData = selected?.getDisplayData(AppContext.files.gameDataDir) ?: ResourcepacksDisplayData(mapOf(), mapOf(), {}, {})
+            loading = false
+        }.start()
     }
 
     Components(
@@ -81,7 +75,13 @@ fun Resourcepacks() {
             }
         },
         detailsContent = { current, _, _ ->
-            DisposableEffect(current) {
+            LaunchedEffect(showAdd) {
+                if(!showAdd) {
+                    filesToAdd = emptyList()
+                }
+            }
+
+            DisposableEffect(current, AppContext.runningInstance) {
                 selected = current
                 reloadPacks()
 
@@ -114,7 +114,14 @@ fun Resourcepacks() {
                     fileExtensions = listOf("zip"),
                     allowDirectoryPicker = true,
                     filesToAdd = filesToAdd,
-                    clearFilesToAdd = { filesToAdd = emptyList() }
+                    clearFilesToAdd = { filesToAdd = emptyList() },
+                    addFiles = {
+                        val texturepacks = it.filter { it.first is Texturepack }
+                        val resourcepacks = it.filter { it.first !is Texturepack }
+
+                        displayData.addResourcepacks(resourcepacks.map { it.second })
+                        displayData.addTexturepacks(texturepacks.map { it.second })
+                    }
                 ) {
                     showAdd = false
                     reloadPacks()

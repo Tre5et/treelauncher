@@ -26,8 +26,8 @@ class SavesComponent(
 ) {
     fun getDisplayData(gameDataDir: LauncherFile): SavesDisplayData {
         val displayData = SavesDisplayData(
-            saves = listOf(),
-            server = listOf(),
+            saves = mapOf(),
+            servers = listOf(),
             onAdd = { f -> this.onAdd(f, gameDataDir) }
         )
 
@@ -41,17 +41,17 @@ class SavesComponent(
 
         saves = savesDirectory.listFiles().mapNotNull {
             try {
-                Save.get(it)
+                Save.get(it) to it
             } catch (e: IOException) {
                 null
             }
-        }
+        }.toMap()
     }
 
     private fun SavesDisplayData.loadServers(gameDataDir: LauncherFile) {
         val serverFile = LauncherFile.of(getContentDirectory(gameDataDir), "servers.dat")
 
-        server = try {
+        servers = try {
             Server.getAll(serverFile)
         } catch (e: IOException) {
             emptyList()

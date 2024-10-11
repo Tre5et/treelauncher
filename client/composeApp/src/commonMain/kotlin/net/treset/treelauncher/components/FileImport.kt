@@ -40,6 +40,7 @@ fun <T> FileImport(
     directoryName: String,
     toFile: LauncherFile.() -> T?,
     getDisplayName: T.() -> String,
+    addFiles: (List<Pair<T?, LauncherFile>>) -> Unit,
     icon: ImageVector,
     stringPackage: Strings.Manager.Component.ImportStrings,
     allowFilePicker: Boolean = true,
@@ -63,6 +64,7 @@ fun <T> FileImport(
         fileExtensions = fileExtensions,
         filesToAdd = filesToAdd,
         clearFilesToAdd = clearFilesToAdd,
+        addFiles = addFiles,
         close = close
     )
 }
@@ -82,6 +84,7 @@ fun <T> FileImport(
     fileExtensions: List<String> = listOf(),
     filesToAdd: List<LauncherFile> = emptyList(),
     clearFilesToAdd: () -> Unit = {},
+    addFiles: (List<Pair<T?, LauncherFile>>) -> Unit = {},
     close: () -> Unit
 ) {
     var tfFile by remember(component) { mutableStateOf("") }
@@ -436,36 +439,11 @@ fun <T> FileImport(
                         titleRow = { Text(stringPackage.importing()) }
                     )
                     LOGGER.debug { "Importing files into component: ${component.name}" }
-                    selectedFiles.forEach { file ->
-                        LOGGER.debug { "Importing file: ${file.second.path}" }
-
-                        var newDir = LauncherFile.of(component.directory, directoryNames[file.first.getDirectoryName()], file.second.name)
-                        var found = false
-                        for(i in 1..100) {
-                            if(!newDir.exists()) {
-                                found = true
-                                break
-                            }
-                            LOGGER.debug { "File already exists: ${newDir.path}: finding unique name" }
-                            val nameParts = newDir.name.split(".")
-                            val newName = if(nameParts.size == 1) {
-                                "${nameParts.first()}-"
-                            } else {
-                                "${nameParts.dropLast(1).joinToString(".")}-.${nameParts.last()}"
-                            }
-                            newDir = LauncherFile.of(component.directory, newName)
-                        }
-                        if(!found) {
-                            AppContext.error(IOException("Failed to find a unique name for file: ${file.second.path}"))
-                            return@Thread
-                        }
-
-                        try {
-                            LOGGER.debug { "Copying file: ${file.second.path} -> ${newDir.path}" }
-                            file.second.copyTo(newDir)
-                        } catch (e: IOException) {
-                            AppContext.error(e)
-                        }
+                    try {
+                        addFiles(selectedFiles)
+                    } catch(e: IOException) {
+                        LOGGER.error(e) { "Failed to import files into component: ${component.name}" }
+                        AppContext.error(e)
                     }
                     close()
                 }.start()
