@@ -1,5 +1,4 @@
 
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
@@ -38,13 +37,12 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "1.0.0-alpha.8"
+        val mcdlVersion = "1.0.0-alpha.11"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
-            @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
@@ -74,7 +72,7 @@ kotlin {
 }
 
 
-val version = "2.6.0"
+val version = "3.0.0"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
