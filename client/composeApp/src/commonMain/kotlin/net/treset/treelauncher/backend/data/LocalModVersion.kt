@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.data
 
-import net.treset.mcdl.mods.LocalModVersion
+import dev.treset.mcdl.mods.LocalModVersion
 
 fun LocalModVersion.toLauncherMod(): LauncherMod {
     return LauncherMod(

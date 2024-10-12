@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mcdl.json.GenericJsonParsable
+import dev.treset.mcdl.json.GenericJsonParsable
 import java.io.IOException
 
 abstract class  Manifest(

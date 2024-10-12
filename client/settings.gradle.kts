@@ -17,7 +17,6 @@ dependencyResolutionManagement {
         mavenLocal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://repo.u-team.info")
-        maven("https://raw.githubusercontent.com/Tre5et/maven/main/")
         maven("https://jogamp.org/deployment/maven")
         maven("https://packages.jetbrains.team/maven/p/kpm/public/")
         maven("https://jitpack.io")

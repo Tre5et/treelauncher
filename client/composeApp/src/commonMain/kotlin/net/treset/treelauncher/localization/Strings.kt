@@ -1,7 +1,7 @@
 package net.treset.treelauncher.localization
 
-import net.treset.mcdl.auth.AuthenticationStep
-import net.treset.mcdl.saves.Save
+import dev.treset.mcdl.auth.AuthenticationStep
+import dev.treset.mcdl.saves.Save
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherMod

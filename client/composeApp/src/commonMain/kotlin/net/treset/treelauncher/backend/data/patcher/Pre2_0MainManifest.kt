@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.data.patcher
 
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 
 class Pre2_0MainManifest(

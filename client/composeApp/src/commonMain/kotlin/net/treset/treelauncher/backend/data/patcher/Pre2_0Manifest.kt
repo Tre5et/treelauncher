@@ -1,9 +1,9 @@
 package net.treset.treelauncher.backend.data.patcher
 
 import com.google.gson.annotations.SerializedName
-import net.treset.mcdl.format.FormatUtils
-import net.treset.mcdl.json.GenericJsonParsable
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.format.FormatUtils
+import dev.treset.mcdl.json.GenericJsonParsable
+import dev.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
 import java.time.LocalDateTime
 

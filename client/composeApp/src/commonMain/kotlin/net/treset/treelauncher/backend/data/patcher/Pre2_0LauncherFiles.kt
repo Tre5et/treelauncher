@@ -1,8 +1,8 @@
 package net.treset.treelauncher.backend.data.patcher
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.json.GenericJsonParsable
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.GenericJsonParsable
+import dev.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.manifest.*
 import net.treset.treelauncher.backend.util.exception.FileLoadException

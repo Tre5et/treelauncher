@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import net.treset.mcdl.mods.ModVersionData
+import dev.treset.mcdl.mods.ModVersionData
 import net.treset.treelauncher.backend.util.string.openInBrowser
 import net.treset.treelauncher.components.mods.display.ModDisplayData
 import net.treset.treelauncher.generic.ComboBox

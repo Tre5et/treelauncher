@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mcdl.saves.Save
-import net.treset.mcdl.saves.Server
+import dev.treset.mcdl.saves.Save
+import dev.treset.mcdl.saves.Server
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.launching.resources.SavesDisplayData
 import net.treset.treelauncher.backend.util.file.LauncherFile

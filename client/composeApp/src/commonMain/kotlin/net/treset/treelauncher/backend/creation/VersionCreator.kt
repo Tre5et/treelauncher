@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.minecraft.MinecraftLaunchArgument
+import dev.treset.mcdl.minecraft.MinecraftLaunchArgument
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.data.manifest.VersionComponent

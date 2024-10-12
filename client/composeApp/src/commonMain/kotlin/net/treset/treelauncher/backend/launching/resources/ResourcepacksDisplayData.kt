@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.launching.resources
 
-import net.treset.mcdl.resourcepacks.Resourcepack
-import net.treset.mcdl.resourcepacks.Texturepack
+import dev.treset.mcdl.resourcepacks.Resourcepack
+import dev.treset.mcdl.resourcepacks.Texturepack
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 

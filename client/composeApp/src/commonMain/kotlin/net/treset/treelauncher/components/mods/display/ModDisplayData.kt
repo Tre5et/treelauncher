@@ -1,8 +1,8 @@
 package net.treset.treelauncher.components.mods.display
 
 import androidx.compose.ui.graphics.painter.Painter
-import net.treset.mcdl.mods.ModData
-import net.treset.mcdl.mods.ModVersionData
+import dev.treset.mcdl.mods.ModData
+import dev.treset.mcdl.mods.ModVersionData
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.util.ModProviderStatus
 

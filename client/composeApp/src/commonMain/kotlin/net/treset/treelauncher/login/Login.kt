@@ -13,8 +13,8 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.treset.mcdl.auth.AuthenticationStep
-import net.treset.mcdl.auth.InteractiveData
+import dev.treset.mcdl.auth.AuthenticationStep
+import dev.treset.mcdl.auth.InteractiveData
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth

@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.data
 
-import net.treset.mcdl.json.GenericJsonParsable
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.GenericJsonParsable
+import dev.treset.mcdl.json.SerializationException
 
 class LauncherVersionDetails(
     var versionNumber: String,

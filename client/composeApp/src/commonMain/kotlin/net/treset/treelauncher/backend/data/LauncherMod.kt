@@ -1,12 +1,12 @@
 package net.treset.treelauncher.backend.data
 
 import com.google.gson.annotations.SerializedName
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.mods.CombinedModData
-import net.treset.mcdl.mods.ModData
-import net.treset.mcdl.mods.ModsDL
-import net.treset.mcdl.mods.curseforge.CurseforgeMod
-import net.treset.mcdl.mods.modrinth.ModrinthMod
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.mods.CombinedModData
+import dev.treset.mcdl.mods.ModData
+import dev.treset.mcdl.mods.ModsDL
+import dev.treset.mcdl.mods.curseforge.CurseforgeMod
+import dev.treset.mcdl.mods.modrinth.ModrinthMod
 
 class LauncherMod(
     var currentProvider: String?,

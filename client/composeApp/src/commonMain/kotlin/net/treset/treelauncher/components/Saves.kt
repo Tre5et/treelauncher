@@ -9,8 +9,8 @@ import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mcdl.saves.Save
-import net.treset.mcdl.saves.Server
+import dev.treset.mcdl.saves.Save
+import dev.treset.mcdl.saves.Server
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.*

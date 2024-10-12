@@ -10,8 +10,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.resourcepacks.Resourcepack
-import net.treset.mcdl.resourcepacks.Texturepack
+import dev.treset.mcdl.resourcepacks.Resourcepack
+import dev.treset.mcdl.resourcepacks.Texturepack
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.creation.*

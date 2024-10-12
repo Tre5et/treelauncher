@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.util
 
-import net.treset.mcdl.util.DownloadStatus
+import dev.treset.mcdl.util.DownloadStatus
 import net.treset.treelauncher.localization.strings
 
 data class CreationStatus(val currentStep: DownloadStep, val downloadStatus: DownloadStatus?) {

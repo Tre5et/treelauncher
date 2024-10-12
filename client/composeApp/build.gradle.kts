@@ -32,12 +32,11 @@ kotlin {
             "java",
             "minecraft",
             "mods",
-            "mojang",
             "quiltmc",
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "1.0.0-alpha.11"
+        val mcdlVersion = "2.0.0"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -47,9 +46,9 @@ kotlin {
 
             implementation("com.google.code.gson:gson:2.10.1")
 
-            implementation("net.treset.mcdl:mcdl:$mcdlVersion")
+            implementation("dev.treset.mcdl:mcdl:$mcdlVersion")
             mcdlModules.forEach {
-                implementation("net.treset.mcdl:mcdl-$it:$mcdlVersion")
+                implementation("dev.treset.mcdl:mcdl-$it:$mcdlVersion")
             }
 
             implementation("io.github.oshai:kotlin-logging:6.0.3")

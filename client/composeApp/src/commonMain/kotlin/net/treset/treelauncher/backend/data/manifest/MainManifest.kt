@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 

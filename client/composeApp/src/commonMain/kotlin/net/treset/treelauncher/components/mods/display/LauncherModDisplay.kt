@@ -2,8 +2,8 @@ package net.treset.treelauncher.components.mods.display
 
 import androidx.compose.ui.graphics.painter.Painter
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.mods.*
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.mods.*
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.data.LauncherMod

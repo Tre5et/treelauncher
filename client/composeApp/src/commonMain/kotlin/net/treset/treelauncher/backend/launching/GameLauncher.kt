@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.auth.data.UserData
+import dev.treset.mcdl.auth.data.UserData
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.util.QuickPlayData

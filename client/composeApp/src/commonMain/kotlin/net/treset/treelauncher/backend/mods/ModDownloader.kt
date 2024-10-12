@@ -1,10 +1,10 @@
 package net.treset.treelauncher.backend.mods
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.mods.ModData
-import net.treset.mcdl.mods.ModProvider
-import net.treset.mcdl.mods.ModVersionData
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.mods.ModData
+import dev.treset.mcdl.mods.ModProvider
+import dev.treset.mcdl.mods.ModVersionData
 import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.backend.data.toLauncherMod
 import net.treset.treelauncher.backend.util.file.LauncherFile

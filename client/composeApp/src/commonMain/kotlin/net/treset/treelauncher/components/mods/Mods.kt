@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import net.treset.mcdl.minecraft.MinecraftVersion
-import net.treset.mcdl.mods.ModProvider
+import dev.treset.mcdl.minecraft.MinecraftVersion
+import dev.treset.mcdl.mods.ModProvider
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.LauncherModSortType
 import net.treset.treelauncher.backend.config.appSettings

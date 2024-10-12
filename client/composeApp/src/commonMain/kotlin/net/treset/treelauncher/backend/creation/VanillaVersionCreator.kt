@@ -1,10 +1,10 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.assets.AssetIndex
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.minecraft.MinecraftLibrary
-import net.treset.mcdl.minecraft.MinecraftVersionDetails
+import dev.treset.mcdl.assets.AssetIndex
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.minecraft.MinecraftLibrary
+import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent

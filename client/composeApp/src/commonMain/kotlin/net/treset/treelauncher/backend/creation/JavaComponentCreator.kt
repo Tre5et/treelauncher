@@ -1,9 +1,9 @@
 package net.treset.treelauncher.backend.creation
 
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.java.JavaFile
-import net.treset.mcdl.java.JavaRuntimes
-import net.treset.mcdl.util.OsUtil
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.java.JavaFile
+import dev.treset.mcdl.java.JavaRuntimes
+import dev.treset.mcdl.util.OsUtil
 import net.treset.treelauncher.backend.data.manifest.JavaComponent
 import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.FormatStringProvider

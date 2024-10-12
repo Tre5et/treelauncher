@@ -4,7 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.update.UpdaterStatus

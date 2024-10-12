@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.launching.resources
 
-import net.treset.mcdl.saves.Save
-import net.treset.mcdl.saves.Server
+import dev.treset.mcdl.saves.Save
+import dev.treset.mcdl.saves.Server
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 

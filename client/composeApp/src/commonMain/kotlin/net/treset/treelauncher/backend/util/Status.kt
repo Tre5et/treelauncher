@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.util
 
-import net.treset.mcdl.util.DownloadStatus
+import dev.treset.mcdl.util.DownloadStatus
 import net.treset.treelauncher.localization.strings
 
 open class Status(

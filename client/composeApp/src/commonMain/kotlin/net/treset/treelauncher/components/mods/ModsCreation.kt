@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import net.treset.mcdl.minecraft.MinecraftVersion
+import dev.treset.mcdl.minecraft.MinecraftVersion
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.creation.*
 import net.treset.treelauncher.backend.data.manifest.ModsComponent

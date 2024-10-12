@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.update
 
-import net.treset.mcdl.json.GenericJsonParsable
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.GenericJsonParsable
+import dev.treset.mcdl.json.SerializationException
 
 class Update(
     var id: String?,

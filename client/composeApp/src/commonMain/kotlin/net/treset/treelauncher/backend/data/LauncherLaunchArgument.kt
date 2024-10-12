@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.data
 
-import net.treset.mcdl.format.FormatUtils
-import net.treset.mcdl.util.OsUtil
+import dev.treset.mcdl.format.FormatUtils
+import dev.treset.mcdl.util.OsUtil
 
 class LauncherLaunchArgument(
     var argument: String,

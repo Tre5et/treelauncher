@@ -1,13 +1,13 @@
 package net.treset.treelauncher.backend.auth
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.auth.AuthDL
-import net.treset.mcdl.auth.AuthenticationStep
-import net.treset.mcdl.auth.InteractiveData
-import net.treset.mcdl.auth.data.UserData
-import net.treset.mcdl.auth.token.DefaultTokenPolicy
-import net.treset.mcdl.auth.token.FileTokenPolicy
-import net.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.auth.AuthDL
+import dev.treset.mcdl.auth.AuthenticationStep
+import dev.treset.mcdl.auth.InteractiveData
+import dev.treset.mcdl.auth.data.UserData
+import dev.treset.mcdl.auth.token.DefaultTokenPolicy
+import dev.treset.mcdl.auth.token.FileTokenPolicy
+import dev.treset.mcdl.exception.FileDownloadException
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.Images
 import java.awt.image.BufferedImage

@@ -1,7 +1,7 @@
 package net.treset.treelauncher.backend.data.manifest
 
-import net.treset.mcdl.format.FormatUtils
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.format.FormatUtils
+import dev.treset.mcdl.json.SerializationException
 import net.treset.treelauncher.backend.launching.resources.ComponentResourceProvider
 import net.treset.treelauncher.backend.launching.resources.GenericResourceProvider
 import net.treset.treelauncher.backend.util.file.LauncherFile

@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.util
 
-import net.treset.mcdl.json.SerializationException
+import dev.treset.mcdl.json.SerializationException
 
 class Version(
     val major: Int,

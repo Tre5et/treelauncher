@@ -7,10 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.mods.ModsDL
-import net.treset.mcdl.mods.curseforge.CurseforgeMod
-import net.treset.mcdl.mods.modrinth.ModrinthMod
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.mods.ModsDL
+import dev.treset.mcdl.mods.curseforge.CurseforgeMod
+import dev.treset.mcdl.mods.modrinth.ModrinthMod
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherMod

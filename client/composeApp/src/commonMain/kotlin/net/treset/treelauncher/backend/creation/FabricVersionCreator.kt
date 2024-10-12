@@ -1,12 +1,12 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mcdl.exception.FileDownloadException
-import net.treset.mcdl.fabric.FabricLibrary
-import net.treset.mcdl.fabric.FabricProfile
-import net.treset.mcdl.fabric.FabricVersion
-import net.treset.mcdl.minecraft.MinecraftVersion
-import net.treset.mcdl.minecraft.MinecraftVersionDetails
+import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.fabric.FabricLibrary
+import dev.treset.mcdl.fabric.FabricProfile
+import dev.treset.mcdl.fabric.FabricVersion
+import dev.treset.mcdl.minecraft.MinecraftVersion
+import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.data.LauncherFiles
 import net.treset.treelauncher.backend.data.manifest.VersionComponent
