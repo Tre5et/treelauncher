@@ -77,7 +77,7 @@ val uuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
 
 compose.desktop {
     application {
-        mainClass = "net.treset.treelauncher.MainKt"
+        mainClass = "dev.treset.treelauncher.MainKt"
 
         javaHome = "${System.getProperty("user.home")}\\.jdks\\jbr-17.0.11"
 
@@ -171,7 +171,7 @@ launcherTask(
         }
     }
 ) {
-    val stringsFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/localization/Strings.kt")
+    val stringsFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/localization/Strings.kt")
     var found = false
     val stringsLines = stringsFile.readLines()
     stringsFile.writeText(
@@ -194,7 +194,7 @@ launcherTask(
     }
 
 
-    val configFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/backend/config/Config.kt")
+    val configFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/backend/config/Config.kt")
     found = false
     val configLines = configFile.readLines()
     configFile.writeText(

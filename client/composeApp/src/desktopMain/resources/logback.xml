@@ -7,7 +7,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>./logs/current.log</file>
-        <rollingPolicy class="net.treset.treelauncher.logging.SessionBasedRollingPolicy">
+        <rollingPolicy class="dev.treset.treelauncher.logging.SessionBasedRollingPolicy">
             <fileNamePattern>./logs/%d{yyyy-MM-dd}_%i.log.gz</fileNamePattern>
         </rollingPolicy>
         <encoder>
