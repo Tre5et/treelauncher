@@ -41,3 +41,15 @@ abstract class FormatString {
         }
     }
 }
+
+operator fun String.times(i: Int): String {
+    if(i <= 0) {
+        throw IllegalStateException("Cannot multiply a string by a non-positive number")
+    }
+
+    val sb = StringBuilder()
+    for(j in 1..i) {
+        sb.append(this)
+    }
+    return sb.toString()
+}

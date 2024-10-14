@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import net.treset.treelauncher.style.contentColor
 import net.treset.treelauncher.style.hovered
 
 @Composable
@@ -29,7 +30,7 @@ fun Button(
     enabled: Boolean = true,
     shape: Shape = ButtonDefaults.shape,
     color: Color = MaterialTheme.colorScheme.primary,
-    invertedContent: Boolean = true,
+    dynamicContentColor: Boolean = true,
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     border: BorderStroke? = null,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -50,15 +51,20 @@ fun Button(
         }
     )
 
-    val foregroundColor = if(invertedContent) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.onBackground
-    }
+    val contentColor = MaterialTheme.colorScheme.onPrimary
+
+    val colorScheme = MaterialTheme.colorScheme
+    val foregroundColor =
+        if(dynamicContentColor) {
+            //Use unhovered color always
+            colorScheme.contentColor(color)
+        } else {
+            contentColor
+        }
 
     androidx.compose.material3.Button(
         onClick,
-        modifier.pointerHoverIcon(PointerIcon.Hand),
+        modifier.pointerHoverIcon(if(enabled) PointerIcon.Hand else PointerIcon.Default),
         enabled,
         shape,
         ButtonDefaults.buttonColors(

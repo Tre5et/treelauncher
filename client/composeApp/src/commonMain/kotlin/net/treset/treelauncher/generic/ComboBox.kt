@@ -31,27 +31,26 @@ fun <T> ComboBox(
     placeholder: String = "",
     loading: Boolean = false,
     loadingPlaceholder: String = strings().comboBox.loading(),
-    defaultSelected: T? = null,
+    selected: T? = null,
     allowUnselect: Boolean,
     allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember(enabled) { mutableStateOf(false) }
-    var selectedItem: T? by remember { mutableStateOf(defaultSelected) }
-    val displayString = if(loading) loadingPlaceholder else selectedItem?.toDisplayString() ?: placeholder
+    val displayString = remember(loading, loadingPlaceholder, selected, placeholder) { if(loading) loadingPlaceholder else selected?.toDisplayString() ?: placeholder }
 
     var search by remember { mutableStateOf("") }
-    val actualItems by remember(items, search) { mutableStateOf(items.filter { it.toDisplayString().contains(search, ignoreCase = true) }) }
+    var actualItems: List<T> by remember(items) { mutableStateOf(emptyList()) }
 
-    LaunchedEffect(defaultSelected) {
-        selectedItem = defaultSelected
-        onSelected(defaultSelected)
+    LaunchedEffect(items, search) {
+        actualItems = items.filter { it.toDisplayString().contains(search, ignoreCase = true) }
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentSize(Alignment.TopStart)
             .pointerHoverIcon(PointerIcon.Hand),
     ) {
@@ -68,7 +67,7 @@ fun <T> ComboBox(
         )
 
         val textColor by animateColorAsState(
-            if(enabled)
+            if(enabled && !loading)
                 LocalContentColor.current
             else
                 LocalContentColor.current.disabledContent()
@@ -78,17 +77,19 @@ fun <T> ComboBox(
             if(expanded && enabled) 2.dp else 1.dp
         )
 
-        val rowModifier = if(loading || !enabled) {
-            Modifier
-        } else {
-            Modifier.clickable(onClick = { expanded = true })
-        }.let {
-            if(decorated) {
-                it
-                    .border(borderWidth, borderColor, RoundedCornerShape(4.dp))
-                    .padding(start = 12.dp, bottom = 9.dp, top = 6.dp, end = 6.dp)
+        val rowModifier = remember(loading, enabled, decorated, borderWidth, borderColor) {
+            if (loading || !enabled) {
+                Modifier
             } else {
-                it
+                Modifier.clickable(onClick = { expanded = true })
+            }.let {
+                if (decorated) {
+                    it
+                        .border(borderWidth, borderColor, RoundedCornerShape(4.dp))
+                        .padding(start = 12.dp, bottom = 9.dp, top = 6.dp, end = 6.dp)
+                } else {
+                    it
+                }
             }
         }
 
@@ -104,7 +105,8 @@ fun <T> ComboBox(
                 Icon(
                     icons().comboBox,
                     "Open",
-                    modifier = Modifier.offset(y = 2.dp)
+                    modifier = Modifier.offset(y = 2.dp),
+                    tint = textColor
                 )
             }
         }
@@ -117,7 +119,7 @@ fun <T> ComboBox(
             if(allowSearch) {
                 TextBox(
                     text = search,
-                    onChange = { search = it },
+                    onTextChanged = { search = it },
                     placeholder = strings().comboBox.search(),
                     leadingIcon = {
                         Icon(
@@ -131,7 +133,6 @@ fun <T> ComboBox(
                 ComboBoxItem(
                     text = placeholder,
                     onClick = {
-                        selectedItem = null
                         onSelected(null)
                         expanded = false
                     }
@@ -141,7 +142,6 @@ fun <T> ComboBox(
                 ComboBoxItem(
                     text = i.toDisplayString(),
                     onClick = {
-                        selectedItem = i
                         onSelected(i)
                         expanded = false
                     }
@@ -158,11 +158,12 @@ fun <T> ComboBox(
     placeholder: String = "",
     loading: Boolean = false,
     loadingPlaceholder: String = strings().creator.version.loading(),
-    defaultSelected: T? = null,
+    selected: T? = null,
     toDisplayString: T.() -> String = { toString() },
     allowSearch: Boolean = false,
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) = ComboBox(
     items,
     { it?.let { e -> onSelected(e) } },
@@ -171,10 +172,11 @@ fun <T> ComboBox(
     loadingPlaceholder,
     allowUnselect = false,
     allowSearch = allowSearch,
-    defaultSelected = defaultSelected,
+    selected = selected,
     toDisplayString = toDisplayString,
     decorated = decorated,
-    enabled = enabled
+    enabled = enabled,
+    modifier = modifier
 )
 
 @Composable
@@ -185,16 +187,18 @@ fun <T> TitledComboBox(
     loading: Boolean = false,
     loadingPlaceholder: String = strings().creator.version.loading(),
     placeholder: String = "",
-    defaultSelected: T? = null,
+    selected: T? = null,
     allowUnselect: Boolean,
     allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+        modifier = modifier
     ) {
         Text(
             title,
@@ -207,7 +211,7 @@ fun <T> TitledComboBox(
             placeholder,
             loading,
             loadingPlaceholder,
-            defaultSelected,
+            selected,
             allowUnselect,
             allowSearch,
             toDisplayString,
@@ -225,11 +229,12 @@ fun <T> TitledComboBox(
     loading: Boolean = false,
     loadingPlaceholder: String = strings().creator.version.loading(),
     placeholder: String = "",
-    defaultSelected: T? = null,
+    selected: T? = null,
     allowSearch: Boolean = false,
     toDisplayString: T.() -> String = { toString() },
     decorated: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) = TitledComboBox(
     title = title,
     items = items,
@@ -237,12 +242,13 @@ fun <T> TitledComboBox(
     loading = loading,
     loadingPlaceholder = loadingPlaceholder,
     placeholder = placeholder,
-    defaultSelected = defaultSelected,
+    selected = selected,
     allowUnselect = false,
     allowSearch = allowSearch,
     toDisplayString = toDisplayString,
     decorated = decorated,
-    enabled = enabled
+    enabled = enabled,
+    modifier = modifier
 )
 
 @Composable
@@ -254,12 +260,12 @@ fun ComboBoxItem(
 ) {
     val hovered by interactionSource.collectIsHoveredAsState()
 
-    val background = if(hovered)
+    val background = if (hovered)
             MaterialTheme.colorScheme.primary.hovered()
         else
             Color.Transparent
 
-    val textColor = if(hovered)
+    val textColor = if (hovered)
             MaterialTheme.colorScheme.onPrimary
         else
             LocalContentColor.current

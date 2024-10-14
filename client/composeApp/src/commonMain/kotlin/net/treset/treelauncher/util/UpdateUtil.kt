@@ -1,10 +1,10 @@
 package net.treset.treelauncher.util
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.app
 import net.treset.treelauncher.backend.update.UpdaterStatus
 import net.treset.treelauncher.backend.update.updater
@@ -12,6 +12,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.Button
 import net.treset.treelauncher.generic.PopupData
 import net.treset.treelauncher.generic.PopupType
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
@@ -32,9 +33,14 @@ fun onUpdate(
         )
     )
     coroutineScope.launch {
-        try {
-            val update = updater().getUpdate()
+        val update = try {
+            updater().getUpdate()
+        } catch (e: IOException) {
+            AppContext.errorIfOnline(e)
+            return@launch
+        }
 
+        try {
             update.id?.let {
                 setPopup(
                     PopupData(
@@ -56,21 +62,27 @@ fun onUpdate(
                                         )
                                     )
 
-                                    updater().executeUpdate { amount, total, file ->
-                                        setPopup(
-                                            PopupData(
-                                                titleRow = { Text(strings().settings.update.downloadingTitle()) },
-                                                content = {
-                                                    Text(
-                                                        strings().settings.update.downloadingMessage(
-                                                            file,
-                                                            amount,
-                                                            total
+                                    try {
+                                        updater().executeUpdate { amount, total, file ->
+                                            setPopup(
+                                                PopupData(
+                                                    titleRow = { Text(strings().settings.update.downloadingTitle()) },
+                                                    content = {
+                                                        Text(
+                                                            strings().settings.update.downloadingMessage(
+                                                                file,
+                                                                amount,
+                                                                total
+                                                            )
                                                         )
-                                                    )
-                                                }
+                                                    }
+                                                )
                                             )
-                                        )
+                                        }
+                                    } catch(e: IOException) {
+                                        setPopup(null)
+                                        AppContext.error(e)
+                                        return@Button
                                     }
 
                                     setPopup(
@@ -136,7 +148,7 @@ fun onUpdate(
                 }
             }
         } catch (e: IOException) {
-            app().error(e)
+            AppContext.error(e)
         }
     }
 }
@@ -161,8 +173,14 @@ fun checkUpdateOnStart(
         status.exceptions?.let { exs ->
             LOGGER.warn { "Exceptions occurred during update: " + status.message }
             exs.forEach {
-                LOGGER.warn(IOException(it)) {}
+                LOGGER.warn { it }
             }
+        }
+
+        try {
+            updateFile.delete()
+        } catch (e: IOException) {
+            LOGGER.warn(e) { "Failed to delete update file" }
         }
 
         setPopup(PopupData(

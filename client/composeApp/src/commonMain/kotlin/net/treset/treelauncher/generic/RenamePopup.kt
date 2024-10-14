@@ -1,18 +1,17 @@
 package net.treset.treelauncher.generic
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.localization.strings
 
 @Composable
 fun RenamePopup(
-    manifest: LauncherManifest,
+    manifest: ComponentManifest,
     editValid: (String) -> Boolean,
     onDone: (String?) -> Unit
 ) {

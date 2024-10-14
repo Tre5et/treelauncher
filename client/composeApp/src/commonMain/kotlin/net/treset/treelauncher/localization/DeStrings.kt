@@ -1,5 +1,6 @@
 package net.treset.treelauncher.localization
 
+import net.treset.treelauncher.backend.data.patcher.DataPatcher
 import net.treset.treelauncher.instances.InstanceDetails
 
 class DeStrings : Strings(
@@ -36,7 +37,9 @@ class DeStrings : Strings(
             version = { "Version" },
         ),
         mods = Creator.Mods (
-            version = { "Version" }
+            quiltIncludeFabric = { "Fabric Mods nutzen" },
+            type = { "Mod-Loader"},
+            version = { "Version" },
         ),
         name = { "Name" },
         radioCreate = { "Erstellen" },
@@ -49,11 +52,19 @@ class DeStrings : Strings(
             resourcepacks = { "Ressoucenpaketkomponente wird erstellt..." },
             saves = { "Weltenkomponente wird erstellt..." },
             version = Creator.Status.Version(
-                value = { "Version wird erstellt..." },
-                vanilla = { "Minecraft Version wird erstellt..." },
                 assets = { "Assets werden heruntergeladen..." },
+                fabric = { "Fabric Version wird erstellt..." },
+                fabricFile = { "Fabric Version wird heruntergeladen..." },
+                fabricLibraries = { "Fabric Bibliotheken werden heruntergeladen..." },
+                file = { "Version wird heruntergeladen..." },
+                forge = { "Forge Version wird erstellt..." },
+                forgeFile = { "Forge Version wird heruntergeladen..." },
+                forgeLibraries = { "Forge Bibliotheken werden heruntergeladen..." },
                 libraries = { "Bibliotheken werden heruntergeladen..." },
-                fabric = { "Fabric Version wird erstellt..." }
+                quilt = { "Quilt Version wird erstellt..." },
+                quiltLibraries = { "Quilt Bibliotheken werden heruntergeladen..." },
+                value = { "Version wird erstellt..." },
+                vanilla = { "Minecraft Version wird erstellt..." }
             ),
             java = { "Java Version wird heruntergeladen..." },
             finishing = { "Erstellung wird abgeschlossen..." }
@@ -62,9 +73,11 @@ class DeStrings : Strings(
             errorVersion = { "Keine Version ausgewählt." },
             errorType = { "Kein Versionstyp ausgewählt." },
             errorLoader = { "Keine Fabric Version ausgewählt." },
+            fabric = { "Fabric Version" },
+            forge = { "Forge Version" },
             showSnapshots = { "Snapshots anzeigen" },
-            loader = { "Fabric Version" },
             loading = { "Laden..." },
+            quilt = { "Quilt Version" },
             type = { "Versionstyp" },
             version = { "Version" }
         )
@@ -74,12 +87,25 @@ class DeStrings : Strings(
     ),
     error = Error(
         close = { "Akzeptieren" },
-        message = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
-        title = { "Ein Fehler ist aufgetreten!" },
+        notification = { error -> "Ein Fehler ist aufgetreten: ${error.message ?: "Unbekannter Fehler"}. Hier klicken zum schließen." },
         severeClose = { "Launcher schließen" },
         severeMessage = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
         severeTitle = { "Ein kritischen Fehler ist aufgetreten!" },
         unknown = { "Unbekannter Fehler" }
+    ),
+    fixFiles = FixFiles(
+        cancel = { "Nicht versuchen" },
+        close = { "Schließen" },
+        confirm = { "Versuchen, den Launcher wiederherzustellen" },
+        failureMessage = { "Ein erneuter Versuch wird wahrscheinlich nicht helfen.\nBitte versuchen, die Dateien manuell zu reparieren oder den Entwickler zu kontaktieren." },
+        failureTitle = { "Wiederherstellung des Launchers fehlgeschlagen!" },
+        message = { "Der Launcher ist in diesem Zustand nicht nutzbar.\nDies kann durch ein unerwartetes Schließen während das Spiel lief verursacht worden sein.\n\nVersuchen, die Dateien automatisch zu reparieren?\nNicht-Weltdaten aus Ihrer letzten Spielsitzung können hierbei verloren gehen.\n\nVor dem Versuch bitte alle Spiel-Ordner und Dateien schließen.\nDIESEN VORGANG NUR STARTEN, WENN KEINE SPIELINSTANZ LÄUFT!" },
+        notification = { "Launcher-Dateien inkonsistent! Hier klicken zum Beheben." },
+        runningMessage = { "Dies könnte eine Weile dauern." },
+        runningTitle = { "Versuchen, den Launcher wiederherzustellen..." },
+        successMessage = { "Der Launcher sollte wieder nutzbar sein." },
+        successTitle = { "Launcher erfolgreich wiederhergestellt!" },
+        title = { "Inkonsistente Launcher-Dateien erkannt!" }
     ),
     game = Game(),
     language = Language(
@@ -89,17 +115,63 @@ class DeStrings : Strings(
         status = Launcher.Status(
             preparing = { progress -> "Einmaliges Setup wird durchgeführt... $progress%" },
             restartRequired = { "Neustart erforderlich. Bitte neu starten." }
-        )
+        ),
+        patch = Launcher.Patch(
+            running = { "Daten Aktualisierung läuft..." },
+            message = { "Die Daten müssen aktualisiert werden, um mit der neuen Version kompatibel zu sein." },
+            title = { "Die Launcher Daten müssen aktualisiert werden" },
+            backup = { "Backup vor dem Aktualisieren erstellen" },
+            backupHint = { "Abhängig von der Datengröße kann dies viel Zeit und Speicherplatz in Anspruch nehmen."},
+            start = { "Aktualisierung starten" },
+            status = {
+                when(it) {
+                    DataPatcher.PatchStep.CREATE_BACKUP -> "Backup wird erstellt"
+                    DataPatcher.PatchStep.REMOVE_BACKUP_EXCLUDED_FILES -> "Backup-Dateien werden aus Instanzen entfernt"
+                    DataPatcher.PatchStep.UPGRADE_SETTINGS -> "Version wird in den Einstellungen angewendet"
+                    DataPatcher.PatchStep.GAME_DATA_COMPONENTS -> "Spieldaten Komponenten werden bewegt"
+                    DataPatcher.PatchStep.INCLUDED_FILES -> "Einbegriffene Dateien werden neustrukturiert"
+                    DataPatcher.PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT -> "Ressourcenpaket Versionsargumente werden entfernt"
+                    DataPatcher.PatchStep.ADD_GAME_DATA_INCLUDED_FILES -> "Einbegriffene Dateien werden Spieldaten Komponenten hinzugefügt"
+                    DataPatcher.PatchStep.TEXTUREPACKS_INCLUDED_FILES -> "Texturenpakete werden zu einbegriffenen Dateien hinzugefügt"
+                }
+            }
+        ),
+    ),
+    list = List(
+        full = { "Komfortabel" },
+        compact = { "Kompakt" },
+        minimal = { "Minimal" }
     ),
     login = Login(
         browserTitle = { state -> "Einloggen: ${state.pageTitle ?: "Wird geladen..."} (${state.lastLoadedUrl ?: "URL wird abgerufen..."})" },
         button = { "Login mit Microsoft" },
+        tip = { "TIPP: ${
+            arrayOf(
+                "Dateien können in Welten, Ressourcenpaket oder Mod Komponenten gezogen werden, um diese zu importieren.",
+                "Welten oder Server können direkt gestartet werden. Diese auswählen und den Spielen Knopf klicken.",
+                "Die Farbe des Launchers kann in den Einstellungen angepasst werden.",
+                "Den Nachrichten Knopf am oberen Bildschirmrand klicken, um die neuesten Neuigkeiten zu sehen.",
+                "Mit dem Mauszeiger kann über die Spielzeit einer Instanz gefahren werden, um die genaue Zeit anzuzeigen.",
+                "Die Mods-Komponente einer Instanz kann durch auswahl des der Option \"Keine Komponente\" entfernt werden.",
+                "Launcher-Dateien können an einem anderen Speicherort gespeichert werden. Der Ort wird in den Einstellungen ausgewählt.",
+                "Die Sortierung von Komponenten kann durch Klicken auf den Sortierknopf neben dem Zeilenkopf geändert werden.",
+                "Der Launcher kann komplett durch benutzen der Tabulator-Taste verwendet werden.",
+                "Dateien können in die Komponenteneinstellungen gezogen werden, um diese den Einbegriffenen Dateien hinzuzufügen.",
+                "Die größe von Listenelementen in Komponenten kann durch klicken auf den Listenanzeige-Knopf neben dem Titel angepasst werden",
+                "Die Anzeigegröße kann in den Einstellungen angepasst werden.",
+                "In den Einstellungen kann die Discord Integration angeschaltet werden, die allen anzeigt, was gerade gespielt wird."
+            ).random()
+        }" },
         label = Login.Label(
             authenticating = { "Einloggen..." },
             failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
-            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" }
+            success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" },
+            offline = { "Im Offline-Modus gestartet." }
         ),
-        keepLoggedIn = { "Eingeloggt bleiben" }
+        logout = { "Gespeichertes Logindaten löschen" },
+        keepLoggedIn = { "Eingeloggt bleiben" },
+        offline = { "Im Offline-Modus starten" },
+        offlineNotification = { "Offline-Modus aktiv. Funktionalität eingeschränkt." },
     ),
     manager = Manager(
         component = Manager.Component(
@@ -109,6 +181,10 @@ class DeStrings : Strings(
             file = { "Datei" },
             fileName = { "Dateiname eingeben" },
             folder = { "Verzeichnis" },
+            import = Manager.Component.Import(
+                back = { "Zurück" },
+                tooltipExpand = { expanded -> if(expanded) "Zuklappen" else "Aufklappen" },
+            ),
             includedFiles = { "Einbegriffene Dateien:" },
             settings = { "Komponenteneinstellungen" }
         ),
@@ -122,7 +198,7 @@ class DeStrings : Strings(
                 message = { "Kompatibilität kann nicht garantiert werden.\nEs ist empfohlen, die Version durch Erstellen einer neuen Instanz mit gleichen Komponenten zu ändern."},
                 noComponent = { "Keine Komponente" },
                 success = { "Version geändert!" },
-                title = { "Eine Komponente auswählen" },
+                title = { "Die Version dieser Instanz wirklich ändern?" },
                 activeTitle = { type, name ->
                     when(type) {
                         InstanceDetails.SAVES -> strings().manager.instance.details.saves()
@@ -158,23 +234,19 @@ class DeStrings : Strings(
         ),
         mods = Manager.Mods(
             add = { "Lokale mod hinzufügen" },
-            local = Manager.Mods.Local(
-                cancel = { "Abbrechen" },
-                confirm = { "Hinzufügen" },
-                curseforge = { "Curseforge Projekt ID" },
-                curseforgeError = { "Ungültige Projekt ID" },
-                file = { "Datei" },
-                fileError = { "Keine Datei ausgewählt" },
-                modrinth = { "Modrinth Projekt ID" },
-                modrinthError = { "Ungültige Projekt ID" },
-                name = { "Name" },
-                version = { "Version" },
-                versionError = { "Keine Version ausgewählt" }
+            addMods = Manager.Mods.Add(
+                addLocal = { "Mod manuell hinzufügen" },
+                back = { "Zurück" },
+                search = { "Online nach einer Mod suchen" },
+                searchTooltip = { "Suchen" },
+                loading = { "Mods werden gesucht..."},
+                noResults = { "Keine Mod mit passender Version gefunden." }
             ),
             card = Manager.Mods.Card(
                 changeUsed = { enabled -> if(enabled) "Mod deaktivieren" else "Mod aktivieren" },
                 delete = { "Mod Löschen" },
                 download = { "Version herunterladen" },
+                edit = { "Mod bearbeiten" },
                 openBrowser = { "Im Browser öffnen" },
                 versionPlaceholder = { "Eine Version auswählen" }
             ),
@@ -186,30 +258,93 @@ class DeStrings : Strings(
             ),
             changeVersion = { "Spielversion:" },
             current = { "Aktuelle Mods" },
-            search = Manager.Mods.Search(
-                addLocal = { "Mod manuell hinzufügen" },
-                back = { "Zurück" },
-                search = { "Nach einer Mod suchen" },
-                searchTooltip = { "Suchen" },
-                loading = { "Mods werden gesucht..."},
-                noResults = { "Keine Mod mit passender Version gefunden." }
+            edit = Manager.Mods.Edit(
+                cancel = { "Abbrechen" },
+                confirm = { current -> current?.let{ "Anwenden" } ?: "Hinzufügen" },
+                curseforge = { "Curseforge Projekt ID" },
+                curseforgeError = { "Ungültige Projekt ID" },
+                file = { "Datei" },
+                fileError = { "Keine Datei ausgewählt" },
+                modrinth = { "Modrinth Projekt ID" },
+                modrinthError = { "Ungültige Projekt ID" },
+                name = { "Name" },
+                version = { "Version" },
+                versionError = { "Keine Version ausgewählt" }
+            ),
+            empty = { "Keine Mods gefunden" },
+            import = Manager.Mods.ImportStrings(
+                delete = { "Mod entfernen" },
+                displayName = { mod -> "${mod.name} v${mod.version}"},
+                import = { "Mods importieren" },
+                importComponent = { "Mods aus anderen Komponenten auswählen:" },
+                importFile = { "Lokale Moddateien kopieren:" },
+                importing = { "Mods werden importiert..." },
+                selectedFiles = { "Ausgewählte Mods:" },
+                tooltipAdd = { "Hinzufügen" },
+                tooltipFile = { "Moddatei auswählen" }
+            ),
+            searchPlaceholder = { "Nach einer Mod suchen" },
+            settings = Manager.Mods.Settings(
+                order = { down -> if(down) "Priorität verringern" else "Priorität erhöhen" },
+                providers = { "Mod-Quellen Priorität"},
+                help = { "Wenn möglich, werden mods von der höchst-priorisierten Quelle heruntergeladen.\nWenn eine Quelle verboten ist, werden Mods niemals von dort heruntergeladen." },
+                state = { enabled -> if(enabled) "Verbieten" else "Erlauben" },
+                tooltip = { "Einstellungen öffnen" }
             ),
             update = Manager.Mods.Update(
                 auto = { "Automatisch aktualisieren" },
                 disable = { "Mods ohne passende Version deaktivieren" },
                 enable = { "Deaktivierte Mods aktivieren"},
+                settings = { "Aktualisierungseinstellungen" },
                 tooltip = { "Nach Updates suchen" }
             ),
             version = { "Spielversion" }
-        )
-    ),
-    menu = Menu(
-        delete = { "Löschen" },
-        rename = { "Umbenennen" },
-        noSelection = { "Nichts ausgewählt" },
-        folder = { "Im Dateiexplorer öffnen" },
-        play = { "Start" },
-        sync = { "Komponente hochladen" }
+        ),
+        resourcepacks = Manager.Resourcepacks(
+            delete = { "Ressourcenpaket löschen" },
+            deleteTitle = { "Die Ressourcenpaket wirklich löschen?" },
+            deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden." },
+            deleteConfirm = { "Ja, löschen" },
+            deleteCancel = { "Abbrechen" },
+            import = Manager.Component.ImportStrings(
+                delete = { "Ressourcenpaket entfernen" },
+                import = { "Ressourcenpakete importieren" },
+                importComponent = { "Ressourcenpakete aus anderen Komponenten auswählen:" },
+                importFile = { "Lokale Ressourcenpakete kopieren:" },
+                importing = { "Ressourcenpakete werden importiert..." },
+                selectedFiles = { "Ausgewählte Ressourcenpakete:" },
+                tooltipAdd = { "Hinzufügen" },
+                tooltipFile = { "Ressourcenpaket auswählen" },
+                unknownCancel = { "Abbrechen" },
+                unknownConfirm = { "Ressourcenpaket importieren" },
+                unknownMessage = { file -> "Die Datei \"${file.name}\" hat kein dem Launcher bekanntes Ressourcenpaketformat.\nDas Ressourcenpaket trotzdem importieren?" },
+                unknownTitle = { "Unbekanntes Ressourcenpaketformat" }
+
+            ),
+            tooltipAdd = { "Ressourcenpaket hinzufügen" },
+        ),
+        saves = Manager.Saves(
+            delete = { "Welt löschen" },
+            deleteTitle = { world -> "Die Welt \"${world.name}\" wirklich löschen?" },
+            deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle Daten dieser Welt werden unwiederruflich gelöscht." },
+            deleteConfirm = { world -> "Ja, die Welt \"${world.name}\" permanent löschen" },
+            deleteCancel = { "Abbrechen" },
+            import = Manager.Component.ImportStrings(
+                delete = { "Welt entfernen" },
+                import = { "Welten importieren" },
+                importComponent = { "Welten aus anderen Komponenten auswählen:" },
+                importFile = { "Lokale Weltendateien kopieren:" },
+                importing = { "Welten werden importiert..." },
+                selectedFiles = { "Ausgewählte Welten:" },
+                tooltipAdd = { "Hinzufügen" },
+                tooltipFile = { "Weltendatei auswählen" },
+                unknownCancel = { "Abbrechen" },
+                unknownConfirm = { "Welt importieren" },
+                unknownMessage = { file -> "Die Datei \"${file.name}\" hat kein dem Launcher bekanntes Weltenformat.\nDie Welt trotzdem importieren?" },
+                unknownTitle = { "Unbekanntes Weltenformat" }
+            ),
+            tooltipAdd = { "Welt hinzufügen" },
+        ),
     ),
     nav = Nav(
         add = { "Instanz erstellen" },
@@ -225,6 +360,7 @@ class DeStrings : Strings(
         important = { "Wichtige Neuigkeiten:" },
         loading = { "Neuigkeiten werden geladen..." },
         none = { "Keine aktuellen Neuigkeiten" },
+        notification = { "Neue Neuigkeiten verfügbar! Hier klicken zum Anzeigen." },
         other = { "Neuigkeiten:" },
         tooltip = { "Neuigkeiten anzeigen" },
         title = { "Neuigkeiten" }
@@ -236,6 +372,7 @@ class DeStrings : Strings(
                 confirm = { "Löschen" },
                 message = { "Diese Aktion kann nicht rückgängig gemacht werden!\nDaten in dieser Komponente werden unwiderruflich gelöscht.\nDiese Komponente wird von keiner Instanz verwendet." },
                 title = { "Diese Komponente wirklich löschen?" },
+                tooltip = { "Komponente löschen" },
                 unableClose = { "Schließen" },
                 unableMessage = { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
                 unableTitle = { "Diese Komponente kann nicht gelöscht werden!" },
@@ -254,14 +391,26 @@ class DeStrings : Strings(
                 cancel = { "Abbrechen" },
                 confirm = { "Löschen" },
                 message = { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle verwendeten Komponenten bleiben bestehen." },
-                title = { "Diese Instanz wirklich löschen?" }
+                title = { "Diese Instanz wirklich löschen?" },
+                tooltip = { "Instanz löschen" }
             ),
+            empty = { "Auf den" to "Knopf unten klicken, um Instanzen zu erstellen." },
+            emptyTitle = { "Keine Instanzen erstellt." },
             game = Selector.Instance.Game(
+                cleanupFailCancel = { "Abbrechen: der Launcher wird unbenutzbar" },
+                cleanupFailMessage = { "Spieldateien konnten nicht an ihren Zielort bewegt werden.\nVor dem erneuten Versuchen bitte alle Spiel-Ordner und Dateien schließen!\nDurch das Klicken von \"Abbrechen\" wird der Launcher unbenutzbar." },
+                cleanupFailRetry = { "Erneut versuchen" },
+                cleanupFailTitle = { "Aufräumen von Spielressourcen fehlgeschlagen!" },
                 errorMessage = { message -> "Fehler:\n$message\nDiesen Fehler bitte melden."},
                 errorTitle ={ "Spielstart fehlgeschlagen!" },
+                exitingMessage = { "Das Spiel wird geschlossen." },
+                exitingTitle = { "Spielressourcen werden aufgeräumt..." },
                 preparingMessage = { "Das Spiel starten in Kürze." },
                 preparingTitle ={ "Spielressourcen werden vorbereitet..." },
                 runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
+                runningNotification = { instance -> "Aktuell läuft: ${instance.instance.first.name}" },
+                runningOpen = { "Spielordner öffnen" },
+                runningStop = { "Spielprozess beenden" },
                 runningTitle = { "Das Spiel läuft..." },
                 crashClose = { "Schließen" },
                 crashMessage = { message -> "Fehler:\n$message\nDies wurde vermutlich nicht durch den Launcher verursacht." },
@@ -277,6 +426,8 @@ class DeStrings : Strings(
             version = { "Version" }
         ),
         mods = Selector.Mods(
+            empty = { "Mods hierher ziehen oder auf den" to "Knopf oben drücken, um Mods hinzuzufügen." },
+            emptyTitle = { "Keine Mods hinzugefügt." },
             content = Selector.Mods.Content(
                 delete = { "Mod löschen" },
                 disable = { "Mod deaktivieren" },
@@ -290,9 +441,15 @@ class DeStrings : Strings(
             title = { "Optionen" }
         ),
         resourcepacks = Selector.Resourcepacks(
-            title = { "Ressourcenpakete" }
+            empty = { "Ressourcenpakete hierher ziehen oder auf den" to "Knopf oben drücken, um welche importieren." },
+            emptyTitle = { "Keine Ressourcenpakete hinzugefügt." },
+            title = { "Ressourcenpakete" },
+            resourcepacks = { "Ressourcenpakete:" },
+            texturepacks = { "Texturenpakete:" }
         ),
         saves = Selector.Saves(
+            empty = { "Welten hierher ziehen oder auf den" to "Knopf oben drücken, um welche importieren." },
+            emptyTitle = { "Keine Welten hinzugefügt." },
             play = Selector.Saves.Play(
                 button = { "Welt starten" },
                 multipleClose = { "Abbrechen" },
@@ -309,7 +466,38 @@ class DeStrings : Strings(
         )
     ),
     settings = Settings(
-        appearance = { "Darstellung" },
+        appearance = Settings.Appearance(
+            decrement = { "Um 10% erhöhen" },
+            displayScale = { "Anzeigegröße:" },
+            increment = { "Um 10% verringern" },
+            largeHint = { "Große Anzeigegrößen können Inhalt abschneiden" },
+            smallHint = { "Kleine Anzeigegrößen können die Lesbarkeit einschränken" },
+            title = { "Darstellung" }
+        ),
+        cleanup = Settings.Cleanup(
+            button = { "Ungenutzte Dateien löschen" },
+            cancel = { "Abbrechen" },
+            close = { "Schließen" },
+            confirm = { "Dateien Löschen" },
+            deleting = { "Dateien werden gelöscht..." },
+            failureMessage = { "Nicht alle Dateien konnten gelöscht werden.\nDies beeinflusst die funtkionalität des Launchers wahrscheinlich nicht.\nDetails wurden in die Logs geschrieben." },
+            failureTitle = { "Löschen fehlgeschlagen." },
+            libraries = { "Auch ungenutzte Bibliotheken löschen" },
+            message = { "Alle versionsdateien, die von keiner Instanz genutzt werden, werden gelöscht um Speicherplatz zu sparen.\n Versionen können jederzeit wieder installiert werden." },
+            success = { "Ungenutzte Dateien gelöscht." },
+            title = { "Ungenutzte Dateien löschen?" }
+        ),
+        debugNotification = { "Debug-Modus ${if(it) "aktiviert" else "deaktiviert"}!" },
+        discord = Settings.Discord(
+            instanceExample = { "MeineInstanz"},
+            instanceToggle = { "Instanznamen anzeigen" },
+            modLoaderToggle = { "Mod-Loader anzeigen" },
+            timeSuffix = { " vergangen" },
+            timeToggle = { "Spielzeit anzeigen" },
+            title = { "Discord Integration" },
+            versionToggle = { "Spielversion anzeigen" },
+            watermarkToggle = { "Launchernamen anzeigen" }
+        ),
         language = { "Sprache:" },
         logout = { "Ausloggen" },
         path = Settings.Path(
@@ -324,7 +512,7 @@ class DeStrings : Strings(
             success = { "Dateipfad geändert" },
             title = { "Launcher Dateipfad"}
         ),
-        restartRequired = { "Diese Einstellung wird nach dem Neustart angewendet" },
+        resetWindow = { "Fenstergröße und -position zurücksetzen" },
         source = { "Quellcode Repository" },
         sourceTooltip = { "Quellcode Repository öffnen" },
         sync = Settings.Sync(
@@ -339,10 +527,14 @@ class DeStrings : Strings(
             url = { "URL" }
         ),
         title = { "Einstellungen" },
-        theme = { "Farben:" },
+        theme = Settings.Theme(
+            cancel = { "Abbrechen" },
+            confirm = { "Anwenden" },
+            title = { "Akzentfarbe auswählen:" }
+        ),
         update = Settings.Update(
             available = { "Update verfügbar!" },
-            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"}}"},
+            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"} ?: ""}"},
             availableTitle = { "Update verfügbar!" },
             cancel = { "Abbrechen" },
             checkingTitle = { "Es wird nach Updates gesucht..." },
@@ -359,6 +551,13 @@ class DeStrings : Strings(
             unavailableMessage = { "Ein Update ist verfügbar, aber der Launcher kann nicht automatisch aktualisiert werden.\nBitte online nach manueller Update-Anleitung suchen." },
             unavailableTitle = { "Update kann nicht durchgeführt werden." }
         ),
+        updateUrl = Settings.UpdateUrl(
+            apply = { "Anwenden" },
+            popupClose = { "Schließen" },
+            popupMessage = {e -> "Der folgende Fehler ist aufgetreten:\n${e.message}" },
+            popupTitle = { "URL konnte nicht geändert werden" },
+            title = { "Update URL" }
+        ),
         user = { "Eingeloggt als:" },
         version = { "Version: v${strings().launcher.version()}" }
     ),
@@ -366,6 +565,7 @@ class DeStrings : Strings(
         sort = SortBox.Sort(
             enabledName = { "Name (Aktivierte zuerst)" },
             lastPlayed = { "Zuletzt gespielt" },
+            lastUsed = { "Zuletzt verwendet" },
             name = { "Name" },
             time = { "Spielzeit" }
         ),
@@ -393,13 +593,15 @@ class DeStrings : Strings(
         syncing = { "Komponente wird synchronisiert..."},
         unknown = { "<Unbekannter Name>" }
     ),
-    textBox = TextBox(
-        clear = { "Löschen" }
-    ),
     theme = Theme(
         dark = { "Dunkel" },
         light = { "Hell" },
-        system = { "Systemeinstellung" }
+        system = { "Systemeinstellung" },
+        green = { "Grün" },
+        blue = { "Blau" },
+        magenta = { "Magenta" },
+        orange = { "Orange" },
+        custom = { "Benutzerdefiniert" }
     ),
     units = Units(
         days = { "d" },
@@ -408,7 +610,10 @@ class DeStrings : Strings(
         seconds = { "s" },
         megabytes = { "mb" },
         pixels = { "px" },
-        resolutionBy = { "x" }
+        resolutionBy = { "x" },
+        accurateTime = { secs ->
+            "${secs/3600}h ${(secs%3600/60).toString().padStart(2,'0')}m ${(secs%60).toString().padStart(2,'0')}s"
+        }
     ),
     updater = Updater(
         close = { "Schließen" },
@@ -425,5 +630,6 @@ class DeStrings : Strings(
             warningMessage = { "Das Löschen temporärer Update Ressourcen ist fehlgeschlagen.\nDas verursacht wahrscheinlich keine Fehler.\nDetails wurden in die Logs geschrieben." },
             warningTitle = { "Der Launcher wurde aktualisiert." }
         )
-    )
+    ),
+    version = Version()
 )

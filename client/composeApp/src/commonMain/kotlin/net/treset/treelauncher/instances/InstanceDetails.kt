@@ -1,13 +1,13 @@
 package net.treset.treelauncher.instances
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appConfig
@@ -25,8 +25,7 @@ fun InstanceDetails(
     instance: InstanceData,
     redrawSelected: () -> Unit,
     reloadInstances: () -> Unit,
-    appContext: AppContext,
-    loginContext: LoginContext,
+    unselectInstance: () -> Unit
 ) {
     var selectedDetails: InstanceDetails? by remember { mutableStateOf(null) }
 
@@ -49,69 +48,53 @@ fun InstanceDetails(
                 ) {
                     IconButton(
                         onClick = {
+                            unselectInstance()
                             val launcher = GameLauncher(
                                 instance,
-                                appContext.files,
-                                loginContext.userAuth.minecraftUser!!
+                                AppContext.files,
+                                LoginContext.isOffline(),
+                                LoginContext.userAuth.minecraftUser
                             )
                             launchGame(
-                                launcher,
-                                { popupContent = it },
-                                { redrawSelected() }
-                            )
+                                launcher
+                            ) { redrawSelected() }
                         },
+                        painter = icons().play,
+                        size = 32.dp,
                         highlighted = true,
+                        enabled = AppContext.runningInstance == null,
                         tooltip = strings().selector.instance.play()
-                    ) {
-                        Icon(
-                            icons().play,
-                            "Play",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     Text(instance.instance.first.name)
                     IconButton(
                         onClick = {
                             showRename = true
                         },
+                        icon = icons().edit,
+                        size = 32.dp,
                         tooltip = strings().selector.component.rename.title()
-                    ) {
-                        Icon(
-                            icons().rename,
-                            "Rename",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     IconButton(
                         onClick = {
                             LauncherFile.of(instance.instance.first.directory).open()
                         },
+                        icon = icons().folder,
+                        size = 32.dp,
                         tooltip = strings().selector.component.openFolder()
-                    ) {
-                        Icon(
-                            icons().folder,
-                            "Open Folder",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     IconButton(
                         onClick = {
                             deleteDialog(
                                 instance,
-                                appContext,
                                 { pc -> popupContent = pc },
                                 { reloadInstances() }
                             )
                         },
+                        icon = icons().delete,
+                        size = 32.dp,
                         interactionTint = MaterialTheme.colorScheme.error,
-                        tooltip = strings().selector.component.delete.title()
-                    ) {
-                        Icon(
-                            icons().delete,
-                            "Delete",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                        tooltip = strings().selector.instance.delete.tooltip()
+                    )
                 }
         }
     ) {
@@ -152,17 +135,15 @@ fun InstanceDetails(
                 selectedDetails = if (selectedDetails == InstanceDetails.OPTIONS) null else InstanceDetails.OPTIONS
             }
         )
-        if(instance.versionComponents.size > 1) { // Fabric
-            SelectorButton(
-                title = strings().manager.instance.details.mods(),
-                component = instance.modsComponent?.first,
-                icon = icons().mods,
-                selected = selectedDetails == InstanceDetails.MODS,
-                onClick = {
-                    selectedDetails = if (selectedDetails == InstanceDetails.MODS) null else InstanceDetails.MODS
-                }
-            )
-        }
+        SelectorButton(
+            title = strings().manager.instance.details.mods(),
+            component = instance.modsComponent?.first,
+            icon = instance.modsComponent?.let { icons().mods } ?: icons().add,
+            selected = selectedDetails == InstanceDetails.MODS,
+            onClick = {
+                selectedDetails = if (selectedDetails == InstanceDetails.MODS) null else InstanceDetails.MODS
+            }
+        )
         SelectorButton(
             title = strings().manager.instance.details.settings(),
             icon = icons().settings,
@@ -179,7 +160,7 @@ fun InstanceDetails(
                 InstanceComponentChanger(
                     instance = instance,
                     type = it,
-                    appContext = appContext,
+                    appContext = AppContext,
                     redrawSelected = redrawSelected
                 )
             }
@@ -188,14 +169,14 @@ fun InstanceDetails(
                     instance = instance,
                     type = it,
                     allowUnselect = true,
-                    appContext = appContext,
+                    appContext = AppContext,
                     redrawSelected = redrawSelected
                 )
             }
             InstanceDetails.VERSION -> {
                 InstanceVersionChanger(
                     instance = instance,
-                    appContext = appContext,
+                    appContext = AppContext,
                     redrawCurrent = redrawSelected
                 )
             }
@@ -230,7 +211,6 @@ fun InstanceDetails(
 
 private fun deleteDialog(
     instance: InstanceData,
-    appContext: AppContext,
     setPopup: (PopupData?) -> Unit,
     onSuccess: () -> Unit
 ) {
@@ -238,10 +218,7 @@ private fun deleteDialog(
         PopupData(
             type = PopupType.WARNING,
             titleRow = { Text(strings().selector.instance.delete.title()) },
-            content =  { Text(
-                strings().selector.instance.delete.message(),
-                textAlign = TextAlign.Center,
-            ) },
+            content =  { Text(strings().selector.instance.delete.message()) },
             buttonRow = {
                 Button(
                     onClick = { setPopup(null) },
@@ -249,7 +226,7 @@ private fun deleteDialog(
                 )
                 Button(
                     onClick = {
-                        instance.delete(appContext.files)
+                        instance.delete(AppContext.files)
                         onSuccess()
                         setPopup(null)
                     },

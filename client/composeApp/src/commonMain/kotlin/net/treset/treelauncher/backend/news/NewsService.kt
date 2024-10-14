@@ -1,13 +1,12 @@
 package net.treset.treelauncher.backend.news
 
 import net.treset.mc_version_loader.json.SerializationException
-import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.util.HttpService
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
 import java.io.IOException
 
-class NewsService : HttpService(appConfig().updateUrl) {
+class NewsService(url: String) : HttpService(url) {
     @Throws(IOException::class)
     fun news(): News {
         val result: Pair<HttpStatusCode, ByteArray> = get(

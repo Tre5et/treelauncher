@@ -1,6 +1,6 @@
 package net.treset.treelauncher.backend.util.sort
 
-import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.treelauncher.backend.data.LauncherMod
 import net.treset.treelauncher.localization.strings
 
 class LauncherModDisabledNameComparator : Comparator<LauncherMod> {

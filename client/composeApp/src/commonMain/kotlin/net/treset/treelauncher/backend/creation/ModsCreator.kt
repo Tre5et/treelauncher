@@ -1,27 +1,26 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 class ModsCreator : GenericComponentCreator {
-    private val modsType: String?
-    private val modsVersion: String?
-    private var gameManifest: LauncherManifest? = null
+    private val types: List<String>?
+    private val versions: List<String>?
 
     constructor(
         name: String?,
         typeConversion: Map<String, LauncherManifestType>,
-        componentsManifest: LauncherManifest,
-        modsType: String?,
-        modsVersion: String?,
-        gameManifest: LauncherManifest?
+        componentsManifest: ParentManifest,
+        types: List<String>?,
+        versions: List<String>?,
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
         null,
@@ -32,17 +31,15 @@ class ModsCreator : GenericComponentCreator {
         appConfig().modsDefaultDetails,
         componentsManifest
     ) {
-        this.modsType = modsType
-        this.modsVersion = modsVersion
-        this.gameManifest = gameManifest
+        this.types = types
+        this.versions = versions
         this.defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
 
     constructor(
         name: String?,
-        inheritsFrom: Pair<LauncherManifest?, LauncherModsDetails?>,
-        componentsManifest: LauncherManifest,
-        gameManifest: LauncherManifest?
+        inheritsFrom: Pair<ComponentManifest?, LauncherModsDetails?>,
+        componentsManifest: ParentManifest,
     ) : super(
         LauncherManifestType.MODS_COMPONENT,
         null,
@@ -53,13 +50,12 @@ class ModsCreator : GenericComponentCreator {
         null,
         componentsManifest
     ) {
-        modsType = null
-        modsVersion = null
-        this.gameManifest = gameManifest
+        types = null
+        versions = null
         defaultStatus = CreationStatus(CreationStatus.DownloadStep.MODS, null)
     }
 
-    constructor(uses: Pair<LauncherManifest?, LauncherModsDetails?>) : super(
+    constructor(uses: Pair<ComponentManifest?, LauncherModsDetails?>) : super(
         LauncherManifestType.MODS_COMPONENT,
         uses.first,
         null,
@@ -69,8 +65,8 @@ class ModsCreator : GenericComponentCreator {
         null,
         null
     ) {
-        modsType = null
-        modsVersion = null
+        types = null
+        versions = null
         defaultStatus = (CreationStatus(CreationStatus.DownloadStep.MODS, null))
     }
 
@@ -78,7 +74,7 @@ class ModsCreator : GenericComponentCreator {
     override fun createComponent(): String {
         val result: String = super.createComponent()
         newManifest?.let {
-            val details = LauncherModsDetails(modsType, modsVersion, listOf())
+            val details = LauncherModsDetails(types, versions, mutableListOf())
             try {
                 LauncherFile.of(it.directory, appConfig().modsDefaultDetails).write(details)
             } catch (e: IOException) {
@@ -91,9 +87,6 @@ class ModsCreator : GenericComponentCreator {
         attemptCleanup()
         throw ComponentCreationException("Failed to create mods component: invalid data")
     }
-
-    override val parentManifestFileName: String
-        get() = gameManifest?.components?.get(0)?: super.parentManifestFileName
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}

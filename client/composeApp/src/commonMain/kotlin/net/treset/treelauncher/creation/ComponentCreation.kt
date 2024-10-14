@@ -2,13 +2,9 @@ package net.treset.treelauncher.creation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.ComboBox
-import net.treset.treelauncher.generic.TextBox
-import net.treset.treelauncher.generic.TitledRadioButton
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 
 
@@ -64,15 +60,15 @@ fun <T> ComponentCreator(
 
     var useSelected: T? by remember(existing) { mutableStateOf(null) }
 
-    setCurrentState(
+    val creationState = remember(existing, mode, newName, inheritName, inheritSelected, useSelected) {
         CreationState.of(
             mode,
             newName,
             inheritName,
             inheritSelected,
             useSelected
-        )
-    )
+        ).also(setCurrentState)
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -84,7 +80,7 @@ fun <T> ComponentCreator(
         )
         TextBox(
             text = newName,
-            onChange = {
+            onTextChanged = {
                 newName = it
             },
             placeholder = strings().creator.name(),
@@ -98,7 +94,7 @@ fun <T> ComponentCreator(
         )
         TextBox(
             text = inheritName,
-            onChange = {
+            onTextChanged = {
                 inheritName = it
             },
             placeholder = strings().creator.name(),
@@ -106,7 +102,7 @@ fun <T> ComponentCreator(
         )
         ComboBox(
             items = existing,
-            defaultSelected = inheritSelected,
+            selected = inheritSelected,
             onSelected = {
                 inheritSelected = it
             },
@@ -123,7 +119,7 @@ fun <T> ComponentCreator(
             )
             ComboBox(
                 items = existing,
-                defaultSelected = useSelected,
+                selected = useSelected,
                 onSelected = {
                     useSelected = it
                 },
@@ -135,21 +131,9 @@ fun <T> ComponentCreator(
 
         if(showCreate) {
             Button(
-                enabled = when(mode) {
-                    CreationMode.NEW -> newName.isNotBlank()
-                    CreationMode.INHERIT -> inheritName.isNotBlank() && inheritSelected != null
-                    CreationMode.USE -> useSelected != null
-                },
+                enabled = creationState.isValid(),
                 onClick = {
-                    CreationState.of(
-                        mode,
-                        newName,
-                        inheritName,
-                        inheritSelected,
-                        useSelected
-                    ).let {
-                        if(it.isValid()) onCreate(it)
-                    }
+                    if(creationState.isValid()) onCreate(creationState)
                 }
             ) {
                 Text(strings().creator.buttonCreate())

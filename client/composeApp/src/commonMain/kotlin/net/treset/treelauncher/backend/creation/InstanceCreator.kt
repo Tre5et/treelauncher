@@ -1,8 +1,12 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.*
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.data.LauncherFeature
+import net.treset.treelauncher.backend.data.LauncherInstanceDetails
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -12,7 +16,7 @@ import java.io.IOException
 class InstanceCreator(
     name: String?,
     typeConversion: Map<String, LauncherManifestType>?,
-    componentsManifest: LauncherManifest?,
+    componentsManifest: ParentManifest?,
     private val ignoredFiles: List<PatternString>,
     private val jvmArguments: List<LauncherLaunchArgument>,
     private val features: List<LauncherFeature>,
@@ -48,20 +52,17 @@ class InstanceCreator(
                 jvmArguments
             )
             jvmArguments.addAll(appConfig().instanceDefaultJvmArguments)
-            val details = LauncherInstanceDetails(
-                features,
-                ignoredFiles.stream().map(PatternString::get).toList(),
-                jvmArguments,
-                null, null, null, null, null
-            )
-            try {
-                if (modsCreator != null) {
-                    details.modsComponent = modsCreator.id
-                }
-                details.optionsComponent = optionsCreator.id
-                details.resourcepacksComponent = resourcepackCreator.id
-                details.savesComponent = savesCreator.id
-                details.versionComponent = versionCreator.id
+            val details = try {
+                LauncherInstanceDetails(
+                    features,
+                    ignoredFiles.stream().map(PatternString::get).toList(),
+                    jvmArguments,
+                    modsCreator?.id,
+                    optionsCreator.id,
+                    resourcepackCreator.id,
+                    savesCreator.id,
+                    versionCreator.id
+                )
             } catch (e: ComponentCreationException) {
                 attemptCleanup()
                 throw ComponentCreationException("Failed to create instance: Error creating components", e)
@@ -77,7 +78,7 @@ class InstanceCreator(
                 )
             }
             LOGGER.debug { "${"Created instance component: id={}"} ${newManifest.id}" }
-        }?: {
+        }?: run {
             attemptCleanup()
             throw ComponentCreationException("Failed to create instance component: invalid data")
         }

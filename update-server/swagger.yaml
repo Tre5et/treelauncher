@@ -50,6 +50,42 @@ paths:
           content:
             string:
               example: 'Unable to read versions file!'
+  /update/{version}/{locale}:
+    get:
+      tags:
+        - update
+      summary: Get the update for the given version with message in the given locale
+      operationId: update
+      parameters:
+        - name: version
+          in: path
+          description: The current launcher version
+          required: true
+          schema:
+            type: string
+        - name: locale
+          in: path
+          description: Locale to get the message in
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Update'
+        '400':
+          description: Invalid version
+          content:
+            string:
+              example: 'Invalid version!'
+        '500':
+          description: Failed to get update data
+          content:
+            string:
+              example: 'Unable to read versions file!'
   /file/{version}/{path}:
     get:
       tags:

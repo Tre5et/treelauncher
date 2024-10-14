@@ -15,7 +15,15 @@ data class CreationStatus(val currentStep: DownloadStep, val downloadStatus: Dow
         VERSION_VANILLA({ strings().creator.status.version.vanilla() }),
         VERSION_ASSETS({ strings().creator.status.version.assets() }),
         VERSION_LIBRARIES({ strings().creator.status.version.libraries() }),
+        VERSION_FILE({ strings().creator.status.version.file() }),
         VERSION_FABRIC({ strings().creator.status.version.fabric() }),
+        VERSION_FABRIC_LIBRARIES({ strings().creator.status.version.fabricLibraries() }),
+        VERSION_FABRIC_FILE({ strings().creator.status.version.fabricFile() }),
+        VERSION_FORGE({ strings().creator.status.version.forge() }),
+        VERSION_FORGE_LIBRARIES({ strings().creator.status.version.forgeLibraries() }),
+        VERSION_FORGE_FILE({ strings().creator.status.version.forgeFile() }),
+        VERSION_QUILT({ strings().creator.status.version.quilt() }),
+        VERSION_QUILT_LIBRARIES({ strings().creator.status.version.quiltLibraries() }),
         JAVA({ strings().creator.status.java() }),
         FINISHING({ strings().creator.status.finishing() });
     }

@@ -1,66 +1,83 @@
 package net.treset.treelauncher.util
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
-import net.treset.treelauncher.app
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.news.News
 import net.treset.treelauncher.backend.news.news
 import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupData
+import net.treset.treelauncher.generic.NotificationData
+import net.treset.treelauncher.generic.PopupOverlay
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.info
 import java.io.IOException
 
-fun getNewsPopup(
-    close: () -> Unit,
-    displayOther: Boolean = true,
-    acknowledgeImportant: Boolean = true,
-    displayAcknowledged: Boolean = true
-): PopupData = PopupData(
-        content = {
-            var currentNews: News? by remember { mutableStateOf(null) }
+@Composable
+fun News(
+    openNews: Int = 0,
+) {
+    var newOnly: Boolean by remember { mutableStateOf(false) }
 
-            LaunchedEffect(Unit) {
-                try {
-                    currentNews = news().let { nws ->
-                        nws.apply {
-                            if(!displayAcknowledged) {
-                                important = important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
-                            }
-                            if(!displayOther) {
-                                other = null
-                            }
-                        }
-                    }.also { nws ->
-                        if(acknowledgeImportant) {
-                            nws.important?.forEach {
-                                if(!appSettings().acknowledgedNews.contains(it.id)) {
-                                    appSettings().acknowledgedNews.add(it.id)
-                                }
-                            }
-                        }
-                    }
-                } catch(e: IOException) {
-                    app().error(e)
+    var popupVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(openNews) {
+        if (openNews > 0) {
+            newOnly = false
+            popupVisible = true
+        }
+    }
+
+    var notification: NotificationData? by remember { mutableStateOf(null) }
+
+    var currentNews: News? by remember { mutableStateOf(null) }
+
+    val notificationColor = MaterialTheme.colorScheme.info
+    LaunchedEffect(Unit) {
+        try {
+            currentNews = news().also { nws ->
+                if (nws.important?.map { it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
+                    notification = NotificationData(
+                        onClick = {
+                            newOnly = false
+                            popupVisible = true
+                        },
+                        color = notificationColor,
+                        content = {
+                            Text(strings().news.notification())
+                        },
+                    ).also { AppContext.addNotification(it) }
                 }
             }
+        } catch (e: IOException) {
+            AppContext.errorIfOnline(IOException("Unable to load News", e))
+        }
+    }
 
-            currentNews?.let {nws ->
-                Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (!nws.important.isNullOrEmpty()) {
+    if(popupVisible) {
+        PopupOverlay(
+            content = {
+                val important = remember(currentNews) {
+                    if(newOnly) {
+                        currentNews?.important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
+                    } else {
+                        currentNews?.important
+                    }
+                }
+
+                val other = remember(currentNews) {
+                    if(newOnly) {
+                        null
+                    } else {
+                        currentNews?.other
+                    }
+                }
+
+                    if (!important.isNullOrEmpty()) {
                         Text(
                             strings().news.important(),
                             style = MaterialTheme.typography.titleMedium,
@@ -68,23 +85,21 @@ fun getNewsPopup(
 
                         val content = remember {
                             val sb = StringBuilder("<hr/>")
-                            nws.important!!.forEach {
+                            important.forEach {
                                 sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
                             }
 
-                            print(sb.toString())
                             htmlToAnnotatedString(sb.toString())
                         }
 
                         Text(
                             content,
                             softWrap = true,
-                            textAlign = TextAlign.Center,
                             modifier = Modifier.widthIn(0.dp, 800.dp)
                         )
                     }
 
-                    if (!nws.other.isNullOrEmpty()) {
+                    if (!other.isNullOrEmpty()) {
                         Text(
                             strings().news.other(),
                             style = MaterialTheme.typography.titleMedium
@@ -92,7 +107,7 @@ fun getNewsPopup(
 
                         val content = remember {
                             val sb = StringBuilder()
-                            nws.other!!.forEach {
+                            other.forEach {
                                 sb.append("<h3>${it.title}</h3>${it.content}<hr/>")
                             }
 
@@ -102,30 +117,35 @@ fun getNewsPopup(
                         Text(
                             content,
                             softWrap = true,
-                            textAlign = TextAlign.Center,
                             modifier = Modifier.widthIn(0.dp, 800.dp)
                         )
                     }
 
-                    if(nws.other.isNullOrEmpty() && nws.important.isNullOrEmpty()) {
+                    if(other.isNullOrEmpty() && important.isNullOrEmpty()) {
                         Text(
                             strings().news.none(),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
+            },
+            buttonRow  = {
+                Button(
+                    onClick = {
+                        popupVisible = false
+                        notification?.let { AppContext.dismissNotification(it) }
+                        currentNews?.important?.forEach {
+                            if(!appSettings().acknowledgedNews.contains(it.id)) {
+                                appSettings().acknowledgedNews.add(it.id)
+                            }
+                        }
+                    }
+                ) {
+                    Text(strings().news.close())
                 }
-            } ?: Text(strings().news.loading())
-        },
-        buttonRow  = {
-            Button(
-                onClick = {
-                    close()
-                }
-            ) {
-                Text(strings().news.close())
-            }
-        },
-    )
+            },
+        )
+    }
+}
 
 fun <T> List<T>.allContainedIn(other: List<T>): Boolean {
     return this.all { other.contains(it) }

@@ -6,10 +6,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.mc_version_loader.fabric.FabricLoader
+import net.treset.mc_version_loader.forge.MinecraftForge
+import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.mods.MinecraftMods
+import net.treset.mc_version_loader.util.FileUtil
 import net.treset.treelauncher.backend.config.*
+import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.discord.DiscordIntegration
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.backend.util.FileInitializer
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -18,26 +26,49 @@ import net.treset.treelauncher.components.Resourcepacks
 import net.treset.treelauncher.components.Saves
 import net.treset.treelauncher.components.mods.Mods
 import net.treset.treelauncher.creation.Create
-import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupData
-import net.treset.treelauncher.generic.PopupOverlay
+import net.treset.treelauncher.generic.*
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.instances.Instances
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.login.LoginScreen
 import net.treset.treelauncher.navigation.NavigationContainer
+import net.treset.treelauncher.navigation.NavigationContext
 import net.treset.treelauncher.navigation.NavigationState
 import net.treset.treelauncher.settings.Settings
-import net.treset.treelauncher.style.colors
-import net.treset.treelauncher.style.typography
-import net.treset.treelauncher.util.getNewsPopup
-import java.io.File
+import net.treset.treelauncher.style.*
+import net.treset.treelauncher.util.DataPatcher
+import net.treset.treelauncher.util.FixFiles
+import net.treset.treelauncher.util.News
 import java.io.IOException
 import kotlin.system.exitProcess
 
-data class AppContext(
-    val files: LauncherFiles
+data class AppContextData(
+    val files: LauncherFiles,
+    val runningInstance: InstanceData?,
+    val setRunningInstance: (InstanceData?) -> Unit,
+    val setTheme: (Theme) -> Unit,
+    val setAccentColor: (AccentColor) -> Unit,
+    val setCustomColor: (Color) -> Unit,
+    val globalPopup: PopupData?,
+    val addNotification: (NotificationData) -> Unit,
+    val dismissNotification: (NotificationData) -> Unit,
+    val setGlobalPopup: (PopupData?) -> Unit,
+    val openNews: () -> Unit,
+    val error: (Exception) -> Unit,
+    val severeError: (Exception) -> Unit,
+    val silentError: (Exception) -> Unit,
+    val errorIfOnline: (Exception) -> Unit,
+    val resetWindowSize: () -> Unit,
+    val discord: DiscordIntegration
 )
+
+lateinit var AppContext: AppContextData
+
+val LocalAppContext = staticCompositionLocalOf<AppContextData> {
+    error("No NavigationState provided")
+}
 
 @Composable
 fun App(
@@ -45,95 +76,177 @@ fun App(
 ) {
     var popupData: PopupData? by remember { mutableStateOf(null) }
 
-    var exceptions: List<Exception> by remember { mutableStateOf(listOf()) }
     var fatalExceptions: List<Exception> by remember { mutableStateOf(listOf()) }
 
-    app = remember {
-        launcherApp.apply {
-            setPopup = { popupData = it }
-            onError = {
-                LOGGER.warn(it) { "An error occurred!" }
-                exceptions = exceptions + it
-            }
-            onSevereError = {
-                LOGGER.error(it) { "A severe error occurred!" }
-                fatalExceptions = fatalExceptions + it
-            }
-        }
-    }
+    val discord = remember { DiscordIntegration() }
+
+    app = launcherApp
+
+    var theme by remember { mutableStateOf(appSettings().theme) }
+    val themeDark = theme.isDark()
+    var accentColor by remember { mutableStateOf(appSettings().accentColor) }
+    var customColor by remember { mutableStateOf(appSettings().customColor) }
+    val colors by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
+
+    var runningInstance: InstanceData? by remember { mutableStateOf(null) }
 
     val launcherFiles = remember { LauncherFiles() }
 
-    val appContext = remember(launcherFiles) {
-        AppContext(
-            launcherFiles
+    var notifications: List<NotificationBannerData> by remember { mutableStateOf(listOf()) }
+    var notificationsChanged by remember { mutableStateOf(0) }
+
+    var openNews by remember { mutableStateOf(0) }
+
+    AppContext = remember(launcherFiles, runningInstance, popupData) {
+        AppContextData(
+            files = launcherFiles,
+            runningInstance = runningInstance,
+            setRunningInstance = {
+                runningInstance = it
+            },
+            setTheme = {
+                theme = it
+                app.setTheme(it)
+                appSettings().theme = it
+            },
+            setAccentColor = {
+                accentColor = it
+                appSettings().accentColor = it
+            },
+            setCustomColor = {
+                customColor = it
+                appSettings().customColor = it
+            },
+            globalPopup = popupData,
+            setGlobalPopup = { popupData = it },
+            addNotification = {
+                notifications += NotificationBannerData(
+                    visible = false,
+                    data = it
+                )
+            },
+            dismissNotification = {toRemove ->
+                notifications.firstOrNull { it.data === toRemove && it.visible }?.visible = false
+                notificationsChanged++
+            },
+            openNews = {
+                openNews++
+            },
+            error = {e ->
+                LOGGER.warn(e) { "An error occurred!" }
+                AppContext.addNotification(
+                    NotificationData(
+                        color = colors.warning,
+                        onClick = {
+                            it.dismiss()
+                        },
+                        content = {
+                            Text(
+                                strings().error.notification(e),
+                                softWrap = true
+                            )
+                        }
+                    )
+                )
+            },
+            severeError = {
+                LOGGER.error(it) { "A severe error occurred!" }
+                fatalExceptions = fatalExceptions + it
+            },
+            silentError = {
+                LOGGER.error(it) { "An error occurred!" }
+            },
+            errorIfOnline = {
+                if(LoginContext.isOffline()) {
+                    AppContext.silentError(it)
+                } else {
+                    AppContext.error(it)
+                }
+            },
+            resetWindowSize = ::resetWindow,
+            discord = discord
         )
     }
 
-    MaterialTheme(
-        colorScheme = colors(),
+    LauncherTheme(
+        colors = colors,
         typography = typography()
     ) {
-        ProvideTextStyle(
-            MaterialTheme.typography.bodyMedium
-        ) {
-            Scaffold {
-                Column(
-                    Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+        ScalingProvider {
+            CompositionLocalProvider(
+                LocalAppContext provides AppContext
+            ) {
+                ProvideTextStyle(
+                    MaterialTheme.typography.bodyMedium
                 ) {
-                    LoginScreen { loginContext ->
-                        NavigationContainer(loginContext) { navContext ->
-                            when (navContext.navigationState) {
-                                NavigationState.INSTANCES -> Instances(appContext, loginContext)
-                                NavigationState.ADD -> Create(appContext, navContext)
-                                NavigationState.SAVES -> Saves(appContext, loginContext)
-                                NavigationState.RESSOURCE_PACKS -> Resourcepacks(appContext)
-                                NavigationState.OPTIONS -> Options(appContext)
-                                NavigationState.MODS -> Mods(appContext)
-                                NavigationState.SETTINGS -> Settings(loginContext)
+                    Scaffold {
+                        DataPatcher {
+                            Column(
+                                Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                notificationsChanged.let {
+                                    for (notification in notifications) {
+                                        LaunchedEffect(Unit) {
+                                            notification.visible = true
+                                            notificationsChanged++
+                                        }
+                                        NotificationBanner(
+                                            visible = notification.visible,
+                                            onDismissed = {
+                                                //Strange behavior when removing, downstream notifications get dismissed too, so keep them in the list
+                                                //notifications -= notification
+                                            },
+                                            data = notification.data
+                                        )
+                                    }
+                                }
+
+                                LoginScreen {
+                                    News(openNews)
+                                    FixFiles()
+
+                                    NavigationContainer {
+                                        when (NavigationContext.navigationState) {
+                                            NavigationState.INSTANCES -> Instances()
+                                            NavigationState.ADD -> Create()
+                                            NavigationState.SAVES -> Saves()
+                                            NavigationState.RESSOURCE_PACKS -> Resourcepacks()
+                                            NavigationState.OPTIONS -> Options()
+                                            NavigationState.MODS -> Mods()
+                                            NavigationState.SETTINGS -> Settings()
+                                        }
+                                    }
+                                }
                             }
+                        }
+
+                        popupData?.let {
+                            PopupOverlay(it)
+                        }
+
+                        fatalExceptions.forEach { e ->
+                            AlertDialog(
+                                onDismissRequest = {},
+                                title = { Text(strings().error.severeTitle()) },
+                                text = {
+                                    Text(
+                                        strings().error.severeMessage(e),
+                                        textAlign = TextAlign.Start
+                                    )
+                                },
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                confirmButton = {
+                                    Button(
+                                        onClick = { app().exit(force = true) },
+                                        color = MaterialTheme.colorScheme.error
+                                    ) {
+                                        Text(strings().error.severeClose())
+                                    }
+                                }
+                            )
                         }
                     }
-                }
-
-                popupData?.let {
-                    PopupOverlay(it)
-                }
-
-                exceptions.forEach { e ->
-                    AlertDialog(
-                        onDismissRequest = {},
-                        title = { Text(strings().error.title()) },
-                        text = { Text(strings().error.message(e)) },
-                        containerColor = MaterialTheme.colorScheme.inversePrimary,
-                        textContentColor = MaterialTheme.colorScheme.onPrimary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        confirmButton = {
-                            Button(
-                                onClick = { exceptions = exceptions.filter { it != e } },
-                            ) {
-                                Text(strings().error.close())
-                            }
-                        }
-                    )
-                }
-
-                fatalExceptions.forEach { e ->
-                    AlertDialog(
-                        onDismissRequest = {},
-                        title = { Text(strings().error.severeTitle()) },
-                        text = { Text(strings().error.severeMessage(e)) },
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        confirmButton = {
-                            Button(
-                                onClick = { app().exit(force = true) },
-                                color = MaterialTheme.colorScheme.error
-                            ) {
-                                Text(strings().error.severeClose())
-                            }
-                        }
-                    )
                 }
             }
         }
@@ -145,6 +258,7 @@ fun app() = app
 
 class LauncherApp(
     val exitApplication: () -> Unit,
+    val setTheme: (Theme) -> Unit
 ) {
     init {
         try {
@@ -157,8 +271,7 @@ class LauncherApp(
             exitProcess(-1)
         }
 
-        MinecraftMods.setModrinthUserAgent(appConfig().modrinthUserAgent)
-        MinecraftMods.setCurseforgeApiKey(appConfig().curseforgeApiKey)
+        configureVersionLoader()
 
         try {
             if (!appConfig().baseDir.exists() || !GlobalConfigLoader().hasMainManifest(appConfig().baseDir)) {
@@ -175,36 +288,31 @@ class LauncherApp(
             exitProcess(-1)
         }
 
+        setTheme(appSettings().theme)
+
         language().appLanguage = appSettings().language
     }
 
-    fun error(e: Exception) = onError(e)
+    private fun configureVersionLoader() {
+        MinecraftMods.setModrinthUserAgent(appConfig().modrinthUserAgent)
+        MinecraftMods.setCurseforgeApiKey(appConfig().curseforgeApiKey)
 
-    fun severeError(e: Exception) = onSevereError(e)
-
-    var setPopup: (PopupData?) -> Unit = {}
-    var onError: (Exception) -> Unit = {}
-    var onSevereError: (Exception) -> Unit = {}
-
-    fun showNews(
-        displayOther: Boolean = true,
-        acknowledgeImportant: Boolean = true,
-        displayAcknowledged: Boolean = true
-    ) {
-        setPopup(
-            getNewsPopup(
-                close = { setPopup(null) },
-                displayOther = displayOther,
-                acknowledgeImportant = acknowledgeImportant,
-                displayAcknowledged = displayAcknowledged,
-            )
-        )
+        MinecraftGame.useVersionCache(true)
+        FabricLoader.useVersionCache(true)
+        MinecraftForge.useVersionCache(true)
+        FileUtil.useWebRequestCache(true)
     }
 
     fun exit(
         restart: Boolean = false,
         force: Boolean = false
     ) {
+        if((AppContext.runningInstance != null || AppContext.globalPopup != null) && !force) {
+            // Abort close; game is running or an important popup is open
+            LOGGER.info{ "Close request denied: Important Action Running" }
+            return
+        }
+
         if(!force) {
             try {
                 updater().startUpdater(restart)
@@ -218,6 +326,8 @@ class LauncherApp(
         } catch (e: IOException) {
             LOGGER.error(e) { "Failed to save settings!" }
         }
+
+        AppContext.discord.close()
 
         exitApplication()
     }
@@ -237,6 +347,13 @@ class LauncherApp(
     }
 }
 
+internal data class NotificationBannerData(
+    var visible: Boolean,
+    val data: NotificationData,
+)
+
 private val LOGGER = KotlinLogging.logger {  }
 
-expect fun getUpdaterFile(): File
+expect fun getUpdaterProcess(updaterArgs: String): ProcessBuilder
+
+expect fun resetWindow()

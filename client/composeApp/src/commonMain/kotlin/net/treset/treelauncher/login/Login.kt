@@ -1,39 +1,59 @@
 package net.treset.treelauncher.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.auth.UserAuth
 import net.treset.treelauncher.backend.auth.userAuth
 import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.Language
 import net.treset.treelauncher.localization.language
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.disabledContent
 import net.treset.treelauncher.style.icons
+import net.treset.treelauncher.style.info
 import net.treset.treelauncher.util.checkUpdateOnStart
 
 enum class LoginState(val actionAllowed: Boolean) {
     NOT_LOGGED_IN(true),
     AUTHENTICATING(false),
     LOGGED_IN(false),
+    OFFLINE(false),
     FAILED(true)
+}
+
+data class LoginContextData(
+    val loginState: LoginState,
+    val userAuth: UserAuth,
+    val logout: () -> Unit,
+) {
+    fun isOffline() = loginState == LoginState.OFFLINE
+    fun isLoggedIn() = loginState == LoginState.LOGGED_IN
+}
+
+lateinit var LoginContext: LoginContextData
+
+val LocalLoginContext = staticCompositionLocalOf<LoginContextData> {
+    error("No LoginState provided")
 }
 
 @Composable
 fun LoginScreen(
-    content: @Composable (LoginContext) -> Unit
+    content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -46,6 +66,19 @@ fun LoginScreen(
     var updateChecked by remember { mutableStateOf(false) }
 
     var popupData: PopupData? by remember { mutableStateOf(null) }
+
+    val notificationColor = MaterialTheme.colorScheme.info
+    val offlineNotification = remember {
+        NotificationData(
+            color = notificationColor,
+            content = {
+                Text(
+                    strings().login.offlineNotification(),
+                    softWrap = true
+                )
+            }
+        )
+    }
 
     LaunchedEffect(Unit) {
         checkUpdateOnStart(
@@ -69,17 +102,30 @@ fun LoginScreen(
         }
     }
 
+    LaunchedEffect(showContent) {
+        if(!showContent) {
+            AppContext.dismissNotification(offlineNotification)
+        }
+    }
+
+    LoginContext = remember(loginState, userAuth().isLoggedIn) {
+        LoginContextData(
+            loginState,
+            userAuth()
+        ) {
+            loginState = LoginState.NOT_LOGGED_IN
+            showContent = false
+            userAuth().logout()
+        }
+    }
+
+
     if(showContent) {
-        content(
-            LoginContext(
-                loginState,
-                userAuth()
-            ) {
-                loginState = LoginState.NOT_LOGGED_IN
-                showContent = false
-                userAuth().logout()
-            }
-        )
+        CompositionLocalProvider(
+            LocalLoginContext provides LoginContext
+        ) {
+            content()
+        }
         return
     }
 
@@ -134,18 +180,57 @@ fun LoginScreen(
                     onCheckedChange = { keepLoggedIn = it },
                     enabled = loginState.actionAllowed
                 )
+
+                Text(
+                    strings().login.offline(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f).let { if (loginState.actionAllowed) it else it.disabledContent() },
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .clickable(
+                            enabled = loginState.actionAllowed,
+                        ) {
+                            loginState = LoginState.OFFLINE
+                            AppContext.addNotification(offlineNotification)
+                            showContent = true
+                        }
+                        .pointerHoverIcon(PointerIcon.Hand)
+                )
             }
 
-            Text(
-                text = when (loginState) {
-                    LoginState.NOT_LOGGED_IN -> ""
-                    LoginState.AUTHENTICATING -> strings().login.label.authenticating()
-                    LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
-                    LoginState.FAILED -> strings().login.label.failure()
-                },
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = when (loginState) {
+                            LoginState.NOT_LOGGED_IN -> ""
+                            LoginState.AUTHENTICATING -> strings().login.label.authenticating()
+                            LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.name)
+                            LoginState.OFFLINE -> strings().login.label.offline()
+                            LoginState.FAILED -> strings().login.label.failure()
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+
+                    if (loginState == LoginState.FAILED) {
+                        Button(
+                            onClick = {
+                                LoginContext.logout()
+                            },
+                            color = MaterialTheme.colorScheme.error,
+                        ) {
+                            Text(strings().login.logout())
+                        }
+                    }
+                }
+            }
         }
 
         Row(
@@ -165,16 +250,29 @@ fun LoginScreen(
                     language = it
                     language().appLanguage = it
                 },
-                defaultSelected = language,
+                selected = language,
                 toDisplayString = { displayName() },
                 decorated = false
+            )
+        }
+
+        val tip = remember { strings().login.tip() }
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 6.dp),
+        ) {
+            Text(
+                tip,
+                color = MaterialTheme.colorScheme.onBackground.disabledContent(),
             )
         }
 
         Column(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(10.dp)
+                .padding(10.dp),
         ) {
             if (loginState == LoginState.LOGGED_IN && updateChecked) {
                 FloatingActionButton(
@@ -247,9 +345,3 @@ private fun startLogin(
         url?.let { onUrl(it) }
     }.start()
 }
-
-data class LoginContext(
-    val loginState: LoginState,
-    val userAuth: UserAuth,
-    val logout: () -> Unit
-)

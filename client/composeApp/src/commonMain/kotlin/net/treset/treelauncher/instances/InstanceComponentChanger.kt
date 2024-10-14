@@ -3,19 +3,17 @@ package net.treset.treelauncher.instances
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.generic.ComboBox
 import net.treset.treelauncher.generic.IconButton
+import net.treset.treelauncher.generic.Text
 import net.treset.treelauncher.generic.TitledColumn
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
@@ -25,16 +23,16 @@ fun InstanceComponentChanger(
     instance: InstanceData,
     type: InstanceDetails,
     allowUnselect: Boolean = false,
-    appContext: AppContext,
+    appContext: AppContextData,
     redrawSelected: () -> Unit
 ) {
-    var components: Array<LauncherManifest> by remember { mutableStateOf(emptyArray()) }
+    var components: Array<ComponentManifest> by remember { mutableStateOf(emptyArray()) }
 
-    var current: LauncherManifest? by remember { mutableStateOf(null) }
+    var current: ComponentManifest? by remember(type) { mutableStateOf(null) }
 
-    var selected: LauncherManifest? by remember{ mutableStateOf(current) }
+    var selected: ComponentManifest? by remember(current) { mutableStateOf(current) }
 
-    val loadFirstSelected = {
+    val loadCurrent = {
         current = when (type) {
             InstanceDetails.SAVES -> instance.savesComponent
             InstanceDetails.RESOURCE_PACKS -> instance.resourcepacksComponent
@@ -42,8 +40,6 @@ fun InstanceComponentChanger(
             InstanceDetails.MODS -> instance.modsComponent?.first
             else -> null
         }
-
-        selected = current
     }
 
     LaunchedEffect(type) {
@@ -55,7 +51,7 @@ fun InstanceComponentChanger(
             else -> emptyArray()
         }
 
-        loadFirstSelected()
+        loadCurrent()
     }
 
     TitledColumn(
@@ -65,18 +61,14 @@ fun InstanceComponentChanger(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(text = strings().manager.instance.change.activeTitle(type, current?.name))
-                IconButton(
-                    onClick = {
-                        current?.let {
+                current?.let {
+                    IconButton(
+                        onClick = {
                             LauncherFile.of(it.directory).open()
-                        }
-                    },
-                    tooltip = strings().selector.component.openFolder()
-                ) {
-                    Icon(
-                        icons().folder,
-                        "Open Folder",
-                        modifier = Modifier.size(32.dp)
+                        },
+                        icon = icons().folder,
+                        size = 32.dp,
+                        tooltip = strings().selector.component.openFolder()
                     )
                 }
             }
@@ -95,23 +87,30 @@ fun InstanceComponentChanger(
                 },
                 allowUnselect = allowUnselect,
                 placeholder = strings().manager.instance.change.noComponent(),
-                defaultSelected = selected,
+                selected = selected,
                 toDisplayString = { name },
+                loading = components.isEmpty()
             )
             IconButton(
                 onClick = {
                     when(type) {
                         InstanceDetails.SAVES -> {
-                            instance.instance.second.savesComponent = selected?.id
-                            instance.reloadSavesComponent(appContext.files)
+                            selected?.id?.let { id ->
+                                instance.instance.second.savesComponent = id
+                                instance.reloadSavesComponent(appContext.files)
+                            }
                         }
                         InstanceDetails.RESOURCE_PACKS -> {
-                            instance.instance.second.resourcepacksComponent = selected?.id
-                            instance.reloadResourcepacksComponent(appContext.files)
+                            selected?.id?.let { id ->
+                                instance.instance.second.resourcepacksComponent = id
+                                instance.reloadResourcepacksComponent(appContext.files)
+                            }
                         }
                         InstanceDetails.OPTIONS -> {
-                            instance.instance.second.optionsComponent = selected?.id
-                            instance.reloadOptionsComponent(appContext.files)
+                            selected?.id?.let { id ->
+                                instance.instance.second.optionsComponent = id
+                                instance.reloadOptionsComponent(appContext.files)
+                            }
                         }
                         InstanceDetails.MODS -> {
                             instance.instance.second.modsComponent = selected?.id
@@ -119,18 +118,14 @@ fun InstanceComponentChanger(
                         }
                         else -> {}
                     }
-                    loadFirstSelected()
+                    loadCurrent()
                     LauncherFile.of(instance.instance.first.directory, instance.instance.first.details).write(instance.instance.second)
                     redrawSelected()
                 },
+                icon = icons().change,
                 enabled = (allowUnselect || selected != null) && selected != current,
                 tooltip = strings().changer.apply()
-            ) {
-                Icon(
-                    icons().change,
-                    "change"
-                )
-            }
+            )
         }
     }
 }

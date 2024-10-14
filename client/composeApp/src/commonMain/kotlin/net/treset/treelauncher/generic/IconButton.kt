@@ -1,6 +1,7 @@
 package net.treset.treelauncher.generic
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -9,6 +10,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,10 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.treset.treelauncher.style.disabledContent
@@ -38,8 +43,6 @@ fun IconButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val pressed by interactionSource.collectIsPressedAsState()
     val hovered by interactionSource.collectIsHoveredAsState()
     val nativeFocused by interactionSource.collectIsFocusedAsState()
@@ -89,28 +92,45 @@ fun IconButton(
         LocalContentColor provides foregroundColor
     ) {
         tooltip?.let {
+            val tooltipState = rememberTooltipState(
+                isPersistent = true
+            )
 
-            //TODO: Update to Compose 1.6 to work natively with hover
-            val tooltipState = remember { PlainTooltipState() }
-
-            val hoverHandler = remember {
-                HoverHandler(
-                    coroutineScope,
-                    { tooltipState.show() },
-                    { tooltipState.dismiss() }
-                )
+            LaunchedEffect(focused) {
+                if(focused) {
+                    tooltipState.show(MutatePriority.UserInput)
+                } else {
+                    tooltipState.dismiss()
+                }
             }
 
+            var job: Job? = remember { null }
             LaunchedEffect(hovered) {
-                hoverHandler.hovered = hovered
+                if(hovered) {
+                    job = launch {
+                        delay(1000)
+                        tooltipState.show(MutatePriority.UserInput)
+                    }
+                } else {
+                    job?.cancel()
+                    tooltipState.dismiss()
+                }
             }
 
-            PlainTooltipBox(
-                tooltip = { Text(it) },
-                tooltipState = tooltipState
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip(
+                        caretProperties = TooltipDefaults.caretProperties,
+                    ) {
+                        Text(it)
+                    }
+                },
+                state = tooltipState,
+                enableUserInput = false,
             ) {
                 Box(
-                    modifier = newModifier.tooltipAnchor(),
+                    modifier = newModifier,
                     contentAlignment = Alignment.Center
                 ) {
                     content()
@@ -125,30 +145,40 @@ fun IconButton(
     }
 }
 
-private class HoverHandler(
-    var coroutineScope: CoroutineScope,
-    var onOpen: suspend () -> Unit,
-    var onClose: suspend () -> Unit,
+@Composable
+fun IconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    selected: Boolean = false,
+    highlighted: Boolean = false,
+    tooltip: String? = null,
+    interactionTint: Color = MaterialTheme.colorScheme.primary,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    icon: ImageVector? = null,
+    painter: Painter? = null,
+    size: Dp = 24.dp
+) = IconButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    selected = selected,
+    highlighted = highlighted,
+    tooltip = tooltip,
+    interactionTint = interactionTint,
+    interactionSource = interactionSource
 ) {
-    private var num = 0
-    var hovered = false
-        set(value) {
-            field = value
-            num++
-            launch()
-        }
-
-    fun launch() {
-        coroutineScope.launch {
-            if(hovered) {
-                val currentNum = num
-                delay(1500)
-                if (hovered && num == currentNum) {
-                    onOpen()
-                }
-            } else {
-                onClose()
-            }
-        }
+    if(icon != null) {
+        Icon(
+            imageVector = icon,
+            contentDescription = tooltip,
+            modifier = Modifier.size(size)
+        )
+    } else if(painter != null) {
+        Icon(
+            painter = painter,
+            contentDescription = tooltip,
+            modifier = Modifier.size(size)
+        )
     }
 }

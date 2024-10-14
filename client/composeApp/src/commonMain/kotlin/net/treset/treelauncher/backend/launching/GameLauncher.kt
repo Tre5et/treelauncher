@@ -15,9 +15,12 @@ import java.io.IOException
 class GameLauncher(
     val instance: InstanceData,
     val files: LauncherFiles,
-    val minecraftUser: User,
+    val offline: Boolean,
+    val minecraftUser: User?,
     val quickPlayData: QuickPlayData? = null,
-    var exitCallbacks: Array<(String?) -> Unit> = arrayOf()
+    var onExit: (String?) -> Unit = { _ -> },
+    var onResourceCleanupFailed:  (Exception, (retry: Boolean) -> Unit) -> Unit  = { _, _ -> },
+    var onExited: (String?) -> Unit = { _ -> },
 ) {
     private var resourceManager: ResourceManager? = null
     var gameListener: GameListener? = null
@@ -29,7 +32,7 @@ class GameLauncher(
         } catch (e: FileLoadException) {
             throw GameLaunchException("Unable to launch game: file reload failed", e)
         }
-        if (files.launcherDetails.activeInstance != null && files.launcherDetails.activeInstance.isNotBlank()) {
+        if (!files.launcherDetails.activeInstance.isNullOrBlank()) {
             if (!cleanupActiveInstance) {
                 throw GameLaunchException("Unable to launch game: active instance already exists")
             }
@@ -40,16 +43,10 @@ class GameLauncher(
             }
         }
         resourceManager = ResourceManager(instance)
-        files.launcherDetails.activeInstance = instance.instance.first.id
-        try {
-            LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).write(files.launcherDetails)
-        } catch (e: IOException) {
-            throw GameLaunchException("Unable to launch game: unable to write launcher details", e)
-        }
         Thread(Runnable {
             try {
-                resourceManager!!.prepareResources()
                 resourceManager!!.setLastPlayedTime()
+                resourceManager!!.prepareResources()
             } catch (e: GameResourceException) {
                 val gle = GameLaunchException("Unable to launch game: unable to prepare resources", e)
                 try {
@@ -78,10 +75,15 @@ class GameLauncher(
         }).start()
     }
 
+    fun stop() {
+        gameListener?.stop()
+    }
+
     @Throws(GameLaunchException::class)
     private fun finishLaunch() {
         val pb = ProcessBuilder().redirectOutput(ProcessBuilder.Redirect.PIPE)
-        val commandBuilder = CommandBuilder(pb, instance, minecraftUser, quickPlayData)
+        pb.inheritIO()
+        val commandBuilder = CommandBuilder(pb, instance, offline, minecraftUser, quickPlayData)
         try {
             commandBuilder.makeStartCommand()
         } catch (e: GameCommandException) {
@@ -92,8 +94,8 @@ class GameLauncher(
         LOGGER.debug { "command=" + pb.command() }
         try {
             val p = pb.start()
-            resourceManager?.let { resourceManager ->
-                GameListener(p, resourceManager, exitCallbacks).let {
+            resourceManager?.let { _ ->
+                GameListener(p, this::cleanupResources).let {
                     gameListener = it
                     it.start()
                 }
@@ -146,6 +148,29 @@ class GameLauncher(
             LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).write(files.launcherDetails)
         } catch (e: IOException) {
             throw GameLaunchException("Unable to abort launch correctly: failed to write launcher details")
+        }
+    }
+
+    private fun cleanupResources(playDuration: Long, error: String?) {
+        LOGGER.info { "Cleaning up resources" }
+        onExit(error)
+        try {
+            resourceManager?.addPlayDuration(playDuration)
+        } catch (e: IOException) {
+            LOGGER.error(e) { "Unable to add play duration to statistics: duration=$playDuration" }
+        }
+
+        try {
+            resourceManager?.cleanupGameFiles()
+            onExited(error)
+        } catch (e: GameResourceException) {
+            onResourceCleanupFailed(e) { retry ->
+                if(retry) {
+                    cleanupResources(playDuration, error)
+                } else {
+                    onExited(error)
+                }
+            }
         }
     }
 

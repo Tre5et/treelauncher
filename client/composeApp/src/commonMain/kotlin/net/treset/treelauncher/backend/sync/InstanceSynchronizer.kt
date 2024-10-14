@@ -4,18 +4,21 @@ import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.fabric.FabricLoader
 import net.treset.mc_version_loader.fabric.FabricProfile
 import net.treset.mc_version_loader.fabric.FabricVersionDetails
-import net.treset.mc_version_loader.launcher.LauncherInstanceDetails
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
-import net.treset.mc_version_loader.launcher.LauncherVersionDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
 import net.treset.mc_version_loader.minecraft.MinecraftVersionDetails
 import net.treset.mc_version_loader.util.DownloadStatus
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.creation.FabricVersionCreator
+import net.treset.treelauncher.backend.creation.VanillaVersionCreator
 import net.treset.treelauncher.backend.creation.VersionCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.data.LauncherFiles
+import net.treset.treelauncher.backend.data.LauncherInstanceDetails
+import net.treset.treelauncher.backend.data.LauncherVersionDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
@@ -67,7 +70,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadFiles(difference: List<String>) {
+    private fun downloadFiles(difference: List<String>) {
         var detailsFileName: String? = null
         val newDifference: MutableList<String> = mutableListOf()
         for (file in difference) {
@@ -94,101 +97,107 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun downloadDetails(): String {
+    private fun downloadDetails(): String? {
         val details = downloadManifest()
-        val service = SyncService()
-        val out = service.downloadFile("instance", instanceData.instance.first.id, details)
-        val newDetails: LauncherInstanceDetails = LauncherInstanceDetails.fromJson(String(out))
-        instanceData.instance.second.features = newDetails.features
-        instanceData.instance.second.jvm_arguments = newDetails.jvm_arguments
-        instanceData.instance.second.ignoredFiles = newDetails.ignoredFiles
-        instanceData.instance.second.lastPlayed = newDetails.lastPlayed
-        instanceData.instance.second.totalTime = newDetails.totalTime
-        instanceData.instance.second.savesComponent = downloadDependency(newDetails.savesComponent, LauncherManifestType.SAVES_COMPONENT)
-        instanceData.instance.second.resourcepacksComponent = downloadDependency(newDetails.resourcepacksComponent, LauncherManifestType.RESOURCEPACKS_COMPONENT)
-        instanceData.instance.second.optionsComponent = downloadDependency(newDetails.optionsComponent, LauncherManifestType.OPTIONS_COMPONENT)
-        instanceData.instance.second.modsComponent = downloadDependency(newDetails.modsComponent, LauncherManifestType.MODS_COMPONENT)
+        details?.let {
+            val service = SyncService()
+            val out = service.downloadFile("instance", instanceData.instance.first.id, details)
+            val newDetails: LauncherInstanceDetails = LauncherInstanceDetails.fromJson(String(out))
+            instanceData.instance.second.features = newDetails.features
+            instanceData.instance.second.jvmArguments = newDetails.jvmArguments
+            instanceData.instance.second.ignoredFiles = newDetails.ignoredFiles
+            instanceData.instance.second.lastPlayed = newDetails.lastPlayed
+            instanceData.instance.second.totalTime = newDetails.totalTime
+            instanceData.instance.second.savesComponent =
+                downloadDependency(newDetails.savesComponent, LauncherManifestType.SAVES_COMPONENT)!!
+            instanceData.instance.second.resourcepacksComponent =
+                downloadDependency(newDetails.resourcepacksComponent, LauncherManifestType.RESOURCEPACKS_COMPONENT)!!
+            instanceData.instance.second.optionsComponent =
+                downloadDependency(newDetails.optionsComponent, LauncherManifestType.OPTIONS_COMPONENT)!!
+            instanceData.instance.second.modsComponent =
+                downloadDependency(newDetails.modsComponent, LauncherManifestType.MODS_COMPONENT)
+        }
         return details
     }
 
     @Throws(IOException::class)
-    protected fun downloadManifest(): String {
+    private fun downloadManifest(): String? {
         val service = SyncService()
         val out = service.downloadFile(
             "instance",
             instanceData.instance.first.id,
             appConfig().manifestFileName
         )
-        val manifest = LauncherManifest.fromJson(String(out))
+        val manifest = ComponentManifest.fromJson(String(out))
         LauncherFile.of(instanceData.instance.first.directory, appConfig().manifestFileName).write(manifest)
         return manifest.details
     }
 
     @Throws(IOException::class)
-    protected fun downloadDependency(id: String, type: LauncherManifestType): String {
-        val parentManifest: LauncherManifest
-        val otherComponents: Array<LauncherManifest>
-        val currentManifest: LauncherManifest?
-        when (type) {
-            LauncherManifestType.SAVES_COMPONENT -> {
-                parentManifest = files.savesManifest
-                otherComponents = files.savesComponents
-                currentManifest = instanceData.savesComponent
-            }
+    private fun downloadDependency(id: String?, type: LauncherManifestType): String? {
+        id?.let {
+            val parentManifest: ParentManifest
+            val otherComponents: Array<ComponentManifest>
+            val currentManifest: ComponentManifest?
+            when (type) {
+                LauncherManifestType.SAVES_COMPONENT -> {
+                    parentManifest = files.savesManifest
+                    otherComponents = files.savesComponents
+                    currentManifest = instanceData.savesComponent
+                }
 
-            LauncherManifestType.RESOURCEPACKS_COMPONENT -> {
-                parentManifest = files.resourcepackManifest
-                otherComponents = files.resourcepackComponents
-                currentManifest = instanceData.resourcepacksComponent
-            }
+                LauncherManifestType.RESOURCEPACKS_COMPONENT -> {
+                    parentManifest = files.resourcepackManifest
+                    otherComponents = files.resourcepackComponents
+                    currentManifest = instanceData.resourcepacksComponent
+                }
 
-            LauncherManifestType.OPTIONS_COMPONENT -> {
-                parentManifest = files.optionsManifest
-                otherComponents = files.optionsComponents
-                currentManifest = instanceData.optionsComponent
-            }
+                LauncherManifestType.OPTIONS_COMPONENT -> {
+                    parentManifest = files.optionsManifest
+                    otherComponents = files.optionsComponents
+                    currentManifest = instanceData.optionsComponent
+                }
 
-            LauncherManifestType.MODS_COMPONENT -> {
-                parentManifest = files.modsManifest
-                otherComponents = files.modsComponents.map{it.first}.toTypedArray()
-                currentManifest = instanceData.modsComponent?.first
-            }
+                LauncherManifestType.MODS_COMPONENT -> {
+                    parentManifest = files.modsManifest
+                    otherComponents = files.modsComponents.map { it.first }.toTypedArray()
+                    currentManifest = instanceData.modsComponent?.first
+                }
 
-            else -> throw IOException("Unknown component type: $type")
-        }
-        if (currentManifest == null || id != currentManifest.id) {
-            val existingManifest: LauncherManifest? = otherComponents.firstOrNull { it.id == id }
-            if (existingManifest != null) {
-                if (isUpdateEverything) {
-                    val synchronizer = ManifestSynchronizer(existingManifest, files, callback)
+                else -> throw IOException("Unknown component type: $type")
+            }
+            if (currentManifest == null || id != currentManifest.id) {
+                val existingManifest: ComponentManifest? = otherComponents.firstOrNull { it.id == id }
+                if (existingManifest != null) {
+                    if (isUpdateEverything) {
+                        val synchronizer = ManifestSynchronizer(existingManifest, files, callback)
+                        synchronizer.download()
+                    }
+                } else {
+                    val fakeManifest = ComponentManifest(
+                        type,
+                        files.launcherDetails.typeConversion,
+                        id,
+                        "",
+                        listOf(),
+                        null,
+                    )
+                    fakeManifest.directory =
+                        LauncherFile.of(parentManifest.directory, "${parentManifest.prefix}_$id").path
+                    val synchronizer = ManifestSynchronizer(fakeManifest, files, callback)
                     synchronizer.download()
                 }
-            } else {
-                val fakeManifest = LauncherManifest(
-                    getStringFromType(type, files.launcherDetails.typeConversion),
-                    files.launcherDetails.typeConversion,
-                    id,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                )
-                fakeManifest.directory = LauncherFile.of(parentManifest.directory, "${parentManifest.prefix}_$id").path
-                val synchronizer = ManifestSynchronizer(fakeManifest, files, callback)
-                synchronizer.download()
             }
         }
         return id
     }
 
     @Throws(IOException::class, ComponentCreationException::class, FileDownloadException::class)
-    protected fun downloadVersion() {
+    private fun downloadVersion() {
         val service = SyncService()
         setStatus(SyncStatus(SyncStep.DOWNLOADING, DownloadStatus(0, 0, "version.json", false)))
         val details: LauncherVersionDetails = LauncherVersionDetails.fromJson(
-            String(service.downloadFile("instance", instanceData.instance.first.id, "version.json")),
-            LauncherVersionDetails::class.java
+            String(service.downloadFile("instance", instanceData.instance.first.id, "version.json"))
         )
         val creator: VersionCreator
         if (details.versionId != instanceData.versionComponents[0].second.versionId) {
@@ -210,13 +219,13 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class, FileDownloadException::class)
-    protected fun getVanillaCreator(details: LauncherVersionDetails): VersionCreator {
+    private fun getVanillaCreator(details: LauncherVersionDetails): VersionCreator {
         val version: MinecraftVersion = MinecraftGame.getReleases()
             .firstOrNull { it.id == details.versionId || it.id == details.versionNumber }?:
             throw IOException("Failed to find version: " + details.versionId)
         val url: String = version.url
         val versionDetails: MinecraftVersionDetails = MinecraftGame.getVersionDetails(url)
-        return VersionCreator(
+        return VanillaVersionCreator(
             instanceData.instance.first.typeConversion,
             files.versionManifest,
             versionDetails,
@@ -226,12 +235,12 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class, FileDownloadException::class)
-    protected fun getFabricCreator(details: LauncherVersionDetails): VersionCreator {
+    private fun getFabricCreator(details: LauncherVersionDetails): VersionCreator {
         val version: FabricVersionDetails =
             FabricLoader.getFabricVersionDetails(details.versionNumber, details.loaderVersion)
         val profile: FabricProfile =
             FabricLoader.getFabricProfile(details.versionNumber, details.loaderVersion)
-        return VersionCreator(
+        return FabricVersionCreator(
             instanceData.instance.first.typeConversion,
             files.versionManifest,
             version,
@@ -242,7 +251,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun uploadDependency(manifest: LauncherManifest?) {
+    private fun uploadDependency(manifest: ComponentManifest?) {
         if (manifest != null && (isUpdateEverything || !SyncService.isSyncing(manifest))) {
             val synchronizer = ManifestSynchronizer(manifest, files, callback)
             synchronizer.upload()
@@ -250,7 +259,7 @@ class InstanceSynchronizer : ManifestSynchronizer {
     }
 
     @Throws(IOException::class)
-    protected fun uploadVersionFile() {
+    private fun uploadVersionFile() {
         val details = LauncherVersionDetails(
             instanceData.versionComponents[0].second.versionNumber,
             instanceData.versionComponents[0].second.versionType,
@@ -259,9 +268,11 @@ class InstanceSynchronizer : ManifestSynchronizer {
             null,
             null,
             null,
-            null,
-            null,
-            null,
+            listOf(),
+            listOf(),
+            "",
+            listOf(),
+            instanceData.versionComponents[0].second.mainClass,
             null,
             instanceData.versionComponents[0].second.versionId
         )

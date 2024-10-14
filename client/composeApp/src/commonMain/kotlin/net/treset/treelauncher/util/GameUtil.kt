@@ -1,24 +1,22 @@
 package net.treset.treelauncher.util
 
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.launching.GameLauncher
 import net.treset.treelauncher.backend.util.exception.GameLaunchException
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.generic.Button
-import net.treset.treelauncher.generic.PopupData
-import net.treset.treelauncher.generic.PopupType
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
+import net.treset.treelauncher.style.hovered
+import net.treset.treelauncher.style.icons
 
 fun launchGame(
     launcher: GameLauncher,
-    setPopup: (PopupData?) -> Unit,
     onExit: () -> Unit
 ) {
     GameLaunchHelper(
         launcher,
-        setPopup,
         onExit
     )
 }
@@ -27,12 +25,15 @@ private val LOGGER = KotlinLogging.logger { }
 
 class GameLaunchHelper(
     val launcher: GameLauncher,
-    val setPopup: (PopupData?) -> Unit,
     val onExit: () -> Unit
 ) {
+    private var notification: NotificationData? = null
+
     init {
         onPrep()
-        launcher.exitCallbacks = arrayOf({ onGameExit(it) })
+        launcher.onExit = { onGameExit() }
+        launcher.onResourceCleanupFailed = this::onCleanupFail
+        launcher.onExited = this::onGameExited
         try {
             launcher.launch(false) { onLaunchDone(it) }
         } catch(e: GameLaunchException) {
@@ -41,7 +42,7 @@ class GameLaunchHelper(
     }
 
     private fun onPrep() {
-        setPopup(
+        AppContext.setGlobalPopup(
             PopupData(
                 titleRow = { Text(strings().selector.instance.game.preparingTitle()) },
                 content =  { Text(strings().selector.instance.game.preparingMessage()) },
@@ -58,24 +59,42 @@ class GameLaunchHelper(
     }
 
     private fun onRunning() {
-        setPopup(
-            PopupData(
-                titleRow = { Text(strings().selector.instance.game.runningTitle()) },
-                content =  { Text(strings().selector.instance.game.runningMessage()) },
-            )
-        )
+        AppContext.setRunningInstance(launcher.instance)
+        AppContext.discord.activateActivity(launcher.instance)
+        notification = NotificationData(
+            content = {
+                Text(strings().selector.instance.game.runningNotification(launcher.instance))
+                IconButton(
+                    onClick = {
+                        LauncherFile.ofData(AppContext.files.launcherDetails.gamedataDir).open()
+                    },
+                    icon = icons().folder,
+                    tooltip = strings().selector.instance.game.runningOpen(),
+                    interactionTint = MaterialTheme.colorScheme.onPrimary.hovered()
+                )
+                IconButton(
+                    onClick = {
+                        launcher.stop()
+                    },
+                    icon = icons().close,
+                    tooltip = strings().selector.instance.game.runningStop(),
+                    interactionTint = MaterialTheme.colorScheme.error.hovered()
+                )
+            },
+        ).also { AppContext.addNotification(it) }
+        AppContext.setGlobalPopup(null)
     }
 
     private fun onLaunchFailed(
         e: Exception
     ) {
-        setPopup(
+        AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.ERROR,
                 titleRow = { Text(strings().selector.instance.game.errorTitle()) },
                 content =  { Text(strings().selector.instance.game.errorMessage(e.toString())) },
                 buttonRow = { Button(
-                    onClick = { setPopup(null) },
+                    onClick = { AppContext.setGlobalPopup(null) },
                     content = { Text(strings().selector.instance.game.crashClose()) }
                 ) }
             )
@@ -84,33 +103,67 @@ class GameLaunchHelper(
         onExit()
     }
 
-    private fun onGameExit(
+    private fun onGameExit() {
+        AppContext.setGlobalPopup(
+            PopupData(
+                titleRow = { Text(strings().selector.instance.game.exitingTitle()) },
+                content =  { Text(strings().selector.instance.game.exitingMessage()) },
+            )
+        )
+        AppContext.setRunningInstance(null)
+        AppContext.discord.clearActivity()
+        notification?.let { AppContext.dismissNotification(it) }
+    }
+
+    private fun onGameExited(
         error: String?
     ) {
         error?.let {
             onCrash(it)
             return
         }
-        setPopup(null)
+        AppContext.setGlobalPopup(null)
         LOGGER.info { "Game exited normally!" }
         onExit()
+    }
+    
+    private fun onCleanupFail(e: Exception, callback: (Boolean) -> Unit) {
+        AppContext.silentError(e)
+        AppContext.setGlobalPopup(
+            PopupData(
+                type = PopupType.ERROR,
+                titleRow = { Text(strings().selector.instance.game.cleanupFailTitle()) },
+                content =  { Text(strings().selector.instance.game.cleanupFailMessage()) },
+                buttonRow = {
+                    Button(
+                        onClick = { callback(false) },
+                        content = { Text(strings().selector.instance.game.cleanupFailCancel()) },
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Button(
+                        onClick = { callback(true) },
+                        content = { Text(strings().selector.instance.game.cleanupFailRetry()) },
+                    )
+                }
+            )
+        )
     }
 
     private fun onCrash(
         error: String
     ) {
-        setPopup(
+        AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.WARNING,
                 titleRow = { Text(strings().selector.instance.game.crashTitle()) },
                 content =  { Text(strings().selector.instance.game.crashMessage(error)) },
                 buttonRow = {
                     Button(
-                        onClick = { setPopup(null) },
+                        onClick = { AppContext.setGlobalPopup(null) },
                         content = { Text(strings().selector.instance.game.crashClose()) }
                     )
                     Button(
-                        onClick = { LauncherFile.of(launcher.instance.instance.first.directory, appConfig().includedFilesDirName, "crash-reports").open() },
+                        onClick = { LauncherFile.of(launcher.instance.instance.first.directory, "crash-reports").open() },
                         content = { Text(strings().selector.instance.game.crashReports()) }
                     )
                 }

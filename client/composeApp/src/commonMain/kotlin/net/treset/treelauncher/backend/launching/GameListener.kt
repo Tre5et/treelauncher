@@ -1,14 +1,12 @@
 package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.treelauncher.backend.util.exception.GameResourceException
 import java.io.IOException
 import java.util.*
 
 class GameListener(
     val gameProcess: Process,
-    val resourceManager: ResourceManager,
-    private val exitCallbacks: Array<(String?) -> Unit>
+    private val exitCallback: (duration: Long, error: String?) -> Unit
 ) {
     var isValid = false
         private set
@@ -28,6 +26,22 @@ class GameListener(
         playStart = System.currentTimeMillis()
         val t = Thread({ listenToGameOutput() }, "GameListener")
         t.start()
+    }
+
+    fun stop() {
+        Thread {
+            if (isRunning) {
+                gameProcess.destroy()
+            }
+            try {
+                Thread.sleep(5000)
+            } catch (e: InterruptedException) {
+                LOGGER.warn(e) { "Game listener interrupted, restarting: pid=${gameProcess.pid()}" }
+            }
+            if (isRunning) {
+                gameProcess.destroyForcibly()
+            }
+        }.start()
     }
 
     private fun listenToGameOutput() {
@@ -72,21 +86,7 @@ class GameListener(
         }
         isExited = true
         val playDuration = (System.currentTimeMillis() - playStart) / 1000
-        try {
-            resourceManager.addPlayDuration(playDuration)
-        } catch (e: IOException) {
-            LOGGER.error(e) { "Unable to add play duration to statistics: duration=$playDuration, pid=${gameProcess.pid()}" }
-            error = "Unable to add play duration to statistics"
-        }
-        try {
-            resourceManager.cleanupGameFiles()
-        } catch (e: GameResourceException) {
-            LOGGER.error(e) { "Unable to clean up game files after exit: pid=${gameProcess.pid()}" }
-            error = "Unable to clean up game files"
-        }
-        for (c in exitCallbacks) {
-            c(error)
-        }
+        exitCallback(playDuration, error)
     }
 
     companion object {

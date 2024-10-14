@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="Changed Updater to wait for launcher while deleting">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Tre5et"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Tre5et/treelauncher.git",
+    "accountId": "7f2857bf-4ae5-4fcd-8e50-1998039f2bd6"
+  }
+}]]></component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="k7wf2hw5" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2daVT5AmW95RhhHi6YH7Cdg8FFj" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Build `Run`.executor": "Run",
+    "Cargo.Build.executor": "Run",
+    "Cargo.Run.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "git-widget-placeholder": "dev",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/Hannes/Coding/gits/treelauncher/updater",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.first.attach.projects": "true",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "settings.sync",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Hannes\Coding\gits\treelauncher\updater" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Hannes\Coding\gits\treelauncher\updater\app" />
+      <recent name="D:\Hannes\Coding\gits\treelauncher\updater" />
+      <recent name="D:\Hannes\Coding\gits\treelauncher\updater\target\debug" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Cargo.Run">
+    <configuration name="Build" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
+      <option name="command" value="build --release" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run --package updater --bin updater --  -iD:/Hannes/Coding/gits/treelauncher/updater/update.json -oD:/Hannes/Coding/gits/treelauncher/updater/result.json -rC:/Users/hanne/AppData/Local/TreeLauncher;$USER_HOME$/AppData/Local/TreeLauncher/TreeLauncher.exe" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Cargo.Run" />
+      <item itemvalue="Cargo.Build" />
+    </list>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="702a865d-40a6-4507-bc71-77614465bdae" name="Changes" comment="" />
+      <created>1710246180339</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1710246180339</updated>
+      <workItem from="1710246182042" duration="6817000" />
+      <workItem from="1710257378717" duration="25000" />
+      <workItem from="1710257498577" duration="2207000" />
+      <workItem from="1710259726432" duration="60000" />
+      <workItem from="1710260782251" duration="1933000" />
+      <workItem from="1710269608016" duration="9019000" />
+      <workItem from="1710330031086" duration="1186000" />
+      <workItem from="1711290074416" duration="1862000" />
+      <workItem from="1713033296348" duration="2228000" />
+      <workItem from="1714476885562" duration="1484000" />
+      <workItem from="1723730137999" duration="1126000" />
+    </task>
+    <task id="LOCAL-00001" summary="Changed Updater to Rust Project">
+      <option name="closed" value="true" />
+      <created>1710246278699</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1710246278699</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Implemented Updater Structure">
+      <option name="closed" value="true" />
+      <created>1710249380107</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1710249380107</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added Ability to restart">
+      <option name="closed" value="true" />
+      <created>1710255903192</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1710255903192</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Implemented Updater Logic">
+      <option name="closed" value="true" />
+      <created>1710278608688</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1710278608688</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Implemented Updater Logic">
+      <option name="closed" value="true" />
+      <created>1710278649016</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1710278649016</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Implemented Updater Logic">
+      <option name="closed" value="true" />
+      <created>1710278673101</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1710278673101</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Changed Updater to wait for launcher while deleting">
+      <option name="closed" value="true" />
+      <created>1713034922661</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1713034922661</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Changed Updater to Rust Project" />
+    <MESSAGE value="Implemented Updater Structure" />
+    <MESSAGE value="Added Ability to restart" />
+    <MESSAGE value="Implemented Updater Logic" />
+    <MESSAGE value="Changed Updater to wait for launcher while deleting" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed Updater to wait for launcher while deleting" />
+  </component>
+</project>

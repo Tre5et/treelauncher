@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -20,32 +19,40 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.style.disabledContainer
+import net.treset.treelauncher.style.disabledContent
 
 @Composable
 fun SelectorButton(
     selected: Boolean,
     onClick: () -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
     val backgroundColor by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.primary
+        if(!enabled) MaterialTheme.colorScheme.secondaryContainer.disabledContainer()
+        else if(selected) MaterialTheme.colorScheme.primary
         else MaterialTheme.colorScheme.secondaryContainer
     )
 
     val contentColor by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.onPrimary
+        if(!enabled) MaterialTheme.colorScheme.onSecondaryContainer.disabledContent()
+        else if (selected) MaterialTheme.colorScheme.onPrimary
         else MaterialTheme.colorScheme.onSecondaryContainer
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
             .background(backgroundColor)
-            .pointerHoverIcon(PointerIcon.Hand)
-            .clickable { onClick() }
+            .pointerHoverIcon(if(enabled) PointerIcon.Hand else PointerIcon.Default)
+            .clickable { if(enabled) onClick() }
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -60,14 +67,16 @@ fun SelectorButton(
 @Composable
 fun SelectorButton(
     title: String,
-    component: LauncherManifest? = null,
+    component: ComponentManifest? = null,
     icon: ImageVector,
     selected: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     SelectorButton(
         selected = selected,
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -98,13 +107,15 @@ fun SelectorButton(
 
 @Composable
 fun ComponentButton(
-    component: LauncherManifest,
+    component: ComponentManifest,
     selected: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     SelectorButton(
         selected = selected,
         onClick = onClick,
+        enabled = enabled
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -124,11 +135,14 @@ fun ImageSelectorButton(
     onClick: () -> Unit,
     image: ImageBitmap?,
     title: String?,
-    subtitle: String? = null
+    subtitle: String? = null,
+    enabled: Boolean = true,
+    overlayContent: @Composable BoxScope.() -> Unit = {}
 ) {
     SelectorButton(
         selected = selected,
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier
@@ -159,13 +173,88 @@ fun ImageSelectorButton(
                 title?.let {
                     Text(
                         it,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Start
                     )
                 }
                 subtitle?.let {
-                    Text(it)
+                    Text(
+                        it,
+                        textAlign = TextAlign.Start
+                    )
                 }
             }
         }
+
+        overlayContent()
+    }
+}
+
+@Composable
+fun CompactSelectorButton(
+    selected: Boolean,
+    onClick: () -> Unit,
+    image: ImageBitmap? = null,
+    title: String? = null,
+    subtitle: String? = null,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    overlayContent: @Composable BoxScope.() -> Unit = {}
+) {
+    SelectorButton(
+        selected = selected,
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            image?.let {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(LocalContentColor.current)
+                        .size(56.dp)
+                        .padding(3.dp)
+                ) {
+                    Image(
+                        it,
+                        "Icon",
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
+            }
+
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(4.dp)
+            ) {
+                title?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(end = 36.dp)
+                    )
+                }
+                subtitle?.let {
+                    Text(
+                        it,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(end = 36.dp)
+                    )
+                }
+            }
+        }
+
+        overlayContent()
     }
 }

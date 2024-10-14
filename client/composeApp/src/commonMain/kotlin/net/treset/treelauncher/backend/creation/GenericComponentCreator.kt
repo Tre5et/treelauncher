@@ -1,9 +1,10 @@
 package net.treset.treelauncher.backend.creation
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.treelauncher.backend.config.appConfig
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -17,17 +18,17 @@ import java.util.*
 
 abstract class GenericComponentCreator(
     var type: LauncherManifestType,
-    var uses: LauncherManifest?,
-    var inheritsFrom: LauncherManifest?,
+    var uses: ComponentManifest?,
+    var inheritsFrom: ComponentManifest?,
     var name: String?,
     var typeConversion: Map<String, LauncherManifestType>?,
     var includedFiles: Array<PatternString>?,
     var details: String?,
-    var componentsManifest: LauncherManifest?
+    var componentsManifest: ParentManifest?
 ) : ComponentCreator {
-    protected var newManifest: LauncherManifest? = null
+    var newManifest: ComponentManifest? = null
     open var statusCallback: (CreationStatus) -> Unit = {}
-    protected var defaultStatus: CreationStatus? = null
+    var defaultStatus: CreationStatus? = null
 
     @get:Throws(ComponentCreationException::class)
     override val id: String
@@ -51,20 +52,13 @@ abstract class GenericComponentCreator(
 
     @Throws(ComponentCreationException::class)
     protected open fun createComponent(): String {
-        val manifestType = try {
-            getManifestType(type, typeConversion?: throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: invalid parameters"))
-        } catch (e: IllegalArgumentException) {
-            throw ComponentCreationException("Unable to create ${type.toString().lowercase(Locale.getDefault())} component: unable to get manifest type", e)
-        }
-        LauncherManifest(
-            manifestType,
-            typeConversion,
-            null,
-            details,
-            null,
-            name,
-            includedFiles?.map { s -> s.get() }?.toList(),
-            null
+        ComponentManifest(
+            type = type,
+            id = "",
+            typeConversion = typeConversion!!,
+            name = name!!,
+            includedFiles = includedFiles?.map { s -> s.get() }?.toList() ?: listOf(),
+            details = details,
         ).let {
             it.id = hash(it)
             newManifest = it
@@ -82,9 +76,10 @@ abstract class GenericComponentCreator(
     @Throws(ComponentCreationException::class)
     protected open fun useComponent(): String {
         uses?.let {
-            if (it.type != type || it.id == null) {
+            if (it.type != type || it.id.isBlank()) {
                 throw ComponentCreationException("Unable to use ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
             }
+            newManifest = uses
             LOGGER.debug { "Using ${type.toString().lowercase(Locale.getDefault())} component: id=${it.id}" }
             return it.id
         }?: throw ComponentCreationException("Unable to use ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
@@ -96,17 +91,14 @@ abstract class GenericComponentCreator(
             if (it.type != type) {
                 throw ComponentCreationException("Unable to inherit ${type.toString().lowercase(Locale.getDefault())} component: invalid component specified")
             }
-            val manifestType = getManifestType(type, it.typeConversion)
 
-            LauncherManifest(
-                manifestType,
-                it.typeConversion,
-                null,
-                it.details,
-                it.prefix,
-                name,
-                it.includedFiles,
-                it.components
+            ComponentManifest(
+                type = type,
+                typeConversion = it.typeConversion,
+                id = "",
+                name = name!!,
+                includedFiles = it.includedFiles,
+                details = it.details,
             ).let { manifest ->
                 manifest.id = hash(manifest)
                 newManifest = manifest
@@ -129,8 +121,8 @@ abstract class GenericComponentCreator(
     }
 
     @Throws(ComponentCreationException::class)
-    fun copyFiles(oldManifest: LauncherManifest, newManifest: LauncherManifest) {
-        if (!isValid || oldManifest.directory == null || newManifest.directory == null) {
+    fun copyFiles(oldManifest: ComponentManifest, newManifest: ComponentManifest) {
+        if (!isValid) {
             throw ComponentCreationException("Unable to copy files: invalid parameters")
         }
         try {
@@ -179,13 +171,6 @@ abstract class GenericComponentCreator(
                         e
                     )
                 }
-                if (it.includedFiles != null) {
-                    try {
-                        LauncherFile.of(it.directory, appConfig().includedFilesDirName).createDir()
-                    } catch (e: IOException) {
-                        throw ComponentCreationException("Unable to write manifest: unable to create included files directory: id=${it.id}, path=${it.directory}/${appConfig().includedFilesDirName}")
-                    }
-                }
                 LOGGER.debug {
                     "Wrote manifest: path=${it.directory}/${appConfig().manifestFileName}"
                 }
@@ -198,7 +183,7 @@ abstract class GenericComponentCreator(
         var success = true
         newManifest?.let {
             componentsManifest?.let { componentsMan ->
-                if (it.directory != null) {
+                if (it.directory.isNotBlank()) {
                     val directory: LauncherFile = LauncherFile.of(it.directory)
                     if (directory.isDirectory()) {
                         try {
@@ -211,9 +196,7 @@ abstract class GenericComponentCreator(
                     }
                 }
 
-                if (componentsMan.components != null && it.id != null && componentsMan.components.contains(
-                        it.id
-                    )
+                if (it.id.isNotBlank() && componentsMan.components.contains(it.id)
                 ) {
                     val components: MutableList<String> = ArrayList<String>(componentsMan.components)
                     components.remove(it.id)
@@ -236,19 +219,9 @@ abstract class GenericComponentCreator(
     protected open val parentManifestFileName: String
         get() = appConfig().manifestFileName
 
-    @Throws(IllegalArgumentException::class)
-    fun getManifestType(type: LauncherManifestType, typeConversion: Map<String, LauncherManifestType>): String {
-        for ((key, value) in typeConversion) {
-            if (value == type) {
-                return key
-            }
-        }
-        throw IllegalArgumentException("Unable to get manifest type: no type found: type=${type.toString().lowercase(Locale.getDefault())}")
-    }
-
     private val isValid: Boolean
         get() = componentsManifest?.let {
-            isComponentManifest && it.directory != null && it.prefix != null
+            isComponentManifest && it.directory.isNotBlank() && it.prefix.isNotBlank()
         }?: false
     private val isComponentManifest: Boolean
         get() = componentsManifest?.let {

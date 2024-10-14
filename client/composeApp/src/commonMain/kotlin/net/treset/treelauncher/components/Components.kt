@@ -5,18 +5,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.DragData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
 import net.treset.treelauncher.AppContext
-import net.treset.treelauncher.app
+import net.treset.treelauncher.backend.config.ComponentManifestSortType
 import net.treset.treelauncher.backend.config.appConfig
 import net.treset.treelauncher.backend.creation.GenericComponentCreator
+import net.treset.treelauncher.backend.data.LauncherInstanceDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -28,16 +31,32 @@ import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import java.io.IOException
 
+data class SortContext(
+    val getSortType: () -> ComponentManifestSortType,
+    val setSortType: (ComponentManifestSortType) -> Unit,
+    val getReverse: () -> Boolean,
+    val setReverse: (Boolean) -> Unit
+)
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T, C:CreationState<T>> Components(
     title: String,
     components: List<T>,
-    manifest: T.() -> LauncherManifest,
-    appContext: AppContext,
+    componentManifest: ParentManifest,
+    checkHasComponent: (LauncherInstanceDetails, ComponentManifest) -> Boolean,
+    getManifest: T.() -> ComponentManifest,
+    isEnabled: T.() -> Boolean = {true},
     getCreator: (C) -> GenericComponentCreator?,
     reload: () -> Unit,
     createContent: @Composable ColumnScope.(onCreate: (C) -> Unit) -> Unit,
     actionBarSpecial: @Composable RowScope.(
+        selected: T,
+        settingsOpen: Boolean,
+        redraw: () -> Unit,
+        reload: () -> Unit
+    ) -> Unit = {_,_,_,_->},
+    actionBarBoxContent: @Composable BoxScope.(
         selected: T,
         settingsOpen: Boolean,
         redraw: () -> Unit,
@@ -48,8 +67,10 @@ fun <T, C:CreationState<T>> Components(
         redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_->},
+    detailsOnDrop: ((DragData) -> Unit)? = null,
     detailsScrollable: Boolean = true,
-    settingsDefault: Boolean = false
+    settingsDefault: Boolean = false,
+    sortContext: SortContext? = null
 ) {
     var selected: T? by remember(components) { mutableStateOf(null) }
 
@@ -64,6 +85,22 @@ fun <T, C:CreationState<T>> Components(
         }
     }
 
+    var sortType: ComponentManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: ComponentManifestSortType.LAST_USED) }
+    var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
+
+    val actualComponents: List<T> = remember(components, sortType, sortReversed, AppContext.runningInstance) {
+        components
+            .sortedWith { o1, o2 ->
+                sortType.comparator.compare(o1.getManifest(), o2.getManifest())
+            }.let {
+                if (sortReversed) {
+                    it.reversed()
+                } else {
+                    it
+                }
+            }
+    }
+
     LaunchedEffect(Unit) {
         reload()
     }
@@ -74,11 +111,30 @@ fun <T, C:CreationState<T>> Components(
     ) {
 
         TitledColumn(
-            title = title,
+            headerContent = {
+                Text(title)
+
+                sortContext?.let {
+                    SortBox(
+                        sorts = ComponentManifestSortType.entries,
+                        reversed = it.getReverse(),
+                        selected = it.getSortType(),
+                        onReversed = {
+                            it.setReverse(!sortReversed)
+                            sortReversed = !sortReversed
+                        },
+                        onSelected = { new ->
+                            it.setSortType(new)
+                            sortType = new
+                        },
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    )
+                }
+            },
             modifier = Modifier.padding(12.dp),
             parentModifier = Modifier.fillMaxWidth(1 / 2f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            scrollable = false
+            scrollable = false,
         ) {
             Box(
                 modifier = Modifier
@@ -87,10 +143,11 @@ fun <T, C:CreationState<T>> Components(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(components) { component ->
+                    items(actualComponents) { component ->
                         ComponentButton(
-                            component = component.manifest(),
+                            component = component.getManifest(),
                             selected = component == selected,
+                            enabled = component.isEnabled(),
                             onClick = {
                                 creatorSelected = false
                                 selected = if(component == selected) {
@@ -116,7 +173,7 @@ fun <T, C:CreationState<T>> Components(
         }
 
         selected?.let {
-            var showSettings by remember { mutableStateOf(false) }
+            var showSettings by remember(it) { mutableStateOf(settingsDefault) }
 
             var showRename by remember { mutableStateOf(false) }
 
@@ -124,113 +181,134 @@ fun <T, C:CreationState<T>> Components(
 
             TitledColumn(
                 headerContent = {
+                    if(showSettings && !settingsDefault) {
+                        Box(
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            IconButton(
+                                onClick = { showSettings = false },
+                                icon = icons().back,
+                                size = 32.dp,
+                                tooltip = strings().manager.component.back(),
+                            )
+                        }
+                    }
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         actionBarSpecial(
                             it,
-                            settingsDefault || showSettings,
+                            showSettings,
                             redrawSelected,
                             reload
                         )
 
-                        Text(it.manifest().name)
+                        Text(it.getManifest().name)
 
                         IconButton(
                             onClick = {
                                 showRename = true
                             },
+                            icon = icons().edit,
+                            size = 32.dp,
                             tooltip = strings().selector.component.rename.title()
-                        ) {
-                            Icon(
-                                icons().rename,
-                                "Rename",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                        )
                         IconButton(
                             onClick = {
-                                LauncherFile.of(it.manifest().directory).open()
+                                LauncherFile.of(it.getManifest().directory).open()
                             },
+                            icon = icons().folder,
+                            size = 32.dp,
                             tooltip = strings().selector.component.openFolder()
-                        ) {
-                            Icon(
-                                icons().folder,
-                                "Open Folder",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                        )
                         IconButton(
                             onClick = {
                                 showDelete = true
                             },
+                            icon = icons().delete,
+                            size = 32.dp,
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().selector.component.delete.title()
-                        ) {
-                            Icon(
-                                icons().delete,
-                                "Delete",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                            tooltip = strings().selector.component.delete.tooltip()
+                        )
                     }
+
+                    actionBarBoxContent(
+                        it,
+                        showSettings,
+                        redrawSelected,
+                        reload
+                    )
                 },
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.padding(12.dp),
                 scrollable = false
             ) {
-                if(settingsDefault || showSettings) {
-                    ComponentSettings(
-                        it.manifest(),
-                        onClose = { showSettings = false },
-                        showBack = !settingsDefault
-                    )
-                } else {
+                val columnContent: @Composable () -> Unit = {
                     Column(
-                        modifier = Modifier
-                            .weight(1f, false)
-                            .let {mod ->
-                                if(detailsScrollable) {
-                                    mod.verticalScroll(rememberScrollState())
-                                } else {
-                                    mod
-                                }
-                            },
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        detailsContent(
-                            it,
-                            redrawSelected,
-                            reload
+                        Column(
+                            modifier = Modifier
+                                .weight(1f, false)
+                                .let {mod ->
+                                    if(detailsScrollable) {
+                                        mod.verticalScroll(rememberScrollState())
+                                    } else {
+                                        mod
+                                    }
+                                },
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            detailsContent(
+                                it,
+                                redrawSelected,
+                                reload
+                            )
+                        }
+
+                        SelectorButton(
+                            title = strings().manager.component.settings(),
+                            icon = icons().settings,
+                            selected = showSettings,
+                            onClick = { showSettings = true }
                         )
                     }
+                }
 
-                    SelectorButton(
-                        title = strings().manager.component.settings(),
-                        icon = icons().settings,
-                        selected = showSettings,
-                        onClick = { showSettings = true }
+                if(showSettings) {
+                    ComponentSettings(
+                        it.getManifest(),
                     )
+                } else {
+                    detailsOnDrop?.let {
+                        DroppableArea(
+                            onDrop = it,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            columnContent()
+                        }
+                    } ?: columnContent()
                 }
             }
 
 
             if (showRename) {
                 RenamePopup(
-                    manifest = it.manifest(),
-                    editValid = { name -> name.isNotBlank() && name != it.manifest().name },
+                    manifest = it.getManifest(),
+                    editValid = { name -> name.isNotBlank() && name != it.getManifest().name },
                     onDone = { name ->
                         showRename = false
                         name?.let { newName ->
-                            it.manifest().name = newName
+                            it.getManifest().name = newName
                             try {
                                 LauncherFile.of(
-                                    it.manifest().directory,
+                                    it.getManifest().directory,
                                     appConfig().manifestFileName
-                                ).write(it.manifest())
+                                ).write(it.getManifest())
                             } catch (e: IOException) {
-                                app().severeError(e)
+                                AppContext.severeError(e)
                             }
                             redrawSelected()
                         }
@@ -240,20 +318,23 @@ fun <T, C:CreationState<T>> Components(
 
             if (showDelete) {
                 DeletePopup(
-                    component = it.manifest(),
-                    appContext = appContext,
-                    checkHasComponent = { details -> details.savesComponent == it.manifest().id },
+                    component = it.getManifest(),
+                    checkHasComponent = { details -> checkHasComponent(details, it.getManifest()) },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        appContext.files.savesManifest.components.remove(it.manifest().id)
+                        componentManifest.components.remove(it.getManifest().id)
                         try {
                             LauncherFile.of(
-                                appContext.files.savesManifest.directory,
-                                appContext.files.gameDetailsManifest.components[1]
-                            ).write(appContext.files.savesManifest)
-                            LauncherFile.of(it.manifest().directory).remove()
+                                componentManifest.directory,
+                                when(componentManifest.type) {
+                                    LauncherManifestType.SAVES -> "saves.json"
+                                    LauncherManifestType.MODS -> "mods.json"
+                                    else -> appConfig().manifestFileName
+                                }
+                            ).write(componentManifest)
+                            LauncherFile.of(it.getManifest().directory).remove()
                         } catch(e: IOException) {
-                            app().severeError(e)
+                            AppContext.severeError(e)
                         }
                         reload()
                         showDelete = false
@@ -282,7 +363,7 @@ fun <T, C:CreationState<T>> Components(
                             try {
                                 creation.execute()
                             } catch (e: ComponentCreationException) {
-                                app().error(e)
+                                AppContext.error(e)
                             }
                             reload()
                             creationStatus = null
@@ -298,30 +379,44 @@ fun <T, C:CreationState<T>> Components(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Components(
     title: String,
-    components: List<LauncherManifest>,
-    appContext: AppContext,
-    getCreator: (CreationState<LauncherManifest>) -> GenericComponentCreator?,
+    componentManifest: ParentManifest,
+    components: List<ComponentManifest>,
+    checkHasComponent: (LauncherInstanceDetails, ComponentManifest) -> Boolean,
+    isEnabled: ComponentManifest.() -> Boolean = {true},
+    getCreator: (CreationState<ComponentManifest>) -> GenericComponentCreator?,
     reload: () -> Unit,
     actionBarSpecial: @Composable RowScope.(
-        LauncherManifest,
+        ComponentManifest,
         Boolean,
         () -> Unit,
         () -> Unit
     ) -> Unit = {_,_,_,_->},
+    actionBarBoxContent: @Composable BoxScope.(
+        selected: ComponentManifest,
+        settingsOpen: Boolean,
+        redraw: () -> Unit,
+        reload: () -> Unit
+    ) -> Unit = {_,_,_,_->},
     detailsContent: @Composable ColumnScope.(
-        LauncherManifest,
-        () -> Unit,
-        () -> Unit
+        selected: ComponentManifest,
+        redraw: () -> Unit,
+        reload: () -> Unit
     ) -> Unit = {_,_,_->},
-    settingsDefault: Boolean = false
+    detailsOnDrop: ((DragData) -> Unit)? = null,
+    detailsScrollable: Boolean = false,
+    settingsDefault: Boolean = false,
+    sortContext: SortContext? = null
 ) = Components(
     title,
     components,
+    componentManifest,
+    checkHasComponent,
     { this },
-    appContext,
+    isEnabled,
     getCreator,
     reload,
     { onCreate ->
@@ -333,6 +428,10 @@ fun Components(
         )
     },
     actionBarSpecial,
+    actionBarBoxContent,
     detailsContent,
-    settingsDefault
+    detailsOnDrop,
+    detailsScrollable,
+    settingsDefault,
+    sortContext
 )

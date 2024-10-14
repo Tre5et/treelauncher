@@ -10,11 +10,11 @@ import java.math.BigInteger
 import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import java.util.function.Function
+import kotlin.io.path.isDirectory
 
 class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
@@ -23,37 +23,55 @@ class LauncherFile(pathname: String) : File(pathname) {
         return Files.readAllBytes(toPath())
     }
 
-    @Suppress("CheckedExceptionsKotlin")
     @Throws(IOException::class)
     fun readString(): String {
         return String(read())
     }
 
     fun isChildOf(parent: File): Boolean {
-        return parent.isDirectory() && absolutePath.startsWith(parent.absolutePath)
+        return parent.isDirectory() && toPath().startsWith(parent.toPath())
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, vararg options: CopyOption?) {
+    fun copyTo(dst: LauncherFile, vararg options: CopyOption) {
         copyTo(dst, { true }, *options)
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, copyChecker: Function<String?, Boolean>, vararg options: CopyOption?) {
+    fun copyTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption) {
+        moveOrCopy(dst, copyChecker, false, *options)
+    }
+
+    @Throws(IOException::class)
+    fun moveTo(dst: LauncherFile, vararg options: CopyOption) {
+        moveTo(dst, { true }, *options)
+    }
+
+    @Throws(IOException::class)
+    fun moveTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption) {
+        moveOrCopy(dst, copyChecker, true, *options)
+    }
+
+    @Throws(IOException::class)
+    private fun moveOrCopy(dst: LauncherFile, copyChecker: (String) -> Boolean, move: Boolean, vararg options: CopyOption) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
+        Files.createDirectories(dst.parentFile.toPath())
         if (isDirectory()) {
             dst.createDir()
             try {
                 Files.walk(Path.of(path)).use { stream ->
                     val exceptions: MutableList<IOException> = ArrayList()
                     val sourceLength = path.length
-                    stream.forEach { sourceF: Path ->
-                        if (!copyChecker.apply(sourceF.fileName.toString()) || sourceF.toString() == absolutePath) {
+                    stream.forEach { src: Path ->
+                        if (!copyChecker(src.fileName.toString()) || src.toString() == absolutePath) {
                             return@forEach
                         }
-                        val destinationF = Paths.get(dst.path, sourceF.toString().substring(sourceLength))
+                        val destinationF = of(dst.path, src.toString().substring(sourceLength))
+                        if(src.isDirectory() && destinationF.isDirectory) {
+                            return@forEach
+                        }
                         try {
-                            Files.copy(sourceF, destinationF, *options)
+                            Files.copy(src, destinationF.toPath(), *options)
                         } catch (e: IOException) {
                             exceptions.add(e)
                         }
@@ -71,11 +89,16 @@ class LauncherFile(pathname: String) : File(pathname) {
         } else {
             Files.copy(toPath(), dst.toPath(), *options)
         }
+        if(move) {
+            remove()
+        }
     }
 
     @Throws(IOException::class)
-    fun moveTo(dst: File, vararg options: CopyOption?) {
-        Files.move(toPath(), dst.toPath(), *options)
+    fun atomicMoveTo(dst: LauncherFile, vararg options: CopyOption) {
+        if (!exists()) throw IOException("File does not exist: $absolutePath")
+        Files.createDirectories(dst.parentFile.toPath())
+        Files.move(toPath(), dst.toPath(), StandardCopyOption.ATOMIC_MOVE, *options)
     }
 
     @Throws(IOException::class)
@@ -180,6 +203,10 @@ class LauncherFile(pathname: String) : File(pathname) {
 
     fun getLauncherName(): String {
         return if(isDirectory()) { "${name}/" } else { name }
+    }
+
+    fun existsOrNull(): LauncherFile? {
+        return if(exists()) this else null
     }
 
     companion object {

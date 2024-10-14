@@ -2,10 +2,10 @@ package net.treset.treelauncher.backend.creation
 
 import net.treset.mc_version_loader.exception.FileDownloadException
 import net.treset.mc_version_loader.java.*
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherManifestType
 import net.treset.mc_version_loader.util.DownloadStatus
 import net.treset.mc_version_loader.util.OsUtil
+import net.treset.treelauncher.backend.data.manifest.LauncherManifestType
+import net.treset.treelauncher.backend.data.manifest.ParentManifest
 import net.treset.treelauncher.backend.util.CreationStatus
 import net.treset.treelauncher.backend.util.exception.ComponentCreationException
 import net.treset.treelauncher.backend.util.file.LauncherFile
@@ -13,7 +13,7 @@ import net.treset.treelauncher.backend.util.file.LauncherFile
 class JavaComponentCreator(
     name: String,
     typeConversion: Map<String, LauncherManifestType>,
-    componentsManifest: LauncherManifest
+    componentsManifest: ParentManifest
 ) : GenericComponentCreator(
     LauncherManifestType.JAVA_COMPONENT,
     null,
@@ -47,24 +47,13 @@ class JavaComponentCreator(
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get os identifier", e)
         }
-        var os: JavaRuntimeOs? = null
-        for (o in java.runtimes) {
-            if (o.id == osIdentifier) {
-                os = o
-                break
-            }
-        }
-        if (os?.releases == null) {
+        val os = java[osIdentifier]
+        if (os?.entries == null || os.entries.isEmpty()) {
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get os runtime")
         }
-        var release: JavaRuntimeRelease? = null
-        for (r in os.releases) {
-            if (r != null && name == r.id) {
-                release = r
-                break
-            }
-        }
+
+        val release = os[name]?.get(0)
         if (release?.manifest == null || release.manifest.url == null) {
             attemptCleanup()
             throw ComponentCreationException("Failed to create java component: failed to get release")

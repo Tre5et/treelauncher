@@ -2,21 +2,25 @@ package net.treset.treelauncher.backend.mods
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.exception.FileDownloadException
-import net.treset.mc_version_loader.launcher.LauncherMod
 import net.treset.mc_version_loader.mods.MinecraftMods
 import net.treset.mc_version_loader.mods.ModData
+import net.treset.mc_version_loader.mods.ModProvider
 import net.treset.mc_version_loader.mods.ModVersionData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.toLauncherMod
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.isSame
+import net.treset.treelauncher.generic.VersionType
 import java.io.IOException
 import java.nio.file.StandardCopyOption
 
 class ModDownloader(
     val launcherMod: LauncherMod?,
     val directory: LauncherFile,
-    val versionType: String,
-    val version: String,
+    val versionTypes: List<VersionType>,
+    val versions: List<String>,
     val existing: MutableList<LauncherMod>,
+    val modProviders: List<ModProvider>,
     val enableOnDownload: Boolean = false,
 ) {
     @Throws(FileDownloadException::class, IOException::class)
@@ -51,7 +55,7 @@ class ModDownloader(
         val newMod = try {
             downloadRequired(
                 versionData,
-                launcherMod?.isEnabled ?: true || enableOnDownload,
+                launcherMod?.isEnabled != false || enableOnDownload,
                 !existing.contains(launcherMod)
             )
         } catch(e: FileDownloadException) {
@@ -118,14 +122,26 @@ class ModDownloader(
         LOGGER.debug {
             "Downloading mod file: ${versionData.name}"
         }
-        val newMod = MinecraftMods.downloadModFile(versionData, directory)
+        versionData.downloadProviders = modProviders
+        val newMod = MinecraftMods.downloadModFile(versionData, directory).toLauncherMod()
+        if(!enabled) {
+            LOGGER.debug { "Disabling new mod file: ${newMod.fileName}" }
+            val file = LauncherFile.of(directory, newMod.fileName)
+            val disabledFile = LauncherFile.of(directory, "${newMod.fileName}.disabled")
+            try {
+                file.moveTo(disabledFile, StandardCopyOption.REPLACE_EXISTING)
+            } catch(e: IOException) {
+                throw FileDownloadException("Failed to disable new mod file: ${file.name}", e)
+            }
+        }
         newMod.isEnabled = enabled
 
         if(addToList) {
             existing.add(newMod)
         }
 
-        for (d in versionData.getRequiredDependencies(version, versionType)) {
+        versionData.setDependencyConstraints(versions, versionTypes.map { it.id }, modProviders)
+        for (d in versionData.requiredDependencies) {
             if (d == null) {
                 continue
             }

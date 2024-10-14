@@ -4,14 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
-import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.AppContextData
 import net.treset.treelauncher.backend.creation.VersionCreator
 import net.treset.treelauncher.backend.data.InstanceData
 import net.treset.treelauncher.backend.util.CreationStatus
@@ -24,7 +22,7 @@ import net.treset.treelauncher.localization.strings
 @Composable
 fun InstanceVersionChanger(
     instance: InstanceData,
-    appContext: AppContext,
+    appContext: AppContextData,
     redrawCurrent: () -> Unit
 ) {
     var creator: VersionCreator? by remember { mutableStateOf(null) }
@@ -45,13 +43,13 @@ fun InstanceVersionChanger(
                 onDone = {
                      creator = it
                 },
-                appContext = appContext,
                 defaultVersionId = instance.versionComponents[0].second.versionNumber,
                 defaultVersionType = when(instance.versionComponents[0].second.versionType) {
                     "fabric" -> VersionType.FABRIC
+                    "forge" -> VersionType.FORGE
                     else -> VersionType.VANILLA
                 },
-                defaultFabricVersion = instance.versionComponents[0].second.loaderVersion,
+                defaultLoaderVersion = instance.versionComponents[0].second.loaderVersion,
             )
         }
     }
@@ -60,10 +58,7 @@ fun InstanceVersionChanger(
         PopupOverlay(
             type = PopupType.WARNING,
             titleRow = { Text(strings().manager.instance.change.title()) },
-            content = { Text(
-                strings().manager.instance.change.message(),
-                textAlign = TextAlign.Center
-            ) },
+            content = { Text(strings().manager.instance.change.message()) },
             buttonRow = {
                 Button(
                     onClick = {

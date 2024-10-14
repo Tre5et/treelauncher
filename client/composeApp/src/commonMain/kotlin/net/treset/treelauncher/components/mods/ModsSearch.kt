@@ -1,11 +1,12 @@
 package net.treset.treelauncher.components.mods
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,14 +14,20 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherMod
+import net.treset.mc_version_loader.exception.FileDownloadException
+import net.treset.mc_version_loader.format.FormatUtils
 import net.treset.mc_version_loader.mods.MinecraftMods
-import net.treset.mc_version_loader.mods.ModData
+import net.treset.mc_version_loader.mods.ModProvider
+import net.treset.treelauncher.AppContext
+import net.treset.treelauncher.AppContextData
+import net.treset.treelauncher.backend.data.LauncherMod
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.backend.util.string.FormatString
-import net.treset.treelauncher.generic.IconButton
-import net.treset.treelauncher.generic.SelectorButton
-import net.treset.treelauncher.generic.TextBox
+import net.treset.treelauncher.components.mods.display.ModDataProvider
+import net.treset.treelauncher.components.mods.display.ModDataSearchDisplay
+import net.treset.treelauncher.generic.*
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.style.icons
 import kotlin.math.log10
@@ -28,55 +35,93 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ModsSearch(
+    component: Pair<ComponentManifest, LauncherModsDetails>,
     modContext: ModContext,
+    appContext: AppContextData,
+    droppedFile: LauncherFile? = null,
     closeSearch: () -> Unit
 ) {
     var showLocal by remember { mutableStateOf(false) }
 
     if(showLocal) {
-        ModsLocal(
+        ModsImport(
+            component,
             modContext,
+            appContext,
+            droppedFile = droppedFile,
         ) {
-            if(it) {
-                closeSearch()
-            } else {
-                showLocal = false
-            }
+            closeSearch()
         }
         return
     }
 
     var tfValue by remember { mutableStateOf("") }
-    var results: List<ModData>? by remember { mutableStateOf(null) }
+
+    var results: List<ModDataSearchDisplay>? by remember { mutableStateOf(null) }
 
     var searching by remember { mutableStateOf(false) }
 
-    var recheckExising by remember { mutableStateOf(0) }
-
-    val searchContext = remember(modContext, recheckExising) {
+    val searchContext = remember(modContext) {
         SearchContext.from(
             modContext,
-            recheckExising
-        ) {
-            recheckExising++
+        )
+    }
+
+    LaunchedEffect(droppedFile) {
+        droppedFile?.let {
+            if(!showLocal) {
+                showLocal = true
+            }
         }
     }
 
-    LaunchedEffect(searching) {
+    LaunchedEffect(searching, searchContext) {
         if(searching) {
-            results = MinecraftMods.searchCombinedMods(
-                tfValue,
-                modContext.version,
-                "fabric",
-                25,
-                0
-            ).sortedWith { o1, o2 -> (
-                    FormatString.distance(tfValue, o1.name) -
-                    FormatString.distance(tfValue, o2.name) +
-                    log10((o2.downloadsCount / o1.downloadsCount).toDouble())
-                ).roundToInt()
-            }
-            searching = false
+            Thread {
+                try {
+                    results = (
+                        if(searchContext.providers.isEmpty() || searchContext.providers.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
+                            MinecraftMods.searchCombinedMods(
+                                tfValue,
+                                modContext.versions,
+                                modContext.types.map { it.id },
+                            25,
+                            0
+                            )
+                        } else if(searchContext.providers.contains(ModProvider.MODRINTH)) {
+                            MinecraftMods.searchModrinth(
+                                tfValue,
+                                modContext.versions,
+                                modContext.types.map { it.id },
+                                25,
+                                0
+                            ).hits
+                        } else {
+                            MinecraftMods.searchCurseforge(
+                                tfValue,
+                                modContext.versions,
+                                FormatUtils.modLoadersToCurseforgeModLoaders(modContext.types.map { it.id }),
+                                25,
+                                0
+                            ).data
+                        }
+                    ).sortedWith { o1, o2 ->
+                        (
+                            FormatString.distance(tfValue, o1.name) -
+                                FormatString.distance(tfValue, o2.name) +
+                                log10((o2.downloadsCount / o1.downloadsCount).toDouble())
+                        ).roundToInt()
+                    }.map {
+                        ModDataSearchDisplay(
+                            it,
+                            searchContext
+                        )
+                    }
+                } catch (e: FileDownloadException) {
+                    AppContext.error(e)
+                }
+                searching = false
+            }.start()
         }
     }
 
@@ -89,20 +134,20 @@ fun ModsSearch(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            IconButton(
-                onClick = closeSearch,
-                tooltip = strings().manager.mods.search.back()
-            ) {
-                Icon(
-                    imageVector = icons().back,
-                    contentDescription = "Back",
-                )
-            }
-
             TextBox(
                 tfValue,
-                onChange = { tfValue = it },
-                placeholder = strings().manager.mods.search.search(),
+                onTextChanged = { tfValue = it },
+                placeholder = strings().manager.mods.addMods.search(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            results = null
+                            searching = true
+                        },
+                        icon = icons().search,
+                        tooltip = strings().manager.mods.addMods.searchTooltip()
+                    )
+                },
                 modifier = Modifier.onKeyEvent {
                     if (it.key == Key.Enter) {
                         results = null
@@ -111,19 +156,6 @@ fun ModsSearch(
                     false
                 }.weight(1f, true)
             )
-
-            IconButton(
-                onClick = {
-                    results = null
-                    searching = true
-                },
-                tooltip = strings().manager.mods.search.searchTooltip()
-            ) {
-                Icon(
-                    imageVector = icons().search,
-                    contentDescription = "Search",
-                )
-            }
         }
 
         if (searching) {
@@ -133,17 +165,18 @@ fun ModsSearch(
         } else {
             results?.let {
                 if (it.isEmpty()) {
-                    Text(strings().manager.mods.search.noResults())
+                    Text(strings().manager.mods.addMods.noResults())
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.weight(1f, false)
                     ) {
                         items(it) { mod ->
-                            ModSearchButton(
-                                mod,
-                                searchContext
-                            )
+                            ModDataProvider(
+                                mod
+                            ) {
+                                ModSearchButton()
+                            }
                         }
                     }
                 }
@@ -151,7 +184,7 @@ fun ModsSearch(
         }
 
         SelectorButton(
-            title = strings().manager.mods.search.addLocal(),
+            title = strings().manager.mods.addMods.addLocal(),
             icon = icons().add,
             selected = false,
         ) {
@@ -164,26 +197,34 @@ data class SearchContext(
     val autoUpdate: Boolean,
     val disableNoVersion: Boolean,
     val enableOnDownload: Boolean,
-    val version: String,
+    val versions: List<String>,
+    val types: List<VersionType>,
+    val providers: List<ModProvider>,
     val directory: LauncherFile,
     val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
-    val recheck: Int,
-    val requestRecheck: () -> Unit,
 ) {
+    private var recheckCallbacks: MutableList<() -> Unit> = mutableListOf()
+
+    fun registerRecheck(onRecheck: () -> Unit) {
+        recheckCallbacks.add(onRecheck)
+    }
+
+    fun recheck() {
+        recheckCallbacks.forEach { it() }
+    }
+
     companion object {
         fun from(
-            modContext: ModContext,
-            recheck: Int,
-            requestRecheck: () -> Unit
+            modContext: ModContext
         ): SearchContext = SearchContext(
             modContext.autoUpdate,
             modContext.disableNoVersion,
             modContext.enableOnDownload,
-            modContext.version,
+            modContext.versions,
+            modContext.types,
+            modContext.providers,
             modContext.directory,
-            modContext.registerChangingJob,
-            recheck,
-            requestRecheck
+            modContext.registerChangingJob
         )
     }
 }

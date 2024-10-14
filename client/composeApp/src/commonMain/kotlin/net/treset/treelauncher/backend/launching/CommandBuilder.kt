@@ -2,17 +2,36 @@ package net.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.hycrafthd.minecraft_authenticator.login.User
-import net.treset.mc_version_loader.launcher.LauncherLaunchArgument
 import net.treset.treelauncher.backend.data.InstanceData
+import net.treset.treelauncher.backend.data.LauncherLaunchArgument
 import net.treset.treelauncher.backend.util.QuickPlayData
 import net.treset.treelauncher.backend.util.exception.GameCommandException
 import net.treset.treelauncher.backend.util.file.LauncherFile
 import net.treset.treelauncher.localization.strings
+import java.io.File
+
+class CommandContext(
+    val offline: Boolean,
+    val minecraftUser: User?,
+    val gameDataDir: String,
+    val resourcepacksDir: String,
+    val assetsDir: String,
+    val assetsIndex: String,
+    val libraries: List<String>,
+    val librariesDir: String,
+    val nativesDir: String,
+    val versionName: String,
+    val versionType: String,
+    val resX: String?,
+    val resY: String?,
+    val quickPlayData: QuickPlayData?
+)
 
 class CommandBuilder(
     var processBuilder: ProcessBuilder,
     private var instanceData: InstanceData,
-    var minecraftUser: User,
+    var offline: Boolean,
+    var minecraftUser: User?,
     private var quickPlayData: QuickPlayData?
 ) {
     @Throws(GameCommandException::class)
@@ -22,7 +41,7 @@ class CommandBuilder(
         }
         var assetsIndex: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.assets != null && v.second.assets.isNotBlank()) {
+            if (v.second.assets?.isNotBlank() == true) {
                 assetsIndex = v.second.assets
                 break
             }
@@ -33,7 +52,7 @@ class CommandBuilder(
 
         var mainClass: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.second.mainClass != null && v.second.mainClass.isNotBlank()) {
+            if (v.second.mainClass.isNotBlank()) {
                 mainClass = v.second.mainClass
                 break
             }
@@ -45,7 +64,9 @@ class CommandBuilder(
         val libraries: MutableList<String> = mutableListOf()
         for (v in instanceData.versionComponents) {
             for (l in v.second.libraries) {
-                libraries.add(LauncherFile.of(instanceData.librariesDir, l).absolutePath)
+                val library = LauncherFile.of(instanceData.librariesDir, l).absolutePath
+                if(libraries.any { it == library }) continue
+                libraries.add(library)
             }
         }
         if (libraries.isEmpty()) {
@@ -53,11 +74,21 @@ class CommandBuilder(
         }
 
         for (v in instanceData.versionComponents) {
-            if (v.second.mainFile == null || v.second.mainFile.isBlank()) {
-                throw GameCommandException("Unable to create start command: unable to determine main file: version=${v.first.id}")
+            if (v.second.mainFile?.isNotBlank() == true) {
+                libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile!!).absolutePath)
             }
-            libraries.add(LauncherFile.of(v.first.directory, v.second.mainFile).absolutePath)
         }
+
+        val natives: MutableList<String> = mutableListOf()
+        for(v in instanceData.versionComponents) {
+            if(v.second.natives?.isNotBlank() == true) {
+                natives.add(LauncherFile.of(v.first.directory, v.second.natives!!).absolutePath)
+            }
+        }
+        if(natives.isEmpty()) {
+            natives.add(LauncherFile.of(instanceData.javaComponent.directory, "libs").absolutePath)
+        }
+        val nativesDir = natives.joinToString(File.pathSeparator)
 
         var resX: String? = null
         var resY: String? = null
@@ -76,38 +107,40 @@ class CommandBuilder(
 
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
-        processBuilder.command()
-            .add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
-
-        val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvm_arguments.toTypedArray())
+        processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
+        val argOrder: MutableList<Array<LauncherLaunchArgument>> = mutableListOf(instanceData.instance.second.jvmArguments.toTypedArray())
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.jvmArguments.toTypedArray())
         }
         argOrder.add(arrayOf(
-            LauncherLaunchArgument(
-                mainClass,
-                null,
-                null,
-                null,
-                null
-            )
+            LauncherLaunchArgument(mainClass)
         ))
         for (v in instanceData.versionComponents) {
             argOrder.add(v.second.gameArguments.toTypedArray())
         }
+
+        val context = CommandContext(
+            offline,
+            minecraftUser,
+            instanceData.gameDataDir.absolutePath,
+            instanceData.resourcepacksComponent.directory,
+            instanceData.assetsDir.absolutePath,
+            assetsIndex,
+            libraries,
+            instanceData.librariesDir.absolutePath,
+            nativesDir,
+            strings().game.versionName(instanceData),
+            strings().game.versionType(instanceData),
+            resX,
+            resY,
+            quickPlayData
+        )
+
         try {
             appendArguments(
                 processBuilder,
                 argOrder.toTypedArray(),
-                instanceData,
-                minecraftUser,
-                instanceData.gameDataDir.absolutePath,
-                instanceData.assetsDir.absolutePath,
-                assetsIndex,
-                libraries,
-                resX,
-                resY,
-                quickPlayData
+                context
             )
         } catch (e: GameCommandException) {
             throw GameCommandException("Unable to create start command: unable to append arguments", e)
@@ -115,32 +148,17 @@ class CommandBuilder(
         LOGGER.info { "Created start command, instance=${instanceData.instance.first.id}" }
     }
 
+    @Throws(GameCommandException::class)
     private fun appendArguments(
         pb: ProcessBuilder,
         argOrder: Array<Array<LauncherLaunchArgument>>,
-        instanceData: InstanceData,
-        minecraftUser: User,
-        gameDataDir: String,
-        assetsDir: String,
-        assetsIndex: String,
-        libraries: List<String>,
-        resX: String?,
-        resY: String?,
-        quickPlayData: QuickPlayData?
+        context: CommandContext
     ) {
         for(args in argOrder) {
             appendArguments(
                 pb,
                 args,
-                instanceData,
-                minecraftUser,
-                gameDataDir,
-                assetsDir,
-                assetsIndex,
-                libraries,
-                resX,
-                resY,
-                quickPlayData
+                context,
             )
         }
     }
@@ -149,31 +167,15 @@ class CommandBuilder(
     private fun appendArguments(
         pb: ProcessBuilder,
         args: Array<LauncherLaunchArgument>,
-        instanceData: InstanceData,
-        minecraftUser: User,
-        gameDataDir: String,
-        assetsDir: String,
-        assetsIndex: String,
-        libraries: List<String>,
-        resX: String?,
-        resY: String?,
-        quickPlayData: QuickPlayData?
+        context: CommandContext
     ) {
         val exceptionQueue: MutableList<GameCommandException> = mutableListOf()
         for (a in args) {
             try {
                 appendArgument(
                     pb,
-                    instanceData,
-                    minecraftUser,
-                    gameDataDir,
-                    assetsDir,
-                    assetsIndex,
-                    libraries,
-                    resX,
-                    resY,
                     a,
-                    quickPlayData
+                    context
                 )
             } catch (e: GameCommandException) {
                 exceptionQueue.add(e)
@@ -188,16 +190,8 @@ class CommandBuilder(
     @Throws(GameCommandException::class)
     private fun appendArgument(
         pb: ProcessBuilder,
-        instanceData: InstanceData,
-        minecraftUser: User,
-        gameDataDir: String,
-        assetsDir: String,
-        assetsIndex: String,
-        libraries: List<String>,
-        resX: String?,
-        resY: String?,
         a: LauncherLaunchArgument,
-        quickPlayData: QuickPlayData?
+        context: CommandContext
     ) {
         if (a.isActive(instanceData.instance.second.features)) {
             val replacements: MutableMap<String, String> = mutableMapOf()
@@ -206,18 +200,7 @@ class CommandBuilder(
                 try {
                     val replacement = getReplacement(
                         r,
-                        gameDataDir,
-                        instanceData.javaComponent.directory,
-                        assetsDir,
-                        instanceData.resourcepacksComponent.directory,
-                        assetsIndex,
-                        libraries,
-                        minecraftUser,
-                        strings().game.versionName(instanceData),
-                        strings().game.versionType(instanceData),
-                        resX,
-                        resY,
-                        quickPlayData
+                        context
                     )
                     replacements[r] = replacement
                 } catch (e: GameCommandException) {
@@ -231,7 +214,7 @@ class CommandBuilder(
             }
             a.replace(replacements)
             if (!a.isFinished) {
-                throw GameCommandException("Unable to append argument: unable to replace all variables: argument=$a")
+                throw GameCommandException("Unable to append argument: unable to replace all variables: argument=${a.argument}")
             }
             pb.command().add(a.parsedArgument)
         }
@@ -240,22 +223,11 @@ class CommandBuilder(
     @Throws(GameCommandException::class)
     private fun getReplacement(
         key: String,
-        gameDir: String,
-        javaDir: String,
-        assetsDir: String,
-        resourcepackDir: String,
-        assetsIndex: String,
-        libraries: List<String>,
-        minecraftUser: User,
-        versionName: String,
-        versionType: String,
-        resX: String?,
-        resY: String?,
-        quickPlayData: QuickPlayData?
+        context: CommandContext
     ): String {
         return when (key) {
             "natives_directory" -> {
-                javaDir + "lib"
+                context.nativesDir
             }
 
             "launcher_name" -> {
@@ -268,66 +240,106 @@ class CommandBuilder(
 
             "classpath" -> {
                 val sb = StringBuilder()
-                for (l in libraries) {
+                for (l in context.libraries) {
                     sb.append(l).append(";")
                 }
                 sb.substring(0, sb.length - 1)
             }
 
+            "classpath_separator" -> {
+                File.pathSeparator
+            }
+
+            "library_directory" -> {
+                context.librariesDir
+            }
+
             "auth_player_name" -> {
-                minecraftUser.name()
+                if(context.minecraftUser != null && !context.offline) {
+                    context.minecraftUser.name()
+                } else {
+                    "LocalPlayer"
+                }
             }
 
             "version_name" -> {
-                versionName
+                context.versionName
             }
 
             "game_directory" -> {
-                gameDir
-            }
-
-            "resourcepack_directory" -> {
-                resourcepackDir
+                context.gameDataDir
             }
 
             "assets_root" -> {
-                assetsDir
+                context.assetsDir
+            }
+
+            "game_assets" -> {
+                context.assetsDir
             }
 
             "assets_index_name" -> {
-                assetsIndex
+                context.assetsIndex
             }
 
             "auth_uuid" -> {
-                minecraftUser.uuid()
+                if(context.minecraftUser != null && !context.offline) {
+                    context.minecraftUser.uuid()
+                } else {
+                    "00000000000000000000000000000000"
+                }
             }
 
             "auth_xuid" -> {
-                minecraftUser.xuid()
+                if(context.minecraftUser != null && !context.offline) {
+                    context.minecraftUser.xuid()
+                } else {
+                    ""
+                }
             }
 
             "auth_access_token" -> {
-                minecraftUser.accessToken()
+                if(context.minecraftUser != null && !context.offline) {
+                    context.minecraftUser.accessToken()
+                } else {
+                    ""
+                }
             }
 
             "clientid" -> {
-                minecraftUser.clientId()
+                if(context.minecraftUser != null && !context.offline) {
+                    context.minecraftUser.clientId()
+                } else {
+                    ""
+                }
             }
 
             "user_type" -> {
-                minecraftUser.type()
+                if(context.minecraftUser != null && !context.offline) {
+                    context.minecraftUser.type()
+                } else {
+                    ""
+                }
+            }
+
+            "auth_session" -> {
+                if(context.minecraftUser != null && !context.offline) {
+                    "token:${context.minecraftUser.accessToken()}:${context.minecraftUser.uuid()}"
+                } else {
+                    "token::00000000000000000000000000000000"
+                }
             }
 
             "version_type" -> {
-                versionType
+                context.versionType
             }
 
             "resolution_width" -> {
-                resX ?: ""
+                context.resX ?: ""
             }
 
             "resolution_height" -> {
-                resY ?: ""
+                context.resY ?: ""
             }
 
             "quickPlayPath" -> {
@@ -335,15 +347,15 @@ class CommandBuilder(
             }
 
             "quickPlaySingleplayer" -> {
-                if (quickPlayData?.type == QuickPlayData.Type.WORLD) quickPlayData.name else ""
+                if (context.quickPlayData?.type == QuickPlayData.Type.WORLD) context.quickPlayData.name else ""
             }
 
             "quickPlayMultiplayer" -> {
-                if (quickPlayData?.type == QuickPlayData.Type.SERVER) quickPlayData.name else ""
+                if (context.quickPlayData?.type == QuickPlayData.Type.SERVER) context.quickPlayData.name else ""
             }
 
             "quickPlayRealms" -> {
-                if (quickPlayData?.type === QuickPlayData.Type.REALM) quickPlayData.name else ""
+                if (context.quickPlayData?.type === QuickPlayData.Type.REALM) context.quickPlayData.name else ""
             }
 
             else -> throw GameCommandException("Unknown environment variable: key=$key")

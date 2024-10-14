@@ -2,12 +2,14 @@ package net.treset.treelauncher.backend.update
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.treset.mc_version_loader.json.JsonUtils
+import net.treset.treelauncher.backend.config.appSettings
 import net.treset.treelauncher.backend.util.file.LauncherFile
-import net.treset.treelauncher.getUpdaterFile
+import net.treset.treelauncher.getUpdaterProcess
 import java.io.IOException
+import java.nio.file.Paths
 
 class LauncherUpdater {
-    private val updateService: UpdateService = UpdateService()
+    private var updateService: UpdateService = UpdateService(appSettings().updateUrl)
     private var update: Update? = null
     private var readyToUpdate = false
 
@@ -18,6 +20,7 @@ class LauncherUpdater {
 
     @Throws(IOException::class)
     fun fetchUpdate(): Update {
+        updateService = UpdateService(appSettings().updateUrl)
         updateService.update().let {
             update = it
             return it
@@ -52,6 +55,7 @@ class LauncherUpdater {
                             updateFile.write(updateService.file(it.id!!, change.path))
                         } catch (e: IOException) {
                             exceptions.add(e)
+                            LOGGER.warn(e) { "Failed to download file: " + change.path }
                         }
                         if (change.updater) {
                             LOGGER.debug { "Delegating file to updater: " + change.path }
@@ -66,6 +70,7 @@ class LauncherUpdater {
                                 updateFile.moveTo(targetFile)
                             } catch (e: IOException) {
                                 exceptions.add(e)
+                                LOGGER.warn(e) { "Failed to move file: " + change.path }
                             }
                         }
                     }
@@ -84,6 +89,7 @@ class LauncherUpdater {
                             }
                         } catch (e: IOException) {
                             exceptions.add(e)
+                            LOGGER.warn(e) { "Failed to delete file: " + change.path }
                         }
                     }
 
@@ -133,29 +139,27 @@ class LauncherUpdater {
             return
         }
         LOGGER.info { "Starting updater..." }
-        val pb = ProcessBuilder(
-            LauncherFile.of(System.getProperty("java.home"), "bin", "java").path,
-            "-jar",
-            getUpdaterFile().path
-        )
+        val path = Paths.get("").toAbsolutePath()
+        val commandBuilder = StringBuilder()
+        commandBuilder.append(" -i").append(path).append("/update.json")
+        commandBuilder.append(" -o").append(path).append("/updater.json")
         if (restart) {
-            pb.command().add("-gui")
             if (LauncherFile("TreeLauncher.exe").isFile()) {
                 LOGGER.info { "Restarting TreeLauncher.exe after update" }
-                pb.command().add("-rTreeLauncher.exe")
+                commandBuilder.append(" -r${path};${path}/TreeLauncher.exe")
             } else {
                 LOGGER.warn { "TreeLauncher.exe not found to restart, searching alternative file..." }
                 val files: Array<LauncherFile> = LauncherFile(".").listFiles()
                 for (file in files) {
                     if (file.getName().endsWith(".exe")) {
                         LOGGER.info { "Restarting alternative file ${file.getName()} after update" }
-                        pb.command().add("-r" + file.getName())
+                        commandBuilder.append(" -r${path};${path}/${file.getName()}")
                         break
                     }
                 }
             }
         }
-        pb.start()
+        getUpdaterProcess(commandBuilder.toString()).start()
     }
 
     companion object {

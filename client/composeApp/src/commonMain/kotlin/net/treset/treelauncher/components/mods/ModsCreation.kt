@@ -3,14 +3,13 @@ package net.treset.treelauncher.components.mods
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import net.treset.mc_version_loader.launcher.LauncherManifest
-import net.treset.mc_version_loader.launcher.LauncherModsDetails
 import net.treset.mc_version_loader.minecraft.MinecraftGame
 import net.treset.mc_version_loader.minecraft.MinecraftVersion
+import net.treset.treelauncher.backend.data.LauncherModsDetails
+import net.treset.treelauncher.backend.data.manifest.ComponentManifest
 import net.treset.treelauncher.creation.CreationMode
 import net.treset.treelauncher.creation.CreationState
 import net.treset.treelauncher.generic.*
@@ -19,15 +18,17 @@ import net.treset.treelauncher.localization.strings
 class ModsCreationState(
     mode: CreationMode,
     name: String?,
-    existing: Pair<LauncherManifest, LauncherModsDetails>?,
-    val version: String?
-) : CreationState<Pair<LauncherManifest, LauncherModsDetails>>(
+    existing: Pair<ComponentManifest, LauncherModsDetails>?,
+    val version: MinecraftVersion?,
+    val type: VersionType?,
+    val alternateLoader: Boolean?
+) : CreationState<Pair<ComponentManifest, LauncherModsDetails>>(
     mode,
     name,
     existing
 ) {
     override fun isValid(): Boolean = when(mode) {
-        CreationMode.NEW -> !name.isNullOrBlank() && !version.isNullOrBlank()
+        CreationMode.NEW -> !name.isNullOrBlank() && version != null && type != null && alternateLoader != null
         CreationMode.INHERIT -> !name.isNullOrBlank() && existing != null
         CreationMode.USE -> existing != null
     }
@@ -36,10 +37,12 @@ class ModsCreationState(
         fun of(
             mode: CreationMode,
             newName: String?,
-            newVersion: String?,
+            newVersion: MinecraftVersion?,
+            newType: VersionType?,
+            alternateLoader: Boolean?,
             inheritName: String?,
-            inheritSelected: Pair<LauncherManifest, LauncherModsDetails>?,
-            useSelected: Pair<LauncherManifest, LauncherModsDetails>?
+            inheritSelected: Pair<ComponentManifest, LauncherModsDetails>?,
+            useSelected: Pair<ComponentManifest, LauncherModsDetails>?
         ): ModsCreationState = ModsCreationState(
             mode,
             when(mode) {
@@ -52,26 +55,51 @@ class ModsCreationState(
                 CreationMode.INHERIT -> inheritSelected
                 CreationMode.USE -> useSelected
             },
-            if(mode == CreationMode.NEW) newVersion else null
+            if(mode == CreationMode.NEW) newVersion else null,
+            if(mode == CreationMode.NEW) newType else null,
+            if(mode == CreationMode.NEW) alternateLoader else null
         )
     }
 }
 
 @Composable
 fun ModsCreation(
-    existing: List<Pair<LauncherManifest, LauncherModsDetails>>,
+    existing: List<Pair<ComponentManifest, LauncherModsDetails>>,
+    showCreate: Boolean = true,
+    showUse: Boolean = true,
+    setCurrentState: (ModsCreationState) -> Unit = {},
+    defaultVersion: MinecraftVersion? = null,
+    defaultType: VersionType? = null,
+    defaultAlternate: Boolean = true,
     onCreate: (ModsCreationState) -> Unit = { _->}
 ) {
     var mode by remember(existing) { mutableStateOf(CreationMode.NEW) }
 
     var newName by remember(existing) { mutableStateOf("") }
-    var newVersion by remember(existing) { mutableStateOf("") }
+    var newVersion: MinecraftVersion? by remember(existing, defaultVersion) { mutableStateOf(defaultVersion) }
+    var newType: VersionType? by remember(existing, defaultType) { mutableStateOf(defaultType) }
+    var alternateLoader by remember(existing, defaultAlternate) { mutableStateOf(defaultAlternate) }
 
     var inheritName by remember(existing) { mutableStateOf("") }
-    var inheritSelected: Pair<LauncherManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+    var inheritSelected: Pair<ComponentManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
+
+    var useSelected: Pair<ComponentManifest, LauncherModsDetails>? by remember(existing) { mutableStateOf(null) }
 
     var showSnapshots by remember(existing) { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
+
+    val currentState = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
+        ModsCreationState.of(
+            mode,
+            newName,
+            newVersion,
+            newType,
+            alternateLoader,
+            inheritName,
+            inheritSelected,
+            useSelected
+        ).also(setCurrentState)
+    }
 
     LaunchedEffect(showSnapshots) {
         versions = if(showSnapshots) {
@@ -91,7 +119,7 @@ fun ModsCreation(
         )
         TextBox(
             text = newName,
-            onChange = {
+            onTextChanged = {
                 newName = it
             },
             placeholder = strings().creator.name(),
@@ -102,8 +130,9 @@ fun ModsCreation(
         ) {
             ComboBox(
                 items = versions,
+                selected = newVersion,
                 onSelected = {
-                    newVersion = it.id
+                    newVersion = it
                 },
                 placeholder = strings().creator.mods.version(),
                 loading = versions.isEmpty(),
@@ -121,6 +150,29 @@ fun ModsCreation(
             )
         }
 
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ComboBox(
+                items = VersionType.entries.filter { it != VersionType.VANILLA },
+                selected = newType,
+                onSelected = {
+                    newType = it
+                },
+                placeholder = strings().creator.mods.type(),
+                enabled = mode == CreationMode.NEW
+            )
+            if(newType == VersionType.QUILT) {
+                TitledCheckBox(
+                    title = strings().creator.mods.quiltIncludeFabric(),
+                    checked = alternateLoader,
+                    onCheckedChange = {
+                        alternateLoader = it
+                    },
+                )
+            }
+        }
+
         TitledRadioButton(
             text = strings().creator.radioInherit(),
             selected = mode == CreationMode.INHERIT,
@@ -128,7 +180,7 @@ fun ModsCreation(
         )
         TextBox(
             text = inheritName,
-            onChange = {
+            onTextChanged = {
                 inheritName = it
             },
             placeholder = strings().creator.name(),
@@ -136,7 +188,7 @@ fun ModsCreation(
         )
         ComboBox(
             items = existing,
-            defaultSelected = inheritSelected,
+            selected = inheritSelected,
             onSelected = {
                 inheritSelected = it
             },
@@ -145,26 +197,31 @@ fun ModsCreation(
             enabled = mode == CreationMode.INHERIT
         )
 
-        Button(
-            enabled = when(mode) {
-                CreationMode.NEW -> newName.isNotBlank()
-                CreationMode.INHERIT -> inheritName.isNotBlank() && inheritSelected != null
-                else -> false
-            },
-            onClick = {
-                ModsCreationState.of(
-                    mode,
-                    newName,
-                    newVersion,
-                    inheritName,
-                    inheritSelected,
-                    null
-                ).let {
-                    if(it.isValid()) onCreate(it)
-                }
+        if(showUse) {
+            TitledRadioButton(
+                text = strings().creator.radioUse(),
+                selected = mode == CreationMode.USE,
+                onClick = { mode = CreationMode.USE }
+            )
+            ComboBox(
+                items = existing,
+                selected = useSelected,
+                onSelected = {
+                    useSelected = it
+                },
+                placeholder = strings().creator.component(),
+                toDisplayString = { first.name },
+                enabled = mode == CreationMode.USE
+            )
+        }
+
+        if(showCreate) {
+            Button(
+                enabled = currentState.isValid(),
+                onClick = { if (currentState.isValid()) onCreate(currentState) }
+            ) {
+                Text(strings().creator.buttonCreate())
             }
-        ) {
-            Text(strings().creator.buttonCreate())
         }
     }
 }

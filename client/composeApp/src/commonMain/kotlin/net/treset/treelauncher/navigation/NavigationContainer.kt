@@ -6,7 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -18,15 +18,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import net.treset.treelauncher.app
-import net.treset.treelauncher.backend.config.appSettings
-import net.treset.treelauncher.backend.news.news
+import io.github.oshai.kotlinlogging.KotlinLogging
+import net.treset.mc_version_loader.exception.FileDownloadException
+import net.treset.treelauncher.AppContext
 import net.treset.treelauncher.backend.update.updater
 import net.treset.treelauncher.generic.IconButton
 import net.treset.treelauncher.localization.strings
 import net.treset.treelauncher.login.LoginContext
 import net.treset.treelauncher.style.icons
-import net.treset.treelauncher.util.allContainedIn
 import java.awt.image.BufferedImage
 import java.io.IOException
 
@@ -40,148 +39,161 @@ enum class NavigationState {
     SETTINGS
 }
 
+data class NavigationContextData(
+    val navigationState: NavigationState,
+    val navigateTo: (NavigationState) -> Unit
+)
+
+lateinit var NavigationContext: NavigationContextData
+
+val LocalNavigationContext = staticCompositionLocalOf<NavigationContextData> {
+    error("No NavigationState provided")
+}
+
 @Composable
 fun NavigationContainer(
-    loginContext: LoginContext,
-    content: @Composable (NavigationContext) -> Unit
+    content: @Composable () -> Unit
 ) {
     val navigationState = remember { mutableStateOf(NavigationState.INSTANCES) }
     var profileImage: BufferedImage? by remember { mutableStateOf(null) }
     var updateAvailable by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        profileImage = loginContext.userAuth.getUserIcon()
+        try {
+            profileImage = LoginContext.userAuth.getUserIcon()
+        } catch (e: FileDownloadException) {
+            LOGGER.debug(e) { "Unable to load profile image." }
+        }
     }
 
     LaunchedEffect(Unit) {
         try {
-            updateAvailable = updater().getUpdate().latest == false
+            updateAvailable = updater().getUpdate().id != null
         } catch (e: IOException) {
-            app().error(e)
+            AppContext.errorIfOnline(e)
         }
     }
 
-    LaunchedEffect(Unit) {
-        news().let {nws ->
-            if(nws.important?.map{ it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
-                app().showNews(displayOther = false, displayAcknowledged = false)
-            }
-        }
+    NavigationContext = remember(navigationState.value) {
+        NavigationContextData(
+            navigationState.value
+        ) { navigationState.value = it }
     }
 
-    Column(
-        verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier.fillMaxSize()
+    CompositionLocalProvider(
+        LocalNavigationContext provides NavigationContext
     ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            content(NavigationContext(
-                navigationState.value
-            ) { navigationState.value = it })
-        }
-
-        Divider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(46.dp)
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.fillMaxSize()
         ) {
             Row(
-                modifier = Modifier.padding(5.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
             ) {
-                NavigationButton(
-                    NavigationState.INSTANCES,
-                    navigationState,
-                    icons().instances,
-                    strings().nav.home(),
-                )
-                NavigationButton(
-                    NavigationState.ADD,
-                    navigationState,
-                    icons().add,
-                    strings().nav.add()
-                )
+                content()
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(5.dp),
-            ) {
-                NavigationButton(
-                    NavigationState.SAVES,
-                    navigationState,
-                    icons().saves,
-                    strings().nav.saves()
-                )
-                NavigationButton(
-                    NavigationState.RESSOURCE_PACKS,
-                    navigationState,
-                    icons().resourcePacks,
-                    strings().nav.resourcepacks()
-                )
-                NavigationButton(
-                    NavigationState.OPTIONS,
-                    navigationState,
-                    icons().options,
-                    strings().nav.options()
-                )
-                NavigationButton(
-                    NavigationState.MODS,
-                    navigationState,
-                    icons().mods,
-                    strings().nav.mods()
-                )
-            }
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
 
             Row(
-                modifier = Modifier.padding(5.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp)
             ) {
-
-                NavigationButton(
-                    NavigationState.SETTINGS,
-                    navigationState
+                Row(
+                    modifier = Modifier.padding(5.dp),
                 ) {
-                    Icon(
-                        icons().settings,
-                        contentDescription = strings().nav.settings(),
-                        modifier = Modifier.size(36.dp)
+                    NavigationButton(
+                        NavigationState.INSTANCES,
+                        navigationState,
+                        icons().instances,
+                        strings().nav.home(),
                     )
-                    profileImage?.let {
-                        Image(
-                            it.toComposeImageBitmap(),
-                            contentDescription = strings().nav.settings(),
-                            contentScale = FixedScale(LocalDensity.current.density * 3.5f),
-                            filterQuality = FilterQuality.None,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(2.dp))
-                        )
-                    }
+                    NavigationButton(
+                        NavigationState.ADD,
+                        navigationState,
+                        icons().add,
+                        strings().nav.add()
+                    )
+                }
 
-                    if (updateAvailable) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(5.dp),
+                ) {
+                    NavigationButton(
+                        NavigationState.SAVES,
+                        navigationState,
+                        icons().saves,
+                        strings().nav.saves()
+                    )
+                    NavigationButton(
+                        NavigationState.RESSOURCE_PACKS,
+                        navigationState,
+                        icons().resourcePacks,
+                        strings().nav.resourcepacks()
+                    )
+                    NavigationButton(
+                        NavigationState.OPTIONS,
+                        navigationState,
+                        icons().options,
+                        strings().nav.options()
+                    )
+                    NavigationButton(
+                        NavigationState.MODS,
+                        navigationState,
+                        icons().mods,
+                        strings().nav.mods()
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(5.dp),
+                ) {
+
+                    NavigationButton(
+                        NavigationState.SETTINGS,
+                        navigationState,
+                        tooltip = strings().nav.settings()
+                    ) {
                         Icon(
-                            icons().updateHint,
-                            tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = "Update Available",
-                            modifier = Modifier
-                                .offset(12.dp, 12.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.background)
-                                .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
+                            icons().settings,
+                            contentDescription = strings().nav.settings(),
+                            modifier = Modifier.size(36.dp)
                         )
+                        profileImage?.let {
+                            Image(
+                                it.toComposeImageBitmap(),
+                                contentDescription = strings().nav.settings(),
+                                contentScale = FixedScale(LocalDensity.current.density * 3.5f),
+                                filterQuality = FilterQuality.None,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(2.dp))
+                            )
+                        }
+
+                        if (updateAvailable) {
+                            Icon(
+                                icons().updateHint,
+                                tint = MaterialTheme.colorScheme.primary,
+                                contentDescription = "Update Available",
+                                modifier = Modifier
+                                    .offset(8.dp, 8.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
+                            )
+                        }
                     }
                 }
             }
-
         }
     }
 }
@@ -227,7 +239,4 @@ private fun NavigationButton(
     }
 }
 
-data class NavigationContext(
-    val navigationState: NavigationState,
-    val navigateTo: (NavigationState) -> Unit
-)
+private val LOGGER = KotlinLogging.logger {  }

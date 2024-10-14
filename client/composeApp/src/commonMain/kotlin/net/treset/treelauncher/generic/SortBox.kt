@@ -2,7 +2,6 @@ package net.treset.treelauncher.generic
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
@@ -34,19 +33,15 @@ fun <T> SortBox(
             ComboBox(
                 items = sorts,
                 onSelected = onSelected,
-                defaultSelected = selected,
+                selected = selected,
                 decorated = false
             )
             IconButton(
                 onClick = onReversed,
+                icon = icons().sort,
                 modifier = Modifier.rotate(rotation),
                 tooltip = strings().sortBox.reverse()
-            ) {
-                Icon(
-                    icons().sort,
-                    "Reverse"
-                )
-            }
+            )
         }
     }
 }
