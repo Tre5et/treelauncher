@@ -14,6 +14,8 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.localization.strings
 import java.io.IOException
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KMutableProperty0
 
 class DataPatcher {
 
@@ -33,6 +35,7 @@ class DataPatcher {
         val UPGRADE_MODS = FormatStringProvider { strings().launcher.patch.status.upgradeMods() }
         val UPGRADE_VERSIONS = FormatStringProvider { strings().launcher.patch.status.upgradeVersions() }
         val UPGRADE_JAVA = FormatStringProvider { strings().launcher.patch.status.upgradeJavas() }
+        val COMPONENT_DIRECTORIES = FormatStringProvider { strings().launcher.patch.status.componentDirectories() }
         val INCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.includedFiles() }
         val INCLUDED_FILES_INSTANCE = FormatStringProvider { strings().launcher.patch.status.includedFilesInstances() }
         val INCLUDED_FILES_SAVES = FormatStringProvider { strings().launcher.patch.status.includedFilesSaves() }
@@ -63,6 +66,7 @@ class DataPatcher {
         UpgradeFunction(this::moveGameDataComponents, Version(1,0,0)),
         UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
         UpgradeFunction(this::upgradeComponents, Version(2,0,0)),
+        UpgradeFunction(this::upgradeComponentDirectories, Version(2,0,0)),
         UpgradeFunction(this::upgradeIncludedFiles, Version(2,0,0)),
         UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0)),
         UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
@@ -262,7 +266,7 @@ class DataPatcher {
     fun upgradeMainManifest(files: Pre2_0LauncherFiles, statusProvider: StatusProvider) {
         LOGGER.info { "Upgrading launcher details..." }
         val mainManifestProvider = statusProvider.subStep(PatchStep.UPGRADE_MAIN_MANIFEST, 1)
-        mainManifestProvider.next("manifest")
+        mainManifestProvider.next()
         val oldFile = LauncherFile.of(files.mainManifest.directory, appConfig().manifestFileName)
         val backupFile = LauncherFile.of(files.mainManifest.directory, appConfig().manifestFileName + ".old")
         oldFile.moveTo(backupFile)
@@ -272,7 +276,8 @@ class DataPatcher {
 
         backupFile.remove()
         LauncherFile.of(files.mainManifest.directory, files.mainManifest.details).remove()
-        mainManifestProvider.finish("")
+
+        mainManifestProvider.finish()
         LOGGER.info { "Upgraded launcher details" }
     }
 
@@ -310,6 +315,47 @@ class DataPatcher {
             LauncherFile.of(component.directory, component.details).remove()
         }
         LOGGER.info { "Upgraded component: ${component.type}: ${component.id}" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeComponentDirectories(statusProvider: StatusProvider) {
+        LOGGER.info { "Upgrading component directories..." }
+        val componentDirectoriesProvider = statusProvider.subStep(PatchStep.COMPONENT_DIRECTORIES, 10)
+        componentDirectoriesProvider.next()
+
+        val files = LauncherFiles()
+        files.reload()
+
+        componentDirectoriesProvider.next("instances")
+        upgradeComponentsDirectory(files.mainManifest::instancesDir, "instances")
+        componentDirectoriesProvider.next("saves_components")
+        upgradeComponentsDirectory(files.mainManifest::savesDir, "saves_components")
+        componentDirectoriesProvider.next("resourcepacks_components")
+        upgradeComponentsDirectory(files.mainManifest::resourcepacksDir, "resourcepacks_components")
+        componentDirectoriesProvider.next("options_components")
+        upgradeComponentsDirectory(files.mainManifest::optionsDir, "options_components")
+        componentDirectoriesProvider.next("mods_components")
+        upgradeComponentsDirectory(files.mainManifest::modsDir, "mods_components")
+        componentDirectoriesProvider.next("version_components")
+        upgradeComponentsDirectory(files.mainManifest::versionDir, "version_components")
+        componentDirectoriesProvider.next("java_components")
+        upgradeComponentsDirectory(files.mainManifest::javasDir, "java_components")
+
+        componentDirectoriesProvider.next()
+        files.mainManifest.write()
+
+        componentDirectoriesProvider.finish()
+        LOGGER.info { "Upgraded component directories" }
+    }
+
+    @Throws(IOException::class)
+    fun upgradeComponentsDirectory(property: KMutableProperty0<String>, targetName: String) {
+        val srcDir = LauncherFile.ofData(property.get())
+        val targetDir = LauncherFile.ofData(targetName)
+        if(srcDir.exists()) {
+            srcDir.atomicMoveTo(targetDir)
+            property.set(targetName)
+        }
     }
 
     @Throws(IOException::class)

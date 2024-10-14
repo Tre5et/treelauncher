@@ -244,6 +244,7 @@ open class Strings(
                 val upgradeMods: () -> String = { "Upgrading mod components" },
                 val upgradeVersions: () -> String = { "Upgrading version components" },
                 val upgradeJavas: () -> String = { "Upgrading java components" },
+                val componentDirectories: () -> String = { "Renaming component directories" },
                 val includedFiles: () -> String = { "Restructuring included files" },
                 val includedFilesInstances: () -> String = { "Restructuring included files of instances" },
                 val includedFilesSaves: () -> String = { "Restructuring included files of saves" },

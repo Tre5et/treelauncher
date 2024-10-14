@@ -140,6 +140,7 @@ class DeStrings : Strings(
                 upgradeMods = { "Mods Komponenten werden aktualisiert" },
                 upgradeVersions = { "Versionskomponenten werden aktualisiert" },
                 upgradeJavas = { "Java Komponenten werden aktualisiert" },
+                componentDirectories = { "Komponentenverzeichnisse werden umbenannt" },
                 includedFiles = { "Einbegriffene Dateien werden umstrukturiert" },
                 includedFilesInstances = { "Einbegriffene Dateien der Instanzen werden umstrukturiert" },
                 includedFilesSaves = { "Einbegriffene Dateien der Welten Komponenten werden umstrukturiert" },
