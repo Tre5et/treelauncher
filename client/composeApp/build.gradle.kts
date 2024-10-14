@@ -1,5 +1,4 @@
 
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
@@ -24,25 +23,38 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
         }
+
+        val mcdlModules = listOf(
+            "assets",
+            "auth",
+            "fabric",
+            "forge",
+            "java",
+            "minecraft",
+            "mods",
+            "quiltmc",
+            "resourcepacks",
+            "saves"
+        )
+        val mcdlVersion = "2.0.0"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
-            @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
 
             implementation("com.google.code.gson:gson:2.10.1")
-            implementation("net.treset:mc-version-loader:7.0.0")
-            implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
+
+            implementation("dev.treset.mcdl:mcdl:$mcdlVersion")
+            mcdlModules.forEach {
+                implementation("dev.treset.mcdl:mcdl-$it:$mcdlVersion")
+            }
 
             implementation("io.github.oshai:kotlin-logging:6.0.3")
             implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
             implementation("org.slf4j:slf4j-api:2.0.12")
             implementation("ch.qos.logback:logback-classic:1.5.3")
-
-            api("io.github.kevinnzou:compose-webview-multiplatform:1.9.20")
-            implementation("dev.datlag:kcef:2024.04.20.1")
 
             implementation("org.jetbrains.jewel:jewel-int-ui-standalone-241:0.19.5")
             implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window-241:0.19.5")
@@ -56,7 +68,7 @@ kotlin {
 }
 
 
-val version = "2.6.0"
+val version = "3.0.0"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
@@ -65,7 +77,7 @@ val uuid = "d7cd48ff-3946-4744-b772-dfcdbff7d4f2"
 
 compose.desktop {
     application {
-        mainClass = "net.treset.treelauncher.MainKt"
+        mainClass = "dev.treset.treelauncher.MainKt"
 
         javaHome = "${System.getProperty("user.home")}\\.jdks\\jbr-17.0.11"
 
@@ -159,7 +171,7 @@ launcherTask(
         }
     }
 ) {
-    val stringsFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/localization/Strings.kt")
+    val stringsFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/localization/Strings.kt")
     var found = false
     val stringsLines = stringsFile.readLines()
     stringsFile.writeText(
@@ -182,7 +194,7 @@ launcherTask(
     }
 
 
-    val configFile = project.file("src/commonMain/kotlin/net/treset/treelauncher/backend/config/Config.kt")
+    val configFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/backend/config/Config.kt")
     found = false
     val configLines = configFile.readLines()
     configFile.writeText(
