@@ -14,10 +14,7 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.sort.*
 import dev.treset.treelauncher.localization.Language
 import dev.treset.treelauncher.localization.language
-import dev.treset.treelauncher.style.AccentColor
-import dev.treset.treelauncher.style.Theme
-import dev.treset.treelauncher.style.setDisplayScale
-import dev.treset.treelauncher.style.setFontScale
+import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
 import java.util.*
@@ -64,6 +61,8 @@ class Settings(@Transient var file: LauncherFile, dataVersion: String = appConfi
     var theme: Theme = Theme.SYSTEM
     var accentColor: AccentColor = AccentColor.GREEN
     var customColor: Color = Color.White
+    var darkColors: UserColors = UserColors()
+    var lightColors: UserColors = UserColors()
     var displayScale: Int = 1000
         set(value) {
             field = value

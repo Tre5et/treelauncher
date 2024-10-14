@@ -52,155 +52,160 @@ fun Discord() {
             .padding(12.dp)
             .fillMaxWidth()
     ) {
-
-        TitledSwitch(
-            title = strings().settings.discord.title(),
-            checked = enabled,
-            onCheckedChange = {
-                enabled = it
-                appSettings().discordIntegration = it
-            },
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.offset(y = (-1).dp),
-            enabled = !disabled,
-        )
-
-        AnimatedVisibility(
-            visible = enabled,
-            enter = expandVertically(),
-            exit = shrinkVertically()
+        CompositionLocalProvider(
+            LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(IntrinsicSize.Max)
+            TitledSwitch(
+                title = strings().settings.discord.title(),
+                checked = enabled,
+                onCheckedChange = {
+                    enabled = it
+                    appSettings().discordIntegration = it
+                },
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.offset(y = (-1).dp),
+                enabled = !disabled,
+            )
+
+            AnimatedVisibility(
+                visible = enabled,
+                enter = expandVertically(),
+                exit = shrinkVertically()
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.width(IntrinsicSize.Max)
-                ) {
-                    TitledSwitch(
-                        strings().settings.discord.instanceToggle(),
-                        checked = instance,
-                        onCheckedChange = {
-                            instance = it
-                            appSettings().discordShowInstance = it
-                        },
-                        enabled = !disabled,
-                        rowModifier = Modifier.fillMaxWidth()
-                    )
-
-                    TitledSwitch(
-                        strings().settings.discord.versionToggle(),
-                        checked = version,
-                        onCheckedChange = {
-                            version = it
-                            appSettings().discordShowVersion = version
-                        },
-                        enabled = !disabled,
-                        rowModifier = Modifier.fillMaxWidth()
-                    )
-
-                    TitledSwitch(
-                        strings().settings.discord.modLoaderToggle(),
-                        checked = modLoader,
-                        onCheckedChange = {
-                            modLoader = it
-                            appSettings().discordShowModLoader = it
-                        },
-                        enabled = !disabled,
-                        rowModifier = Modifier.fillMaxWidth()
-                    )
-
-                    TitledSwitch(
-                        strings().settings.discord.timeToggle(),
-                        checked = time,
-                        onCheckedChange = {
-                            time = it
-                            appSettings().discordShowTime = it
-                        },
-                        enabled = !disabled,
-                        rowModifier = Modifier.fillMaxWidth()
-                    )
-
-                    TitledSwitch(
-                        strings().settings.discord.watermarkToggle(),
-                        checked = watermark,
-                        onCheckedChange = {
-                            watermark = it
-                            appSettings().discordShowWatermark = it
-                        },
-                        enabled = !disabled,
-                        rowModifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                VerticalDivider(
-                    thickness = 2.dp,
-                    color = LocalContentColor.current.disabledContent(),
-                    modifier = Modifier.padding(horizontal = 6.dp)
-                )
-
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier
-                        .width(295.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF111214))
-                        .padding(12.dp)
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.height(IntrinsicSize.Max)
                 ) {
-                    Image(
-                        useResource("img/minecraft_logo.png") { loadImageBitmap(it) },
-                        "Minecraft logo",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(4.dp))
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.Start,
+                        modifier = Modifier.width(IntrinsicSize.Max)
+                    ) {
+                        TitledSwitch(
+                            strings().settings.discord.instanceToggle(),
+                            checked = instance,
+                            onCheckedChange = {
+                                instance = it
+                                appSettings().discordShowInstance = it
+                            },
+                            enabled = !disabled,
+                            rowModifier = Modifier.fillMaxWidth()
+                        )
+
+                        TitledSwitch(
+                            strings().settings.discord.versionToggle(),
+                            checked = version,
+                            onCheckedChange = {
+                                version = it
+                                appSettings().discordShowVersion = version
+                            },
+                            enabled = !disabled,
+                            rowModifier = Modifier.fillMaxWidth()
+                        )
+
+                        TitledSwitch(
+                            strings().settings.discord.modLoaderToggle(),
+                            checked = modLoader,
+                            onCheckedChange = {
+                                modLoader = it
+                                appSettings().discordShowModLoader = it
+                            },
+                            enabled = !disabled,
+                            rowModifier = Modifier.fillMaxWidth()
+                        )
+
+                        TitledSwitch(
+                            strings().settings.discord.timeToggle(),
+                            checked = time,
+                            onCheckedChange = {
+                                time = it
+                                appSettings().discordShowTime = it
+                            },
+                            enabled = !disabled,
+                            rowModifier = Modifier.fillMaxWidth()
+                        )
+
+                        TitledSwitch(
+                            strings().settings.discord.watermarkToggle(),
+                            checked = watermark,
+                            onCheckedChange = {
+                                watermark = it
+                                appSettings().discordShowWatermark = it
+                            },
+                            enabled = !disabled,
+                            rowModifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    VerticalDivider(
+                        thickness = 2.dp,
+                        color = LocalContentColor.current.disabledContent(),
+                        modifier = Modifier.padding(horizontal = 6.dp)
                     )
 
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(1.dp),
-                        horizontalAlignment = Alignment.Start,
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Top,
+                        modifier = Modifier
+                            .width(295.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF111214))
+                            .padding(12.dp)
                     ) {
-                        Text(
-                            "Minecraft",
-                            style = TextStyle(
+                        Image(
+                            useResource("img/minecraft_logo.png") { loadImageBitmap(it) },
+                            "Minecraft logo",
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                        )
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(1.dp),
+                            horizontalAlignment = Alignment.Start,
+                        ) {
+                            Text(
+                                "Minecraft",
+                                style = TextStyle(
+                                    fontFamily = GgSansFont,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 15.sp
+                                ),
+                                textAlign = TextAlign.Start,
+                            )
+
+                            val textStyle = TextStyle(
                                 fontFamily = GgSansFont,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 15.sp
-                            ),
-                            textAlign = TextAlign.Start,
-                        )
-
-                        val textStyle = TextStyle(
-                            fontFamily = GgSansFont,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp
-                        )
-
-                        val details = remember(instance, version, modLoader, watermark) { strings().settings.discord.details(
-                            strings().settings.discord.instanceExample(),
-                            strings().settings.discord.versionExample(),
-                            strings().settings.discord.modLoaderExample()
-                        ) }
-
-                        if(details.isNotBlank()) {
-                            Text(
-                                details,
-                                style = textStyle,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Start,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 14.sp
                             )
-                        }
-                        if(time) {
-                            Text(
-                                strings().settings.discord.timeExample() + strings().settings.discord.timeSuffix(),
-                                style = textStyle,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Start,
-                            )
+
+                            val details = remember(instance, version, modLoader, watermark) {
+                                strings().settings.discord.details(
+                                    strings().settings.discord.instanceExample(),
+                                    strings().settings.discord.versionExample(),
+                                    strings().settings.discord.modLoaderExample()
+                                )
+                            }
+
+                            if (details.isNotBlank()) {
+                                Text(
+                                    details,
+                                    style = textStyle,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Start,
+                                )
+                            }
+                            if (time) {
+                                Text(
+                                    strings().settings.discord.timeExample() + strings().settings.discord.timeSuffix(),
+                                    style = textStyle,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Start,
+                                )
+                            }
                         }
                     }
                 }

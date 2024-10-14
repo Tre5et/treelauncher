@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,50 +35,53 @@ fun UpdateUrl() {
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(12.dp)
         ) {
-
-            Text(
-                strings().settings.updateUrl.title(),
-                style = MaterialTheme.typography.titleSmall
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            CompositionLocalProvider(
+                LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
             ) {
-                TextBox(
-                    tfValue,
-                    {
-                        tfValue = it
-                    },
-                    placeholder = strings().settings.updateUrl.title()
+                Text(
+                    strings().settings.updateUrl.title(),
+                    style = MaterialTheme.typography.titleSmall
                 )
 
-                IconButton(
-                    onClick = {
-                        try {
-                            UpdateService(tfValue).update()
-                            LOGGER.debug { "Updating URL to: $tfValue" }
-                            appSettings().updateUrl = tfValue
-                            currentUrl = tfValue
-                        } catch (e: IOException) {
-                            LOGGER.debug(e) { "Unable to update URL"}
-                            popupContent = PopupData(
-                                type = PopupType.ERROR,
-                                titleRow = { Text(strings().settings.updateUrl.popupTitle()) },
-                                content = { Text(strings().settings.updateUrl.popupMessage(e)) },
-                                buttonRow = {
-                                    Button(
-                                        onClick = { popupContent = null }
-                                    ) {
-                                        Text(strings().settings.updateUrl.popupClose())
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextBox(
+                        tfValue,
+                        {
+                            tfValue = it
+                        },
+                        placeholder = strings().settings.updateUrl.title()
+                    )
+
+                    IconButton(
+                        onClick = {
+                            try {
+                                UpdateService(tfValue).update()
+                                LOGGER.debug { "Updating URL to: $tfValue" }
+                                appSettings().updateUrl = tfValue
+                                currentUrl = tfValue
+                            } catch (e: IOException) {
+                                LOGGER.debug(e) { "Unable to update URL" }
+                                popupContent = PopupData(
+                                    type = PopupType.ERROR,
+                                    titleRow = { Text(strings().settings.updateUrl.popupTitle()) },
+                                    content = { Text(strings().settings.updateUrl.popupMessage(e)) },
+                                    buttonRow = {
+                                        Button(
+                                            onClick = { popupContent = null }
+                                        ) {
+                                            Text(strings().settings.updateUrl.popupClose())
+                                        }
                                     }
-                                }
-                            )
-                        }
-                    },
-                    icon = icons().change,
-                    tooltip = strings().settings.updateUrl.apply(),
-                    enabled = tfValue != currentUrl
-                )
+                                )
+                            }
+                        },
+                        icon = icons().change,
+                        tooltip = strings().settings.updateUrl.apply(),
+                        enabled = tfValue != currentUrl
+                    )
+                }
             }
         }
     }

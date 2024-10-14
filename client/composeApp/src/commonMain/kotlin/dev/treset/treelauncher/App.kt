@@ -47,6 +47,8 @@ data class AppContextData(
     val setTheme: (Theme) -> Unit,
     val setAccentColor: (AccentColor) -> Unit,
     val setCustomColor: (Color) -> Unit,
+    val setDarkColors: (UserColors) -> Unit,
+    val setLightColors: (UserColors) -> Unit,
     val globalPopup: PopupData?,
     val addNotification: (NotificationData) -> Unit,
     val dismissNotification: (NotificationData) -> Unit,
@@ -82,7 +84,9 @@ fun App(
     val themeDark = theme.isDark()
     var accentColor by remember { mutableStateOf(appSettings().accentColor) }
     var customColor by remember { mutableStateOf(appSettings().customColor) }
-    val colors by remember(themeDark, accentColor, customColor) { mutableStateOf(if(themeDark) darkColors(accentColor) else lightColors(accentColor)) }
+    var darkColors by remember { mutableStateOf(appSettings().darkColors) }
+    var lightColors by remember { mutableStateOf(appSettings().lightColors) }
+    val colors by remember(themeDark, accentColor, customColor, darkColors, lightColors) { mutableStateOf(if(themeDark) darkColors(accentColor, darkColors) else lightColors(accentColor, lightColors)) }
 
     var runningInstance: InstanceData? by remember { mutableStateOf(null) }
 
@@ -113,6 +117,14 @@ fun App(
                 customColor = it
                 appSettings().customColor = it
             },
+            setDarkColors = {
+                darkColors = it
+                appSettings().darkColors = it
+            },
+            setLightColors = {
+                lightColors = it
+                appSettings().lightColors = it
+            },
             globalPopup = popupData,
             setGlobalPopup = { popupData = it },
             addNotification = {
@@ -132,7 +144,7 @@ fun App(
                 LOGGER.warn(e) { "An error occurred!" }
                 AppContext.addNotification(
                     NotificationData(
-                        color = colors.warning,
+                        color = colors.extensions.warning,
                         onClick = {
                             it.dismiss()
                         },

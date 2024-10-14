@@ -38,116 +38,120 @@ fun Directory() {
             .padding(12.dp)
             .fillMaxWidth()
     ) {
-        Text(
-            strings().settings.path.title(),
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 4.dp),
-            color = if(instanceRunning) LocalContentColor.current.disabledContent() else LocalContentColor.current
-        )
-
-        var tfValue by remember { mutableStateOf(appConfig().baseDir.absolutePath) }
-        var showDirPicker by remember { mutableStateOf(false) }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextBox(
-                tfValue,
-                {
-                    tfValue = it
-                },
-                enabled = !instanceRunning
-            )
-
-            IconButton(
-                onClick = {
-                    showDirPicker = true
-                },
-                icon = icons().folder,
-                tooltip = strings().settings.path.select(),
-                enabled = !instanceRunning
-            )
-        }
-
-        DirectoryPicker(
-            show = showDirPicker && !instanceRunning,
-            initialDirectory = if (LauncherFile.of(tfValue)
-                    .isDirectory()
-            ) tfValue else appConfig().baseDir.absolutePath,
-            onFileSelected = {
-                it?.let { tfValue = it }
-                showDirPicker = false
-            },
-        )
-
-        var cbState by remember { mutableStateOf(false) }
-        TitledCheckBox(
-            title = strings().settings.path.remove(),
-            checked = cbState,
-            onCheckedChange = {
-                cbState = it
-            },
-            enabled = !instanceRunning
-        )
-
-        Button(
-            onClick = {
-                val dir = LauncherFile.of(tfValue)
-
-                if (!dir.isDirectory()) {
-                    popupContent = PopupData(
-                        type = PopupType.ERROR,
-                        titleRow = { Text(strings().settings.path.invalid()) },
-                        buttonRow = {
-                            Button(
-                                onClick = { popupContent = null }
-                            ) {
-                                Text(strings().settings.path.close())
-                            }
-                        }
-                    )
-                } else {
-                    popupContent = PopupData(
-                        titleRow = { Text(strings().settings.path.changing()) }
-                    )
-
-                    Thread {
-                        try {
-                            GlobalConfigLoader().updatePath(dir, cbState)
-
-                            popupContent = PopupData(
-                                type = PopupType.SUCCESS,
-                                titleRow = { Text(strings().settings.path.success()) },
-                                buttonRow = {
-                                    Button(
-                                        onClick = { popupContent = null }
-                                    ) {
-                                        Text(strings().settings.path.close())
-                                    }
-                                }
-                            )
-                        } catch (e: IOException) {
-                            popupContent = PopupData(
-                                type = PopupType.ERROR,
-                                titleRow = { Text(strings().settings.path.errorTitle()) },
-                                content = { Text(strings().settings.path.errorMessage(e)) },
-                                buttonRow = {
-                                    Button(
-                                        onClick = { popupContent = null }
-                                    ) {
-                                        Text(strings().settings.path.close())
-                                    }
-                                }
-                            )
-                        }
-                    }.start()
-                }
-            },
-            enabled = !instanceRunning
+        CompositionLocalProvider(
+            LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                strings().settings.path.apply()
+                strings().settings.path.title(),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 4.dp),
+                color = if (instanceRunning) LocalContentColor.current.disabledContent() else LocalContentColor.current
             )
+
+            var tfValue by remember { mutableStateOf(appConfig().baseDir.absolutePath) }
+            var showDirPicker by remember { mutableStateOf(false) }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextBox(
+                    tfValue,
+                    {
+                        tfValue = it
+                    },
+                    enabled = !instanceRunning
+                )
+
+                IconButton(
+                    onClick = {
+                        showDirPicker = true
+                    },
+                    icon = icons().folder,
+                    tooltip = strings().settings.path.select(),
+                    enabled = !instanceRunning
+                )
+            }
+
+            DirectoryPicker(
+                show = showDirPicker && !instanceRunning,
+                initialDirectory = if (LauncherFile.of(tfValue)
+                        .isDirectory()
+                ) tfValue else appConfig().baseDir.absolutePath,
+                onFileSelected = {
+                    it?.let { tfValue = it }
+                    showDirPicker = false
+                },
+            )
+
+            var cbState by remember { mutableStateOf(false) }
+            TitledCheckBox(
+                title = strings().settings.path.remove(),
+                checked = cbState,
+                onCheckedChange = {
+                    cbState = it
+                },
+                enabled = !instanceRunning
+            )
+
+            Button(
+                onClick = {
+                    val dir = LauncherFile.of(tfValue)
+
+                    if (!dir.isDirectory()) {
+                        popupContent = PopupData(
+                            type = PopupType.ERROR,
+                            titleRow = { Text(strings().settings.path.invalid()) },
+                            buttonRow = {
+                                Button(
+                                    onClick = { popupContent = null }
+                                ) {
+                                    Text(strings().settings.path.close())
+                                }
+                            }
+                        )
+                    } else {
+                        popupContent = PopupData(
+                            titleRow = { Text(strings().settings.path.changing()) }
+                        )
+
+                        Thread {
+                            try {
+                                GlobalConfigLoader().updatePath(dir, cbState)
+
+                                popupContent = PopupData(
+                                    type = PopupType.SUCCESS,
+                                    titleRow = { Text(strings().settings.path.success()) },
+                                    buttonRow = {
+                                        Button(
+                                            onClick = { popupContent = null }
+                                        ) {
+                                            Text(strings().settings.path.close())
+                                        }
+                                    }
+                                )
+                            } catch (e: IOException) {
+                                popupContent = PopupData(
+                                    type = PopupType.ERROR,
+                                    titleRow = { Text(strings().settings.path.errorTitle()) },
+                                    content = { Text(strings().settings.path.errorMessage(e)) },
+                                    buttonRow = {
+                                        Button(
+                                            onClick = { popupContent = null }
+                                        ) {
+                                            Text(strings().settings.path.close())
+                                        }
+                                    }
+                                )
+                            }
+                        }.start()
+                    }
+                },
+                enabled = !instanceRunning
+            ) {
+                Text(
+                    strings().settings.path.apply()
+                )
+            }
         }
     }
 

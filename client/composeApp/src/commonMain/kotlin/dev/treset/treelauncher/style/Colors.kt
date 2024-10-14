@@ -8,7 +8,6 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.takeOrElse
 import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.localization.strings
 import org.jetbrains.jewel.intui.window.styling.dark
@@ -26,30 +25,25 @@ enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> S
     }
 }
 
-enum class AccentColor(val primary: (dark: Boolean) -> Color, val onPrimary: (dark: Boolean) -> Color, val displayName: () -> String) {
+enum class AccentColor(val primary: (dark: Boolean) -> Color, val displayName: () -> String) {
     GREEN(
         {if(it) Color.Green else Color(0xFF00E000)},
-        { Color.Black },
         { strings().theme.green() }
     ),
     BLUE(
         {if(it) Color.Blue else Color(0xFF0000E0)},
-        { Color.White },
         { strings().theme.blue() }
     ),
     ORANGE(
         {if(it) Color(0xFFE0A000) else Color(0xFFD0A000)},
-        { Color.Black },
         { strings().theme.orange() }
     ),
     MAGENTA(
         {if(it) Color.Magenta else Color(0xFFE000E0)},
-        { Color.Black },
         { strings().theme.magenta() }
     ),
     CUSTOM(
         { appSettings().customColor },
-        { if(appSettings().customColor.contrast(Color.Black) > appSettings().customColor.contrast(Color.White)) Color.Black else Color.White },
         { strings().theme.custom() }
     );
 
@@ -58,43 +52,98 @@ enum class AccentColor(val primary: (dark: Boolean) -> Color, val onPrimary: (da
     }
 }
 
-data class Colors(
+data class UserColors(
+    val background: Color? = null,
+    val secondary: Color? = null,
+    val secondaryContainer: Color? = null,
+    val info: Color? = null,
+    val warning: Color? = null,
+    val error: Color? = null,
+    val contentColors: ContentColors? = null
+) {
+    fun toColors(
+        accent: AccentColor,
+        material: ColorScheme,
+        extensions: ExtensionColors
+    ): Colors {
+        val contentColors = contentColors ?: ContentColors()
+
+        val secondary = secondary ?: material.secondary
+        val secondaryContainer = secondaryContainer ?: material.secondaryContainer
+        val error = error ?: material.error
+        val background = background ?: material.background
+
+        return Colors(
+            material = material.copy(
+                primary = accent.primary(true),
+                onPrimary = contentColors.on(accent.primary(true)),
+                secondary = secondary,
+                onSecondary = contentColors.on(secondary),
+                secondaryContainer = secondaryContainer,
+                onSecondaryContainer = contentColors.on(secondaryContainer),
+                error = error,
+                onError = contentColors.on(error),
+                background = background,
+                onBackground = contentColors.on(background),
+            ),
+            extensions = extensions.copy(
+                info = info ?: extensions.info,
+                onInfo = info?.let { contentColors.on(it) } ?: extensions.onInfo,
+                warning = warning ?: extensions.warning,
+                onWarning = warning?.let { contentColors.on(it) } ?: extensions.onWarning,
+            ),
+            contentColors = contentColors
+        )
+    }
+}
+
+data class ContentColors(
+    val light: Color = Color.White,
+    val dark: Color = Color.Black,
+)
+
+data class ExtensionColors(
     val warning: Color = Color.Yellow,
     val onWarning: Color = Color.Black,
     val info: Color = Color.Cyan,
     val onInfo: Color = Color.Black,
     val popupScrim: Color = Color.Black.copy(alpha = 0.8f),
-    val material: ColorScheme
 )
 
-fun darkColors() = darkColors(AccentColor.GREEN)
+data class Colors(
+    val material: ColorScheme,
+    val extensions: ExtensionColors,
+    val contentColors: ContentColors
+)
 
-fun lightColors() = lightColors(AccentColor.GREEN)
-
-fun darkColors(primary: AccentColor) = Colors(
-    warning = Color(0xFFEBDC02),
+fun darkColors(
+    accent: AccentColor = AccentColor.GREEN,
+    userColors: UserColors = UserColors()
+) = userColors.toColors(
+    accent = accent,
     material = darkColorScheme(
-        primary = primary.primary(true),
-        onPrimary = primary.onPrimary(true),
+        primary = accent.primary(true),
         secondaryContainer = Color(0xFF373342),
         error = Color(0xFFE20505),
-        onError = Color.White,
-        tertiary = Color(0xFF43454A),
-        onBackground = Color.White,
         scrim = Color.Black.copy(alpha = 0.85f)
+    ),
+    extensions = ExtensionColors(
+        warning = Color(0xFFEBDC02)
     )
 )
 
-fun lightColors(primary: AccentColor) = Colors(
-    warning = Color(0xFFD0A000),
+fun lightColors(
+    accent: AccentColor = AccentColor.GREEN,
+    userColors: UserColors = UserColors()
+) = userColors.toColors(
+    accent = accent,
     material = lightColorScheme(
-        primary = primary.primary(false),
-        onPrimary = primary.onPrimary(false),
+        primary = accent.primary(false),
         error = Color(0xFFD00000),
-        onError = Color.White,
-        tertiary = Color(0xFFB4B6BB),
-        onBackground = Color.Black,
         scrim = Color.White.copy(alpha = 0.85f)
+    ),
+    extensions = ExtensionColors(
+        warning = Color(0xFFD0A000)
     )
 )
 
@@ -103,7 +152,7 @@ fun darkTitleBar() = TitleBarStyle.dark(
     colors = TitleBarColors.dark(
         backgroundColor = darkColors().material.background,
         inactiveBackground = darkColors().material.background,
-        borderColor = darkColors().material.tertiary
+        borderColor = darkColors().material.secondary
     )
 )
 
@@ -112,9 +161,18 @@ fun lightTitleBar() = TitleBarStyle.light(
     colors = TitleBarColors.light(
         backgroundColor = lightColors().material.background,
         inactiveBackground = lightColors().material.background,
-        borderColor = lightColors().material.tertiary
+        borderColor = lightColors().material.secondary
     )
 )
+
+fun ContentColors.on(color: Color): Color {
+    val darkContrast = color.contrast(light)
+    return if(darkContrast < 4.5f && color.contrast(dark) > darkContrast) {
+        dark
+    } else {
+        light
+    }
+}
 
 fun Color.hovered(): Color = this.copy(
         alpha = alpha,
@@ -170,30 +228,28 @@ fun Color.inverted(): Color = Color(
 
 val ColorScheme.warning: Color
     @Composable @ReadOnlyComposable
-    get() = LocalColors.current.warning
+    get() = LocalColors.current.extensions.warning
 
 val ColorScheme.onWarning: Color
     @Composable @ReadOnlyComposable
-    get() = LocalColors.current.onWarning
+    get() = LocalColors.current.extensions.onWarning
 
 val ColorScheme.info: Color
     @Composable @ReadOnlyComposable
-    get() = LocalColors.current.info
+    get() = LocalColors.current.extensions.info
 
 val ColorScheme.onInfo: Color
     @Composable @ReadOnlyComposable
-    get() = LocalColors.current.onInfo
+    get() = LocalColors.current.extensions.onInfo
+
+val ColorScheme.contentColors: ContentColors
+    @Composable @ReadOnlyComposable
+    get() = LocalColors.current.contentColors
 
 @Composable
 fun ColorScheme.contentColor(backgroundColor: Color): Color =
     when(backgroundColor) {
         warning -> onWarning
         info -> onInfo
-        else -> contentColorFor(backgroundColor).takeOrElse {
-            if(backgroundColor.contrast(onBackground) < 4.5f && backgroundColor.contrast(onBackground.inverted()) > 4.5f) {
-                onBackground.inverted()
-            } else {
-                onBackground
-            }
-        }
+        else -> contentColors.on(backgroundColor)
     }

@@ -32,64 +32,67 @@ fun Sync() {
             .padding(12.dp)
             .fillMaxWidth()
     ) {
-        Text(
-            strings().settings.sync.title(),
-            style = MaterialTheme.typography.titleSmall,
-            color = LocalContentColor.current.disabledContent()
-        )
-
-        var tfUrl by remember { mutableStateOf(appSettings().syncUrl ?: "") }
-        var tfPort by remember { mutableStateOf(appSettings().syncPort ?: "") }
-        var tfKey by remember { mutableStateOf(appSettings().syncKey ?: "") }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
+        CompositionLocalProvider(
+            LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                "http://",
+                strings().settings.sync.title(),
+                style = MaterialTheme.typography.titleSmall,
                 color = LocalContentColor.current.disabledContent()
             )
-            TextBox(
-                tfUrl,
-                {
-                    tfUrl = it
-                },
-                placeholder = strings().settings.sync.url(),
-                enabled = false
-            )
-            Text(
-                ":",
-                color = LocalContentColor.current.disabledContent()
-            )
-            TextBox(
-                tfPort,
-                {
-                    tfPort = it
-                },
-                placeholder = strings().settings.sync.port(),
-                enabled = false
-            )
-        }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                strings().settings.sync.key(),
-                color = LocalContentColor.current.disabledContent()
-            )
-            TextBox(
-                tfKey,
-                {
-                    tfKey = it
-                },
-                placeholder = strings().settings.sync.keyPlaceholder(),
-                enabled = false
-            )
-        }
+            var tfUrl by remember { mutableStateOf(appSettings().syncUrl ?: "") }
+            var tfPort by remember { mutableStateOf(appSettings().syncPort ?: "") }
+            var tfKey by remember { mutableStateOf(appSettings().syncKey ?: "") }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "http://",
+                    color = LocalContentColor.current.disabledContent()
+                )
+                TextBox(
+                    tfUrl,
+                    {
+                        tfUrl = it
+                    },
+                    placeholder = strings().settings.sync.url(),
+                    enabled = false
+                )
+                Text(
+                    ":",
+                    color = LocalContentColor.current.disabledContent()
+                )
+                TextBox(
+                    tfPort,
+                    {
+                        tfPort = it
+                    },
+                    placeholder = strings().settings.sync.port(),
+                    enabled = false
+                )
+            }
 
-        /*Button(
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    strings().settings.sync.key(),
+                    color = LocalContentColor.current.disabledContent()
+                )
+                TextBox(
+                    tfKey,
+                    {
+                        tfKey = it
+                    },
+                    placeholder = strings().settings.sync.keyPlaceholder(),
+                    enabled = false
+                )
+            }
+
+            /*Button(
             onClick = {
                 try {
                     SyncService(
@@ -135,6 +138,7 @@ fun Sync() {
                 strings().settings.sync.test()
             )
         }*/
+        }
     }
 
     popupContent?.let {

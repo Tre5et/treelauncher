@@ -97,7 +97,7 @@ fun NavigationContainer(
 
             HorizontalDivider(
                 thickness = 1.dp,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 

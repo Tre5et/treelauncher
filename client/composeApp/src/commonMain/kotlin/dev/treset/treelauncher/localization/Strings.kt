@@ -725,7 +725,16 @@ open class Strings(
                 "${(it / 10f).roundToInt()}%"
             },
             val smallHint: () -> String = { "Small display scaling may compromise readability" },
-            val title: () -> String = { "Appearance" }
+            val title: () -> String = { "Appearance" },
+            val tooltipAdvanced: (Boolean) -> String = { "${if(it) "Hide" else "Show"} Advanced Customization" },
+            val background: () -> String = { "Background" },
+            val backgroundTooltip: () -> String = { "Choose Background Color" },
+            val container: () -> String = { "Container" },
+            val containerTooltip: () -> String = { "Choose Container Color" },
+            val text: () -> String = { "Text" },
+            val textLight: () -> String = { "Choose Light Text Color" },
+            val textDark: () -> String = { "Choose Dark Text Color" },
+            val reset: () -> String = { "Revert Colors to Default" }
         )
 
         data class Cleanup(

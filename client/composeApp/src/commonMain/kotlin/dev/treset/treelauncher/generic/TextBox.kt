@@ -2,6 +2,8 @@ package dev.treset.treelauncher.generic
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ fun TextBox(
                 onTextChanged(it)
             }
         },
+        textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
         placeholder = { Text(placeholder) },
         enabled = enabled,
         modifier = modifier,

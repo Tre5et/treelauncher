@@ -498,7 +498,16 @@ class DeStrings : Strings(
             increment = { "Um 10% verringern" },
             largeHint = { "Große Anzeigegrößen können Inhalt abschneiden" },
             smallHint = { "Kleine Anzeigegrößen können die Lesbarkeit einschränken" },
-            title = { "Darstellung" }
+            title = { "Darstellung" },
+            tooltipAdvanced = { "Erweiterte Darstellungseinstellungen ${if(it) "verstecken" else "anzeigen"}"},
+            background = { "Hintergrund" },
+            backgroundTooltip = { "Hintergrundfarbe auswählen" },
+            container = { "Container" },
+            containerTooltip = { "Containerfarbe auswählen" },
+            text = { "Text" },
+            textLight = { "Helle Textfarbe auswählen" },
+            textDark = { "Dunkle Textfarbe auswählen" },
+            reset = { "Standardfarben wiederherstellen" }
         ),
         cleanup = Settings.Cleanup(
             button = { "Ungenutzte Dateien löschen" },
