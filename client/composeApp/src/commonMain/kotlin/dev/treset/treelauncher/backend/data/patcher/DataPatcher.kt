@@ -132,7 +132,7 @@ class DataPatcher {
         for(file in gameDataDir.listFiles()) {
             if(file.isDirectory && file.name.startsWith(files.savesManifest.prefix)) {
                 savesProvider.next(file.name)
-                file.moveTo(LauncherFile.of(savesDir, file.name))
+                file.atomicMoveTo(LauncherFile.of(savesDir, file.name))
             }
         }
         savesProvider.finish("")
@@ -149,7 +149,7 @@ class DataPatcher {
         for(file in gameDataDir.listFiles()) {
             if(file.isDirectory && file.name.startsWith(files.modsManifest.prefix)) {
                 modsProvider.next(file.name)
-                file.moveTo(LauncherFile.of(modsDir, file.name))
+                file.atomicMoveTo(LauncherFile.of(modsDir, file.name))
             }
         }
         modsProvider.finish("")
@@ -428,7 +428,7 @@ class DataPatcher {
                 && file.name != ".included_files_old"
                 && file.name != ".included_files"
             ) {
-                file.moveTo(target.child(file.name))
+                file.atomicMoveTo(target.child(file.name))
             }
         }
 
@@ -448,7 +448,7 @@ class DataPatcher {
         val dir = LauncherFile.of(component.directory, ".included_files")
         val files = dir.listFiles()
         for(file in files) {
-            file.moveTo(LauncherFile.of(component.directory, file.name))
+            file.atomicMoveTo(LauncherFile.of(component.directory, file.name))
         }
         dir.remove()
 

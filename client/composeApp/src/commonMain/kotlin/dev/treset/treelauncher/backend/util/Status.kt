@@ -55,9 +55,10 @@ class StatusProvider(
         step?.let {
             lastStatus = Status(
                 step,
-                DetailsProvider(message, index++, if (total >= index) total else index),
-                index.toFloat() / total.toFloat()
+                DetailsProvider(message, index, if (total >= index) total else index),
+                (index.toFloat() - 1f) / total.toFloat()
             ).also(onStatus)
+            index++
         }
     }
 
@@ -74,7 +75,7 @@ class StatusProvider(
             lastStatus = Status(
                 step,
                 DetailsProvider(status.currentFile, index, total),
-                index.toFloat() / total.toFloat()
+                (index.toFloat() - 1f) / total.toFloat()
             ).also(onStatus)
         }
     }

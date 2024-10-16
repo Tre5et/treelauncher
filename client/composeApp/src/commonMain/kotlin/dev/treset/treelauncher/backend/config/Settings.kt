@@ -56,7 +56,7 @@ data class Window(
 )
 
 
-class Settings(@Transient var file: LauncherFile, dataVersion: String = appConfig().dataVersion.toString()) : GenericJsonParsable() {
+class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     var language: Language = language().systemLanguage
     var theme: Theme = Theme.SYSTEM
     var accentColor: AccentColor = AccentColor.GREEN
@@ -120,11 +120,6 @@ class Settings(@Transient var file: LauncherFile, dataVersion: String = appConfi
     var window: Window? = null
     var dataVersion: String = "0.0.1"
     val clientId: String = UUID.randomUUID().toString()
-
-
-    init {
-        this.dataVersion = dataVersion
-    }
 
     @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null

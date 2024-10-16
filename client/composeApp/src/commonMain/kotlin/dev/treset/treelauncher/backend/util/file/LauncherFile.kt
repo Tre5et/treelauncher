@@ -7,6 +7,7 @@ import java.awt.Desktop
 import java.io.File
 import java.io.IOException
 import java.math.BigInteger
+import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Path
@@ -114,7 +115,11 @@ class LauncherFile(pathname: String) : File(pathname) {
     fun atomicMoveTo(dst: LauncherFile, vararg options: CopyOption) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
         Files.createDirectories(dst.parentFile.toPath())
-        Files.move(toPath(), dst.toPath(), StandardCopyOption.ATOMIC_MOVE, *options)
+        try {
+            Files.move(toPath(), dst.toPath(), StandardCopyOption.ATOMIC_MOVE, *options)
+        } catch(e: AtomicMoveNotSupportedException) {
+            moveTo(dst, *options)
+        }
     }
 
     @Throws(IOException::class)
