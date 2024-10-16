@@ -15,7 +15,6 @@ import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.discord.DiscordIntegration
 import dev.treset.treelauncher.backend.update.updater
-import dev.treset.treelauncher.backend.util.FileInitializer
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.Options
 import dev.treset.treelauncher.components.Resourcepacks
@@ -269,25 +268,7 @@ class LauncherApp(
     val setTheme: (Theme) -> Unit
 ) {
     init {
-        try {
-            GlobalConfigLoader().loadConfig()
-        } catch (e: IllegalStateException) {
-            LOGGER.error(e) { "Failed to load config!" }
-            exitProcess(-1)
-        } catch (e: IOException) {
-            LOGGER.error(e) { "Failed to load config!" }
-            exitProcess(-1)
-        }
-
         configureVersionLoader()
-
-        try {
-            if (!appConfig().baseDir.exists() || !GlobalConfigLoader().hasMainManifest(appConfig().baseDir)) {
-                FileInitializer(appConfig().baseDir).create()
-            }
-        } catch (e: IOException) {
-            LOGGER.error(e) { "Failed to initialize directory structure!" }
-        }
 
         try {
             loadSettings()

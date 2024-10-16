@@ -114,6 +114,11 @@ class DeStrings : Strings(
         systemLanguage = { "Systemsprache" }
     ),
     launcher = Launcher(
+        setup = Launcher.Setup(
+            initializing = { "Datenverzeichnis wird initalisiert" },
+            title = { "Datenverzeichnis auswählen" },
+            message = { "Hier kann das Verzeichnis, in dem alle Instanzdaten gespeichert werden ausgewählt werden.\nDies kann ein leeres Verzeichis oder ein Verzeichnis mit bestehenden Launcher-Daten sein." }
+        ),
         status = Launcher.Status(
             preparing = { progress -> "Einmaliges Setup wird durchgeführt... $progress%" },
             restartRequired = { "Neustart erforderlich. Bitte neu starten." }

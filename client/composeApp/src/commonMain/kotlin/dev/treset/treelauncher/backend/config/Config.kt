@@ -4,10 +4,15 @@ import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.util.configFile
+import io.github.oshai.kotlinlogging.KotlinLogging
+import java.io.IOException
+import java.nio.file.StandardCopyOption
+import kotlin.jvm.Throws
 
-class Config(baseDir: String, val updateUrl: String?) {
+class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = null) {
     val dataVersion: Version = Version(2, 0, 0)
-    var baseDir: LauncherFile = LauncherFile.of(baseDir)
+    var baseDir: LauncherFile = LauncherFile.of(globalConfig.path)
     val syncFileName = "data.sync"
     val metaDir: LauncherFile = LauncherFile.of(baseDir, ".launcher")
     val tokenFile: LauncherFile = LauncherFile.of(metaDir, "tokens.json")
@@ -19,7 +24,6 @@ class Config(baseDir: String, val updateUrl: String?) {
     val instanceDefaultIncludedFiles: Array<String> = arrayOf()
     val instanceDefaultIgnoredFiles: Array<String> = arrayOf()
     val instanceDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val instanceDefaultDetails = "instance.json"
     val optionsDefaultIncludedFiles: Array<String> = arrayOf(
         "options.txt",
         "usercache.json"
@@ -71,6 +75,47 @@ class Config(baseDir: String, val updateUrl: String?) {
     val modrinthUserAgent = "TreSet/treelauncher/v3.0.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"
     val msClientId = "389304a5-70a6-4013-907f-98c4eb4b51fb"
+
+    @Throws(IOException::class)
+    fun setBaseDir(newBaseDir: LauncherFile, copyFiles: Boolean, removeOld: Boolean) {
+        LOGGER.info { "Updating path: path=${newBaseDir.absolutePath}" }
+
+        try {
+            GlobalConfig.validateDataPath(
+                newBaseDir,
+                appConfig().baseDir,
+                !copyFiles
+            )
+        } catch (e: IllegalStateException) {
+            throw IOException(e)
+        }
+
+        if(copyFiles) {
+            if(removeOld) {
+                LOGGER.info { "Moving files from ${appConfig().baseDir.absolutePath} to ${newBaseDir.absolutePath}..." }
+                appConfig().baseDir.atomicMoveTo(newBaseDir, StandardCopyOption.REPLACE_EXISTING)
+            } else {
+                LOGGER.info { "Copying files from ${appConfig().baseDir.absolutePath} to ${newBaseDir.absolutePath}..." }
+                appConfig().baseDir.copyTo(newBaseDir, StandardCopyOption.REPLACE_EXISTING)
+            }
+        }
+
+        LOGGER.debug { "Updating config" }
+        val oldDir = appConfig().baseDir
+        baseDir = newBaseDir
+        globalConfig.path = newBaseDir.absolutePath
+        globalConfig.writeToFile(configFile.absolutePath)
+
+        if (removeOld) {
+            LOGGER.debug { "Removing old directory" }
+            oldDir.remove()
+        }
+        LOGGER.info { "Successfully changed directory" }
+    }
+
+    companion object {
+        private val LOGGER = KotlinLogging.logger {}
+    }
 }
 
 private lateinit var config: Config

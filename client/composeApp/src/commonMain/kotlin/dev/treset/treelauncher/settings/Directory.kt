@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.GlobalConfigLoader
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
@@ -116,7 +115,7 @@ fun Directory() {
 
                         Thread {
                             try {
-                                GlobalConfigLoader().updatePath(dir, cbState)
+                                appConfig().setBaseDir(dir, false, cbState)
 
                                 popupContent = PopupData(
                                     type = PopupType.SUCCESS,

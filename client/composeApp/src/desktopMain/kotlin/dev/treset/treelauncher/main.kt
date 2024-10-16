@@ -22,16 +22,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import dev.treset.mcdl.util.OsUtil
-import dev.treset.treelauncher.App
-import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.LauncherApp
-import dev.treset.treelauncher.app
 import dev.treset.treelauncher.backend.config.Window
 import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.strings
 import dev.treset.treelauncher.style.*
+import dev.treset.treelauncher.util.ConfigLoader
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.intui.standalone.theme.darkThemeDefinition
@@ -49,122 +46,124 @@ import kotlin.math.roundToInt
 
 
 fun main() = application {
-    var theme by remember { mutableStateOf(Theme.SYSTEM) }
+    ConfigLoader {
+        var theme by remember { mutableStateOf(Theme.SYSTEM) }
 
-    val app = remember {
-        LauncherApp(
-            ::exitApplication
-        ) {
-            theme = it
-        }
-    }
-
-    val titleColors = if(theme.isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition()
-    val styling = ComponentStyling.decoratedWindow(
-        titleBarStyle = if(theme.isDark()) darkTitleBar() else lightTitleBar()
-    )
-    val colors = if(theme.isDark()) darkColors() else lightColors()
-
-    val density = LocalDensity.current
-    val position: WindowPosition = remember {
-        appSettings().window?.let {
-            WindowPosition.Absolute(it.x, it.y)
-                .let { if(isValidPosition(it, density)) it else null }
-        } ?: WindowPosition(Alignment.Center)
-    }
-
-    val size: DpSize = remember {
-        appSettings().window?.let {
-            DpSize(it.width, it.height)
-                .let { if(isValidSize(it)) it else null }
-        } ?: with(density) { DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.toDp() - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.toDp() - 100.dp)) }
-    }
-
-    val placement = remember {
-        appSettings().window?.let {
-            if(it.isMaximized) WindowPlacement.Maximized else null
-        } ?: WindowPlacement.Floating
-    }
-
-    val windowState = rememberWindowState(
-        placement = placement,
-        position = position,
-        size = size
-    )
-
-    LaunchedEffect(Unit) {
-        resetSize = {
-            windowState.position = WindowPosition(Alignment.Center)
-            windowState.size = with(density) { DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.toDp() - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.toDp() - 100.dp)) }
-            windowState.placement = WindowPlacement.Floating
-        }
-    }
-
-    IntUiTheme(
-        theme = titleColors,
-        styling = styling
-    ) {
-        DecoratedWindow(
-            onCloseRequest = { app().exit() },
-            title = strings().launcher.name(),
-            state = windowState,
-            icon = BitmapPainter(useResource("icon_default.png", ::loadImageBitmap)),
-        ) {
-            window.minimumSize = with(LocalDensity.current) {
-                Dimension(200.dp.toPx().roundToInt(), 100.dp.toPx().roundToInt())
+        val app = remember {
+            LauncherApp(
+                ::exitApplication
+            ) {
+                theme = it
             }
+        }
 
-            LaunchedEffect(windowState) {
-                snapshotFlow { windowState.placement }
-                    .map { it == WindowPlacement.Maximized }
-                    .onEach(::onWindowMaximized)
-                    .launchIn(this)
+        val titleColors = if(theme.isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition()
+        val styling = ComponentStyling.decoratedWindow(
+            titleBarStyle = if(theme.isDark()) darkTitleBar() else lightTitleBar()
+        )
+        val colors = if(theme.isDark()) darkColors() else lightColors()
 
-                snapshotFlow { windowState.size }
-                    .filter { it.isSpecified && windowState.placement == WindowPlacement.Floating }
-                    .onEach(::onWindowResize)
-                    .launchIn(this)
+        val density = LocalDensity.current
+        val position: WindowPosition = remember {
+            appSettings().window?.let {
+                WindowPosition.Absolute(it.x, it.y)
+                    .let { if(isValidPosition(it, density)) it else null }
+            } ?: WindowPosition(Alignment.Center)
+        }
 
-                snapshotFlow { windowState.position }
-                    .filter { it.isSpecified && windowState.placement == WindowPlacement.Floating }
-                    .onEach(::onWindowRelocate)
-                    .launchIn(this)
+        val size: DpSize = remember {
+            appSettings().window?.let {
+                DpSize(it.width, it.height)
+                    .let { if(isValidSize(it)) it else null }
+            } ?: with(density) { DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.toDp() - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.toDp() - 100.dp)) }
+        }
 
+        val placement = remember {
+            appSettings().window?.let {
+                if(it.isMaximized) WindowPlacement.Maximized else null
+            } ?: WindowPlacement.Floating
+        }
+
+        val windowState = rememberWindowState(
+            placement = placement,
+            position = position,
+            size = size
+        )
+
+        LaunchedEffect(Unit) {
+            resetSize = {
+                windowState.position = WindowPosition(Alignment.Center)
+                windowState.size = with(density) { DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.toDp() - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.toDp() - 100.dp)) }
+                windowState.placement = WindowPlacement.Floating
             }
+        }
 
-            TitleBar(Modifier.newFullscreenControls()) {
-                CompositionLocalProvider(
-                    LocalContentColor provides colors.material.onBackground
-                ) {
-                    Box(
-                        modifier = Modifier.offset(x = (-9).dp),
-                        contentAlignment = Alignment.Center
+        IntUiTheme(
+            theme = titleColors,
+            styling = styling
+        ) {
+            DecoratedWindow(
+                onCloseRequest = { app().exit() },
+                title = strings().launcher.name(),
+                state = windowState,
+                icon = BitmapPainter(useResource("icon_default.png", ::loadImageBitmap)),
+            ) {
+                window.minimumSize = with(LocalDensity.current) {
+                    Dimension(200.dp.toPx().roundToInt(), 100.dp.toPx().roundToInt())
+                }
+
+                LaunchedEffect(windowState) {
+                    snapshotFlow { windowState.placement }
+                        .map { it == WindowPlacement.Maximized }
+                        .onEach(::onWindowMaximized)
+                        .launchIn(this)
+
+                    snapshotFlow { windowState.size }
+                        .filter { it.isSpecified && windowState.placement == WindowPlacement.Floating }
+                        .onEach(::onWindowResize)
+                        .launchIn(this)
+
+                    snapshotFlow { windowState.position }
+                        .filter { it.isSpecified && windowState.placement == WindowPlacement.Floating }
+                        .onEach(::onWindowRelocate)
+                        .launchIn(this)
+
+                }
+
+                TitleBar(Modifier.newFullscreenControls()) {
+                    CompositionLocalProvider(
+                        LocalContentColor provides colors.material.onBackground
                     ) {
-                        Text(
-                            strings().launcher.name(),
-                            style = typography().titleSmall,
-                            modifier = Modifier.offset(y = 2.dp)
-                        )
+                        Box(
+                            modifier = Modifier.offset(x = (-9).dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                strings().launcher.name(),
+                                style = typography().titleSmall,
+                                modifier = Modifier.offset(y = 2.dp)
+                            )
 
-                        IconButton(
-                            onClick = {
-                                AppContext.openNews()
-                            },
-                            icon = icons().news,
-                            tooltip = strings().news.tooltip(),
-                            modifier = Modifier
-                                .offset(x = 82.dp, y = 1.dp)
-                        )
+                            IconButton(
+                                onClick = {
+                                    AppContext.openNews()
+                                },
+                                icon = icons().news,
+                                tooltip = strings().news.tooltip(),
+                                modifier = Modifier
+                                    .offset(x = 82.dp, y = 1.dp)
+                            )
+                        }
                     }
                 }
-            }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colors.material.background)
-            ) {
-                App(app)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colors.material.background)
+                ) {
+                    App(app)
+                }
             }
         }
     }

@@ -19,5 +19,5 @@ composeApp/data/
 composeApp/jcef/
 composeApp/kcef/
 composeApp/logs/
-composeApp/app/treelauncher.conf
+composeApp/config
 libs/

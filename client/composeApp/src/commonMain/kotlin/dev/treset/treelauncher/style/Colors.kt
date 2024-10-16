@@ -197,8 +197,8 @@ fun Color.contrast(other: Color): Float {
     }
 }
 
-val LocalColors = staticCompositionLocalOf<Colors> {
-    error("No Colors provided")
+val LocalColors = staticCompositionLocalOf {
+    lightColors()
 }
 
 @Composable

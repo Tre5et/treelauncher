@@ -211,10 +211,19 @@ open class Strings(
     data class Launcher(
         val name: () -> String = { "TreeLauncher" },
         val patch: Patch = Patch(),
+        val setup: Setup = Setup(),
         val slug: () -> String = { "treelauncher" },
         val status: Status = Status(),
         val version: () -> String = { "3.0.0" }
     ) {
+        data class Setup(
+            val initializing: () -> String = { "Initializing data directory" },
+            val title: () -> String = { "Select a data directory" },
+            val message: () -> String = { "Select a directory where your instances should be stored.\nThis can be an empty directory or existing launcher data." },
+            val dirPicker: () -> String = { "Select a directory" },
+            val error: (Exception) -> String = { "Invalid path: ${it.message}" }
+        )
+
         data class Status(
             val preparing: (Int) -> String = { progress -> "Performing first time setup... $progress%" },
             val restartRequired: () -> String = { "Restart required. Please restart." }
