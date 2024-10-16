@@ -1,5 +1,7 @@
 package dev.treset.treelauncher.backend.config
 
+import dev.treset.treelauncher.AppContext
+import dev.treset.treelauncher.app
 import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.Version
@@ -105,6 +107,9 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
         baseDir = newBaseDir
         globalConfig.path = newBaseDir.absolutePath
         globalConfig.writeToFile(configFile.absolutePath)
+
+        app().loadSettings()
+        AppContext.recheckData()
 
         if (removeOld) {
             LOGGER.debug { "Removing old directory" }

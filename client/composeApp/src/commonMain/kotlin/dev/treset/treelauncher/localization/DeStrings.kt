@@ -547,6 +547,7 @@ class DeStrings : Strings(
             errorTitle = { "Dateipfad konnte nicht geändert werden" },
             errorMessage = { e -> "Der folgende Fehler ist aufgetreten:\n$e" },
             invalid = { "Kein Ordner ausgewählt" },
+            copyData = { "Dateien zum neuen Ort kopieren" },
             remove = { "Dateien vom alten Ort entfernen" },
             select = { "Ordner auswählen" },
             success = { "Dateipfad geändert" },

@@ -1,10 +1,7 @@
 package dev.treset.treelauncher.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -82,15 +79,30 @@ fun Directory() {
                 },
             )
 
-            var cbState by remember { mutableStateOf(false) }
-            TitledCheckBox(
-                title = strings().settings.path.remove(),
-                checked = cbState,
-                onCheckedChange = {
-                    cbState = it
-                },
-                enabled = !instanceRunning
-            )
+            var copy by remember { mutableStateOf(false) }
+            var remove by remember { mutableStateOf(false) }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy((-16).dp)
+            ) {
+                TitledCheckBox(
+                    title = strings().settings.path.copyData(),
+                    checked = copy,
+                    onCheckedChange = {
+                        copy = it
+                    },
+                    enabled = !instanceRunning
+                )
+
+                TitledCheckBox(
+                    title = strings().settings.path.remove(),
+                    checked = remove,
+                    onCheckedChange = {
+                        remove = it
+                    },
+                    enabled = !instanceRunning
+                )
+            }
 
             Button(
                 onClick = {
@@ -115,7 +127,7 @@ fun Directory() {
 
                         Thread {
                             try {
-                                appConfig().setBaseDir(dir, false, cbState)
+                                appConfig().setBaseDir(dir, copy, remove)
 
                                 popupContent = PopupData(
                                     type = PopupType.SUCCESS,

@@ -58,7 +58,8 @@ data class AppContextData(
     val silentError: (Exception) -> Unit,
     val errorIfOnline: (Exception) -> Unit,
     val resetWindowSize: () -> Unit,
-    val discord: DiscordIntegration
+    val discord: DiscordIntegration,
+    var recheckData: () -> Unit = {}
 )
 
 lateinit var AppContext: AppContextData
@@ -187,7 +188,9 @@ fun App(
                     MaterialTheme.typography.bodyMedium
                 ) {
                     Scaffold {
-                        DataPatcher {
+                        DataPatcher { recheckData ->
+                            AppContext.recheckData = recheckData
+
                             Column(
                                 Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -317,7 +320,7 @@ class LauncherApp(
     }
 
     @Throws(IOException::class)
-    private fun loadSettings() {
+    fun loadSettings() {
         val settingsFile = LauncherFile.of(appConfig().baseDir, appConfig().settingsFile)
         if (!settingsFile.exists()) {
             Settings.new(settingsFile)

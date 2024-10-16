@@ -1,7 +1,6 @@
 package dev.treset.treelauncher.util
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.patcher.DataPatcher
 import dev.treset.treelauncher.backend.util.Status
@@ -11,20 +10,21 @@ import java.io.IOException
 
 @Composable
 fun DataPatcher(
-    content: @Composable () -> Unit
+    content: @Composable (recheck: () -> Unit) -> Unit
 ) {
-    val dataPatcher = remember { DataPatcher() }
+    var recheck by remember { mutableStateOf(0) }
 
-    var upgraded by rememberSaveable { mutableStateOf(!dataPatcher.upgradeNeeded()) }
-    var error by remember { mutableStateOf<Exception?>(null) }
+    val dataPatcher = remember(recheck) { DataPatcher() }
+    var upgraded by remember(recheck) { mutableStateOf(!dataPatcher.upgradeNeeded()) }
+    var error by remember(recheck) { mutableStateOf<Exception?>(null) }
     var status: Status? by remember { mutableStateOf(null) }
-    var backup by remember { mutableStateOf(true) }
+    var backup by remember(recheck) { mutableStateOf(true) }
 
 
     if(error != null) {
         AppContext.severeError(error!!)
     } else if(upgraded) {
-        content()
+        content { recheck++ }
     } else {
         status?.let {
             StatusPopup(it)

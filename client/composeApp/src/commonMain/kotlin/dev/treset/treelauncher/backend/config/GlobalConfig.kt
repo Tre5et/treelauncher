@@ -37,19 +37,6 @@ class GlobalConfig(
             }
         }
 
-        fun isValidDataPath(
-            path: LauncherFile,
-            prevPath: LauncherFile? = null,
-            allowLauncherData: Boolean = true
-        ): Boolean {
-            return try {
-                validateDataPath(path, prevPath, allowLauncherData)
-                true
-            } catch (e: IllegalStateException) {
-                false
-            }
-        }
-
         fun isLauncherDataPath(directory: LauncherFile): Boolean {
             if(!directory.isDirectory || directory.isDirEmpty) {
                 return false

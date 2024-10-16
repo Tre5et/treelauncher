@@ -814,6 +814,7 @@ open class Strings(
             val errorTitle: () -> String = { "Failed to change path" },
             val errorMessage: (Exception) -> String = { e -> "An error occurred:\n$e" },
             val invalid: () -> String = { "No valid folder provided" },
+            val copyData: () -> String = { "Copy files to destination" },
             val remove: () -> String = { "Remove files from old location" },
             val select: () -> String = { "Select a Folder" },
             val success: () -> String = { "Successfully changed path" },
