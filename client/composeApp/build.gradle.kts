@@ -36,7 +36,7 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "2.0.0"
+        val mcdlVersion = "2.1.0-SNAPSHOT"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)

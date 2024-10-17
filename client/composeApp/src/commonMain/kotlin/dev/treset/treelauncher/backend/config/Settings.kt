@@ -1,5 +1,9 @@
 package dev.treset.treelauncher.backend.config
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.google.gson.annotations.SerializedName
@@ -57,69 +61,61 @@ data class Window(
 
 
 class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
-    var language: Language = language().systemLanguage
-    var theme: Theme = Theme.SYSTEM
-    var accentColor: AccentColor = AccentColor.GREEN
-    var customColor: Color = Color.White
-    var darkColors: UserColors = UserColors()
-    var lightColors: UserColors = UserColors()
-    var displayScale: Int = 1000
-        set(value) {
-            field = value
-            setDisplayScale(value)
-        }
-    var fontScale: Int = 1000
-        set(value) {
-            field = value
-            setFontScale(value)
-        }
-    var syncUrl: String? = null
-    var syncPort: String? = null
-    var syncKey: String? = null
-    var instanceSortType: InstanceDataSortType = InstanceDataSortType.NAME
-    var isInstanceSortReverse = false
-    var savesComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
-    var isSavesComponentSortReverse = false
-    var savesDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
-    var resourcepacksDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
-    var resourcepacksComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
-    var isResourcepacksComponentSortReverse = false
-    var optionsComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
-    var isOptionsComponentSortReverse = false
-    var modDetailsListDisplay: DetailsListDisplay = DetailsListDisplay.FULL
-    var modComponentSortType: ComponentManifestSortType = ComponentManifestSortType.NAME
-    var isModComponentSortReverse = false
-    var modSortType: LauncherModSortType = LauncherModSortType.NAME
-    var isModSortReverse = false
-    var isModsUpdate = true
-    var isModsEnable = false
-    var isModsDisable = false
-    var modrinthStatus = 0 to true
-    var curseforgeSatus = 1 to true
+    var language = mutableStateOf(language().systemLanguage)
+    var theme = mutableStateOf(Theme.SYSTEM)
+    var accentColor = mutableStateOf(AccentColor.GREEN)
+    var customColor = mutableStateOf(Color.White)
+    var darkColors = mutableStateOf(UserColors())
+    var lightColors = mutableStateOf(UserColors())
+    var displayScale = mutableStateOf(1000)
+    var fontScale = mutableStateOf(1000)
+    var syncUrl = mutableStateOf<String?>(null)
+    var syncPort = mutableStateOf<String?>(null)
+    var syncKey = mutableStateOf<String?>(null)
+    var instanceSortType = mutableStateOf(InstanceDataSortType.NAME)
+    var isInstanceSortReverse = mutableStateOf(false)
+    var savesComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
+    var isSavesComponentSortReverse = mutableStateOf(false)
+    var savesDetailsListDisplay = mutableStateOf(DetailsListDisplay.FULL)
+    var resourcepacksDetailsListDisplay = mutableStateOf(DetailsListDisplay.FULL)
+    var resourcepacksComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
+    var isResourcepacksComponentSortReverse = mutableStateOf(false)
+    var optionsComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
+    var isOptionsComponentSortReverse = mutableStateOf(false)
+    var modDetailsListDisplay = mutableStateOf(DetailsListDisplay.FULL)
+    var modComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
+    var isModComponentSortReverse = mutableStateOf(false)
+    var modSortType = mutableStateOf(LauncherModSortType.NAME)
+    var isModSortReverse = mutableStateOf(false)
+    var isModsUpdate = mutableStateOf(true)
+    var isModsEnable = mutableStateOf(false)
+    var isModsDisable = mutableStateOf(false)
+    var modrinthStatus = mutableStateOf(0 to true)
+    var curseforgeSatus = mutableStateOf(1 to true)
     var modProviders: List<Pair<ModProvider, Boolean>>
         get() {
             val result = mutableListOf<Pair<ModProvider, Boolean>>()
-            result.add(ModProvider.MODRINTH to modrinthStatus.second)
-            result.add(curseforgeSatus.first, ModProvider.CURSEFORGE to curseforgeSatus.second)
+            result.add(ModProvider.MODRINTH to modrinthStatus.value.second)
+            result.add(curseforgeSatus.value.first, ModProvider.CURSEFORGE to curseforgeSatus.value.second)
             return result
         }
         set(value) = value.forEachIndexed { i, provider ->
             when(provider.first) {
-                ModProvider.MODRINTH -> modrinthStatus = i to provider.second
-                ModProvider.CURSEFORGE -> curseforgeSatus = i to provider.second
+                ModProvider.MODRINTH -> modrinthStatus.value = i to provider.second
+                ModProvider.CURSEFORGE -> curseforgeSatus.value = i to provider.second
             }
         }
-    var acknowledgedNews = mutableListOf<String>()
-    var updateUrl: String = appConfig().updateUrl ?: "https://update.treelauncher.net"
-    var discordIntegration: Boolean = false
-    var discordShowModLoader: Boolean = true
-    var discordShowTime: Boolean = true
-    var discordShowWatermark: Boolean = true
-    var discordShowVersion: Boolean = true
-    var discordShowInstance: Boolean = true
-    var window: Window? = null
-    var dataVersion: String = "0.0.1"
-    val clientId: String = UUID.randomUUID().toString()
+    var acknowledgedNews = mutableStateListOf<String>()
+    var updateUrl = mutableStateOf(appConfig().updateUrl ?: "https://update.treelauncher.net")
+    var discordIntegration = mutableStateOf(false)
+    var discordShowModLoader = mutableStateOf(true)
+    var discordShowTime = mutableStateOf(true)
+    var discordShowWatermark = mutableStateOf(true)
+    var discordShowVersion = mutableStateOf(true)
+    var discordShowInstance = mutableStateOf(true)
+    var window = mutableStateOf<Window?>(null)
+    var dataVersion = mutableStateOf("0.0.1")
+    val clientId = mutableStateOf(UUID.randomUUID().toString())
 
     @SerializedName("is_debug")
     private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null
@@ -157,27 +153,23 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
                 throw IOException("Failed to load settings", e)
             }
             result.file = file
-            setAppSettings(result)
+            AppSettings = result
             LOGGER.debug { "Loaded settings" }
-            return appSettings()
+            return result
         }
 
         @Throws(IOException::class)
         fun new(file: LauncherFile): Settings {
             LOGGER.debug { "Creating new settings at: $file..." }
             val result = Settings(file)
-            setAppSettings(result)
+            AppSettings = result
             result.save()
             LOGGER.debug { "Created new settings" }
-            return appSettings()
+            return result
         }
     }
 }
 
 private val LOGGER = KotlinLogging.logger {}
 
-private lateinit var settings: Settings
-fun appSettings(): Settings = settings
-fun setAppSettings(newSettings: Settings) {
-    settings = newSettings
-}
+lateinit var AppSettings: Settings

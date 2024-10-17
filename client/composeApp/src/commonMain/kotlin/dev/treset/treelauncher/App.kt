@@ -16,6 +16,7 @@ import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.discord.DiscordIntegration
 import dev.treset.treelauncher.backend.update.updater
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.serialization.modifySerializer
 import dev.treset.treelauncher.components.Options
 import dev.treset.treelauncher.components.Resourcepacks
 import dev.treset.treelauncher.components.Saves
@@ -272,6 +273,8 @@ class LauncherApp(
 ) {
     init {
         configureVersionLoader()
+
+        modifySerializer()
 
         try {
             loadSettings()

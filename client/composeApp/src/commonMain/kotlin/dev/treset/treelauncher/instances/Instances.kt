@@ -8,8 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.InstanceDataSortType
-import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.SortBox
@@ -23,8 +23,6 @@ import java.io.IOException
 fun Instances() {
     var selectedInstance: InstanceData? by remember { mutableStateOf(null) }
     var instances: List<InstanceData> by remember { mutableStateOf(emptyList()) }
-    var selectedSort: InstanceDataSortType by remember { mutableStateOf(appSettings().instanceSortType) }
-    var sortReversed: Boolean by remember { mutableStateOf(appSettings().isInstanceSortReverse) }
 
     var loading by remember { mutableStateOf(true) }
 
@@ -58,10 +56,10 @@ fun Instances() {
         reloadInstances()
     }
 
-    LaunchedEffect(instances, selectedSort, sortReversed, AppContext.runningInstance) {
+    LaunchedEffect(instances, AppSettings.instanceSortType, AppSettings.isInstanceSortReverse.value, AppContext.runningInstance) {
         val newInst = instances
-            .sortedWith(selectedSort.comparator)
-        instances = if(sortReversed) newInst.reversed() else newInst
+            .sortedWith(AppSettings.instanceSortType.value.comparator)
+        instances = if(AppSettings.isInstanceSortReverse.value) newInst.reversed() else newInst
     }
 
     if(instances.isEmpty() && !loading) {
@@ -104,15 +102,13 @@ fun Instances() {
                 Text(strings().selector.instance.title())
                 SortBox(
                     sorts = InstanceDataSortType.entries,
-                    selected = selectedSort,
-                    reversed = sortReversed,
+                    selected = AppSettings.instanceSortType.value,
+                    reversed = AppSettings.isInstanceSortReverse.value,
                     onSelected = {
-                        selectedSort = it
-                        appSettings().instanceSortType = it
+                        AppSettings.instanceSortType.value = it
                     },
                     onReversed = {
-                        sortReversed = !sortReversed
-                        appSettings().isInstanceSortReverse = sortReversed
+                        AppSettings.isInstanceSortReverse.value = !AppSettings.isInstanceSortReverse.value
                     },
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )
