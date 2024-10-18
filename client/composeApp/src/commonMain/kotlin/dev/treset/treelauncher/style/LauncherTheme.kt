@@ -1,14 +1,15 @@
 package dev.treset.treelauncher.style
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.Typography
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.localization.Strings
 
@@ -37,7 +38,15 @@ fun LauncherTheme(
             ProvideTextStyle(
                 MaterialTheme.typography.bodyMedium
             ) {
-                content()
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
+                    )
+                    content()
+                }
             }
         }
     }

@@ -31,7 +31,6 @@ import kotlin.system.exitProcess
 fun App(
     launcherApp: LauncherApp
 ) {
-
     app = launcherApp
 
     val themeDark = AppSettings.theme.value.isDark()

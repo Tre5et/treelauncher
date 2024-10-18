@@ -149,7 +149,7 @@ fun darkTitleBar() = TitleBarStyle.dark(
     colors = TitleBarColors.dark(
         backgroundColor = darkColors().material.background,
         inactiveBackground = darkColors().material.background,
-        borderColor = darkColors().material.secondary
+        borderColor = darkColors().material.background
     )
 )
 
@@ -158,7 +158,7 @@ fun lightTitleBar() = TitleBarStyle.light(
     colors = TitleBarColors.light(
         backgroundColor = lightColors().material.background,
         inactiveBackground = lightColors().material.background,
-        borderColor = lightColors().material.secondary
+        borderColor = lightColors().material.background
     )
 )
 
