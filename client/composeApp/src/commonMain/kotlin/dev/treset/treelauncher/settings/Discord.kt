@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledSwitch
 import dev.treset.treelauncher.localization.strings
@@ -34,13 +34,6 @@ import dev.treset.treelauncher.style.disabledContent
 
 @Composable
 fun Discord() {
-    var enabled by remember { mutableStateOf(appSettings().discordIntegration) }
-    var instance by remember { mutableStateOf(appSettings().discordShowInstance) }
-    var version by remember { mutableStateOf(appSettings().discordShowVersion) }
-    var modLoader by remember { mutableStateOf(appSettings().discordShowModLoader) }
-    var time by remember { mutableStateOf(appSettings().discordShowTime) }
-    var watermark by remember { mutableStateOf(appSettings().discordShowWatermark) }
-
     val disabled = remember(AppContext.runningInstance) { AppContext.runningInstance != null }
 
     Column(
@@ -57,10 +50,9 @@ fun Discord() {
         ) {
             TitledSwitch(
                 title = strings().settings.discord.title(),
-                checked = enabled,
+                checked = AppSettings.discordIntegration.value,
                 onCheckedChange = {
-                    enabled = it
-                    appSettings().discordIntegration = it
+                    AppSettings.discordIntegration.value = it
                 },
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.offset(y = (-1).dp),
@@ -68,7 +60,7 @@ fun Discord() {
             )
 
             AnimatedVisibility(
-                visible = enabled,
+                visible = AppSettings.discordIntegration.value,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
@@ -83,10 +75,9 @@ fun Discord() {
                     ) {
                         TitledSwitch(
                             strings().settings.discord.instanceToggle(),
-                            checked = instance,
+                            checked = AppSettings.discordShowInstance.value,
                             onCheckedChange = {
-                                instance = it
-                                appSettings().discordShowInstance = it
+                                AppSettings.discordShowInstance.value = it
                             },
                             enabled = !disabled,
                             rowModifier = Modifier.fillMaxWidth()
@@ -94,10 +85,9 @@ fun Discord() {
 
                         TitledSwitch(
                             strings().settings.discord.versionToggle(),
-                            checked = version,
+                            checked = AppSettings.discordShowVersion.value,
                             onCheckedChange = {
-                                version = it
-                                appSettings().discordShowVersion = version
+                                AppSettings.discordShowVersion.value = it
                             },
                             enabled = !disabled,
                             rowModifier = Modifier.fillMaxWidth()
@@ -105,10 +95,9 @@ fun Discord() {
 
                         TitledSwitch(
                             strings().settings.discord.modLoaderToggle(),
-                            checked = modLoader,
+                            checked = AppSettings.discordShowModLoader.value,
                             onCheckedChange = {
-                                modLoader = it
-                                appSettings().discordShowModLoader = it
+                                AppSettings.discordShowModLoader.value = it
                             },
                             enabled = !disabled,
                             rowModifier = Modifier.fillMaxWidth()
@@ -116,10 +105,9 @@ fun Discord() {
 
                         TitledSwitch(
                             strings().settings.discord.timeToggle(),
-                            checked = time,
+                            checked = AppSettings.discordShowTime.value,
                             onCheckedChange = {
-                                time = it
-                                appSettings().discordShowTime = it
+                                AppSettings.discordShowTime.value = it
                             },
                             enabled = !disabled,
                             rowModifier = Modifier.fillMaxWidth()
@@ -127,10 +115,9 @@ fun Discord() {
 
                         TitledSwitch(
                             strings().settings.discord.watermarkToggle(),
-                            checked = watermark,
+                            checked = AppSettings.discordShowWatermark.value,
                             onCheckedChange = {
-                                watermark = it
-                                appSettings().discordShowWatermark = it
+                                AppSettings.discordShowWatermark.value = it
                             },
                             enabled = !disabled,
                             rowModifier = Modifier.fillMaxWidth()
@@ -180,7 +167,7 @@ fun Discord() {
                                 fontSize = 14.sp
                             )
 
-                            val details = remember(instance, version, modLoader, watermark) {
+                            val details = remember(AppSettings.discordShowInstance.value, AppSettings.discordShowVersion.value, AppSettings.discordShowModLoader.value, AppSettings.discordShowWatermark.value) {
                                 strings().settings.discord.details(
                                     strings().settings.discord.instanceExample(),
                                     strings().settings.discord.versionExample(),
@@ -197,7 +184,7 @@ fun Discord() {
                                     textAlign = TextAlign.Start,
                                 )
                             }
-                            if (time) {
+                            if (AppSettings.discordShowTime.value) {
                                 Text(
                                     strings().settings.discord.timeExample() + strings().settings.discord.timeSuffix(),
                                     style = textStyle,

@@ -2,7 +2,7 @@ package dev.treset.treelauncher.backend.news
 
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.SerializationException
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import java.io.IOException
 
 class News(
@@ -27,7 +27,7 @@ private var news: News? = null
 
 @Throws(IOException::class)
 fun news(): News {
-    val newsService = NewsService(appSettings().updateUrl)
+    val newsService = NewsService(AppSettings.updateUrl.value)
     return newsService.news().also {
         news = it
     }

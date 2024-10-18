@@ -22,8 +22,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import dev.treset.mcdl.util.OsUtil
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.Window
-import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.strings
@@ -47,39 +47,35 @@ import kotlin.math.roundToInt
 
 fun main() = application {
     ConfigLoader {
-        var theme by remember { mutableStateOf(Theme.SYSTEM) }
-
         val app = remember {
             LauncherApp(
                 ::exitApplication
-            ) {
-                theme = it
-            }
+            )
         }
 
-        val titleColors = if(theme.isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition()
+        val titleColors = if(AppSettings.theme.value.isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition()
         val styling = ComponentStyling.decoratedWindow(
-            titleBarStyle = if(theme.isDark()) darkTitleBar() else lightTitleBar()
+            titleBarStyle = if(AppSettings.theme.value.isDark()) darkTitleBar() else lightTitleBar()
         )
-        val colors = if(theme.isDark()) darkColors() else lightColors()
+        val colors = if(AppSettings.theme.value.isDark()) darkColors() else lightColors()
 
         val density = LocalDensity.current
         val position: WindowPosition = remember {
-            appSettings().window?.let {
+            AppSettings.window.value?.let {
                 WindowPosition.Absolute(it.x, it.y)
                     .let { if(isValidPosition(it, density)) it else null }
             } ?: WindowPosition(Alignment.Center)
         }
 
         val size: DpSize = remember {
-            appSettings().window?.let {
+            AppSettings.window.value?.let {
                 DpSize(it.width, it.height)
                     .let { if(isValidSize(it)) it else null }
             } ?: with(density) { DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.toDp() - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.toDp() - 100.dp)) }
         }
 
         val placement = remember {
-            appSettings().window?.let {
+            AppSettings.window.value?.let {
                 if(it.isMaximized) WindowPlacement.Maximized else null
             } ?: WindowPlacement.Floating
         }
@@ -177,7 +173,7 @@ actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {
     val commandBuilder = StringBuilder()
     commandBuilder.append(updaterFile.absolutePath)
     return if(OsUtil.isOsName("windows")) {
-        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(appSettings().isDebug) "/k" else "/c",
+        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(AppSettings.isDebug) "/k" else "/c",
             "$commandBuilder $updaterArgs"
         )
     } else {
@@ -220,31 +216,31 @@ private fun isValidPosition(position: WindowPosition, density: Density): Boolean
 }
 
 private fun onWindowMaximized(maximized: Boolean) {
-    appSettings().window = Window(
-        appSettings().window?.x ?: (-1).dp,
-        appSettings().window?.y ?: (-1).dp,
-        appSettings().window?.width ?: (-1).dp,
-        appSettings().window?.height ?: (-1).dp,
+    AppSettings.window.value = Window(
+        AppSettings.window.value?.x ?: (-1).dp,
+        AppSettings.window.value?.y ?: (-1).dp,
+        AppSettings.window.value?.width ?: (-1).dp,
+        AppSettings.window.value?.height ?: (-1).dp,
         maximized
     )
 }
 
 private fun onWindowResize(size: DpSize) {
-    appSettings().window = Window(
-        appSettings().window?.x ?: (-1).dp,
-        appSettings().window?.y ?: (-1).dp,
+    AppSettings.window.value = Window(
+        AppSettings.window.value?.x ?: (-1).dp,
+        AppSettings.window.value?.y ?: (-1).dp,
         size.width,
         size.height,
-        appSettings().window?.isMaximized ?: false
+        AppSettings.window.value?.isMaximized ?: false
     )
 }
 
 private fun onWindowRelocate(position: WindowPosition) {
-    appSettings().window = Window(
+    AppSettings.window.value = Window(
         position.x,
         position.y,
-        appSettings().window?.width ?: (-1).dp,
-        appSettings().window?.height ?: (-1).dp,
-        appSettings().window?.isMaximized ?: false
+        AppSettings.window.value?.width ?: (-1).dp,
+        AppSettings.window.value?.height ?: (-1).dp,
+        AppSettings.window.value?.isMaximized ?: false
     )
 }

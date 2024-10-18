@@ -3,7 +3,7 @@ package dev.treset.treelauncher.components
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.util.Status
@@ -41,10 +41,10 @@ fun Options() {
         },
         settingsDefault = true,
         sortContext = SortContext(
-            getSortType = { appSettings().optionsComponentSortType },
-            setSortType = { appSettings().optionsComponentSortType = it },
-            getReverse = { appSettings().isOptionsComponentSortReverse },
-            setReverse = { appSettings().isOptionsComponentSortReverse = it }
+            getSortType = { AppSettings.optionsComponentSortType.value },
+            setSortType = { AppSettings.optionsComponentSortType.value = it },
+            getReverse = { AppSettings.isOptionsComponentSortReverse.value },
+            setReverse = { AppSettings.isOptionsComponentSortReverse.value = it }
         )
     )
 }

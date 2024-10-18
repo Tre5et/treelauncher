@@ -13,7 +13,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.resourcepacks.Resourcepack
 import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import dev.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
@@ -40,8 +40,6 @@ fun Resourcepacks() {
 
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
-
-    var listDisplay by remember { mutableStateOf(appSettings().resourcepacksDetailsListDisplay) }
 
     var displayData: ResourcepacksDisplayData by remember { mutableStateOf(ResourcepacksDisplayData(mapOf(), mapOf(), {}, {})) }
     var loading by remember { mutableStateOf(true) }
@@ -161,7 +159,7 @@ fun Resourcepacks() {
                         displayData.resourcepacks.forEach {
                             ResourcepackButton(
                                 it.key,
-                                display = listDisplay
+                                display = AppSettings.resourcepacksDetailsListDisplay.value
                             ) {
                                 try {
                                     it.value.remove()
@@ -180,7 +178,7 @@ fun Resourcepacks() {
                         displayData.texturepacks.forEach {
                             TexturepackButton(
                                 it.key,
-                                display = listDisplay
+                                display = AppSettings.resourcepacksDetailsListDisplay.value
                             ) {
                                 try {
                                     it.value.remove()
@@ -228,10 +226,9 @@ fun Resourcepacks() {
                 ) {
                     ListDisplayBox(
                         DetailsListDisplay.entries,
-                        listDisplay,
+                        AppSettings.resourcepacksDetailsListDisplay.value,
                         {
-                            listDisplay = it
-                            appSettings().resourcepacksDetailsListDisplay = it
+                            AppSettings.resourcepacksDetailsListDisplay.value = it
                         }
                     )
                 }
@@ -245,10 +242,10 @@ fun Resourcepacks() {
         },
         detailsScrollable = displayData.resourcepacks.isNotEmpty() || showAdd,
         sortContext = SortContext(
-            getSortType = { appSettings().resourcepacksComponentSortType },
-            setSortType = { appSettings().resourcepacksComponentSortType = it },
-            getReverse = { appSettings().isResourcepacksComponentSortReverse },
-            setReverse = { appSettings().isResourcepacksComponentSortReverse = it }
+            getSortType = { AppSettings.resourcepacksComponentSortType.value },
+            setSortType = { AppSettings.resourcepacksComponentSortType.value = it },
+            getReverse = { AppSettings.isResourcepacksComponentSortReverse.value },
+            setReverse = { AppSettings.isResourcepacksComponentSortReverse.value = it }
         )
     )
 }

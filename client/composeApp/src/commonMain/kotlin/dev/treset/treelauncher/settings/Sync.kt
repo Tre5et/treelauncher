@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.generic.PopupData
 import dev.treset.treelauncher.generic.PopupOverlay
 import dev.treset.treelauncher.generic.Text
@@ -23,7 +22,7 @@ import dev.treset.treelauncher.style.disabledContent
 fun Sync() {
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
-    Column(
+    /*Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
@@ -143,5 +142,5 @@ fun Sync() {
 
     popupContent?.let {
         PopupOverlay(it)
-    }
+    }*/
 }

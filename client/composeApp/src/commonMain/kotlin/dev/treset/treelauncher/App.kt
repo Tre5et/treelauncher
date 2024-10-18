@@ -6,9 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.mods.ModsDL
 import dev.treset.treelauncher.backend.config.*
 import dev.treset.treelauncher.backend.data.InstanceData
@@ -37,6 +35,7 @@ import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.DataPatcher
 import dev.treset.treelauncher.util.FixFiles
 import dev.treset.treelauncher.util.News
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
 import kotlin.system.exitProcess
 
@@ -44,11 +43,6 @@ data class AppContextData(
     val files: LauncherFiles,
     val runningInstance: InstanceData?,
     val setRunningInstance: (InstanceData?) -> Unit,
-    val setTheme: (Theme) -> Unit,
-    val setAccentColor: (AccentColor) -> Unit,
-    val setCustomColor: (Color) -> Unit,
-    val setDarkColors: (UserColors) -> Unit,
-    val setLightColors: (UserColors) -> Unit,
     val globalPopup: PopupData?,
     val addNotification: (NotificationData) -> Unit,
     val dismissNotification: (NotificationData) -> Unit,
@@ -81,13 +75,15 @@ fun App(
 
     app = launcherApp
 
-    var theme by remember { mutableStateOf(appSettings().theme) }
-    val themeDark = theme.isDark()
-    var accentColor by remember { mutableStateOf(appSettings().accentColor) }
-    var customColor by remember { mutableStateOf(appSettings().customColor) }
-    var darkColors by remember { mutableStateOf(appSettings().darkColors) }
-    var lightColors by remember { mutableStateOf(appSettings().lightColors) }
-    val colors by remember(themeDark, accentColor, customColor, darkColors, lightColors) { mutableStateOf(if(themeDark) darkColors(accentColor, darkColors) else lightColors(accentColor, lightColors)) }
+    val themeDark = AppSettings.theme.value.isDark()
+    val colors by remember(themeDark, AppSettings.accentColor.value, AppSettings.customColor.value, AppSettings.darkColors.value, AppSettings.lightColors.value) {
+        mutableStateOf(
+            if(themeDark)
+                darkColors(AppSettings.accentColor.value, AppSettings.darkColors.value)
+            else
+                lightColors(AppSettings.accentColor.value, AppSettings.lightColors.value)
+        )
+    }
 
     var runningInstance: InstanceData? by remember { mutableStateOf(null) }
 
@@ -104,27 +100,6 @@ fun App(
             runningInstance = runningInstance,
             setRunningInstance = {
                 runningInstance = it
-            },
-            setTheme = {
-                theme = it
-                app.setTheme(it)
-                appSettings().theme = it
-            },
-            setAccentColor = {
-                accentColor = it
-                appSettings().accentColor = it
-            },
-            setCustomColor = {
-                customColor = it
-                appSettings().customColor = it
-            },
-            setDarkColors = {
-                darkColors = it
-                appSettings().darkColors = it
-            },
-            setLightColors = {
-                lightColors = it
-                appSettings().lightColors = it
             },
             globalPopup = popupData,
             setGlobalPopup = { popupData = it },
@@ -268,8 +243,7 @@ private lateinit var app: LauncherApp
 fun app() = app
 
 class LauncherApp(
-    val exitApplication: () -> Unit,
-    val setTheme: (Theme) -> Unit
+    val exitApplication: () -> Unit
 ) {
     init {
         configureVersionLoader()
@@ -283,9 +257,7 @@ class LauncherApp(
             exitProcess(-1)
         }
 
-        setTheme(appSettings().theme)
-
-        language().appLanguage = appSettings().language
+        language().appLanguage = AppSettings.language.value
     }
 
     private fun configureVersionLoader() {
@@ -312,7 +284,7 @@ class LauncherApp(
         }
 
         try {
-            appSettings().save()
+            AppSettings.save()
         } catch (e: IOException) {
             LOGGER.error(e) { "Failed to save settings!" }
         }

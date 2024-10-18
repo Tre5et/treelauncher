@@ -18,8 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Language
 import dev.treset.treelauncher.localization.language
@@ -38,12 +37,7 @@ class ColorPickerData(
 fun Appearance() {
     var language by remember { mutableStateOf(language().appLanguage) }
 
-    var theme by remember { mutableStateOf(appSettings().theme) }
-    val dark = theme.isDark()
-    var accentColor by remember { mutableStateOf(appSettings().accentColor) }
-    var customColor by remember { mutableStateOf(appSettings().customColor) }
-    var darkColors by remember { mutableStateOf(appSettings().darkColors) }
-    var lightColors by remember { mutableStateOf(appSettings().lightColors) }
+    val dark = AppSettings.theme.value.isDark()
 
     var colorPicker: ColorPickerData? by remember { mutableStateOf(null) }
 
@@ -97,34 +91,31 @@ fun Appearance() {
                 ) {
                     IconButton(
                         onClick = {
-                            theme = Theme.DARK
-                            AppContext.setTheme(Theme.DARK)
+                            AppSettings.theme.value = Theme.DARK
                         },
                         tooltip = Theme.DARK.displayName(),
                         icon = icons().darkMode,
-                        selected = theme == Theme.DARK,
+                        selected = AppSettings.theme.value == Theme.DARK,
                         modifier = Modifier.clip(RoundedCornerShape(100.dp))
                     )
 
                     IconButton(
                         onClick = {
-                            theme = Theme.LIGHT
-                            AppContext.setTheme(Theme.LIGHT)
+                            AppSettings.theme.value = Theme.LIGHT
                         },
                         tooltip = Theme.LIGHT.displayName(),
                         icon = icons().lightMode,
-                        selected = theme == Theme.LIGHT,
+                        selected = AppSettings.theme.value == Theme.LIGHT,
                         modifier = Modifier.clip(RoundedCornerShape(100.dp))
                     )
 
                     IconButton(
                         onClick = {
-                            theme = Theme.SYSTEM
-                            AppContext.setTheme(Theme.SYSTEM)
+                            AppSettings.theme.value = Theme.SYSTEM
                         },
                         tooltip = Theme.SYSTEM.displayName(),
                         icon = icons().systemMode,
-                        selected = theme == Theme.SYSTEM,
+                        selected = AppSettings.theme.value == Theme.SYSTEM,
                         modifier = Modifier
                             .clip(RoundedCornerShape(100.dp))
                     )
@@ -139,11 +130,9 @@ fun Appearance() {
                         if (it == AccentColor.CUSTOM) {
                             IconButton(
                                 onClick = {
-                                    colorPicker = ColorPickerData(customColor) {
-                                        customColor = it
-                                        accentColor = AccentColor.CUSTOM
-                                        AppContext.setCustomColor(it)
-                                        AppContext.setAccentColor(AccentColor.CUSTOM)
+                                    colorPicker = ColorPickerData(AppSettings.customColor.value) {
+                                        AppSettings.customColor.value = it
+                                        AppSettings.accentColor.value = AccentColor.CUSTOM
                                     }
                                 },
                                 tooltip = it.displayName()
@@ -152,9 +141,9 @@ fun Appearance() {
                                     modifier = Modifier
                                         .size(32.dp)
                                         .clip(RoundedCornerShape(16.dp))
-                                        .background(customColor)
+                                        .background(AppSettings.customColor.value)
                                 ) {
-                                    if (accentColor == it) {
+                                    if (AppSettings.accentColor.value == it) {
                                         Icon(
                                             imageVector = icons().check,
                                             contentDescription = it.displayName(),
@@ -178,8 +167,7 @@ fun Appearance() {
                         } else {
                             IconButton(
                                 onClick = {
-                                    accentColor = it
-                                    AppContext.setAccentColor(it)
+                                    AppSettings.accentColor.value = it
                                 },
                                 tooltip = it.displayName()
                             ) {
@@ -187,9 +175,9 @@ fun Appearance() {
                                     modifier = Modifier
                                         .size(32.dp)
                                         .clip(RoundedCornerShape(16.dp))
-                                        .background(it.primary(theme.isDark()))
+                                        .background(it.primary(dark))
                                 ) {
-                                    if (accentColor == it) {
+                                    if (AppSettings.accentColor.value == it) {
                                         Icon(
                                             imageVector = icons().check,
                                             contentDescription = it.displayName(),
@@ -211,21 +199,8 @@ fun Appearance() {
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
-                val colors = remember(theme, darkColors, lightColors) {
-                    if (dark) darkColors else lightColors
-                }
-                val setColors: (UserColors) -> Unit = remember(theme, darkColors, lightColors) {
-                    if (dark) {
-                        {
-                            darkColors = it
-                            AppContext.setDarkColors(it)
-                        }
-                    } else {
-                        {
-                            lightColors = it
-                            AppContext.setLightColors(it)
-                        }
-                    }
+                val colors = remember(AppSettings.theme.value, AppSettings.darkColors.value, AppSettings.lightColors.value) {
+                    if (dark) AppSettings.darkColors else AppSettings.lightColors
                 }
 
                 Row(
@@ -245,10 +220,10 @@ fun Appearance() {
                         ) {
                             Text(strings().settings.appearance.background())
                             CustomColorSelector(
-                                colors.background ?: MaterialTheme.colorScheme.background,
+                                colors.value.background ?: MaterialTheme.colorScheme.background,
                                 strings().settings.appearance.backgroundTooltip(),
                                 {
-                                    setColors(colors.copy(background = it))
+                                    colors.value = colors.value.copy(background = it)
                                 },
                                 {
                                     colorPicker = it
@@ -262,10 +237,10 @@ fun Appearance() {
                         ) {
                             Text(strings().settings.appearance.container())
                             CustomColorSelector(
-                                colors.secondaryContainer ?: MaterialTheme.colorScheme.secondaryContainer,
+                                colors.value.secondaryContainer ?: MaterialTheme.colorScheme.secondaryContainer,
                                 strings().settings.appearance.containerTooltip(),
                                 {
-                                    setColors(colors.copy(secondaryContainer = it))
+                                    colors.value = colors.value.copy(secondaryContainer = it)
                                 },
                                 {
                                     colorPicker = it
@@ -287,22 +262,22 @@ fun Appearance() {
                             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                         ) {
                             CustomColorSelector(
-                                colors.contentColors?.light ?: MaterialTheme.colorScheme.contentColors.light,
+                                colors.value.contentColors?.light ?: MaterialTheme.colorScheme.contentColors.light,
                                 strings().settings.appearance.textLight(),
                                 {
-                                    val contentColors = colors.contentColors?.copy(light = it) ?: ContentColors(light = it)
-                                    setColors(colors.copy(contentColors = contentColors))
+                                    val contentColors = colors.value.contentColors?.copy(light = it) ?: ContentColors(light = it)
+                                    colors.value = colors.value.copy(contentColors = contentColors)
                                 },
                                 {
                                     colorPicker = it
                                 }
                             )
                             CustomColorSelector(
-                                colors.contentColors?.dark ?: MaterialTheme.colorScheme.contentColors.dark,
+                                colors.value.contentColors?.dark ?: MaterialTheme.colorScheme.contentColors.dark,
                                 strings().settings.appearance.textDark(),
                                 {
-                                    val contentColors = colors.contentColors?.copy(dark = it) ?: ContentColors(dark = it)
-                                    setColors(colors.copy(contentColors = contentColors))
+                                    val contentColors = colors.value.contentColors?.copy(dark = it) ?: ContentColors(dark = it)
+                                    colors.value = colors.value.copy(contentColors = contentColors)
                                 },
                                 {
                                     colorPicker = it
@@ -314,7 +289,7 @@ fun Appearance() {
                     IconButton(
                         icon = icons().reset,
                         onClick = {
-                            setColors(UserColors())
+                            colors.value = UserColors()
                         },
                         tooltip = strings().settings.appearance.reset()
                     )
@@ -343,12 +318,12 @@ fun Appearance() {
                     2000
                 )
             }
-            val currentScalingIndex = remember(appSettings().displayScale) {
+            val currentScalingIndex = remember(AppSettings.displayScale.value) {
                 var nearest = 7
                 var distance = Int.MAX_VALUE
                 displayScales.forEachIndexed { index, displayScale ->
-                    if (abs(appSettings().displayScale - displayScale) < distance) {
-                        distance = appSettings().displayScale - displayScale
+                    if (abs(AppSettings.displayScale.value - displayScale) < distance) {
+                        distance =AppSettings.displayScale.value - displayScale
                         nearest = index
                     }
                 }
@@ -363,18 +338,18 @@ fun Appearance() {
                 IconButton(
                     onClick = {
                         if (currentScalingIndex > 0) {
-                            appSettings().displayScale = displayScales[currentScalingIndex - 1]
+                            AppSettings.displayScale.value = displayScales[currentScalingIndex - 1]
                         }
                     },
                     icon = icons().minus,
                     tooltip = strings().settings.appearance.decrement(),
                     enabled = currentScalingIndex > 0
                 )
-                Text(strings().settings.appearance.scaling(appSettings().displayScale))
+                Text(strings().settings.appearance.scaling(AppSettings.displayScale.value))
                 IconButton(
                     onClick = {
                         if (currentScalingIndex < displayScales.size - 1) {
-                            appSettings().displayScale = displayScales[currentScalingIndex + 1]
+                            AppSettings.displayScale.value = displayScales[currentScalingIndex + 1]
                         }
                     },
                     icon = icons().plus,
@@ -383,7 +358,7 @@ fun Appearance() {
                 )
             }
 
-            if (appSettings().displayScale < 1000 || appSettings().displayScale > 1300) {
+            if (AppSettings.displayScale.value < 1000 || AppSettings.displayScale.value > 1300) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -395,7 +370,7 @@ fun Appearance() {
                         modifier = Modifier.size(18.dp).offset(y = (-1).dp)
                     )
                     Text(
-                        if (appSettings().displayScale < 1000)
+                        if (AppSettings.displayScale.value < 1000)
                             strings().settings.appearance.smallHint()
                         else
                             strings().settings.appearance.largeHint(),

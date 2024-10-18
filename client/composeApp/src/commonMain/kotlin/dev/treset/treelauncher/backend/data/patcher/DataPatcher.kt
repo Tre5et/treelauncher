@@ -1,8 +1,8 @@
 package dev.treset.treelauncher.backend.data.patcher
 
+import dev.treset.treelauncher.backend.config.AppSettings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
@@ -14,7 +14,6 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.localization.strings
 import java.io.IOException
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KMutableProperty0
 
 class DataPatcher {
@@ -52,7 +51,7 @@ class DataPatcher {
         val applies: () -> Boolean
     ) {
         constructor(function: (StatusProvider) -> Unit, vararg version: Version) : this(function, {
-            version.any { appConfig().dataVersion >= it && Version.fromString(appSettings().dataVersion) < it }
+            version.any { appConfig().dataVersion >= it && Version.fromString(AppSettings.dataVersion.value) < it }
         })
 
         fun execute(statusProvider: StatusProvider) {
@@ -86,7 +85,7 @@ class DataPatcher {
 
         val statusProvider = StatusProvider(null, 0, onStatus)
 
-        LOGGER.info { "Performing data upgrade: v${appSettings().dataVersion} -> v${appConfig().dataVersion} " }
+        LOGGER.info { "Performing data upgrade: v${AppSettings.dataVersion.value} -> v${appConfig().dataVersion} " }
         if(backup) {
             backupFiles(statusProvider)
         }
@@ -516,8 +515,8 @@ class DataPatcher {
         LOGGER.info { "Upgrading settings..." }
         val upgradeSettingsProvider = statusProvider.subStep(PatchStep.UPGRADE_SETTINGS, 1)
         upgradeSettingsProvider.next()
-        appSettings().dataVersion = appConfig().dataVersion.toString()
-        appSettings().save()
+        AppSettings.dataVersion.value = appConfig().dataVersion.toString()
+        AppSettings.save()
         upgradeSettingsProvider.finish()
         LOGGER.info { "Upgraded settings" }
     }

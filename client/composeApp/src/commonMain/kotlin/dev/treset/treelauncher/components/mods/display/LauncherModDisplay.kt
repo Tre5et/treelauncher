@@ -5,7 +5,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.mods.*
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.mods.ModDownloader
 import dev.treset.treelauncher.backend.util.ModProviderStatus
@@ -102,15 +102,15 @@ class LauncherModDisplay(
     fun checkForUpdates(): Boolean {
         versions?.let {
             if (it.isNotEmpty()) {
-                if (appSettings().isModsUpdate) {
+                if (AppSettings.isModsUpdate.value) {
                     if (currentVersion.versionNumber != it.first().versionNumber) {
                         downloadVersion(it.first())
                     }
-                    if(appSettings().isModsEnable && !enabled) {
+                    if(AppSettings.isModsEnable.value && !enabled) {
                         changeEnabled()
                     }
                 }
-            } else if(appSettings().isModsDisable && enabled) {
+            } else if(AppSettings.isModsDisable.value && enabled) {
                 changeEnabled()
             }
         }

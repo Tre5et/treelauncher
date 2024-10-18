@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.treelauncher.AppContext
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.LauncherModSortType
-import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.EmptyingJobQueue
@@ -72,14 +72,7 @@ fun Mods() {
     var showSearch by remember(selected) { mutableStateOf(false) }
     var checkUpdates by remember(selected) { mutableStateOf(0) }
 
-    var sort: LauncherModSortType by remember { mutableStateOf(appSettings().modSortType) }
-    var reverse by remember { mutableStateOf(appSettings().isModSortReverse) }
-
     var editingMod: LauncherMod? by remember(selected) { mutableStateOf(null) }
-
-    var listDisplay by remember { mutableStateOf(appSettings().modDetailsListDisplay) }
-
-    var providers by remember { mutableStateOf(appSettings().modProviders) }
 
     var droppedFile by remember { mutableStateOf<LauncherFile?>(null) }
 
@@ -111,10 +104,6 @@ fun Mods() {
 
             var redrawMods by remember(current) { mutableStateOf(0) }
 
-            val autoUpdate by remember { mutableStateOf(appSettings().isModsUpdate) }
-            val disableNoVersion by remember { mutableStateOf(appSettings().isModsDisable) }
-            val enableOnDownload by remember { mutableStateOf(appSettings().isModsEnable) }
-
             var searchContent by remember { mutableStateOf("") }
 
             var versions: List<MinecraftVersion> by remember(current) { mutableStateOf(emptyList()) }
@@ -127,9 +116,9 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(sort, reverse, redrawMods, providers, current.mods.size, current.versions) {
-                current.mods.sortedWith(sort.comparator).let {
-                    if(reverse) it.reversed() else it
+            val mods: List<LauncherMod> = remember(AppSettings.modSortType.value, AppSettings.isModSortReverse.value, redrawMods, AppSettings.modrinthStatus.value, AppSettings.curseforgeSatus.value, current.mods.size, current.versions) {
+                current.mods.sortedWith(AppSettings.modSortType.value.comparator).let {
+                    if(AppSettings.isModSortReverse.value) it.reversed() else it
                 }
             }
 
@@ -144,14 +133,14 @@ fun Mods() {
                 }
             }
 
-            val modContext = remember(current, current.versions, types, autoUpdate, disableNoVersion, enableOnDownload, providers) {
+            val modContext = remember(current, current.versions, types, AppSettings.isModsUpdate.value, AppSettings.isModsDisable.value, AppSettings.isModsEnable.value, AppSettings.modrinthStatus.value, AppSettings.curseforgeSatus.value) {
                 ModContext(
-                    autoUpdate,
-                    disableNoVersion,
-                    enableOnDownload,
+                    AppSettings.isModsUpdate.value,
+                    AppSettings.isModsDisable.value,
+                    AppSettings.isModsEnable.value,
                     current.versions!!,
                     types,
-                    providers.filter { it.second }.map { it.first },
+                    AppSettings.modProviders.filter { it.second }.map { it.first },
                     LauncherFile.of(current.directory, "mods")
                 ) { element ->
                     updateQueue.add(element)
@@ -230,7 +219,7 @@ fun Mods() {
                             }.start()
                         }
 
-                        if(appSettings().isModsUpdate) {
+                        if(AppSettings.isModsUpdate.value) {
                             notViewedMods = emptyList()
                             toUpdateMods = it
                             updateToUpdate()
@@ -331,7 +320,7 @@ fun Mods() {
                                     element = mod
                                 ) {
                                     ModButton(
-                                        display = listDisplay,
+                                        display = AppSettings.modDetailsListDisplay.value,
                                     ) {
                                         editingMod = mod.mod
                                     }
@@ -563,40 +552,32 @@ fun Mods() {
                             MaterialTheme.typography.bodyMedium
                         ) {
 
-                            var update by remember { mutableStateOf(appSettings().isModsUpdate) }
-                            var enable by remember { mutableStateOf(appSettings().isModsEnable) }
-                            var disable by remember { mutableStateOf(appSettings().isModsDisable) }
-
                             TitledCheckBox(
                                 strings().manager.mods.update.auto(),
-                                update,
+                                AppSettings.isModsUpdate.value,
                                 {
-                                    update = it
-                                    appSettings().isModsUpdate = it
+                                    AppSettings.isModsUpdate.value = it
                                     if (!it) {
-                                        enable = false
-                                        appSettings().isModsEnable = false
+                                        AppSettings.isModsEnable.value = false
                                     }
                                 }
                             )
 
-                            if(update) {
+                            if(AppSettings.isModsUpdate.value) {
                                 TitledCheckBox(
                                     strings().manager.mods.update.enable(),
-                                    enable,
+                                    AppSettings.isModsEnable.value,
                                     {
-                                        enable = it
-                                        appSettings().isModsEnable = it
+                                        AppSettings.isModsEnable.value = it
                                     }
                                 )
                             }
 
                             TitledCheckBox(
                                 strings().manager.mods.update.disable(),
-                                disable,
+                                AppSettings.isModsDisable.value,
                                 {
-                                    disable = it
-                                    appSettings().isModsDisable = it
+                                    AppSettings.isModsDisable.value = it
                                 }
                             )
                         }
@@ -682,7 +663,7 @@ fun Mods() {
                         ProvideTextStyle(
                             MaterialTheme.typography.bodyMedium
                         ) {
-                            providers.forEachIndexed { i,  provider ->
+                            AppSettings.modProviders.forEachIndexed { i,  provider ->
                                 when(provider.first) {
                                     ModProvider.MODRINTH -> Row(
                                             verticalAlignment = Alignment.CenterVertically,
@@ -690,8 +671,7 @@ fun Mods() {
                                         ) {
                                             IconButton(
                                                 onClick = {
-                                                    providers = providers.reversed()
-                                                    appSettings().modProviders = providers
+                                                    AppSettings.modProviders = AppSettings.modProviders.reversed()
                                                 },
                                                 icon = icons().down,
                                                 size = 20.dp,
@@ -701,17 +681,16 @@ fun Mods() {
 
                                             IconButton(
                                                 onClick = {
-                                                    providers = providers.map {
+                                                    AppSettings.modProviders = AppSettings.modProviders.map {
                                                         if(it.first == ModProvider.MODRINTH) {
                                                             it.first to !it.second
                                                         } else it
                                                     }
-                                                    appSettings().modProviders = providers
                                                 },
                                                 icon = if(provider.second) icons().minus else icons().plus,
                                                 size = 20.dp,
                                                 tooltip = strings().manager.mods.settings.state(provider.second),
-                                                enabled = !provider.second || providers.firstOrNull { it.first == ModProvider.CURSEFORGE }?.second ?: false
+                                                enabled = !provider.second || AppSettings.modProviders.firstOrNull { it.first == ModProvider.CURSEFORGE }?.second ?: false
                                             )
 
                                             Text(
@@ -734,8 +713,7 @@ fun Mods() {
                                     ) {
                                         IconButton(
                                             onClick = {
-                                                providers = providers.reversed()
-                                                appSettings().modProviders = providers
+                                                AppSettings.modProviders = AppSettings.modProviders.reversed()
                                             },
                                             icon = icons().down,
                                             size = 20.dp,
@@ -745,17 +723,16 @@ fun Mods() {
 
                                         IconButton(
                                             onClick = {
-                                                providers = providers.map {
+                                                AppSettings.modProviders = AppSettings.modProviders.map {
                                                     if(it.first == ModProvider.CURSEFORGE) {
                                                         it.first to !it.second
                                                     } else it
                                                 }
-                                                appSettings().modProviders = providers
                                             },
                                             icon = if(provider.second) icons().minus else icons().plus,
                                             size = 20.dp,
                                             tooltip = strings().manager.mods.settings.state(provider.second),
-                                            enabled = !provider.second || providers.firstOrNull { it.first == ModProvider.MODRINTH }?.second ?: false
+                                            enabled = !provider.second || AppSettings.modProviders.firstOrNull { it.first == ModProvider.MODRINTH }?.second ?: false
                                         )
 
                                         Text(
@@ -804,24 +781,21 @@ fun Mods() {
                 SortBox(
                     sorts = LauncherModSortType.entries,
                     modifier = Modifier.align(Alignment.CenterEnd),
-                    selected = sort,
-                    reversed = reverse,
+                    selected = AppSettings.modSortType.value,
+                    reversed = AppSettings.isModSortReverse.value,
                     onSelected = {
-                        sort = it
-                        appSettings().modSortType = it
+                        AppSettings.modSortType.value = it
                     },
                     onReversed = {
-                        reverse = !reverse
-                        appSettings().isModSortReverse = reverse
+                        AppSettings.isModSortReverse.value = !AppSettings.isModSortReverse.value
                     }
                 )
 
                 ListDisplayBox(
                     displays = DetailsListDisplay.entries,
-                    selected = listDisplay,
+                    selected = AppSettings.modDetailsListDisplay.value,
                     onSelected = {
-                        listDisplay = it
-                        appSettings().modDetailsListDisplay = it
+                        AppSettings.modDetailsListDisplay.value = it
                     },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
@@ -854,10 +828,10 @@ fun Mods() {
             }
         },
         sortContext = SortContext(
-            getSortType = { appSettings().modComponentSortType },
-            setSortType = { appSettings().modComponentSortType = it },
-            getReverse = { appSettings().isModComponentSortReverse },
-            setReverse = { appSettings().isModComponentSortReverse = it }
+            getSortType = { AppSettings.modComponentSortType.value },
+            setSortType = { AppSettings.modComponentSortType.value = it },
+            getReverse = { AppSettings.isModComponentSortReverse.value },
+            setReverse = { AppSettings.isModComponentSortReverse.value = it }
         )
     )
 }

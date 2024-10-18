@@ -2,7 +2,7 @@ package dev.treset.treelauncher.localization
 
 import dev.treset.mcdl.auth.AuthenticationStep
 import dev.treset.mcdl.saves.Save
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -27,7 +27,7 @@ class LanguageInfo {
     var appLanguage: Language = systemLanguage
         set(value) {
             field = value
-            appSettings().language = value
+            AppSettings.language.value = value
             strings = when(value) {
                 Language.ENGLISH -> Strings()
                 Language.GERMAN -> DeStrings()
@@ -763,24 +763,24 @@ open class Strings(
         data class Discord(
             val versionLoader: (String, String) -> String = {version, modLoader ->
                 val builder = StringBuilder()
-                if(appSettings().discordShowVersion) {
+                if(AppSettings.discordShowVersion.value) {
                     builder.append(version)
                 }
 
-                if(appSettings().discordShowVersion && appSettings().discordShowModLoader && modLoader != "vanilla") {
+                if(AppSettings.discordShowVersion.value && AppSettings.discordShowModLoader.value && modLoader != "vanilla") {
                     builder.append(" ")
                 }
 
-                if(appSettings().discordShowModLoader && modLoader != "vanilla") {
+                if(AppSettings.discordShowModLoader.value && modLoader != "vanilla") {
                     builder.append(modLoader)
                 }
                 builder.toString()
             },
             val details: (String, String, String) -> String = { name, version, modLoader ->
                 val builder = StringBuilder()
-                if(appSettings().discordShowInstance) {
+                if(AppSettings.discordShowInstance.value) {
                     builder.append(name)
-                    if(appSettings().discordShowVersion || appSettings().discordShowModLoader && modLoader != "vanilla") {
+                    if(AppSettings.discordShowVersion.value || AppSettings.discordShowModLoader.value && modLoader != "vanilla") {
                         builder.append(" (")
                         builder.append(versionLoader(version, modLoader))
                         builder.append(")")
@@ -788,7 +788,7 @@ open class Strings(
                 } else {
                     builder.append(versionLoader(version, modLoader))
                 }
-                if(appSettings().discordShowWatermark) {
+                if(AppSettings.discordShowWatermark.value) {
                     builder.append(strings().settings.discord.watermark())
                 }
                 builder.toString()

@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.news.News
 import dev.treset.treelauncher.backend.news.news
 import dev.treset.treelauncher.generic.Button
@@ -40,7 +40,7 @@ fun News(
     LaunchedEffect(Unit) {
         try {
             currentNews = news().also { nws ->
-                if (nws.important?.map { it.id }?.allContainedIn(appSettings().acknowledgedNews) == false) {
+                if (nws.important?.map { it.id }?.allContainedIn(AppSettings.acknowledgedNews) == false) {
                     notification = NotificationData(
                         onClick = {
                             newOnly = false
@@ -63,7 +63,7 @@ fun News(
             content = {
                 val important = remember(currentNews) {
                     if(newOnly) {
-                        currentNews?.important?.filter { !appSettings().acknowledgedNews.contains(it.id) }
+                        currentNews?.important?.filter { !AppSettings.acknowledgedNews.contains(it.id) }
                     } else {
                         currentNews?.important
                     }
@@ -134,8 +134,8 @@ fun News(
                         popupVisible = false
                         notification?.let { AppContext.dismissNotification(it) }
                         currentNews?.important?.forEach {
-                            if(!appSettings().acknowledgedNews.contains(it.id)) {
-                                appSettings().acknowledgedNews.add(it.id)
+                            if(!AppSettings.acknowledgedNews.contains(it.id)) {
+                                AppSettings.acknowledgedNews.add(it.id)
                             }
                         }
                     }

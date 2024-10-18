@@ -2,14 +2,14 @@ package dev.treset.treelauncher.backend.update
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.json.JsonUtils
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.getUpdaterProcess
 import java.io.IOException
 import java.nio.file.Paths
 
 class LauncherUpdater {
-    private var updateService: UpdateService = UpdateService(appSettings().updateUrl)
+    private var updateService: UpdateService = UpdateService(AppSettings.updateUrl.value)
     private var update: Update? = null
     private var readyToUpdate = false
 
@@ -20,7 +20,7 @@ class LauncherUpdater {
 
     @Throws(IOException::class)
     fun fetchUpdate(): Update {
-        updateService = UpdateService(appSettings().updateUrl)
+        updateService = UpdateService(AppSettings.updateUrl.value)
         updateService.update().let {
             update = it
             return it

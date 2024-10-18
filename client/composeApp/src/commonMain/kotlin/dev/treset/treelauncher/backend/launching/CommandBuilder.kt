@@ -2,7 +2,7 @@ package dev.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.auth.data.UserData
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.QuickPlayData
@@ -303,7 +303,7 @@ class CommandBuilder(
             }
 
             "clientid" -> {
-                appSettings().clientId
+                AppSettings.clientId.value
             }
 
             "user_type" -> {

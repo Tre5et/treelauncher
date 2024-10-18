@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.saves.Save
 import dev.treset.mcdl.saves.Server
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
@@ -52,9 +52,6 @@ fun Saves() {
 
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
-
-
-    var listDisplay by remember { mutableStateOf(appSettings().savesDetailsListDisplay) }
 
     LaunchedEffect(showAdd) {
         if(!showAdd) {
@@ -163,7 +160,7 @@ fun Saves() {
                         SaveButton(
                             it.key,
                             selectedSave == it.key,
-                            display = listDisplay,
+                            display = AppSettings.savesDetailsListDisplay.value,
                             onDelete = {
                                 try {
                                     it.value.remove()
@@ -194,7 +191,7 @@ fun Saves() {
                         ServerButton(
                             it,
                             selectedServer == it,
-                            display = listDisplay,
+                            display = AppSettings.savesDetailsListDisplay.value,
                         ) {
                             selectedSave = null
                             selectedServer = if (selectedServer == it) {
@@ -302,10 +299,9 @@ fun Saves() {
                 ) {
                     ListDisplayBox(
                         DetailsListDisplay.entries,
-                        listDisplay,
+                        AppSettings.savesDetailsListDisplay.value,
                         {
-                            listDisplay = it
-                            appSettings().savesDetailsListDisplay = it
+                            AppSettings.savesDetailsListDisplay.value = it
                         }
                     )
                 }
@@ -319,10 +315,10 @@ fun Saves() {
         },
         detailsScrollable = displayData.saves.isNotEmpty() || displayData.servers.isNotEmpty() || showAdd,
         sortContext = SortContext(
-            getSortType = { appSettings().savesComponentSortType },
-            setSortType = { appSettings().savesComponentSortType = it },
-            getReverse = { appSettings().isSavesComponentSortReverse },
-            setReverse = { appSettings().isSavesComponentSortReverse = it }
+            getSortType = { AppSettings.savesComponentSortType.value },
+            setSortType = { AppSettings.savesComponentSortType.value = it },
+            getReverse = { AppSettings.isSavesComponentSortReverse.value },
+            setReverse = { AppSettings.isSavesComponentSortReverse.value = it }
         )
     )
 }

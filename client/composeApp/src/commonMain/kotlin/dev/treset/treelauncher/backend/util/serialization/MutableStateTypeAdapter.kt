@@ -5,35 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.io.IOException
 import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 import java.util.*
-
-
-class MutableStateSerializer : JsonSerializer<MutableState<*>> {
-    override fun serialize(
-        state: MutableState<*>,
-        type: Type,
-        jsonSerializationContext: JsonSerializationContext
-    ): JsonElement {
-        return jsonSerializationContext.serialize(state.value)
-    }
-}
-
-class MutableStateDeserializer<T> : JsonDeserializer<MutableState<T>> {
-    @Throws(JsonParseException::class)
-    override fun deserialize(
-        jsonElement: JsonElement,
-        type: Type,
-        jsonDeserializationContext: JsonDeserializationContext
-    ): MutableState<T> {
-        val state = jsonDeserializationContext.deserialize<T>(jsonElement, object : TypeToken<T>() {}.type)
-        return mutableStateOf(state)
-    }
-}
 
 class MutableStateTypeAdapter<E>(
     private val adapter: TypeAdapter<E>

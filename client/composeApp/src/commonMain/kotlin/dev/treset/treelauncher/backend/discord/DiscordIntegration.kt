@@ -4,8 +4,8 @@ import de.jcm.discordgamesdk.Core
 import de.jcm.discordgamesdk.CreateParams
 import de.jcm.discordgamesdk.activity.Activity
 import de.jcm.discordgamesdk.activity.ActivityType
+import dev.treset.treelauncher.backend.config.AppSettings
 import io.github.oshai.kotlinlogging.KotlinLogging
-import dev.treset.treelauncher.backend.config.appSettings
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.localization.strings
 import java.time.Instant
@@ -40,7 +40,7 @@ class DiscordIntegration {
     }
 
     fun activateActivity(instance: InstanceData) {
-        if(!appSettings().discordIntegration) {
+        if(!AppSettings.discordIntegration.value) {
             return
         }
 
@@ -54,12 +54,12 @@ class DiscordIntegration {
             activity.details = constructDetailsString(instance)
 
             activity.assets().largeImage = "pack"
-            if (appSettings().discordShowModLoader) {
+            if (AppSettings.discordShowModLoader.value) {
                 activity.assets().smallImage = instance.versionComponents[0].versionType
                 activity.assets().smallText = instance.versionComponents[0].versionType
             }
 
-            if (appSettings().discordShowTime) {
+            if (AppSettings.discordShowTime.value) {
                 activity.timestamps().start = Instant.now()
             }
             try {

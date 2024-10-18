@@ -8,7 +8,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.localization.strings
 import org.jetbrains.jewel.intui.window.styling.dark
 import org.jetbrains.jewel.intui.window.styling.light
@@ -43,7 +43,7 @@ enum class AccentColor(val primary: (dark: Boolean) -> Color, val displayName: (
         { strings().theme.magenta() }
     ),
     CUSTOM(
-        { appSettings().customColor },
+        { AppSettings.customColor.value },
         { strings().theme.custom() }
     );
 

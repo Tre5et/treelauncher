@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.appSettings
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.update.updater
 import dev.treset.treelauncher.backend.util.string.openInBrowser
 import dev.treset.treelauncher.generic.*
@@ -59,8 +59,8 @@ fun Update() {
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    if(appSettings().isDebug) {
-                        appSettings().isDebug = false
+                    if(AppSettings.isDebug) {
+                        AppSettings.isDebug = false
                         NavigationContext.navigateTo(NavigationState.INSTANCES)
                         AppContext.addNotification(
                             NotificationData(
@@ -85,7 +85,7 @@ fun Update() {
                         }
                         lastClick = now
                         if (consecutiveClicks >= 5) {
-                            appSettings().isDebug = true
+                            AppSettings.isDebug = true
                             NavigationContext.navigateTo(NavigationState.INSTANCES)
                             AppContext.addNotification(
                                 NotificationData(
