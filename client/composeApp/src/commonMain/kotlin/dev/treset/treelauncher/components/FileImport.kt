@@ -29,7 +29,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.Strings
+import dev.treset.treelauncher.localization.StringsEn
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -42,7 +42,7 @@ fun <T> FileImport(
     getDisplayName: T.() -> String,
     addFiles: (List<Pair<T?, LauncherFile>>) -> Unit,
     icon: ImageVector,
-    stringPackage: Strings.Manager.Component.ImportStrings,
+    stringPackage: StringsEn.Manager.Component.ImportStrings,
     allowFilePicker: Boolean = true,
     allowDirectoryPicker: Boolean = false,
     fileExtensions: List<String> = listOf(),
@@ -78,7 +78,7 @@ fun <T> FileImport(
     toFile: LauncherFile.() -> T?,
     getDisplayName: T.() -> String,
     icon: ImageVector,
-    stringPackage: Strings.Manager.Component.ImportStrings,
+    stringPackage: StringsEn.Manager.Component.ImportStrings,
     allowFilePicker: Boolean = true,
     allowDirectoryPicker: Boolean = false,
     fileExtensions: List<String> = listOf(),

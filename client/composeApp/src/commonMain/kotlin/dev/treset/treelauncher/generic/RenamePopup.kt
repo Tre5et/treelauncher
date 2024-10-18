@@ -7,7 +7,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import dev.treset.treelauncher.backend.data.manifest.Component
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 @Composable
 fun RenamePopup(
@@ -18,14 +18,14 @@ fun RenamePopup(
 
     var tfName: String by remember { mutableStateOf(manifest.name) }
     PopupOverlay(
-        titleRow = { Text(strings().selector.component.rename.title()) },
+        titleRow = { Text(Strings.selector.component.rename.title()) },
         content = {
             TextBox(
                 tfName,
                 {
                     tfName = it
                 },
-                placeholder = strings().selector.component.rename.prompt(),
+                placeholder = Strings.selector.component.rename.prompt(),
                 modifier = Modifier.onKeyEvent {
                     if(it.key == Key.Enter && editValid(tfName)) {
                         manifest.name = tfName
@@ -42,7 +42,7 @@ fun RenamePopup(
                 },
                 color = MaterialTheme.colorScheme.error
             ) {
-                Text(strings().selector.component.rename.cancel())
+                Text(Strings.selector.component.rename.cancel())
             }
             Button(
                 onClick = {
@@ -51,7 +51,7 @@ fun RenamePopup(
                 },
                 enabled = editValid(tfName)
             ) {
-                Text(strings().selector.component.rename.confirm())
+                Text(Strings.selector.component.rename.confirm())
             }
         }
     )

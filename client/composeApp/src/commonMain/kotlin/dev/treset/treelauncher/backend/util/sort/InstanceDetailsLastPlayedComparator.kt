@@ -1,7 +1,7 @@
 package dev.treset.treelauncher.backend.util.sort
 
 import dev.treset.treelauncher.backend.data.InstanceData
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class InstanceDetailsLastPlayedComparator : Comparator<InstanceData> {
     override fun compare(o1: InstanceData, o2: InstanceData): Int {
@@ -14,5 +14,5 @@ class InstanceDetailsLastPlayedComparator : Comparator<InstanceData> {
         return secondLastPlayed.compareTo(firstLastPlayed)
     }
 
-    override fun toString(): String = strings().sortBox.sort.lastPlayed()
+    override fun toString(): String = Strings.sortBox.sort.lastPlayed()
 }

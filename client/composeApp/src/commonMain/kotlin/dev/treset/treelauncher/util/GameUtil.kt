@@ -7,7 +7,7 @@ import dev.treset.treelauncher.backend.launching.GameLauncher
 import dev.treset.treelauncher.backend.util.exception.GameLaunchException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.hovered
 import dev.treset.treelauncher.style.icons
 
@@ -44,8 +44,8 @@ class GameLaunchHelper(
     private fun onPrep() {
         AppContext.setGlobalPopup(
             PopupData(
-                titleRow = { Text(strings().selector.instance.game.preparingTitle()) },
-                content =  { Text(strings().selector.instance.game.preparingMessage()) },
+                titleRow = { Text(Strings.selector.instance.game.preparingTitle()) },
+                content =  { Text(Strings.selector.instance.game.preparingMessage()) },
             )
         )
     }
@@ -63,13 +63,13 @@ class GameLaunchHelper(
         AppContext.discord.activateActivity(launcher.instance)
         notification = NotificationData(
             content = {
-                Text(strings().selector.instance.game.runningNotification(launcher.instance))
+                Text(Strings.selector.instance.game.runningNotification(launcher.instance))
                 IconButton(
                     onClick = {
                         AppContext.files.gameDataDir.open()
                     },
                     icon = icons().folder,
-                    tooltip = strings().selector.instance.game.runningOpen(),
+                    tooltip = Strings.selector.instance.game.runningOpen(),
                     interactionTint = MaterialTheme.colorScheme.onPrimary.hovered()
                 )
                 IconButton(
@@ -77,7 +77,7 @@ class GameLaunchHelper(
                         launcher.stop()
                     },
                     icon = icons().close,
-                    tooltip = strings().selector.instance.game.runningStop(),
+                    tooltip = Strings.selector.instance.game.runningStop(),
                     interactionTint = MaterialTheme.colorScheme.error.hovered()
                 )
             },
@@ -91,11 +91,11 @@ class GameLaunchHelper(
         AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.ERROR,
-                titleRow = { Text(strings().selector.instance.game.errorTitle()) },
-                content =  { Text(strings().selector.instance.game.errorMessage(e.toString())) },
+                titleRow = { Text(Strings.selector.instance.game.errorTitle()) },
+                content =  { Text(Strings.selector.instance.game.errorMessage(e.toString())) },
                 buttonRow = { Button(
                     onClick = { AppContext.setGlobalPopup(null) },
-                    content = { Text(strings().selector.instance.game.crashClose()) }
+                    content = { Text(Strings.selector.instance.game.crashClose()) }
                 ) }
             )
         )
@@ -106,8 +106,8 @@ class GameLaunchHelper(
     private fun onGameExit() {
         AppContext.setGlobalPopup(
             PopupData(
-                titleRow = { Text(strings().selector.instance.game.exitingTitle()) },
-                content =  { Text(strings().selector.instance.game.exitingMessage()) },
+                titleRow = { Text(Strings.selector.instance.game.exitingTitle()) },
+                content =  { Text(Strings.selector.instance.game.exitingMessage()) },
             )
         )
         AppContext.setRunningInstance(null)
@@ -132,17 +132,17 @@ class GameLaunchHelper(
         AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.ERROR,
-                titleRow = { Text(strings().selector.instance.game.cleanupFailTitle()) },
-                content =  { Text(strings().selector.instance.game.cleanupFailMessage()) },
+                titleRow = { Text(Strings.selector.instance.game.cleanupFailTitle()) },
+                content =  { Text(Strings.selector.instance.game.cleanupFailMessage()) },
                 buttonRow = {
                     Button(
                         onClick = { callback(false) },
-                        content = { Text(strings().selector.instance.game.cleanupFailCancel()) },
+                        content = { Text(Strings.selector.instance.game.cleanupFailCancel()) },
                         color = MaterialTheme.colorScheme.error
                     )
                     Button(
                         onClick = { callback(true) },
-                        content = { Text(strings().selector.instance.game.cleanupFailRetry()) },
+                        content = { Text(Strings.selector.instance.game.cleanupFailRetry()) },
                     )
                 }
             )
@@ -155,16 +155,16 @@ class GameLaunchHelper(
         AppContext.setGlobalPopup(
             PopupData(
                 type = PopupType.WARNING,
-                titleRow = { Text(strings().selector.instance.game.crashTitle()) },
-                content =  { Text(strings().selector.instance.game.crashMessage(error)) },
+                titleRow = { Text(Strings.selector.instance.game.crashTitle()) },
+                content =  { Text(Strings.selector.instance.game.crashMessage(error)) },
                 buttonRow = {
                     Button(
                         onClick = { AppContext.setGlobalPopup(null) },
-                        content = { Text(strings().selector.instance.game.crashClose()) }
+                        content = { Text(Strings.selector.instance.game.crashClose()) }
                     )
                     Button(
                         onClick = { LauncherFile.of(launcher.instance.instance.directory, "crash-reports").open() },
-                        content = { Text(strings().selector.instance.game.crashReports()) }
+                        content = { Text(Strings.selector.instance.game.crashReports()) }
                     )
                 }
             )

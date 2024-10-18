@@ -27,7 +27,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledSwitch
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.GgSansFont
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.disabledContent
@@ -49,7 +49,7 @@ fun Discord() {
             LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             TitledSwitch(
-                title = strings().settings.discord.title(),
+                title = Strings.settings.discord.title(),
                 checked = AppSettings.discordIntegration.value,
                 onCheckedChange = {
                     AppSettings.discordIntegration.value = it
@@ -74,7 +74,7 @@ fun Discord() {
                         modifier = Modifier.width(IntrinsicSize.Max)
                     ) {
                         TitledSwitch(
-                            strings().settings.discord.instanceToggle(),
+                            Strings.settings.discord.instanceToggle(),
                             checked = AppSettings.discordShowInstance.value,
                             onCheckedChange = {
                                 AppSettings.discordShowInstance.value = it
@@ -84,7 +84,7 @@ fun Discord() {
                         )
 
                         TitledSwitch(
-                            strings().settings.discord.versionToggle(),
+                            Strings.settings.discord.versionToggle(),
                             checked = AppSettings.discordShowVersion.value,
                             onCheckedChange = {
                                 AppSettings.discordShowVersion.value = it
@@ -94,7 +94,7 @@ fun Discord() {
                         )
 
                         TitledSwitch(
-                            strings().settings.discord.modLoaderToggle(),
+                            Strings.settings.discord.modLoaderToggle(),
                             checked = AppSettings.discordShowModLoader.value,
                             onCheckedChange = {
                                 AppSettings.discordShowModLoader.value = it
@@ -104,7 +104,7 @@ fun Discord() {
                         )
 
                         TitledSwitch(
-                            strings().settings.discord.timeToggle(),
+                            Strings.settings.discord.timeToggle(),
                             checked = AppSettings.discordShowTime.value,
                             onCheckedChange = {
                                 AppSettings.discordShowTime.value = it
@@ -114,7 +114,7 @@ fun Discord() {
                         )
 
                         TitledSwitch(
-                            strings().settings.discord.watermarkToggle(),
+                            Strings.settings.discord.watermarkToggle(),
                             checked = AppSettings.discordShowWatermark.value,
                             onCheckedChange = {
                                 AppSettings.discordShowWatermark.value = it
@@ -168,10 +168,10 @@ fun Discord() {
                             )
 
                             val details = remember(AppSettings.discordShowInstance.value, AppSettings.discordShowVersion.value, AppSettings.discordShowModLoader.value, AppSettings.discordShowWatermark.value) {
-                                strings().settings.discord.details(
-                                    strings().settings.discord.instanceExample(),
-                                    strings().settings.discord.versionExample(),
-                                    strings().settings.discord.modLoaderExample()
+                                Strings.settings.discord.details(
+                                    Strings.settings.discord.instanceExample(),
+                                    Strings.settings.discord.versionExample(),
+                                    Strings.settings.discord.modLoaderExample()
                                 )
                             }
 
@@ -186,7 +186,7 @@ fun Discord() {
                             }
                             if (AppSettings.discordShowTime.value) {
                                 Text(
-                                    strings().settings.discord.timeExample() + strings().settings.discord.timeSuffix(),
+                                    Strings.settings.discord.timeExample() + Strings.settings.discord.timeSuffix(),
                                     style = textStyle,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,

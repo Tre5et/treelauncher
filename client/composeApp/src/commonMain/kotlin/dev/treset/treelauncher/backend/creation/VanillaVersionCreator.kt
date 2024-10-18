@@ -11,7 +11,7 @@ import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
 
@@ -27,7 +27,7 @@ class VanillaVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new vanilla version: id=${data.versionId}..." }
-        statusProvider.next(strings().creator.status.message.vanillaVersion())
+        statusProvider.next(Strings.creator.status.message.vanillaVersion())
         val version = VersionComponent(
             id = id,
             name = data.name,
@@ -195,7 +195,7 @@ class VanillaCreationData(
     files: LauncherFiles
 ): VersionCreationData(version.id, version.id, files)
 
-val VERSION_VANILLA = FormatStringProvider { strings().creator.status.version.vanilla() }
-val VERSION_ASSETS = FormatStringProvider { dev.treset.treelauncher.localization.strings().creator.status.version.assets() }
-val VERSION_LIBRARIES = FormatStringProvider { dev.treset.treelauncher.localization.strings().creator.status.version.libraries() }
-val VERSION_FILE = FormatStringProvider { dev.treset.treelauncher.localization.strings().creator.status.version.file() }
+val VERSION_VANILLA = FormatStringProvider { Strings.creator.status.version.vanilla() }
+val VERSION_ASSETS = FormatStringProvider { dev.treset.treelauncher.localization.Strings.creator.status.version.assets() }
+val VERSION_LIBRARIES = FormatStringProvider { dev.treset.treelauncher.localization.Strings.creator.status.version.libraries() }
+val VERSION_FILE = FormatStringProvider { dev.treset.treelauncher.localization.Strings.creator.status.version.file() }

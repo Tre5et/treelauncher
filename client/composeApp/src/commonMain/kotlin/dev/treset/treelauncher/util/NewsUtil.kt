@@ -14,7 +14,7 @@ import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.NotificationData
 import dev.treset.treelauncher.generic.PopupOverlay
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.info
 import java.io.IOException
 
@@ -48,7 +48,7 @@ fun News(
                         },
                         color = notificationColor,
                         content = {
-                            Text(strings().news.notification())
+                            Text(Strings.news.notification())
                         },
                     ).also { AppContext.addNotification(it) }
                 }
@@ -79,7 +79,7 @@ fun News(
 
                     if (!important.isNullOrEmpty()) {
                         Text(
-                            strings().news.important(),
+                            Strings.news.important(),
                             style = MaterialTheme.typography.titleMedium,
                         )
 
@@ -101,7 +101,7 @@ fun News(
 
                     if (!other.isNullOrEmpty()) {
                         Text(
-                            strings().news.other(),
+                            Strings.news.other(),
                             style = MaterialTheme.typography.titleMedium
                         )
 
@@ -123,7 +123,7 @@ fun News(
 
                     if(other.isNullOrEmpty() && important.isNullOrEmpty()) {
                         Text(
-                            strings().news.none(),
+                            Strings.news.none(),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -140,7 +140,7 @@ fun News(
                         }
                     }
                 ) {
-                    Text(strings().news.close())
+                    Text(Strings.news.close())
                 }
             },
         )

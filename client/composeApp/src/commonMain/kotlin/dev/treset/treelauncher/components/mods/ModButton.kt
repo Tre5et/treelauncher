@@ -24,7 +24,7 @@ import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.SelectorButton
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.DownloadingIcon
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
@@ -116,7 +116,7 @@ fun ModDisplayData.ModButton(
                                     startDownload(selectedVersion)
                                 },
                                 icon = icons().download,
-                                tooltip = strings().manager.mods.card.download(),
+                                tooltip = Strings.manager.mods.card.download(),
                             )
                         }
 
@@ -143,7 +143,7 @@ fun ModDisplayData.ModButton(
                                 onEdit()
                             },
                             icon = icons().edit,
-                            tooltip = strings().manager.mods.card.edit(),
+                            tooltip = Strings.manager.mods.card.edit(),
                         )
 
                         IconButton(
@@ -151,7 +151,7 @@ fun ModDisplayData.ModButton(
                                 changeEnabled()
                             },
                             icon = icons().enabled.invoke(enabled),
-                            tooltip = strings().manager.mods.card.changeUsed(enabled),
+                            tooltip = Strings.manager.mods.card.changeUsed(enabled),
                         )
 
                         IconButton(
@@ -160,7 +160,7 @@ fun ModDisplayData.ModButton(
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().manager.mods.card.delete(),
+                            tooltip = Strings.manager.mods.card.delete(),
                         )
                     }
 
@@ -173,7 +173,7 @@ fun ModDisplayData.ModButton(
                                     it.openInBrowser()
                                 },
                                 icon = icons().browser,
-                                tooltip = strings().manager.mods.card.openBrowser()
+                                tooltip = Strings.manager.mods.card.openBrowser()
                             )
                         }
 
@@ -259,7 +259,7 @@ fun ModDisplayData.ModButton(
                                     startDownload(selectedVersion)
                                 },
                                 icon = icons().download,
-                                tooltip = strings().manager.mods.card.download(),
+                                tooltip = Strings.manager.mods.card.download(),
                             )
                         }
 
@@ -287,7 +287,7 @@ fun ModDisplayData.ModButton(
                                     it.openInBrowser()
                                 },
                                 icon = icons().browser,
-                                tooltip = strings().manager.mods.card.openBrowser()
+                                tooltip = Strings.manager.mods.card.openBrowser()
                             )
                         }
 
@@ -296,7 +296,7 @@ fun ModDisplayData.ModButton(
                                 onEdit()
                             },
                             icon = icons().edit,
-                            tooltip = strings().manager.mods.card.edit(),
+                            tooltip = Strings.manager.mods.card.edit(),
                         )
 
                         IconButton(
@@ -304,7 +304,7 @@ fun ModDisplayData.ModButton(
                                 changeEnabled()
                             },
                             icon = icons().enabled(enabled),
-                            tooltip = strings().manager.mods.card.changeUsed(enabled),
+                            tooltip = Strings.manager.mods.card.changeUsed(enabled),
                         )
 
                         IconButton(
@@ -313,7 +313,7 @@ fun ModDisplayData.ModButton(
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().manager.mods.card.delete(),
+                            tooltip = Strings.manager.mods.card.delete(),
                         )
 
                     }
@@ -349,7 +349,7 @@ fun ModDisplayData.ModButton(
                             startDownload(selectedVersion)
                         },
                         icon = icons().download,
-                        tooltip = strings().manager.mods.card.download(),
+                        tooltip = Strings.manager.mods.card.download(),
                     )
                 }
 
@@ -376,7 +376,7 @@ fun ModDisplayData.ModButton(
                             it.openInBrowser()
                         },
                         icon = icons().browser,
-                        tooltip = strings().manager.mods.card.openBrowser()
+                        tooltip = Strings.manager.mods.card.openBrowser()
                     )
                 }
 
@@ -385,7 +385,7 @@ fun ModDisplayData.ModButton(
                         onEdit()
                     },
                     icon = icons().edit,
-                    tooltip = strings().manager.mods.card.edit(),
+                    tooltip = Strings.manager.mods.card.edit(),
                 )
 
                 IconButton(
@@ -393,7 +393,7 @@ fun ModDisplayData.ModButton(
                         changeEnabled()
                     },
                     icon = icons().enabled(enabled),
-                    tooltip = strings().manager.mods.card.changeUsed(enabled),
+                    tooltip = Strings.manager.mods.card.changeUsed(enabled),
                 )
 
                 IconButton(
@@ -402,7 +402,7 @@ fun ModDisplayData.ModButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.mods.card.delete(),
+                    tooltip = Strings.manager.mods.card.delete(),
                 )
             }
         }

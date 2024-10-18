@@ -18,12 +18,12 @@ import dev.treset.mcdl.auth.InteractiveData
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.auth.UserAuth
 import dev.treset.treelauncher.backend.auth.userAuth
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.util.string.copyToClipboard
 import dev.treset.treelauncher.backend.util.string.openInBrowser
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Language
-import dev.treset.treelauncher.localization.language
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.style.info
@@ -63,7 +63,6 @@ fun LoginScreen(
     var interactiveData by remember { mutableStateOf<InteractiveData?>(null) }
     var loginStep by remember { mutableStateOf<AuthenticationStep?>(null) }
     var showContent by remember { mutableStateOf(false) }
-    var language by remember { mutableStateOf(language().appLanguage) }
 
     var updateChecked by remember { mutableStateOf(false) }
 
@@ -75,7 +74,7 @@ fun LoginScreen(
             color = notificationColor,
             content = {
                 Text(
-                    strings().login.offlineNotification(),
+                    Strings.login.offlineNotification(),
                     softWrap = true
                 )
             }
@@ -175,19 +174,19 @@ fun LoginScreen(
                     enabled = loginState.actionAllowed,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    key(language) {
-                        Text(strings().login.button())
+                    key(AppSettings.language.value) {
+                        Text(Strings.login.button())
                     }
                 }
                 TitledCheckBox(
-                    title = strings().login.keepLoggedIn(),
+                    title = Strings.login.keepLoggedIn(),
                     checked = keepLoggedIn,
                     onCheckedChange = { keepLoggedIn = it },
                     enabled = loginState.actionAllowed
                 )
 
                 Text(
-                    strings().login.offline(),
+                    Strings.login.offline(),
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f).let { if (loginState.actionAllowed) it else it.disabledContent() },
@@ -216,17 +215,17 @@ fun LoginScreen(
                     Text(
                         text = when (loginState) {
                             LoginState.NOT_LOGGED_IN -> ""
-                            LoginState.AUTHENTICATING -> strings().login.label.authenticating(loginStep)
-                            LoginState.LOGGED_IN -> strings().login.label.success(userAuth().minecraftUser?.username)
-                            LoginState.OFFLINE -> strings().login.label.offline()
-                            LoginState.FAILED -> strings().login.label.failure()
+                            LoginState.AUTHENTICATING -> Strings.login.label.authenticating(loginStep)
+                            LoginState.LOGGED_IN -> Strings.login.label.success(userAuth().minecraftUser?.username)
+                            LoginState.OFFLINE -> Strings.login.label.offline()
+                            LoginState.FAILED -> Strings.login.label.failure()
                         },
                         style = MaterialTheme.typography.titleMedium,
                     )
 
                     if(loginState == LoginState.AUTHENTICATING) {
                         Text(
-                            text = strings().login.label.authenticatingSub(loginStep),
+                            text = Strings.login.label.authenticatingSub(loginStep),
                             style = MaterialTheme.typography.labelMedium,
                         )
 
@@ -238,7 +237,7 @@ fun LoginScreen(
                             },
                             color = MaterialTheme.colorScheme.secondaryContainer,
                         ) {
-                            Text(strings().login.cancel())
+                            Text(Strings.login.cancel())
                         }
                     }
 
@@ -249,7 +248,7 @@ fun LoginScreen(
                             },
                             color = MaterialTheme.colorScheme.error,
                         ) {
-                            Text(strings().login.logout())
+                            Text(Strings.login.logout())
                         }
                     }
                 }
@@ -270,16 +269,15 @@ fun LoginScreen(
             ComboBox(
                 Language.entries,
                 onSelected = {
-                    language = it
-                    language().appLanguage = it
+                    AppSettings.language.value = it
                 },
-                selected = language,
+                selected = AppSettings.language.value,
                 toDisplayString = { displayName() },
                 decorated = false
             )
         }
 
-        val tip = remember { strings().login.tip() }
+        val tip = remember { Strings.login.tip() }
         Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
@@ -326,13 +324,13 @@ private fun LoginPopup(
 ) {
     PopupOverlay(
         type = PopupType.NONE,
-        titleRow = { Text(strings().login.popup.title() ) },
+        titleRow = { Text(Strings.login.popup.title() ) },
         buttonRow = {
             Button(
                 onClick = close,
                 color = MaterialTheme.colorScheme.error
             ) {
-                Text(strings().login.popup.close())
+                Text(Strings.login.popup.close())
             }
             Button(
                 onClick = {
@@ -340,11 +338,11 @@ private fun LoginPopup(
                     data.userCode.copyToClipboard()
                 }
             ) {
-                Text(strings().login.popup.open())
+                Text(Strings.login.popup.open())
             }
         }
     ) {
-        strings().login.popup.content().let {
+        Strings.login.popup.content().let {
             Text(it.first)
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -356,7 +354,7 @@ private fun LoginPopup(
                 IconButton(
                     onClick = { data.url.copyToClipboard() },
                     icon = icons().copy,
-                    tooltip = strings().login.popup.copyContent(),
+                    tooltip = Strings.login.popup.copyContent(),
                     modifier = Modifier.padding(start = 6.dp)
                 )
             }
@@ -371,7 +369,7 @@ private fun LoginPopup(
                 IconButton(
                     onClick = { data.userCode.copyToClipboard() },
                     icon = icons().copy,
-                    tooltip = strings().login.popup.copyContent(),
+                    tooltip = Strings.login.popup.copyContent(),
                     modifier = Modifier.padding(start = 6.dp)
                 )
             }

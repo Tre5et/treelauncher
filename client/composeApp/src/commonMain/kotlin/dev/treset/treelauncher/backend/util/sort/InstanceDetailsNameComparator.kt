@@ -1,12 +1,12 @@
 package dev.treset.treelauncher.backend.util.sort
 
 import dev.treset.treelauncher.backend.data.InstanceData
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class InstanceDetailsNameComparator : Comparator<InstanceData> {
     override fun compare(e1: InstanceData, e2: InstanceData): Int {
         return e1.instance.name.lowercase().compareTo(e2.instance.name.lowercase())
     }
 
-    override fun toString(): String = strings().sortBox.sort.name()
+    override fun toString(): String = Strings.sortBox.sort.name()
 }

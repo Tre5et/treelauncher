@@ -7,7 +7,7 @@ import de.jcm.discordgamesdk.activity.ActivityType
 import dev.treset.treelauncher.backend.config.AppSettings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.backend.data.InstanceData
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.time.Instant
 
 class DiscordIntegration {
@@ -73,7 +73,7 @@ class DiscordIntegration {
     }
 
     private fun constructDetailsString(instance: InstanceData): String {
-        return strings().settings.discord.details(instance.instance.name, instance.versionComponents[0].versionNumber, instance.versionComponents[0].versionType)
+        return Strings.settings.discord.details(instance.instance.name, instance.versionComponents[0].versionNumber, instance.versionComponents[0].versionType)
     }
 
     fun clearActivity() {

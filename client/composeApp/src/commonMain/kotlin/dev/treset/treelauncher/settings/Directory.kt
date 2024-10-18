@@ -15,7 +15,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
@@ -38,7 +38,7 @@ fun Directory() {
             LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                strings().settings.path.title(),
+                Strings.settings.path.title(),
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(bottom = 4.dp),
                 color = if (instanceRunning) LocalContentColor.current.disabledContent() else LocalContentColor.current
@@ -63,7 +63,7 @@ fun Directory() {
                         showDirPicker = true
                     },
                     icon = icons().folder,
-                    tooltip = strings().settings.path.select(),
+                    tooltip = Strings.settings.path.select(),
                     enabled = !instanceRunning
                 )
             }
@@ -86,7 +86,7 @@ fun Directory() {
                 verticalArrangement = Arrangement.spacedBy((-16).dp)
             ) {
                 TitledCheckBox(
-                    title = strings().settings.path.copyData(),
+                    title = Strings.settings.path.copyData(),
                     checked = copy,
                     onCheckedChange = {
                         copy = it
@@ -95,7 +95,7 @@ fun Directory() {
                 )
 
                 TitledCheckBox(
-                    title = strings().settings.path.remove(),
+                    title = Strings.settings.path.remove(),
                     checked = remove,
                     onCheckedChange = {
                         remove = it
@@ -111,18 +111,18 @@ fun Directory() {
                     if (!dir.isDirectory()) {
                         popupContent = PopupData(
                             type = PopupType.ERROR,
-                            titleRow = { Text(strings().settings.path.invalid()) },
+                            titleRow = { Text(Strings.settings.path.invalid()) },
                             buttonRow = {
                                 Button(
                                     onClick = { popupContent = null }
                                 ) {
-                                    Text(strings().settings.path.close())
+                                    Text(Strings.settings.path.close())
                                 }
                             }
                         )
                     } else {
                         popupContent = PopupData(
-                            titleRow = { Text(strings().settings.path.changing()) }
+                            titleRow = { Text(Strings.settings.path.changing()) }
                         )
 
                         Thread {
@@ -131,25 +131,25 @@ fun Directory() {
 
                                 popupContent = PopupData(
                                     type = PopupType.SUCCESS,
-                                    titleRow = { Text(strings().settings.path.success()) },
+                                    titleRow = { Text(Strings.settings.path.success()) },
                                     buttonRow = {
                                         Button(
                                             onClick = { popupContent = null }
                                         ) {
-                                            Text(strings().settings.path.close())
+                                            Text(Strings.settings.path.close())
                                         }
                                     }
                                 )
                             } catch (e: IOException) {
                                 popupContent = PopupData(
                                     type = PopupType.ERROR,
-                                    titleRow = { Text(strings().settings.path.errorTitle()) },
-                                    content = { Text(strings().settings.path.errorMessage(e)) },
+                                    titleRow = { Text(Strings.settings.path.errorTitle()) },
+                                    content = { Text(Strings.settings.path.errorMessage(e)) },
                                     buttonRow = {
                                         Button(
                                             onClick = { popupContent = null }
                                         ) {
-                                            Text(strings().settings.path.close())
+                                            Text(Strings.settings.path.close())
                                         }
                                     }
                                 )
@@ -160,7 +160,7 @@ fun Directory() {
                 enabled = !instanceRunning
             ) {
                 Text(
-                    strings().settings.path.apply()
+                    Strings.settings.path.apply()
                 )
             }
         }

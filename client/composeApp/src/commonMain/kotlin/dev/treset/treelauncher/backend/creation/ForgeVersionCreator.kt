@@ -11,7 +11,7 @@ import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
 
@@ -27,7 +27,7 @@ class ForgeVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new forge version: id=${data.installer.version}..." }
-        statusProvider.next(strings().creator.status.message.vanillaVersion())
+        statusProvider.next(Strings.creator.status.message.vanillaVersion())
 
         if(data.installer.installData.inheritsFrom == null) {
             throw IOException("Unable to create forge version: no valid forge version")
@@ -183,6 +183,6 @@ class ForgeCreationData(
     files: LauncherFiles
 ): VersionCreationData(installer.installData.id, installer.version, files)
 
-val VERSION_FORGE = FormatStringProvider { strings().creator.status.version.forge() }
-val VERSION_FORGE_LIBRARIES = FormatStringProvider { strings().creator.status.version.forgeLibraries() }
-val VERSION_FORGE_FILE = FormatStringProvider { strings().creator.status.version.forgeFile() }
+val VERSION_FORGE = FormatStringProvider { Strings.creator.status.version.forge() }
+val VERSION_FORGE_LIBRARIES = FormatStringProvider { Strings.creator.status.version.forgeLibraries() }
+val VERSION_FORGE_FILE = FormatStringProvider { Strings.creator.status.version.forgeFile() }

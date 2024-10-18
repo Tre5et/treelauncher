@@ -17,7 +17,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.Status
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -175,23 +175,23 @@ fun VersionSelector(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TitledComboBox(
-            title = strings().creator.version.version(),
+            title = Strings.creator.version.version(),
             items = minecraftVersions,
             loading = minecraftVersions.isEmpty(),
             selected = minecraftVersion,
             onSelected = { minecraftVersion = it },
-            placeholder = strings().creator.version.version(),
+            placeholder = Strings.creator.version.version(),
             allowSearch = true
         )
 
         TitledCheckBox(
-            title = strings().creator.version.showSnapshots(),
+            title = Strings.creator.version.showSnapshots(),
             checked = showSnapshots,
             onCheckedChange = { showSnapshots = it }
         )
 
         TitledComboBox(
-            title = strings().creator.version.type(),
+            title = Strings.creator.version.type(),
             items = VersionType.entries,
             onSelected = { versionType = it },
             selected = versionType,
@@ -200,25 +200,25 @@ fun VersionSelector(
         minecraftVersion?.let {
             if (versionType == VersionType.FABRIC) {
                     TitledComboBox(
-                        title = strings().creator.version.fabric(),
+                        title = Strings.creator.version.fabric(),
                         items = fabricVersions,
                         selected = fabricVersion,
                         onSelected = { fabricVersion = it },
                         loading = fabricVersions.isEmpty(),
-                        placeholder = strings().creator.version.fabric(),
-                        loadingPlaceholder = strings().creator.version.loading(),
+                        placeholder = Strings.creator.version.fabric(),
+                        loadingPlaceholder = Strings.creator.version.loading(),
                     )
             }
 
             if(versionType == VersionType.FORGE) {
                 TitledComboBox(
-                    title = strings().creator.version.forge(),
+                    title = Strings.creator.version.forge(),
                     items = forgeVersions,
                     selected = forgeVersion,
                     onSelected = { forgeVersion = it },
                     loading = forgeVersions.isEmpty(),
-                    placeholder = strings().creator.version.forge(),
-                    loadingPlaceholder = strings().creator.version.loading(),
+                    placeholder = Strings.creator.version.forge(),
+                    loadingPlaceholder = Strings.creator.version.loading(),
                     toDisplayString = {
                         val parts = this.split("-")
                         if(parts.size > 1) {
@@ -232,13 +232,13 @@ fun VersionSelector(
 
             if(versionType == VersionType.QUILT) {
                 TitledComboBox(
-                    title = strings().creator.version.quilt(),
+                    title = Strings.creator.version.quilt(),
                     items = quiltVersions,
                     selected = quiltVersion,
                     onSelected = { quiltVersion = it },
                     loading = quiltVersions.isEmpty(),
-                    placeholder = strings().creator.version.quilt(),
-                    loadingPlaceholder = strings().creator.version.loading(),
+                    placeholder = Strings.creator.version.quilt(),
+                    loadingPlaceholder = Strings.creator.version.loading(),
                     toDisplayString = { loader.version }
                 )
             }
@@ -270,7 +270,7 @@ fun VersionSelector(
                             || versionType == VersionType.FORGE && forgeVersion != defaultLoaderVersion
                             || versionType == VersionType.QUILT && quiltVersion?.let { it.loader.version != defaultLoaderVersion } ?: false
                         ),
-                tooltip = strings().changer.apply()
+                tooltip = Strings.changer.apply()
             )
         }
 
@@ -284,10 +284,10 @@ enum class VersionType(
     val id: String,
     val displayName: () -> String
 ) {
-    VANILLA("vanilla", { strings().version.vanilla() }),
-    FABRIC("fabric", { strings().version.fabric() }),
-    FORGE("forge", { strings().version.forge() }),
-    QUILT("quilt", { strings().version.quilt() });
+    VANILLA("vanilla", { Strings.version.vanilla() }),
+    FABRIC("fabric", { Strings.version.fabric() }),
+    FORGE("forge", { Strings.version.forge() }),
+    QUILT("quilt", { Strings.version.quilt() });
 
     override fun toString(): String {
         return displayName()

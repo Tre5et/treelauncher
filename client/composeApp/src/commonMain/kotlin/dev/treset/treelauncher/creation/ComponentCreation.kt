@@ -9,7 +9,7 @@ import dev.treset.treelauncher.backend.creation.ComponentCreator
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 open class CreationContent<T: Component>(
@@ -104,7 +104,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         TitledRadioButton(
-            text = strings().creator.radioCreate(),
+            text = Strings.creator.radioCreate(),
             selected = mode == CreationMode.NEW,
             onClick = { mode = CreationMode.NEW }
         )
@@ -113,12 +113,12 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
             onTextChanged = {
                 newName = it
             },
-            placeholder = strings().creator.name(),
+            placeholder = Strings.creator.name(),
             enabled = mode == CreationMode.NEW
         )
 
         TitledRadioButton(
-            text = strings().creator.radioInherit(),
+            text = Strings.creator.radioInherit(),
             selected = mode == CreationMode.INHERIT,
             onClick = { mode = CreationMode.INHERIT }
         )
@@ -127,7 +127,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
             onTextChanged = {
                 inheritName = it
             },
-            placeholder = strings().creator.name(),
+            placeholder = Strings.creator.name(),
             enabled = mode == CreationMode.INHERIT
         )
         ComboBox(
@@ -136,14 +136,14 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
             onSelected = {
                 inheritSelected = it
             },
-            placeholder = strings().creator.component(),
+            placeholder = Strings.creator.component(),
             toDisplayString = { name },
             enabled = mode == CreationMode.INHERIT
         )
 
         if(allowUse) {
             TitledRadioButton(
-                text = strings().creator.radioUse(),
+                text = Strings.creator.radioUse(),
                 selected = mode == CreationMode.USE,
                 onClick = { mode = CreationMode.USE }
             )
@@ -153,7 +153,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
                 onSelected = {
                     useSelected = it
                 },
-                placeholder = strings().creator.component(),
+                placeholder = Strings.creator.component(),
                 toDisplayString = { name },
                 enabled = mode == CreationMode.USE
             )
@@ -176,7 +176,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
                     }
                 }
             ) {
-                Text(strings().creator.buttonCreate())
+                Text(Strings.creator.buttonCreate())
             }
         }
 

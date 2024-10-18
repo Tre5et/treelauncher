@@ -12,38 +12,38 @@ import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 import kotlin.reflect.KMutableProperty0
 
 class DataPatcher {
 
     object PatchStep {
-        val CREATE_BACKUP = FormatStringProvider { strings().launcher.patch.status.createBackup() }
-        val UPGRADE_SETTINGS = FormatStringProvider { strings().launcher.patch.status.upgradeSettings() }
-        val GAME_DATA_COMPONENTS = FormatStringProvider { strings().launcher.patch.status.gameDataComponents() }
-        val GAME_DATA_SAVES = FormatStringProvider { strings().launcher.patch.status.gameDataSaves() }
-        val GAME_DATA_MODS = FormatStringProvider { strings().launcher.patch.status.gameDataMods() }
-        val REMOVE_BACKUP_EXCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.removeBackupIncludedFiles() }
-        val UPGRADE_COMPONENTS = FormatStringProvider { strings().launcher.patch.status.upgradeComponents() }
-        val UPGRADE_MAIN_MANIFEST = FormatStringProvider { strings().launcher.patch.status.upgradeMainManifest() }
-        val UPGRADE_INSTANCES = FormatStringProvider { strings().launcher.patch.status.upgradeInstances() }
-        val UPGRADE_SAVES = FormatStringProvider { strings().launcher.patch.status.upgradeSaves() }
-        val UPGRADE_RESOURCEPACKS = FormatStringProvider { strings().launcher.patch.status.upgradeResourcepacks() }
-        val UPGRADE_OPTIONS = FormatStringProvider { strings().launcher.patch.status.upgradeOptions() }
-        val UPGRADE_MODS = FormatStringProvider { strings().launcher.patch.status.upgradeMods() }
-        val UPGRADE_VERSIONS = FormatStringProvider { strings().launcher.patch.status.upgradeVersions() }
-        val UPGRADE_JAVA = FormatStringProvider { strings().launcher.patch.status.upgradeJavas() }
-        val COMPONENT_DIRECTORIES = FormatStringProvider { strings().launcher.patch.status.componentDirectories() }
-        val INCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.includedFiles() }
-        val INCLUDED_FILES_INSTANCE = FormatStringProvider { strings().launcher.patch.status.includedFilesInstances() }
-        val INCLUDED_FILES_SAVES = FormatStringProvider { strings().launcher.patch.status.includedFilesSaves() }
-        val INCLUDED_FILES_RESOURCEPACKS = FormatStringProvider { strings().launcher.patch.status.includedFilesResourcepacks() }
-        val INCLUDED_FILES_OPTIONS = FormatStringProvider { strings().launcher.patch.status.includedFilesOptions() }
-        val INCLUDED_FILES_MODS = FormatStringProvider { strings().launcher.patch.status.includedFilesMods() }
-        val REMOVE_RESOURCEPACKS_ARGUMENT = FormatStringProvider { strings().launcher.patch.status.removeResourcepacksArgument() }
-        val TEXTUREPACKS_INCLUDED_FILES = FormatStringProvider { strings().launcher.patch.status.texturepacksIncludedFiles() }
-        val REMOVE_LOGIN = FormatStringProvider { strings().launcher.patch.status.removeLogin() }
+        val CREATE_BACKUP = FormatStringProvider { Strings.launcher.patch.status.createBackup() }
+        val UPGRADE_SETTINGS = FormatStringProvider { Strings.launcher.patch.status.upgradeSettings() }
+        val GAME_DATA_COMPONENTS = FormatStringProvider { Strings.launcher.patch.status.gameDataComponents() }
+        val GAME_DATA_SAVES = FormatStringProvider { Strings.launcher.patch.status.gameDataSaves() }
+        val GAME_DATA_MODS = FormatStringProvider { Strings.launcher.patch.status.gameDataMods() }
+        val REMOVE_BACKUP_EXCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.removeBackupIncludedFiles() }
+        val UPGRADE_COMPONENTS = FormatStringProvider { Strings.launcher.patch.status.upgradeComponents() }
+        val UPGRADE_MAIN_MANIFEST = FormatStringProvider { Strings.launcher.patch.status.upgradeMainManifest() }
+        val UPGRADE_INSTANCES = FormatStringProvider { Strings.launcher.patch.status.upgradeInstances() }
+        val UPGRADE_SAVES = FormatStringProvider { Strings.launcher.patch.status.upgradeSaves() }
+        val UPGRADE_RESOURCEPACKS = FormatStringProvider { Strings.launcher.patch.status.upgradeResourcepacks() }
+        val UPGRADE_OPTIONS = FormatStringProvider { Strings.launcher.patch.status.upgradeOptions() }
+        val UPGRADE_MODS = FormatStringProvider { Strings.launcher.patch.status.upgradeMods() }
+        val UPGRADE_VERSIONS = FormatStringProvider { Strings.launcher.patch.status.upgradeVersions() }
+        val UPGRADE_JAVA = FormatStringProvider { Strings.launcher.patch.status.upgradeJavas() }
+        val COMPONENT_DIRECTORIES = FormatStringProvider { Strings.launcher.patch.status.componentDirectories() }
+        val INCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.includedFiles() }
+        val INCLUDED_FILES_INSTANCE = FormatStringProvider { Strings.launcher.patch.status.includedFilesInstances() }
+        val INCLUDED_FILES_SAVES = FormatStringProvider { Strings.launcher.patch.status.includedFilesSaves() }
+        val INCLUDED_FILES_RESOURCEPACKS = FormatStringProvider { Strings.launcher.patch.status.includedFilesResourcepacks() }
+        val INCLUDED_FILES_OPTIONS = FormatStringProvider { Strings.launcher.patch.status.includedFilesOptions() }
+        val INCLUDED_FILES_MODS = FormatStringProvider { Strings.launcher.patch.status.includedFilesMods() }
+        val REMOVE_RESOURCEPACKS_ARGUMENT = FormatStringProvider { Strings.launcher.patch.status.removeResourcepacksArgument() }
+        val TEXTUREPACKS_INCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.texturepacksIncludedFiles() }
+        val REMOVE_LOGIN = FormatStringProvider { Strings.launcher.patch.status.removeLogin() }
     }
 
     private class UpgradeFunction(

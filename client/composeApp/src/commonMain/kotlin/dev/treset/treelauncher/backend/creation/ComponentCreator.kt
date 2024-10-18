@@ -6,7 +6,7 @@ import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.*
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -103,7 +103,7 @@ abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
         data.component.copyData(new)
         new.write()
 
-        inheritProvider.next(strings().creator.status.message.inheritFiles())
+        inheritProvider.next(Strings.creator.status.message.inheritFiles())
         data.component.directory.listFiles().forEach {
             if(it.name != appConfig().manifestFileName) {
                 it.copyTo(LauncherFile.of(new.directory, it.name))
@@ -160,7 +160,7 @@ open class UseCreationData<T: Component>(
 ): CreationData(parent)
 
 object CreationStep {
-    val STARTING = FormatStringProvider { strings().creator.status.starting() }
-    val FINISHING = FormatStringProvider { strings().creator.status.finishing() }
+    val STARTING = FormatStringProvider { Strings.creator.status.starting() }
+    val FINISHING = FormatStringProvider { Strings.creator.status.finishing() }
 }
 

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 @Composable
 fun WindowReset() {
@@ -13,6 +13,6 @@ fun WindowReset() {
             AppContext.resetWindowSize()
         }
     ) {
-        Text(strings().settings.resetWindow())
+        Text(Strings.settings.resetWindow())
     }
 }

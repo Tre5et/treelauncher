@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Language
-import dev.treset.treelauncher.localization.language
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.HsvColor
 import org.jetbrains.jewel.ui.util.toRgbaHexString
@@ -35,8 +34,6 @@ class ColorPickerData(
 
 @Composable
 fun Appearance() {
-    var language by remember { mutableStateOf(language().appLanguage) }
-
     val dark = AppSettings.theme.value.isDark()
 
     var colorPicker: ColorPickerData? by remember { mutableStateOf(null) }
@@ -54,18 +51,17 @@ fun Appearance() {
             LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                strings().settings.appearance.title(),
+                Strings.settings.appearance.title(),
                 style = MaterialTheme.typography.titleSmall
             )
 
             TitledComboBox(
-                strings().settings.language(),
+                Strings.settings.language(),
                 items = Language.entries,
                 onSelected = {
-                    language = it
-                    language().appLanguage = it
+                    AppSettings.language.value = it
                 },
-                selected = language
+                selected = AppSettings.language.value
             )
 
             var expanded by remember { mutableStateOf(false) }
@@ -80,7 +76,7 @@ fun Appearance() {
                     onClick = { expanded = !expanded },
                     icon = icons().expand,
                     modifier = Modifier.rotate(rotation),
-                    tooltip = strings().settings.appearance.tooltipAdvanced(expanded)
+                    tooltip = Strings.settings.appearance.tooltipAdvanced(expanded)
                 )
 
                 Row(
@@ -218,10 +214,10 @@ fun Appearance() {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text(strings().settings.appearance.background())
+                            Text(Strings.settings.appearance.background())
                             CustomColorSelector(
                                 colors.value.background ?: MaterialTheme.colorScheme.background,
-                                strings().settings.appearance.backgroundTooltip(),
+                                Strings.settings.appearance.backgroundTooltip(),
                                 {
                                     colors.value = colors.value.copy(background = it)
                                 },
@@ -235,10 +231,10 @@ fun Appearance() {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text(strings().settings.appearance.container())
+                            Text(Strings.settings.appearance.container())
                             CustomColorSelector(
                                 colors.value.secondaryContainer ?: MaterialTheme.colorScheme.secondaryContainer,
-                                strings().settings.appearance.containerTooltip(),
+                                Strings.settings.appearance.containerTooltip(),
                                 {
                                     colors.value = colors.value.copy(secondaryContainer = it)
                                 },
@@ -255,7 +251,7 @@ fun Appearance() {
                             .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(21.dp))
                             .padding(5.dp)
                     ) {
-                        Text(strings().settings.appearance.text())
+                        Text(Strings.settings.appearance.text())
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -263,7 +259,7 @@ fun Appearance() {
                         ) {
                             CustomColorSelector(
                                 colors.value.contentColors?.light ?: MaterialTheme.colorScheme.contentColors.light,
-                                strings().settings.appearance.textLight(),
+                                Strings.settings.appearance.textLight(),
                                 {
                                     val contentColors = colors.value.contentColors?.copy(light = it) ?: ContentColors(light = it)
                                     colors.value = colors.value.copy(contentColors = contentColors)
@@ -274,7 +270,7 @@ fun Appearance() {
                             )
                             CustomColorSelector(
                                 colors.value.contentColors?.dark ?: MaterialTheme.colorScheme.contentColors.dark,
-                                strings().settings.appearance.textDark(),
+                                Strings.settings.appearance.textDark(),
                                 {
                                     val contentColors = colors.value.contentColors?.copy(dark = it) ?: ContentColors(dark = it)
                                     colors.value = colors.value.copy(contentColors = contentColors)
@@ -291,7 +287,7 @@ fun Appearance() {
                         onClick = {
                             colors.value = UserColors()
                         },
-                        tooltip = strings().settings.appearance.reset()
+                        tooltip = Strings.settings.appearance.reset()
                     )
                 }
             }
@@ -334,7 +330,7 @@ fun Appearance() {
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(strings().settings.appearance.displayScale())
+                Text(Strings.settings.appearance.displayScale())
                 IconButton(
                     onClick = {
                         if (currentScalingIndex > 0) {
@@ -342,10 +338,10 @@ fun Appearance() {
                         }
                     },
                     icon = icons().minus,
-                    tooltip = strings().settings.appearance.decrement(),
+                    tooltip = Strings.settings.appearance.decrement(),
                     enabled = currentScalingIndex > 0
                 )
-                Text(strings().settings.appearance.scaling(AppSettings.displayScale.value))
+                Text(Strings.settings.appearance.scaling(AppSettings.displayScale.value))
                 IconButton(
                     onClick = {
                         if (currentScalingIndex < displayScales.size - 1) {
@@ -353,7 +349,7 @@ fun Appearance() {
                         }
                     },
                     icon = icons().plus,
-                    tooltip = strings().settings.appearance.increment(),
+                    tooltip = Strings.settings.appearance.increment(),
                     enabled = currentScalingIndex < displayScales.size - 1
                 )
             }
@@ -371,9 +367,9 @@ fun Appearance() {
                     )
                     Text(
                         if (AppSettings.displayScale.value < 1000)
-                            strings().settings.appearance.smallHint()
+                            Strings.settings.appearance.smallHint()
                         else
-                            strings().settings.appearance.largeHint(),
+                            Strings.settings.appearance.largeHint(),
                         style = MaterialTheme.typography.labelMedium,
                         color = LocalContentColor.current.disabledContent()
                     )
@@ -390,7 +386,7 @@ fun Appearance() {
         }) }
 
         PopupOverlay(
-            titleRow = { Text(strings().settings.theme.title()) },
+            titleRow = { Text(Strings.settings.theme.title()) },
             content = {
                 ColorPicker(
                     onColorChanged = {
@@ -427,7 +423,7 @@ fun Appearance() {
                     },
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().settings.theme.cancel())
+                    Text(Strings.settings.theme.cancel())
                 }
                 Button(
                     onClick = {
@@ -436,7 +432,7 @@ fun Appearance() {
                     },
                     color = color.toColor()
                 ) {
-                    Text(strings().settings.theme.confirm())
+                    Text(Strings.settings.theme.confirm())
                 }
             }
         )

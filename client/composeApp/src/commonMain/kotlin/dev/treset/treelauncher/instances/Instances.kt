@@ -15,7 +15,7 @@ import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.SortBox
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledColumn
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -69,14 +69,14 @@ fun Instances() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                strings().selector.instance.emptyTitle(),
+                Strings.selector.instance.emptyTitle(),
                 style = MaterialTheme.typography.titleMedium
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                strings().selector.instance.empty().let {
+                Strings.selector.instance.empty().let {
                     Text(it.first)
                     Icon(
                         icons().add,
@@ -99,7 +99,7 @@ fun Instances() {
             parentModifier = Modifier.fillMaxWidth(1/3f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             headerContent = {
-                Text(strings().selector.instance.title())
+                Text(Strings.selector.instance.title())
                 SortBox(
                     sorts = InstanceDataSortType.entries,
                     selected = AppSettings.instanceSortType.value,

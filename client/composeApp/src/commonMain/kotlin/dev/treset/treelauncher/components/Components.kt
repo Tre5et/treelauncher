@@ -19,7 +19,7 @@ import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -150,7 +150,7 @@ fun <T: Component> Components(
             }
 
             SelectorButton(
-                title = strings().components.create(),
+                title = Strings.components.create(),
                 icon = icons().add,
                 selected = creatorSelected,
                 onClick = {
@@ -177,7 +177,7 @@ fun <T: Component> Components(
                                 onClick = { showSettings = false },
                                 icon = icons().back,
                                 size = 32.dp,
-                                tooltip = strings().manager.component.back(),
+                                tooltip = Strings.manager.component.back(),
                             )
                         }
                     }
@@ -201,7 +201,7 @@ fun <T: Component> Components(
                             },
                             icon = icons().edit,
                             size = 32.dp,
-                            tooltip = strings().selector.component.rename.title()
+                            tooltip = Strings.selector.component.rename.title()
                         )
                         IconButton(
                             onClick = {
@@ -209,7 +209,7 @@ fun <T: Component> Components(
                             },
                             icon = icons().folder,
                             size = 32.dp,
-                            tooltip = strings().selector.component.openFolder()
+                            tooltip = Strings.selector.component.openFolder()
                         )
                         IconButton(
                             onClick = {
@@ -218,7 +218,7 @@ fun <T: Component> Components(
                             icon = icons().delete,
                             size = 32.dp,
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().selector.component.delete.tooltip()
+                            tooltip = Strings.selector.component.delete.tooltip()
                         )
                     }
 
@@ -257,7 +257,7 @@ fun <T: Component> Components(
                         }
 
                         SelectorButton(
-                            title = strings().manager.component.settings(),
+                            title = Strings.manager.component.settings(),
                             icon = icons().settings,
                             selected = showSettings,
                             onClick = { showSettings = true }
@@ -321,7 +321,7 @@ fun <T: Component> Components(
 
         if(creatorSelected) {
             TitledColumn(
-                title = strings().components.create(),
+                title = Strings.components.create(),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(12.dp)

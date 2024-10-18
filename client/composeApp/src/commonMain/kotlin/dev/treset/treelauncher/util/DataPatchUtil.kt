@@ -5,7 +5,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.patcher.DataPatcher
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 @Composable
@@ -29,7 +29,7 @@ fun DataPatcher(
         status?.let {
             StatusPopup(it)
         } ?: PopupOverlay(
-            titleRow = { Text(strings().launcher.patch.title()) },
+            titleRow = { Text(Strings.launcher.patch.title()) },
             buttonRow = {
                 Button(
                     onClick = {
@@ -44,19 +44,19 @@ fun DataPatcher(
                         }.start()
                     }
                 ) {
-                    Text(strings().launcher.patch.start())
+                    Text(Strings.launcher.patch.start())
                 }
             }
         ) {
-            Text(strings().launcher.patch.message())
+            Text(Strings.launcher.patch.message())
             TitledCheckBox(
                 checked = backup,
                 onCheckedChange = {
                     backup = it
                 },
-                title = strings().launcher.patch.backup()
+                title = Strings.launcher.patch.backup()
             )
-            Text(strings().launcher.patch.backupHint())
+            Text(Strings.launcher.patch.backupHint())
         }
     }
 }

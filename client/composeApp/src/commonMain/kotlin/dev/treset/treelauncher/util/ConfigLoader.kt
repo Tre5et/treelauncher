@@ -28,7 +28,7 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
@@ -99,7 +99,7 @@ fun ApplicationScope.ConfigLoader(
                         .fillMaxSize()
                         .padding(8.dp),
                 ) {
-                    Text(strings().launcher.setup.initializing())
+                    Text(Strings.launcher.setup.initializing())
                 }
             } else if (requiresPath) {
                 var path by remember { mutableStateOf(defaultPath) }
@@ -118,11 +118,11 @@ fun ApplicationScope.ConfigLoader(
                             .padding(8.dp),
                     ) {
                         Text(
-                            strings().launcher.setup.title(),
+                            Strings.launcher.setup.title(),
                             style = TextStyle(fontSize = 20.sp)
                         )
 
-                        Text(strings().launcher.setup.message())
+                        Text(Strings.launcher.setup.message())
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically
@@ -140,12 +140,12 @@ fun ApplicationScope.ConfigLoader(
                                     showDirPicker = true
                                 },
                                 icon = icons().folder,
-                                tooltip = strings().launcher.setup.dirPicker()
+                                tooltip = Strings.launcher.setup.dirPicker()
                             )
                         }
                         error?.let {
                             Text(
-                                strings().launcher.setup.error(it),
+                                Strings.launcher.setup.error(it),
                                 color = Color.Red
                             )
                         }

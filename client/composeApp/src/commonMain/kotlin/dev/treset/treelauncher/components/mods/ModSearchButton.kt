@@ -23,7 +23,7 @@ import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.SelectorButton
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.DownloadingIcon
 import dev.treset.treelauncher.style.icons
 
@@ -97,7 +97,7 @@ fun ModDisplayData.ModSearchButton() {
                                 }
                             },
                             icon = icons().download,
-                            tooltip = strings().manager.mods.card.download(),
+                            tooltip = Strings.manager.mods.card.download(),
                         )
                     }
                     if(downloading) {
@@ -113,7 +113,7 @@ fun ModDisplayData.ModSearchButton() {
                             selectedVersion = it
                         },
                         selected = selectedVersion,
-                        placeholder = strings().manager.mods.card.versionPlaceholder(),
+                        placeholder = Strings.manager.mods.card.versionPlaceholder(),
                     )
                 }
 
@@ -126,7 +126,7 @@ fun ModDisplayData.ModSearchButton() {
                                 it.openInBrowser()
                             },
                             icon = icons().browser,
-                            tooltip = strings().manager.mods.card.openBrowser()
+                            tooltip = Strings.manager.mods.card.openBrowser()
                         )
                     }
 

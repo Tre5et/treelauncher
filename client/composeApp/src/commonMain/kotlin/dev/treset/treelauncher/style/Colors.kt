@@ -2,23 +2,20 @@ package dev.treset.treelauncher.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import dev.treset.treelauncher.backend.config.AppSettings
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import org.jetbrains.jewel.intui.window.styling.dark
 import org.jetbrains.jewel.intui.window.styling.light
 import org.jetbrains.jewel.window.styling.TitleBarColors
 import org.jetbrains.jewel.window.styling.TitleBarStyle
 
 enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> String) {
-    DARK({ true }, { strings().theme.dark() }),
-    LIGHT({ false }, { strings().theme.light() }),
-    SYSTEM({ isSystemInDarkTheme() }, { strings().theme.system() });
+    DARK({ true }, { Strings.theme.dark() }),
+    LIGHT({ false }, { Strings.theme.light() }),
+    SYSTEM({ isSystemInDarkTheme() }, { Strings.theme.system() });
 
     override fun toString(): String {
         return this.displayName()
@@ -28,23 +25,23 @@ enum class Theme(val isDark: @Composable () -> Boolean, val displayName: () -> S
 enum class AccentColor(val primary: (dark: Boolean) -> Color, val displayName: () -> String) {
     GREEN(
         {if(it) Color.Green else Color(0xFF00E000)},
-        { strings().theme.green() }
+        { Strings.theme.green() }
     ),
     BLUE(
         {if(it) Color.Blue else Color(0xFF0000E0)},
-        { strings().theme.blue() }
+        { Strings.theme.blue() }
     ),
     ORANGE(
         {if(it) Color(0xFFE0A000) else Color(0xFFD0A000)},
-        { strings().theme.orange() }
+        { Strings.theme.orange() }
     ),
     MAGENTA(
         {if(it) Color.Magenta else Color(0xFFE000E0)},
-        { strings().theme.magenta() }
+        { Strings.theme.magenta() }
     ),
     CUSTOM(
         { AppSettings.customColor.value },
-        { strings().theme.custom() }
+        { Strings.theme.custom() }
     );
 
     override fun toString(): String {
@@ -199,23 +196,6 @@ fun Color.contrast(other: Color): Float {
 
 val LocalColors = staticCompositionLocalOf {
     lightColors()
-}
-
-@Composable
-fun LauncherTheme(
-    colors: Colors,
-    shapes: Shapes = MaterialTheme.shapes,
-    typography: Typography = MaterialTheme.typography,
-    content: @Composable () -> Unit
-) {
-    CompositionLocalProvider(LocalColors provides colors) {
-        MaterialTheme(
-            colorScheme = colors.material,
-            shapes = shapes,
-            typography = typography,
-            content = content
-        )
-    }
 }
 
 fun Color.inverted(): Color = Color(

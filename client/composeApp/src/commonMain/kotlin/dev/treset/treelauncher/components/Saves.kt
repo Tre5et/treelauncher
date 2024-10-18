@@ -27,7 +27,7 @@ import dev.treset.treelauncher.creation.ComponentCreator
 import dev.treset.treelauncher.creation.CreationContent
 import dev.treset.treelauncher.creation.CreationMode
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.DetailsListDisplay
@@ -67,7 +67,7 @@ fun Saves() {
     }
 
     Components(
-        strings().selector.saves.title(),
+        Strings.selector.saves.title(),
         components = components,
         componentManifest = AppContext.files.savesManifest,
         checkHasComponent = { details, component -> details.savesComponent == component.id },
@@ -116,7 +116,7 @@ fun Saves() {
                         displayData.addSaves(it.map { it.second })
                     },
                     icons().saves,
-                    strings().manager.saves.import,
+                    Strings.manager.saves.import,
                     allowFilePicker = false,
                     allowDirectoryPicker = true,
                     filesToAdd = filesToAdd,
@@ -132,14 +132,14 @@ fun Saves() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        strings().selector.saves.emptyTitle(),
+                        Strings.selector.saves.emptyTitle(),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        strings().selector.saves.empty().let {
+                        Strings.selector.saves.empty().let {
                             Text(it.first)
                             Icon(
                                 icons().add,
@@ -153,7 +153,7 @@ fun Saves() {
             } else {
                 if (displayData.saves.isNotEmpty()) {
                     Text(
-                        strings().selector.saves.worlds(),
+                        Strings.selector.saves.worlds(),
                         style = MaterialTheme.typography.titleMedium
                     )
                     displayData.saves.forEach {
@@ -184,7 +184,7 @@ fun Saves() {
                 }
                 if (displayData.servers.isNotEmpty()) {
                     Text(
-                        strings().selector.saves.servers(),
+                        Strings.selector.saves.servers(),
                         style = MaterialTheme.typography.titleMedium
                     )
                     displayData.servers.forEach {
@@ -246,7 +246,7 @@ fun Saves() {
                         painter = icons().play,
                         size = 32.dp,
                         highlighted = true,
-                        tooltip = strings().selector.saves.play.button(),
+                        tooltip = Strings.selector.saves.play.button(),
                         enabled = AppContext.runningInstance == null
                     )
                 }
@@ -262,7 +262,7 @@ fun Saves() {
                         painter = icons().play,
                         size = 32.dp,
                         highlighted = true,
-                        tooltip = strings().selector.saves.play.button(),
+                        tooltip = Strings.selector.saves.play.button(),
                         enabled = AppContext.runningInstance == null
                     )
                 }
@@ -273,7 +273,7 @@ fun Saves() {
                     },
                     icon = icons().add,
                     size = 32.dp,
-                    tooltip = strings().manager.saves.tooltipAdd()
+                    tooltip = Strings.manager.saves.tooltipAdd()
                 )
             }
         },
@@ -288,7 +288,7 @@ fun Saves() {
                         },
                         icon = icons().back,
                         size = 32.dp,
-                        tooltip = strings().manager.component.import.back(),
+                        tooltip = Strings.manager.component.import.back(),
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
                 }
@@ -348,13 +348,13 @@ private fun PlayPopup(
     if (instances.isEmpty()) {
         PopupOverlay(
             type = PopupType.ERROR,
-            titleRow = { Text(strings().selector.saves.play.noTitle()) },
-            content = { Text(strings().selector.saves.play.noMessage()) },
+            titleRow = { Text(Strings.selector.saves.play.noTitle()) },
+            content = { Text(Strings.selector.saves.play.noMessage()) },
             buttonRow = {
                 Button(
                     onClick = onClose
                 ) {
-                    Text(strings().selector.saves.play.noClose())
+                    Text(Strings.selector.saves.play.noClose())
                 }
             }
         )
@@ -363,9 +363,9 @@ private fun PlayPopup(
 
         PopupOverlay(
             type = PopupType.NONE,
-            titleRow = { Text(strings().selector.saves.play.multipleTitle()) },
+            titleRow = { Text(Strings.selector.saves.play.multipleTitle()) },
             content = {
-                Text(strings().selector.saves.play.multipleMessage())
+                Text(Strings.selector.saves.play.multipleMessage())
                 ComboBox(
                     items = instances,
                     selected = selectedInstance,
@@ -378,12 +378,12 @@ private fun PlayPopup(
                     onClick = onClose,
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().selector.saves.play.multipleClose())
+                    Text(Strings.selector.saves.play.multipleClose())
                 }
                 Button(
                     onClick = { onConfirm(quickPlayData, selectedInstance) },
                 ) {
-                    Text(strings().selector.saves.play.multiplePlay())
+                    Text(Strings.selector.saves.play.multiplePlay())
                 }
             }
         )

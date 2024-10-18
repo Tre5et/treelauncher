@@ -32,7 +32,7 @@ import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.PopupData
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -72,7 +72,7 @@ fun ModsImport(
         ) {
             if (anyFilesExist) {
                 Text(
-                    strings().manager.mods.import.importComponent(),
+                    Strings.manager.mods.import.importComponent(),
                     style = MaterialTheme.typography.titleSmall
                 )
             }
@@ -110,7 +110,7 @@ fun ModsImport(
                                 onClick = { expanded = !expanded },
                                 icon = icons().expand,
                                 modifier = Modifier.rotate(rotation),
-                                tooltip = strings().manager.mods.import.tooltipExpand(expanded)
+                                tooltip = Strings.manager.mods.import.tooltipExpand(expanded)
                             )
 
                             Text(component.name)
@@ -156,14 +156,14 @@ fun ModsImport(
                                                 ""
                                             )
 
-                                            Text(strings().manager.mods.import.displayName(it))
+                                            Text(Strings.manager.mods.import.displayName(it))
 
                                             IconButton(
                                                 onClick = {
                                                     selectedMods += it to LauncherFile.of(component.directory, it.fileName)
                                                 },
                                                 icon = icons().add,
-                                                tooltip = strings().manager.mods.import.tooltipAdd(),
+                                                tooltip = Strings.manager.mods.import.tooltipAdd(),
                                                 enabled = !selectedMods.map { it.first }.contains(it)
                                             )
                                         }
@@ -181,7 +181,7 @@ fun ModsImport(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                strings().manager.mods.import.importFile(),
+                Strings.manager.mods.import.importFile(),
                 style = MaterialTheme.typography.titleSmall
             )
 
@@ -200,7 +200,7 @@ fun ModsImport(
                     .fillMaxWidth()
             ) {
                 Text(
-                    strings().manager.mods.import.selectedFiles(),
+                    Strings.manager.mods.import.selectedFiles(),
                     style = MaterialTheme.typography.titleSmall
                 )
 
@@ -227,7 +227,7 @@ fun ModsImport(
                                 ""
                             )
 
-                            Text(strings().manager.mods.import.displayName(it.first))
+                            Text(Strings.manager.mods.import.displayName(it.first))
 
                             IconButton(
                                 onClick = {
@@ -235,7 +235,7 @@ fun ModsImport(
                                 },
                                 icon = icons().delete,
                                 interactionTint = MaterialTheme.colorScheme.error,
-                                tooltip = strings().manager.mods.import.delete()
+                                tooltip = Strings.manager.mods.import.delete()
                             )
                         }
                     }
@@ -246,7 +246,7 @@ fun ModsImport(
         Button(
             onClick = {
                 popupContent = PopupData(
-                    titleRow = { Text(strings().manager.mods.import.importing()) }
+                    titleRow = { Text(Strings.manager.mods.import.importing()) }
                 )
                 LOGGER.debug { "Importing mods into component: ${component.name}" }
                 modContext.registerChangingJob { mods ->
@@ -292,7 +292,7 @@ fun ModsImport(
             },
             enabled = selectedMods.isNotEmpty()
         ) {
-            Text(strings().manager.mods.import.import())
+            Text(Strings.manager.mods.import.import())
         }
     }
 }

@@ -3,7 +3,7 @@ package dev.treset.treelauncher.backend.update
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.SerializationException
 import dev.treset.treelauncher.generic.PopupType
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class UpdaterStatus(
     var status: Status,
@@ -15,11 +15,11 @@ class UpdaterStatus(
         val popupMessage: () -> String,
         val type: PopupType
     ) {
-        UPDATING({ strings().updater.status.updatingTitle() }, { strings().updater.status.updatingMessage() }, PopupType.ERROR),
-        SUCCESS({ strings().updater.status.successTitle() }, { strings().updater.status.successMessage() }, PopupType.SUCCESS),
-        WARNING({ strings().updater.status.warningTitle() }, { strings().updater.status.warningMessage() }, PopupType.WARNING),
-        FAILURE({ strings().updater.status.failureTitle() }, { strings().updater.status.failureMessage() }, PopupType.WARNING),
-        FATAL({ strings().updater.status.fatalTitle() }, { strings().updater.status.fatalMessage() }, PopupType.ERROR);
+        UPDATING({ Strings.updater.status.updatingTitle() }, { Strings.updater.status.updatingMessage() }, PopupType.ERROR),
+        SUCCESS({ Strings.updater.status.successTitle() }, { Strings.updater.status.successMessage() }, PopupType.SUCCESS),
+        WARNING({ Strings.updater.status.warningTitle() }, { Strings.updater.status.warningMessage() }, PopupType.WARNING),
+        FAILURE({ Strings.updater.status.failureTitle() }, { Strings.updater.status.failureMessage() }, PopupType.WARNING),
+        FATAL({ Strings.updater.status.fatalTitle() }, { Strings.updater.status.fatalMessage() }, PopupType.ERROR);
     }
 
     companion object {

@@ -20,7 +20,7 @@ import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.net.URI
 
@@ -60,7 +60,7 @@ fun ColumnScope.ComponentSettings(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                strings().manager.component.includedFiles(),
+                Strings.manager.component.includedFiles(),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -100,7 +100,7 @@ fun ColumnScope.ComponentSettings(
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().manager.component.deleteFile()
+                            tooltip = Strings.manager.component.deleteFile()
                         )
                     }
 
@@ -126,7 +126,7 @@ fun ColumnScope.ComponentSettings(
                     onTextChanged = {
                         newArg = it
                     },
-                    placeholder = strings().manager.component.fileName(),
+                    placeholder = Strings.manager.component.fileName(),
                 )
 
                 IconButton(
@@ -136,7 +136,7 @@ fun ColumnScope.ComponentSettings(
                     },
                     icon = icons().add,
                     enabled = newArg.isNotBlank(),
-                    tooltip = strings().manager.component.addFile()
+                    tooltip = Strings.manager.component.addFile()
                 )
             }
         }
@@ -144,6 +144,6 @@ fun ColumnScope.ComponentSettings(
 }
 
 private enum class FileType(val title: String) {
-    FILE(strings().manager.component.file()),
-    FOLDER(strings().manager.component.folder())
+    FILE(Strings.manager.component.file()),
+    FOLDER(Strings.manager.component.folder())
 }

@@ -10,7 +10,7 @@ import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.creation.ComponentCreator
 import dev.treset.treelauncher.creation.CreationContent
 import dev.treset.treelauncher.creation.CreationMode
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -19,7 +19,7 @@ fun Options() {
     var components by remember { mutableStateOf(AppContext.files.optionsComponents.sortedBy { it.name }) }
 
     Components(
-        strings().selector.options.title(),
+        Strings.selector.options.title(),
         components = components,
         componentManifest = AppContext.files.optionsManifest,
         checkHasComponent = { details, component -> details.optionsComponent == component.id },

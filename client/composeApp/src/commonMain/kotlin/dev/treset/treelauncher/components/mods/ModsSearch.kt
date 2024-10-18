@@ -29,7 +29,7 @@ import dev.treset.treelauncher.backend.util.string.FormatString
 import dev.treset.treelauncher.components.mods.display.ModDataProvider
 import dev.treset.treelauncher.components.mods.display.ModDataSearchDisplay
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import kotlin.math.log10
 import kotlin.math.roundToInt
@@ -138,7 +138,7 @@ fun ModsSearch(
             TextBox(
                 tfValue,
                 onTextChanged = { tfValue = it },
-                placeholder = strings().manager.mods.addMods.search(),
+                placeholder = Strings.manager.mods.addMods.search(),
                 trailingIcon = {
                     IconButton(
                         onClick = {
@@ -146,7 +146,7 @@ fun ModsSearch(
                             searching = true
                         },
                         icon = icons().search,
-                        tooltip = strings().manager.mods.addMods.searchTooltip()
+                        tooltip = Strings.manager.mods.addMods.searchTooltip()
                     )
                 },
                 modifier = Modifier.onKeyEvent {
@@ -166,7 +166,7 @@ fun ModsSearch(
         } else {
             results?.let {
                 if (it.isEmpty()) {
-                    Text(strings().manager.mods.addMods.noResults())
+                    Text(Strings.manager.mods.addMods.noResults())
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -185,7 +185,7 @@ fun ModsSearch(
         }
 
         SelectorButton(
-            title = strings().manager.mods.addMods.addLocal(),
+            title = Strings.manager.mods.addMods.addLocal(),
             icon = icons().add,
             selected = false,
         ) {

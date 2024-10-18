@@ -20,7 +20,7 @@ import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TextBox
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 import java.nio.file.StandardCopyOption
@@ -77,7 +77,7 @@ fun ModsEdit(
         TextBox(
             text = tfName,
             onTextChanged = { tfName = it },
-            placeholder = strings().manager.mods.edit.name(),
+            placeholder = Strings.manager.mods.edit.name(),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -91,7 +91,7 @@ fun ModsEdit(
                     tfFile = it
                     fileError = false
                 },
-                placeholder = strings().manager.mods.edit.file(),
+                placeholder = Strings.manager.mods.edit.file(),
                 modifier = Modifier.weight(1f, false),
                 isError = fileError
             )
@@ -101,7 +101,7 @@ fun ModsEdit(
                     showFilePicker = true
                 },
                 icon = icons().selectFile,
-                tooltip = strings().manager.mods.edit.file()
+                tooltip = Strings.manager.mods.edit.file()
             )
 
             FilePicker(
@@ -119,7 +119,7 @@ fun ModsEdit(
         TextBox(
             text = tfVersion,
             onTextChanged = { tfVersion = it },
-            placeholder = strings().manager.mods.edit.version(),
+            placeholder = Strings.manager.mods.edit.version(),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -131,7 +131,7 @@ fun ModsEdit(
                     curseforgeError = false
                 }
             },
-            placeholder = strings().manager.mods.edit.curseforge(),
+            placeholder = Strings.manager.mods.edit.curseforge(),
             isError = curseforgeError,
             modifier = Modifier.fillMaxWidth()
         )
@@ -142,7 +142,7 @@ fun ModsEdit(
                 tfModrinth = it
                 modrinthError = false
             },
-            placeholder = strings().manager.mods.edit.modrinth(),
+            placeholder = Strings.manager.mods.edit.modrinth(),
             isError = modrinthError,
             modifier = Modifier.fillMaxWidth()
         )
@@ -283,7 +283,7 @@ fun ModsEdit(
             enabled = tfFile.isNotBlank() && tfVersion.isNotBlank()
                     && currentMod?.let { it.name != tfName || it.version != tfVersion || currentFile?.let { it.path != tfFile } ?: true || (currentCurseforge ?: "") != tfCurseforge || (currentModrinth ?: "") != tfModrinth } ?: true
         ) {
-            Text(strings().manager.mods.edit.confirm(currentMod))
+            Text(Strings.manager.mods.edit.confirm(currentMod))
         }
     }
 }

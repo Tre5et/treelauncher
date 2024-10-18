@@ -5,7 +5,7 @@ import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class NewModsCreator(
     data: NewModsCreationData,
@@ -96,4 +96,4 @@ class UseModsCreationData(
 ): UseCreationData<ModsComponent>(component, parent)
 
 val CreationStep.MODS: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.mods() }
+    get() = FormatStringProvider { Strings.creator.status.mods() }

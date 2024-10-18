@@ -14,7 +14,7 @@ import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.PopupData
 import dev.treset.treelauncher.generic.PopupType
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 fun onUpdate(
@@ -23,12 +23,12 @@ fun onUpdate(
 ) {
     setPopup(
         PopupData(
-            titleRow = { Text(strings().settings.update.checkingTitle()) },
+            titleRow = { Text(Strings.settings.update.checkingTitle()) },
             buttonRow = {
                 Button(
                     onClick = { setPopup(null) }
                 ) {
-                    Text(strings().settings.update.cancel())
+                    Text(Strings.settings.update.cancel())
                 }
             }
         )
@@ -45,21 +45,21 @@ fun onUpdate(
             update.id?.let {
                 setPopup(
                     PopupData(
-                        titleRow = { Text(strings().settings.update.available()) },
-                        content = { Text(strings().settings.update.availableMessage(it, update.message)) },
+                        titleRow = { Text(Strings.settings.update.available()) },
+                        content = { Text(Strings.settings.update.availableMessage(it, update.message)) },
                         buttonRow = {
                             Button(
                                 onClick = { setPopup(null) },
                                 color = MaterialTheme.colorScheme.error
                             ) {
-                                Text(strings().settings.update.cancel())
+                                Text(Strings.settings.update.cancel())
                             }
 
                             Button(
                                 onClick = {
                                     setPopup(
                                         PopupData(
-                                            titleRow = { Text(strings().settings.update.downloadingTitle()) }
+                                            titleRow = { Text(Strings.settings.update.downloadingTitle()) }
                                         )
                                     )
 
@@ -67,10 +67,10 @@ fun onUpdate(
                                         updater().executeUpdate { amount, total, file ->
                                             setPopup(
                                                 PopupData(
-                                                    titleRow = { Text(strings().settings.update.downloadingTitle()) },
+                                                    titleRow = { Text(Strings.settings.update.downloadingTitle()) },
                                                     content = {
                                                         Text(
-                                                            strings().statusDetailsMessage(
+                                                            Strings.statusDetailsMessage(
                                                                 file,
                                                                 amount,
                                                                 total
@@ -89,13 +89,13 @@ fun onUpdate(
                                     setPopup(
                                         PopupData(
                                             type = PopupType.SUCCESS,
-                                            titleRow = { Text(strings().settings.update.successTitle()) },
-                                            content = { Text(strings().settings.update.successMessage()) },
+                                            titleRow = { Text(Strings.settings.update.successTitle()) },
+                                            content = { Text(Strings.settings.update.successMessage()) },
                                             buttonRow = {
                                                 Button(
                                                     onClick = { setPopup(null) }
                                                 ) {
-                                                    Text(strings().settings.update.close())
+                                                    Text(Strings.settings.update.close())
                                                 }
 
                                                 Button(
@@ -103,14 +103,14 @@ fun onUpdate(
                                                         app().exit(true)
                                                     }
                                                 ) {
-                                                    Text(strings().settings.update.successRestart())
+                                                    Text(Strings.settings.update.successRestart())
                                                 }
                                             }
                                         )
                                     )
                                 }
                             ) {
-                                Text(strings().settings.update.download())
+                                Text(Strings.settings.update.download())
                             }
                         }
                     )
@@ -120,13 +120,13 @@ fun onUpdate(
                     setPopup(
                         PopupData(
                             type = PopupType.SUCCESS,
-                            titleRow = { Text(strings().settings.update.latestTitle()) },
-                            content = { Text(strings().settings.update.latestMessage()) },
+                            titleRow = { Text(Strings.settings.update.latestTitle()) },
+                            content = { Text(Strings.settings.update.latestMessage()) },
                             buttonRow = {
                                 Button(
                                     onClick = { setPopup(null) }
                                 ) {
-                                    Text(strings().settings.update.close())
+                                    Text(Strings.settings.update.close())
                                 }
                             }
                         )
@@ -135,13 +135,13 @@ fun onUpdate(
                     setPopup(
                         PopupData(
                             type = PopupType.WARNING,
-                            titleRow = { Text(strings().settings.update.unavailableTitle()) },
-                            content = { Text(strings().settings.update.unavailableMessage()) },
+                            titleRow = { Text(Strings.settings.update.unavailableTitle()) },
+                            content = { Text(Strings.settings.update.unavailableMessage()) },
                             buttonRow = {
                                 Button(
                                     onClick = { setPopup(null) }
                                 ) {
-                                    Text(strings().settings.update.close())
+                                    Text(Strings.settings.update.close())
                                 }
                             }
                         )
@@ -201,7 +201,7 @@ fun checkUpdateOnStart(
                         onClick = { app().exit(force = true) },
                         color = MaterialTheme.colorScheme.error
                     ) {
-                        Text(strings().updater.quit())
+                        Text(Strings.updater.quit())
                     }
                 } else {
                     Button(
@@ -210,7 +210,7 @@ fun checkUpdateOnStart(
                             onDone()
                         }
                     ) {
-                        Text(strings().updater.close())
+                        Text(Strings.updater.close())
                     }
                 }
             }

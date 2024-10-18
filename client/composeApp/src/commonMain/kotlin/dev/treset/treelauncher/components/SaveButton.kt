@@ -10,7 +10,7 @@ import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.DetailsListDisplay
 
@@ -43,7 +43,7 @@ fun SaveButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.saves.delete(),
+                    tooltip = Strings.manager.saves.delete(),
                 )
             }
         }
@@ -64,7 +64,7 @@ fun SaveButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.saves.delete()
+                    tooltip = Strings.manager.saves.delete()
                 )
             }
         }
@@ -83,7 +83,7 @@ fun SaveButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.saves.delete()
+                    tooltip = Strings.manager.saves.delete()
                 )
             }
         }
@@ -92,15 +92,15 @@ fun SaveButton(
     if(showDeleteDialog) {
         PopupOverlay(
             type = PopupType.WARNING,
-            titleRow = { Text(strings().manager.saves.deleteTitle(save)) },
+            titleRow = { Text(Strings.manager.saves.deleteTitle(save)) },
             content = {
-                Text(strings().manager.saves.deleteMessage(save))
+                Text(Strings.manager.saves.deleteMessage(save))
             },
             buttonRow = {
                 Button(
                     onClick = { showDeleteDialog = false },
                 ) {
-                    Text(strings().manager.saves.deleteCancel())
+                    Text(Strings.manager.saves.deleteCancel())
                 }
 
                 Button(
@@ -110,7 +110,7 @@ fun SaveButton(
                     },
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().manager.saves.deleteConfirm(save))
+                    Text(Strings.manager.saves.deleteConfirm(save))
                 }
             }
         )

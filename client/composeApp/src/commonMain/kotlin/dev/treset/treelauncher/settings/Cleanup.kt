@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 @Composable
 fun Cleanup() {
@@ -20,7 +20,7 @@ fun Cleanup() {
         enabled = AppContext.runningInstance == null
     ) {
         Text(
-            strings().settings.cleanup.button()
+            Strings.settings.cleanup.button()
         )
     }
 
@@ -30,17 +30,17 @@ fun Cleanup() {
 
         when(state) {
             0 -> PopupOverlay(
-                titleRow = { Text(strings().settings.cleanup.title()) },
+                titleRow = { Text(Strings.settings.cleanup.title()) },
                 content = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            strings().settings.cleanup.message(),
+                            Strings.settings.cleanup.message(),
                         )
 
                         TitledCheckBox(
-                            title = strings().settings.cleanup.libraries(),
+                            title = Strings.settings.cleanup.libraries(),
                             checked = includeLibraries,
                             onCheckedChange = {
                                 includeLibraries = it
@@ -55,7 +55,7 @@ fun Cleanup() {
                         },
                         color = MaterialTheme.colorScheme.error
                     ) {
-                        Text(strings().settings.cleanup.cancel())
+                        Text(Strings.settings.cleanup.cancel())
                     }
                     Button(
                         onClick = {
@@ -71,37 +71,37 @@ fun Cleanup() {
                             state = 1
                         }
                     ) {
-                        Text(strings().settings.cleanup.confirm())
+                        Text(Strings.settings.cleanup.confirm())
                     }
                 }
             )
             1 -> PopupOverlay(
-                titleRow = { Text(strings().settings.cleanup.deleting()) }
+                titleRow = { Text(Strings.settings.cleanup.deleting()) }
             )
             2 -> PopupOverlay(
                 type = PopupType.SUCCESS,
-                titleRow = { Text(strings().settings.cleanup.success()) },
+                titleRow = { Text(Strings.settings.cleanup.success()) },
                 buttonRow = {
                     Button(
                         onClick = {
                             showCleanup = false
                         }
                     ) {
-                        Text(strings().settings.cleanup.close())
+                        Text(Strings.settings.cleanup.close())
                     }
                 }
             )
             3 -> PopupOverlay(
                 type = PopupType.ERROR,
-                titleRow = { Text(strings().settings.cleanup.failureTitle()) },
-                content = { Text(strings().settings.cleanup.failureMessage()) },
+                titleRow = { Text(Strings.settings.cleanup.failureTitle()) },
+                content = { Text(Strings.settings.cleanup.failureMessage()) },
                 buttonRow = {
                     Button(
                         onClick = {
                             showCleanup = false
                         }
                     ) {
-                        Text(strings().settings.cleanup.close())
+                        Text(Strings.settings.cleanup.close())
                     }
                 }
             )

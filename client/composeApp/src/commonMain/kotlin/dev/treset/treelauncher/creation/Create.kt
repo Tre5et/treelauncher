@@ -22,7 +22,7 @@ import dev.treset.treelauncher.components.mods.ModsCreation
 import dev.treset.treelauncher.components.mods.ModsCreationContent
 import dev.treset.treelauncher.components.mods.get
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.navigation.NavigationContext
 import dev.treset.treelauncher.navigation.NavigationState
 import java.io.IOException
@@ -47,7 +47,7 @@ fun Create() {
     var creationException: Exception? by remember { mutableStateOf(null) }
 
     TitledColumn(
-        title = strings().creator.instance.title(),
+        title = Strings.creator.instance.title(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.padding(12.dp)
     ) {
@@ -63,7 +63,7 @@ fun Create() {
                     .fillMaxHeight()
             ) {
                 Text(
-                    strings().creator.instance.instance(),
+                    Strings.creator.instance.instance(),
                     style = MaterialTheme.typography.titleSmall
                 )
                 TextBox(
@@ -72,7 +72,7 @@ fun Create() {
                         prevInstanceName = instanceName
                         instanceName = it
                     },
-                    placeholder = strings().creator.name()
+                    placeholder = Strings.creator.name()
                 )
             }
 
@@ -84,7 +84,7 @@ fun Create() {
                     .fillMaxHeight()
             ) {
                 Text(
-                    strings().creator.instance.version(),
+                    Strings.creator.instance.version(),
                     style = MaterialTheme.typography.titleSmall
                 )
                 VersionSelector(
@@ -113,7 +113,7 @@ fun Create() {
                 }
 
                 Text(
-                    strings().creator.instance.saves(),
+                    Strings.creator.instance.saves(),
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
@@ -138,7 +138,7 @@ fun Create() {
                 }
 
                 Text(
-                    strings().creator.instance.resourcepacks(),
+                    Strings.creator.instance.resourcepacks(),
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
@@ -163,7 +163,7 @@ fun Create() {
                 }
 
                 Text(
-                    strings().creator.instance.options(),
+                    Strings.creator.instance.options(),
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
@@ -183,7 +183,7 @@ fun Create() {
                     .fillMaxHeight()
             ) {
                 TitledSwitch(
-                    strings().creator.instance.mods(),
+                    Strings.creator.instance.mods(),
                     checked = hasMods,
                     onCheckedChange = {
                         hasMods = it
@@ -261,7 +261,7 @@ fun Create() {
                 (!hasMods || modsContent?.isValid() ?: false)
         ) {
             Text(
-                strings().creator.buttonCreate()
+                Strings.creator.buttonCreate()
             )
         }
     }
@@ -278,7 +278,7 @@ fun Create() {
 
             PopupOverlay(
                 type = PopupType.ERROR,
-                titleRow = { Text(strings().creator.instance.popup.failure()) },
+                titleRow = { Text(Strings.creator.instance.popup.failure()) },
                 content = { Text(it.toString()) },
                 buttonRow = {
                     Button(
@@ -287,13 +287,13 @@ fun Create() {
                             creationException = null
                         }
                     ) {
-                        Text(strings().creator.instance.popup.back())
+                        Text(Strings.creator.instance.popup.back())
                     }
                 }
             )
         } ?: PopupOverlay(
             type = PopupType.SUCCESS,
-            titleRow = { Text(strings().creator.instance.popup.success()) },
+            titleRow = { Text(Strings.creator.instance.popup.success()) },
             buttonRow = {
                 Button(
                     onClick = {
@@ -301,7 +301,7 @@ fun Create() {
                         NavigationContext.navigateTo(NavigationState.INSTANCES)
                     }
                 ) {
-                    Text(strings().creator.instance.popup.backToInstances())
+                    Text(Strings.creator.instance.popup.backToInstances())
                 }
             }
         )

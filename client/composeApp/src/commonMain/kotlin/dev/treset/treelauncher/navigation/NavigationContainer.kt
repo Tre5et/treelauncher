@@ -23,7 +23,7 @@ import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.update.updater
 import dev.treset.treelauncher.generic.IconButton
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.icons
 import java.awt.image.BufferedImage
@@ -114,13 +114,13 @@ fun NavigationContainer(
                         NavigationState.INSTANCES,
                         navigationState,
                         icons().instances,
-                        strings().nav.home(),
+                        Strings.nav.home(),
                     )
                     NavigationButton(
                         NavigationState.ADD,
                         navigationState,
                         icons().add,
-                        strings().nav.add()
+                        Strings.nav.add()
                     )
                 }
 
@@ -132,25 +132,25 @@ fun NavigationContainer(
                         NavigationState.SAVES,
                         navigationState,
                         icons().saves,
-                        strings().nav.saves()
+                        Strings.nav.saves()
                     )
                     NavigationButton(
                         NavigationState.RESSOURCE_PACKS,
                         navigationState,
                         icons().resourcePacks,
-                        strings().nav.resourcepacks()
+                        Strings.nav.resourcepacks()
                     )
                     NavigationButton(
                         NavigationState.OPTIONS,
                         navigationState,
                         icons().options,
-                        strings().nav.options()
+                        Strings.nav.options()
                     )
                     NavigationButton(
                         NavigationState.MODS,
                         navigationState,
                         icons().mods,
-                        strings().nav.mods()
+                        Strings.nav.mods()
                     )
                 }
 
@@ -161,17 +161,17 @@ fun NavigationContainer(
                     NavigationButton(
                         NavigationState.SETTINGS,
                         navigationState,
-                        tooltip = strings().nav.settings()
+                        tooltip = Strings.nav.settings()
                     ) {
                         Icon(
                             icons().settings,
-                            contentDescription = strings().nav.settings(),
+                            contentDescription = Strings.nav.settings(),
                             modifier = Modifier.size(36.dp)
                         )
                         profileImage?.let {
                             Image(
                                 it.toComposeImageBitmap(),
-                                contentDescription = strings().nav.settings(),
+                                contentDescription = Strings.nav.settings(),
                                 contentScale = FixedScale(LocalDensity.current.density * 3.5f),
                                 filterQuality = FilterQuality.None,
                                 modifier = Modifier

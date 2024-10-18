@@ -1,13 +1,10 @@
 package dev.treset.treelauncher.backend.config
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.google.gson.annotations.SerializedName
-import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.SerializationException
 import dev.treset.mcdl.mods.ModProvider
@@ -16,10 +13,10 @@ import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.sort.*
-import dev.treset.treelauncher.localization.Language
-import dev.treset.treelauncher.localization.language
+import dev.treset.treelauncher.localization.SystemLanguage
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.DetailsListDisplay
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
 import java.util.*
 
@@ -61,7 +58,7 @@ data class Window(
 
 
 class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
-    var language = mutableStateOf(language().systemLanguage)
+    var language = mutableStateOf(SystemLanguage)
     var theme = mutableStateOf(Theme.SYSTEM)
     var accentColor = mutableStateOf(AccentColor.GREEN)
     var customColor = mutableStateOf(Color.White)

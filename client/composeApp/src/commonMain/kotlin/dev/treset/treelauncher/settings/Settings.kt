@@ -9,13 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.generic.TitledColumn
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 
 @Composable
 fun Settings() {
     TitledColumn(
-        title = strings().settings.title(),
+        title = Strings.settings.title(),
         modifier = Modifier.padding(top = 12.dp)
     ) {
         Column(

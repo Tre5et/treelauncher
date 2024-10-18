@@ -4,7 +4,7 @@ import dev.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class NewResourcepackCreator(
     data: NewCreationData,
@@ -73,4 +73,4 @@ object ResourcepackCreator {
 }
 
 val CreationStep.RESOURCEPACKS: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.resourcepacks() }
+    get() = FormatStringProvider { Strings.creator.status.resourcepacks() }

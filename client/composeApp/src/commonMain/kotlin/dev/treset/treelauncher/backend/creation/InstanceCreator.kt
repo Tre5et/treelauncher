@@ -6,7 +6,7 @@ import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.exception.ComponentCreationException
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 class InstanceCreator(
@@ -96,4 +96,4 @@ class InstanceCreationData: NewCreationData {
 }
 
 val CreationStep.INSTANCE: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.instance() }
+    get() = FormatStringProvider { Strings.creator.status.instance() }

@@ -9,7 +9,7 @@ import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 class JavaComponentCreator(
@@ -87,4 +87,4 @@ class JavaCreationData(
     parent: ParentManifest
 ): NewCreationData(name, parent)
 
-val JAVA = FormatStringProvider { strings().creator.status.java() }
+val JAVA = FormatStringProvider { Strings.creator.status.java() }

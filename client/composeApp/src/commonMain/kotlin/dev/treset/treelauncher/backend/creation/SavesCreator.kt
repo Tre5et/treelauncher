@@ -4,7 +4,7 @@ import dev.treset.treelauncher.backend.data.manifest.SavesComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class NewSavesCreator(
     data: NewCreationData,
@@ -73,4 +73,4 @@ object SavesCreator {
 }
 
 val CreationStep.SAVES: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.saves() }
+    get() = FormatStringProvider { Strings.creator.status.saves() }

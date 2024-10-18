@@ -12,7 +12,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
 
@@ -28,7 +28,7 @@ class QuiltVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating quilt version..." }
-        statusProvider.next(strings().creator.status.message.vanillaVersion())
+        statusProvider.next(Strings.creator.status.message.vanillaVersion())
 
         if (data.profile.inheritsFrom == null) {
             throw IOException("Unable to create quilt version: no valid quilt profile")
@@ -135,6 +135,6 @@ class QuiltCreationData(
 ): VersionCreationData(profile.id, profile.id, files)
 
 val CreationStep.VERSION_QUILT: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.version.quilt() }
+    get() = FormatStringProvider { Strings.creator.status.version.quilt() }
 val CreationStep.VERSION_QUILT_LIBRARIES: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.version.quiltLibraries() }
+    get() = FormatStringProvider { Strings.creator.status.version.quiltLibraries() }

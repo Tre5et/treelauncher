@@ -14,7 +14,7 @@ import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.creation.CreationContent
 import dev.treset.treelauncher.creation.CreationMode
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 class ModsCreationContent(
@@ -147,7 +147,7 @@ fun ModsCreation(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         TitledRadioButton(
-            text = strings().creator.radioCreate(),
+            text = Strings.creator.radioCreate(),
             selected = mode == CreationMode.NEW,
             onClick = { mode = CreationMode.NEW }
         )
@@ -156,7 +156,7 @@ fun ModsCreation(
             onTextChanged = {
                 newName = it
             },
-            placeholder = strings().creator.name(),
+            placeholder = Strings.creator.name(),
             enabled = mode == CreationMode.NEW
         )
         Row(
@@ -168,14 +168,14 @@ fun ModsCreation(
                 onSelected = {
                     newVersion = it
                 },
-                placeholder = strings().creator.mods.version(),
+                placeholder = Strings.creator.mods.version(),
                 loading = versions.isEmpty(),
                 toDisplayString = { id },
                 enabled = mode == CreationMode.NEW
             )
 
             TitledCheckBox(
-                title = strings().creator.version.showSnapshots(),
+                title = Strings.creator.version.showSnapshots(),
                 checked = showSnapshots,
                 onCheckedChange = {
                     showSnapshots = it
@@ -193,12 +193,12 @@ fun ModsCreation(
                 onSelected = {
                     newType = it
                 },
-                placeholder = strings().creator.mods.type(),
+                placeholder = Strings.creator.mods.type(),
                 enabled = mode == CreationMode.NEW
             )
             if(newType == VersionType.QUILT) {
                 TitledCheckBox(
-                    title = strings().creator.mods.quiltIncludeFabric(),
+                    title = Strings.creator.mods.quiltIncludeFabric(),
                     checked = alternateLoader,
                     onCheckedChange = {
                         alternateLoader = it
@@ -208,7 +208,7 @@ fun ModsCreation(
         }
 
         TitledRadioButton(
-            text = strings().creator.radioInherit(),
+            text = Strings.creator.radioInherit(),
             selected = mode == CreationMode.INHERIT,
             onClick = { mode = CreationMode.INHERIT }
         )
@@ -217,7 +217,7 @@ fun ModsCreation(
             onTextChanged = {
                 inheritName = it
             },
-            placeholder = strings().creator.name(),
+            placeholder = Strings.creator.name(),
             enabled = mode == CreationMode.INHERIT
         )
         ComboBox(
@@ -226,14 +226,14 @@ fun ModsCreation(
             onSelected = {
                 inheritSelected = it
             },
-            placeholder = strings().creator.component(),
+            placeholder = Strings.creator.component(),
             toDisplayString = { name },
             enabled = mode == CreationMode.INHERIT
         )
 
         if(showUse) {
             TitledRadioButton(
-                text = strings().creator.radioUse(),
+                text = Strings.creator.radioUse(),
                 selected = mode == CreationMode.USE,
                 onClick = { mode = CreationMode.USE }
             )
@@ -243,7 +243,7 @@ fun ModsCreation(
                 onSelected = {
                     useSelected = it
                 },
-                placeholder = strings().creator.component(),
+                placeholder = Strings.creator.component(),
                 toDisplayString = { name },
                 enabled = mode == CreationMode.USE
             )
@@ -266,7 +266,7 @@ fun ModsCreation(
                     }
                 }
             ) {
-                Text(strings().creator.buttonCreate())
+                Text(Strings.creator.buttonCreate())
             }
         }
 

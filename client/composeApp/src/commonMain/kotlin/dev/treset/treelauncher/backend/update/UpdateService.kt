@@ -1,8 +1,8 @@
 package dev.treset.treelauncher.backend.update
 
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.util.HttpService
-import dev.treset.treelauncher.localization.language
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 class UpdateService(url: String) : HttpService(url) {
@@ -10,8 +10,8 @@ class UpdateService(url: String) : HttpService(url) {
     fun update(): Update {
         val result: Pair<HttpStatusCode, ByteArray> = get(
             "update",
-            strings().launcher.version(),
-            language().appLanguage.locale
+            Strings.launcher.version(),
+            AppSettings.language.value.locale
         )
         val response = String(result.second)
         return try {

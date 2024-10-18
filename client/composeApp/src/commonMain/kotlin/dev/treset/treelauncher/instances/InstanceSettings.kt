@@ -23,7 +23,7 @@ import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TextBox
 import dev.treset.treelauncher.generic.TitledColumn
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.BufferedReader
 import java.io.IOException
@@ -84,7 +84,7 @@ fun InstanceSettings(
     }
 
     TitledColumn(
-        title = strings().manager.instance.settings.title(),
+        title = Strings.manager.instance.settings.title(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Column(
@@ -93,7 +93,7 @@ fun InstanceSettings(
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
-                strings().manager.instance.settings.memory(),
+                Strings.manager.instance.settings.memory(),
                 style = MaterialTheme.typography.titleMedium
             )
             Row(
@@ -117,7 +117,7 @@ fun InstanceSettings(
                         memory = it.toIntOrNull()?.let { num -> if(num in 256..(systemMemory ?: 256)) num else null} ?: memory
                     },
                     suffix = {
-                        Text(strings().units.megabytes())
+                        Text(Strings.units.megabytes())
                     },
                     enabled = systemMemory != null && memory != null
                 )
@@ -129,7 +129,7 @@ fun InstanceSettings(
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
-                strings().manager.instance.settings.resolution(),
+                Strings.manager.instance.settings.resolution(),
                 style = MaterialTheme.typography.titleMedium
             )
             Row(
@@ -142,11 +142,11 @@ fun InstanceSettings(
                         res = Pair(it.toIntOrNull()?.let { num -> if(num > 0) num else null} ?: res.first, res.second)
                     },
                     suffix = {
-                        Text(strings().units.pixels())
+                        Text(Strings.units.pixels())
                     }
                 )
 
-                Text(strings().units.resolutionBy())
+                Text(Strings.units.resolutionBy())
 
                 TextBox(
                     text = res.second.toString(),
@@ -154,7 +154,7 @@ fun InstanceSettings(
                         res = Pair(res.first, it.toIntOrNull()?.let { num -> if(num > 0) num else null} ?: res.second)
                     },
                     suffix = {
-                        Text(strings().units.pixels())
+                        Text(Strings.units.pixels())
                     }
                 )
             }
@@ -166,7 +166,7 @@ fun InstanceSettings(
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
-                strings().manager.instance.settings.arguments(),
+                Strings.manager.instance.settings.arguments(),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -197,7 +197,7 @@ fun InstanceSettings(
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = strings().manager.instance.settings.deleteArgument()
+                            tooltip = Strings.manager.instance.settings.deleteArgument()
                         )
                     }
 
@@ -215,7 +215,7 @@ fun InstanceSettings(
                     onTextChanged = {
                         newArg = it
                     },
-                    placeholder = strings().manager.instance.settings.argumentPlaceholder(),
+                    placeholder = Strings.manager.instance.settings.argumentPlaceholder(),
                 )
 
                 IconButton(
@@ -226,7 +226,7 @@ fun InstanceSettings(
                     icon = icons().add,
                     size = 32.dp,
                     enabled = newArg.isNotBlank(),
-                    tooltip = strings().manager.instance.settings.addArgument()
+                    tooltip = Strings.manager.instance.settings.addArgument()
                 )
             }
         }

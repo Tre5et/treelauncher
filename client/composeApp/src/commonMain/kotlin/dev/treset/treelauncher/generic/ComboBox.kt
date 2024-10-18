@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.hovered
@@ -30,7 +30,7 @@ fun <T> ComboBox(
     onSelected: (T?) -> Unit = {},
     placeholder: String = "",
     loading: Boolean = false,
-    loadingPlaceholder: String = strings().comboBox.loading(),
+    loadingPlaceholder: String = Strings.comboBox.loading(),
     selected: T? = null,
     allowUnselect: Boolean,
     allowSearch: Boolean = false,
@@ -120,7 +120,7 @@ fun <T> ComboBox(
                 TextBox(
                     text = search,
                     onTextChanged = { search = it },
-                    placeholder = strings().comboBox.search(),
+                    placeholder = Strings.comboBox.search(),
                     leadingIcon = {
                         Icon(
                             icons().search,
@@ -157,7 +157,7 @@ fun <T> ComboBox(
     onSelected: (T) -> Unit = {},
     placeholder: String = "",
     loading: Boolean = false,
-    loadingPlaceholder: String = strings().creator.version.loading(),
+    loadingPlaceholder: String = Strings.creator.version.loading(),
     selected: T? = null,
     toDisplayString: T.() -> String = { toString() },
     allowSearch: Boolean = false,
@@ -185,7 +185,7 @@ fun <T> TitledComboBox(
     items: List<T>,
     onSelected: (T?) -> Unit = {},
     loading: Boolean = false,
-    loadingPlaceholder: String = strings().creator.version.loading(),
+    loadingPlaceholder: String = Strings.creator.version.loading(),
     placeholder: String = "",
     selected: T? = null,
     allowUnselect: Boolean,
@@ -227,7 +227,7 @@ fun <T> TitledComboBox(
     items: List<T>,
     onSelected: (T) -> Unit = {},
     loading: Boolean = false,
-    loadingPlaceholder: String = strings().creator.version.loading(),
+    loadingPlaceholder: String = Strings.creator.version.loading(),
     placeholder: String = "",
     selected: T? = null,
     allowSearch: Boolean = false,

@@ -12,7 +12,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.AppContextData
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 @Composable
@@ -26,7 +26,7 @@ fun InstanceVersionChanger(
     var showFailed: Exception? by remember { mutableStateOf(null) }
 
     TitledColumn(
-        title = strings().manager.instance.change.activeTitle(InstanceDetails.VERSION, instance.versionComponents[0].name),
+        title = Strings.manager.instance.change.activeTitle(InstanceDetails.VERSION, instance.versionComponents[0].name),
     ) {
 
         Row(
@@ -62,8 +62,8 @@ fun InstanceVersionChanger(
     execute?.let {
         PopupOverlay(
             type = PopupType.WARNING,
-            titleRow = { Text(strings().manager.instance.change.title()) },
-            content = { Text(strings().manager.instance.change.message()) },
+            titleRow = { Text(Strings.manager.instance.change.title()) },
+            content = { Text(Strings.manager.instance.change.message()) },
             buttonRow = {
                 Button(
                     onClick = {
@@ -71,7 +71,7 @@ fun InstanceVersionChanger(
                     },
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().manager.instance.change.cancel())
+                    Text(Strings.manager.instance.change.cancel())
                 }
                 Button(
                     onClick = {
@@ -83,7 +83,7 @@ fun InstanceVersionChanger(
                         execute = null
                     }
                 ) {
-                    Text(strings().manager.instance.change.confirm())
+                    Text(Strings.manager.instance.change.confirm())
                 }
             }
         )
@@ -92,14 +92,14 @@ fun InstanceVersionChanger(
     if(showDone) {
         PopupOverlay(
             type = PopupType.SUCCESS,
-            titleRow = { Text(strings().manager.instance.change.success()) },
+            titleRow = { Text(Strings.manager.instance.change.success()) },
             buttonRow = {
                 Button(
                     onClick = {
                         showDone = false
                     }
                 ) {
-                    Text(strings().manager.instance.change.back())
+                    Text(Strings.manager.instance.change.back())
                 }
             }
         )
@@ -108,7 +108,7 @@ fun InstanceVersionChanger(
     showFailed?.let {
         PopupOverlay(
             type = PopupType.ERROR,
-            titleRow = { Text(strings().manager.instance.change.failure()) },
+            titleRow = { Text(Strings.manager.instance.change.failure()) },
             content = { Text(it.toString()) },
             buttonRow = {
                 Button(
@@ -116,7 +116,7 @@ fun InstanceVersionChanger(
                         showFailed = null
                     }
                 ) {
-                    Text(strings().manager.instance.change.back())
+                    Text(Strings.manager.instance.change.back())
                 }
             }
         )

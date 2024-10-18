@@ -4,7 +4,7 @@ import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class NewOptionCreator(
     data: NewCreationData,
@@ -73,4 +73,4 @@ object OptionsCreator {
 }
 
 val CreationStep.OPTIONS: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.options() }
+    get() = FormatStringProvider { Strings.creator.status.options() }

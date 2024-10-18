@@ -1,22 +1,7 @@
 package dev.treset.treelauncher.settings
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.generic.PopupData
-import dev.treset.treelauncher.generic.PopupOverlay
-import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.generic.TextBox
-import dev.treset.treelauncher.localization.strings
-import dev.treset.treelauncher.style.disabledContainer
-import dev.treset.treelauncher.style.disabledContent
 
 @Composable
 fun Sync() {
@@ -35,7 +20,7 @@ fun Sync() {
             LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                strings().settings.sync.title(),
+                Strings.settings.sync.title(),
                 style = MaterialTheme.typography.titleSmall,
                 color = LocalContentColor.current.disabledContent()
             )
@@ -56,7 +41,7 @@ fun Sync() {
                     {
                         tfUrl = it
                     },
-                    placeholder = strings().settings.sync.url(),
+                    placeholder = Strings.settings.sync.url(),
                     enabled = false
                 )
                 Text(
@@ -68,7 +53,7 @@ fun Sync() {
                     {
                         tfPort = it
                     },
-                    placeholder = strings().settings.sync.port(),
+                    placeholder = Strings.settings.sync.port(),
                     enabled = false
                 )
             }
@@ -78,7 +63,7 @@ fun Sync() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    strings().settings.sync.key(),
+                    Strings.settings.sync.key(),
                     color = LocalContentColor.current.disabledContent()
                 )
                 TextBox(
@@ -86,7 +71,7 @@ fun Sync() {
                     {
                         tfKey = it
                     },
-                    placeholder = strings().settings.sync.keyPlaceholder(),
+                    placeholder = Strings.settings.sync.keyPlaceholder(),
                     enabled = false
                 )
             }
@@ -102,12 +87,12 @@ fun Sync() {
 
                     popupContent = PopupData(
                         type = PopupType.SUCCESS,
-                        titleRow = { Text(strings().settings.sync.success()) },
+                        titleRow = { Text(Strings.settings.sync.success()) },
                         buttonRow = {
                             Button(
                                 onClick = { popupContent = null }
                             ) {
-                                Text(strings().settings.sync.close())
+                                Text(Strings.settings.sync.close())
                             }
                         }
                     )
@@ -117,12 +102,12 @@ fun Sync() {
                 } catch (e: Exception) {
                     popupContent = PopupData(
                         type = PopupType.ERROR,
-                        titleRow = { Text(strings().settings.sync.failure()) },
+                        titleRow = { Text(Strings.settings.sync.failure()) },
                         buttonRow = {
                             Button(
                                 onClick = { popupContent = null }
                             ) {
-                                Text(strings().settings.sync.close())
+                                Text(Strings.settings.sync.close())
                             }
                         }
                     )
@@ -134,7 +119,7 @@ fun Sync() {
             enabled = false
         ) {
             Text(
-                strings().settings.sync.test()
+                Strings.settings.sync.test()
             )
         }*/
         }

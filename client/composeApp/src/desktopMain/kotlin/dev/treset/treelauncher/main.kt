@@ -26,7 +26,7 @@ import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.Window
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.ConfigLoader
 import org.jetbrains.jewel.foundation.theme.JewelTheme
@@ -100,7 +100,7 @@ fun main() = application {
         ) {
             DecoratedWindow(
                 onCloseRequest = { app().exit() },
-                title = strings().launcher.name(),
+                title = Strings.launcher.name(),
                 state = windowState,
                 icon = BitmapPainter(useResource("icon_default.png", ::loadImageBitmap)),
             ) {
@@ -135,7 +135,7 @@ fun main() = application {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                strings().launcher.name(),
+                                Strings.launcher.name(),
                                 style = typography().titleSmall,
                                 modifier = Modifier.offset(y = 2.dp)
                             )
@@ -145,7 +145,7 @@ fun main() = application {
                                     AppContext.openNews()
                                 },
                                 icon = icons().news,
-                                tooltip = strings().news.tooltip(),
+                                tooltip = Strings.news.tooltip(),
                                 modifier = Modifier
                                     .offset(x = 82.dp, y = 1.dp)
                             )

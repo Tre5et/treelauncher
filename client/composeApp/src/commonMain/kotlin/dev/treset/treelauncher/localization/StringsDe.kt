@@ -2,7 +2,7 @@ package dev.treset.treelauncher.localization
 
 import dev.treset.treelauncher.instances.InstanceDetails
 
-class DeStrings : Strings(
+class StringsDe : StringsEn(
     components = Components(
         create = { "Neu erstellen" },
         details = Components.Details (
@@ -230,12 +230,12 @@ class DeStrings : Strings(
                 title = { "Die Version dieser Instanz wirklich ändern?" },
                 activeTitle = { type, name ->
                     when(type) {
-                        InstanceDetails.SAVES -> strings().manager.instance.details.saves()
-                        InstanceDetails.RESOURCE_PACKS -> strings().manager.instance.details.resourcepacks()
-                        InstanceDetails.OPTIONS -> strings().manager.instance.details.options()
-                        InstanceDetails.MODS -> strings().manager.instance.details.mods()
-                        InstanceDetails.VERSION-> strings().manager.instance.details.version()
-                        InstanceDetails.SETTINGS -> strings().manager.instance.details.settings()
+                        InstanceDetails.SAVES -> Strings.manager.instance.details.saves()
+                        InstanceDetails.RESOURCE_PACKS -> Strings.manager.instance.details.resourcepacks()
+                        InstanceDetails.OPTIONS -> Strings.manager.instance.details.options()
+                        InstanceDetails.MODS -> Strings.manager.instance.details.mods()
+                        InstanceDetails.VERSION-> Strings.manager.instance.details.version()
+                        InstanceDetails.SETTINGS -> Strings.manager.instance.details.settings()
                     }.let { ts ->
                         name?.let {
                             "$ts: $name"
@@ -575,14 +575,14 @@ class DeStrings : Strings(
         ),
         update = Settings.Update(
             available = { "Update verfügbar!" },
-            availableMessage = { new, message ->  "Update: v${strings().launcher.version()} → v$new ${message?.let {"\n\n$it"} ?: ""}"},
+            availableMessage = { new, message ->  "Update: v${Strings.launcher.version()} → v$new ${message?.let {"\n\n$it"} ?: ""}"},
             availableTitle = { "Update verfügbar!" },
             cancel = { "Abbrechen" },
             checkingTitle = { "Es wird nach Updates gesucht..." },
             close = { "Schließen" },
             download = { "Herunterladen" },
             downloadingTitle = { "Update wird heruntergeladen..." },
-            latestMessage = { "Aktuelle Version: v${strings().launcher.version()}" },
+            latestMessage = { "Aktuelle Version: v${Strings.launcher.version()}" },
             latestTitle = { "Der Launcher ist aktuell!" },
             successMessage = { "Der Launcher muss neugestartet werden um das Update anzuwenden." },
             successRestart = { "Jetzt Neustarten" },
@@ -599,7 +599,7 @@ class DeStrings : Strings(
             title = { "Update URL" }
         ),
         user = { "Eingeloggt als:" },
-        version = { "Version: v${strings().launcher.version()}" }
+        version = { "Version: v${Strings.launcher.version()}" }
     ),
     sortBox = SortBox(
         sort = SortBox.Sort(

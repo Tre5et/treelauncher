@@ -1,9 +1,9 @@
 package dev.treset.treelauncher.backend.news
 
 import dev.treset.mcdl.json.SerializationException
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.util.HttpService
-import dev.treset.treelauncher.localization.language
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 class NewsService(url: String) : HttpService(url) {
@@ -11,8 +11,8 @@ class NewsService(url: String) : HttpService(url) {
     fun news(): News {
         val result: Pair<HttpStatusCode, ByteArray> = get(
             "news",
-            strings().launcher.version(),
-            language().appLanguage.locale
+            Strings.launcher.version(),
+            AppSettings.language.value.locale
         )
         val response = String(result.second)
         return try {

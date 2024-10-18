@@ -10,7 +10,7 @@ import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.PopupOverlay
 import dev.treset.treelauncher.generic.PopupType
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 @Composable
 fun DeletePopup(
@@ -29,30 +29,30 @@ fun DeletePopup(
     usedBy?.let {
         PopupOverlay(
             type = PopupType.ERROR,
-            titleRow = { Text(strings().selector.component.delete.unableTitle()) },
-            content = { Text(strings().selector.component.delete.unableMessage(it)) },
+            titleRow = { Text(Strings.selector.component.delete.unableTitle()) },
+            content = { Text(Strings.selector.component.delete.unableMessage(it)) },
             buttonRow = {
                 Button (
                     onClick = onClose
                 ) {
-                    Text(strings().selector.component.delete.unableClose())
+                    Text(Strings.selector.component.delete.unableClose())
                 }
             }
         )
     } ?: PopupOverlay(
         type = PopupType.WARNING,
-        titleRow = { Text(strings().selector.component.delete.title()) },
-        content = { Text(strings().selector.component.delete.message()) },
+        titleRow = { Text(Strings.selector.component.delete.title()) },
+        content = { Text(Strings.selector.component.delete.message()) },
         buttonRow = {
             Button(
                 onClick = onClose,
-                content = { Text(strings().selector.component.delete.cancel()) }
+                content = { Text(Strings.selector.component.delete.cancel()) }
             )
             Button(
                 onClick = onConfirm,
                 color = MaterialTheme.colorScheme.error
             ) {
-                Text(strings().selector.component.delete.confirm())
+                Text(Strings.selector.component.delete.confirm())
             }
         }
     )

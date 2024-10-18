@@ -10,7 +10,7 @@ import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.DetailsListDisplay
 
@@ -41,7 +41,7 @@ fun TexturepackButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.saves.delete(),
+                    tooltip = Strings.manager.saves.delete(),
                 )
             }
         }
@@ -62,7 +62,7 @@ fun TexturepackButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.saves.delete()
+                    tooltip = Strings.manager.saves.delete()
                 )
             }
         }
@@ -81,7 +81,7 @@ fun TexturepackButton(
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
-                    tooltip = strings().manager.saves.delete()
+                    tooltip = Strings.manager.saves.delete()
                 )
             }
         }
@@ -90,15 +90,15 @@ fun TexturepackButton(
     if(showDeleteDialog) {
         PopupOverlay(
             type = PopupType.WARNING,
-            titleRow = { Text(strings().manager.resourcepacks.deleteTitle()) },
+            titleRow = { Text(Strings.manager.resourcepacks.deleteTitle()) },
             content = {
-                Text(strings().manager.resourcepacks.deleteMessage())
+                Text(Strings.manager.resourcepacks.deleteMessage())
             },
             buttonRow = {
                 Button(
                     onClick = { showDeleteDialog = false },
                 ) {
-                    Text(strings().manager.resourcepacks.deleteCancel())
+                    Text(Strings.manager.resourcepacks.deleteCancel())
                 }
 
                 Button(
@@ -108,7 +108,7 @@ fun TexturepackButton(
                     },
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().manager.resourcepacks.deleteConfirm())
+                    Text(Strings.manager.resourcepacks.deleteConfirm())
                 }
             }
         )

@@ -7,7 +7,7 @@ import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.launching.ResourceManager
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 private enum class CleanupState(
@@ -16,31 +16,31 @@ private enum class CleanupState(
     val buttonRow: @Composable (close: () -> Unit) -> Unit
 ) {
     RUNNING(
-        title = strings().fixFiles.runningTitle(),
-        content = strings().fixFiles.runningMessage(),
+        title = Strings.fixFiles.runningTitle(),
+        content = Strings.fixFiles.runningMessage(),
         buttonRow = {}
     ),
     SUCCESS(
-        title = strings().fixFiles.successTitle(),
-        content = strings().fixFiles.successMessage(),
+        title = Strings.fixFiles.successTitle(),
+        content = Strings.fixFiles.successMessage(),
         buttonRow = {
             Button(
                 onClick = it,
                 color = MaterialTheme.colorScheme.primary
             ) {
-                Text(strings().fixFiles.close())
+                Text(Strings.fixFiles.close())
             }
         }
     ),
     FAILURE(
-        title = strings().fixFiles.failureTitle(),
-        content = strings().fixFiles.failureMessage(),
+        title = Strings.fixFiles.failureTitle(),
+        content = Strings.fixFiles.failureMessage(),
         buttonRow = {
             Button(
                 onClick = it,
                 color = MaterialTheme.colorScheme.error
             ) {
-                Text(strings().fixFiles.close())
+                Text(Strings.fixFiles.close())
             }
         }
     )
@@ -63,7 +63,7 @@ fun FixFiles() {
                     showPopup = true
                 },
                 content = {
-                    Text(strings().fixFiles.notification())
+                    Text(Strings.fixFiles.notification())
                 }
             ).also { AppContext.addNotification(it) }
         }
@@ -72,16 +72,16 @@ fun FixFiles() {
     if(showPopup) {
         PopupOverlay(
             type = PopupType.WARNING,
-            titleRow = { Text(strings().fixFiles.title()) },
+            titleRow = { Text(Strings.fixFiles.title()) },
             content = {
-                Text(strings().fixFiles.message())
+                Text(Strings.fixFiles.message())
             },
             buttonRow = {
                 Button(
                     onClick = { showPopup = false },
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().fixFiles.cancel())
+                    Text(Strings.fixFiles.cancel())
                 }
 
                 Button(
@@ -138,7 +138,7 @@ fun FixFiles() {
                     },
                     color = MaterialTheme.colorScheme.primary
                 ) {
-                    Text(strings().fixFiles.confirm())
+                    Text(Strings.fixFiles.confirm())
                 }
             }
         )

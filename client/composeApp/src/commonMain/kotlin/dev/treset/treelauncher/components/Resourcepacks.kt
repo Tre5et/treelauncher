@@ -25,7 +25,7 @@ import dev.treset.treelauncher.creation.CreationMode
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.ListDisplayBox
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
@@ -52,7 +52,7 @@ fun Resourcepacks() {
     }
 
     Components(
-        strings().selector.resourcepacks.title(),
+        Strings.selector.resourcepacks.title(),
         components = components,
         componentManifest = AppContext.files.resourcepackManifest,
         checkHasComponent = { details, component -> details.resourcepacksComponent == component.id },
@@ -108,7 +108,7 @@ fun Resourcepacks() {
                         }
                     },
                     icons().resourcePacks,
-                    strings().manager.resourcepacks.import,
+                    Strings.manager.resourcepacks.import,
                     fileExtensions = listOf("zip"),
                     allowDirectoryPicker = true,
                     filesToAdd = filesToAdd,
@@ -132,14 +132,14 @@ fun Resourcepacks() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            strings().selector.resourcepacks.emptyTitle(),
+                            Strings.selector.resourcepacks.emptyTitle(),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            strings().selector.resourcepacks.empty().let {
+                            Strings.selector.resourcepacks.empty().let {
                                 Text(it.first)
                                 Icon(
                                     icons().add,
@@ -153,7 +153,7 @@ fun Resourcepacks() {
                 } else {
                     if(displayData.resourcepacks.isNotEmpty()) {
                         Text(
-                            strings().selector.resourcepacks.resourcepacks(),
+                            Strings.selector.resourcepacks.resourcepacks(),
                             style = MaterialTheme.typography.titleMedium
                         )
                         displayData.resourcepacks.forEach {
@@ -172,7 +172,7 @@ fun Resourcepacks() {
                     }
                     if(displayData.texturepacks.isNotEmpty()) {
                         Text(
-                            strings().selector.resourcepacks.texturepacks(),
+                            Strings.selector.resourcepacks.texturepacks(),
                             style = MaterialTheme.typography.titleMedium
                         )
                         displayData.texturepacks.forEach {
@@ -200,7 +200,7 @@ fun Resourcepacks() {
                     },
                     icon = icons().add,
                     size = 32.dp,
-                    tooltip = strings().manager.saves.tooltipAdd()
+                    tooltip = Strings.manager.saves.tooltipAdd()
                 )
             }
         },
@@ -215,7 +215,7 @@ fun Resourcepacks() {
                         },
                         icon = icons().back,
                         size = 32.dp,
-                        tooltip = strings().manager.component.import.back(),
+                        tooltip = Strings.manager.component.import.back(),
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
                 }

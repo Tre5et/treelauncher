@@ -1,7 +1,7 @@
 package dev.treset.treelauncher.backend.util
 
 import dev.treset.mcdl.util.DownloadStatus
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 open class Status(
     private val stepProvider: StringProvider,
@@ -36,7 +36,7 @@ class DetailsProvider(
         total: Int
     ) : this({ message }, index, total)
 
-    override fun get(): String = strings().statusDetailsMessage(message(), index, total)
+    override fun get(): String = Strings.statusDetailsMessage(message(), index, total)
 }
 
 class StatusProvider(

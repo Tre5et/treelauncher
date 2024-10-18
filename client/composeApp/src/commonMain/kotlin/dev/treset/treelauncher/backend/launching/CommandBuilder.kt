@@ -8,7 +8,7 @@ import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.QuickPlayData
 import dev.treset.treelauncher.backend.util.exception.GameCommandException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import java.io.File
 
 class CommandContext(
@@ -140,8 +140,8 @@ class CommandBuilder(
             libraries,
             instanceData.librariesDir.absolutePath,
             nativesDir,
-            strings().game.versionName(instanceData),
-            strings().game.versionType(instanceData),
+            Strings.game.versionName(instanceData),
+            Strings.game.versionType(instanceData),
             resX,
             resY,
             quickPlayData
@@ -227,11 +227,11 @@ class CommandBuilder(
             }
 
             "launcher_name" -> {
-                strings().launcher.name()
+                Strings.launcher.name()
             }
 
             "launcher_version" -> {
-                strings().launcher.version()
+                Strings.launcher.version()
             }
 
             "classpath" -> {

@@ -16,7 +16,7 @@ import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledColumn
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -62,7 +62,7 @@ fun InstanceComponentChanger(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(text = strings().manager.instance.change.activeTitle(type, current?.name))
+                Text(text = Strings.manager.instance.change.activeTitle(type, current?.name))
                 current?.let {
                     IconButton(
                         onClick = {
@@ -70,7 +70,7 @@ fun InstanceComponentChanger(
                         },
                         icon = icons().folder,
                         size = 32.dp,
-                        tooltip = strings().selector.component.openFolder()
+                        tooltip = Strings.selector.component.openFolder()
                     )
                 }
             }
@@ -88,7 +88,7 @@ fun InstanceComponentChanger(
                     selected = it
                 },
                 allowUnselect = allowUnselect,
-                placeholder = strings().manager.instance.change.noComponent(),
+                placeholder = Strings.manager.instance.change.noComponent(),
                 selected = selected,
                 toDisplayString = { name },
                 loading = components.isEmpty()
@@ -134,7 +134,7 @@ fun InstanceComponentChanger(
                 },
                 icon = icons().change,
                 enabled = (allowUnselect || selected != null) && selected != current,
-                tooltip = strings().changer.apply()
+                tooltip = Strings.changer.apply()
             )
         }
     }

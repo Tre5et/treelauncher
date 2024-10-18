@@ -43,7 +43,7 @@ import dev.treset.treelauncher.components.mods.display.ModDataProvider
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.style.inverted
@@ -77,7 +77,7 @@ fun Mods() {
     var droppedFile by remember { mutableStateOf<LauncherFile?>(null) }
 
     Components(
-        title = strings().selector.mods.title(),
+        title = Strings.selector.mods.title(),
         components = components,
         componentManifest = AppContext.files.modsManifest,
         checkHasComponent = { details, component -> details.modsComponent == component.id },
@@ -266,14 +266,14 @@ fun Mods() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            strings().selector.mods.emptyTitle(),
+                            Strings.selector.mods.emptyTitle(),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            strings().selector.mods.empty().let {
+                            Strings.selector.mods.empty().let {
                                 Text(it.first)
                                 Icon(
                                     icons().add,
@@ -290,7 +290,7 @@ fun Mods() {
                         onTextChanged = {
                             searchContent = it
                         },
-                        placeholder = strings().manager.mods.searchPlaceholder(),
+                        placeholder = Strings.manager.mods.searchPlaceholder(),
                         trailingIcon = {
                             Icon(
                                 icons().search,
@@ -309,7 +309,7 @@ fun Mods() {
                             item {
                                 if (filteredMods.isEmpty()) {
                                     Text(
-                                        strings().manager.mods.empty(),
+                                        Strings.manager.mods.empty(),
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
@@ -349,7 +349,7 @@ fun Mods() {
                                     tint = MaterialTheme.colorScheme.onPrimary,
                                 )
                                 Text(
-                                    strings().manager.mods.update.notViewed(notViewedMods.size),
+                                    Strings.manager.mods.update.notViewed(notViewedMods.size),
                                     color = MaterialTheme.colorScheme.onPrimary,
                                 )
                             }
@@ -371,7 +371,7 @@ fun Mods() {
                                     .padding(horizontal = 8.dp)
                             ) {
                                 Text(
-                                    strings().manager.mods.update.remaining(toUpdateMods.size),
+                                    Strings.manager.mods.update.remaining(toUpdateMods.size),
                                     color = MaterialTheme.colorScheme.onPrimary,
                                 )
                             }
@@ -396,7 +396,7 @@ fun Mods() {
                                     .padding(bottom = 2.dp)
                             ) {
                                 Text(
-                                    strings().manager.mods.update.noUpdates(),
+                                    Strings.manager.mods.update.noUpdates(),
                                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 )
                             }
@@ -427,7 +427,7 @@ fun Mods() {
                     )
 
                     TitledCheckBox(
-                        title = strings().creator.version.showSnapshots(),
+                        title = Strings.creator.version.showSnapshots(),
                         checked = showSnapshots,
                         onCheckedChange = {
                             showSnapshots = it
@@ -436,7 +436,7 @@ fun Mods() {
 
                     if(selectedType == VersionType.QUILT) {
                         TitledCheckBox(
-                            title = strings().creator.mods.quiltIncludeFabric(),
+                            title = Strings.creator.mods.quiltIncludeFabric(),
                             checked = includeAlternateLoader,
                             onCheckedChange = {
                                 includeAlternateLoader = it
@@ -450,9 +450,9 @@ fun Mods() {
                             selectedVersion?.let { v ->
                                 popupData = PopupData(
                                     type = PopupType.WARNING,
-                                    titleRow = { Text(strings().manager.mods.change.title()) },
+                                    titleRow = { Text(Strings.manager.mods.change.title()) },
                                     content = {
-                                        Text(strings().manager.mods.change.message())
+                                        Text(Strings.manager.mods.change.message())
                                     },
                                     buttonRow = {
                                         Button(
@@ -461,7 +461,7 @@ fun Mods() {
                                             },
                                             color = MaterialTheme.colorScheme.error
                                         ) {
-                                            Text(strings().manager.mods.change.cancel())
+                                            Text(Strings.manager.mods.change.cancel())
                                         }
 
                                         Button(
@@ -478,7 +478,7 @@ fun Mods() {
                                                 }
                                             }
                                         ) {
-                                            Text(strings().manager.mods.change.confirm())
+                                            Text(Strings.manager.mods.change.confirm())
                                         }
                                     }
                                 )
@@ -513,7 +513,7 @@ fun Mods() {
                     },
                     icon = icons().add,
                     size = 32.dp,
-                    tooltip = strings().manager.mods.add()
+                    tooltip = Strings.manager.mods.add()
                 )
 
                 Box(
@@ -526,7 +526,7 @@ fun Mods() {
                         },
                         icon = icons().expand,
                         size = 24.dp,
-                        tooltip = strings().manager.mods.update.settings(),
+                        tooltip = Strings.manager.mods.update.settings(),
                         modifier = Modifier
                             .offset(x = 20.dp)
                             .rotate(updateRotation)
@@ -538,7 +538,7 @@ fun Mods() {
                         },
                         icon = icons().update,
                         size = 32.dp,
-                        tooltip = strings().manager.mods.update.tooltip(),
+                        tooltip = Strings.manager.mods.update.tooltip(),
                     )
 
                     DropdownMenu(
@@ -553,7 +553,7 @@ fun Mods() {
                         ) {
 
                             TitledCheckBox(
-                                strings().manager.mods.update.auto(),
+                                Strings.manager.mods.update.auto(),
                                 AppSettings.isModsUpdate.value,
                                 {
                                     AppSettings.isModsUpdate.value = it
@@ -565,7 +565,7 @@ fun Mods() {
 
                             if(AppSettings.isModsUpdate.value) {
                                 TitledCheckBox(
-                                    strings().manager.mods.update.enable(),
+                                    Strings.manager.mods.update.enable(),
                                     AppSettings.isModsEnable.value,
                                     {
                                         AppSettings.isModsEnable.value = it
@@ -574,7 +574,7 @@ fun Mods() {
                             }
 
                             TitledCheckBox(
-                                strings().manager.mods.update.disable(),
+                                Strings.manager.mods.update.disable(),
                                 AppSettings.isModsDisable.value,
                                 {
                                     AppSettings.isModsDisable.value = it
@@ -593,7 +593,7 @@ fun Mods() {
                         },
                         icon = icons().settings,
                         size = 24.dp,
-                        tooltip = strings().manager.mods.settings.tooltip(),
+                        tooltip = Strings.manager.mods.settings.tooltip(),
                         modifier = Modifier.rotate(settingsRotation)
                     )
 
@@ -608,7 +608,7 @@ fun Mods() {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                strings().manager.mods.settings.providers(),
+                                Strings.manager.mods.settings.providers(),
                                 style = MaterialTheme.typography.titleSmall,
                             )
 
@@ -645,7 +645,7 @@ fun Mods() {
                                     PlainTooltip(
                                         caretProperties = TooltipDefaults.caretProperties,
                                     ) {
-                                        Text(strings().manager.mods.settings.help())
+                                        Text(Strings.manager.mods.settings.help())
                                     }
                                 },
                                 state = tooltipState,
@@ -675,7 +675,7 @@ fun Mods() {
                                                 },
                                                 icon = icons().down,
                                                 size = 20.dp,
-                                                tooltip = strings().manager.mods.settings.order(i == 0),
+                                                tooltip = Strings.manager.mods.settings.order(i == 0),
                                                 modifier = Modifier.rotate(if(i == 0) 0f else 180f)
                                             )
 
@@ -689,12 +689,12 @@ fun Mods() {
                                                 },
                                                 icon = if(provider.second) icons().minus else icons().plus,
                                                 size = 20.dp,
-                                                tooltip = strings().manager.mods.settings.state(provider.second),
+                                                tooltip = Strings.manager.mods.settings.state(provider.second),
                                                 enabled = !provider.second || AppSettings.modProviders.firstOrNull { it.first == ModProvider.CURSEFORGE }?.second ?: false
                                             )
 
                                             Text(
-                                                strings().manager.mods.settings.modrinth(),
+                                                Strings.manager.mods.settings.modrinth(),
                                                 style = LocalTextStyle.current.let {
                                                     if(!provider.second) {
                                                         it.copy(
@@ -717,7 +717,7 @@ fun Mods() {
                                             },
                                             icon = icons().down,
                                             size = 20.dp,
-                                            tooltip = strings().manager.mods.settings.order(i == 0),
+                                            tooltip = Strings.manager.mods.settings.order(i == 0),
                                             modifier = Modifier.rotate(if(i == 0) 0f else 180f)
                                         )
 
@@ -731,12 +731,12 @@ fun Mods() {
                                             },
                                             icon = if(provider.second) icons().minus else icons().plus,
                                             size = 20.dp,
-                                            tooltip = strings().manager.mods.settings.state(provider.second),
+                                            tooltip = Strings.manager.mods.settings.state(provider.second),
                                             enabled = !provider.second || AppSettings.modProviders.firstOrNull { it.first == ModProvider.MODRINTH }?.second ?: false
                                         )
 
                                         Text(
-                                            strings().manager.mods.settings.curseforge(),
+                                            Strings.manager.mods.settings.curseforge(),
                                             style = LocalTextStyle.current.let {
                                                 if(!provider.second) {
                                                     it.copy(
@@ -752,7 +752,7 @@ fun Mods() {
                             }
 
                             /*TitledCheckBox(
-                                strings().manager.mods.modrinth(),
+                                Strings.manager.mods.modrinth(),
                                 modrinth,
                                 {
                                     modrinth = it
@@ -762,7 +762,7 @@ fun Mods() {
                             )
 
                             TitledCheckBox(
-                                strings().manager.mods.curseforge(),
+                                Strings.manager.mods.curseforge(),
                                 curseforge,
                                 {
                                     curseforge = it
@@ -812,7 +812,7 @@ fun Mods() {
                         },
                         icon = icons().back,
                         size = 32.dp,
-                        tooltip = strings().manager.mods.addMods.back()
+                        tooltip = Strings.manager.mods.addMods.back()
                     )
                 }
             }

@@ -14,7 +14,7 @@ import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.launching.GameLauncher
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.launchGame
@@ -63,7 +63,7 @@ fun InstanceDetails(
                         size = 32.dp,
                         highlighted = true,
                         enabled = AppContext.runningInstance == null,
-                        tooltip = strings().selector.instance.play()
+                        tooltip = Strings.selector.instance.play()
                     )
                     Text(instance.instance.name)
                     IconButton(
@@ -72,7 +72,7 @@ fun InstanceDetails(
                         },
                         icon = icons().edit,
                         size = 32.dp,
-                        tooltip = strings().selector.component.rename.title()
+                        tooltip = Strings.selector.component.rename.title()
                     )
                     IconButton(
                         onClick = {
@@ -80,7 +80,7 @@ fun InstanceDetails(
                         },
                         icon = icons().folder,
                         size = 32.dp,
-                        tooltip = strings().selector.component.openFolder()
+                        tooltip = Strings.selector.component.openFolder()
                     )
                     IconButton(
                         onClick = {
@@ -93,13 +93,13 @@ fun InstanceDetails(
                         icon = icons().delete,
                         size = 32.dp,
                         interactionTint = MaterialTheme.colorScheme.error,
-                        tooltip = strings().selector.instance.delete.tooltip()
+                        tooltip = Strings.selector.instance.delete.tooltip()
                     )
                 }
         }
     ) {
         SelectorButton(
-            title = strings().manager.instance.details.version(),
+            title = Strings.manager.instance.details.version(),
             component = instance.versionComponents[0],
             icon = icons().version,
             selected = selectedDetails == InstanceDetails.VERSION,
@@ -108,7 +108,7 @@ fun InstanceDetails(
             }
         )
         SelectorButton(
-            title = strings().manager.instance.details.saves(),
+            title = Strings.manager.instance.details.saves(),
             component = instance.savesComponent,
             icon = icons().saves,
             selected = selectedDetails == InstanceDetails.SAVES,
@@ -117,7 +117,7 @@ fun InstanceDetails(
             }
         )
         SelectorButton(
-            title = strings().manager.instance.details.resourcepacks(),
+            title = Strings.manager.instance.details.resourcepacks(),
             component = instance.resourcepacksComponent,
             icon = icons().resourcePacks,
             selected = selectedDetails == InstanceDetails.RESOURCE_PACKS,
@@ -127,7 +127,7 @@ fun InstanceDetails(
             }
         )
         SelectorButton(
-            title = strings().manager.instance.details.options(),
+            title = Strings.manager.instance.details.options(),
             component = instance.optionsComponent,
             icon = icons().options,
             selected = selectedDetails == InstanceDetails.OPTIONS,
@@ -136,7 +136,7 @@ fun InstanceDetails(
             }
         )
         SelectorButton(
-            title = strings().manager.instance.details.mods(),
+            title = Strings.manager.instance.details.mods(),
             component = instance.modsComponent,
             icon = instance.modsComponent?.let { icons().mods } ?: icons().add,
             selected = selectedDetails == InstanceDetails.MODS,
@@ -145,7 +145,7 @@ fun InstanceDetails(
             }
         )
         SelectorButton(
-            title = strings().manager.instance.details.settings(),
+            title = Strings.manager.instance.details.settings(),
             icon = icons().settings,
             selected = selectedDetails == InstanceDetails.SETTINGS,
             onClick = {
@@ -218,12 +218,12 @@ private fun deleteDialog(
     setPopup(
         PopupData(
             type = PopupType.WARNING,
-            titleRow = { Text(strings().selector.instance.delete.title()) },
-            content =  { Text(strings().selector.instance.delete.message()) },
+            titleRow = { Text(Strings.selector.instance.delete.title()) },
+            content =  { Text(Strings.selector.instance.delete.message()) },
             buttonRow = {
                 Button(
                     onClick = { setPopup(null) },
-                    content = { Text(strings().selector.instance.delete.cancel()) }
+                    content = { Text(Strings.selector.instance.delete.cancel()) }
                 )
                 Button(
                     onClick = {
@@ -237,7 +237,7 @@ private fun deleteDialog(
                     },
                     color = MaterialTheme.colorScheme.error
                 ) {
-                    Text(strings().selector.instance.delete.confirm())
+                    Text(Strings.selector.instance.delete.confirm())
                 }
             }
         )

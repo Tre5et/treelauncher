@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.generic.SelectorButton
 import dev.treset.treelauncher.generic.Text
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 
 @Composable
@@ -51,9 +51,9 @@ fun InstanceButton(
 
             Text(
                 if(hovered) {
-                    strings().units.accurateTime(instance.instance.totalTime)
+                    Strings.units.accurateTime(instance.instance.totalTime)
                 } else {
-                    strings().units.approxTime(instance.instance.totalTime)
+                    Strings.units.approxTime(instance.instance.totalTime)
                 }
             )
             Icon(

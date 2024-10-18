@@ -15,7 +15,7 @@ import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.update.updater
 import dev.treset.treelauncher.backend.util.string.openInBrowser
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.navigation.NavigationContext
 import dev.treset.treelauncher.navigation.NavigationState
 import dev.treset.treelauncher.style.icons
@@ -49,12 +49,12 @@ fun Update() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                strings().launcher.name(),
+                Strings.launcher.name(),
                 style = MaterialTheme.typography.titleSmall
             )
             val notificationColor = MaterialTheme.colorScheme.info
             Text(
-                strings().settings.version(),
+                Strings.settings.version(),
                 modifier = Modifier.clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
@@ -72,7 +72,7 @@ fun Update() {
                                     it.dismiss()
                                 }
                                 Text(
-                                    strings().settings.debugNotification(false)
+                                    Strings.settings.debugNotification(false)
                                 )
                             }
                         )
@@ -97,7 +97,7 @@ fun Update() {
                                         it.dismiss()
                                     }
                                     Text(
-                                        strings().settings.debugNotification(true)
+                                        Strings.settings.debugNotification(true)
                                     )
                                 }
                             )
@@ -114,13 +114,13 @@ fun Update() {
             },
             icon = icons().update,
             highlighted = update?.id != null,
-            tooltip = strings().settings.update.tooltip(),
+            tooltip = Strings.settings.update.tooltip(),
             enabled = AppContext.runningInstance == null
         )
 
         if (update?.id != null) {
             Text(
-                strings().settings.update.available()
+                Strings.settings.update.available()
             )
         }
 
@@ -129,7 +129,7 @@ fun Update() {
                 "https://github.com/Tre5et/treelauncher".openInBrowser()
             },
             painter = icons().gitHub,
-            tooltip = strings().settings.sourceTooltip()
+            tooltip = Strings.settings.sourceTooltip()
         )
     }
 

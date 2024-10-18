@@ -16,7 +16,7 @@ import dev.treset.treelauncher.backend.config.AppSettings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.backend.update.UpdateService
 import dev.treset.treelauncher.generic.*
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -38,7 +38,7 @@ fun UpdateUrl() {
                 LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer
             ) {
                 Text(
-                    strings().settings.updateUrl.title(),
+                    Strings.settings.updateUrl.title(),
                     style = MaterialTheme.typography.titleSmall
                 )
 
@@ -50,7 +50,7 @@ fun UpdateUrl() {
                         {
                             tfValue = it
                         },
-                        placeholder = strings().settings.updateUrl.title()
+                        placeholder = Strings.settings.updateUrl.title()
                     )
 
                     IconButton(
@@ -63,20 +63,20 @@ fun UpdateUrl() {
                                 LOGGER.debug(e) { "Unable to update URL" }
                                 popupContent = PopupData(
                                     type = PopupType.ERROR,
-                                    titleRow = { Text(strings().settings.updateUrl.popupTitle()) },
-                                    content = { Text(strings().settings.updateUrl.popupMessage(e)) },
+                                    titleRow = { Text(Strings.settings.updateUrl.popupTitle()) },
+                                    content = { Text(Strings.settings.updateUrl.popupMessage(e)) },
                                     buttonRow = {
                                         Button(
                                             onClick = { popupContent = null }
                                         ) {
-                                            Text(strings().settings.updateUrl.popupClose())
+                                            Text(Strings.settings.updateUrl.popupClose())
                                         }
                                     }
                                 )
                             }
                         },
                         icon = icons().change,
-                        tooltip = strings().settings.updateUrl.apply(),
+                        tooltip = Strings.settings.updateUrl.apply(),
                         enabled = tfValue != AppSettings.updateUrl.value
                     )
                 }

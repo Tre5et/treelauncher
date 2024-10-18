@@ -7,44 +7,9 @@ import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.instances.InstanceDetails
-import java.util.*
 import kotlin.math.roundToInt
 
-enum class Language(val locale: Locale, val strings: Strings, val displayName: () -> String) {
-    ENGLISH(Locale.ENGLISH, Strings(), { strings().language.english(language().systemLanguage == ENGLISH) }),
-    GERMAN(Locale.GERMAN, DeStrings(), { strings().language.german(language().systemLanguage == GERMAN) });
-
-    override fun toString(): String {
-        return this.displayName()
-    }
-}
-class LanguageInfo {
-    val systemLanguage: Language = when (Locale.getDefault(Locale.Category.DISPLAY).language) {
-        "de" -> Language.GERMAN
-        else -> Language.ENGLISH
-    }
-
-    var appLanguage: Language = systemLanguage
-        set(value) {
-            field = value
-            AppSettings.language.value = value
-            strings = when(value) {
-                Language.ENGLISH -> Strings()
-                Language.GERMAN -> DeStrings()
-            }
-        }
-}
-
-private val languageInfo = LanguageInfo()
-fun language() = languageInfo
-
-private var strings: Strings = when(language().appLanguage) {
-    Language.ENGLISH -> Strings()
-    Language.GERMAN -> DeStrings()
-}
-fun strings() = strings
-
-open class Strings(
+open class StringsEn(
     val components: Components = Components(),
     val comboBox: ComboBox = ComboBox(),
     val creator: Creator = Creator(),
@@ -198,14 +163,14 @@ open class Strings(
     )
 
     data class Game(
-        val versionName: (instance: InstanceData) -> String = { instance -> "${strings().launcher.slug()}:${strings().launcher.version()}:${instance.instance.id.substring(0,3)}...${instance.instance.id.substring(instance.instance.id.length - 2)}"},
+        val versionName: (instance: InstanceData) -> String = { instance -> "${Strings.launcher.slug()}:${Strings.launcher.version()}:${instance.instance.id.substring(0,3)}...${instance.instance.id.substring(instance.instance.id.length - 2)}"},
         val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.name }
     )
 
     data class Language(
         val systemLanguage: () -> String = { "system language" },
-        val english: (default: Boolean) -> String = { default ->  "English${if (default) " (${strings().language.systemLanguage()})" else ""}" },
-        val german: (default: Boolean) -> String = { default ->  "Deutsch${if (default) " (${strings().language.systemLanguage()})" else ""}" }
+        val english: (default: Boolean) -> String = { default ->  "English${if (default) " (${Strings.language.systemLanguage()})" else ""}" },
+        val german: (default: Boolean) -> String = { default ->  "Deutsch${if (default) " (${Strings.language.systemLanguage()})" else ""}" }
     )
 
     data class Launcher(
@@ -354,7 +319,7 @@ open class Strings(
             )
 
             data class ImportStrings(
-                val back: () -> String = { strings().manager.component.import.back() },
+                val back: () -> String = { Strings.manager.component.import.back() },
                 val delete: () -> String,
                 val import: () -> String,
                 val importComponent: () -> String,
@@ -363,7 +328,7 @@ open class Strings(
                 val selectedFiles: () -> String,
                 val tooltipAdd: () -> String,
                 val tooltipFile: () -> String,
-                val tooltipExpand: (expanded: Boolean) -> String = { strings().manager.component.import.tooltipExpand(it) },
+                val tooltipExpand: (expanded: Boolean) -> String = { Strings.manager.component.import.tooltipExpand(it) },
                 val unknownCancel: () -> String,
                 val unknownConfirm: () -> String,
                 val unknownMessage: (file: LauncherFile) -> String,
@@ -388,12 +353,12 @@ open class Strings(
                 val title: () -> String = { "You are about to change the version of this Instance!" },
                 val activeTitle: (InstanceDetails, String?) -> String = { type, name ->
                     when(type) {
-                        InstanceDetails.SAVES -> strings().manager.instance.details.saves()
-                        InstanceDetails.RESOURCE_PACKS -> strings().manager.instance.details.resourcepacks()
-                        InstanceDetails.OPTIONS -> strings().manager.instance.details.options()
-                        InstanceDetails.MODS -> strings().manager.instance.details.mods()
-                        InstanceDetails.VERSION-> strings().manager.instance.details.version()
-                        InstanceDetails.SETTINGS -> strings().manager.instance.details.settings()
+                        InstanceDetails.SAVES -> Strings.manager.instance.details.saves()
+                        InstanceDetails.RESOURCE_PACKS -> Strings.manager.instance.details.resourcepacks()
+                        InstanceDetails.OPTIONS -> Strings.manager.instance.details.options()
+                        InstanceDetails.MODS -> Strings.manager.instance.details.mods()
+                        InstanceDetails.VERSION-> Strings.manager.instance.details.version()
+                        InstanceDetails.SETTINGS -> Strings.manager.instance.details.settings()
                     }.let { ts ->
                         name?.let {
                             "$ts: $name"
@@ -723,7 +688,7 @@ open class Strings(
         val update: Update = Update(),
         val updateUrl: UpdateUrl = UpdateUrl(),
         val user: () -> String = { "Logged in as:" },
-        val version: () -> String = { "Version: v${strings().launcher.version()}" }
+        val version: () -> String = { "Version: v${Strings.launcher.version()}" }
     ) {
         data class Appearance(
             val decrement: () -> String = { "Decrease by 10%" },
@@ -789,7 +754,7 @@ open class Strings(
                     builder.append(versionLoader(version, modLoader))
                 }
                 if(AppSettings.discordShowWatermark.value) {
-                    builder.append(strings().settings.discord.watermark())
+                    builder.append(Strings.settings.discord.watermark())
                 }
                 builder.toString()
             },
@@ -841,14 +806,14 @@ open class Strings(
 
         data class Update(
             val available: () -> String = { "Update Available!" },
-            val availableMessage: (String, String?) -> String = { new, message -> "Update: v${strings().launcher.version()} → v$new ${message?.let { "\n\n$it" } ?: ""}" },
+            val availableMessage: (String, String?) -> String = { new, message -> "Update: v${Strings.launcher.version()} → v$new ${message?.let { "\n\n$it" } ?: ""}" },
             val availableTitle: () -> String = { "Update Available!" },
             val cancel: () -> String = { "Cancel" },
             val checkingTitle: () -> String = { "Checking for updates..." },
             val close: () -> String = { "Close" },
             val download: () -> String = { "Download" },
             val downloadingTitle: () -> String = { "Downloading Update..." },
-            val latestMessage: () -> String = { "Current Version: v${strings().launcher.version()}" },
+            val latestMessage: () -> String = { "Current Version: v${Strings.launcher.version()}" },
             val latestTitle: () -> String = { "Everything is up to date!" },
             val successMessage: () -> String = { "Restart the launcher for these changes to take effect." },
             val successRestart: () -> String = { "Restart Now" },
@@ -928,17 +893,17 @@ open class Strings(
         val resolutionBy: () -> String = { "x" },
         val approxTime: (Long) -> String = { secs ->
             if (secs < 60) {
-                "${secs}${strings().units.seconds()}"
+                "${secs}${Strings.units.seconds()}"
             } else if (secs < 60 * 60) {
-                "${secs / 60}${strings().units.minutes()}"
+                "${secs / 60}${Strings.units.minutes()}"
             } else if (secs < 60 * 60 * 10) {
-                "${secs / 3600}${strings().units.hours()} ${secs % 3600 / 60}${strings().units.minutes()}"
+                "${secs / 3600}${Strings.units.hours()} ${secs % 3600 / 60}${Strings.units.minutes()}"
             } else if (secs < 60 * 60 * 24) {
-                "${secs / 3600}${strings().units.hours()}"
+                "${secs / 3600}${Strings.units.hours()}"
             } else if (secs < 60 * 60 * 24 * 10) {
-                "${secs / (3600 * 24)}${strings().units.days()} ${secs % (3600 * 24) / 3600}${strings().units.hours()}"
+                "${secs / (3600 * 24)}${Strings.units.days()} ${secs % (3600 * 24) / 3600}${Strings.units.hours()}"
             } else {
-                "${secs / (3600 * 24)}${strings().units.days()}"
+                "${secs / (3600 * 24)}${Strings.units.days()}"
             }
         },
         val accurateTime: (Long) -> String = { secs ->

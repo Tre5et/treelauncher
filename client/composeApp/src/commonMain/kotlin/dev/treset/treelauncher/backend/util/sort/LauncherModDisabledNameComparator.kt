@@ -1,7 +1,7 @@
 package dev.treset.treelauncher.backend.util.sort
 
 import dev.treset.treelauncher.backend.data.LauncherMod
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 
 class LauncherModDisabledNameComparator : Comparator<LauncherMod> {
     override fun compare(o1: LauncherMod, o2: LauncherMod): Int {
@@ -13,5 +13,5 @@ class LauncherModDisabledNameComparator : Comparator<LauncherMod> {
         } else 1
     }
 
-    override fun toString(): String = strings().sortBox.sort.enabledName()
+    override fun toString(): String = Strings.sortBox.sort.enabledName()
 }

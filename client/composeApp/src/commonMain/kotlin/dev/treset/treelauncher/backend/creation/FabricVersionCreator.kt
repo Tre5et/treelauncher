@@ -13,7 +13,7 @@ import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.string.PatternString
-import dev.treset.treelauncher.localization.strings
+import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 import java.io.IOException
@@ -30,7 +30,7 @@ class FabricVersionCreator(
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
         LOGGER.debug { "Creating new fabric version: id=${data.profile.id}..." }
-        statusProvider.next(strings().creator.status.message.vanillaVersion())
+        statusProvider.next(Strings.creator.status.message.vanillaVersion())
 
         if(data.profile.inheritsFrom == null) {
             throw IOException("Unable to create fabric version: no valid fabric profile")
@@ -157,8 +157,8 @@ class FabricCreationData(
 ): VersionCreationData(profile.id, version.loader.version, files)
 
 val CreationStep.VERSION_FABRIC: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.version.fabric() }
+    get() = FormatStringProvider { Strings.creator.status.version.fabric() }
 val CreationStep.VERSION_FABRIC_LIBRARIES: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.version.fabricLibraries() }
+    get() = FormatStringProvider { Strings.creator.status.version.fabricLibraries() }
 val CreationStep.VERSION_FABRIC_FILE: FormatStringProvider
-    get() = FormatStringProvider { strings().creator.status.version.fabricFile() }
+    get() = FormatStringProvider { Strings.creator.status.version.fabricFile() }
