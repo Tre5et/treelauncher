@@ -59,7 +59,7 @@ class GameLaunchHelper(
     }
 
     private fun onRunning() {
-        AppContext.setRunningInstance(launcher.instance)
+        AppContext.runningInstance = launcher.instance
         AppContext.discord.activateActivity(launcher.instance)
         notification = NotificationData(
             content = {
@@ -110,7 +110,7 @@ class GameLaunchHelper(
                 content =  { Text(Strings.selector.instance.game.exitingMessage()) },
             )
         )
-        AppContext.setRunningInstance(null)
+        AppContext.runningInstance = null
         AppContext.discord.clearActivity()
         notification?.let { AppContext.dismissNotification(it) }
     }

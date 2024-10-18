@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.AppContextData
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -40,7 +39,6 @@ import java.io.IOException
 fun ModsImport(
     component: ModsComponent,
     modContext: ModContext,
-    appContext: AppContextData,
     droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
@@ -51,7 +49,7 @@ fun ModsImport(
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
     val filteredComponents = remember(component) {
-        appContext.files.modsComponents
+        AppContext.files.modsComponents
             .filter {
                 it != component
             }

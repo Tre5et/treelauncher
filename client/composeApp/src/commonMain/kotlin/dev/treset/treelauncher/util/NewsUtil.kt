@@ -19,14 +19,12 @@ import dev.treset.treelauncher.style.info
 import java.io.IOException
 
 @Composable
-fun News(
-    openNews: Int = 0,
-) {
+fun News() {
     var newOnly: Boolean by remember { mutableStateOf(false) }
 
     var popupVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(openNews) {
-        if (openNews > 0) {
+    LaunchedEffect(AppContext.newsIndex) {
+        if (AppContext.newsIndex > 0) {
             newOnly = false
             popupVisible = true
         }

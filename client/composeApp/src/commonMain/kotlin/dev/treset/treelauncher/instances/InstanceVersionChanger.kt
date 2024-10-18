@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.AppContextData
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
@@ -18,7 +17,6 @@ import java.io.IOException
 @Composable
 fun InstanceVersionChanger(
     instance: InstanceData,
-    appContext: AppContextData,
     redrawCurrent: () -> Unit
 ) {
     var execute: (() -> Unit)? by remember { mutableStateOf(null) }
@@ -38,10 +36,10 @@ fun InstanceVersionChanger(
                 onChange = { execute = it },
                 onDone = {
                     try {
-                        appContext.files.reloadVersions()
-                        appContext.files.reloadJavas()
-                        instance.reloadVersionComponent(appContext.files)
-                        instance.reloadJavaComponent(appContext.files)
+                        AppContext.files.reloadVersions()
+                        AppContext.files.reloadJavas()
+                        instance.reloadVersionComponent(AppContext.files)
+                        instance.reloadJavaComponent(AppContext.files)
                         showDone = true
                         redrawCurrent()
                     } catch (e: IOException) {

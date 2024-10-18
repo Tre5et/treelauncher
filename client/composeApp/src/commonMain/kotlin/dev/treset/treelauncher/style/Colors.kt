@@ -194,9 +194,7 @@ fun Color.contrast(other: Color): Float {
     }
 }
 
-val LocalColors = staticCompositionLocalOf {
-    lightColors()
-}
+val ColorScheme by mutableStateOf(lightColors())
 
 fun Color.inverted(): Color = Color(
     red = 1f - red,
@@ -207,24 +205,19 @@ fun Color.inverted(): Color = Color(
 
 
 val ColorScheme.warning: Color
-    @Composable @ReadOnlyComposable
-    get() = LocalColors.current.extensions.warning
+    get() = ColorScheme.extensions.warning
 
 val ColorScheme.onWarning: Color
-    @Composable @ReadOnlyComposable
-    get() = LocalColors.current.extensions.onWarning
+    get() = ColorScheme.extensions.onWarning
 
 val ColorScheme.info: Color
-    @Composable @ReadOnlyComposable
-    get() = LocalColors.current.extensions.info
+    get() = ColorScheme.extensions.info
 
 val ColorScheme.onInfo: Color
-    @Composable @ReadOnlyComposable
-    get() = LocalColors.current.extensions.onInfo
+    get() = ColorScheme.extensions.onInfo
 
 val ColorScheme.contentColors: ContentColors
-    @Composable @ReadOnlyComposable
-    get() = LocalColors.current.contentColors
+    get() = ColorScheme.contentColors
 
 @Composable
 fun ColorScheme.contentColor(backgroundColor: Color): Color =

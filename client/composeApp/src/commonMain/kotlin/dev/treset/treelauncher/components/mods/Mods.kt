@@ -249,7 +249,6 @@ fun Mods() {
                 ModsSearch(
                     current,
                     modContext,
-                    AppContext,
                     droppedFile = droppedFile
                 ) {
                     showSearch = false

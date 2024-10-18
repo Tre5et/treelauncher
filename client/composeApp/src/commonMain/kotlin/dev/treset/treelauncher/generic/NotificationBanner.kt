@@ -20,39 +20,38 @@ import dev.treset.treelauncher.style.contentColor
 
 @Composable
 fun NotificationBanner(
-    visible: Boolean,
-    color: Color = MaterialTheme.colorScheme.primary,
-    onDismissed: () -> Unit,
-    onClick: ((NotificationContext) -> Unit)? = null,
-    content: @Composable RowScope.(NotificationContext) -> Unit
+    onDismissed: (NotificationData) -> Unit = {},
+    data: NotificationData
 ) {
     val colorScheme = MaterialTheme.colorScheme
+    val color = data.color ?: colorScheme.primary
     val contentColor = colorScheme.contentColor(color)
 
-    var dismiss by remember { mutableStateOf(false) }
+    var dismiss by remember(data) { mutableStateOf(false) }
 
-    val context = remember(content) {
-        NotificationContext {
+    LaunchedEffect(data) {
+        data.dismiss = {
             dismiss = true
         }
+        data.visible = true
     }
 
     AnimatedVisibility(
-        visible = visible && !dismiss,
+        visible = data.visible && !dismiss,
         enter = expandVertically(),
         exit = shrinkVertically()
     ) {
-        DisposableEffect(content) {
+        DisposableEffect(Unit) {
             onDispose {
-                onDismissed()
+                onDismissed(data)
             }
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color)
-                .clickable(enabled = onClick != null) { onClick?.invoke(context) }
-                .pointerHoverIcon(if(onClick != null) PointerIcon.Hand else PointerIcon.Default)
+                .clickable(enabled = data.onClick != null) { data.onClick?.invoke(data) }
+                .pointerHoverIcon(if(data.onClick != null) PointerIcon.Hand else PointerIcon.Default)
                 .padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
@@ -63,35 +62,18 @@ fun NotificationBanner(
                 CompositionLocalProvider(
                     LocalContentColor provides contentColor
                 ) {
-                    content(context)
+                    data.content(this, data)
                 }
             }
         }
     }
 }
 
-@Composable
-fun NotificationBanner(
-    visible: Boolean,
-    onDismissed: () -> Unit = {},
-    data: NotificationData
-) {
-    NotificationBanner(
-        visible = visible,
-        color = data.color?: MaterialTheme.colorScheme.primary,
-        onClick = data.onClick,
-        onDismissed = onDismissed
-    ) {
-        data.content(this, it)
-    }
-}
-
-data class NotificationContext(
-    val dismiss: () -> Unit
-)
-
 data class NotificationData(
     val color: Color? = null,
-    val onClick: ((NotificationContext) -> Unit)? = null,
-    val content: @Composable RowScope.(NotificationContext) -> Unit
-)
+    val onClick: ((NotificationData) -> Unit)? = null,
+    val content: @Composable RowScope.(NotificationData) -> Unit
+) {
+    var visible by mutableStateOf(false)
+    var dismiss: () -> Unit = {}
+}

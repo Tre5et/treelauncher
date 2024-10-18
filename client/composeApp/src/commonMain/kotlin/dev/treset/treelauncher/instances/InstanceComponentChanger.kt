@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.AppContextData
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -25,7 +24,6 @@ fun InstanceComponentChanger(
     instance: InstanceData,
     type: InstanceDetails,
     allowUnselect: Boolean = false,
-    appContext: AppContextData,
     redrawSelected: () -> Unit
 ) {
     var components: Array<out Component> by remember { mutableStateOf(emptyArray()) }
@@ -46,10 +44,10 @@ fun InstanceComponentChanger(
 
     LaunchedEffect(type) {
         components = when(type) {
-            InstanceDetails.SAVES -> appContext.files.savesComponents
-            InstanceDetails.RESOURCE_PACKS -> appContext.files.resourcepackComponents
-            InstanceDetails.OPTIONS -> appContext.files.optionsComponents
-            InstanceDetails.MODS -> appContext.files.modsComponents
+            InstanceDetails.SAVES -> AppContext.files.savesComponents
+            InstanceDetails.RESOURCE_PACKS -> AppContext.files.resourcepackComponents
+            InstanceDetails.OPTIONS -> AppContext.files.optionsComponents
+            InstanceDetails.MODS -> AppContext.files.modsComponents
             else -> emptyArray()
         }
 
@@ -100,27 +98,27 @@ fun InstanceComponentChanger(
                             InstanceDetails.SAVES -> {
                                 selected?.id?.let { id ->
                                     instance.instance.savesComponent = id
-                                    instance.reloadSavesComponent(appContext.files)
+                                    instance.reloadSavesComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.RESOURCE_PACKS -> {
                                 selected?.id?.let { id ->
                                     instance.instance.resourcepacksComponent = id
-                                    instance.reloadResourcepacksComponent(appContext.files)
+                                    instance.reloadResourcepacksComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.OPTIONS -> {
                                 selected?.id?.let { id ->
                                     instance.instance.optionsComponent = id
-                                    instance.reloadOptionsComponent(appContext.files)
+                                    instance.reloadOptionsComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.MODS -> {
                                 instance.instance.modsComponent = selected?.id
-                                instance.reloadModsComponent(appContext.files)
+                                instance.reloadModsComponent(AppContext.files)
                             }
 
                             else -> {}

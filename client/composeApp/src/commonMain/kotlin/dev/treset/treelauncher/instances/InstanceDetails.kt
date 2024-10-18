@@ -160,7 +160,6 @@ fun InstanceDetails(
                 InstanceComponentChanger(
                     instance = instance,
                     type = it,
-                    appContext = AppContext,
                     redrawSelected = redrawSelected
                 )
             }
@@ -169,14 +168,12 @@ fun InstanceDetails(
                     instance = instance,
                     type = it,
                     allowUnselect = true,
-                    appContext = AppContext,
                     redrawSelected = redrawSelected
                 )
             }
             InstanceDetails.VERSION -> {
                 InstanceVersionChanger(
                     instance = instance,
-                    appContext = AppContext,
                     redrawCurrent = redrawSelected
                 )
             }
