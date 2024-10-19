@@ -34,7 +34,7 @@ data class SortContext(
 @Composable
 fun <T: Component> Components(
     title: String,
-    components: List<T>,
+    components: MutableList<T>,
     componentManifest: ParentManifest,
     checkHasComponent: (InstanceComponent, T) -> Boolean,
     isEnabled: T.() -> Boolean = {true},
@@ -62,6 +62,9 @@ fun <T: Component> Components(
     settingsDefault: Boolean = false,
     sortContext: SortContext? = null
 ) {
+    @Suppress("NAME_SHADOWING")
+    val components = components.toList()
+
     var selected: T? by remember(components) { mutableStateOf(null) }
 
     var creatorSelected by remember { mutableStateOf(false) }
@@ -305,7 +308,6 @@ fun <T: Component> Components(
                     checkHasComponent = { details -> checkHasComponent(details, it) },
                     onClose = { showDelete = false },
                     onConfirm = {
-                        componentManifest.components.remove(it.id)
                         try {
                             it.delete(componentManifest)
                         } catch(e: IOException) {

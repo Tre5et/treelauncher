@@ -34,9 +34,7 @@ import java.net.URI
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Resourcepacks() {
-    var components by remember { mutableStateOf(AppContext.files.resourcepackComponents.sortedBy { it.name }) }
-
-    var selected: ResourcepackComponent? by remember { mutableStateOf(null) }
+    var selected: ResourcepackComponent? by remember(AppContext.files.resourcepackComponents) { mutableStateOf(null) }
 
     var showAdd by remember(selected) { mutableStateOf(false) }
     var filesToAdd by remember(selected) { mutableStateOf(emptyList<LauncherFile>()) }
@@ -53,12 +51,12 @@ fun Resourcepacks() {
 
     Components(
         Strings.selector.resourcepacks.title(),
-        components = components,
+        components = AppContext.files.resourcepackComponents,
         componentManifest = AppContext.files.resourcepackManifest,
         checkHasComponent = { details, component -> details.resourcepacksComponent == component.id },
         createContent = { onDone ->
             ComponentCreator(
-                existing = components,
+                components = AppContext.files.resourcepackComponents,
                 allowUse = false,
                 getCreator = ResourcepackCreator::get,
                 onDone = { onDone() }
@@ -67,7 +65,6 @@ fun Resourcepacks() {
         reload = {
             try {
                 AppContext.files.reloadResourcepacks()
-                components = AppContext.files.resourcepackComponents.sortedBy { it.name }
             } catch (e: IOException) {
                 AppContext.severeError(e)
             }
@@ -91,7 +88,7 @@ fun Resourcepacks() {
             if(showAdd) {
                 FileImport(
                     current,
-                    AppContext.files.resourcepackComponents,
+                    AppContext.files.resourcepackComponents.toTypedArray(),
                     arrayOf("resourcepacks", "texturepacks"),
                     {
                         when(this) {

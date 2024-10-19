@@ -65,8 +65,6 @@ data class ModContext(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Mods() {
-    var components by remember { mutableStateOf(AppContext.files.modsComponents.sortedBy { it.name }) }
-
     var selected: ModsComponent? by remember { mutableStateOf(null) }
 
     var showSearch by remember(selected) { mutableStateOf(false) }
@@ -78,21 +76,20 @@ fun Mods() {
 
     Components(
         title = Strings.selector.mods.title(),
-        components = components,
+        components = AppContext.files.modsComponents,
         componentManifest = AppContext.files.modsManifest,
         checkHasComponent = { details, component -> details.modsComponent == component.id },
         isEnabled = { id != AppContext.runningInstance?.modsComponent?.id },
         reload = {
             try {
                 AppContext.files.reloadMods()
-                components = AppContext.files.modsComponents.sortedBy { it.name }
             } catch (e: IOException) {
                 AppContext.severeError(e)
             }
         },
         createContent =  { onDone ->
             ModsCreation(
-                existing = components,
+                components = AppContext.files.modsComponents,
                 showUse = false,
                 onDone = { onDone() }
             )

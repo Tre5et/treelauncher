@@ -38,8 +38,6 @@ import java.net.URI
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Saves() {
-    var components by remember { mutableStateOf(AppContext.files.savesComponents.sortedBy { it.name }) }
-
     var selected: SavesComponent? by remember { mutableStateOf(null) }
 
     var displayData by remember { mutableStateOf(SavesDisplayData(mapOf(), listOf(), {})) }
@@ -68,12 +66,12 @@ fun Saves() {
 
     Components(
         Strings.selector.saves.title(),
-        components = components,
+        components = AppContext.files.savesComponents,
         componentManifest = AppContext.files.savesManifest,
         checkHasComponent = { details, component -> details.savesComponent == component.id },
         createContent = { onDone ->
             ComponentCreator(
-                existing = components,
+                components = AppContext.files.savesComponents,
                 allowUse = false,
                 getCreator = SavesCreator::get,
                 onDone = { onDone() }
@@ -82,7 +80,6 @@ fun Saves() {
         reload = {
             try {
                 AppContext.files.reloadSaves()
-                components = AppContext.files.savesComponents.sortedBy { it.name }
             } catch (e: IOException) {
                 AppContext.severeError(e)
             }
@@ -100,7 +97,7 @@ fun Saves() {
             if(showAdd) {
                 FileImport(
                     current,
-                    AppContext.files.savesComponents,
+                    AppContext.files.savesComponents.toTypedArray(),
                     "saves",
                     {
                         try {

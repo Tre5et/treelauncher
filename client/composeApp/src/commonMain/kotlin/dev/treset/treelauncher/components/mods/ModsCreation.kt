@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.minecraft.MinecraftVersion
@@ -42,7 +43,7 @@ class ModsCreationContent(
 
 @Composable
 fun ModsCreation(
-    existing: List<ModsComponent>,
+    components: SnapshotStateList<ModsComponent>,
     showCreate: Boolean = true,
     showUse: Boolean = true,
     defaultMode: CreationMode = CreationMode.NEW,
@@ -58,26 +59,26 @@ fun ModsCreation(
     setContent: (ModsCreationContent) -> Unit = {},
     onDone: (ModsComponent) -> Unit = { _->}
 ) {
-    var mode by remember(existing, defaultMode) { mutableStateOf(defaultMode) }
+    var mode by remember(defaultMode) { mutableStateOf(defaultMode) }
 
-    var newName by remember(existing, defaultNewName) { mutableStateOf(defaultNewName) }
+    var newName by remember(defaultNewName) { mutableStateOf(defaultNewName) }
 
-    var newVersion: MinecraftVersion? by remember(existing) { mutableStateOf(null) }
+    var newVersion: MinecraftVersion? by remember { mutableStateOf(null) }
 
-    var newType: VersionType? by remember(existing, defaultType) { mutableStateOf(defaultType) }
-    var alternateLoader by remember(existing, defaultAlternateLoader) { mutableStateOf(defaultAlternateLoader) }
+    var newType: VersionType? by remember(defaultType) { mutableStateOf(defaultType) }
+    var alternateLoader by remember(defaultAlternateLoader) { mutableStateOf(defaultAlternateLoader) }
 
-    var inheritName by remember(existing, defaultInheritName) { mutableStateOf(defaultInheritName) }
-    var inheritSelected: ModsComponent? by remember(existing, defaultInheritComponent) { mutableStateOf(defaultInheritComponent) }
+    var inheritName by remember(defaultInheritName) { mutableStateOf(defaultInheritName) }
+    var inheritSelected: ModsComponent? by remember(components, defaultInheritComponent) { mutableStateOf(defaultInheritComponent) }
 
-    var useSelected: ModsComponent? by remember(existing, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
+    var useSelected: ModsComponent? by remember(components, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
 
-    var showSnapshots by remember(existing) { mutableStateOf(false) }
+    var showSnapshots by remember { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
 
-    var creationStatus: Status? by remember(existing) { mutableStateOf(null) }
+    var creationStatus: Status? by remember { mutableStateOf(null) }
 
-    val creationContent: ModsCreationContent = remember(existing, mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
+    val creationContent: ModsCreationContent = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
         val additionalLoader = if (newType == VersionType.QUILT && alternateLoader) VersionType.FABRIC else null
 
         ModsCreationContent(
@@ -221,7 +222,7 @@ fun ModsCreation(
             enabled = mode == CreationMode.INHERIT
         )
         ComboBox(
-            items = existing,
+            items = components,
             selected = inheritSelected,
             onSelected = {
                 inheritSelected = it
@@ -238,7 +239,7 @@ fun ModsCreation(
                 onClick = { mode = CreationMode.USE }
             )
             ComboBox(
-                items = existing,
+                items = components,
                 selected = useSelected,
                 onSelected = {
                     useSelected = it

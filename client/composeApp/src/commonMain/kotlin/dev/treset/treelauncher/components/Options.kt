@@ -16,16 +16,14 @@ import java.io.IOException
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Options() {
-    var components by remember { mutableStateOf(AppContext.files.optionsComponents.sortedBy { it.name }) }
-
     Components(
         Strings.selector.options.title(),
-        components = components,
+        components = AppContext.files.optionsComponents,
         componentManifest = AppContext.files.optionsManifest,
         checkHasComponent = { details, component -> details.optionsComponent == component.id },
         createContent = { onDone ->
             ComponentCreator(
-                existing = components,
+                components = AppContext.files.optionsComponents,
                 allowUse = false,
                 getCreator = OptionsCreator::get,
                 onDone = { onDone() }
@@ -34,7 +32,6 @@ fun Options() {
         reload = {
             try {
                 AppContext.files.reloadOptions()
-                components = AppContext.files.optionsComponents.sortedBy { it.name }
             } catch (e: IOException) {
                 AppContext.severeError(e)
             }

@@ -34,7 +34,7 @@ open class CreationContent<T: Component>(
 
 @Composable
 fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
-    existing: List<T>,
+    components: MutableList<T>,
     allowUse: Boolean = true,
     showCreate: Boolean = true,
     getCreator: (content: CreationContent<T>, onStatus: (Status) -> Unit) -> C,
@@ -47,19 +47,22 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
     setContent: (CreationContent<T>) -> Unit = {},
     onDone: (T) -> Unit = {}
 ) {
-    var mode by remember(existing, defaultMode) { mutableStateOf(defaultMode) }
-    var newName by remember(existing, defaultNewName) {
+    @Suppress("NAME_SHADOWING")
+    val components = components.toList()
+
+    var mode by remember(defaultMode) { mutableStateOf(defaultMode) }
+    var newName by remember(defaultNewName) {
         mutableStateOf(defaultNewName)
     }
 
-    var inheritName by remember(existing, defaultInheritName) { mutableStateOf(defaultInheritName) }
-    var inheritSelected: T? by remember(existing, defaultInheritComponent) { mutableStateOf(defaultInheritComponent) }
+    var inheritName by remember(defaultInheritName) { mutableStateOf(defaultInheritName) }
+    var inheritSelected: T? by remember(components, defaultInheritComponent) { mutableStateOf(defaultInheritComponent) }
 
-    var useSelected: T? by remember(existing, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
+    var useSelected: T? by remember(components, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
 
     var creationStatus: Status? by remember { mutableStateOf(null) }
 
-    val creationContent: CreationContent<T> = remember(existing, mode, newName, inheritName, inheritSelected, useSelected) {
+    val creationContent: CreationContent<T> = remember(mode, newName, inheritName, inheritSelected, useSelected) {
         CreationContent(
             mode = mode,
             newName = newName,
@@ -131,7 +134,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
             enabled = mode == CreationMode.INHERIT
         )
         ComboBox(
-            items = existing,
+            items = components,
             selected = inheritSelected,
             onSelected = {
                 inheritSelected = it
@@ -148,7 +151,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
                 onClick = { mode = CreationMode.USE }
             )
             ComboBox(
-                items = existing,
+                items = components,
                 selected = useSelected,
                 onSelected = {
                     useSelected = it

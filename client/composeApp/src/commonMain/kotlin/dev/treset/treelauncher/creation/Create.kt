@@ -117,7 +117,7 @@ fun Create() {
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
-                    existing = AppContext.files.savesComponents.toList(),
+                    components = AppContext.files.savesComponents,
                     showCreate = false,
                     getCreator = SavesCreator::get,
                     defaultNewName = defaultSavesName,
@@ -142,7 +142,7 @@ fun Create() {
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
-                    existing = AppContext.files.resourcepackComponents.toList(),
+                    components = AppContext.files.resourcepackComponents,
                     showCreate = false,
                     getCreator = ResourcepackCreator::get,
                     defaultNewName = defaultResourcepackName,
@@ -167,7 +167,7 @@ fun Create() {
                     style = MaterialTheme.typography.titleSmall
                 )
                 ComponentCreator(
-                    existing = AppContext.files.optionsComponents.toList(),
+                    components = AppContext.files.optionsComponents,
                     showCreate = false,
                     getCreator = OptionsCreator::get,
                     defaultNewName = defaultOptionsName,
@@ -202,7 +202,7 @@ fun Create() {
                         defaultModsName = instanceName
                     }
                     ModsCreation(
-                        existing = AppContext.files.modsComponents.toList(),
+                        components = AppContext.files.modsComponents,
                         showCreate = false,
                         setContent = { modsContent = it },
                         defaultNewName = defaultModsName,

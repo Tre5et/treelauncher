@@ -44,10 +44,10 @@ fun InstanceComponentChanger(
 
     LaunchedEffect(type) {
         components = when(type) {
-            InstanceDetails.SAVES -> AppContext.files.savesComponents
-            InstanceDetails.RESOURCE_PACKS -> AppContext.files.resourcepackComponents
-            InstanceDetails.OPTIONS -> AppContext.files.optionsComponents
-            InstanceDetails.MODS -> AppContext.files.modsComponents
+            InstanceDetails.SAVES -> AppContext.files.savesComponents.toTypedArray()
+            InstanceDetails.RESOURCE_PACKS -> AppContext.files.resourcepackComponents.toTypedArray()
+            InstanceDetails.OPTIONS -> AppContext.files.optionsComponents.toTypedArray()
+            InstanceDetails.MODS -> AppContext.files.modsComponents.toTypedArray()
             else -> emptyArray()
         }
 

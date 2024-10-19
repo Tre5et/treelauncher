@@ -114,7 +114,7 @@ class VanillaVersionCreator(
         val javaName: String = data.version.javaVersion.getComponent()
 
         val javaCreator = JavaComponentCreator(
-            JavaCreationData(javaName, data.files.javaComponents, data.files.javaManifest),
+            JavaCreationData(javaName, data.files.javaComponents.toTypedArray(), data.files.javaManifest),
             statusProvider
         )
 
