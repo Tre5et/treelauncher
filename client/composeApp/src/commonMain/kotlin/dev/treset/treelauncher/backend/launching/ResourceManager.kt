@@ -21,10 +21,10 @@ class ResourceManager(private var instanceData: InstanceData) {
         try {
             prepareComponents(
                 arrayOf(
-                    instanceData.savesComponent,
-                    instanceData.modsComponent ?: return,
-                    instanceData.resourcepacksComponent,
-                    instanceData.optionsComponent,
+                    instanceData.savesComponent.value,
+                    instanceData.modsComponent.value ?: return,
+                    instanceData.resourcepacksComponent.value ,
+                    instanceData.optionsComponent.value,
                     instanceData.instance
                 )
             )
@@ -40,10 +40,10 @@ class ResourceManager(private var instanceData: InstanceData) {
         try {
             cleanComponents(
                 arrayOf(
-                    instanceData.savesComponent,
-                    instanceData.modsComponent ?: return,
-                    instanceData.resourcepacksComponent,
-                    instanceData.optionsComponent,
+                    instanceData.savesComponent.value,
+                    instanceData.modsComponent.value ?: return,
+                    instanceData.resourcepacksComponent.value,
+                    instanceData.optionsComponent.value,
                     instanceData.instance
                 )
             )
@@ -64,18 +64,18 @@ class ResourceManager(private var instanceData: InstanceData) {
         LOGGER.debug { "Setting last played time: instance=${instanceData.instance.id}" }
         val time = LocalDateTime.now()
         instanceData.instance.lastUsedTime = time
-        instanceData.savesComponent.lastUsedTime = time
-        instanceData.resourcepacksComponent.lastUsedTime = time
-        instanceData.optionsComponent.lastUsedTime = time
-        instanceData.modsComponent?.lastUsedTime = time
-        instanceData.javaComponent.lastUsedTime = time
+        instanceData.savesComponent.value.lastUsedTime = time
+        instanceData.resourcepacksComponent.value.lastUsedTime = time
+        instanceData.optionsComponent.value.lastUsedTime = time
+        instanceData.modsComponent.value?.lastUsedTime = time
+        instanceData.javaComponent.value.lastUsedTime = time
         instanceData.versionComponents.forEach { it.lastUsedTime = time }
         instanceData.instance.write()
-        instanceData.savesComponent.write()
-        instanceData.resourcepacksComponent.write()
-        instanceData.optionsComponent.write()
-        instanceData.modsComponent?.write()
-        instanceData.javaComponent.write()
+        instanceData.savesComponent.value.write()
+        instanceData.resourcepacksComponent.value.write()
+        instanceData.optionsComponent.value.write()
+        instanceData.modsComponent.value?.write()
+        instanceData.javaComponent.value.write()
         instanceData.versionComponents.forEach { it.write() }
         LOGGER.debug { "Set last played time: instance=${instanceData.instance.id}" }
     }

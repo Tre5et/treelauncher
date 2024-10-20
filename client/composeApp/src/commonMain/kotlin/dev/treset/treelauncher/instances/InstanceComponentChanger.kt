@@ -24,35 +24,24 @@ fun InstanceComponentChanger(
     instance: InstanceData,
     type: InstanceDetails,
     allowUnselect: Boolean = false,
-    redrawSelected: () -> Unit
 ) {
-    var components: Array<out Component> by remember { mutableStateOf(emptyArray()) }
+    val components = when(type) {
+        InstanceDetails.SAVES -> AppContext.files.savesComponents
+        InstanceDetails.RESOURCE_PACKS -> AppContext.files.resourcepackComponents
+        InstanceDetails.OPTIONS -> AppContext.files.optionsComponents
+        InstanceDetails.MODS -> AppContext.files.modsComponents
+        else -> mutableListOf()
+    }
 
-    var current: Component? by remember(type) { mutableStateOf(null) }
+    val current by when (type) {
+        InstanceDetails.SAVES -> instance.savesComponent
+        InstanceDetails.RESOURCE_PACKS -> instance.resourcepacksComponent
+        InstanceDetails.OPTIONS -> instance.optionsComponent
+        InstanceDetails.MODS -> instance.modsComponent
+        else -> mutableStateOf(null)
+    }
 
     var selected: Component? by remember(current) { mutableStateOf(current) }
-
-    val loadCurrent = {
-        current = when (type) {
-            InstanceDetails.SAVES -> instance.savesComponent
-            InstanceDetails.RESOURCE_PACKS -> instance.resourcepacksComponent
-            InstanceDetails.OPTIONS -> instance.optionsComponent
-            InstanceDetails.MODS -> instance.modsComponent
-            else -> null
-        }
-    }
-
-    LaunchedEffect(type) {
-        components = when(type) {
-            InstanceDetails.SAVES -> AppContext.files.savesComponents.toTypedArray()
-            InstanceDetails.RESOURCE_PACKS -> AppContext.files.resourcepackComponents.toTypedArray()
-            InstanceDetails.OPTIONS -> AppContext.files.optionsComponents.toTypedArray()
-            InstanceDetails.MODS -> AppContext.files.modsComponents.toTypedArray()
-            else -> emptyArray()
-        }
-
-        loadCurrent()
-    }
 
     TitledColumn(
         headerContent = {
@@ -98,34 +87,28 @@ fun InstanceComponentChanger(
                             InstanceDetails.SAVES -> {
                                 selected?.id?.value?.let { id ->
                                     instance.instance.savesComponent.value = id
-                                    instance.reloadSavesComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.RESOURCE_PACKS -> {
                                 selected?.id?.value?.let { id ->
                                     instance.instance.resourcepacksComponent.value = id
-                                    instance.reloadResourcepacksComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.OPTIONS -> {
                                 selected?.id?.value?.let { id ->
                                     instance.instance.optionsComponent.value = id
-                                    instance.reloadOptionsComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.MODS -> {
                                 instance.instance.modsComponent.value = selected?.id?.value
-                                instance.reloadModsComponent(AppContext.files)
                             }
 
                             else -> {}
                         }
-                        loadCurrent()
                         instance.instance.write()
-                        redrawSelected()
                     } catch (e: IOException) {
                         AppContext.error(e)
                     }

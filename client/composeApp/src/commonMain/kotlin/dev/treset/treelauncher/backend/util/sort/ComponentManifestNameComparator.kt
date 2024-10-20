@@ -3,8 +3,8 @@ package dev.treset.treelauncher.backend.util.sort
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.localization.Strings
 
-class ComponentManifestNameComparator : Comparator<Component> {
-    override fun compare(o1: Component, o2: Component): Int {
+class ComponentManifestNameComparator<T: Component>  : Comparator<T> {
+    override fun compare(o1: T, o2: T): Int {
         return o1.name.value.lowercase().compareTo(o2.name.value.lowercase())
     }
 

@@ -47,7 +47,7 @@ fun VersionSelector(
     getCreator: (data: VersionCreationContent, onStatus: (Status) -> Unit) -> VersionCreator<*> = {d,s -> VersionCreator.get(d,s) },
     setExecute: (((onStatus: (Status) -> Unit) -> VersionComponent)?) -> Unit = {},
     setContent: (VersionCreationContent) -> Unit = {},
-    onChange: (execute: () -> Unit) -> Unit = { it() },
+    onChange: (execute: () -> VersionComponent) -> Unit = { it() },
     onDone: (VersionComponent) -> Unit = {}
 ) {
     var showSnapshots by remember { mutableStateOf(defaultVersionId?.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")) == false) }
@@ -253,12 +253,14 @@ fun VersionSelector(
                                 onChange {
                                     execute {
                                         creationStatus = it
+                                    }.also {
+                                        creationStatus = null
                                     }
                                 }
                             } catch (e: IOException) {
                                 AppContext.error(e)
                             }
-                        }
+                        }.start()
                     }
                 },
                 icon = icons().change,

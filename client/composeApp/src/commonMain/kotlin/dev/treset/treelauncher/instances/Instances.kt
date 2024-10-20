@@ -9,9 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.AppSettings
-import dev.treset.treelauncher.backend.config.InstanceDataSortType
+import dev.treset.treelauncher.backend.config.InstanceSortType
 import dev.treset.treelauncher.backend.data.InstanceData
-import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.SortBox
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledColumn
@@ -22,7 +21,7 @@ import java.io.IOException
 @Composable
 fun Instances() {
     var selectedInstance: InstanceData? by remember { mutableStateOf(null) }
-    var instances: List<InstanceData> by remember { mutableStateOf(emptyList()) }
+    val instances = AppContext.files.instanceComponents.toList()
 
     var loading by remember { mutableStateOf(true) }
 
@@ -32,37 +31,23 @@ fun Instances() {
         } catch (e: IOException) {
             AppContext.severeError(e)
         }
-        selectedInstance = null
-        instances = AppContext.files.instanceComponents
-            .mapNotNull {
-                try {
-                    InstanceData.of(it, AppContext.files)
-                } catch (e: FileLoadException) {
-                    AppContext.severeError(e)
-                    null
-                }
-            }
+        if(!AppContext.files.instanceComponents.contains(selectedInstance?.instance)) {
+            selectedInstance = null
+        }
         loading = false
     }
 
-    val redrawSelected: () -> Unit = {
-        selectedInstance?.let {
-            selectedInstance = null
-            selectedInstance = it
-        }
-    }
-
-    LaunchedEffect(Unit) {
+    LaunchedEffect(AppContext.files.instanceComponents.toList()) {
         reloadInstances()
     }
 
-    LaunchedEffect(instances, AppSettings.instanceSortType, AppSettings.isInstanceSortReverse.value, AppContext.runningInstance) {
-        val newInst = instances
-            .sortedWith(AppSettings.instanceSortType.value.comparator)
-        instances = if(AppSettings.isInstanceSortReverse.value) newInst.reversed() else newInst
+    val actualInstances = remember(instances, AppSettings.instanceSortType, AppSettings.isInstanceSortReverse.value) {
+        instances.sortedWith(AppSettings.instanceSortType.value.comparator).let {
+            if(AppSettings.isInstanceSortReverse.value) it.reversed() else it
+        }
     }
 
-    if(instances.isEmpty() && !loading) {
+    if(actualInstances.isEmpty() && !loading) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -101,7 +86,7 @@ fun Instances() {
             headerContent = {
                 Text(Strings.selector.instance.title())
                 SortBox(
-                    sorts = InstanceDataSortType.entries,
+                    sorts = InstanceSortType.entries,
                     selected = AppSettings.instanceSortType.value,
                     reversed = AppSettings.isInstanceSortReverse.value,
                     onSelected = {
@@ -114,20 +99,21 @@ fun Instances() {
                 )
             }
         ) {
-            instances.forEach {
-                InstanceButton(
-                    instance = it,
-                    selected = selectedInstance == it,
-                    enabled = AppContext.runningInstance?.instance?.id != it.instance.id,
-                    onClick = { selectedInstance = if(selectedInstance == it) null else it }
-                )
+            actualInstances.forEach {
+                InstanceDataProvider(it) {
+                    InstanceButton(
+                        instance = it,
+                        selected = selectedInstance == it,
+                        enabled = AppContext.runningInstance?.instance?.id != it.instance.id,
+                        onClick = { selectedInstance = if (selectedInstance == it) null else it }
+                    )
+                }
             }
         }
 
         selectedInstance?.let {
             InstanceDetails(
                 it,
-                redrawSelected,
                 reloadInstances
             ) {
                 selectedInstance = null

@@ -10,16 +10,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.InstanceData
+import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
 @Composable
 fun InstanceVersionChanger(
-    instance: InstanceData,
-    redrawCurrent: () -> Unit
+    instance: InstanceData
 ) {
-    var execute: (() -> Unit)? by remember { mutableStateOf(null) }
+    var execute: (() -> VersionComponent)? by remember { mutableStateOf(null) }
     var showDone by remember { mutableStateOf(false) }
     var showFailed: Exception? by remember { mutableStateOf(null) }
 
@@ -38,18 +38,18 @@ fun InstanceVersionChanger(
                     try {
                         AppContext.files.reloadVersions()
                         AppContext.files.reloadJavas()
-                        instance.reloadVersionComponent(AppContext.files)
-                        instance.reloadJavaComponent(AppContext.files)
+                        execute = null
                         showDone = true
-                        redrawCurrent()
                     } catch (e: IOException) {
                         AppContext.error(e)
                     }
+                    instance.instance.versionComponent.value = it.id.value
                 },
                 defaultVersionId = instance.versionComponents[0].versionNumber.value,
                 defaultVersionType = when(instance.versionComponents[0].versionType.value) {
                     "fabric" -> VersionType.FABRIC
                     "forge" -> VersionType.FORGE
+                    "quilt" -> VersionType.QUILT
                     else -> VersionType.VANILLA
                 },
                 defaultLoaderVersion = instance.versionComponents[0].loaderVersion.value,
@@ -73,11 +73,13 @@ fun InstanceVersionChanger(
                 }
                 Button(
                     onClick = {
-                        try {
-                            it()
-                        } catch (e: IOException) {
-                            showFailed = e
-                        }
+                        Thread {
+                            try {
+                                it()
+                            } catch (e: IOException) {
+                                showFailed = e
+                            }
+                        }.start()
                         execute = null
                     }
                 ) {

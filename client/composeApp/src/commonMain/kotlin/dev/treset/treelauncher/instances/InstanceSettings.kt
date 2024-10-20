@@ -249,7 +249,7 @@ private fun getCurrentMemory(instance: InstanceData): Int {
     val result = BufferedReader(
         InputStreamReader(
             Runtime.getRuntime().exec(
-                LauncherFile.of(instance.javaComponent.directory, "bin", "java").path
+                LauncherFile.of(instance.javaComponent.value.directory, "bin", "java").path
                         + " -XX:+PrintFlagsFinal -version | findstr HeapSize"
             ).inputStream
         )

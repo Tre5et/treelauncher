@@ -87,7 +87,7 @@ class CommandBuilder(
             }
         }
         if(natives.isEmpty()) {
-            natives.add(LauncherFile.of(instanceData.javaComponent.directory, "libs").absolutePath)
+            natives.add(LauncherFile.of(instanceData.javaComponent.value.directory, "libs").absolutePath)
         }
         val nativesDir = natives.joinToString(File.pathSeparator)
 
@@ -108,7 +108,7 @@ class CommandBuilder(
 
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
-        processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.directory, "bin", "java").path)
+        processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.value.directory, "bin", "java").path)
 
         val jvmArgs = instanceData.instance.jvmArguments.toMutableList()
         for(v in instanceData.versionComponents) {
@@ -134,7 +134,7 @@ class CommandBuilder(
             offline,
             minecraftUser,
             instanceData.gameDataDir.absolutePath,
-            instanceData.resourcepacksComponent.directory.absolutePath,
+            instanceData.resourcepacksComponent.value.directory.absolutePath,
             instanceData.assetsDir.absolutePath,
             assetsIndex,
             libraries,

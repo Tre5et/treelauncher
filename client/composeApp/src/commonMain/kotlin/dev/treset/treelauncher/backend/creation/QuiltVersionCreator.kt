@@ -87,7 +87,7 @@ class QuiltVersionCreator(
         } catch (e: IOException) {
             throw IOException("Unable to create quilt version: versionId=${data.profile.id}", e)
         }
-        LOGGER.debug { "Created fabric version: id=${version.id}" }
+        LOGGER.debug { "Created quilt version: id=${version.id.value}" }
         return version
     }
 

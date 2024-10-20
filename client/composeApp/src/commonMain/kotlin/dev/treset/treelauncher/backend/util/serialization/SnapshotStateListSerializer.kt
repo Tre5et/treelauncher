@@ -9,6 +9,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+typealias MutableStateList<T> = SnapshotStateList<T>
+
 typealias MutableDataStateList<T> = @Serializable(with = SnapshotStateListSerializer::class) SnapshotStateList<T>
 
 class SnapshotStateListSerializer<T>(private val dataSerializer: KSerializer<T>) : KSerializer<SnapshotStateList<T>> {

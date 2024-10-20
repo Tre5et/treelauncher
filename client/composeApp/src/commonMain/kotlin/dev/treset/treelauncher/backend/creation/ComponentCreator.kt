@@ -24,9 +24,9 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
 
     var id = createHash()
     val directory: LauncherFile
-        get() = LauncherFile.of(data.parent.directory, "${data.parent.prefix}_${id}")
+        get() = LauncherFile.of(data.parent.directory, "${data.parent.prefix.value}_${id}")
     val file: LauncherFile
-        get() = LauncherFile.of(data.parent.directory, "${data.parent.prefix}_${id}", appConfig().manifestFileName)
+        get() = LauncherFile.of(data.parent.directory, "${data.parent.prefix.value}_${id}", appConfig().manifestFileName)
 
     @Throws(IOException::class)
     abstract fun create(): T

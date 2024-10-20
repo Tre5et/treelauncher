@@ -1,78 +1,54 @@
 package dev.treset.treelauncher.backend.data
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import dev.treset.treelauncher.backend.data.manifest.*
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.serialization.MutableStateList
 
 class InstanceData(
-    var mainManifest: MainManifest,
-    var instance: InstanceComponent,
-    var versionComponents: Array<VersionComponent>,
-    var javaComponent: JavaComponent,
-    var optionsComponent: OptionsComponent,
-    var resourcepacksComponent: ResourcepackComponent,
-    var savesComponent: SavesComponent,
-    var modsComponent: ModsComponent?,
-    var gameDataDir: LauncherFile,
-    var assetsDir: LauncherFile,
-    var librariesDir: LauncherFile
+    val mainManifest: MainManifest,
+    val instance: InstanceComponent,
+    versionComponents: List<VersionComponent>,
+    javaComponent: JavaComponent,
+    optionsComponent: OptionsComponent,
+    resourcepacksComponent: ResourcepackComponent,
+    savesComponent: SavesComponent,
+    modsComponent: ModsComponent?,
+    val gameDataDir: LauncherFile,
+    val assetsDir: LauncherFile,
+    val librariesDir: LauncherFile
 ) {
-    @Throws(FileLoadException::class)
-    fun reloadVersionComponent(files: LauncherFiles) {
-        this.versionComponents = getVersionComponents(instance, files)
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadJavaComponent(files: LauncherFiles) {
-        this.javaComponent = getJavaComponent(versionComponents, files)
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadOptionsComponent(files: LauncherFiles) {
-        this.optionsComponent = getOptionsComponent(instance, files)
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadResourcepacksComponent(files: LauncherFiles) {
-        this.resourcepacksComponent = getResourcepacksComponent(instance, files)
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadSavesComponent(files: LauncherFiles) {
-        this.savesComponent = getSavesComponent(instance, files)
-    }
-
-    @Throws(FileLoadException::class)
-    fun reloadModsComponent(files: LauncherFiles) {
-        this.modsComponent = getModsComponent(instance, files)
-    }
+    val versionComponents: MutableStateList<VersionComponent> = versionComponents.toMutableStateList()
+    val javaComponent: MutableState<JavaComponent> = mutableStateOf(javaComponent)
+    val optionsComponent: MutableState<OptionsComponent> = mutableStateOf(optionsComponent)
+    val resourcepacksComponent: MutableState<ResourcepackComponent> = mutableStateOf(resourcepacksComponent)
+    val savesComponent: MutableState<SavesComponent> = mutableStateOf(savesComponent)
+    val modsComponent: MutableState<ModsComponent?> = mutableStateOf(modsComponent)
 
     companion object {
         @Throws(FileLoadException::class)
         fun of(instance: InstanceComponent, files: LauncherFiles): InstanceData {
-            val versionComponents = getVersionComponents(instance, files)
-            val virtualDir = versionComponents.find{ it.virtualAssets.value != null }?.virtualAssets?.value
-            val assetsDir = virtualDir?.let {
-                LauncherFile.ofData(files.mainManifest.assetsDir.value, it)
-            } ?: LauncherFile.ofData(files.mainManifest.assetsDir.value)
-
+            val versions = getVersionComponents(instance, files)
             return InstanceData(
                 files.mainManifest,
                 instance,
-                versionComponents,
-                getJavaComponent(versionComponents, files),
+                versions,
+                getJavaComponent(versions, files),
                 getOptionsComponent(instance, files),
                 getResourcepacksComponent(instance, files),
                 getSavesComponent(instance, files),
                 getModsComponent(instance, files),
-                LauncherFile.ofData(files.mainManifest.gameDataDir.value),
-                assetsDir,
-                LauncherFile.ofData(files.mainManifest.librariesDir.value)
+                files.gameDataDir,
+                files.assetsDir,
+                files.librariesDir
             )
         }
 
         @Throws(FileLoadException::class)
-        private fun getVersionComponents(instance: InstanceComponent, files: LauncherFiles): Array<VersionComponent> {
+        fun getVersionComponents(instance: InstanceComponent, files: LauncherFiles): List<VersionComponent> {
             val versionComponents: MutableList<VersionComponent> = mutableListOf()
 
             var firstComponent: VersionComponent? = null
@@ -100,11 +76,11 @@ class InstanceData(
                 versionComponents.add(currentComponent)
             }
 
-            return versionComponents.toTypedArray()
+            return versionComponents
         }
 
         @Throws(FileLoadException::class)
-        private fun getJavaComponent(versionComponents: Array<VersionComponent>, files: LauncherFiles): JavaComponent {
+        fun getJavaComponent(versionComponents: List<VersionComponent>, files: LauncherFiles): JavaComponent {
             for (v in versionComponents) {
                 if (!v.java.value.isNullOrBlank()) {
                     for (j in files.javaComponents) {
@@ -119,7 +95,7 @@ class InstanceData(
         }
 
         @Throws(FileLoadException::class)
-        private fun getOptionsComponent(instance: InstanceComponent, files: LauncherFiles): OptionsComponent {
+        fun getOptionsComponent(instance: InstanceComponent, files: LauncherFiles): OptionsComponent {
             for (o in files.optionsComponents) {
                 if (o.id.value == instance.optionsComponent.value) {
                     return o
@@ -129,7 +105,7 @@ class InstanceData(
         }
 
         @Throws(FileLoadException::class)
-        private fun getResourcepacksComponent(instance: InstanceComponent, files: LauncherFiles): ResourcepackComponent {
+        fun getResourcepacksComponent(instance: InstanceComponent, files: LauncherFiles): ResourcepackComponent {
             for (r in files.resourcepackComponents) {
                 if (r.id.value == instance.resourcepacksComponent.value) {
                     return r
@@ -139,7 +115,7 @@ class InstanceData(
         }
 
         @Throws(FileLoadException::class)
-        private fun getSavesComponent(instance: InstanceComponent, files: LauncherFiles): SavesComponent {
+        fun getSavesComponent(instance: InstanceComponent, files: LauncherFiles): SavesComponent {
             for (s in files.savesComponents) {
                 if (s.id.value == instance.savesComponent.value) {
                     return s
@@ -149,7 +125,7 @@ class InstanceData(
         }
 
         @Throws(FileLoadException::class)
-        private fun getModsComponent(instance: InstanceComponent, files: LauncherFiles): ModsComponent? {
+        fun getModsComponent(instance: InstanceComponent, files: LauncherFiles): ModsComponent? {
             if (!instance.modsComponent.value.isNullOrBlank()) {
                 for (m in files.modsComponents) {
                     if (m.id.value == instance.modsComponent.value) {

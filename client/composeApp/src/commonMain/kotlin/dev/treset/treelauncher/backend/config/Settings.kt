@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.mods.ModProvider
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.Component
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.ColorData
 import dev.treset.treelauncher.backend.util.serialization.DpData
@@ -26,10 +26,10 @@ import kotlinx.serialization.json.JsonNames
 import java.io.IOException
 import java.util.*
 
-enum class InstanceDataSortType(val comparator: Comparator<InstanceData>) {
-    NAME(InstanceDetailsNameComparator()),
-    TIME(InstanceDetailsTimeComparator()),
-    LAST_PLAYED(InstanceDetailsLastPlayedComparator());
+enum class InstanceSortType(val comparator: Comparator<InstanceComponent>) {
+    NAME(ComponentManifestNameComparator()),
+    LAST_PLAYED(ComponentManifestLastUsedComparator()),
+    TIME(InstanceComponentTimePlayedComparator());
 
     override fun toString(): String {
         return comparator.toString()
@@ -77,7 +77,7 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val syncUrl: MutableDataState<String?> = mutableStateOf(null)
     val syncPort: MutableDataState<String?> = mutableStateOf(null)
     val syncKey: MutableDataState<String?> = mutableStateOf(null)
-    val instanceSortType: MutableDataState<InstanceDataSortType> = mutableStateOf(InstanceDataSortType.NAME)
+    val instanceSortType: MutableDataState<InstanceSortType> = mutableStateOf(InstanceSortType.NAME)
     val isInstanceSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     val savesComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
     val isSavesComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)

@@ -23,7 +23,6 @@ import java.io.IOException
 @Composable
 fun InstanceDetails(
     instance: InstanceData,
-    redrawSelected: () -> Unit,
     reloadInstances: () -> Unit,
     unselectInstance: () -> Unit
 ) {
@@ -57,7 +56,7 @@ fun InstanceDetails(
                             )
                             launchGame(
                                 launcher
-                            ) { redrawSelected() }
+                            ) { }
                         },
                         painter = icons().play,
                         size = 32.dp,
@@ -109,7 +108,7 @@ fun InstanceDetails(
         )
         SelectorButton(
             title = Strings.manager.instance.details.saves(),
-            component = instance.savesComponent,
+            component = instance.savesComponent.value,
             icon = icons().saves,
             selected = selectedDetails == InstanceDetails.SAVES,
             onClick = {
@@ -118,7 +117,7 @@ fun InstanceDetails(
         )
         SelectorButton(
             title = Strings.manager.instance.details.resourcepacks(),
-            component = instance.resourcepacksComponent,
+            component = instance.resourcepacksComponent.value,
             icon = icons().resourcePacks,
             selected = selectedDetails == InstanceDetails.RESOURCE_PACKS,
             onClick = {
@@ -128,7 +127,7 @@ fun InstanceDetails(
         )
         SelectorButton(
             title = Strings.manager.instance.details.options(),
-            component = instance.optionsComponent,
+            component = instance.optionsComponent.value,
             icon = icons().options,
             selected = selectedDetails == InstanceDetails.OPTIONS,
             onClick = {
@@ -137,8 +136,8 @@ fun InstanceDetails(
         )
         SelectorButton(
             title = Strings.manager.instance.details.mods(),
-            component = instance.modsComponent,
-            icon = instance.modsComponent?.let { icons().mods } ?: icons().add,
+            component = instance.modsComponent.value,
+            icon = instance.modsComponent.value?.let { icons().mods } ?: icons().add,
             selected = selectedDetails == InstanceDetails.MODS,
             onClick = {
                 selectedDetails = if (selectedDetails == InstanceDetails.MODS) null else InstanceDetails.MODS
@@ -160,7 +159,6 @@ fun InstanceDetails(
                 InstanceComponentChanger(
                     instance = instance,
                     type = it,
-                    redrawSelected = redrawSelected
                 )
             }
             InstanceDetails.MODS -> {
@@ -168,13 +166,11 @@ fun InstanceDetails(
                     instance = instance,
                     type = it,
                     allowUnselect = true,
-                    redrawSelected = redrawSelected
                 )
             }
             InstanceDetails.VERSION -> {
                 InstanceVersionChanger(
                     instance = instance,
-                    redrawCurrent = redrawSelected
                 )
             }
             InstanceDetails.SETTINGS -> {
@@ -193,7 +189,6 @@ fun InstanceDetails(
                     name?.let { newName ->
                         instance.instance.name.value = newName
                         instance.instance.write()
-                        redrawSelected()
                     }
                 } catch (e: IOException) {
                     AppContext.error(e)
