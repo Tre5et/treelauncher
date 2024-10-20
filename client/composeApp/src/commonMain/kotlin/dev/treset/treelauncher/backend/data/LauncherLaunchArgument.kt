@@ -15,21 +15,9 @@ class LauncherLaunchArgument(
 ) {
     @Transient
     var parsedArgument = argument
-        get() {
-            if (field == null) {
-                field = argument
-            }
-            return field
-        }
 
     @Transient
-    var replacementValues = FormatUtils.findMatches(argument, "\\$\\{([a-zA-z_\\-\\d]*)\\}")
-        get() {
-            if(field == null) {
-                field = FormatUtils.findMatches(argument, "\\$\\{([a-zA-z_\\-\\d]*)\\}")
-            }
-            return field
-        }
+    var replacementValues: MutableList<String> = FormatUtils.findMatches(argument, "\\$\\{([a-zA-z_\\-\\d]*)\\}").toMutableList()
 
     fun replace(replacements: Map<String, String>): Boolean {
         var allReplaced = true

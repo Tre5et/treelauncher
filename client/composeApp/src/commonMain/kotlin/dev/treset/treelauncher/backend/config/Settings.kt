@@ -127,7 +127,7 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val isDebug: MutableDataState<Boolean> = mutableStateOf(System.getenv("debug") == "true")
 
     fun hasSyncData(): Boolean {
-        return syncUrl != null && syncPort != null && syncKey != null
+        return syncUrl.value != null && syncPort.value != null && syncKey.value != null
     }
 
     @Throws(IOException::class)
