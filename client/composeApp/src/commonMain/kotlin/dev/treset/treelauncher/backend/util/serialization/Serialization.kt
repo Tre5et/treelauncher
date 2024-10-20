@@ -1,15 +1,15 @@
 package dev.treset.treelauncher.backend.util.serialization
 
-import androidx.compose.ui.graphics.Color
-import com.google.gson.GsonBuilder
-import dev.treset.mcdl.json.JsonUtils
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.ClassDiscriminatorMode
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 
-fun modifySerializer() {
-    JsonUtils.setDefaultGson(
-        GsonBuilder()
-            .registerTypeAdapterFactory(MutableStateTypeAdapter.FACTORY)
-            .registerTypeAdapter(Color::class.java, ColorSerializer())
-            .registerTypeAdapter(Color::class.java, ColorDeserializer())
-            .setPrettyPrinting()
-    )
+@OptIn(ExperimentalSerializationApi::class)
+val Serializer = Json {
+    prettyPrint = true
+    namingStrategy = JsonNamingStrategy.SnakeCase
+    isLenient = true
+    ignoreUnknownKeys = true
+    classDiscriminatorMode = ClassDiscriminatorMode.NONE
 }

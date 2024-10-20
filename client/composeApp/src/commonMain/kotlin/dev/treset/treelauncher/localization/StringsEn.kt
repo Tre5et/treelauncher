@@ -163,8 +163,8 @@ open class StringsEn(
     )
 
     data class Game(
-        val versionName: (instance: InstanceData) -> String = { instance -> "${Strings.launcher.slug()}:${Strings.launcher.version()}:${instance.instance.id.substring(0,3)}...${instance.instance.id.substring(instance.instance.id.length - 2)}"},
-        val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.name }
+        val versionName: (instance: InstanceData) -> String = { instance -> "${Strings.launcher.slug()}:${Strings.launcher.version()}:${instance.instance.id.value.substring(0,3)}...${instance.instance.id.value.substring(instance.instance.id.value.length - 2)}"},
+        val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.name.value }
     )
 
     data class Language(

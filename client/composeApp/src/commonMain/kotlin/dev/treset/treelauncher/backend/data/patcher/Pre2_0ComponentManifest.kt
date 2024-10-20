@@ -67,7 +67,7 @@ fun Pre2_0ComponentManifest.toSavesComponent(): SavesComponent {
         id,
         name,
         LauncherFile.of(directory, appConfig().manifestFileName),
-        includedFiles = includedFiles.toTypedArray(),
+        includedFiles = includedFiles,
         lastUsed = lastUsed ?: ""
     )
 }
@@ -77,7 +77,7 @@ fun Pre2_0ComponentManifest.toResourcepackComponent(): ResourcepackComponent {
         id,
         name,
         LauncherFile.of(directory, appConfig().manifestFileName),
-        includedFiles = includedFiles.toTypedArray(),
+        includedFiles = includedFiles,
         lastUsed = lastUsed ?: ""
     )
 }
@@ -87,7 +87,7 @@ fun Pre2_0ComponentManifest.toOptionsComponent(): OptionsComponent {
         id,
         name,
         LauncherFile.of(directory, appConfig().manifestFileName),
-        includedFiles = includedFiles.toTypedArray(),
+        includedFiles = includedFiles,
         lastUsed = lastUsed ?: ""
     )
 }
@@ -97,7 +97,7 @@ fun Pre2_0ComponentManifest.toJavaComponent(): JavaComponent {
         id,
         name,
         LauncherFile.of(directory, appConfig().manifestFileName),
-        includedFiles = includedFiles.toTypedArray(),
+        includedFiles = includedFiles,
         lastUsed = lastUsed ?: ""
     )
 }

@@ -35,6 +35,7 @@ import dev.treset.treelauncher.backend.config.LauncherModSortType
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.EmptyingJobQueue
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.Components
 import dev.treset.treelauncher.components.SortContext
@@ -94,9 +95,9 @@ fun Mods() {
                 onDone = { onDone() }
             )
         },
-        detailsContent = { current, _, _ ->
+        detailsContent = { current, _ ->
             val types = remember(current.types) {
-                VersionType.fromIds(current.types!!)
+                VersionType.fromIds(current.types)
             }
 
             var redrawMods by remember(current) { mutableStateOf(0) }
@@ -113,7 +114,7 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(AppSettings.modSortType.value, AppSettings.isModSortReverse.value, redrawMods, AppSettings.modrinthStatus.value, AppSettings.curseforgeSatus.value, current.mods.size, current.versions) {
+            val mods: List<LauncherMod> = remember(AppSettings.modSortType.value, AppSettings.isModSortReverse.value, redrawMods, AppSettings.modrinthStatus.value, AppSettings.curseforgeStatus.value, current.mods.size, current.versions) {
                 current.mods.sortedWith(AppSettings.modSortType.value.comparator).let {
                     if(AppSettings.isModSortReverse.value) it.reversed() else it
                 }
@@ -130,12 +131,12 @@ fun Mods() {
                 }
             }
 
-            val modContext = remember(current, current.versions, types, AppSettings.isModsUpdate.value, AppSettings.isModsDisable.value, AppSettings.isModsEnable.value, AppSettings.modrinthStatus.value, AppSettings.curseforgeSatus.value) {
+            val modContext = remember(current, current.versions, types, AppSettings.isModsUpdate.value, AppSettings.isModsDisable.value, AppSettings.isModsEnable.value, AppSettings.modrinthStatus.value, AppSettings.curseforgeStatus.value) {
                 ModContext(
                     AppSettings.isModsUpdate.value,
                     AppSettings.isModsDisable.value,
                     AppSettings.isModsEnable.value,
-                    current.versions!!,
+                    current.versions,
                     types,
                     AppSettings.modProviders.filter { it.second }.map { it.first },
                     LauncherFile.of(current.directory, "mods")
@@ -189,7 +190,7 @@ fun Mods() {
                         MinecraftVersion.getAll().filter { it.isRelease }
                     }.also { v ->
                         selectedVersion = v.firstOrNull {
-                            it.id == current.versions?.let {it[0]}
+                            it.id == current.versions.firstOrNull()
                         }
                     }
                 }.start()
@@ -463,12 +464,14 @@ fun Mods() {
                                         Button(
                                             onClick = {
                                                 modContext.registerChangingJob {
-                                                    current.versions = listOf(v.id)
-                                                    current.types = if(selectedType == VersionType.QUILT && includeAlternateLoader) {
-                                                        listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
-                                                    } else {
-                                                        listOf(selectedType.id)
-                                                    }
+                                                    current.versions.assignFrom(listOf(v.id))
+                                                    current.types.assignFrom(
+                                                        if(selectedType == VersionType.QUILT && includeAlternateLoader) {
+                                                            listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
+                                                        } else {
+                                                            listOf(selectedType.id)
+                                                        }
+                                                    )
 
                                                     popupData = null
                                                 }
@@ -481,7 +484,7 @@ fun Mods() {
                             }
                         },
                         icon = icons().change,
-                        enabled = selectedVersion?.let { it.id != current.versions?.let {it[0]} } ?: false
+                        enabled = selectedVersion?.let { it.id != current.versions.firstOrNull() } ?: false
                                 || selectedType != types[0]
                                 || includeAlternateLoader != types.size > 1,
                         modifier = Modifier
@@ -495,7 +498,7 @@ fun Mods() {
             }
         },
         detailsScrollable = false,
-        actionBarSpecial = { _, settingsOpen, _, _ ->
+        actionBarSpecial = { _, settingsOpen, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
                 var updateExpanded by remember { mutableStateOf(false) }
                 val updateRotation by animateFloatAsState(if(updateExpanded) 180f else 0f)
@@ -772,7 +775,7 @@ fun Mods() {
                 }
             }
         },
-        actionBarBoxContent = { _, settingsOpen, _, _ ->
+        actionBarBoxContent = { _, settingsOpen, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
                 SortBox(
                     sorts = LauncherModSortType.entries,

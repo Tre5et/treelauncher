@@ -24,7 +24,7 @@ fun InstanceVersionChanger(
     var showFailed: Exception? by remember { mutableStateOf(null) }
 
     TitledColumn(
-        title = Strings.manager.instance.change.activeTitle(InstanceDetails.VERSION, instance.versionComponents[0].name),
+        title = Strings.manager.instance.change.activeTitle(InstanceDetails.VERSION, instance.versionComponents[0].name.value),
     ) {
 
         Row(
@@ -46,13 +46,13 @@ fun InstanceVersionChanger(
                         AppContext.error(e)
                     }
                 },
-                defaultVersionId = instance.versionComponents[0].versionNumber,
-                defaultVersionType = when(instance.versionComponents[0].versionType) {
+                defaultVersionId = instance.versionComponents[0].versionNumber.value,
+                defaultVersionType = when(instance.versionComponents[0].versionType.value) {
                     "fabric" -> VersionType.FABRIC
                     "forge" -> VersionType.FORGE
                     else -> VersionType.VANILLA
                 },
-                defaultLoaderVersion = instance.versionComponents[0].loaderVersion,
+                defaultLoaderVersion = instance.versionComponents[0].loaderVersion.value,
             )
         }
     }

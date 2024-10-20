@@ -111,7 +111,7 @@ fun ModsImport(
                                 tooltip = Strings.manager.mods.import.tooltipExpand(expanded)
                             )
 
-                            Text(component.name)
+                            Text(component.name.value)
                         }
 
                         AnimatedVisibility(

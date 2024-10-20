@@ -13,7 +13,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     @Throws(IOException::class)
     fun prepareResources() {
         try {
-            instanceData.mainManifest.activeInstance = instanceData.instance.id
+            instanceData.mainManifest.activeInstance.value = instanceData.instance.id.value
             instanceData.mainManifest.write()
         } catch (e: IOException) {
             throw IOException("Failed to prepare resources: unable to set instance active", e)
@@ -51,7 +51,7 @@ class ResourceManager(private var instanceData: InstanceData) {
             throw GameResourceException("Unable to cleanup game files", e)
         }
         try {
-            instanceData.mainManifest.activeInstance = null
+            instanceData.mainManifest.activeInstance.value = null
             instanceData.mainManifest.write()
         } catch (e: IOException) {
             throw GameResourceException("Unable to cleanup game files: unable to set instance inactive", e)
@@ -84,7 +84,7 @@ class ResourceManager(private var instanceData: InstanceData) {
     fun addPlayDuration(duration: Long) {
         LOGGER.debug { "Adding play duration: instance=${instanceData.instance.id}, duration=$duration" }
 
-        instanceData.instance.totalTime += duration
+        instanceData.instance.totalTime.value += duration
         instanceData.instance.write()
         LOGGER.debug { "Added play duration: instance=${instanceData.instance.id}, duration=$duration, totalTime=${instanceData.instance.totalTime}" }
     }

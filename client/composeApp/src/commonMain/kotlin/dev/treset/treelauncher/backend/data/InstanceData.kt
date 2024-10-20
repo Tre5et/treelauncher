@@ -51,10 +51,10 @@ class InstanceData(
         @Throws(FileLoadException::class)
         fun of(instance: InstanceComponent, files: LauncherFiles): InstanceData {
             val versionComponents = getVersionComponents(instance, files)
-            val virtualDir = versionComponents.firstOrNull{it.virtualAssets != null}?.virtualAssets
+            val virtualDir = versionComponents.find{ it.virtualAssets.value != null }?.virtualAssets?.value
             val assetsDir = virtualDir?.let {
-                LauncherFile.ofData(files.mainManifest.assetsDir, it)
-            } ?: LauncherFile.ofData(files.mainManifest.assetsDir)
+                LauncherFile.ofData(files.mainManifest.assetsDir.value, it)
+            } ?: LauncherFile.ofData(files.mainManifest.assetsDir.value)
 
             return InstanceData(
                 files.mainManifest,
@@ -65,9 +65,9 @@ class InstanceData(
                 getResourcepacksComponent(instance, files),
                 getSavesComponent(instance, files),
                 getModsComponent(instance, files),
-                LauncherFile.ofData(files.mainManifest.gameDataDir),
+                LauncherFile.ofData(files.mainManifest.gameDataDir.value),
                 assetsDir,
-                LauncherFile.ofData(files.mainManifest.librariesDir)
+                LauncherFile.ofData(files.mainManifest.librariesDir.value)
             )
         }
 
@@ -77,25 +77,25 @@ class InstanceData(
 
             var firstComponent: VersionComponent? = null
             for (v in files.versionComponents) {
-                if (v.id == instance.versionComponent) {
+                if (v.id.value == instance.versionComponent.value) {
                     firstComponent = v
                     break
                 }
             }
-            firstComponent?: throw FileLoadException("Failed to load instance data: unable to find version component: versionId=${instance.versionComponent}")
+            firstComponent?: throw FileLoadException("Failed to load instance data: unable to find version component: versionId=${instance.versionComponent.value}")
             var currentComponent: VersionComponent = firstComponent
             versionComponents.add(currentComponent)
-            while (currentComponent.depends?.isNotBlank() == true) {
+            while (!currentComponent.depends.value.isNullOrBlank()) {
                 var found = false
                 for (v in files.versionComponents) {
-                    if (v.id == currentComponent.depends) {
+                    if (v.id.value == currentComponent.depends.value) {
                         currentComponent = v
                         found = true
                         break
                     }
                 }
                 if (!found) {
-                    throw FileLoadException("Failed to load instance data: unable to find dependent version component: versionId=${currentComponent.depends}")
+                    throw FileLoadException("Failed to load instance data: unable to find dependent version component: versionId=${currentComponent.depends.value}")
                 }
                 versionComponents.add(currentComponent)
             }
@@ -106,13 +106,13 @@ class InstanceData(
         @Throws(FileLoadException::class)
         private fun getJavaComponent(versionComponents: Array<VersionComponent>, files: LauncherFiles): JavaComponent {
             for (v in versionComponents) {
-                if (v.java?.isNotBlank() == true) {
+                if (!v.java.value.isNullOrBlank()) {
                     for (j in files.javaComponents) {
-                        if (j.id == v.java) {
+                        if (j.id.value == v.java.value) {
                             return j
                         }
                     }
-                    throw FileLoadException("Failed to load instance data: unable to find java component: javaId=" + v.java)
+                    throw FileLoadException("Failed to load instance data: unable to find java component: javaId=" + v.java.value)
                 }
             }
             throw FileLoadException("Failed to load instance data: unable to find version with java component")
@@ -121,42 +121,42 @@ class InstanceData(
         @Throws(FileLoadException::class)
         private fun getOptionsComponent(instance: InstanceComponent, files: LauncherFiles): OptionsComponent {
             for (o in files.optionsComponents) {
-                if (o.id == instance.optionsComponent) {
+                if (o.id.value == instance.optionsComponent.value) {
                     return o
                 }
             }
-            throw FileLoadException("Failed to load instance data: unable to find options component: optionsId=" + instance.optionsComponent)
+            throw FileLoadException("Failed to load instance data: unable to find options component: optionsId=" + instance.optionsComponent.value)
         }
 
         @Throws(FileLoadException::class)
         private fun getResourcepacksComponent(instance: InstanceComponent, files: LauncherFiles): ResourcepackComponent {
             for (r in files.resourcepackComponents) {
-                if (r.id == instance.resourcepacksComponent) {
+                if (r.id.value == instance.resourcepacksComponent.value) {
                     return r
                 }
             }
-            throw FileLoadException("Failed to load instance data: unable to find resourcepacks component: resourcepacksId=" + instance.resourcepacksComponent)
+            throw FileLoadException("Failed to load instance data: unable to find resourcepacks component: resourcepacksId=" + instance.resourcepacksComponent.value)
         }
 
         @Throws(FileLoadException::class)
         private fun getSavesComponent(instance: InstanceComponent, files: LauncherFiles): SavesComponent {
             for (s in files.savesComponents) {
-                if (s.id == instance.savesComponent) {
+                if (s.id.value == instance.savesComponent.value) {
                     return s
                 }
             }
-            throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.savesComponent)
+            throw FileLoadException("Failed to load instance data: unable to find saves component: savesId=" + instance.savesComponent.value)
         }
 
         @Throws(FileLoadException::class)
         private fun getModsComponent(instance: InstanceComponent, files: LauncherFiles): ModsComponent? {
-            if (instance.modsComponent?.isNotBlank() == true) {
+            if (!instance.modsComponent.value.isNullOrBlank()) {
                 for (m in files.modsComponents) {
-                    if (m.id == instance.modsComponent) {
+                    if (m.id.value == instance.modsComponent.value) {
                         return m
                     }
                 }
-                throw FileLoadException("Failed to load instance data: unable to find mods component: modsId=" + instance.modsComponent)
+                throw FileLoadException("Failed to load instance data: unable to find mods component: modsId=" + instance.modsComponent.value)
             }
             return null
         }

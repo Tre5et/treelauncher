@@ -71,7 +71,7 @@ abstract class NewComponentCreator<T: Component, D: NewCreationData>(
 
         val new = createNew(newProvider)
         new.write()
-        data.parent.components += new.id
+        data.parent.components += new.id.value
         data.parent.write()
 
         newProvider.finish()
@@ -112,7 +112,7 @@ abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
 
         inheritProvider.finish()
 
-        data.parent.components += new.id
+        data.parent.components += new.id.value
         data.parent.write()
         return new
     }

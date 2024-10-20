@@ -1,56 +1,69 @@
 package dev.treset.treelauncher.backend.data.manifest
 
-import dev.treset.mcdl.json.SerializationException
+import androidx.compose.runtime.mutableStateOf
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import java.io.IOException
+import dev.treset.treelauncher.backend.util.serialization.MutableDataState
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class MainManifest(
-    var activeInstance: String?,
-    var assetsDir: String,
-    var librariesDir: String,
-    var gameDataDir: String,
-    var instancesDir: String,
-    var savesDir: String,
-    var resourcepacksDir: String,
-    var optionsDir: String,
-    var modsDir: String,
-    var versionDir: String,
-    var javasDir: String,
-    val type: LauncherManifestType = LauncherManifestType.LAUNCHER,
-    @Transient var file: LauncherFile
+    val activeInstance: MutableDataState<String?> = mutableStateOf(null),
+    val assetsDir: MutableDataState<String>,
+    val librariesDir: MutableDataState<String>,
+    val gameDataDir: MutableDataState<String>,
+    val instancesDir: MutableDataState<String>,
+    val savesDir: MutableDataState<String>,
+    val resourcepacksDir: MutableDataState<String>,
+    val optionsDir: MutableDataState<String>,
+    val modsDir: MutableDataState<String>,
+    val versionDir: MutableDataState<String>,
+    val javasDir: MutableDataState<String>,
+    @Transient override val file: MutableDataState<LauncherFile> = mutableStateOf(LauncherFile.of(""))
 ): Manifest() {
-    val directory: LauncherFile
-        get() = LauncherFile.of(file.parentFile)
+    override val type = LauncherManifestType.LAUNCHER
+    @Transient override var expectedType = LauncherManifestType.LAUNCHER
 
-    @Throws(IOException::class)
-    override fun write() {
-        file.write(this)
-    }
+    constructor(
+        activeInstance: String?,
+        assetsDir: String,
+        librariesDir: String,
+        gameDataDir: String,
+        instancesDir: String,
+        savesDir: String,
+        resourcepacksDir: String,
+        optionsDir: String,
+        modsDir: String,
+        versionDir: String,
+        javasDir: String,
+        file: LauncherFile
+    ): this(
+        mutableStateOf(activeInstance),
+        mutableStateOf(assetsDir),
+        mutableStateOf(librariesDir),
+        mutableStateOf(gameDataDir),
+        mutableStateOf(instancesDir),
+        mutableStateOf(savesDir),
+        mutableStateOf(resourcepacksDir),
+        mutableStateOf(optionsDir),
+        mutableStateOf(modsDir),
+        mutableStateOf(versionDir),
+        mutableStateOf(javasDir),
+        mutableStateOf(file)
+    )
 
-    companion object {
-        @Throws(SerializationException::class)
-        fun fromJson(
-            json: String
-        ): MainManifest {
-            val mainManifest = fromJson(json, MainManifest::class.java)
-            if(mainManifest.type != LauncherManifestType.LAUNCHER) {
-                throw SerializationException("Expected type ${LauncherManifestType.LAUNCHER}, got ${mainManifest.type}")
-            }
-            return mainManifest
-        }
-
-        @Throws(IOException::class)
-        fun readFile(
-            file: LauncherFile
-        ): MainManifest {
-            val json = file.readString()
-            val manifest = try {
-                fromJson(json)
-            } catch (e: SerializationException) {
-                throw IOException("Failed to parse component manifest: $file", e)
-            }
-            manifest.file = file
-            return manifest
-        }
+    fun copyTo(other: MainManifest) {
+        other.activeInstance.value = activeInstance.value
+        other.assetsDir.value = assetsDir.value
+        other.librariesDir.value = librariesDir.value
+        other.gameDataDir.value = gameDataDir.value
+        other.instancesDir.value = instancesDir.value
+        other.savesDir.value = savesDir.value
+        other.resourcepacksDir.value = resourcepacksDir.value
+        other.optionsDir.value = optionsDir.value
+        other.modsDir.value = modsDir.value
+        other.versionDir.value = versionDir.value
+        other.javasDir.value = javasDir.value
+        other.file.value = file.value
     }
 }

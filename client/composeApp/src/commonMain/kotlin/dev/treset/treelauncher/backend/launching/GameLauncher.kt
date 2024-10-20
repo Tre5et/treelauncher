@@ -31,7 +31,7 @@ class GameLauncher(
         } catch (e: IOException) {
             throw GameLaunchException("Unable to launch game: file reload failed", e)
         }
-        if (!files.mainManifest.activeInstance.isNullOrBlank()) {
+        if (!files.mainManifest.activeInstance.value.isNullOrBlank()) {
             if (!cleanupActiveInstance) {
                 throw GameLaunchException("Unable to launch game: active instance already exists")
             }
@@ -142,7 +142,7 @@ class GameLauncher(
         } catch (e: IOException) {
             throw GameLaunchException("Unable to abort launch correctly: failed to cleanup game files")
         }
-        files.mainManifest.activeInstance = null
+        files.mainManifest.activeInstance.value = null
         try {
             files.mainManifest.write()
         } catch (e: IOException) {

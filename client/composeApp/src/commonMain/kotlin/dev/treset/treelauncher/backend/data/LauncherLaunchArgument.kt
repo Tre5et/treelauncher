@@ -2,7 +2,10 @@ package dev.treset.treelauncher.backend.data
 
 import dev.treset.mcdl.format.FormatUtils
 import dev.treset.mcdl.util.OsUtil
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class LauncherLaunchArgument(
     var argument: String,
     var feature: String? = null,
@@ -44,7 +47,7 @@ class LauncherLaunchArgument(
         return allReplaced
     }
 
-    fun isActive(features: Array<LauncherFeature>): Boolean {
+    fun isActive(features: List<LauncherFeature>): Boolean {
         if (feature?.isNotBlank() == true) {
             if (features.none { f: LauncherFeature -> f.feature == feature }) {
                 return false

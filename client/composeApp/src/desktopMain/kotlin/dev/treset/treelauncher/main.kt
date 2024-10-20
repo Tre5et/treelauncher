@@ -2,13 +2,13 @@ package dev.treset.treelauncher
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -20,10 +20,6 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import dev.treset.mcdl.util.OsUtil
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.Window
@@ -32,6 +28,10 @@ import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.ConfigLoader
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.intui.standalone.theme.darkThemeDefinition
@@ -176,7 +176,7 @@ actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {
     val commandBuilder = StringBuilder()
     commandBuilder.append(updaterFile.absolutePath)
     return if(OsUtil.isOsName("windows")) {
-        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(AppSettings.isDebug) "/k" else "/c",
+        ProcessBuilder("cmd.exe", "/c", "start", "cmd", if(AppSettings.isDebug.value) "/k" else "/c",
             "$commandBuilder $updaterArgs"
         )
     } else {

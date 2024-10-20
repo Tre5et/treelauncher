@@ -228,7 +228,7 @@ fun ModsCreation(
                 inheritSelected = it
             },
             placeholder = Strings.creator.component(),
-            toDisplayString = { name },
+            toDisplayString = { name.value },
             enabled = mode == CreationMode.INHERIT
         )
 
@@ -245,7 +245,7 @@ fun ModsCreation(
                     useSelected = it
                 },
                 placeholder = Strings.creator.component(),
-                toDisplayString = { name },
+                toDisplayString = { name.value },
                 enabled = mode == CreationMode.USE
             )
         }

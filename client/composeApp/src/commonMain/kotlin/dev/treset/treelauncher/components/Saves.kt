@@ -84,7 +84,7 @@ fun Saves() {
                 AppContext.severeError(e)
             }
         },
-        detailsContent = { current, _, _ ->
+        detailsContent = { current,  _ ->
             DisposableEffect(current, AppContext.runningInstance) {
                 selected = current
                 reloadSaves()
@@ -230,7 +230,7 @@ fun Saves() {
                 }
             }
         },
-        actionBarSpecial = { _, settingsShown, _, _ ->
+        actionBarSpecial = { _, settingsShown, _ ->
             if(!settingsShown && !showAdd) {
                 selectedSave?.let {
                     IconButton(
@@ -274,7 +274,7 @@ fun Saves() {
                 )
             }
         },
-        actionBarBoxContent = {_, _, _, _ ->
+        actionBarBoxContent = {_, _, _ ->
             if(showAdd) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -367,7 +367,7 @@ private fun PlayPopup(
                     items = instances,
                     selected = selectedInstance,
                     onSelected = { selectedInstance = it },
-                    toDisplayString = { name }
+                    toDisplayString = { name.value }
                 )
             },
             buttonRow = {

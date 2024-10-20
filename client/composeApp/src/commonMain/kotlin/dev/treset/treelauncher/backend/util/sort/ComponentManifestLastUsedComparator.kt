@@ -5,14 +5,10 @@ import dev.treset.treelauncher.localization.Strings
 
 class ComponentManifestLastUsedComparator : Comparator<Component> {
     override fun compare(o1: Component, o2: Component): Int {
-        if (o1.lastUsed == o2.lastUsed) {
+        if (o1.lastUsed.value == o2.lastUsed.value) {
             return 0
         }
-        o1.lastUsed.let {  o1Used ->
-            o2.lastUsed.let { o2Used ->
-                return o2Used.compareTo(o1Used)
-            }
-        }
+        return o2.lastUsed.value.compareTo(o1.lastUsed.value)
     }
 
     override fun toString(): String = Strings.sortBox.sort.lastUsed()

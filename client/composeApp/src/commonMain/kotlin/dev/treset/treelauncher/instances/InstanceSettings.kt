@@ -17,6 +17,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.generic.IconButton
@@ -280,7 +281,7 @@ private fun saveMemory(instance: InstanceData, memory: Int, startMemory: Int) {
         }
         newArguments.add(LauncherLaunchArgument("-Xmx${memory}m", null, null, null, null))
         newArguments.add(LauncherLaunchArgument("-Xms${memory}m", null, null, null, null))
-        instance.instance.jvmArguments = newArguments.toTypedArray()
+        instance.instance.jvmArguments.assignFrom(newArguments)
     }
 }
 
@@ -302,7 +303,7 @@ private fun saveResolution(instance: InstanceData, res: Pair<Int, Int>, startRes
                 .toMutableList()
         newFeatures.add(LauncherFeature("resolution_x", res.first.toString()))
         newFeatures.add(LauncherFeature("resolution_y", res.second.toString()))
-        instance.instance.features = newFeatures.toTypedArray()
+        instance.instance.features.assignFrom(newFeatures)
     }
 }
 
@@ -314,7 +315,7 @@ private fun saveArgs(instance: InstanceData, args: List<LauncherLaunchArgument>,
                 mutArgs.add(argument)
             }
         }
-        instance.instance.jvmArguments = mutArgs.toTypedArray()
+        instance.instance.jvmArguments.assignFrom(mutArgs)
     }
 }
 

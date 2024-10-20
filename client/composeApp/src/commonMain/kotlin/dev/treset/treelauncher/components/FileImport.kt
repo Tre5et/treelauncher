@@ -218,7 +218,7 @@ fun <T> FileImport(
                                 tooltip = stringPackage.tooltipExpand(expanded)
                             )
 
-                            Text(component.name)
+                            Text(component.name.value)
                         }
 
                         AnimatedVisibility(

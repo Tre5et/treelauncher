@@ -22,15 +22,15 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
     val manifestFileName = "manifest.json"
     val nativesDirName = "natives"
     val includedFilesBackupDir = ".included_files.bak"
-    val instanceDefaultFeatures: Array<LauncherFeature> = arrayOf()
-    val instanceDefaultIncludedFiles: Array<String> = arrayOf()
-    val instanceDefaultIgnoredFiles: Array<String> = arrayOf()
-    val instanceDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val optionsDefaultIncludedFiles: Array<String> = arrayOf(
+    val instanceDefaultFeatures: List<LauncherFeature> = listOf()
+    val instanceDefaultIncludedFiles: List<String> = listOf()
+    val instanceDefaultIgnoredFiles: List<String> = listOf()
+    val instanceDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
+    val optionsDefaultIncludedFiles: List<String> = listOf(
         "options.txt",
         "usercache.json"
     )
-    val modsDefaultIncludedFiles: Array<String> = arrayOf(
+    val modsDefaultIncludedFiles: List<String> = listOf(
         "mods/",
         ".fabric/",
         "config/",
@@ -47,32 +47,32 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
         "optionsviveprofiles.txt",
         "g4mespeed"
     )
-    val savesDefaultIncludedFiles: Array<String> = arrayOf(
+    val savesDefaultIncludedFiles: List<String> = listOf(
             "saves/",
             "servers.dat",
             "realms_persistence.json",
             "stats/",
             "backups/",
         )
-    val resourcepacksDefaultIncludedFiles: Array<String> = arrayOf(
+    val resourcepacksDefaultIncludedFiles: List<String> = listOf(
             "resourcepacks/",
             "texturepacks/"
         )
-    val javaDefaultIncludedFiles: Array<String> = arrayOf()
-    val versionDefaultIncludedFiles: Array<String> = arrayOf()
-    val minecraftDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val javaDefaultIncludedFiles: List<String> = listOf()
+    val versionDefaultIncludedFiles: List<String> = listOf()
+    val minecraftDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
     val minecraftDefaultFileName = "client.jar"
-    val minecraftDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf(
+    val minecraftDefaultJvmArguments: List<LauncherLaunchArgument> = listOf(
         LauncherLaunchArgument("-Djava.library.path=\${natives_directory}"),
         LauncherLaunchArgument("-cp"),
         LauncherLaunchArgument("\${classpath}"),
     )
-    val fabricDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val fabricDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val forgeDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val forgeDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val quiltDefaultGameArguments: Array<LauncherLaunchArgument> = arrayOf()
-    val quiltDefaultJvmArguments: Array<LauncherLaunchArgument> = arrayOf()
+    val fabricDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
+    val fabricDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
+    val forgeDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
+    val forgeDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
+    val quiltDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
+    val quiltDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
     val fabricDefaultClientFileName = "fabric-client.jar"
     val modrinthUserAgent = "TreSet/treelauncher/v3.0.0"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"

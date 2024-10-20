@@ -48,9 +48,9 @@ fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherInstanceDetails>.toInstanceCompo
         second.modsComponent,
         LauncherFile.of(first.directory, appConfig().manifestFileName),
         lastUsed = second.lastPlayed ?: first.lastUsed ?: "",
-        features = second.features.toTypedArray(),
-        jvmArguments = second.jvmArguments.toTypedArray(),
-        ignoredFiles = second.ignoredFiles.toTypedArray(),
+        features = second.features,
+        jvmArguments = second.jvmArguments,
+        ignoredFiles = second.ignoredFiles,
         totalTime = second.totalTime
     )
 }

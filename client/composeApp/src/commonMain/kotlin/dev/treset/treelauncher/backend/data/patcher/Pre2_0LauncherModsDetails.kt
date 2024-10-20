@@ -37,10 +37,10 @@ fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherModsDetails>.toModsComponent(): 
     return ModsComponent(
         first.id,
         first.name,
-        second.types,
-        second.versions,
+        second.types ?: emptyList(),
+        second.versions ?: emptyList(),
         LauncherFile.of(first.directory, appConfig().manifestFileName),
-        includedFiles = first.includedFiles.toTypedArray(),
+        includedFiles = first.includedFiles,
         lastUsed = first.lastUsed ?: "",
         mods = second.mods
     )

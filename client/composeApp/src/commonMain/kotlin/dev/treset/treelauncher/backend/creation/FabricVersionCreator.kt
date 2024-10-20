@@ -12,6 +12,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -54,7 +55,7 @@ class FabricVersionCreator(
             throw IOException("Unable to create fabric version: failed to create mc version: versionId=${data.profile.inheritsFrom}", e)
         }
 
-        LOGGER.debug { "Created minecraft version: id=${mc.id}" }
+        LOGGER.debug { "Created minecraft version: id=${mc.id.value}" }
 
         val version = VersionComponent(
             id = id,
@@ -65,7 +66,7 @@ class FabricVersionCreator(
             assets = null,
             virtualAssets = null,
             natives = null,
-            depends = mc.id,
+            depends = mc.id.value,
             gameArguments = translateArguments(
                 data.profile.launchArguments.game,
                 appConfig().fabricDefaultGameArguments
@@ -116,7 +117,7 @@ class FabricVersionCreator(
         } catch (e: FileDownloadException) {
             throw IOException("Unable to add fabric libraries: failed to download libraries", e)
         }
-        version.libraries = libs
+        version.libraries.assignFrom(libs)
         libraryProvider.finish()
         LOGGER.debug { "Added fabric libraries" }
     }
@@ -138,7 +139,7 @@ class FabricVersionCreator(
         } catch (e: FileDownloadException) {
             throw IOException("Unable to add fabric client: failed to download fabric loader", e)
         }
-        version.mainFile = appConfig().fabricDefaultClientFileName
+        version.mainFile.value = appConfig().fabricDefaultClientFileName
         LOGGER.debug { "Added fabric client: mainFile=${version.mainFile}" }
     }
 

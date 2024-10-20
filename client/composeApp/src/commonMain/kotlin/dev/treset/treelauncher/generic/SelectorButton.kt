@@ -98,7 +98,7 @@ fun SelectorButton(
                     style = MaterialTheme.typography.titleMedium
                 )
                 component?.let {
-                    Text(it.name)
+                    Text(it.name.value)
                 }
             }
         }
@@ -121,10 +121,10 @@ fun ComponentButton(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                component.name,
+                component.name.value,
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(component.id)
+            Text(component.id.value)
         }
     }
 }

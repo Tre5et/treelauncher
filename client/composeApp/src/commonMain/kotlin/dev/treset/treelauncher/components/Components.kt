@@ -43,20 +43,17 @@ fun <T: Component> Components(
     actionBarSpecial: @Composable RowScope.(
         selected: T,
         settingsOpen: Boolean,
-        redraw: () -> Unit,
         reload: () -> Unit
-    ) -> Unit = {_,_,_,_->},
+    ) -> Unit = {_,_,_->},
     actionBarBoxContent: @Composable BoxScope.(
         selected: T,
         settingsOpen: Boolean,
-        redraw: () -> Unit,
-        reload: () -> Unit
-    ) -> Unit = {_,_,_,_->},
-    detailsContent: @Composable ColumnScope.(
-        selected: T,
-        redraw: () -> Unit,
         reload: () -> Unit
     ) -> Unit = {_,_,_->},
+    detailsContent: @Composable ColumnScope.(
+        selected: T,
+        reload: () -> Unit
+    ) -> Unit = {_,_->},
     detailsOnDrop: ((DragData) -> Unit)? = null,
     detailsScrollable: Boolean = true,
     settingsDefault: Boolean = false,
@@ -68,13 +65,6 @@ fun <T: Component> Components(
     var selected: T? by remember(components) { mutableStateOf(null) }
 
     var creatorSelected by remember { mutableStateOf(false) }
-
-    val redrawSelected: () -> Unit = {
-        selected?.let {
-            selected = null
-            selected = it
-        }
-    }
 
     var sortType: ComponentManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: ComponentManifestSortType.LAST_USED) }
     var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
@@ -192,11 +182,10 @@ fun <T: Component> Components(
                         actionBarSpecial(
                             it,
                             showSettings,
-                            redrawSelected,
                             reload
                         )
 
-                        Text(it.name)
+                        Text(it.name.value)
 
                         IconButton(
                             onClick = {
@@ -228,7 +217,6 @@ fun <T: Component> Components(
                     actionBarBoxContent(
                         it,
                         showSettings,
-                        redrawSelected,
                         reload
                     )
                 },
@@ -254,7 +242,6 @@ fun <T: Component> Components(
                         ) {
                             detailsContent(
                                 it,
-                                redrawSelected,
                                 reload
                             )
                         }
@@ -286,17 +273,16 @@ fun <T: Component> Components(
             if (showRename) {
                 RenamePopup(
                     manifest = it,
-                    editValid = { name -> name.isNotBlank() && name != it.name },
+                    editValid = { name -> name.isNotBlank() && name != it.name.value },
                     onDone = { name ->
                         showRename = false
                         name?.let { newName ->
-                            it.name = newName
+                            it.name.value = newName
                             try {
                                 it.write()
                             } catch (e: IOException) {
                                 AppContext.severeError(e)
                             }
-                            redrawSelected()
                         }
                     }
                 )

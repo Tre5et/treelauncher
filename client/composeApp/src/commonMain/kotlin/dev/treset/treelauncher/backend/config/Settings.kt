@@ -3,20 +3,26 @@ package dev.treset.treelauncher.backend.config
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import com.google.gson.annotations.SerializedName
 import dev.treset.mcdl.json.GenericJsonParsable
-import dev.treset.mcdl.json.SerializationException
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.serialization.ColorData
+import dev.treset.treelauncher.backend.util.serialization.DpData
+import dev.treset.treelauncher.backend.util.serialization.MutableDataState
+import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
 import dev.treset.treelauncher.backend.util.sort.*
+import dev.treset.treelauncher.localization.Language
 import dev.treset.treelauncher.localization.SystemLanguage
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.DetailsListDisplay
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.json.JsonNames
 import java.io.IOException
 import java.util.*
 
@@ -48,81 +54,77 @@ enum class ComponentManifestSortType(val comparator: Comparator<Component>) {
     }
 }
 
+@Serializable
 data class Window(
-    val x: Dp,
-    val y: Dp,
-    val width: Dp,
-    val height: Dp,
+    val x: DpData,
+    val y: DpData,
+    val width: DpData,
+    val height: DpData,
     val isMaximized: Boolean
 )
 
 
-class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
-    var language = mutableStateOf(SystemLanguage)
-    var theme = mutableStateOf(Theme.SYSTEM)
-    var accentColor = mutableStateOf(AccentColor.GREEN)
-    var customColor = mutableStateOf(Color.White)
-    var darkColors = mutableStateOf(UserColors())
-    var lightColors = mutableStateOf(UserColors())
-    var displayScale = mutableStateOf(1000)
-    var fontScale = mutableStateOf(1000)
-    var syncUrl = mutableStateOf<String?>(null)
-    var syncPort = mutableStateOf<String?>(null)
-    var syncKey = mutableStateOf<String?>(null)
-    var instanceSortType = mutableStateOf(InstanceDataSortType.NAME)
-    var isInstanceSortReverse = mutableStateOf(false)
-    var savesComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
-    var isSavesComponentSortReverse = mutableStateOf(false)
-    var savesDetailsListDisplay = mutableStateOf(DetailsListDisplay.FULL)
-    var resourcepacksDetailsListDisplay = mutableStateOf(DetailsListDisplay.FULL)
-    var resourcepacksComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
-    var isResourcepacksComponentSortReverse = mutableStateOf(false)
-    var optionsComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
-    var isOptionsComponentSortReverse = mutableStateOf(false)
-    var modDetailsListDisplay = mutableStateOf(DetailsListDisplay.FULL)
-    var modComponentSortType = mutableStateOf(ComponentManifestSortType.NAME)
-    var isModComponentSortReverse = mutableStateOf(false)
-    var modSortType = mutableStateOf(LauncherModSortType.NAME)
-    var isModSortReverse = mutableStateOf(false)
-    var isModsUpdate = mutableStateOf(true)
-    var isModsEnable = mutableStateOf(false)
-    var isModsDisable = mutableStateOf(false)
-    var modrinthStatus = mutableStateOf(0 to true)
-    var curseforgeSatus = mutableStateOf(1 to true)
+@Serializable
+class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : GenericJsonParsable() {
+    val language: MutableDataState<Language> = mutableStateOf(SystemLanguage)
+    val theme: MutableDataState<Theme> = mutableStateOf(Theme.SYSTEM)
+    val accentColor: MutableDataState<AccentColor> = mutableStateOf(AccentColor.GREEN)
+    val customColor: MutableDataState<ColorData> = mutableStateOf(Color.White)
+    val darkColors: MutableDataState<UserColors> = mutableStateOf(UserColors())
+    val lightColors: MutableDataState<UserColors> = mutableStateOf(UserColors())
+    val displayScale: MutableDataState<Int> = mutableStateOf(1000)
+    val fontScale: MutableDataState<Int> = mutableStateOf(1000)
+    val syncUrl: MutableDataState<String?> = mutableStateOf(null)
+    val syncPort: MutableDataState<String?> = mutableStateOf(null)
+    val syncKey: MutableDataState<String?> = mutableStateOf(null)
+    val instanceSortType: MutableDataState<InstanceDataSortType> = mutableStateOf(InstanceDataSortType.NAME)
+    val isInstanceSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
+    val savesComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
+    val isSavesComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
+    val savesDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
+    val resourcepacksDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
+    val resourcepacksComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
+    val isResourcepacksComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
+    val optionsComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
+    val isOptionsComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
+    val modDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
+    val modComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
+    val isModComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
+    val modSortType: MutableDataState<LauncherModSortType> = mutableStateOf(LauncherModSortType.NAME)
+    val isModSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
+    val isModsUpdate: MutableDataState<Boolean> = mutableStateOf(true)
+    val isModsEnable: MutableDataState<Boolean> = mutableStateOf(false)
+    val isModsDisable: MutableDataState<Boolean> = mutableStateOf(false)
+    val modrinthStatus: MutableDataState<Pair<Int, Boolean>> = mutableStateOf(0 to true)
+    @OptIn(ExperimentalSerializationApi::class)
+    @JsonNames("curseforge_satus")
+    val curseforgeStatus: MutableDataState<Pair<Int, Boolean>> = mutableStateOf(1 to true)
     var modProviders: List<Pair<ModProvider, Boolean>>
         get() {
             val result = mutableListOf<Pair<ModProvider, Boolean>>()
             result.add(ModProvider.MODRINTH to modrinthStatus.value.second)
-            result.add(curseforgeSatus.value.first, ModProvider.CURSEFORGE to curseforgeSatus.value.second)
+            result.add(curseforgeStatus.value.first, ModProvider.CURSEFORGE to curseforgeStatus.value.second)
             return result
         }
         set(value) = value.forEachIndexed { i, provider ->
             when(provider.first) {
                 ModProvider.MODRINTH -> modrinthStatus.value = i to provider.second
-                ModProvider.CURSEFORGE -> curseforgeSatus.value = i to provider.second
+                ModProvider.CURSEFORGE -> curseforgeStatus.value = i to provider.second
             }
         }
-    var acknowledgedNews = mutableStateListOf<String>()
-    var updateUrl = mutableStateOf(appConfig().updateUrl ?: "https://update.treelauncher.net")
-    var discordIntegration = mutableStateOf(false)
-    var discordShowModLoader = mutableStateOf(true)
-    var discordShowTime = mutableStateOf(true)
-    var discordShowWatermark = mutableStateOf(true)
-    var discordShowVersion = mutableStateOf(true)
-    var discordShowInstance = mutableStateOf(true)
-    var window = mutableStateOf<Window?>(null)
-    var dataVersion = mutableStateOf("0.0.1")
-    val clientId = mutableStateOf(UUID.randomUUID().toString())
+    val acknowledgedNews: MutableDataStateList<String> = mutableStateListOf()
+    val updateUrl: MutableDataState<String> = mutableStateOf(appConfig().updateUrl ?: "https://update.treelauncher.net")
+    val discordIntegration: MutableDataState<Boolean> = mutableStateOf(false)
+    val discordShowModLoader: MutableDataState<Boolean> = mutableStateOf(true)
+    val discordShowTime: MutableDataState<Boolean> = mutableStateOf(true)
+    val discordShowWatermark: MutableDataState<Boolean> = mutableStateOf(true)
+    val discordShowVersion: MutableDataState<Boolean> = mutableStateOf(true)
+    val discordShowInstance: MutableDataState<Boolean> = mutableStateOf(true)
+    val window: MutableDataState<Window?> = mutableStateOf(null)
+    val dataVersion: MutableDataState<String> = mutableStateOf("0.0.1")
+    val clientId: MutableDataState<String> = mutableStateOf(UUID.randomUUID().toString())
 
-    @SerializedName("is_debug")
-    private var _isDebug: Boolean? = if(System.getenv("debug") == "true") true else null
-    var isDebug: Boolean
-        get() = _isDebug ?: false
-        set(value) {
-            _isDebug = if(value) true else null
-        }
-    //constructor only for gson
-    private constructor() : this(LauncherFile(""))
+    val isDebug: MutableDataState<Boolean> = mutableStateOf(System.getenv("debug") == "true")
 
     fun hasSyncData(): Boolean {
         return syncUrl != null && syncPort != null && syncKey != null
@@ -136,19 +138,10 @@ class Settings(@Transient var file: LauncherFile) : GenericJsonParsable() {
     }
 
     companion object {
-        @Throws(SerializationException::class)
-        fun fromJson(json: String?): Settings {
-            return fromJson(json, Settings::class.java)
-        }
-
         @Throws(IOException::class)
         fun load(file: LauncherFile): Settings {
             LOGGER.debug { "Loading settings from: $file..." }
-            val result: Settings = try {
-                fromJson(file.readString())
-            } catch (e: SerializationException) {
-                throw IOException("Failed to load settings", e)
-            }
+            val result: Settings = file.readData()
             result.file = file
             AppSettings = result
             LOGGER.debug { "Loaded settings" }

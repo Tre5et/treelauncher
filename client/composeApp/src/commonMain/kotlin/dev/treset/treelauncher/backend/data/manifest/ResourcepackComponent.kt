@@ -1,28 +1,46 @@
 package dev.treset.treelauncher.backend.data.manifest
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import dev.treset.mcdl.resourcepacks.Resourcepack
 import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.serialization.MutableDataState
+import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.io.IOException
 
+@Serializable
 class ResourcepackComponent(
-    id: String,
-    name: String,
-    file: LauncherFile,
-    includedFiles: Array<String> = appConfig().resourcepacksDefaultIncludedFiles,
-    lastUsed: String = "",
-    active: Boolean = false
-): Component(
-    LauncherManifestType.RESOURCEPACKS_COMPONENT,
-    id,
-    name,
-    includedFiles,
-    lastUsed,
-    active,
-    file
-) {
+    override val id: MutableDataState<String>,
+    override val name: MutableDataState<String>,
+    @Transient override val file: MutableDataState<LauncherFile> = mutableStateOf(LauncherFile.of("")),
+    override val includedFiles: MutableDataStateList<String> = appConfig().resourcepacksDefaultIncludedFiles.toMutableStateList(),
+    override val lastUsed: MutableDataState<String> = mutableStateOf(""),
+    override val active: MutableDataState<Boolean> = mutableStateOf(false)
+): Component() {
+    override val type = LauncherManifestType.RESOURCEPACKS_COMPONENT
+    @Transient override var expectedType = LauncherManifestType.RESOURCEPACKS_COMPONENT
+
+    constructor(
+        id: String,
+        name: String,
+        file: LauncherFile,
+        active: Boolean = false,
+        lastUsed: String = "",
+        includedFiles: List<String> = appConfig().resourcepacksDefaultIncludedFiles
+    ): this(
+        mutableStateOf(id),
+        mutableStateOf(name),
+        mutableStateOf(file),
+        includedFiles.toMutableStateList(),
+        mutableStateOf(lastUsed),
+        mutableStateOf(active)
+    )
+
     fun getDisplayData(gameDataDir: LauncherFile): ResourcepacksDisplayData {
         val displayData = ResourcepacksDisplayData(
             resourcepacks = mapOf(),
@@ -79,15 +97,5 @@ class ResourcepackComponent(
             file.copyUniqueTo(directory)
         }
         this.loadTexturepacks(gameDataDir)
-    }
-
-    companion object {
-        @Throws(IOException::class)
-        fun readFile(file: LauncherFile): ResourcepackComponent {
-            return readFile(
-                file,
-                LauncherManifestType.RESOURCEPACKS_COMPONENT,
-            )
-        }
     }
 }

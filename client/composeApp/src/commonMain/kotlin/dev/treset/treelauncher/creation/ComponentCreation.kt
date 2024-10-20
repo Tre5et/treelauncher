@@ -140,7 +140,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
                 inheritSelected = it
             },
             placeholder = Strings.creator.component(),
-            toDisplayString = { name },
+            toDisplayString = { name.value },
             enabled = mode == CreationMode.INHERIT
         )
 
@@ -157,7 +157,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
                     useSelected = it
                 },
                 placeholder = Strings.creator.component(),
-                toDisplayString = { name },
+                toDisplayString = { name.value },
                 enabled = mode == CreationMode.USE
             )
         }

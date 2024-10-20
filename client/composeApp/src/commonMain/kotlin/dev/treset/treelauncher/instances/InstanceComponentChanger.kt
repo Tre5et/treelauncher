@@ -60,7 +60,7 @@ fun InstanceComponentChanger(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(text = Strings.manager.instance.change.activeTitle(type, current?.name))
+                Text(text = Strings.manager.instance.change.activeTitle(type, current?.name?.value))
                 current?.let {
                     IconButton(
                         onClick = {
@@ -88,7 +88,7 @@ fun InstanceComponentChanger(
                 allowUnselect = allowUnselect,
                 placeholder = Strings.manager.instance.change.noComponent(),
                 selected = selected,
-                toDisplayString = { name },
+                toDisplayString = { name.value },
                 loading = components.isEmpty()
             )
             IconButton(
@@ -96,28 +96,28 @@ fun InstanceComponentChanger(
                     try {
                         when (type) {
                             InstanceDetails.SAVES -> {
-                                selected?.id?.let { id ->
-                                    instance.instance.savesComponent = id
+                                selected?.id?.value?.let { id ->
+                                    instance.instance.savesComponent.value = id
                                     instance.reloadSavesComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.RESOURCE_PACKS -> {
-                                selected?.id?.let { id ->
-                                    instance.instance.resourcepacksComponent = id
+                                selected?.id?.value?.let { id ->
+                                    instance.instance.resourcepacksComponent.value = id
                                     instance.reloadResourcepacksComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.OPTIONS -> {
-                                selected?.id?.let { id ->
-                                    instance.instance.optionsComponent = id
+                                selected?.id?.value?.let { id ->
+                                    instance.instance.optionsComponent.value = id
                                     instance.reloadOptionsComponent(AppContext.files)
                                 }
                             }
 
                             InstanceDetails.MODS -> {
-                                instance.instance.modsComponent = selected?.id
+                                instance.instance.modsComponent.value = selected?.id?.value
                                 instance.reloadModsComponent(AppContext.files)
                             }
 

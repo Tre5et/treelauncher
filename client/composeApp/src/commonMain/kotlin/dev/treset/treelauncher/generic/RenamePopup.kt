@@ -16,7 +16,7 @@ fun RenamePopup(
     onDone: (String?) -> Unit
 ) {
 
-    var tfName: String by remember { mutableStateOf(manifest.name) }
+    var tfName: String by remember { mutableStateOf(manifest.name.value) }
     PopupOverlay(
         titleRow = { Text(Strings.selector.component.rename.title()) },
         content = {
@@ -28,7 +28,7 @@ fun RenamePopup(
                 placeholder = Strings.selector.component.rename.prompt(),
                 modifier = Modifier.onKeyEvent {
                     if(it.key == Key.Enter && editValid(tfName)) {
-                        manifest.name = tfName
+                        manifest.name.value = tfName
                         onDone(tfName)
                     }
                     false
@@ -46,7 +46,7 @@ fun RenamePopup(
             }
             Button(
                 onClick = {
-                    manifest.name = tfName
+                    manifest.name.value = tfName
                     onDone(tfName)
                 },
                 enabled = editValid(tfName)

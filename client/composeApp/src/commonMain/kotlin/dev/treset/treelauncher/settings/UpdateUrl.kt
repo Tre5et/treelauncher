@@ -26,7 +26,7 @@ fun UpdateUrl() {
 
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
-    if(AppSettings.isDebug) {
+    if(AppSettings.isDebug.value) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier

@@ -1,10 +1,41 @@
 package dev.treset.treelauncher.backend.data.manifest
 
-import dev.treset.mcdl.json.GenericJsonParsable
+import androidx.compose.runtime.MutableState
+import dev.treset.treelauncher.backend.util.file.LauncherFile
+import kotlinx.serialization.Serializable
 import java.io.IOException
 
-abstract class  Manifest(
-) : GenericJsonParsable() {
+@Serializable
+sealed class Manifest {
+    abstract val file: MutableState<LauncherFile>
+    abstract var expectedType: LauncherManifestType
+    abstract val type: LauncherManifestType
+
+    val directory: LauncherFile
+        get() = LauncherFile.of(file.value.parentFile)
+
     @Throws(IOException::class)
-    abstract fun write()
+    open fun write() {
+        file.value.write(this)
+    }
+
+    companion object {
+        @Throws(IOException::class)
+        inline fun <reified T: Manifest> readFile(file: LauncherFile, expectedType: LauncherManifestType?): T {
+            val content = file.readData<T>()
+            content.file.value = file
+            expectedType?.let {
+                content.expectedType = it
+            }
+            if (content.type != content.expectedType) {
+                throw IOException("Expected type $expectedType, but got ${content.type}")
+            }
+            return content
+        }
+
+        @Throws(IOException::class)
+        inline fun <reified T: Manifest> readFile(file: LauncherFile): T {
+            return readFile(file, null)
+        }
+    }
 }

@@ -1,49 +1,39 @@
 package dev.treset.treelauncher.backend.data.manifest
 
-import dev.treset.mcdl.json.SerializationException
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import java.io.IOException
+import dev.treset.treelauncher.backend.util.serialization.MutableDataState
+import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 open class ParentManifest(
-    val type: LauncherManifestType,
-    var prefix: String,
-    var components: MutableList<String>,
-    @Transient var file: LauncherFile
+    override val type: LauncherManifestType,
+    val prefix: MutableDataState<String>,
+    val components: MutableDataStateList<String>,
+    @Transient override var file: MutableState<LauncherFile> = mutableStateOf(LauncherFile.of(""))
 ): Manifest() {
-    val directory: LauncherFile
-        get() = LauncherFile.of(file.parentFile)
+    @Transient override var expectedType = LauncherManifestType.UNKNOWN
 
-    @Throws(IOException::class)
-    override fun write() {
-        file.write(this)
-    }
+    constructor(
+        type: LauncherManifestType,
+        prefix: String,
+        components: List<String>,
+        file: LauncherFile
+    ): this(
+        type,
+        mutableStateOf(prefix),
+        components.toMutableStateList(),
+        mutableStateOf(file)
+    )
 
-    companion object {
-        @Throws(SerializationException::class)
-        inline fun <reified T: ParentManifest> fromJson(
-            json: String?,
-            expectedType: LauncherManifestType
-        ): T {
-            val parentManifest = fromJson(json, T::class.java)
-            if(parentManifest.type != expectedType) {
-                throw SerializationException("Expected type $expectedType, got ${parentManifest.type}")
-            }
-            return parentManifest
-        }
-
-        @Throws(IOException::class)
-        inline fun <reified T: ParentManifest> readFile(
-            file: LauncherFile,
-            expectedType: LauncherManifestType
-        ): T {
-            val json = file.readString()
-            val manifest = try {
-                fromJson<T>(json, expectedType)
-            } catch (e: SerializationException) {
-                throw IOException("Failed to parse component manifest: $file", e)
-            }
-            manifest.file = file
-            return manifest
-        }
+    fun copyTo(other: ParentManifest) {
+        other.prefix.value = prefix.value
+        components.copyTo(other.components)
+        other.file = file
     }
 }

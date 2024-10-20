@@ -34,10 +34,10 @@ fun InstanceButton(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                instance.instance.name,
+                instance.instance.name.value,
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(instance.versionComponents[0].name)
+            Text(instance.versionComponents[0].name.value)
         }
 
         val interactionSource = remember { MutableInteractionSource() }
@@ -51,9 +51,9 @@ fun InstanceButton(
 
             Text(
                 if(hovered) {
-                    Strings.units.accurateTime(instance.instance.totalTime)
+                    Strings.units.accurateTime(instance.instance.totalTime.value)
                 } else {
-                    Strings.units.approxTime(instance.instance.totalTime)
+                    Strings.units.approxTime(instance.instance.totalTime.value)
                 }
             )
             Icon(

@@ -1,8 +1,11 @@
 package dev.treset.treelauncher.backend.util.file
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import dev.treset.mcdl.json.JsonParsable
 import dev.treset.treelauncher.backend.config.appConfig
+import dev.treset.treelauncher.backend.util.serialization.Serializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
 import java.awt.Desktop
 import java.io.File
 import java.io.IOException
@@ -16,11 +19,22 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 import kotlin.io.path.isDirectory
+
 class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
     fun read(): ByteArray {
         if (!isFile()) throw IOException("File does not exist: $absolutePath")
         return Files.readAllBytes(toPath())
+    }
+
+    @Throws(IOException::class)
+    inline fun <reified T: @Serializable Any> readData(): T {
+        val content = readString()
+        try {
+            return Serializer.decodeFromString(content)
+        } catch (e: SerializationException) {
+            throw IOException("Failed to deserialize data: $content", e)
+        }
     }
 
     @Throws(IOException::class)
@@ -136,8 +150,12 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun write(content: JsonParsable) {
-        write(content.toJson())
+    inline fun <reified T: @Serializable Any> write(content: T) {
+        try {
+            write(Serializer.encodeToString(content))
+        } catch (e: SerializationException) {
+            throw IOException("Failed to serialize data: $content", e)
+        }
     }
 
     @Throws(IOException::class)

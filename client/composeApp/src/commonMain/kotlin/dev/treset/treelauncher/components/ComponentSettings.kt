@@ -29,15 +29,8 @@ import java.net.URI
 fun ColumnScope.ComponentSettings(
     component: Component
 ) {
-    var includedFiles: Array<String> by remember { mutableStateOf(emptyArray()) }
-
-    LaunchedEffect(component) {
-        includedFiles = component.includedFiles
-    }
-
     DisposableEffect(component) {
         onDispose {
-            component.includedFiles = includedFiles
             component.write()
         }
     }
@@ -48,7 +41,7 @@ fun ColumnScope.ComponentSettings(
                 data.readFiles()
                     .map { LauncherFile.of(URI(it).path) }
                     .forEach {
-                        includedFiles += PatternString("${it.name}${if (it.isDirectory) "/" else ""}").get()
+                        component.includedFiles += PatternString("${it.name}${if (it.isDirectory) "/" else ""}").get()
                     }
             }
         },
@@ -73,7 +66,7 @@ fun ColumnScope.ComponentSettings(
                     .verticalScroll(rememberScrollState())
             ) {
 
-                includedFiles.forEach {
+                component.includedFiles.forEach {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -96,7 +89,7 @@ fun ColumnScope.ComponentSettings(
 
                         IconButton(
                             onClick = {
-                                includedFiles = includedFiles.filter { file -> file != it }.toTypedArray()
+                                component.includedFiles.remove(it)
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
@@ -131,7 +124,7 @@ fun ColumnScope.ComponentSettings(
 
                 IconButton(
                     onClick = {
-                        includedFiles = includedFiles + PatternString("$newArg${if (fileType == FileType.FOLDER) "/" else ""}").get()
+                        component.includedFiles += PatternString("$newArg${if (fileType == FileType.FOLDER) "/" else ""}").get()
                         newArg = ""
                     },
                     icon = icons().add,

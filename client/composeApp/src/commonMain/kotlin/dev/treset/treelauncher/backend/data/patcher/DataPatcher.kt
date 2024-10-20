@@ -1,7 +1,7 @@
 package dev.treset.treelauncher.backend.data.patcher
 
+import androidx.compose.runtime.MutableState
 import dev.treset.treelauncher.backend.config.AppSettings
-import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.Component
@@ -13,8 +13,8 @@ import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.localization.Strings
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
-import kotlin.reflect.KMutableProperty0
 
 class DataPatcher {
 
@@ -326,19 +326,19 @@ class DataPatcher {
         files.reload()
 
         componentDirectoriesProvider.next("instances")
-        upgradeComponentsDirectory(files.mainManifest::instancesDir, "instances")
+        upgradeComponentsDirectory(files.mainManifest.instancesDir, "instances")
         componentDirectoriesProvider.next("saves_components")
-        upgradeComponentsDirectory(files.mainManifest::savesDir, "saves_components")
+        upgradeComponentsDirectory(files.mainManifest.savesDir, "saves_components")
         componentDirectoriesProvider.next("resourcepacks_components")
-        upgradeComponentsDirectory(files.mainManifest::resourcepacksDir, "resourcepacks_components")
+        upgradeComponentsDirectory(files.mainManifest.resourcepacksDir, "resourcepacks_components")
         componentDirectoriesProvider.next("options_components")
-        upgradeComponentsDirectory(files.mainManifest::optionsDir, "options_components")
+        upgradeComponentsDirectory(files.mainManifest.optionsDir, "options_components")
         componentDirectoriesProvider.next("mods_components")
-        upgradeComponentsDirectory(files.mainManifest::modsDir, "mods_components")
+        upgradeComponentsDirectory(files.mainManifest.modsDir, "mods_components")
         componentDirectoriesProvider.next("version_components")
-        upgradeComponentsDirectory(files.mainManifest::versionDir, "version_components")
+        upgradeComponentsDirectory(files.mainManifest.versionDir, "version_components")
         componentDirectoriesProvider.next("java_components")
-        upgradeComponentsDirectory(files.mainManifest::javasDir, "java_components")
+        upgradeComponentsDirectory(files.mainManifest.javasDir, "java_components")
 
         componentDirectoriesProvider.next()
         files.mainManifest.write()
@@ -348,12 +348,12 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun upgradeComponentsDirectory(property: KMutableProperty0<String>, targetName: String) {
-        val srcDir = LauncherFile.ofData(property.get())
+    fun upgradeComponentsDirectory(property: MutableState<String>, targetName: String) {
+        val srcDir = LauncherFile.ofData(property.value)
         val targetDir = LauncherFile.ofData(targetName)
         if(srcDir.exists()) {
             srcDir.atomicMoveTo(targetDir)
-            property.set(targetName)
+            property.value = targetName
         }
     }
 
@@ -369,7 +369,7 @@ class DataPatcher {
         includedFilesProvider.next("instances")
         val instanceProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_INSTANCE, files.instanceComponents.size)
         for(instance in files.instanceComponents) {
-            instanceProvider.next(instance.name)
+            instanceProvider.next(instance.name.value)
             upgradeIncludedFiles(instance)
         }
         instanceProvider.finish("")
@@ -377,7 +377,7 @@ class DataPatcher {
         includedFilesProvider.next("saves")
         val savesProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_SAVES, files.savesComponents.size)
         for(saves in files.savesComponents) {
-            savesProvider.next(saves.name)
+            savesProvider.next(saves.name.value)
             moveRootFilesToDirectory(saves, "saves")
             upgradeIncludedFiles(saves)
         }
@@ -386,7 +386,7 @@ class DataPatcher {
         includedFilesProvider.next("resourcepacks")
         val resourcepacksProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_RESOURCEPACKS, files.resourcepackComponents.size)
         for(resourcepacks in files.resourcepackComponents) {
-            resourcepacksProvider.next(resourcepacks.name)
+            resourcepacksProvider.next(resourcepacks.name.value)
             moveRootFilesToDirectory(resourcepacks, "resourcepacks")
             upgradeIncludedFiles(resourcepacks)
         }
@@ -395,7 +395,7 @@ class DataPatcher {
         includedFilesProvider.next("options")
         val optionsProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_OPTIONS, files.optionsComponents.size)
         for(options in files.optionsComponents) {
-            optionsProvider.next(options.name)
+            optionsProvider.next(options.name.value)
             upgradeIncludedFiles(options)
         }
         optionsProvider.finish("")
@@ -403,7 +403,7 @@ class DataPatcher {
         includedFilesProvider.next("mods")
         val modsProvider = includedFilesProvider.subStep(PatchStep.INCLUDED_FILES_MODS, files.modsComponents.size)
         for(mods in files.modsComponents) {
-            modsProvider.next(mods.name)
+            modsProvider.next(mods.name.value)
             moveRootFilesToDirectory(mods, "mods")
             upgradeIncludedFiles(mods)
         }
@@ -465,7 +465,7 @@ class DataPatcher {
 
         texturepacksProvider.total = files.resourcepackComponents.size + 1
         for(resourcepacks in files.resourcepackComponents) {
-            texturepacksProvider.next(resourcepacks.name)
+            texturepacksProvider.next(resourcepacks.name.value)
             if(!resourcepacks.includedFiles.contains("texturepacks/")) {
                 resourcepacks.includedFiles += "texturepacks/"
                 resourcepacks.write()
@@ -487,9 +487,9 @@ class DataPatcher {
         resourcepacksProvider.total = files.versionComponents.size + 1
 
         files.versionComponents.forEach {
-            resourcepacksProvider.next(it.name)
-            it.gameArguments = it.gameArguments.filter { arg ->
-                arg.argument != "--resourcePackDir" && arg.argument != "\${resourcepack_directory}"
+            resourcepacksProvider.next(it.name.value)
+            it.gameArguments.removeIf { arg ->
+                arg.argument == "--resourcePackDir" || arg.argument == "\${resourcepack_directory}"
             }
             it.write()
         }

@@ -59,8 +59,8 @@ fun Update() {
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    if(AppSettings.isDebug) {
-                        AppSettings.isDebug = false
+                    if(AppSettings.isDebug.value) {
+                        AppSettings.isDebug.value = false
                         NavigationContext.navigateTo(NavigationState.INSTANCES)
                         AppContext.addNotification(
                             NotificationData(
@@ -85,7 +85,7 @@ fun Update() {
                         }
                         lastClick = now
                         if (consecutiveClicks >= 5) {
-                            AppSettings.isDebug = true
+                            AppSettings.isDebug.value = true
                             NavigationContext.navigateTo(NavigationState.INSTANCES)
                             AppContext.addNotification(
                                 NotificationData(

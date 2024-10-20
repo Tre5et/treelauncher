@@ -7,7 +7,9 @@ import dev.treset.mcdl.mods.ModData
 import dev.treset.mcdl.mods.ModsDL
 import dev.treset.mcdl.mods.curseforge.CurseforgeMod
 import dev.treset.mcdl.mods.modrinth.ModrinthMod
+import kotlinx.serialization.Serializable
 
+@Serializable
 class LauncherMod(
     var currentProvider: String?,
     var description: String?,
@@ -36,7 +38,7 @@ class LauncherMod(
                 }
                 if (download.provider == "curseforge") {
                     val curseforgeMod = CurseforgeMod.get(download.id.toLong())
-                    if (curseforgeMod.name != null && !curseforgeMod.name.isBlank()) {
+                    if (curseforgeMod.name != null && curseforgeMod.name.isNotBlank()) {
                         mods.add(curseforgeMod)
                     }
                 }

@@ -20,7 +20,7 @@ abstract class VersionCreator<D: VersionCreationData>(
 
     @Throws(IOException::class)
     override fun create(): VersionComponent {
-        data.files.versionComponents.firstOrNull { it.versionId == data.versionId }?.let {
+        data.files.versionComponents.firstOrNull { it.versionId.value == data.versionId }?.let {
             LOGGER.debug { "Matching version already exists, using instead: versionId=${data.versionId}" }
             return it
         }
@@ -29,7 +29,7 @@ abstract class VersionCreator<D: VersionCreationData>(
 
     protected fun translateArguments(
         args: List<MinecraftLaunchArgument>,
-        defaultArgs: Array<LauncherLaunchArgument>
+        defaultArgs: List<LauncherLaunchArgument>
     ): List<LauncherLaunchArgument> {
         val result: MutableList<LauncherLaunchArgument> = mutableListOf()
         for (a in args) {

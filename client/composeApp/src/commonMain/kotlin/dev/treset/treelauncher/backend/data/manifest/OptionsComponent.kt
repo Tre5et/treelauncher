@@ -1,33 +1,39 @@
 package dev.treset.treelauncher.backend.data.manifest
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import java.io.IOException
+import dev.treset.treelauncher.backend.util.serialization.MutableDataState
+import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class OptionsComponent(
-    id: String,
-    name: String,
-    file: LauncherFile,
-    includedFiles: Array<String> = appConfig().optionsDefaultIncludedFiles,
-    lastUsed: String = "",
-    type: LauncherManifestType = LauncherManifestType.OPTIONS_COMPONENT,
-    active: Boolean = false
-): Component(
-    type,
-    id,
-    name,
-    includedFiles,
-    lastUsed,
-    active,
-    file
-) {
-    companion object {
-        @Throws(IOException::class)
-        fun readFile(file: LauncherFile): OptionsComponent {
-            return readFile(
-                file,
-                LauncherManifestType.OPTIONS_COMPONENT,
-            )
-        }
-    }
+    override val id: MutableDataState<String>,
+    override val name: MutableDataState<String>,
+    @Transient override val file: MutableDataState<LauncherFile> = mutableStateOf(LauncherFile.of("")),
+    override val includedFiles: MutableDataStateList<String> = appConfig().optionsDefaultIncludedFiles.toMutableStateList(),
+    override val lastUsed: MutableDataState<String> = mutableStateOf(""),
+    override val active: MutableDataState<Boolean> = mutableStateOf(false)
+): Component() {
+    override val type = LauncherManifestType.OPTIONS_COMPONENT
+    @Transient override var expectedType = LauncherManifestType.OPTIONS_COMPONENT
+
+    constructor(
+        id: String,
+        name: String,
+        file: LauncherFile,
+        active: Boolean = false,
+        lastUsed: String = "",
+        includedFiles: List<String> = appConfig().optionsDefaultIncludedFiles
+    ): this(
+        mutableStateOf(id),
+        mutableStateOf(name),
+        mutableStateOf(file),
+        includedFiles.toMutableStateList(),
+        mutableStateOf(lastUsed),
+        mutableStateOf(active)
+    )
 }

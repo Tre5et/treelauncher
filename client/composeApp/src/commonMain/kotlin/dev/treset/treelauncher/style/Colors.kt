@@ -6,7 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import dev.treset.treelauncher.backend.config.AppSettings
+import dev.treset.treelauncher.backend.util.serialization.ColorData
 import dev.treset.treelauncher.localization.Strings
+import kotlinx.serialization.Serializable
 import org.jetbrains.jewel.intui.window.styling.dark
 import org.jetbrains.jewel.intui.window.styling.light
 import org.jetbrains.jewel.window.styling.TitleBarColors
@@ -49,13 +51,14 @@ enum class AccentColor(val primary: (dark: Boolean) -> Color, val displayName: (
     }
 }
 
+@Serializable
 data class UserColors(
-    val background: Color? = null,
-    val secondary: Color? = null,
-    val secondaryContainer: Color? = null,
-    val info: Color? = null,
-    val warning: Color? = null,
-    val error: Color? = null,
+    val background: ColorData? = null,
+    val secondary: ColorData? = null,
+    val secondaryContainer: ColorData? = null,
+    val info: ColorData? = null,
+    val warning: ColorData? = null,
+    val error: ColorData? = null,
     val contentColors: ContentColors? = null
 ) {
     fun toColors(
@@ -94,9 +97,10 @@ data class UserColors(
     }
 }
 
+@Serializable
 data class ContentColors(
-    val light: Color = Color.White,
-    val dark: Color = Color.Black,
+    val light: ColorData = Color.White,
+    val dark: ColorData = Color.Black,
 )
 
 data class ExtensionColors(

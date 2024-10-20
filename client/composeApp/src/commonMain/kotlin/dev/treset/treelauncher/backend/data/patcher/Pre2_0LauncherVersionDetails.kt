@@ -50,7 +50,7 @@ fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherVersionDetails>.toVersionCompone
         second.mainFile,
         second.versionId,
         LauncherFile.of(first.directory, appConfig().manifestFileName),
-        includedFiles = first.includedFiles.toTypedArray(),
+        includedFiles = first.includedFiles,
         lastUsed = first.lastUsed ?: "",
     )
 }

@@ -10,6 +10,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -101,7 +102,7 @@ class VanillaVersionCreator(
                 throw IOException("Unable to create assets: failed to extract virtual assets", e)
             }
 
-            version.virtualAssets = virtualDir.relativeTo(data.files.assetsDir).path
+            version.virtualAssets.value = virtualDir.relativeTo(data.files.assetsDir).path
         }
 
         assetsProvider.finish()
@@ -118,7 +119,7 @@ class VanillaVersionCreator(
             statusProvider
         )
 
-        version.java = javaCreator.create().id
+        version.java.value = javaCreator.create().id.value
         LOGGER.debug { "Added java component: id=${version.java}" }
     }
 
@@ -150,9 +151,9 @@ class VanillaVersionCreator(
         } catch (e: FileDownloadException) {
             throw IOException("Unable to add libraries: failed to download libraries", e)
         }
-        version.libraries = result
+        result.copyTo(version.libraries)
         if(nativesDir.isDirectory()) {
-            version.natives = appConfig().nativesDirName
+            version.natives.value = appConfig().nativesDirName
         }
         librariesProvider.finish()
         LOGGER.debug { "Added libraries: $result" }
@@ -180,7 +181,7 @@ class VanillaVersionCreator(
             throw IOException("Unable to add client: failed to download client: url=${data.version.downloads.client.url}", e)
         }
         val urlParts = data.version.downloads.client.url.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        version.mainFile = urlParts[urlParts.size - 1]
+        version.mainFile.value = urlParts[urlParts.size - 1]
         clientProvider.finish()
         LOGGER.debug { "Added client: mainFile=${version.mainFile}" }
     }

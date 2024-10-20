@@ -42,8 +42,8 @@ class CommandBuilder(
         }
         var assetsIndex: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.assets?.isNotBlank() == true) {
-                assetsIndex = v.assets
+            if (!v.assets.value.isNullOrBlank()) {
+                assetsIndex = v.assets.value
                 break
             }
         }
@@ -53,8 +53,8 @@ class CommandBuilder(
 
         var mainClass: String? = null
         for (v in instanceData.versionComponents) {
-            if (v.mainClass.isNotBlank()) {
-                mainClass = v.mainClass
+            if (v.mainClass.value.isNotBlank()) {
+                mainClass = v.mainClass.value
                 break
             }
         }
@@ -75,15 +75,15 @@ class CommandBuilder(
         }
 
         for (v in instanceData.versionComponents) {
-            if (v.mainFile?.isNotBlank() == true) {
-                libraries.add(LauncherFile.of(v.directory, v.mainFile!!).absolutePath)
+            if (!v.mainFile.value.isNullOrBlank()) {
+                libraries.add(LauncherFile.of(v.directory, v.mainFile.value!!).absolutePath)
             }
         }
 
         val natives: MutableList<String> = mutableListOf()
         for(v in instanceData.versionComponents) {
-            if(v.natives?.isNotBlank() == true) {
-                natives.add(LauncherFile.of(v.directory, v.natives!!).absolutePath)
+            if(!v.natives.value.isNullOrBlank()) {
+                natives.add(LauncherFile.of(v.directory, v.natives.value!!).absolutePath)
             }
         }
         if(natives.isEmpty()) {

@@ -34,11 +34,11 @@ class InstanceCreator(
             return InstanceComponent(
                 id = id,
                 name = data.name,
-                versionComponent = version.id,
-                savesComponent = saves.id,
-                resourcepacksComponent = resourcepack.id,
-                optionsComponent = options.id,
-                modsComponent = mods?.id,
+                versionComponent = version.id.value,
+                savesComponent = saves.id.value,
+                resourcepacksComponent = resourcepack.id.value,
+                optionsComponent = options.id.value,
+                modsComponent = mods?.id?.value,
                 file = file,
             )
         } catch (e: IOException) {

@@ -12,6 +12,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
@@ -53,7 +54,7 @@ class QuiltVersionCreator(
             throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.profile.inheritsFrom}", e)
         }
 
-        LOGGER.debug { "Created minecraft version: id=${mc.id}" }
+        LOGGER.debug { "Created minecraft version: id=${mc.id.value}" }
 
         val version = VersionComponent(
             id = id,
@@ -64,7 +65,7 @@ class QuiltVersionCreator(
             assets = null,
             virtualAssets = null,
             natives = null,
-            depends = mc.id,
+            depends = mc.id.value,
             gameArguments = translateArguments(
                 data.profile.arguments.game,
                 appConfig().quiltDefaultGameArguments
@@ -114,7 +115,7 @@ class QuiltVersionCreator(
             } catch (e: FileDownloadException) {
                 throw IOException("Unable to add quilt libraries: failed to download libraries", e)
             }
-            version.libraries = libs
+            libs.copyTo(version.libraries)
             librariesProvider.finish()
             LOGGER.debug { "Added quilt libraries" }
         }?: throw IOException("Unable to add quilt libraries: libraries invalid")

@@ -69,7 +69,7 @@ fun Resourcepacks() {
                 AppContext.severeError(e)
             }
         },
-        detailsContent = { current, _, _ ->
+        detailsContent = { current, _ ->
             LaunchedEffect(showAdd) {
                 if(!showAdd) {
                     filesToAdd = emptyList()
@@ -189,7 +189,7 @@ fun Resourcepacks() {
                 }
             }
         },
-        actionBarSpecial = { _, settingsShown, _, _ ->
+        actionBarSpecial = { _, settingsShown, _ ->
             if(!settingsShown || !showAdd) {
                 IconButton(
                     onClick = {
@@ -201,7 +201,7 @@ fun Resourcepacks() {
                 )
             }
         },
-        actionBarBoxContent = { _, _, _, _ ->
+        actionBarBoxContent = { _, _, _ ->
             if(showAdd) {
                 Box(
                     modifier = Modifier.fillMaxWidth()

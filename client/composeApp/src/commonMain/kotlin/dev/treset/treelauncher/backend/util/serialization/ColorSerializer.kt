@@ -1,27 +1,34 @@
 package dev.treset.treelauncher.backend.util.serialization
 
 import androidx.compose.ui.graphics.Color
-import com.google.gson.*
-import java.lang.reflect.Type
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
-class ColorSerializer : JsonSerializer<Color> {
-    override fun serialize(
-        state: Color,
-        type: Type,
-        jsonSerializationContext: JsonSerializationContext
-    ): JsonElement {
-        return jsonSerializationContext.serialize(state.value.toLong())
+typealias ColorData = @Serializable(with = ColorSerializer::class) Color
+
+class ColorSerializer : KSerializer<Color> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Color) {
+        val string = "#${value.toArgb().toUInt().toString(16).padStart(8, '0').toUpperCase(Locale.current)}"
+        encoder.encodeString(string)
     }
-}
 
-class ColorDeserializer : JsonDeserializer<Color> {
-    @Throws(JsonParseException::class)
-    override fun deserialize(
-        jsonElement: JsonElement,
-        type: Type,
-        jsonDeserializationContext: JsonDeserializationContext
-    ): Color {
-        val long = jsonDeserializationContext.deserialize<Long>(jsonElement, Long::class.java)
-        return Color(long shr 32)
+    override fun deserialize(decoder: Decoder): Color {
+        try {
+            val long = decoder.decodeLong()
+            return Color(long shr 32)
+        } catch (e: Exception) {
+            val string = decoder.decodeString().substring(1)
+            return Color(string.toLong(16))
+        }
     }
 }

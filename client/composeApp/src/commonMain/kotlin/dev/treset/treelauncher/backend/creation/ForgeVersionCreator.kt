@@ -10,6 +10,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -52,7 +53,7 @@ class ForgeVersionCreator(
             throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.installer.installData.inheritsFrom}", e)
         }
 
-        LOGGER.debug { "Created minecraft version: id=${mc.id}" }
+        LOGGER.debug { "Created minecraft version: id=${mc.id.value}" }
 
         val version = VersionComponent(
             id = id,
@@ -63,7 +64,7 @@ class ForgeVersionCreator(
             assets = null,
             virtualAssets = null,
             natives = null,
-            depends = mc.id,
+            depends = mc.id.value,
             gameArguments = translateArguments(
                 data.installer.installData.arguments.game,
                 appConfig().forgeDefaultGameArguments
@@ -121,7 +122,7 @@ class ForgeVersionCreator(
         } catch (e: FileDownloadException) {
             throw IOException("Unable to add forge libraries: failed to download libraries", e)
         }
-        version.libraries = libs
+        version.libraries.assignFrom(libs)
         libraryProvider.finish()
         LOGGER.debug { "Added forge libraries" }
     }
@@ -142,7 +143,7 @@ class ForgeVersionCreator(
 
         LOGGER.debug { "Finding minecraft jar..." }
         val minecraftBaseDir = vanillaVersion.directory
-        val minecraftFileName = vanillaVersion.mainFile ?: appConfig().minecraftDefaultFileName
+        val minecraftFileName = vanillaVersion.mainFile.value ?: appConfig().minecraftDefaultFileName
         val minecraftFile = LauncherFile.of(minecraftBaseDir, minecraftFileName)
         if(!minecraftFile.isFile) {
             throw IOException("Unable to create forge version: failed to find mc version client file: versionId=${data.installer.installData.inheritsFrom}")
@@ -150,13 +151,13 @@ class ForgeVersionCreator(
         LOGGER.debug { "Found minecraft jar" }
 
         LOGGER.debug { "Finding minecraft java..." }
-        val javaFile = LauncherFile.ofData(data.files.mainManifest.javasDir, data.files.javaManifest.prefix + "_" + vanillaVersion.java, "bin", "java")
+        val javaFile = LauncherFile.ofData(data.files.mainManifest.javasDir.value, data.files.javaManifest.prefix.value + "_" + vanillaVersion.java.value, "bin", "java")
         LOGGER.debug { "Found minecraft java" }
 
         LOGGER.debug { "Patching forge client..."}
         try {
             data.installer.createClient(
-                LauncherFile.ofData(data.files.mainManifest.librariesDir),
+                data.files.librariesDir,
                 minecraftFile,
                 javaFile
             ) {

@@ -5,7 +5,7 @@ import dev.treset.treelauncher.localization.Strings
 
 class ComponentManifestNameComparator : Comparator<Component> {
     override fun compare(o1: Component, o2: Component): Int {
-        return o1.name.lowercase().compareTo(o2.name.lowercase())
+        return o1.name.value.lowercase().compareTo(o2.name.value.lowercase())
     }
 
     override fun toString(): String = Strings.sortBox.sort.name()

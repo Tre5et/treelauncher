@@ -55,8 +55,8 @@ class DiscordIntegration {
 
             activity.assets().largeImage = "pack"
             if (AppSettings.discordShowModLoader.value) {
-                activity.assets().smallImage = instance.versionComponents[0].versionType
-                activity.assets().smallText = instance.versionComponents[0].versionType
+                activity.assets().smallImage = instance.versionComponents[0].versionType.value
+                activity.assets().smallText = instance.versionComponents[0].versionType.value
             }
 
             if (AppSettings.discordShowTime.value) {
@@ -73,7 +73,7 @@ class DiscordIntegration {
     }
 
     private fun constructDetailsString(instance: InstanceData): String {
-        return Strings.settings.discord.details(instance.instance.name, instance.versionComponents[0].versionNumber, instance.versionComponents[0].versionType)
+        return Strings.settings.discord.details(instance.instance.name.value, instance.versionComponents[0].versionNumber.value, instance.versionComponents[0].versionType.value)
     }
 
     fun clearActivity() {

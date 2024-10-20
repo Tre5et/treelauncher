@@ -5,8 +5,8 @@ import dev.treset.treelauncher.localization.Strings
 
 class InstanceDetailsLastPlayedComparator : Comparator<InstanceData> {
     override fun compare(o1: InstanceData, o2: InstanceData): Int {
-        val firstLastPlayed = o1.instance.lastUsed
-        val secondLastPlayed = o2.instance.lastUsed
+        val firstLastPlayed = o1.instance.lastUsed.value
+        val secondLastPlayed = o2.instance.lastUsed.value
 
         if (firstLastPlayed == secondLastPlayed) {
             return 0

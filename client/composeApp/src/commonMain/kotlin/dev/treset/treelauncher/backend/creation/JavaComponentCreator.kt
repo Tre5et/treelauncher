@@ -23,7 +23,7 @@ class JavaComponentCreator(
 
     @Throws(IOException::class)
     override fun create(): JavaComponent {
-        data.currentComponents.firstOrNull { it.name == data.name }?.let {
+        data.currentComponents.firstOrNull { it.name.value == data.name }?.let {
             LOGGER.debug { "Matching java component already exists, using instead: name=${data.name}" }
             return it
         }

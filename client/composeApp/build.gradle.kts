@@ -12,6 +12,8 @@ plugins {
 
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+
+    kotlin("plugin.serialization") version "2.0.20"
 }
 
 kotlin {
@@ -44,7 +46,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
 
-            implementation("com.google.code.gson:gson:2.10.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
             implementation("dev.treset.mcdl:mcdl:$mcdlVersion")
             mcdlModules.forEach {

@@ -56,7 +56,7 @@ fun FixFiles() {
     val errorColor = MaterialTheme.colorScheme.error
     LaunchedEffect(AppContext.files) {
         AppContext.files.reloadMain()
-        if(AppContext.files.mainManifest.activeInstance != null) {
+        if(AppContext.files.mainManifest.activeInstance.value != null) {
             notification = NotificationData(
                 color = errorColor,
                 onClick = {
@@ -123,12 +123,12 @@ fun FixFiles() {
                             return@Button
                         }
 
-                        AppContext.files.mainManifest.activeInstance = null
+                        AppContext.files.mainManifest.activeInstance.value = null
                         try {
                             AppContext.files.mainManifest.write()
                         } catch (e: IOException) {
                             AppContext.error(e)
-                            AppContext.files.mainManifest.activeInstance = instance.id
+                            AppContext.files.mainManifest.activeInstance.value = instance.id.value
                             cleanupStatus = CleanupState.FAILURE
                             return@Button
                         }

@@ -65,7 +65,7 @@ fun InstanceDetails(
                         enabled = AppContext.runningInstance == null,
                         tooltip = Strings.selector.instance.play()
                     )
-                    Text(instance.instance.name)
+                    Text(instance.instance.name.value)
                     IconButton(
                         onClick = {
                             showRename = true
@@ -186,12 +186,12 @@ fun InstanceDetails(
     if(showRename) {
         RenamePopup(
             manifest = instance.instance,
-            editValid = { name -> name.isNotBlank() && name != instance.instance.name },
-            onDone = {name ->
+            editValid = { name -> name.isNotBlank() && name != instance.instance.name.value },
+            onDone = { name ->
                 try {
                     showRename = false
                     name?.let { newName ->
-                        instance.instance.name = newName
+                        instance.instance.name.value = newName
                         instance.instance.write()
                         redrawSelected()
                     }
