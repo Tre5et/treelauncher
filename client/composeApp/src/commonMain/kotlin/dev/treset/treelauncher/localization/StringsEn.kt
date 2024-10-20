@@ -612,7 +612,7 @@ open class StringsEn(
                 val preparingMessage: () -> String = { "The Game will start shortly." },
                 val preparingTitle: () -> String = { "Preparing Game Resources..." },
                 val runningMessage: () -> String = { "Close the game to be able to perform actions in the launcher." },
-                val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.name}" },
+                val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.name.value}" },
                 val runningOpen: () -> String = { "Open Game folder" },
                 val runningStop: () -> String = { "Kill Game process" },
                 val runningTitle: () -> String = { "The Game is running..." },

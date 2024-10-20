@@ -60,7 +60,7 @@ class ForgeVersionCreator(
             name = data.name,
             versionNumber = data.installer.installData.inheritsFrom,
             versionType = "forge",
-            loaderVersion = data.installer.installData.id,
+            loaderVersion = data.versionId,
             assets = null,
             virtualAssets = null,
             natives = null,

@@ -17,6 +17,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StringProvider
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
@@ -81,6 +82,8 @@ fun VersionSelector(
                 throw IOException("Invalid version creation content")
             }
 
+            onStatus(Status(CreationStep.STARTING, object : StringProvider { override fun get() = "" }))
+
             val creator = getCreator(
                 creationContent,
                 onStatus
@@ -131,14 +134,14 @@ fun VersionSelector(
         minecraftVersion?.also { mcVersion ->
             Thread {
                 try {
-                fabricVersions = FabricVersion.getAll(mcVersion.id)
-                    .also { versions ->
-                        defaultLoaderVersion?.let { default ->
-                            fabricVersion = prevFabric?.let { current ->
-                                versions.firstOrNull { it.loader.version == current.loader.version }
-                            } ?: versions.firstOrNull { it.loader.version == default }
+                    fabricVersions = FabricVersion.getAll(mcVersion.id)
+                        .also { versions ->
+                            defaultLoaderVersion?.let { default ->
+                                fabricVersion = prevFabric?.let { current ->
+                                    versions.firstOrNull { it.loader.version == current.loader.version }
+                                } ?: versions.firstOrNull { it.loader.version == default }
+                            }
                         }
-                    }
                 } catch (_: IOException) { }
             }.start()
 

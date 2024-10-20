@@ -5,14 +5,14 @@ import dev.treset.treelauncher.localization.Strings
 
 open class Status(
     private val stepProvider: StringProvider,
-    private val detailsProvider: StringProvider,
+    private val detailsProvider: StringProvider? = null,
     val progress: Float? = null
 ) {
     val step: String
         get() = stepProvider.get()
 
     val details: String
-        get() = detailsProvider.get()
+        get() = detailsProvider?.get() ?: ""
 }
 
 interface StringProvider {

@@ -215,10 +215,20 @@ fun Create() {
 
         Button(
             onClick = {
-                try {
-                    if (instanceName.isBlank() || versionContent?.isValid() != true || savesContent?.isValid() != true || resourcepackContent?.isValid() != true || optionsContent?.isValid() != true || (hasMods && modsContent?.isValid() != true)) return@Button
+                if (instanceName.isBlank() || versionContent?.isValid() != true || savesContent?.isValid() != true || resourcepackContent?.isValid() != true || optionsContent?.isValid() != true || (hasMods && modsContent?.isValid() != true)) return@Button
+                Thread {
+                    creationStatus = Status(CreationStep.STARTING)
 
-                    val versionCreator = VersionCreator.get(versionContent!!, {})
+                    val start = System.currentTimeMillis()
+                    val versionCreator = try {
+                        VersionCreator.get(versionContent!!, {})
+                    } catch (e: IOException) {
+                        creationStatus = null
+                        AppContext.error(e)
+                        return@Thread
+                    }
+                    System.out.println("Getting creators took: " + (System.currentTimeMillis() - start))
+
                     val savesCreator = SavesCreator.get(savesContent!!, {})
                     val resourcepackCreator = ResourcepackCreator.get(resourcepackContent!!, {})
                     val optionsCreator = OptionsCreator.get(optionsContent!!, {})
@@ -238,19 +248,14 @@ fun Create() {
                         creationStatus = status
                     }
 
-                    Thread {
-                        try {
-                            instanceCreator.create()
-                        } catch (e: Exception) {
-                            creationException = e
-                        }
-                        showCreationDone = true
-                        creationStatus = null
-                    }.start()
-                } catch (e: IOException) {
+                    try {
+                        instanceCreator.create()
+                    } catch (e: Exception) {
+                        creationException = e
+                    }
+                    showCreationDone = true
                     creationStatus = null
-                    AppContext.error(e)
-                }
+                }.start()
             },
             enabled =
                 instanceName.isNotBlank() &&

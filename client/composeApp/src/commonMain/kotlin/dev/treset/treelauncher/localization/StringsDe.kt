@@ -439,7 +439,7 @@ class StringsDe : StringsEn(
                 preparingMessage = { "Das Spiel starten in Kürze." },
                 preparingTitle ={ "Spielressourcen werden vorbereitet..." },
                 runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
-                runningNotification = { instance -> "Aktuell läuft: ${instance.instance.name}" },
+                runningNotification = { instance -> "Aktuell läuft: ${instance.instance.name.value}" },
                 runningOpen = { "Spielordner öffnen" },
                 runningStop = { "Spielprozess beenden" },
                 runningTitle = { "Das Spiel läuft..." },
