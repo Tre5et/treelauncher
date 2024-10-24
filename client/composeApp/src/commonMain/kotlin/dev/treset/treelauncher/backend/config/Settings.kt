@@ -14,15 +14,15 @@ import dev.treset.treelauncher.backend.util.serialization.DpData
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
 import dev.treset.treelauncher.backend.util.sort.*
+import dev.treset.treelauncher.components.mods.ModProviderData
+import dev.treset.treelauncher.components.mods.ModProviderList
 import dev.treset.treelauncher.localization.Language
 import dev.treset.treelauncher.localization.SystemLanguage
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.DetailsListDisplay
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.json.JsonNames
 import java.io.IOException
 import java.util.*
 
@@ -95,23 +95,10 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val isModsUpdate: MutableDataState<Boolean> = mutableStateOf(true)
     val isModsEnable: MutableDataState<Boolean> = mutableStateOf(false)
     val isModsDisable: MutableDataState<Boolean> = mutableStateOf(false)
-    val modrinthStatus: MutableDataState<Pair<Int, Boolean>> = mutableStateOf(0 to true)
-    @OptIn(ExperimentalSerializationApi::class)
-    @JsonNames("curseforge_satus")
-    val curseforgeStatus: MutableDataState<Pair<Int, Boolean>> = mutableStateOf(1 to true)
-    var modProviders: List<Pair<ModProvider, Boolean>>
-        get() {
-            val result = mutableListOf<Pair<ModProvider, Boolean>>()
-            result.add(ModProvider.MODRINTH to modrinthStatus.value.second)
-            result.add(curseforgeStatus.value.first, ModProvider.CURSEFORGE to curseforgeStatus.value.second)
-            return result
-        }
-        set(value) = value.forEachIndexed { i, provider ->
-            when(provider.first) {
-                ModProvider.MODRINTH -> modrinthStatus.value = i to provider.second
-                ModProvider.CURSEFORGE -> curseforgeStatus.value = i to provider.second
-            }
-        }
+    val modProviders: ModProviderList = mutableStateListOf(
+        ModProviderData(ModProvider.MODRINTH, true),
+        ModProviderData(ModProvider.CURSEFORGE, true),
+    )
     val acknowledgedNews: MutableDataStateList<String> = mutableStateListOf()
     val updateUrl: MutableDataState<String> = mutableStateOf(appConfig().updateUrl ?: "https://update.treelauncher.net")
     val discordIntegration: MutableDataState<Boolean> = mutableStateOf(false)
