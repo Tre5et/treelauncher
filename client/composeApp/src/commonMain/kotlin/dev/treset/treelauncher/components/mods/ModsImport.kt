@@ -38,7 +38,7 @@ import java.io.IOException
 @Composable
 fun ModsImport(
     component: ModsComponent,
-    modContext: ModContext,
+    modContext: ModDisplayContext,
     droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
@@ -158,7 +158,7 @@ fun ModsImport(
 
                                             IconButton(
                                                 onClick = {
-                                                    selectedMods += it to LauncherFile.of(component.directory, it.fileName)
+                                                    selectedMods += it to LauncherFile.of(component.directory, it.fileName.value)
                                                 },
                                                 icon = icons().add,
                                                 tooltip = Strings.manager.mods.import.tooltipAdd(),
@@ -247,7 +247,7 @@ fun ModsImport(
                     titleRow = { Text(Strings.manager.mods.import.importing()) }
                 )
                 LOGGER.debug { "Importing mods into component: ${component.name}" }
-                modContext.registerChangingJob { mods ->
+                modContext.registerJob { mods ->
                     selectedMods.forEach { orgMod ->
                         val mod = orgMod.first.clone()
                         val file = orgMod.second
@@ -268,11 +268,11 @@ fun ModsImport(
                                 "${nameParts.dropLast(1).joinToString(".")}-.${nameParts.last()}"
                             }
                             newFile = LauncherFile.of(component.directory, newName)
-                            mod.fileName = newName
+                            mod.fileName.value = newName
                         }
                         if (!found) {
                             AppContext.error(IOException("Failed to find a unique name for mod file: ${file.path}"))
-                            return@registerChangingJob
+                            return@registerJob
                         }
 
                         try {

@@ -11,7 +11,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 fun LauncherMod.isSame(other: ModData): Boolean =
-    this.name == other.name
+    this.name.value == other.name
     || this.downloads.any {thisD ->
         other.projectIds.any {
             thisD.id == it

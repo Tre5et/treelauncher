@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.minecraft.MinecraftVersion
-import dev.treset.mcdl.mods.ModProvider
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.LauncherModSortType
@@ -39,8 +39,6 @@ import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.Components
 import dev.treset.treelauncher.components.SortContext
-import dev.treset.treelauncher.components.mods.display.LauncherModDisplay
-import dev.treset.treelauncher.components.mods.display.ModDataProvider
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.Text
@@ -52,16 +50,6 @@ import dev.treset.treelauncher.util.DetailsListDisplay
 import java.io.IOException
 import java.net.URI
 
-data class ModContext(
-    val autoUpdate: Boolean,
-    val disableNoVersion: Boolean,
-    val enableOnDownload: Boolean,
-    val versions: List<String>,
-    val types: List<VersionType>,
-    val providers: List<ModProvider>,
-    val directory: LauncherFile,
-    val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
-)
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -96,11 +84,9 @@ fun Mods() {
             )
         },
         detailsContent = { current, _ ->
-            val types = remember(current.types) {
+            val types = remember(current.types.toList()) {
                 VersionType.fromIds(current.types)
             }
-
-            var redrawMods by remember(current) { mutableStateOf(0) }
 
             var searchContent by remember { mutableStateOf("") }
 
@@ -109,70 +95,70 @@ fun Mods() {
             var selectedVersion: MinecraftVersion? by remember(current) { mutableStateOf(null) }
             var selectedType: VersionType by remember(types) { mutableStateOf(types[0]) }
             var includeAlternateLoader by remember(types) { mutableStateOf(
-                !(types[0] == VersionType.QUILT && types.size <= 1)
+                types[0] == VersionType.QUILT && types.size > 1
             ) }
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(AppSettings.modSortType.value, AppSettings.isModSortReverse.value, redrawMods, AppSettings.modrinthStatus.value, AppSettings.curseforgeStatus.value, current.mods.size, current.versions) {
-                current.mods.sortedWith(AppSettings.modSortType.value.comparator).let {
-                    if(AppSettings.isModSortReverse.value) it.reversed() else it
-                }
-            }
-
             val updateQueue = remember(current) {
                 EmptyingJobQueue(
                     onEmptied = {
-                        current.write()
-                        redrawMods++
+                        try {
+                            current.write()
+                        } catch (e: IOException) {
+                            AppContext.error(e)
+                        }
                     }
                 ) {
                     current.mods
                 }
             }
 
-            val modContext = remember(current, current.versions, types, AppSettings.isModsUpdate.value, AppSettings.isModsDisable.value, AppSettings.isModsEnable.value, AppSettings.modrinthStatus.value, AppSettings.curseforgeStatus.value) {
-                ModContext(
-                    AppSettings.isModsUpdate.value,
-                    AppSettings.isModsDisable.value,
-                    AppSettings.isModsEnable.value,
-                    current.versions,
+            val modContext = remember(current, current.versions.toList(), types, AppSettings.isModsUpdate.value, AppSettings.isModsDisable.value, AppSettings.isModsEnable.value, AppSettings.modProviders.toList()) {
+                ModDisplayContext(
+                    current.versions.toList(),
                     types,
-                    AppSettings.modProviders.filter { it.second }.map { it.first },
+                    AppSettings.modProviders.filter { it.enabled.value }.map { it.provider },
                     LauncherFile.of(current.directory, "mods")
                 ) { element ->
                     updateQueue.add(element)
                 }
             }
 
-            val filteredMods = remember(mods, searchContent, modContext, showSearch) {
+            val mods: List<LauncherMod> = remember(current.mods.toList(), AppSettings.modSortType.value, AppSettings.isModSortReverse.value, current.mods.toList(), current.versions.toList()) {
+                current.mods.sortedWith(AppSettings.modSortType.value.comparator).let {
+                    if(AppSettings.isModSortReverse.value) it.reversed() else it
+                }
+            }
+
+            val filteredMods = remember(mods, searchContent) {
                 mods.filter {
-                    it.name.contains(searchContent, true)
-                }.map {
-                    LauncherModDisplay(it, modContext)
+                    it.name.value.contains(searchContent, true)
                 }
             }
 
-            var notViewedMods: List<LauncherModDisplay> by remember(filteredMods) { mutableStateOf(emptyList()) }
-            val updateNotViewed = {
-                notViewedMods = notViewedMods.filter { !it.visible }
+            val neverViewedMods = remember(filteredMods) {
+                filteredMods.toMutableStateList()
             }
 
-            var toUpdateMods: List<LauncherModDisplay> by remember(filteredMods) { mutableStateOf(emptyList()) }
-            val updateToUpdate = {
-                toUpdateMods = toUpdateMods.filter { it.downloading }
+            val notVisibleMods = remember(filteredMods.count { it.visible.value }) {
+                neverViewedMods -= filteredMods.filter { it.visible.value }.toSet()
+                filteredMods.filterNot { it.visible.value }
             }
 
-            LaunchedEffect(filteredMods) {
-                filteredMods.forEach {
-                    it.onVisibility = {
-                        updateNotViewed()
-                    }
-                    it.onDownloading = {
-                        updateToUpdate()
-                    }
-                }
+            val downloadingMods = remember(filteredMods.count { it.downloading.value }) {
+                filteredMods.filter { it.downloading.value }
             }
+
+            val updateAvailableMods = remember(filteredMods.count { it.updateAvailable.value == true }) {
+                filteredMods.filter { it.updateAvailable.value == true }
+            }
+
+            val findingOrAvailableMods = remember(filteredMods.count { it.updateAvailable.value != false }) {
+                filteredMods.filter { it.updateAvailable.value != false }
+            }
+
+            var showUpdateBanner by remember { mutableStateOf(false) }
 
             DisposableEffect(current) {
                 selected = current
@@ -182,16 +168,27 @@ fun Mods() {
                 }
             }
 
+            LaunchedEffect(current.mods.toList(), modContext.versions, modContext.types, modContext.providers) {
+                current.mods.forEach {
+                    it.initializeDisplay(modContext)
+                }
+            }
+
             LaunchedEffect(current, showSnapshots) {
                 Thread {
-                    versions = if (showSnapshots) {
-                        MinecraftVersion.getAll()
-                    } else {
-                        MinecraftVersion.getAll().filter { it.isRelease }
-                    }.also { v ->
-                        selectedVersion = v.firstOrNull {
-                            it.id == current.versions.firstOrNull()
+                    versions = try {
+                        if (showSnapshots) {
+                            MinecraftVersion.getAll()
+                        } else {
+                            MinecraftVersion.getAll().filter { it.isRelease }
+                        }.also { v ->
+                            selectedVersion = v.firstOrNull {
+                                it.id == current.versions.firstOrNull()
+                            }
                         }
+                    } catch (e: FileDownloadException) {
+                        AppContext.error(e)
+                        emptyList()
                     }
                 }.start()
             }
@@ -202,30 +199,17 @@ fun Mods() {
                 }
             }
 
-            var displayNoUpdates by remember(current) { mutableStateOf(false) }
-
             LaunchedEffect(checkUpdates) {
                 if(checkUpdates > 0) {
-                    filteredMods.filter {
-                        it.checkForUpdates()
-                    }.let {
-                        if(it.isEmpty()) {
-                            Thread {
-                                displayNoUpdates = true
-                                Thread.sleep(3000)
-                                displayNoUpdates = false
-                            }.start()
-                        }
+                    filteredMods.forEach {
+                        it.checkForUpdates(modContext)
 
-                        if(AppSettings.isModsUpdate.value) {
-                            notViewedMods = emptyList()
-                            toUpdateMods = it
-                            updateToUpdate()
-                        } else {
-                            toUpdateMods = emptyList()
-                            notViewedMods = it
-                            updateNotViewed()
-                        }
+                        neverViewedMods.assignFrom(filteredMods.filterNot { it.visible.value })
+                        Thread {
+                            showUpdateBanner = true
+                            Thread.sleep(3000)
+                            showUpdateBanner = false
+                        }.start()
                     }
                 }
             }
@@ -312,21 +296,19 @@ fun Mods() {
                                 }
                             }
 
-                            items(filteredMods) { mod ->
-                                ModDataProvider(
-                                    element = mod
+                            items(filteredMods) {
+                                it.ModButton(
+                                    display = AppSettings.modDetailsListDisplay.value,
+                                    ctx = modContext,
                                 ) {
-                                    ModButton(
-                                        display = AppSettings.modDetailsListDisplay.value,
-                                    ) {
-                                        editingMod = mod.mod
-                                    }
+                                    editingMod = it
                                 }
                             }
                         }
 
+                        val readyBannerMods = updateAvailableMods.intersect(neverViewedMods.toSet())
                         androidx.compose.animation.AnimatedVisibility(
-                            visible = notViewedMods.isNotEmpty(),
+                            visible = readyBannerMods.isNotEmpty(),
                             enter = fadeIn() + expandVertically(),
                             exit = fadeOut() + shrinkVertically(),
                             modifier = Modifier
@@ -346,14 +328,15 @@ fun Mods() {
                                     tint = MaterialTheme.colorScheme.onPrimary,
                                 )
                                 Text(
-                                    Strings.manager.mods.update.notViewed(notViewedMods.size),
+                                    Strings.manager.mods.update.notViewed(readyBannerMods.size),
                                     color = MaterialTheme.colorScheme.onPrimary,
                                 )
                             }
                         }
 
+                        val updateBannerMods = downloadingMods.intersect(notVisibleMods.toSet())
                         androidx.compose.animation.AnimatedVisibility(
-                            visible = toUpdateMods.isNotEmpty(),
+                            visible = updateBannerMods.isNotEmpty(),
                             enter = fadeIn() + expandVertically(),
                             exit = fadeOut() + shrinkVertically(),
                             modifier = Modifier
@@ -368,14 +351,14 @@ fun Mods() {
                                     .padding(horizontal = 8.dp)
                             ) {
                                 Text(
-                                    Strings.manager.mods.update.remaining(toUpdateMods.size),
+                                    Strings.manager.mods.update.remaining(updateBannerMods.size),
                                     color = MaterialTheme.colorScheme.onPrimary,
                                 )
                             }
                         }
 
                         androidx.compose.animation.AnimatedVisibility(
-                            visible = displayNoUpdates,
+                            visible = showUpdateBanner && findingOrAvailableMods.isEmpty(),
                             enter = fadeIn() + expandVertically(),
                             exit = fadeOut() + shrinkVertically(),
                             modifier = Modifier
@@ -463,7 +446,7 @@ fun Mods() {
 
                                         Button(
                                             onClick = {
-                                                modContext.registerChangingJob {
+                                                modContext.registerJob {
                                                     current.versions.assignFrom(listOf(v.id))
                                                     current.types.assignFrom(
                                                         if(selectedType == VersionType.QUILT && includeAlternateLoader) {
@@ -662,91 +645,43 @@ fun Mods() {
                         ProvideTextStyle(
                             MaterialTheme.typography.bodyMedium
                         ) {
-                            AppSettings.modProviders.forEachIndexed { i,  provider ->
-                                when(provider.first) {
-                                    ModProvider.MODRINTH -> Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                                        ) {
-                                            IconButton(
-                                                onClick = {
-                                                    AppSettings.modProviders = AppSettings.modProviders.reversed()
-                                                },
-                                                icon = icons().down,
-                                                size = 20.dp,
-                                                tooltip = Strings.manager.mods.settings.order(i == 0),
-                                                modifier = Modifier.rotate(if(i == 0) 0f else 180f)
-                                            )
+                            AppSettings.modProviders.forEach {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            AppSettings.modProviders.moveApplicableDirection(it)
+                                        },
+                                        icon = icons().down,
+                                        size = 20.dp,
+                                        tooltip = Strings.manager.mods.settings.order(AppSettings.modProviders.canMoveDown(it)),
+                                        modifier = Modifier.rotate(if(AppSettings.modProviders.canMoveDown(it)) 0f else 180f)
+                                    )
 
-                                            IconButton(
-                                                onClick = {
-                                                    AppSettings.modProviders = AppSettings.modProviders.map {
-                                                        if(it.first == ModProvider.MODRINTH) {
-                                                            it.first to !it.second
-                                                        } else it
-                                                    }
-                                                },
-                                                icon = if(provider.second) icons().minus else icons().plus,
-                                                size = 20.dp,
-                                                tooltip = Strings.manager.mods.settings.state(provider.second),
-                                                enabled = !provider.second || AppSettings.modProviders.firstOrNull { it.first == ModProvider.CURSEFORGE }?.second ?: false
-                                            )
+                                    IconButton(
+                                        onClick = {
+                                            it.enabled.value = !it.enabled.value
+                                        },
+                                        icon = if(it.enabled.value) icons().minus else icons().plus,
+                                        size = 20.dp,
+                                        tooltip = Strings.manager.mods.settings.state(it.enabled.value),
+                                        enabled = !it.enabled.value || AppSettings.modProviders.find { it.enabled.value } != null
+                                    )
 
-                                            Text(
-                                                Strings.manager.mods.settings.modrinth(),
-                                                style = LocalTextStyle.current.let {
-                                                    if(!provider.second) {
-                                                        it.copy(
-                                                            color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
-                                                            fontStyle = FontStyle.Italic,
-                                                            textDecoration = TextDecoration.LineThrough
-                                                        )
-                                                    } else it
-                                                }
-                                            )
+                                    Text(
+                                        Strings.manager.mods.settings.modProvider(it.provider),
+                                        style = LocalTextStyle.current.let { style ->
+                                            if(!it.enabled.value) {
+                                                style.copy(
+                                                    color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
+                                                    fontStyle = FontStyle.Italic,
+                                                    textDecoration = TextDecoration.LineThrough
+                                                )
+                                            } else style
                                         }
-
-                                    ModProvider.CURSEFORGE -> Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(2.dp)
-                                    ) {
-                                        IconButton(
-                                            onClick = {
-                                                AppSettings.modProviders = AppSettings.modProviders.reversed()
-                                            },
-                                            icon = icons().down,
-                                            size = 20.dp,
-                                            tooltip = Strings.manager.mods.settings.order(i == 0),
-                                            modifier = Modifier.rotate(if(i == 0) 0f else 180f)
-                                        )
-
-                                        IconButton(
-                                            onClick = {
-                                                AppSettings.modProviders = AppSettings.modProviders.map {
-                                                    if(it.first == ModProvider.CURSEFORGE) {
-                                                        it.first to !it.second
-                                                    } else it
-                                                }
-                                            },
-                                            icon = if(provider.second) icons().minus else icons().plus,
-                                            size = 20.dp,
-                                            tooltip = Strings.manager.mods.settings.state(provider.second),
-                                            enabled = !provider.second || AppSettings.modProviders.firstOrNull { it.first == ModProvider.MODRINTH }?.second ?: false
-                                        )
-
-                                        Text(
-                                            Strings.manager.mods.settings.curseforge(),
-                                            style = LocalTextStyle.current.let {
-                                                if(!provider.second) {
-                                                    it.copy(
-                                                        color = LocalTextStyle.current.color.copy(alpha = 0.8f).inverted(),
-                                                        fontStyle = FontStyle.Italic,
-                                                        textDecoration = TextDecoration.LineThrough
-                                                    )
-                                                } else it
-                                            }
-                                        )
-                                    }
+                                    )
                                 }
                             }
 

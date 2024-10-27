@@ -15,6 +15,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.LauncherModDownload
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.IconButton
@@ -27,20 +28,20 @@ import java.nio.file.StandardCopyOption
 
 @Composable
 fun ModsEdit(
-    modContext: ModContext,
+    modContext: ModDisplayContext,
     currentMod: LauncherMod? = null,
     onNewMod: ((LauncherMod, LauncherFile) -> Unit)? = null,
     droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
-    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.let { LauncherFile.of(modContext.directory, it) } }
+    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.value?.let { LauncherFile.of(modContext.directory, it) } }
     val currentCurseforge: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "curseforge" }?.id }
     val currentModrinth: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "modrinth" }?.id }
 
-    var tfName by remember(currentMod) { mutableStateOf(currentMod?.name ?: "") }
+    var tfName by remember(currentMod) { mutableStateOf(currentMod?.name?.value ?: "") }
     var tfFile by remember(currentMod) { mutableStateOf(currentFile?.path ?: "") }
     var fileError by remember(currentMod) { mutableStateOf(false) }
-    var tfVersion by remember(currentMod) { mutableStateOf(currentMod?.version ?: "") }
+    var tfVersion by remember(currentMod) { mutableStateOf(currentMod?.version?.value ?: "") }
     var tfCurseforge by remember(currentMod) { mutableStateOf(currentCurseforge ?: "") }
     var curseforgeError by remember(currentMod) { mutableStateOf(false) }
     var tfModrinth by remember(currentMod) { mutableStateOf(currentModrinth ?: "") }
@@ -149,20 +150,20 @@ fun ModsEdit(
 
         Button(
             onClick = {
-                modContext.registerChangingJob { mods ->
+                modContext.registerJob { mods ->
                     if(!checkCurseforge(tfCurseforge)) {
                         curseforgeError = true
-                        return@registerChangingJob
+                        return@registerJob
                     }
                     if(!checkModrinth(tfModrinth)) {
                         modrinthError = true
-                        return@registerChangingJob
+                        return@registerJob
                     }
 
                     val file = LauncherFile.of(tfFile)
                     if(!file.isFile || !file.name.endsWith(".jar") || (currentFile?.let {file.path != it.path} != false && file.absolutePath.startsWith(appConfig().baseDir.absolutePath))) {
                         fileError = true
-                        return@registerChangingJob
+                        return@registerJob
                     }
                     val name = tfName.ifBlank { file.name.substring(0, file.name.length-4) }
                     val downloads = getDownloads(tfCurseforge, tfModrinth)
@@ -176,19 +177,19 @@ fun ModsEdit(
 
                     currentMod?.let {
                         LOGGER.debug { "Editing existing mod: ${it.name}:v${it.version} -> $name:v$tfVersion" }
-                        it.name = name
-                        it.description = description
-                        it.iconUrl = iconUrl
-                        it.version = tfVersion
-                        it.downloads = downloads
-                        it.url = url
+                        it.name.value = name
+                        it.description.value = description
+                        it.iconUrl.value = iconUrl
+                        it.version.value = tfVersion
+                        it.downloads.assignFrom(downloads)
+                        it.url.value = url
 
                         if(currentFile?.path != file.path) {
                             LOGGER.debug { "Changing file: ${currentFile?.path} -> ${file.path}" }
 
                             val oldFile = LauncherFile.of(
                                 modContext.directory,
-                                it.fileName.let { name -> if(it.enabled) name else "$name.disabled" }
+                                it.fileName.value.let { name -> if(it.enabled.value) name else "$name.disabled" }
                             )
 
                             val backupFile = LauncherFile.of(
@@ -200,13 +201,13 @@ fun ModsEdit(
                                 oldFile.moveTo(backupFile)
                             } catch (e: IOException) {
                                 AppContext.error(e)
-                                return@registerChangingJob
+                                return@registerJob
                             }
 
                             try {
                                 val newFile = LauncherFile.of(
                                     modContext.directory,
-                                    file.name.let { name -> if(it.enabled) name else "$name.disabled" }
+                                    file.name.let { name -> if(it.enabled.value) name else "$name.disabled" }
                                 )
 
                                 LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}"}
@@ -219,7 +220,7 @@ fun ModsEdit(
                                 } catch (e: IOException) {
                                     AppContext.error(e)
                                 }
-                                return@registerChangingJob
+                                return@registerJob
                             }
 
                             try {
@@ -229,8 +230,8 @@ fun ModsEdit(
                                 LOGGER.warn { "Failed to remove backup file: ${backupFile.path}" }
                             }
 
-                            it.currentProvider = null
-                            it.fileName = file.name
+                            it.currentProvider.value = null
+                            it.fileName.value = file.name
                         }
                         LOGGER.debug { "Edit completed" }
                     } ?: run {
@@ -268,7 +269,7 @@ fun ModsEdit(
                                 file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
                             } catch (e: IOException) {
                                 AppContext.error(e)
-                                return@registerChangingJob
+                                return@registerJob
                             }
 
                             mods.add(mod)
@@ -281,7 +282,7 @@ fun ModsEdit(
                 }
             },
             enabled = tfFile.isNotBlank() && tfVersion.isNotBlank()
-                    && currentMod?.let { it.name != tfName || it.version != tfVersion || currentFile?.let { it.path != tfFile } ?: true || (currentCurseforge ?: "") != tfCurseforge || (currentModrinth ?: "") != tfModrinth } ?: true
+                    && currentMod?.let { it.name.value != tfName || it.version.value != tfVersion || currentFile?.let { it.path != tfFile } ?: true || (currentCurseforge ?: "") != tfCurseforge || (currentModrinth ?: "") != tfModrinth } ?: true
         ) {
             Text(Strings.manager.mods.edit.confirm(currentMod))
         }

@@ -1,6 +1,7 @@
 package dev.treset.treelauncher.localization
 
 import dev.treset.mcdl.auth.AuthenticationStep
+import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.InstanceData
@@ -455,8 +456,12 @@ open class StringsEn(
             )
 
             data class Settings(
-                val curseforge: () -> String = { "Curseforge" },
-                val modrinth: () -> String = { "Modrinth" },
+                val modProvider: (ModProvider) -> String = {
+                    when (it) {
+                        ModProvider.CURSEFORGE -> "Curseforge"
+                        ModProvider.MODRINTH -> "Modrinth"
+                    }
+                },
                 val order: (Boolean) -> String = { down -> if(down) "Deprioritize" else "Prioritize" },
                 val providers: () -> String = { "Mod Source Priority" },
                 val help: () -> String = { "If available, mods will be downloaded from the topmost source.\nIf a source is disallowed, versions will never be downloaded or searched from there." },

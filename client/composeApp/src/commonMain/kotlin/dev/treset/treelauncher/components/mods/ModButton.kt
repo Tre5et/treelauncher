@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.mods.ModVersionData
+import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.util.string.openInBrowser
-import dev.treset.treelauncher.components.mods.display.ModDisplayData
 import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.SelectorButton
@@ -31,23 +31,24 @@ import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.DetailsListDisplay
 
 @Composable
-fun ModDisplayData.ModButton(
+fun LauncherMod.ModButton(
     display: DetailsListDisplay,
+    ctx: ModDisplayContext,
     onEdit: () -> Unit
 ) {
-    var selectedVersion: ModVersionData by rememberSaveable(currentVersion!!) { mutableStateOf(currentVersion)}
+    var selectedVersion: ModVersionData by rememberSaveable(currentVersion.value) { mutableStateOf(currentVersion.value)}
 
     DisposableEffect(Unit) {
-        setVisible(true)
+        visible.value = true
 
         onDispose {
-            setVisible(false)
+            visible.value = false
         }
     }
 
-    LaunchedEffect(selectLatest, versions) {
-        versions?.let {
-            if(selectLatest && it.isNotEmpty()) {
+    LaunchedEffect(selectLatest.value, versions.value) {
+        versions.value?.let {
+            if(selectLatest.value > 0 && it.isNotEmpty()) {
                 selectedVersion = it[0]
             }
         }
@@ -57,7 +58,7 @@ fun ModDisplayData.ModButton(
         DetailsListDisplay.FULL -> SelectorButton(
             selected = false,
             onClick = {},
-            enabled = enabled,
+            enabled = enabled.value,
         ) {
             Row(
                 modifier = Modifier
@@ -74,11 +75,11 @@ fun ModDisplayData.ModButton(
                         .size(72.dp)
                 ) {
                     Image(
-                        image ?: painterResource("img/default_mod.png"),
+                        image.value ?: painterResource("img/default_mod.png"),
                         "Mod Icon",
                         modifier = Modifier
                             .fillMaxSize()
-                            .alpha(if(enabled) 1f else 0.38f)
+                            .alpha(if(enabled.value) 1f else 0.38f)
                     )
                 }
 
@@ -88,11 +89,11 @@ fun ModDisplayData.ModButton(
                         .weight(1f)
                 ) {
                     Text(
-                        mod?.name?: "",
+                        name.value,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Start,
                     )
-                    mod?.description?.let {
+                    description.value?.let {
                         Text(
                             it,
                             overflow = TextOverflow.Ellipsis,
@@ -110,17 +111,17 @@ fun ModDisplayData.ModButton(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if(!downloading && currentVersion?.versionNumber != selectedVersion.versionNumber) {
+                        if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
                             IconButton(
                                 onClick = {
-                                    startDownload(selectedVersion)
+                                    downloadVersion(selectedVersion, ctx)
                                 },
                                 icon = icons().download,
                                 tooltip = Strings.manager.mods.card.download(),
                             )
                         }
 
-                        if(downloading) {
+                        if(downloading.value) {
                             DownloadingIcon(
                                 "Downloading",
                                 tint = MaterialTheme.colorScheme.primary
@@ -128,12 +129,12 @@ fun ModDisplayData.ModButton(
                         }
 
                         ComboBox(
-                            items = versions?: emptyList(),
+                            items = versions.value ?: emptyList(),
                             onSelected = {
                                 selectedVersion = it
                             },
                             selected = selectedVersion,
-                            loading = versions == null && selectLatest,
+                            loading = versions.value == null && selectLatest.value > 0
                         )
                     }
 
@@ -148,15 +149,15 @@ fun ModDisplayData.ModButton(
 
                         IconButton(
                             onClick = {
-                                changeEnabled()
+                                changeEnabled(ctx)
                             },
-                            icon = icons().enabled.invoke(enabled),
-                            tooltip = Strings.manager.mods.card.changeUsed(enabled),
+                            icon = icons().enabled(enabled.value),
+                            tooltip = Strings.manager.mods.card.changeUsed(enabled.value),
                         )
 
                         IconButton(
                             onClick = {
-                                deleteMod()
+                                delete(ctx)
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
@@ -167,7 +168,7 @@ fun ModDisplayData.ModButton(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        mod?.url?.let {
+                        url.value?.let {
                             IconButton(
                                 onClick = {
                                     it.openInBrowser()
@@ -180,16 +181,16 @@ fun ModDisplayData.ModButton(
                         Icon(
                             icons().modrinth,
                             "Modrinth",
-                            tint = icons().modrinthColor(modrinthStatus).let {
-                                if(enabled) it else it.disabledContent()
+                            tint = icons().modrinthColor(modrinthStatus.value).let {
+                                if(enabled.value) it else it.disabledContent()
                             },
                             modifier = Modifier.size(32.dp)
                         )
                         Icon(
                             icons().curseforge,
                             "Curseforge",
-                            tint = icons().curseforgeColor(curseforgeStatus).let {
-                                if(enabled) it else it.disabledContent()
+                            tint = icons().curseforgeColor(curseforgeStatus.value).let {
+                                if(enabled.value) it else it.disabledContent()
                             },
                             modifier = Modifier.size(32.dp)
                         )
@@ -201,7 +202,7 @@ fun ModDisplayData.ModButton(
         DetailsListDisplay.COMPACT -> SelectorButton(
             selected = false,
             onClick = {},
-            enabled = enabled
+            enabled = enabled.value
         ) {
             Row(
                 modifier = Modifier
@@ -218,7 +219,7 @@ fun ModDisplayData.ModButton(
                         .padding(3.dp)
                 ) {
                     Image(
-                        image ?: painterResource("img/default_mod.png"),
+                        image.value ?: painterResource("img/default_mod.png"),
                         "Icon",
                         modifier = Modifier.size(58.dp)
                     )
@@ -231,12 +232,12 @@ fun ModDisplayData.ModButton(
                         .weight(1f)
                 ) {
                     Text(
-                        mod?.name?: "",
+                        name.value,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    mod?.description?.let {
+                    description.value?.let {
                         Text(
                             it,
                             maxLines = 1,
@@ -253,17 +254,17 @@ fun ModDisplayData.ModButton(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if(!downloading && currentVersion?.versionNumber != selectedVersion.versionNumber) {
+                        if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
                             IconButton(
                                 onClick = {
-                                    startDownload(selectedVersion)
+                                    downloadVersion(selectedVersion, ctx)
                                 },
                                 icon = icons().download,
                                 tooltip = Strings.manager.mods.card.download(),
                             )
                         }
 
-                        if(downloading) {
+                        if(downloading.value) {
                             DownloadingIcon(
                                 "Downloading",
                                 tint = MaterialTheme.colorScheme.primary
@@ -271,17 +272,17 @@ fun ModDisplayData.ModButton(
                         }
 
                         ComboBox(
-                            items = versions?: emptyList(),
+                            items = versions.value ?: emptyList(),
                             onSelected = {
                                 selectedVersion = it
                             },
                             selected = selectedVersion,
-                            loading = versions == null && selectLatest,
+                            loading = versions.value == null && selectLatest.value > 0,
                         )
                     }
 
                     Row {
-                        mod?.url?.let {
+                        url.value?.let {
                             IconButton(
                                 onClick = {
                                     it.openInBrowser()
@@ -301,15 +302,15 @@ fun ModDisplayData.ModButton(
 
                         IconButton(
                             onClick = {
-                                changeEnabled()
+                                changeEnabled(ctx)
                             },
-                            icon = icons().enabled(enabled),
-                            tooltip = Strings.manager.mods.card.changeUsed(enabled),
+                            icon = icons().enabled(enabled.value),
+                            tooltip = Strings.manager.mods.card.changeUsed(enabled.value),
                         )
 
                         IconButton(
                             onClick = {
-                                deleteMod()
+                                delete(ctx)
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
@@ -324,7 +325,7 @@ fun ModDisplayData.ModButton(
         DetailsListDisplay.MINIMAL -> SelectorButton(
             selected = false,
             onClick = {},
-            enabled = enabled
+            enabled = enabled.value
         ) {
             Row(
                 modifier = Modifier
@@ -333,7 +334,7 @@ fun ModDisplayData.ModButton(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    mod?.name?: "",
+                    name.value,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -343,17 +344,17 @@ fun ModDisplayData.ModButton(
                         .padding(end = 16.dp)
                 )
 
-                if(!downloading && currentVersion?.versionNumber != selectedVersion.versionNumber) {
+                if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
                     IconButton(
                         onClick = {
-                            startDownload(selectedVersion)
+                            downloadVersion(selectedVersion, ctx)
                         },
                         icon = icons().download,
                         tooltip = Strings.manager.mods.card.download(),
                     )
                 }
 
-                if(downloading) {
+                if(downloading.value) {
                     DownloadingIcon(
                         "Downloading",
                         tint = MaterialTheme.colorScheme.primary
@@ -361,16 +362,16 @@ fun ModDisplayData.ModButton(
                 }
 
                 ComboBox(
-                    items = versions?: emptyList(),
+                    items = versions.value ?: emptyList(),
                     onSelected = {
                         selectedVersion = it
                     },
                     selected = selectedVersion,
-                    loading = versions == null && selectLatest,
+                    loading = versions.value == null && selectLatest.value > 0,
                     modifier = Modifier.padding(end = 6.dp)
                 )
 
-                mod?.url?.let {
+                url.value?.let {
                     IconButton(
                         onClick = {
                             it.openInBrowser()
@@ -390,15 +391,15 @@ fun ModDisplayData.ModButton(
 
                 IconButton(
                     onClick = {
-                        changeEnabled()
+                        changeEnabled(ctx)
                     },
-                    icon = icons().enabled(enabled),
-                    tooltip = Strings.manager.mods.card.changeUsed(enabled),
+                    icon = icons().enabled(enabled.value),
+                    tooltip = Strings.manager.mods.card.changeUsed(enabled.value),
                 )
 
                 IconButton(
                     onClick = {
-                        deleteMod()
+                        delete(ctx)
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,

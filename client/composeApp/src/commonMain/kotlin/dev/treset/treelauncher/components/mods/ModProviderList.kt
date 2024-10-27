@@ -35,13 +35,17 @@ fun ModProviderList.moveDown(data: ModProviderData) {
 fun ModProviderList.moveApplicableDirection(data: ModProviderData) {
     if(canMoveDown(data)) {
         moveDown(data)
-    } else if(canMoveDown(data)) {
+    } else if(canMoveUp(data)) {
         moveUp(data)
     }
 }
 
-fun ModProviderList.getEnabledCount(): Int {
-    return count { it.enabled.value }
+fun ModProviderList.contains(element: ModProvider): Boolean {
+    return any { it.provider == element }
+}
+
+fun ModProviderList.containsAll(elements: Collection<ModProvider>): Boolean {
+    return elements.all { contains(it) }
 }
 
 @Serializable

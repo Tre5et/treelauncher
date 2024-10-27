@@ -5,7 +5,7 @@ import dev.treset.treelauncher.localization.Strings
 
 class LauncherModNameComparator : Comparator<LauncherMod> {
     override fun compare(o1: LauncherMod, o2: LauncherMod): Int {
-        return o1.name.lowercase().compareTo(o2.name.lowercase())
+        return o1.name.value.lowercase().compareTo(o2.name.value.lowercase())
     }
 
     override fun toString(): String = Strings.sortBox.sort.name()

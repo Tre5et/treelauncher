@@ -21,12 +21,10 @@ import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.curseforge.CurseforgeSearch
 import dev.treset.mcdl.mods.modrinth.ModrinthSearch
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.FormatString
-import dev.treset.treelauncher.components.mods.display.ModDataProvider
-import dev.treset.treelauncher.components.mods.display.ModDataSearchDisplay
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
@@ -36,7 +34,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ModsSearch(
     component: ModsComponent,
-    modContext: ModContext,
+    modContext: ModDisplayContext,
     droppedFile: LauncherFile? = null,
     closeSearch: () -> Unit
 ) {
@@ -55,15 +53,9 @@ fun ModsSearch(
 
     var tfValue by remember { mutableStateOf("") }
 
-    var results: List<ModDataSearchDisplay>? by remember { mutableStateOf(null) }
+    var results: List<ModDataDisplay>? by remember { mutableStateOf(null) }
 
     var searching by remember { mutableStateOf(false) }
-
-    val searchContext = remember(modContext) {
-        SearchContext.from(
-            modContext,
-        )
-    }
 
     LaunchedEffect(droppedFile) {
         droppedFile?.let {
@@ -73,12 +65,12 @@ fun ModsSearch(
         }
     }
 
-    LaunchedEffect(searching, searchContext) {
+    LaunchedEffect(searching) {
         if(searching) {
             Thread {
                 try {
                     results = (
-                        if(searchContext.providers.isEmpty() || searchContext.providers.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
+                        if(AppSettings.modProviders.isEmpty() || AppSettings.modProviders.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
                             ModData.searchCombined(
                                 tfValue,
                                 modContext.versions,
@@ -86,7 +78,7 @@ fun ModsSearch(
                             25,
                             0
                             )
-                        } else if(searchContext.providers.contains(ModProvider.MODRINTH)) {
+                        } else if(AppSettings.modProviders.contains(ModProvider.MODRINTH)) {
                             ModrinthSearch.search(
                                 tfValue,
                                 modContext.versions,
@@ -110,9 +102,9 @@ fun ModsSearch(
                                 log10((o2.downloadsCount / o1.downloadsCount).toDouble())
                         ).roundToInt()
                     }.map {
-                        ModDataSearchDisplay(
+                        ModDataDisplay(
                             it,
-                            searchContext
+                            modContext
                         )
                     }
                 } catch (e: FileDownloadException) {
@@ -169,12 +161,10 @@ fun ModsSearch(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.weight(1f, false)
                     ) {
-                        items(it) { mod ->
-                            ModDataProvider(
-                                mod
-                            ) {
-                                ModSearchButton()
-                            }
+                        items(it) {
+                            it.ModSearchButton(
+                                modContext
+                            )
                         }
                     }
                 }
@@ -188,41 +178,5 @@ fun ModsSearch(
         ) {
             showLocal = true
         }
-    }
-}
-
-data class SearchContext(
-    val autoUpdate: Boolean,
-    val disableNoVersion: Boolean,
-    val enableOnDownload: Boolean,
-    val versions: List<String>,
-    val types: List<VersionType>,
-    val providers: List<ModProvider>,
-    val directory: LauncherFile,
-    val registerChangingJob: ((MutableList<LauncherMod>) -> Unit) -> Unit,
-) {
-    private var recheckCallbacks: MutableList<() -> Unit> = mutableListOf()
-
-    fun registerRecheck(onRecheck: () -> Unit) {
-        recheckCallbacks.add(onRecheck)
-    }
-
-    fun recheck() {
-        recheckCallbacks.forEach { it() }
-    }
-
-    companion object {
-        fun from(
-            modContext: ModContext
-        ): SearchContext = SearchContext(
-            modContext.autoUpdate,
-            modContext.disableNoVersion,
-            modContext.enableOnDownload,
-            modContext.versions,
-            modContext.types,
-            modContext.providers,
-            modContext.directory,
-            modContext.registerChangingJob
-        )
     }
 }
