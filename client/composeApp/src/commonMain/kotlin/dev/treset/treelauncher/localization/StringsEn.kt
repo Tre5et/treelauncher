@@ -444,7 +444,7 @@ open class StringsEn(
 
             data class ImportStrings(
                 val delete: () -> String = { "Unselect Mod" },
-                val displayName: (LauncherMod) -> String = { mod -> "${mod.name} v${mod.version}" },
+                val displayName: (LauncherMod) -> String = { mod -> "${mod.name.value} v${mod.version.value}" },
                 val import: () -> String = { "Import Mods" },
                 val importComponent: () -> String = { "Select mods from other Components:" },
                 val importFile: () -> String = { "Copy local mod files:" },

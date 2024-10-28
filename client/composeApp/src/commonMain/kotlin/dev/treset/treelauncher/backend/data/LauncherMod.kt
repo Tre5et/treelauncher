@@ -10,14 +10,14 @@ import dev.treset.mcdl.mods.*
 import dev.treset.mcdl.mods.curseforge.CurseforgeMod
 import dev.treset.mcdl.mods.modrinth.ModrinthMod
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.AppSettings
+import dev.treset.treelauncher.backend.data.manifest.ModsComponent
+import dev.treset.treelauncher.backend.data.manifest.toVersionTypes
 import dev.treset.treelauncher.backend.mods.ModDownloader
 import dev.treset.treelauncher.backend.util.ModProviderStatus
-import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.loadNetworkImage
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
-import dev.treset.treelauncher.components.mods.ModDisplayContext
+import dev.treset.treelauncher.components.mods.getEnabled
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -91,9 +91,9 @@ class LauncherMod(
         }
     )
 
-    fun initializeDisplay(ctx: ModDisplayContext) {
+    fun initializeDisplay(component: ModsComponent) {
         loadImage()
-        loadVersions(ctx)
+        loadVersions(component)
         updateModProviders()
     }
 
@@ -118,7 +118,7 @@ class LauncherMod(
             }
         }
         if (mods.isEmpty()) {
-            throw FileDownloadException("No mod data found: mod=$name")
+            throw FileDownloadException("No mod data found: mod=${name.value}")
         }
         if (mods.size == 1) {
             return mods[0].also {
@@ -142,7 +142,7 @@ class LauncherMod(
         }.start()
     }
 
-    fun loadVersions(ctx: ModDisplayContext) {
+    fun loadVersions(component: ModsComponent) {
         Thread {
             modData ?: try {
                     loadModData()
@@ -151,7 +151,7 @@ class LauncherMod(
                     versions.value = listOf()
                 }
             modData?.let {
-                it.setVersionConstraints(ctx.versions, ctx.types.map { it.id }, ctx.providers)
+                it.setVersionConstraints(component.versions, component.types, component.providers.getEnabled())
                 versions.value = try {
                     it.versions.sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
                 } catch (e: FileDownloadException) {
@@ -186,25 +186,25 @@ class LauncherMod(
         }
     }
 
-    fun checkForUpdates(ctx: ModDisplayContext) {
+    fun checkForUpdates(component: ModsComponent) {
         Thread {
             updateAvailable.value = null
             versions.value?.let {
                 if (it.isNotEmpty()) {
-                    if (AppSettings.isModsUpdate.value) {
+                    if (component.autoUpdate.value) {
                         if (currentVersion.value.versionNumber != it.first().versionNumber) {
-                            downloadVersion(it.first(), ctx)
+                            downloadVersion(it.first(), component)
                         }
-                        if (AppSettings.isModsEnable.value && !enabled.value) {
-                            changeEnabled(ctx)
+                        if (component.enableOnUpdate.value && !enabled.value) {
+                            changeEnabled(component)
                         }
                     } else {
                         updateAvailable.value = currentVersion.value.versionNumber != it.first().versionNumber
                     }
                 } else {
                     updateAvailable.value = false
-                    if (AppSettings.isModsDisable.value && enabled.value) {
-                        changeEnabled(ctx)
+                    if (component.disableOnNoVersion.value && enabled.value) {
+                        changeEnabled(component)
                     }
                 }
             } ?: run { updateAvailable.value = false }
@@ -212,21 +212,21 @@ class LauncherMod(
         }.start()
     }
 
-    fun downloadVersion(version: ModVersionData, ctx: ModDisplayContext) {
+    fun downloadVersion(version: ModVersionData, component: ModsComponent) {
         downloading.value = true
         updateAvailable.value = null
-        version.downloadProviders = ctx.providers
-        ctx.registerJob { currentMods ->
+        version.downloadProviders = component.providers.getEnabled()
+        component.registerJob { currentMods ->
             LOGGER.debug { "Downloading mod ${fileName} version ${version.versionNumber}" }
 
             try {
                 ModDownloader(
                     this,
-                    ctx.directory,
-                    ctx.types,
-                    ctx.versions,
+                    component.modsDirectory,
+                    component.types.toVersionTypes(),
+                    component.versions,
                     currentMods,
-                    ctx.providers,
+                    component.providers.getEnabled(),
                     false //modContext.enableOnDownload
                 ).download(
                     version
@@ -244,16 +244,14 @@ class LauncherMod(
         }
     }
 
-    fun changeEnabled(ctx: ModDisplayContext) {
-        ctx.registerJob {
+    fun changeEnabled(component: ModsComponent) {
+        component.registerJob {
             LOGGER.debug { "Changing mod state of ${fileName.value} to ${!enabled.value}" }
 
-            val modFile: LauncherFile = LauncherFile.of(
-                ctx.directory,
+            val modFile = component.modsDirectory.child(
                 "${fileName.value}${if (enabled.value) "" else ".disabled"}"
             )
-            val newFile: LauncherFile = LauncherFile.of(
-                ctx.directory,
+            val newFile = component.modsDirectory.child(
                 "${fileName.value}${if (enabled.value) ".disabled" else ""}"
             )
             if(!modFile.exists() && newFile.exists()) {
@@ -280,10 +278,9 @@ class LauncherMod(
         }
     }
 
-    fun delete(ctx: ModDisplayContext) {
-        ctx.registerJob { mods ->
-            val oldFile: LauncherFile = LauncherFile.of(
-                ctx.directory,
+    fun delete(component: ModsComponent) {
+        component.registerJob { mods ->
+            val oldFile = component.modsDirectory.child(
                 "${fileName}${if (enabled.value) "" else ".disabled"}"
             )
             LOGGER.debug { "Deleting mod file: ${oldFile.path}" }

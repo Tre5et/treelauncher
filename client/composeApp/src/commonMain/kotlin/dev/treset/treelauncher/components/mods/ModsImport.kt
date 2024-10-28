@@ -38,7 +38,6 @@ import java.io.IOException
 @Composable
 fun ModsImport(
     component: ModsComponent,
-    modContext: ModDisplayContext,
     droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
@@ -158,7 +157,7 @@ fun ModsImport(
 
                                             IconButton(
                                                 onClick = {
-                                                    selectedMods += it to LauncherFile.of(component.directory, it.fileName.value)
+                                                    selectedMods += it to LauncherFile.of(component.modsDirectory, it.fileName.value)
                                                 },
                                                 icon = icons().add,
                                                 tooltip = Strings.manager.mods.import.tooltipAdd(),
@@ -184,7 +183,7 @@ fun ModsImport(
             )
 
             ModsEdit(
-                modContext,
+                component,
                 onNewMod = { mod, file -> selectedMods += mod to file },
                 droppedFile = droppedFile
             ) {}
@@ -246,14 +245,14 @@ fun ModsImport(
                 popupContent = PopupData(
                     titleRow = { Text(Strings.manager.mods.import.importing()) }
                 )
-                LOGGER.debug { "Importing mods into component: ${component.name}" }
-                modContext.registerJob { mods ->
+                LOGGER.debug { "Importing mods into component: ${component.name.value}" }
+                component.registerJob { mods ->
                     selectedMods.forEach { orgMod ->
                         val mod = orgMod.first.clone()
                         val file = orgMod.second
                         LOGGER.debug { "Importing mod: ${file.path}" }
 
-                        var newFile = LauncherFile.of(component.directory, "mods", file.name)
+                        var newFile = LauncherFile.of(component.modsDirectory, file.name)
                         var found = false
                         for (i in 1..100) {
                             if (!newFile.exists()) {

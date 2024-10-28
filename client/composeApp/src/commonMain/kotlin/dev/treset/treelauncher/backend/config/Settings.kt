@@ -21,8 +21,10 @@ import dev.treset.treelauncher.localization.SystemLanguage
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.DetailsListDisplay
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.json.JsonNames
 import java.io.IOException
 import java.util.*
 
@@ -92,10 +94,16 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val isModComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     val modSortType: MutableDataState<LauncherModSortType> = mutableStateOf(LauncherModSortType.NAME)
     val isModSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
-    val isModsUpdate: MutableDataState<Boolean> = mutableStateOf(true)
-    val isModsEnable: MutableDataState<Boolean> = mutableStateOf(false)
-    val isModsDisable: MutableDataState<Boolean> = mutableStateOf(false)
-    val modProviders: ModProviderList = mutableStateListOf(
+    @OptIn(ExperimentalSerializationApi::class)
+    @JsonNames("isModsAutoUpdate")
+    val modsDefaultAutoUpdate: MutableDataState<Boolean> = mutableStateOf(true)
+    @OptIn(ExperimentalSerializationApi::class)
+    @JsonNames("isModsEnable")
+    val modsDefaultEnableOnUpdate: MutableDataState<Boolean> = mutableStateOf(false)
+    @OptIn(ExperimentalSerializationApi::class)
+    @JsonNames("isModsDisable")
+    val modsDefaultDisableOnNoVersion: MutableDataState<Boolean> = mutableStateOf(false)
+    val modsDefaultProviders: ModProviderList = mutableStateListOf(
         ModProviderData(ModProvider.MODRINTH, true),
         ModProviderData(ModProvider.CURSEFORGE, true),
     )

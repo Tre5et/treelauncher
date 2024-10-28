@@ -34,7 +34,6 @@ import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.LauncherModSortType
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
-import dev.treset.treelauncher.backend.util.EmptyingJobQueue
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.Components
@@ -100,31 +99,6 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val updateQueue = remember(current) {
-                EmptyingJobQueue(
-                    onEmptied = {
-                        try {
-                            current.write()
-                        } catch (e: IOException) {
-                            AppContext.error(e)
-                        }
-                    }
-                ) {
-                    current.mods
-                }
-            }
-
-            val modContext = remember(current, current.versions.toList(), types, AppSettings.isModsUpdate.value, AppSettings.isModsDisable.value, AppSettings.isModsEnable.value, AppSettings.modProviders.toList()) {
-                ModDisplayContext(
-                    current.versions.toList(),
-                    types,
-                    AppSettings.modProviders.filter { it.enabled.value }.map { it.provider },
-                    LauncherFile.of(current.directory, "mods")
-                ) { element ->
-                    updateQueue.add(element)
-                }
-            }
-
             val mods: List<LauncherMod> = remember(current.mods.toList(), AppSettings.modSortType.value, AppSettings.isModSortReverse.value, current.mods.toList(), current.versions.toList()) {
                 current.mods.sortedWith(AppSettings.modSortType.value.comparator).let {
                     if(AppSettings.isModSortReverse.value) it.reversed() else it
@@ -164,13 +138,18 @@ fun Mods() {
                 selected = current
 
                 onDispose {
+                    try {
+                        selected?.write()
+                    } catch(e: IOException) {
+                        AppContext.error(e)
+                    }
                     selected = null
                 }
             }
 
-            LaunchedEffect(current.mods.toList(), modContext.versions, modContext.types, modContext.providers) {
+            LaunchedEffect(current.mods.toList(), current.versions.toList(), current.types.toList(), current.providers.toList()) {
                 current.mods.forEach {
-                    it.initializeDisplay(modContext)
+                    it.initializeDisplay(current)
                 }
             }
 
@@ -193,16 +172,10 @@ fun Mods() {
                 }.start()
             }
 
-            DisposableEffect(current) {
-                onDispose {
-                    updateQueue.finish()
-                }
-            }
-
             LaunchedEffect(checkUpdates) {
                 if(checkUpdates > 0) {
                     filteredMods.forEach {
-                        it.checkForUpdates(modContext)
+                        it.checkForUpdates(current)
 
                         neverViewedMods.assignFrom(filteredMods.filterNot { it.visible.value })
                         Thread {
@@ -220,7 +193,7 @@ fun Mods() {
                     contentAlignment = Alignment.TopCenter
                 ) {
                     ModsEdit(
-                        modContext,
+                        current,
                         it,
                         droppedFile = droppedFile
                     ) {
@@ -230,7 +203,6 @@ fun Mods() {
             } ?: if(showSearch) {
                 ModsSearch(
                     current,
-                    modContext,
                     droppedFile = droppedFile
                 ) {
                     showSearch = false
@@ -298,8 +270,8 @@ fun Mods() {
 
                             items(filteredMods) {
                                 it.ModButton(
-                                    display = AppSettings.modDetailsListDisplay.value,
-                                    ctx = modContext,
+                                    current,
+                                    display = AppSettings.modDetailsListDisplay.value
                                 ) {
                                     editingMod = it
                                 }
@@ -446,7 +418,7 @@ fun Mods() {
 
                                         Button(
                                             onClick = {
-                                                modContext.registerJob {
+                                                current.registerJob {
                                                     current.versions.assignFrom(listOf(v.id))
                                                     current.types.assignFrom(
                                                         if(selectedType == VersionType.QUILT && includeAlternateLoader) {
@@ -481,7 +453,7 @@ fun Mods() {
             }
         },
         detailsScrollable = false,
-        actionBarSpecial = { _, settingsOpen, _ ->
+        actionBarSpecial = { current, settingsOpen, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
                 var updateExpanded by remember { mutableStateOf(false) }
                 val updateRotation by animateFloatAsState(if(updateExpanded) 180f else 0f)
@@ -531,7 +503,7 @@ fun Mods() {
                                     "Update",
                                     modifier = Modifier.size(32.dp)
                                 )
-                                if(AppSettings.isModsUpdate.value) {
+                                if(current.autoUpdate.value) {
                                     Icon(
                                         icons().auto,
                                         "Auto",
@@ -558,30 +530,30 @@ fun Mods() {
 
                             TitledCheckBox(
                                 Strings.manager.mods.update.auto(),
-                                AppSettings.isModsUpdate.value,
+                                current.autoUpdate.value,
                                 {
-                                    AppSettings.isModsUpdate.value = it
-                                    if (!it) {
-                                        AppSettings.isModsEnable.value = false
-                                    }
+                                    current.autoUpdate.value = it
+                                    AppSettings.modsDefaultAutoUpdate.value = it
                                 }
                             )
 
-                            if(AppSettings.isModsUpdate.value) {
+                            if(current.autoUpdate.value) {
                                 TitledCheckBox(
                                     Strings.manager.mods.update.enable(),
-                                    AppSettings.isModsEnable.value,
+                                    current.enableOnUpdate.value,
                                     {
-                                        AppSettings.isModsEnable.value = it
+                                        current.enableOnUpdate.value = it
+                                        AppSettings.modsDefaultEnableOnUpdate.value = it
                                     }
                                 )
                             }
 
                             TitledCheckBox(
                                 Strings.manager.mods.update.disable(),
-                                AppSettings.isModsDisable.value,
+                                current.disableOnNoVersion.value,
                                 {
-                                    AppSettings.isModsDisable.value = it
+                                    current.disableOnNoVersion.value = it
+                                    AppSettings.modsDefaultDisableOnNoVersion.value = it
                                 }
                             )
                         }
@@ -667,19 +639,20 @@ fun Mods() {
                         ProvideTextStyle(
                             MaterialTheme.typography.bodyMedium
                         ) {
-                            AppSettings.modProviders.forEach {
+                            current.providers.forEach {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                                 ) {
                                     IconButton(
                                         onClick = {
-                                            AppSettings.modProviders.moveApplicableDirection(it)
+                                            current.providers.moveApplicableDirection(it)
+                                            AppSettings.modsDefaultProviders.assignFrom(current.providers.copyOrder())
                                         },
                                         icon = icons().down,
                                         size = 20.dp,
-                                        tooltip = Strings.manager.mods.settings.order(AppSettings.modProviders.canMoveDown(it)),
-                                        modifier = Modifier.rotate(if(AppSettings.modProviders.canMoveDown(it)) 0f else 180f)
+                                        tooltip = Strings.manager.mods.settings.order(current.providers.canMoveDown(it)),
+                                        modifier = Modifier.rotate(if(current.providers.canMoveDown(it)) 0f else 180f)
                                     )
 
                                     IconButton(
@@ -689,7 +662,7 @@ fun Mods() {
                                         icon = if(it.enabled.value) icons().minus else icons().plus,
                                         size = 20.dp,
                                         tooltip = Strings.manager.mods.settings.state(it.enabled.value),
-                                        enabled = !it.enabled.value || AppSettings.modProviders.find { it.enabled.value } != null
+                                        enabled = !it.enabled.value || current.providers.find { it.enabled.value } != null
                                     )
 
                                     Text(
@@ -706,27 +679,6 @@ fun Mods() {
                                     )
                                 }
                             }
-
-                            /*TitledCheckBox(
-                                Strings.manager.mods.modrinth(),
-                                modrinth,
-                                {
-                                    modrinth = it
-                                    appSettings().isModsModrinth = it
-                                },
-                                textColor = if (!modrinth && !curseforge) MaterialTheme.colorScheme.error else LocalContentColor.current
-                            )
-
-                            TitledCheckBox(
-                                Strings.manager.mods.curseforge(),
-                                curseforge,
-                                {
-                                    curseforge = it
-                                    appSettings().isModsCurseforge = it
-                                },
-                                textColor = if (!modrinth && !curseforge) MaterialTheme.colorScheme.error else LocalContentColor.current,
-                                modifier = Modifier.offset(y = (-12).dp)
-                            )*/
                         }
                     }
                 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.mods.ModVersionData
+import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.string.openInBrowser
 import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
@@ -27,7 +28,7 @@ import dev.treset.treelauncher.style.icons
 
 @Composable
 fun ModDataDisplay.ModSearchButton(
-    ctx: ModDisplayContext
+    component: ModsComponent
 ) {
     var selectedVersion: ModVersionData? by remember(mod, currentVersion.value) { mutableStateOf(currentVersion.value) }
 
@@ -89,7 +90,7 @@ fun ModDataDisplay.ModSearchButton(
                         IconButton(
                             onClick = {
                                 selectedVersion?.let {
-                                    download(it, ctx)
+                                    download(it, component)
                                 }
                             },
                             icon = icons().download,

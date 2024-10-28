@@ -15,6 +15,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.LauncherModDownload
+import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.Button
@@ -28,13 +29,13 @@ import java.nio.file.StandardCopyOption
 
 @Composable
 fun ModsEdit(
-    modContext: ModDisplayContext,
+    component: ModsComponent,
     currentMod: LauncherMod? = null,
     onNewMod: ((LauncherMod, LauncherFile) -> Unit)? = null,
     droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
-    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.value?.let { LauncherFile.of(modContext.directory, it) } }
+    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.value?.let { LauncherFile.of(component.modsDirectory, it) } }
     val currentCurseforge: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "curseforge" }?.id }
     val currentModrinth: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "modrinth" }?.id }
 
@@ -150,7 +151,7 @@ fun ModsEdit(
 
         Button(
             onClick = {
-                modContext.registerJob { mods ->
+                component.registerJob { mods ->
                     if(!checkCurseforge(tfCurseforge)) {
                         curseforgeError = true
                         return@registerJob
@@ -187,13 +188,11 @@ fun ModsEdit(
                         if(currentFile?.path != file.path) {
                             LOGGER.debug { "Changing file: ${currentFile?.path} -> ${file.path}" }
 
-                            val oldFile = LauncherFile.of(
-                                modContext.directory,
+                            val oldFile = component.modsDirectory.child(
                                 it.fileName.value.let { name -> if(it.enabled.value) name else "$name.disabled" }
                             )
 
-                            val backupFile = LauncherFile.of(
-                                modContext.directory,
+                            val backupFile = component.modsDirectory.child(
                                 "${it.fileName}.old"
                             )
                             try {
@@ -205,8 +204,7 @@ fun ModsEdit(
                             }
 
                             try {
-                                val newFile = LauncherFile.of(
-                                    modContext.directory,
+                                val newFile = component.modsDirectory.child(
                                     file.name.let { name -> if(it.enabled.value) name else "$name.disabled" }
                                 )
 
@@ -259,8 +257,7 @@ fun ModsEdit(
                             it(mod, file)
                         } ?: run {
 
-                            val newFile = LauncherFile.of(
-                                modContext.directory,
+                            val newFile = component.modsDirectory.child(
                                 file.name
                             )
 

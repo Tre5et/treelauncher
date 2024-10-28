@@ -8,8 +8,9 @@ import dev.treset.mcdl.mods.ModData
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.ModVersionData
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.ModsComponent
+import dev.treset.treelauncher.backend.data.manifest.toVersionTypes
 import dev.treset.treelauncher.backend.mods.ModDownloader
 import dev.treset.treelauncher.backend.util.ModProviderStatus
 import dev.treset.treelauncher.backend.util.isSame
@@ -19,7 +20,7 @@ import java.io.IOException
 
 class ModDataDisplay(
     val mod: ModData,
-    ctx: ModDisplayContext
+    component: ModsComponent
 ) {
     var downloading = mutableStateOf(false)
 
@@ -49,23 +50,23 @@ class ModDataDisplay(
 
     init {
         loadImage()
-        loadVersions(ctx)
-        updateLauncherMod(ctx)
+        loadVersions(component)
+        updateLauncherMod(component)
     }
 
-    fun download(version: ModVersionData, ctx: ModDisplayContext) {
+    fun download(version: ModVersionData, component: ModsComponent) {
         downloading.value = true
-        ctx.registerJob { currentMods ->
+        component.registerJob { currentMods ->
             LOGGER.debug { "Downloading mod ${mod.name} version ${version.versionNumber}" }
             try {
                 launcherMod.value = ModDownloader(
                     launcherMod.value,
-                    ctx.directory,
-                    ctx.types,
-                    ctx.versions,
+                    component.modsDirectory,
+                    component.types.toVersionTypes(),
+                    component.versions,
                     currentMods,
-                    ctx.providers,
-                    AppSettings.isModsEnable.value
+                    component.providers.getEnabled(),
+                    component.enableOnUpdate.value
                 ).download(
                     version
                 )
@@ -81,8 +82,8 @@ class ModDataDisplay(
         }
     }
 
-    private fun updateLauncherMod(ctx: ModDisplayContext) {
-        ctx.registerJob { mods ->
+    private fun updateLauncherMod(component: ModsComponent) {
+        component.registerJob { mods ->
             mods.firstOrNull {
                 it.isSame(mod)
             }.let {
@@ -152,10 +153,10 @@ class ModDataDisplay(
         }.start()
     }
 
-    private fun loadVersions(ctx: ModDisplayContext) {
+    private fun loadVersions(component: ModsComponent) {
         Thread {
             try {
-                mod.setVersionConstraints(ctx.versions, ctx.types.map { it.id }, ctx.providers)
+                mod.setVersionConstraints(component.versions, component.types, component.providers.getEnabled())
                 versions.value = mod.versions
                     .sortedWith { a, b -> a.datePublished.compareTo(b.datePublished) * -1 }
             } catch (e: FileDownloadException) {

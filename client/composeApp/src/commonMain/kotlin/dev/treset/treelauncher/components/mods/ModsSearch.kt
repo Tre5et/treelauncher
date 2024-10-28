@@ -21,7 +21,6 @@ import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.curseforge.CurseforgeSearch
 import dev.treset.mcdl.mods.modrinth.ModrinthSearch
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.FormatString
@@ -34,7 +33,6 @@ import kotlin.math.roundToInt
 @Composable
 fun ModsSearch(
     component: ModsComponent,
-    modContext: ModDisplayContext,
     droppedFile: LauncherFile? = null,
     closeSearch: () -> Unit
 ) {
@@ -43,7 +41,6 @@ fun ModsSearch(
     if(showLocal) {
         ModsImport(
             component,
-            modContext,
             droppedFile = droppedFile,
         ) {
             closeSearch()
@@ -70,27 +67,27 @@ fun ModsSearch(
             Thread {
                 try {
                     results = (
-                        if(AppSettings.modProviders.isEmpty() || AppSettings.modProviders.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
+                        if(component.providers.isEmpty() || component.providers.containsAll(listOf(ModProvider.MODRINTH, ModProvider.CURSEFORGE))) {
                             ModData.searchCombined(
                                 tfValue,
-                                modContext.versions,
-                                modContext.types.map { it.id },
+                                component.versions,
+                                component.types,
                             25,
                             0
                             )
-                        } else if(AppSettings.modProviders.contains(ModProvider.MODRINTH)) {
+                        } else if(component.providers.contains(ModProvider.MODRINTH)) {
                             ModrinthSearch.search(
                                 tfValue,
-                                modContext.versions,
-                                modContext.types.map { it.id },
+                                component.versions,
+                                component.types,
                                 25,
                                 0
                             ).hits
                         } else {
                             CurseforgeSearch.search(
                                 tfValue,
-                                modContext.versions,
-                                FormatUtils.modLoadersToCurseforgeModLoaders(modContext.types.map { it.id }),
+                                component.versions,
+                                FormatUtils.modLoadersToCurseforgeModLoaders(component.types),
                                 25,
                                 0
                             ).data
@@ -102,10 +99,7 @@ fun ModsSearch(
                                 log10((o2.downloadsCount / o1.downloadsCount).toDouble())
                         ).roundToInt()
                     }.map {
-                        ModDataDisplay(
-                            it,
-                            modContext
-                        )
+                        ModDataDisplay(it, component)
                     }
                 } catch (e: FileDownloadException) {
                     AppContext.error(e)
@@ -163,7 +157,7 @@ fun ModsSearch(
                     ) {
                         items(it) {
                             it.ModSearchButton(
-                                modContext
+                                component
                             )
                         }
                     }

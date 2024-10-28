@@ -48,6 +48,22 @@ fun ModProviderList.containsAll(elements: Collection<ModProvider>): Boolean {
     return elements.all { contains(it) }
 }
 
+fun ModProviderList.getEnabled(): List<ModProvider> {
+    return filter { it.enabled.value }.map { it.provider }
+}
+
+fun ModProviderList.deepCopy(): ModProviderList {
+    val new = ModProviderList()
+    new.addAll(map { ModProviderData(it.provider, it.enabled.value) })
+    return new
+}
+
+fun ModProviderList.copyOrder(): ModProviderList {
+    val new = ModProviderList()
+    new.addAll(map { ModProviderData(it.provider, true) })
+    return new
+}
+
 @Serializable
 class ModProviderData(
     val provider: ModProvider,

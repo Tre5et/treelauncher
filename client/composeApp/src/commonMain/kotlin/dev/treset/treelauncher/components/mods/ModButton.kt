@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.mods.ModVersionData
 import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.string.openInBrowser
 import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
@@ -32,8 +33,8 @@ import dev.treset.treelauncher.util.DetailsListDisplay
 
 @Composable
 fun LauncherMod.ModButton(
+    component: ModsComponent,
     display: DetailsListDisplay,
-    ctx: ModDisplayContext,
     onEdit: () -> Unit
 ) {
     var selectedVersion: ModVersionData by rememberSaveable(currentVersion.value) { mutableStateOf(currentVersion.value)}
@@ -114,7 +115,7 @@ fun LauncherMod.ModButton(
                         if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
                             IconButton(
                                 onClick = {
-                                    downloadVersion(selectedVersion, ctx)
+                                    downloadVersion(selectedVersion, component)
                                 },
                                 icon = icons().download,
                                 tooltip = Strings.manager.mods.card.download(),
@@ -149,7 +150,7 @@ fun LauncherMod.ModButton(
 
                         IconButton(
                             onClick = {
-                                changeEnabled(ctx)
+                                changeEnabled(component)
                             },
                             icon = icons().enabled(enabled.value),
                             tooltip = Strings.manager.mods.card.changeUsed(enabled.value),
@@ -157,7 +158,7 @@ fun LauncherMod.ModButton(
 
                         IconButton(
                             onClick = {
-                                delete(ctx)
+                                delete(component)
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
@@ -257,7 +258,7 @@ fun LauncherMod.ModButton(
                         if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
                             IconButton(
                                 onClick = {
-                                    downloadVersion(selectedVersion, ctx)
+                                    downloadVersion(selectedVersion, component)
                                 },
                                 icon = icons().download,
                                 tooltip = Strings.manager.mods.card.download(),
@@ -302,7 +303,7 @@ fun LauncherMod.ModButton(
 
                         IconButton(
                             onClick = {
-                                changeEnabled(ctx)
+                                changeEnabled(component)
                             },
                             icon = icons().enabled(enabled.value),
                             tooltip = Strings.manager.mods.card.changeUsed(enabled.value),
@@ -310,7 +311,7 @@ fun LauncherMod.ModButton(
 
                         IconButton(
                             onClick = {
-                                delete(ctx)
+                                delete(component)
                             },
                             icon = icons().delete,
                             interactionTint = MaterialTheme.colorScheme.error,
@@ -347,7 +348,7 @@ fun LauncherMod.ModButton(
                 if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
                     IconButton(
                         onClick = {
-                            downloadVersion(selectedVersion, ctx)
+                            downloadVersion(selectedVersion, component)
                         },
                         icon = icons().download,
                         tooltip = Strings.manager.mods.card.download(),
@@ -391,7 +392,7 @@ fun LauncherMod.ModButton(
 
                 IconButton(
                     onClick = {
-                        changeEnabled(ctx)
+                        changeEnabled(component)
                     },
                     icon = icons().enabled(enabled.value),
                     tooltip = Strings.manager.mods.card.changeUsed(enabled.value),
@@ -399,7 +400,7 @@ fun LauncherMod.ModButton(
 
                 IconButton(
                     onClick = {
-                        delete(ctx)
+                        delete(component)
                     },
                     icon = icons().delete,
                     interactionTint = MaterialTheme.colorScheme.error,
