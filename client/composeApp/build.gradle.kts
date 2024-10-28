@@ -46,6 +46,8 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
 
+            implementation(kotlin("reflect"))
+
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
             implementation("dev.treset.mcdl:mcdl:$mcdlVersion")

@@ -3,8 +3,8 @@ package dev.treset.treelauncher.backend.util.sort
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.localization.Strings
 
-class ComponentManifestLastUsedComparator<T: Component> : Comparator<T> {
-    override fun compare(o1: T, o2: T): Int {
+class ComponentLastUsedComparator : Comparator<Component> {
+    override fun compare(o1: Component, o2: Component): Int {
         if (o1.lastUsed.value == o2.lastUsed.value) {
             return 0
         }

@@ -5,9 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.mods.ModProvider
-import dev.treset.treelauncher.backend.data.LauncherMod
-import dev.treset.treelauncher.backend.data.manifest.Component
-import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.ColorData
 import dev.treset.treelauncher.backend.util.serialization.DpData
@@ -27,34 +24,6 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonNames
 import java.io.IOException
 import java.util.*
-
-enum class InstanceSortType(val comparator: Comparator<InstanceComponent>) {
-    NAME(ComponentManifestNameComparator()),
-    LAST_PLAYED(ComponentManifestLastUsedComparator()),
-    TIME(InstanceComponentTimePlayedComparator());
-
-    override fun toString(): String {
-        return comparator.toString()
-    }
-}
-
-enum class LauncherModSortType(val comparator: Comparator<LauncherMod>) {
-    NAME(LauncherModNameComparator()),
-    DISABLED_NAME(LauncherModDisabledNameComparator());
-
-    override fun toString(): String {
-        return comparator.toString()
-    }
-}
-
-enum class ComponentManifestSortType(val comparator: Comparator<Component>) {
-    NAME(ComponentManifestNameComparator()),
-    LAST_USED(ComponentManifestLastUsedComparator());
-
-    override fun toString(): String {
-        return comparator.toString()
-    }
-}
 
 @Serializable
 data class Window(
@@ -79,19 +48,9 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val syncUrl: MutableDataState<String?> = mutableStateOf(null)
     val syncPort: MutableDataState<String?> = mutableStateOf(null)
     val syncKey: MutableDataState<String?> = mutableStateOf(null)
-    val instanceSortType: MutableDataState<InstanceSortType> = mutableStateOf(InstanceSortType.NAME)
-    val isInstanceSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
-    val savesComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
-    val isSavesComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     val savesDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
     val resourcepacksDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
-    val resourcepacksComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
-    val isResourcepacksComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
-    val optionsComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
-    val isOptionsComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     val modDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
-    val modComponentSortType: MutableDataState<ComponentManifestSortType> = mutableStateOf(ComponentManifestSortType.NAME)
-    val isModComponentSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     val modSortType: MutableDataState<LauncherModSortType> = mutableStateOf(LauncherModSortType.NAME)
     val isModSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     @OptIn(ExperimentalSerializationApi::class)

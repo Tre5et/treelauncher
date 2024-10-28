@@ -7,6 +7,8 @@ import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import dev.treset.treelauncher.backend.util.sort.ComponentSortType
+import dev.treset.treelauncher.backend.util.sort.Sort
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -15,7 +17,11 @@ open class ParentManifest(
     override val type: LauncherManifestType,
     val prefix: MutableDataState<String>,
     val components: MutableDataStateList<String>,
-    @Transient override var file: MutableState<LauncherFile> = mutableStateOf(LauncherFile.of(""))
+    @Transient override var file: MutableState<LauncherFile> = mutableStateOf(LauncherFile.of("")),
+    val sort: Sort<Component> = Sort(
+        ComponentSortType.NAME.comparator,
+        false
+    )
 ): Manifest() {
     @Transient override var expectedType = LauncherManifestType.UNKNOWN
 

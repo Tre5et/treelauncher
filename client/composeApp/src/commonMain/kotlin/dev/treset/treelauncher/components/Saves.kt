@@ -310,13 +310,7 @@ fun Saves() {
                 showAdd = true
             }
         },
-        detailsScrollable = displayData.saves.isNotEmpty() || displayData.servers.isNotEmpty() || showAdd,
-        sortContext = SortContext(
-            getSortType = { AppSettings.savesComponentSortType.value },
-            setSortType = { AppSettings.savesComponentSortType.value = it },
-            getReverse = { AppSettings.isSavesComponentSortReverse.value },
-            setReverse = { AppSettings.isSavesComponentSortReverse.value = it }
-        )
+        detailsScrollable = displayData.saves.isNotEmpty() || displayData.servers.isNotEmpty() || showAdd
     )
 }
 

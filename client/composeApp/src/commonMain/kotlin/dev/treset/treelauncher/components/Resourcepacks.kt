@@ -237,13 +237,7 @@ fun Resourcepacks() {
                 showAdd = true
             }
         },
-        detailsScrollable = displayData.resourcepacks.isNotEmpty() || showAdd,
-        sortContext = SortContext(
-            getSortType = { AppSettings.resourcepacksComponentSortType.value },
-            setSortType = { AppSettings.resourcepacksComponentSortType.value = it },
-            getReverse = { AppSettings.isResourcepacksComponentSortReverse.value },
-            setReverse = { AppSettings.isResourcepacksComponentSortReverse.value = it }
-        )
+        detailsScrollable = displayData.resourcepacks.isNotEmpty() || showAdd
     )
 }
 

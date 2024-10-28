@@ -8,9 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.AppSettings
-import dev.treset.treelauncher.backend.config.InstanceSortType
 import dev.treset.treelauncher.backend.data.InstanceData
+import dev.treset.treelauncher.backend.util.sort.InstanceSortType
+import dev.treset.treelauncher.backend.util.sort.sorted
+import dev.treset.treelauncher.backend.util.toggle
 import dev.treset.treelauncher.generic.SortBox
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledColumn
@@ -37,14 +38,22 @@ fun Instances() {
         loading = false
     }
 
-    LaunchedEffect(AppContext.files.instanceComponents.toList()) {
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                AppContext.files.instanceManifest.write()
+            } catch (e: IOException) {
+                AppContext.severeError(e)
+            }
+        }
+    }
+
+    LaunchedEffect(AppContext.files.instanceManifest.components.toList()) {
         reloadInstances()
     }
 
-    val actualInstances = remember(instances, AppSettings.instanceSortType, AppSettings.isInstanceSortReverse.value) {
-        instances.sortedWith(AppSettings.instanceSortType.value.comparator).let {
-            if(AppSettings.isInstanceSortReverse.value) it.reversed() else it
-        }
+    val actualInstances = remember(instances, AppContext.files.instanceManifest.sort.type.value, AppContext.files.instanceManifest.sort.reverse.value) {
+        instances.sorted(AppContext.files.instanceManifest.sort)
     }
 
     if(actualInstances.isEmpty() && !loading) {
@@ -86,14 +95,14 @@ fun Instances() {
             headerContent = {
                 Text(Strings.selector.instance.title())
                 SortBox(
-                    sorts = InstanceSortType.entries,
-                    selected = AppSettings.instanceSortType.value,
-                    reversed = AppSettings.isInstanceSortReverse.value,
+                    sorts = InstanceSortType.entries.map { it.comparator },
+                    selected = AppContext.files.instanceManifest.sort.type.value,
+                    reversed = AppContext.files.instanceManifest.sort.reverse.value,
                     onSelected = {
-                        AppSettings.instanceSortType.value = it
+                        AppContext.files.instanceManifest.sort.type.value = it
                     },
                     onReversed = {
-                        AppSettings.isInstanceSortReverse.value = !AppSettings.isInstanceSortReverse.value
+                        AppContext.files.instanceManifest.sort.reverse.toggle()
                     },
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )

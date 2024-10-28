@@ -51,6 +51,13 @@ fun App(
                 AppContext.recheckData = recheckData
 
                 ContextProvider {
+                    LaunchedEffect(Unit) {
+                        try {
+                            AppContext.files.reload()
+                        } catch (e: IOException) {
+                            AppContext.severeError(e)
+                        }
+                    }
 
                     LoginScreen {
 

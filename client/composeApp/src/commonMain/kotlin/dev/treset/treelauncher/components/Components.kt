@@ -13,22 +13,17 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.ComponentManifestSortType
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.sort.ComponentSortType
+import dev.treset.treelauncher.backend.util.sort.sorted
+import dev.treset.treelauncher.backend.util.toggle
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
-
-data class SortContext(
-    val getSortType: () -> ComponentManifestSortType,
-    val setSortType: (ComponentManifestSortType) -> Unit,
-    val getReverse: () -> Boolean,
-    val setReverse: (Boolean) -> Unit
-)
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -56,8 +51,7 @@ fun <T: Component> Components(
     ) -> Unit = {_,_->},
     detailsOnDrop: ((DragData) -> Unit)? = null,
     detailsScrollable: Boolean = true,
-    settingsDefault: Boolean = false,
-    sortContext: SortContext? = null
+    settingsDefault: Boolean = false
 ) {
     @Suppress("NAME_SHADOWING")
     val components = components.toList()
@@ -66,24 +60,20 @@ fun <T: Component> Components(
 
     var creatorSelected by remember { mutableStateOf(false) }
 
-    var sortType: ComponentManifestSortType by remember(sortContext) { mutableStateOf(sortContext?.getSortType?.let { it() } ?: ComponentManifestSortType.LAST_USED) }
-    var sortReversed: Boolean by remember(sortContext) { mutableStateOf(sortContext?.getReverse?.let { it() } ?: false) }
-
-    val actualComponents: List<T> = remember(components, sortType, sortReversed, AppContext.runningInstance) {
-        components
-            .sortedWith { o1, o2 ->
-                sortType.comparator.compare(o1, o2)
-            }.let {
-                if (sortReversed) {
-                    it.reversed()
-                } else {
-                    it
-                }
-            }
+    val actualComponents: List<T> = remember(components, componentManifest.sort.type.value, componentManifest.sort.reverse.value, AppContext.runningInstance) {
+        components.sorted(componentManifest.sort)
     }
 
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         reload()
+
+        onDispose {
+            try {
+                componentManifest.write()
+            } catch(e: IOException) {
+                AppContext.error(e)
+            }
+        }
     }
 
 
@@ -95,22 +85,18 @@ fun <T: Component> Components(
             headerContent = {
                 Text(title)
 
-                sortContext?.let {
-                    SortBox(
-                        sorts = ComponentManifestSortType.entries,
-                        reversed = it.getReverse(),
-                        selected = it.getSortType(),
-                        onReversed = {
-                            it.setReverse(!sortReversed)
-                            sortReversed = !sortReversed
-                        },
-                        onSelected = { new ->
-                            it.setSortType(new)
-                            sortType = new
-                        },
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    )
-                }
+                SortBox(
+                    sorts = ComponentSortType.entries.map { it.comparator },
+                    reversed = componentManifest.sort.reverse.value,
+                    selected = componentManifest.sort.type.value,
+                    onReversed = {
+                        componentManifest.sort.reverse.toggle()
+                    },
+                    onSelected = { new ->
+                        componentManifest.sort.type.value = new
+                    },
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                )
             },
             modifier = Modifier.padding(12.dp),
             parentModifier = Modifier.fillMaxWidth(1 / 2f),

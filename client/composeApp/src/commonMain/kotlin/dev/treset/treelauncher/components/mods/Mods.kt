@@ -31,13 +31,12 @@ import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.AppSettings
-import dev.treset.treelauncher.backend.config.LauncherModSortType
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.sort.LauncherModSortType
 import dev.treset.treelauncher.components.Components
-import dev.treset.treelauncher.components.SortContext
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.Text
@@ -734,12 +733,6 @@ fun Mods() {
                     }
                 }
             }
-        },
-        sortContext = SortContext(
-            getSortType = { AppSettings.modComponentSortType.value },
-            setSortType = { AppSettings.modComponentSortType.value = it },
-            getReverse = { AppSettings.isModComponentSortReverse.value },
-            setReverse = { AppSettings.isModComponentSortReverse.value = it }
-        )
+        }
     )
 }
