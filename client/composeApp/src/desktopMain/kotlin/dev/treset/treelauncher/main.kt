@@ -28,6 +28,7 @@ import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.*
 import dev.treset.treelauncher.util.ConfigLoader
+import dev.treset.treelauncher.util.unlockSession
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -51,9 +52,10 @@ import kotlin.math.roundToInt
 fun main() = application {
     ConfigLoader {
         val app = remember {
-            LauncherApp(
-                ::exitApplication
-            )
+            LauncherApp {
+                unlockSession()
+                exitApplication()
+            }
         }
 
         val titleColors = if(AppSettings.theme.value.isDark()) JewelTheme.darkThemeDefinition() else JewelTheme.lightThemeDefinition()
@@ -166,6 +168,10 @@ fun main() = application {
             }
         }
     }
+}
+
+fun ensureSessionLock() {
+
 }
 
 actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {

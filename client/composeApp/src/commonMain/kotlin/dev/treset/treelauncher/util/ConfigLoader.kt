@@ -33,11 +33,20 @@ import dev.treset.treelauncher.style.icons
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 import java.io.IOException
+import java.io.RandomAccessFile
+import java.nio.channels.FileChannel
+import java.nio.channels.FileLock
 
 @Composable
 fun ApplicationScope.ConfigLoader(
     content: @Composable () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        if (!validateSessionLock()) {
+            throw IllegalStateException("Failed to lock session file")
+        }
+    }
+
     var loaded by remember { mutableStateOf(false) }
     var requiresPath by remember { mutableStateOf(false) }
     var initializing by remember { mutableStateOf(false) }
@@ -203,10 +212,51 @@ fun ApplicationScope.ConfigLoader(
     }
 }
 
-val configFile = if(!System.getenv("treelauncher.configPath").isNullOrBlank()) {
+val configPath = if(!System.getenv("treelauncher.configPath").isNullOrBlank()) {
     LauncherFile.of(System.getenv("treelauncher.configPath"))
 } else {
-    LauncherFile.of(System.getenv("LOCALAPPDATA"), "treelauncher-config", "config.json")
+    LauncherFile.of(System.getenv("LOCALAPPDATA"), "treelauncher-config")
+}
+
+val configFile = configPath.child("config.json")
+
+val sessionFile = configPath.child("session.lock")
+
+private var fileChannel: FileChannel? = null
+private var lock: FileLock? = null
+
+private fun validateSessionLock(): Boolean {
+    LOGGER.info { "Validating session lock..." }
+    if (!sessionFile.exists()) {
+        LOGGER.debug { "Session file does not exist, creating..." }
+        try {
+            sessionFile.createFile()
+        } catch (e: IOException) {
+            LOGGER.error(e) { "Failed to create session file" }
+            return false
+        }
+    }
+
+    try {
+        LOGGER.debug { "Locking session file..." }
+        fileChannel = RandomAccessFile(sessionFile, "rw").channel
+        lock = fileChannel!!.lock()
+    } catch (e: Exception) {
+        LOGGER.error(e) { "Failed to lock session file" }
+        return false
+    }
+
+    LOGGER.info { "Session lock validated" }
+    return true
+}
+
+fun unlockSession() {
+    try {
+        lock?.release()
+        fileChannel?.close()
+    } catch (e: IOException) {
+        LOGGER.error(e) { "Failed to unlock session file" }
+    }
 }
 
 @Throws(IOException::class)

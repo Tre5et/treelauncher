@@ -3,7 +3,9 @@ package dev.treset.treelauncher.backend.config
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.SerializationException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import kotlinx.serialization.Serializable
 
+@Serializable
 class GlobalConfig(
     var path: String,
 ) : GenericJsonParsable() {
