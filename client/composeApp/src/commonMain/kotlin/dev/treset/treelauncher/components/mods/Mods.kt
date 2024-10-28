@@ -514,14 +514,36 @@ fun Mods() {
                             .rotate(updateRotation)
                     )
 
-                    IconButton(
-                        onClick = {
-                            checkUpdates++
-                        },
-                        icon = icons().update,
-                        size = 32.dp,
-                        tooltip = Strings.manager.mods.update.tooltip(),
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        IconButton(
+                            onClick = {
+                                checkUpdates++
+                            },
+                            tooltip = Strings.manager.mods.update.tooltip(),
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    icons().update,
+                                    "Update",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                if(AppSettings.isModsUpdate.value) {
+                                    Icon(
+                                        icons().auto,
+                                        "Auto",
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .size(18.dp)
+                                            .offset(y = 4.dp, x = (-4).dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
 
                     DropdownMenu(
                         expanded = updateExpanded,

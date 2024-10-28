@@ -65,6 +65,7 @@ object Icons {
     val close = Icons.Rounded.Close
     val copy = Icons.Rounded.ContentCopy
     val reset = Icons.Rounded.Replay
+    val auto = Icons.Rounded.HdrAuto
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {
