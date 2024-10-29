@@ -9,9 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.InstanceData
-import dev.treset.treelauncher.backend.util.sort.InstanceSortType
+import dev.treset.treelauncher.backend.util.sort.InstanceSortProviders
 import dev.treset.treelauncher.backend.util.sort.sorted
-import dev.treset.treelauncher.backend.util.toggle
 import dev.treset.treelauncher.generic.SortBox
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledColumn
@@ -52,7 +51,7 @@ fun Instances() {
         reloadInstances()
     }
 
-    val actualInstances = remember(instances, AppContext.files.instanceManifest.sort.type.value, AppContext.files.instanceManifest.sort.reverse.value) {
+    val actualInstances = remember(instances, AppContext.files.instanceManifest.sort.provider.value, AppContext.files.instanceManifest.sort.reverse.value) {
         instances.sorted(AppContext.files.instanceManifest.sort)
     }
 
@@ -95,15 +94,8 @@ fun Instances() {
             headerContent = {
                 Text(Strings.selector.instance.title())
                 SortBox(
-                    sorts = InstanceSortType.entries.map { it.comparator },
-                    selected = AppContext.files.instanceManifest.sort.type.value,
-                    reversed = AppContext.files.instanceManifest.sort.reverse.value,
-                    onSelected = {
-                        AppContext.files.instanceManifest.sort.type.value = it
-                    },
-                    onReversed = {
-                        AppContext.files.instanceManifest.sort.reverse.toggle()
-                    },
+                    sorts = InstanceSortProviders,
+                    sort = AppContext.files.instanceManifest.sort,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }

@@ -17,9 +17,8 @@ import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.backend.util.sort.ComponentSortType
+import dev.treset.treelauncher.backend.util.sort.ComponentSortProviders
 import dev.treset.treelauncher.backend.util.sort.sorted
-import dev.treset.treelauncher.backend.util.toggle
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
@@ -60,7 +59,7 @@ fun <T: Component> Components(
 
     var creatorSelected by remember { mutableStateOf(false) }
 
-    val actualComponents: List<T> = remember(components, componentManifest.sort.type.value, componentManifest.sort.reverse.value, AppContext.runningInstance) {
+    val actualComponents: List<T> = remember(components, componentManifest.sort.provider.value, componentManifest.sort.reverse.value, AppContext.runningInstance) {
         components.sorted(componentManifest.sort)
     }
 
@@ -86,15 +85,8 @@ fun <T: Component> Components(
                 Text(title)
 
                 SortBox(
-                    sorts = ComponentSortType.entries.map { it.comparator },
-                    reversed = componentManifest.sort.reverse.value,
-                    selected = componentManifest.sort.type.value,
-                    onReversed = {
-                        componentManifest.sort.reverse.toggle()
-                    },
-                    onSelected = { new ->
-                        componentManifest.sort.type.value = new
-                    },
+                    sorts = ComponentSortProviders,
+                    sort = componentManifest.sort,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )
             },

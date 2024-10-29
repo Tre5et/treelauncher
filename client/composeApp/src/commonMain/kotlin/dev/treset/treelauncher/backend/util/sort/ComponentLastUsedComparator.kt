@@ -3,7 +3,7 @@ package dev.treset.treelauncher.backend.util.sort
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.localization.Strings
 
-class ComponentLastUsedComparator : Comparator<Component> {
+object ComponentLastUsedComparator : SortProvider<Component>() {
     override fun compare(o1: Component, o2: Component): Int {
         if (o1.lastUsed.value == o2.lastUsed.value) {
             return 0
@@ -11,5 +11,8 @@ class ComponentLastUsedComparator : Comparator<Component> {
         return o2.lastUsed.value.compareTo(o1.lastUsed.value)
     }
 
-    override fun toString(): String = Strings.sortBox.sort.lastUsed()
+    override val name: String
+        get() = Strings.sortBox.sort.lastUsed()
+
+    override val id = "LAST_USED"
 }

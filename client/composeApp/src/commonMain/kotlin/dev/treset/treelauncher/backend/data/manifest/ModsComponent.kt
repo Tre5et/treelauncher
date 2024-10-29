@@ -12,6 +12,8 @@ import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import dev.treset.treelauncher.backend.util.sort.LauncherModNameComparator
+import dev.treset.treelauncher.backend.util.sort.Sort
 import dev.treset.treelauncher.components.mods.ModProviderData
 import dev.treset.treelauncher.components.mods.ModProviderList
 import dev.treset.treelauncher.components.mods.deepCopy
@@ -36,6 +38,10 @@ class ModsComponent(
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
     override val active: MutableDataState<Boolean> = mutableStateOf(false),
     val mods: MutableDataStateList<LauncherMod> = mutableStateListOf(),
+    val sort: Sort<LauncherMod> = Sort(
+        LauncherModNameComparator,
+        false
+    ),
     val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.MODS_COMPONENT
@@ -70,6 +76,10 @@ class ModsComponent(
         lastUsed: String = "",
         includedFiles: List<String> = appConfig().modsDefaultIncludedFiles,
         mods: List<LauncherMod> = emptyList(),
+        sort: Sort<LauncherMod> = Sort(
+            LauncherModNameComparator,
+            false
+        ),
         listDisplay: ListDisplay? = null
     ): this(
         mutableStateOf(id),
@@ -85,6 +95,7 @@ class ModsComponent(
         mutableStateOf(lastUsed),
         mutableStateOf(active),
         mods.toMutableStateList(),
+        sort,
         mutableStateOf(listDisplay)
     )
 

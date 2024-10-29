@@ -47,8 +47,6 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val syncUrl: MutableDataState<String?> = mutableStateOf(null)
     val syncPort: MutableDataState<String?> = mutableStateOf(null)
     val syncKey: MutableDataState<String?> = mutableStateOf(null)
-    val modSortType: MutableDataState<LauncherModSortType> = mutableStateOf(LauncherModSortType.NAME)
-    val isModSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     @OptIn(ExperimentalSerializationApi::class)
     @JsonNames("isModsAutoUpdate")
     val modsDefaultAutoUpdate: MutableDataState<Boolean> = mutableStateOf(true)

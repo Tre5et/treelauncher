@@ -35,7 +35,8 @@ import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.backend.util.sort.LauncherModSortType
+import dev.treset.treelauncher.backend.util.sort.LauncherModSortProviders
+import dev.treset.treelauncher.backend.util.sort.sorted
 import dev.treset.treelauncher.components.Components
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.generic.Button
@@ -100,10 +101,8 @@ fun Mods() {
 
             var popupData: PopupData? by remember { mutableStateOf(null) }
 
-            val mods: List<LauncherMod> = remember(current.mods.toList(), AppSettings.modSortType.value, AppSettings.isModSortReverse.value, current.mods.toList(), current.versions.toList()) {
-                current.mods.sortedWith(AppSettings.modSortType.value.comparator).let {
-                    if(AppSettings.isModSortReverse.value) it.reversed() else it
-                }
+            val mods: List<LauncherMod> = remember(current.mods.toList(), current.sort.provider.value, current.sort.reverse.value, current.mods.toList(), current.versions.toList()) {
+                current.mods.sorted(current.sort)
             }
 
             val filteredMods = remember(mods, searchContent) {
@@ -688,16 +687,9 @@ fun Mods() {
         actionBarBoxContent = { current, settingsOpen, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
                 SortBox(
-                    sorts = LauncherModSortType.entries,
+                    sorts = LauncherModSortProviders,
                     modifier = Modifier.align(Alignment.CenterEnd),
-                    selected = AppSettings.modSortType.value,
-                    reversed = AppSettings.isModSortReverse.value,
-                    onSelected = {
-                        AppSettings.modSortType.value = it
-                    },
-                    onReversed = {
-                        AppSettings.isModSortReverse.value = !AppSettings.isModSortReverse.value
-                    }
+                    sort = current.sort,
                 )
 
                 ListDisplayBox(

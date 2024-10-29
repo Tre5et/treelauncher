@@ -7,7 +7,7 @@ import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
-import dev.treset.treelauncher.backend.util.sort.ComponentSortType
+import dev.treset.treelauncher.backend.util.sort.ComponentNameComparator
 import dev.treset.treelauncher.backend.util.sort.Sort
 import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
@@ -20,7 +20,7 @@ open class ParentManifest(
     val components: MutableDataStateList<String>,
     @Transient override var file: MutableState<LauncherFile> = mutableStateOf(LauncherFile.of("")),
     val sort: Sort<Component> = Sort(
-        ComponentSortType.NAME.comparator,
+        ComponentNameComparator,
         false
     ),
     val defaultListDisplay: MutableDataState<ListDisplay> = mutableStateOf(ListDisplay.FULL)
@@ -33,7 +33,7 @@ open class ParentManifest(
         components: List<String>,
         file: LauncherFile,
         sort: Sort<Component> = Sort(
-            ComponentSortType.NAME.comparator,
+            ComponentNameComparator,
             false
         ),
         defaultListDisplay: ListDisplay = ListDisplay.FULL
