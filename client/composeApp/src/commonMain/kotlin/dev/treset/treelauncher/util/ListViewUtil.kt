@@ -2,7 +2,7 @@ package dev.treset.treelauncher.util
 
 import dev.treset.treelauncher.localization.Strings
 
-enum class DetailsListDisplay(
+enum class ListDisplay(
     val displayName: () -> String
 ) {
     FULL({ Strings.list.full() }),

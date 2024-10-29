@@ -146,6 +146,16 @@ fun <T: Component> Components(
 
             var showDelete by remember { mutableStateOf(false) }
 
+            DisposableEffect(selected) {
+                onDispose {
+                    try {
+                        selected?.write()
+                    } catch (e: IOException) {
+                        AppContext.error(e)
+                    }
+                }
+            }
+
             TitledColumn(
                 headerContent = {
                     if(showSettings && !settingsDefault) {

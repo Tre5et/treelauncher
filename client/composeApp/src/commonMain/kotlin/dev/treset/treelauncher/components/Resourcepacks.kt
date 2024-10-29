@@ -13,7 +13,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.resourcepacks.Resourcepack
 import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import dev.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
@@ -27,7 +26,7 @@ import dev.treset.treelauncher.generic.ListDisplayBox
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
-import dev.treset.treelauncher.util.DetailsListDisplay
+import dev.treset.treelauncher.util.ListDisplay
 import java.io.IOException
 import java.net.URI
 
@@ -70,6 +69,8 @@ fun Resourcepacks() {
             }
         },
         detailsContent = { current, _ ->
+            val listDisplay = remember(current.listDisplay.value) { current.listDisplay.value ?: AppContext.files.resourcepackManifest.defaultListDisplay.value }
+
             LaunchedEffect(showAdd) {
                 if(!showAdd) {
                     filesToAdd = emptyList()
@@ -156,7 +157,7 @@ fun Resourcepacks() {
                         displayData.resourcepacks.forEach {
                             ResourcepackButton(
                                 it.key,
-                                display = AppSettings.resourcepacksDetailsListDisplay.value
+                                display = listDisplay
                             ) {
                                 try {
                                     it.value.remove()
@@ -175,7 +176,7 @@ fun Resourcepacks() {
                         displayData.texturepacks.forEach {
                             TexturepackButton(
                                 it.key,
-                                display = AppSettings.resourcepacksDetailsListDisplay.value
+                                display = listDisplay
                             ) {
                                 try {
                                     it.value.remove()
@@ -201,7 +202,7 @@ fun Resourcepacks() {
                 )
             }
         },
-        actionBarBoxContent = { _, _, _ ->
+        actionBarBoxContent = { current, _, _ ->
             if(showAdd) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -222,11 +223,9 @@ fun Resourcepacks() {
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     ListDisplayBox(
-                        DetailsListDisplay.entries,
-                        AppSettings.resourcepacksDetailsListDisplay.value,
-                        {
-                            AppSettings.resourcepacksDetailsListDisplay.value = it
-                        }
+                        ListDisplay.entries,
+                        current.listDisplay,
+                        AppContext.files.resourcepackManifest.defaultListDisplay
                     )
                 }
             }

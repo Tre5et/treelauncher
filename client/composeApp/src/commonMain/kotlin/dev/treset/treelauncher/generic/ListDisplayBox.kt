@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,8 +15,9 @@ import dev.treset.treelauncher.style.icons
 @Composable
 fun <T> ListDisplayBox(
     displays: List<T>,
-    selected: T,
-    onSelected: (T) -> Unit,
+    selected: MutableState<T?>,
+    default: MutableState<T>,
+    onSelected: (T?) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -28,9 +30,13 @@ fun <T> ListDisplayBox(
         ) {
             ComboBox(
                 items = displays,
-                onSelected = onSelected,
-                selected = selected,
-                decorated = false
+                onSelected = {
+                    selected.value = it
+                    default.value = it
+                    onSelected(it)
+                },
+                selected = selected.value ?: default.value,
+                decorated = false,
             )
             Icon(
                 icons().list,

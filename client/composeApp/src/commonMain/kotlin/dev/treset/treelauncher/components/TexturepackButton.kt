@@ -12,12 +12,12 @@ import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
-import dev.treset.treelauncher.util.DetailsListDisplay
+import dev.treset.treelauncher.util.ListDisplay
 
 @Composable
 fun TexturepackButton(
     texturepack: Texturepack,
-    display: DetailsListDisplay,
+    display: ListDisplay,
     onDelete: () -> Unit
 ) {
     var showDeleteDialog by remember(texturepack) { mutableStateOf(false) }
@@ -25,7 +25,7 @@ fun TexturepackButton(
     val image = texturepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) }
 
     when(display) {
-        DetailsListDisplay.FULL -> ImageSelectorButton(
+        ListDisplay.FULL -> ImageSelectorButton(
             selected = false,
             onClick = {},
             image = image,
@@ -46,7 +46,7 @@ fun TexturepackButton(
             }
         }
 
-        DetailsListDisplay.COMPACT -> CompactSelectorButton(
+        ListDisplay.COMPACT -> CompactSelectorButton(
             selected = false,
             onClick = { },
             image = image,
@@ -67,7 +67,7 @@ fun TexturepackButton(
             }
         }
 
-        DetailsListDisplay.MINIMAL -> CompactSelectorButton(
+        ListDisplay.MINIMAL -> CompactSelectorButton(
             selected = false,
             onClick = { },
             title = texturepack.name,

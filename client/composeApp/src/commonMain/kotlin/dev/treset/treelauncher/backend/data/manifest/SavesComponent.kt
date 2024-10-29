@@ -9,6 +9,7 @@ import dev.treset.treelauncher.backend.launching.resources.SavesDisplayData
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.io.IOException
@@ -20,7 +21,8 @@ class SavesComponent(
     @Transient override val file: MutableDataState<LauncherFile> = mutableStateOf(LauncherFile.of("")),
     override val includedFiles: MutableDataStateList<String> = appConfig().savesDefaultIncludedFiles.toMutableStateList(),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
-    override val active: MutableDataState<Boolean> = mutableStateOf(false)
+    override val active: MutableDataState<Boolean> = mutableStateOf(false),
+    val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type= LauncherManifestType.SAVES_COMPONENT
     @Transient override var expectedType = LauncherManifestType.SAVES_COMPONENT
@@ -31,14 +33,16 @@ class SavesComponent(
         file: LauncherFile,
         active: Boolean = false,
         lastUsed: String = "",
-        includedFiles: List<String> = appConfig().savesDefaultIncludedFiles
+        includedFiles: List<String> = appConfig().savesDefaultIncludedFiles,
+        listDisplay: ListDisplay? = null
     ): this(
         mutableStateOf(id),
         mutableStateOf(name),
         mutableStateOf(file),
         includedFiles.toMutableStateList(),
         mutableStateOf(lastUsed),
-        mutableStateOf(active)
+        mutableStateOf(active),
+        mutableStateOf(listDisplay)
     )
 
     fun getDisplayData(gameDataDir: LauncherFile): SavesDisplayData {

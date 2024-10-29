@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.saves.Save
 import dev.treset.mcdl.saves.Server
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
@@ -30,7 +29,7 @@ import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.icons
-import dev.treset.treelauncher.util.DetailsListDisplay
+import dev.treset.treelauncher.util.ListDisplay
 import dev.treset.treelauncher.util.launchGame
 import java.io.IOException
 import java.net.URI
@@ -85,6 +84,8 @@ fun Saves() {
             }
         },
         detailsContent = { current,  _ ->
+            val listDisplay = remember(current.listDisplay.value) { current.listDisplay.value ?: AppContext.files.savesManifest.defaultListDisplay.value }
+
             DisposableEffect(current, AppContext.runningInstance) {
                 selected = current
                 reloadSaves()
@@ -157,7 +158,7 @@ fun Saves() {
                         SaveButton(
                             it.key,
                             selectedSave == it.key,
-                            display = AppSettings.savesDetailsListDisplay.value,
+                            display = listDisplay,
                             onDelete = {
                                 try {
                                     it.value.remove()
@@ -188,7 +189,7 @@ fun Saves() {
                         ServerButton(
                             it,
                             selectedServer == it,
-                            display = AppSettings.savesDetailsListDisplay.value,
+                            display = listDisplay,
                         ) {
                             selectedSave = null
                             selectedServer = if (selectedServer == it) {
@@ -274,7 +275,7 @@ fun Saves() {
                 )
             }
         },
-        actionBarBoxContent = {_, _, _ ->
+        actionBarBoxContent = { current, _, _ ->
             if(showAdd) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -295,11 +296,9 @@ fun Saves() {
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     ListDisplayBox(
-                        DetailsListDisplay.entries,
-                        AppSettings.savesDetailsListDisplay.value,
-                        {
-                            AppSettings.savesDetailsListDisplay.value = it
-                        }
+                        ListDisplay.entries,
+                        current.listDisplay,
+                        AppContext.files.savesManifest.defaultListDisplay
                     )
                 }
             }

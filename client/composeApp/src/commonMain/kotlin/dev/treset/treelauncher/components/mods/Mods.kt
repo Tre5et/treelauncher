@@ -44,7 +44,7 @@ import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.style.inverted
-import dev.treset.treelauncher.util.DetailsListDisplay
+import dev.treset.treelauncher.util.ListDisplay
 import java.io.IOException
 import java.net.URI
 
@@ -82,6 +82,8 @@ fun Mods() {
             )
         },
         detailsContent = { current, _ ->
+            val listDisplay = remember(current.listDisplay.value) { current.listDisplay.value ?: AppContext.files.modsManifest.defaultListDisplay.value }
+
             val types = remember(current.types.toList()) {
                 VersionType.fromIds(current.types)
             }
@@ -270,7 +272,7 @@ fun Mods() {
                             items(filteredMods) {
                                 it.ModButton(
                                     current,
-                                    display = AppSettings.modDetailsListDisplay.value
+                                    display = listDisplay
                                 ) {
                                     editingMod = it
                                 }
@@ -683,7 +685,7 @@ fun Mods() {
                 }
             }
         },
-        actionBarBoxContent = { _, settingsOpen, _ ->
+        actionBarBoxContent = { current, settingsOpen, _ ->
             if(!settingsOpen && !showSearch && editingMod == null) {
                 SortBox(
                     sorts = LauncherModSortType.entries,
@@ -699,11 +701,9 @@ fun Mods() {
                 )
 
                 ListDisplayBox(
-                    displays = DetailsListDisplay.entries,
-                    selected = AppSettings.modDetailsListDisplay.value,
-                    onSelected = {
-                        AppSettings.modDetailsListDisplay.value = it
-                    },
+                    displays = ListDisplay.entries,
+                    selected = current.listDisplay,
+                    default = AppContext.files.modsManifest.defaultListDisplay,
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 18.dp)

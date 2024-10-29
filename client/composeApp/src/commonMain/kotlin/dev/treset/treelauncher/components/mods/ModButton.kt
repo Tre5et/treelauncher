@@ -29,12 +29,12 @@ import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.DownloadingIcon
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
-import dev.treset.treelauncher.util.DetailsListDisplay
+import dev.treset.treelauncher.util.ListDisplay
 
 @Composable
 fun LauncherMod.ModButton(
     component: ModsComponent,
-    display: DetailsListDisplay,
+    display: ListDisplay,
     onEdit: () -> Unit
 ) {
     var selectedVersion: ModVersionData by rememberSaveable(currentVersion.value) { mutableStateOf(currentVersion.value)}
@@ -56,7 +56,7 @@ fun LauncherMod.ModButton(
     }
 
     when(display) {
-        DetailsListDisplay.FULL -> SelectorButton(
+        ListDisplay.FULL -> SelectorButton(
             selected = false,
             onClick = {},
             enabled = enabled.value,
@@ -200,7 +200,7 @@ fun LauncherMod.ModButton(
             }
         }
 
-        DetailsListDisplay.COMPACT -> SelectorButton(
+        ListDisplay.COMPACT -> SelectorButton(
             selected = false,
             onClick = {},
             enabled = enabled.value
@@ -323,7 +323,7 @@ fun LauncherMod.ModButton(
             }
         }
 
-        DetailsListDisplay.MINIMAL -> SelectorButton(
+        ListDisplay.MINIMAL -> SelectorButton(
             selected = false,
             onClick = {},
             enabled = enabled.value

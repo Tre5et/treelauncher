@@ -16,7 +16,6 @@ import dev.treset.treelauncher.components.mods.ModProviderList
 import dev.treset.treelauncher.localization.Language
 import dev.treset.treelauncher.localization.SystemLanguage
 import dev.treset.treelauncher.style.*
-import dev.treset.treelauncher.util.DetailsListDisplay
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -48,9 +47,6 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val syncUrl: MutableDataState<String?> = mutableStateOf(null)
     val syncPort: MutableDataState<String?> = mutableStateOf(null)
     val syncKey: MutableDataState<String?> = mutableStateOf(null)
-    val savesDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
-    val resourcepacksDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
-    val modDetailsListDisplay: MutableDataState<DetailsListDisplay> = mutableStateOf(DetailsListDisplay.FULL)
     val modSortType: MutableDataState<LauncherModSortType> = mutableStateOf(LauncherModSortType.NAME)
     val isModSortReverse: MutableDataState<Boolean> = mutableStateOf(false)
     @OptIn(ExperimentalSerializationApi::class)

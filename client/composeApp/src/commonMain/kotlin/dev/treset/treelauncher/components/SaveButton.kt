@@ -12,13 +12,13 @@ import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
-import dev.treset.treelauncher.util.DetailsListDisplay
+import dev.treset.treelauncher.util.ListDisplay
 
 @Composable
 fun SaveButton(
     save: Save,
     selected: Boolean,
-    display: DetailsListDisplay,
+    display: ListDisplay,
     onDelete: () -> Unit,
     onClick: () -> Unit
 ) {
@@ -27,7 +27,7 @@ fun SaveButton(
     val image = save.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) }
 
     when(display) {
-        DetailsListDisplay.FULL -> ImageSelectorButton(
+        ListDisplay.FULL -> ImageSelectorButton(
             selected = selected,
             onClick = onClick,
             image = image,
@@ -48,7 +48,7 @@ fun SaveButton(
             }
         }
 
-        DetailsListDisplay.COMPACT -> CompactSelectorButton(
+        ListDisplay.COMPACT -> CompactSelectorButton(
             selected = selected,
             onClick = onClick,
             image = image,
@@ -69,7 +69,7 @@ fun SaveButton(
             }
         }
 
-        DetailsListDisplay.MINIMAL -> CompactSelectorButton(
+        ListDisplay.MINIMAL -> CompactSelectorButton(
             selected = selected,
             onClick = onClick,
             title = save.name,

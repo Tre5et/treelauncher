@@ -16,6 +16,7 @@ import dev.treset.treelauncher.components.mods.ModProviderData
 import dev.treset.treelauncher.components.mods.ModProviderList
 import dev.treset.treelauncher.components.mods.deepCopy
 import dev.treset.treelauncher.generic.VersionType
+import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.io.IOException
@@ -34,7 +35,8 @@ class ModsComponent(
     override val includedFiles: MutableDataStateList<String> = appConfig().modsDefaultIncludedFiles.toMutableStateList(),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
     override val active: MutableDataState<Boolean> = mutableStateOf(false),
-    val mods: MutableDataStateList<LauncherMod> = mutableStateListOf()
+    val mods: MutableDataStateList<LauncherMod> = mutableStateListOf(),
+    val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.MODS_COMPONENT
     @Transient override var expectedType = LauncherManifestType.MODS_COMPONENT
@@ -67,7 +69,8 @@ class ModsComponent(
         active: Boolean = false,
         lastUsed: String = "",
         includedFiles: List<String> = appConfig().modsDefaultIncludedFiles,
-        mods: List<LauncherMod> = emptyList()
+        mods: List<LauncherMod> = emptyList(),
+        listDisplay: ListDisplay? = null
     ): this(
         mutableStateOf(id),
         mutableStateOf(name),
@@ -81,7 +84,8 @@ class ModsComponent(
         includedFiles.toMutableStateList(),
         mutableStateOf(lastUsed),
         mutableStateOf(active),
-        mods.toMutableStateList()
+        mods.toMutableStateList(),
+        mutableStateOf(listDisplay)
     )
 
     fun registerJob(job: (MutableList<LauncherMod>) -> Unit) {
