@@ -21,6 +21,8 @@ import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.curseforge.CurseforgeSearch
 import dev.treset.mcdl.mods.modrinth.ModrinthSearch
 import dev.treset.treelauncher.AppContext
+import dev.treset.treelauncher.backend.data.contains
+import dev.treset.treelauncher.backend.data.containsAll
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.FormatString

@@ -10,6 +10,7 @@ import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -29,7 +30,8 @@ class InstanceComponent(
     val features: MutableDataStateList<LauncherFeature> = appConfig().instanceDefaultFeatures.toMutableStateList(),
     val jvmArguments: MutableDataStateList<LauncherLaunchArgument> = appConfig().instanceDefaultJvmArguments.toMutableStateList(),
     val ignoredFiles: MutableDataStateList<String> = appConfig().instanceDefaultIgnoredFiles.toMutableStateList(),
-    val totalTime: MutableDataState<Long> = mutableStateOf(0)
+    val totalTime: MutableDataState<Long> = mutableStateOf(0),
+    override val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.INSTANCE_COMPONENT
     @Transient override var expectedType = LauncherManifestType.INSTANCE_COMPONENT

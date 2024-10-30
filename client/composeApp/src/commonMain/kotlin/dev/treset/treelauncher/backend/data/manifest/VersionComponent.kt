@@ -8,6 +8,7 @@ import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -32,7 +33,8 @@ class VersionComponent(
     @Transient override val file: MutableDataState<LauncherFile> = mutableStateOf(LauncherFile.of("")),
     override val includedFiles: MutableDataStateList<String> = appConfig().versionDefaultIncludedFiles.toMutableStateList(),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
-    override val active: MutableDataState<Boolean> = mutableStateOf(false)
+    override val active: MutableDataState<Boolean> = mutableStateOf(false),
+    override val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.VERSION_COMPONENT
     @Transient override var expectedType = LauncherManifestType.VERSION_COMPONENT

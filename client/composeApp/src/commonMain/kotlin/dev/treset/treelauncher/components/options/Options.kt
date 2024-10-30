@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.components
+package dev.treset.treelauncher.components.options
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -6,6 +6,8 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.components.Components
+import dev.treset.treelauncher.components.SharedComponentData
 import dev.treset.treelauncher.creation.ComponentCreator
 import dev.treset.treelauncher.creation.CreationContent
 import dev.treset.treelauncher.creation.CreationMode
@@ -34,6 +36,9 @@ fun Options() {
             } catch (e: IOException) {
                 AppContext.severeError(e)
             }
+        },
+        constructSharedData = { c,r ->
+            SharedComponentData.of(c,r)
         },
         settingsDefault = true
     )

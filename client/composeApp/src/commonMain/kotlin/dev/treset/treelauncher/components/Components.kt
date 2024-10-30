@@ -26,30 +26,20 @@ import java.io.IOException
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun <T: Component> Components(
+fun <T: Component, D: SharedComponentData<T>> Components(
     title: String,
     components: MutableList<T>,
     componentManifest: ParentManifest,
     checkHasComponent: (InstanceComponent, T) -> Boolean,
     isEnabled: T.() -> Boolean = {true},
     reload: () -> Unit,
+    constructSharedData: (T, () -> Unit) -> D,
     createContent: @Composable ColumnScope.(onDone: () -> Unit) -> Unit,
-    actionBarSpecial: @Composable RowScope.(
-        selected: T,
-        settingsOpen: Boolean,
-        reload: () -> Unit
-    ) -> Unit = {_,_,_->},
-    actionBarBoxContent: @Composable BoxScope.(
-        selected: T,
-        settingsOpen: Boolean,
-        reload: () -> Unit
-    ) -> Unit = {_,_,_->},
-    detailsContent: @Composable ColumnScope.(
-        selected: T,
-        reload: () -> Unit
-    ) -> Unit = {_,_->},
-    detailsOnDrop: ((DragData) -> Unit)? = null,
-    detailsScrollable: Boolean = true,
+    actionBarSpecial: @Composable D.(RowScope) -> Unit = { },
+    actionBarBoxContent: @Composable D.(BoxScope) -> Unit = { },
+    detailsContent: @Composable D.(ColumnScope) -> Unit = { },
+    detailsOnDrop: (D.(DragData) -> Unit)? = null,
+    detailsScrollable: D.() -> Boolean = { true },
     settingsDefault: Boolean = false
 ) {
     @Suppress("NAME_SHADOWING")
@@ -62,6 +52,8 @@ fun <T: Component> Components(
     val actualComponents: List<T> = remember(components, componentManifest.sort.provider.value, componentManifest.sort.reverse.value, AppContext.runningInstance) {
         components.sorted(componentManifest.sort)
     }
+
+    val sharedData: D? = remember(selected) { selected?.let { constructSharedData(it, reload) } }
 
     DisposableEffect(Unit) {
         reload()
@@ -131,17 +123,15 @@ fun <T: Component> Components(
             )
         }
 
-        selected?.let {
-            var showSettings by remember(it) { mutableStateOf(settingsDefault) }
-
+        sharedData?.let {
             var showRename by remember { mutableStateOf(false) }
 
             var showDelete by remember { mutableStateOf(false) }
 
-            DisposableEffect(selected) {
+            DisposableEffect(it.component) {
                 onDispose {
                     try {
-                        selected?.write()
+                        sharedData.component.write()
                     } catch (e: IOException) {
                         AppContext.error(e)
                     }
@@ -150,12 +140,12 @@ fun <T: Component> Components(
 
             TitledColumn(
                 headerContent = {
-                    if(showSettings && !settingsDefault) {
+                    if(it.settingsOpen.value && !settingsDefault) {
                         Box(
                             modifier = Modifier.align(Alignment.CenterStart)
                         ) {
                             IconButton(
-                                onClick = { showSettings = false },
+                                onClick = { it.settingsOpen.value = false },
                                 icon = icons().back,
                                 size = 32.dp,
                                 tooltip = Strings.manager.component.back(),
@@ -167,13 +157,9 @@ fun <T: Component> Components(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        actionBarSpecial(
-                            it,
-                            showSettings,
-                            reload
-                        )
+                        sharedData.actionBarSpecial(this)
 
-                        Text(it.name.value)
+                        Text(it.component.name.value)
 
                         IconButton(
                             onClick = {
@@ -185,7 +171,7 @@ fun <T: Component> Components(
                         )
                         IconButton(
                             onClick = {
-                                LauncherFile.of(it.directory).open()
+                                LauncherFile.of(it.component.directory).open()
                             },
                             icon = icons().folder,
                             size = 32.dp,
@@ -202,11 +188,7 @@ fun <T: Component> Components(
                         )
                     }
 
-                    actionBarBoxContent(
-                        it,
-                        showSettings,
-                        reload
-                    )
+                    sharedData.actionBarBoxContent(this)
                 },
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.padding(12.dp),
@@ -220,7 +202,7 @@ fun <T: Component> Components(
                             modifier = Modifier
                                 .weight(1f, false)
                                 .let {mod ->
-                                    if(detailsScrollable) {
+                                    if(sharedData.detailsScrollable()) {
                                         mod.verticalScroll(rememberScrollState())
                                     } else {
                                         mod
@@ -228,27 +210,24 @@ fun <T: Component> Components(
                                 },
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            detailsContent(
-                                it,
-                                reload
-                            )
+                            sharedData.detailsContent(this)
                         }
 
                         SelectorButton(
                             title = Strings.manager.component.settings(),
                             icon = icons().settings,
-                            selected = showSettings,
-                            onClick = { showSettings = true }
+                            selected = it.settingsOpen.value,
+                            onClick = { it.settingsOpen.value = true }
                         )
                     }
                 }
 
-                if(showSettings) {
-                    ComponentSettings(it)
+                if(it.settingsOpen.value) {
+                    ComponentSettings(it.component)
                 } else {
                     detailsOnDrop?.let {
                         DroppableArea(
-                            onDrop = it,
+                            onDrop = { data -> it(sharedData, data) },
                             modifier = Modifier.fillMaxSize()
                         ) {
                             columnContent()
@@ -260,14 +239,14 @@ fun <T: Component> Components(
 
             if (showRename) {
                 RenamePopup(
-                    manifest = it,
-                    editValid = { name -> name.isNotBlank() && name != it.name.value },
+                    manifest = it.component,
+                    editValid = { name -> name.isNotBlank() && name != it.component.name.value },
                     onDone = { name ->
                         showRename = false
                         name?.let { newName ->
-                            it.name.value = newName
+                            it.component.name.value = newName
                             try {
-                                it.write()
+                                it.component.write()
                             } catch (e: IOException) {
                                 AppContext.severeError(e)
                             }
@@ -278,12 +257,12 @@ fun <T: Component> Components(
 
             if (showDelete) {
                 DeletePopup(
-                    component = it,
-                    checkHasComponent = { details -> checkHasComponent(details, it) },
+                    component = it.component,
+                    checkHasComponent = { details -> checkHasComponent(details, it.component) },
                     onClose = { showDelete = false },
                     onConfirm = {
                         try {
-                            it.delete(componentManifest)
+                            it.component.delete(componentManifest)
                         } catch(e: IOException) {
                             AppContext.severeError(e)
                         }

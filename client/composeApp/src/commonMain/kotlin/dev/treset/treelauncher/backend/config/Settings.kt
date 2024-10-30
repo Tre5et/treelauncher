@@ -11,8 +11,8 @@ import dev.treset.treelauncher.backend.util.serialization.DpData
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
 import dev.treset.treelauncher.backend.util.sort.*
-import dev.treset.treelauncher.components.mods.ModProviderData
-import dev.treset.treelauncher.components.mods.ModProviderList
+import dev.treset.treelauncher.backend.data.ModProviderData
+import dev.treset.treelauncher.backend.data.ModProviderList
 import dev.treset.treelauncher.localization.Language
 import dev.treset.treelauncher.localization.SystemLanguage
 import dev.treset.treelauncher.style.*

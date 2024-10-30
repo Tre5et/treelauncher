@@ -1,11 +1,13 @@
 package dev.treset.treelauncher.backend.data.manifest
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import dev.treset.mcdl.resourcepacks.Resourcepack
 import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.launching.resources.ResourcepacksDisplayData
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
@@ -22,7 +24,7 @@ class ResourcepackComponent(
     override val includedFiles: MutableDataStateList<String> = appConfig().resourcepacksDefaultIncludedFiles.toMutableStateList(),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
     override val active: MutableDataState<Boolean> = mutableStateOf(false),
-    val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
+    override val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.RESOURCEPACKS_COMPONENT
     @Transient override var expectedType = LauncherManifestType.RESOURCEPACKS_COMPONENT
@@ -47,8 +49,8 @@ class ResourcepackComponent(
 
     fun getDisplayData(gameDataDir: LauncherFile): ResourcepacksDisplayData {
         val displayData = ResourcepacksDisplayData(
-            resourcepacks = mapOf(),
-            texturepacks = mapOf(),
+            resourcepacks = mutableStateMapOf(),
+            texturepacks = mutableStateMapOf(),
             onAddResourcepack = { f -> this.onAddResourcepack(f, gameDataDir) },
             onAddTexturepack = { f -> this.onAddTexturepack(f, gameDataDir) }
         )
@@ -62,27 +64,29 @@ class ResourcepackComponent(
     private fun ResourcepacksDisplayData.loadResourcepacks(gameDataDir: LauncherFile) {
         val resourcepacksDirectory = LauncherFile.of(getContentDirectory(gameDataDir), "resourcepacks")
 
-        resourcepacks = resourcepacksDirectory.listFiles()
-            .mapNotNull {
+        resourcepacks.assignFrom(
+            resourcepacksDirectory.listFiles().mapNotNull {
                 try {
                     Resourcepack.get(it)
                 } catch (e: Exception) {
                     null
                 }?.let {rp -> rp to it}
             }.toMap()
+        )
     }
 
     private fun ResourcepacksDisplayData.loadTexturepacks(gameDataDir: LauncherFile) {
         val texturepacksDirectory = LauncherFile.of(getContentDirectory(gameDataDir), "texturepacks")
 
-        texturepacks = texturepacksDirectory.listFiles()
-            .mapNotNull {
+        texturepacks.assignFrom(
+            texturepacksDirectory.listFiles().mapNotNull {
                 try {
                     Texturepack.get(it)
                 } catch (e: Exception) {
                     null
                 }?.let {tp -> tp to it}
             }.toMap()
+        )
     }
 
     @Throws(IOException::class)

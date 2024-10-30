@@ -17,7 +17,6 @@ import dev.treset.treelauncher.backend.util.ModProviderStatus
 import dev.treset.treelauncher.backend.util.loadNetworkImage
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
-import dev.treset.treelauncher.components.mods.getEnabled
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient

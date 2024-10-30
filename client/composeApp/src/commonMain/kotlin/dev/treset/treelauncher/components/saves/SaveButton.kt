@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.components
+package dev.treset.treelauncher.components.saves
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme

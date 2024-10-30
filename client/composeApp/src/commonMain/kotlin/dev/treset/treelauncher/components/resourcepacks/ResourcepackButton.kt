@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.components
+package dev.treset.treelauncher.components.resourcepacks
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
@@ -8,29 +8,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import dev.treset.mcdl.resourcepacks.Texturepack
+import dev.treset.mcdl.resourcepacks.Resourcepack
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.ListDisplay
 
 @Composable
-fun TexturepackButton(
-    texturepack: Texturepack,
+fun ResourcepackButton(
+    resourcepack: Resourcepack,
     display: ListDisplay,
     onDelete: () -> Unit
 ) {
-    var showDeleteDialog by remember(texturepack) { mutableStateOf(false) }
+    var showDeleteDialog by remember(resourcepack) { mutableStateOf(false) }
 
-    val image = texturepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) }
+    val image = resourcepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) }
 
     when(display) {
         ListDisplay.FULL -> ImageSelectorButton(
             selected = false,
             onClick = {},
             image = image,
-            title = texturepack.name,
-            subtitle = texturepack.description
+            title = resourcepack.name,
+            subtitle = resourcepack.packMcmeta?.pack?.description
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -50,8 +50,8 @@ fun TexturepackButton(
             selected = false,
             onClick = { },
             image = image,
-            title = texturepack.name,
-            subtitle = texturepack.description
+            title = resourcepack.name,
+            subtitle = resourcepack.packMcmeta?.pack?.description
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -70,7 +70,7 @@ fun TexturepackButton(
         ListDisplay.MINIMAL -> CompactSelectorButton(
             selected = false,
             onClick = { },
-            title = texturepack.name,
+            title = resourcepack.name,
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -90,7 +90,7 @@ fun TexturepackButton(
     if(showDeleteDialog) {
         PopupOverlay(
             type = PopupType.WARNING,
-            titleRow = { Text(Strings.manager.resourcepacks.deleteTitle()) },
+            titleRow = { Text(Strings.manager.resourcepacks.deleteTexturepackTitle()) },
             content = {
                 Text(Strings.manager.resourcepacks.deleteMessage())
             },

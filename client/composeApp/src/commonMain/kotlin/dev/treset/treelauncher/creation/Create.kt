@@ -17,10 +17,12 @@ import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import dev.treset.treelauncher.backend.data.manifest.SavesComponent
 import dev.treset.treelauncher.backend.util.Status
-import dev.treset.treelauncher.components.get
+import dev.treset.treelauncher.components.saves.get
 import dev.treset.treelauncher.components.mods.ModsCreation
 import dev.treset.treelauncher.components.mods.ModsCreationContent
 import dev.treset.treelauncher.components.mods.get
+import dev.treset.treelauncher.components.options.get
+import dev.treset.treelauncher.components.resourcepacks.get
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.navigation.NavigationContext

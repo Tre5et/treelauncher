@@ -1,11 +1,14 @@
 package dev.treset.treelauncher.backend.data.manifest
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import dev.treset.mcdl.saves.Save
 import dev.treset.mcdl.saves.Server
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.launching.resources.SavesDisplayData
+import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
@@ -22,7 +25,7 @@ class SavesComponent(
     override val includedFiles: MutableDataStateList<String> = appConfig().savesDefaultIncludedFiles.toMutableStateList(),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
     override val active: MutableDataState<Boolean> = mutableStateOf(false),
-    val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
+    override val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type= LauncherManifestType.SAVES_COMPONENT
     @Transient override var expectedType = LauncherManifestType.SAVES_COMPONENT
@@ -47,8 +50,8 @@ class SavesComponent(
 
     fun getDisplayData(gameDataDir: LauncherFile): SavesDisplayData {
         val displayData = SavesDisplayData(
-            saves = mapOf(),
-            servers = listOf(),
+            saves = mutableStateMapOf(),
+            servers = mutableStateListOf(),
             onAdd = { f -> this.onAdd(f, gameDataDir) }
         )
 
@@ -60,23 +63,26 @@ class SavesComponent(
     private fun SavesDisplayData.loadSaves(gameDataDir: LauncherFile) {
         val savesDirectory = LauncherFile.of(getContentDirectory(gameDataDir), "saves")
 
-        saves = savesDirectory.listFiles().mapNotNull {
-            try {
-                Save.get(it) to it
-            } catch (e: IOException) {
-                null
-            }
-        }.toMap()
+        saves.assignFrom(
+            savesDirectory.listFiles().mapNotNull {
+                try {
+                    Save.get(it) to it
+                } catch (e: IOException) {
+                    null
+                }
+            }.toMap()
+        )
     }
 
     private fun SavesDisplayData.loadServers(gameDataDir: LauncherFile) {
         val serverFile = LauncherFile.of(getContentDirectory(gameDataDir), "servers.dat")
 
-        servers = try {
-            Server.getAll(serverFile)
+        try {
+            servers.assignFrom(Server.getAll(serverFile))
         } catch (e: IOException) {
-            emptyList()
+            servers.clear()
         }
+
     }
 
     @Throws(IOException::class)

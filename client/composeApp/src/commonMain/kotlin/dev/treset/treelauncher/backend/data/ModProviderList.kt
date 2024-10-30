@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.components.mods
+package dev.treset.treelauncher.backend.data
 
 import androidx.compose.runtime.mutableStateOf
 import dev.treset.mcdl.mods.ModProvider

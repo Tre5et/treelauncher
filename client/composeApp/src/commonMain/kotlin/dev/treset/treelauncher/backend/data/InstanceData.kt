@@ -6,7 +6,7 @@ import androidx.compose.runtime.toMutableStateList
 import dev.treset.treelauncher.backend.data.manifest.*
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.backend.util.serialization.MutableStateList
+import dev.treset.treelauncher.backend.util.MutableStateList
 
 class InstanceData(
     val mainManifest: MainManifest,

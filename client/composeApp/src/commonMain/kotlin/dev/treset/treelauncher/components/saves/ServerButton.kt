@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.components
+package dev.treset.treelauncher.components.saves
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toComposeImageBitmap

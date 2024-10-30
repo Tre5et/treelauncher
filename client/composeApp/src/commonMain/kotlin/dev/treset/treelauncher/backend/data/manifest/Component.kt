@@ -7,6 +7,7 @@ import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
+import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.time.LocalDateTime
@@ -18,6 +19,7 @@ sealed class Component: Manifest() {
     abstract val includedFiles: MutableDataStateList<String>
     abstract val lastUsed: MutableDataState<String>
     abstract val active: MutableDataState<Boolean>
+    abstract val listDisplay: MutableDataState<ListDisplay?>
 
     var lastUsedTime: LocalDateTime
         get() = try {

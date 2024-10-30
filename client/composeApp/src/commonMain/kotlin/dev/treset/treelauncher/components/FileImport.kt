@@ -43,11 +43,10 @@ fun <T> FileImport(
     addFiles: (List<Pair<T?, LauncherFile>>) -> Unit,
     icon: ImageVector,
     stringPackage: StringsEn.Manager.Component.ImportStrings,
+    filesToAdd: MutableList<LauncherFile>,
     allowFilePicker: Boolean = true,
     allowDirectoryPicker: Boolean = false,
     fileExtensions: List<String> = listOf(),
-    filesToAdd: List<LauncherFile> = emptyList(),
-    clearFilesToAdd: () -> Unit = {},
     close: () -> Unit
 ) {
     FileImport(
@@ -63,7 +62,6 @@ fun <T> FileImport(
         allowDirectoryPicker = allowDirectoryPicker,
         fileExtensions = fileExtensions,
         filesToAdd = filesToAdd,
-        clearFilesToAdd = clearFilesToAdd,
         addFiles = addFiles,
         close = close
     )
@@ -79,11 +77,10 @@ fun <T> FileImport(
     getDisplayName: T.() -> String,
     icon: ImageVector,
     stringPackage: StringsEn.Manager.Component.ImportStrings,
+    filesToAdd: MutableList<LauncherFile>,
     allowFilePicker: Boolean = true,
     allowDirectoryPicker: Boolean = false,
     fileExtensions: List<String> = listOf(),
-    filesToAdd: List<LauncherFile> = emptyList(),
-    clearFilesToAdd: () -> Unit = {},
     addFiles: (List<Pair<T?, LauncherFile>>) -> Unit = {},
     close: () -> Unit
 ) {
@@ -145,7 +142,7 @@ fun <T> FileImport(
                 )
             }
         }
-        clearFilesToAdd()
+        filesToAdd.clear()
     }
 
     Column(

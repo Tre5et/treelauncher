@@ -14,9 +14,9 @@ import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
 import dev.treset.treelauncher.backend.util.sort.LauncherModNameComparator
 import dev.treset.treelauncher.backend.util.sort.Sort
-import dev.treset.treelauncher.components.mods.ModProviderData
-import dev.treset.treelauncher.components.mods.ModProviderList
-import dev.treset.treelauncher.components.mods.deepCopy
+import dev.treset.treelauncher.backend.data.ModProviderData
+import dev.treset.treelauncher.backend.data.ModProviderList
+import dev.treset.treelauncher.backend.data.deepCopy
 import dev.treset.treelauncher.generic.VersionType
 import dev.treset.treelauncher.util.ListDisplay
 import kotlinx.serialization.Serializable
@@ -42,7 +42,7 @@ class ModsComponent(
         LauncherModNameComparator,
         false
     ),
-    val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
+    override val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.MODS_COMPONENT
     @Transient override var expectedType = LauncherManifestType.MODS_COMPONENT
