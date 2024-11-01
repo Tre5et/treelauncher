@@ -47,17 +47,11 @@ class ResourcepackComponent(
         mutableStateOf(listDisplay)
     )
 
-    fun getDisplayData(gameDataDir: LauncherFile): ResourcepacksDisplayData {
-        val displayData = ResourcepacksDisplayData(
-            resourcepacks = mutableStateMapOf(),
-            texturepacks = mutableStateMapOf(),
-            onAddResourcepack = { f -> this.onAddResourcepack(f, gameDataDir) },
-            onAddTexturepack = { f -> this.onAddTexturepack(f, gameDataDir) }
-        )
-
-        displayData.loadResourcepacks(gameDataDir)
-        displayData.loadTexturepacks(gameDataDir)
-        return displayData
+    fun ResourcepacksDisplayData.reload(gameDataDir: LauncherFile) {
+        loadResourcepacks(gameDataDir)
+        loadTexturepacks(gameDataDir)
+        onAddResourcepack.value = { f -> this.onAddResourcepack(f, gameDataDir) }
+        onAddTexturepack.value = { f -> this.onAddTexturepack(f, gameDataDir) }
     }
 
 

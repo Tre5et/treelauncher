@@ -26,7 +26,7 @@ fun SharedResourcepacksData.ResourcepacksDetails() {
 
     val reloadPacks = {
         Thread {
-            displayData = component.getDisplayData(AppContext.files.gameDataDir)
+            with(component) { displayData.reload(AppContext.files.gameDataDir) }
             loading = false
         }.start()
     }

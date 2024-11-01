@@ -8,9 +8,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragData
 import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.manifest.Component
@@ -38,7 +38,7 @@ fun <T: Component, D: SharedComponentData<T>> Components(
     actionBarSpecial: @Composable D.(RowScope) -> Unit = { },
     actionBarBoxContent: @Composable D.(BoxScope) -> Unit = { },
     detailsContent: @Composable D.(ColumnScope) -> Unit = { },
-    detailsOnDrop: (D.(DragData) -> Unit)? = null,
+    detailsOnDrop: (D.(DragData.FilesList) -> Unit)? = null,
     detailsScrollable: D.() -> Boolean = { true },
     settingsDefault: Boolean = false
 ) {
@@ -225,9 +225,17 @@ fun <T: Component, D: SharedComponentData<T>> Components(
                 if(it.settingsOpen.value) {
                     ComponentSettings(it.component)
                 } else {
-                    detailsOnDrop?.let {
-                        DroppableArea(
-                            onDrop = { data -> it(sharedData, data) },
+                    val dropFun = remember(it, detailsOnDrop) {
+                        detailsOnDrop?.let { onDrop ->
+                            { files: DragData.FilesList ->
+                                it.onDrop(files)
+                            }
+                        }
+                    }
+
+                    dropFun?.let { onDrop ->
+                        FilesListDroppableArea(
+                            onDrop = dropFun,
                             modifier = Modifier.fillMaxSize()
                         ) {
                             columnContent()

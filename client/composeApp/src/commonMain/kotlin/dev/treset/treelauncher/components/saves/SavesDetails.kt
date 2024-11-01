@@ -26,7 +26,7 @@ fun SharedSavesData.SavesDetails() {
 
     val reloadSaves: () -> Unit = {
         Thread {
-            displayData = component.getDisplayData(AppContext.files.gameDataDir)
+            with(component) { displayData.reload(AppContext.files.gameDataDir) }
             loading = false
         }.start()
     }
@@ -95,7 +95,7 @@ fun SharedSavesData.SavesDetails() {
                 Strings.selector.saves.worlds(),
                 style = MaterialTheme.typography.titleMedium
             )
-            displayData.saves.forEach {
+            displayData.saves.toMap().forEach {
                 SaveButton(
                     it.key,
                     selectedSave == it.key,

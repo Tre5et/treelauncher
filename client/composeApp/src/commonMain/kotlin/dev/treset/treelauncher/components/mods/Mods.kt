@@ -2,7 +2,6 @@ package dev.treset.treelauncher.components.mods
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -40,12 +39,10 @@ fun Mods() {
         actionBarSpecial = { ModsActionBar() },
         actionBarBoxContent = { ModsBoxContent(it) },
         detailsOnDrop = {
-            if(it is DragData.FilesList) {
-                it.readFiles().firstOrNull()?.let {
-                    droppedFile.value = LauncherFile.of(URI(it).path)
-                    if(editingMod.value == null && !showSearch.value) {
-                        showSearch.value = true
-                    }
+            it.readFiles().firstOrNull()?.let {
+                droppedFile.value = LauncherFile.of(URI(it).path)
+                if(editingMod.value == null && !showSearch.value) {
+                    showSearch.value = true
                 }
             }
         },

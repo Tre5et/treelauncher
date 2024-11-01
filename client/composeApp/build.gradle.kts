@@ -1,4 +1,5 @@
 
+import org.gradle.internal.jvm.Jvm
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
@@ -83,7 +84,7 @@ compose.desktop {
     application {
         mainClass = "dev.treset.treelauncher.MainKt"
 
-        javaHome = "${System.getProperty("user.home")}\\.jdks\\jbr-17.0.11"
+        javaHome = Jvm.current().javaHome.absolutePath
 
         nativeDistributions {
             modules("java.instrument", "java.naming", "java.net.http", "java.sql", "jdk.management", "jdk.unsupported")
@@ -175,7 +176,7 @@ launcherTask(
         }
     }
 ) {
-    val stringsFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/localization/Strings.kt")
+    val stringsFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/localization/StringsEn.kt")
     var found = false
     val stringsLines = stringsFile.readLines()
     stringsFile.writeText(

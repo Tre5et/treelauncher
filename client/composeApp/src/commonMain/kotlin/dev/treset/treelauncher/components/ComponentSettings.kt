@@ -9,19 +9,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
+import java.io.IOException
 import java.net.URI
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -31,19 +32,22 @@ fun ColumnScope.ComponentSettings(
 ) {
     DisposableEffect(component) {
         onDispose {
-            component.write()
+            try {
+                component.write()
+            } catch (e: IOException) {
+                AppContext.error(e)
+            }
         }
     }
 
-    DroppableArea(
+    FilesListDroppableArea(
         onDrop = { data ->
-            if(data is DragData.FilesList) {
-                data.readFiles()
-                    .map { LauncherFile.of(URI(it).path) }
-                    .forEach {
-                        component.includedFiles += PatternString("${it.name}${if (it.isDirectory) "/" else ""}").get()
-                    }
-            }
+            data.readFiles()
+                .map { LauncherFile.of(URI(it).path) }
+                .forEach {
+                    component.includedFiles += PatternString("${it.name}${if (it.isDirectory) "/" else ""}").get()
+                }
+            true
         },
         modifier = Modifier.fillMaxSize()
     ) {

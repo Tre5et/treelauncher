@@ -1,7 +1,9 @@
 package dev.treset.treelauncher.backend.launching.resources
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import dev.treset.mcdl.saves.Save
 import dev.treset.mcdl.saves.Server
 import dev.treset.treelauncher.backend.util.MutableStateList
@@ -12,16 +14,16 @@ import java.io.IOException
 data class SavesDisplayData(
     val saves: MutableStateMap<Save, LauncherFile>,
     val servers: MutableStateList<Server>,
-    private val onAdd: SavesDisplayData.(source: List<LauncherFile>) -> Unit,
+    val onAdd: MutableState<SavesDisplayData.(source: List<LauncherFile>) -> Unit>,
 ) {
     constructor() : this(
         mutableStateMapOf(),
         mutableStateListOf(),
-        { }
+        mutableStateOf({ })
     )
 
     @Throws(IOException::class)
     fun addSaves(source: List<LauncherFile>) {
-        onAdd(source)
+        (this.onAdd.value)(source)
     }
 }

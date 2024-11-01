@@ -1,7 +1,6 @@
 package dev.treset.treelauncher.components.saves
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.DragData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
@@ -46,10 +45,8 @@ fun Saves() {
         actionBarSpecial = { SavesActionBar() },
         actionBarBoxContent = { BoxContent() },
         detailsOnDrop = {
-            if(it is DragData.FilesList) {
-                filesToAdd.assignFrom(it.readFiles().map { LauncherFile.of(URI(it).path) })
-                showAdd.value = true
-            }
+            filesToAdd.assignFrom(it.readFiles().map { LauncherFile.of(URI(it).path) })
+            showAdd.value = true
         },
         detailsScrollable = { displayData.saves.isNotEmpty() || displayData.servers.isNotEmpty() || showAdd.value }
     )

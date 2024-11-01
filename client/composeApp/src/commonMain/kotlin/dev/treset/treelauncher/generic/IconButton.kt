@@ -120,9 +120,7 @@ fun IconButton(
             TooltipBox(
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                 tooltip = {
-                    PlainTooltip(
-                        caretProperties = TooltipDefaults.caretProperties,
-                    ) {
+                    PlainTooltip {
                         Text(it)
                     }
                 },

@@ -195,9 +195,7 @@ fun SharedModsData.ModsActionBar() {
                     TooltipBox(
                         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                         tooltip = {
-                            PlainTooltip(
-                                caretProperties = TooltipDefaults.caretProperties,
-                            ) {
+                            PlainTooltip {
                                 Text(Strings.manager.mods.settings.help())
                             }
                         },

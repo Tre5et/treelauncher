@@ -48,16 +48,10 @@ class SavesComponent(
         mutableStateOf(listDisplay)
     )
 
-    fun getDisplayData(gameDataDir: LauncherFile): SavesDisplayData {
-        val displayData = SavesDisplayData(
-            saves = mutableStateMapOf(),
-            servers = mutableStateListOf(),
-            onAdd = { f -> this.onAdd(f, gameDataDir) }
-        )
-
-        displayData.loadSaves(gameDataDir)
-        displayData.loadServers(gameDataDir)
-        return displayData
+    fun SavesDisplayData.reload(gameDataDir: LauncherFile) {
+        loadSaves(gameDataDir)
+        loadServers(gameDataDir)
+        onAdd.value = { f -> this.onAdd(f, gameDataDir) }
     }
 
     private fun SavesDisplayData.loadSaves(gameDataDir: LauncherFile) {
