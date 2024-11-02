@@ -17,6 +17,7 @@ import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.LauncherModDownload
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.assignFrom
+import dev.treset.treelauncher.backend.util.extractNameVersionFromJarFile
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.Button
 import dev.treset.treelauncher.generic.IconButton
@@ -57,17 +58,10 @@ fun ModsEdit(
     }
 
     LaunchedEffect(tfFile) {
-        if(tfFile != currentFile?.path && tfFile.endsWith(".jar")) {
-            val filePart = tfFile.split("[/\\\\]".toRegex()).last()
-            val firstNum = filePart.indexOfFirst { it.isDigit() }
-            if(firstNum >= -1) {
-                for(i in firstNum downTo 0) {
-                    if(filePart[i] == '-' || filePart[i] == '_' || filePart[i] == ' ') {
-                        tfVersion = filePart.substring(i + 1, filePart.length - 4)
-                        break
-                    }
-                }
-            }
+        if(tfFile != currentFile?.path) {
+            try {
+                tfVersion = tfFile.extractNameVersionFromJarFile().second
+            } catch (_: IllegalArgumentException) {}
         }
     }
 

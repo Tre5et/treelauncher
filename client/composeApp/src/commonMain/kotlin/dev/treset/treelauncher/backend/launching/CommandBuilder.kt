@@ -8,6 +8,7 @@ import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.QuickPlayData
 import dev.treset.treelauncher.backend.util.exception.GameCommandException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.backend.util.libraryContained
 import dev.treset.treelauncher.localization.Strings
 import java.io.File
 
@@ -66,7 +67,10 @@ class CommandBuilder(
         for (v in instanceData.versionComponents) {
             for (l in v.libraries) {
                 val library = LauncherFile.of(instanceData.librariesDir, l).absolutePath
-                if(libraries.any { it == library }) continue
+                if(l.libraryContained(libraries)) {
+                    LOGGER.debug { "Skipping declared library $l because another version is already present" }
+                    continue
+                }
                 libraries.add(library)
             }
         }
