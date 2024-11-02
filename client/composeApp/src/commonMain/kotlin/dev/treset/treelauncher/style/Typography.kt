@@ -2,39 +2,40 @@ package dev.treset.treelauncher.style
 
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.Font
+import treelauncher.composeapp.generated.resources.*
 
-val Exo2Font = FontFamily(
-    Font("font/Exo2/Exo2-ExtraBold.ttf", FontWeight.ExtraBold),
-    Font("font/Exo2/Exo2-ExtraBoldItalic.ttf", FontWeight.ExtraBold, FontStyle.Italic),
-    Font("font/Exo2/Exo2-ExtraLight.ttf", FontWeight.ExtraLight),
-    Font("font/Exo2/Exo2-ExtraLightItalic.ttf", FontWeight.ExtraLight, FontStyle.Italic),
-    Font("font/Exo2/Exo2-Italic.ttf", FontWeight.Normal, FontStyle.Italic),
-    Font("font/Exo2/Exo2-Light.ttf", FontWeight.Light),
-    Font("font/Exo2/Exo2-LightItalic.ttf", FontWeight.Light, FontStyle.Italic),
-    Font("font/Exo2/Exo2-Medium.ttf", FontWeight.Medium),
-    Font("font/Exo2/Exo2-MediumItalic.ttf", FontWeight.Medium, FontStyle.Italic),
-    Font("font/Exo2/Exo2-Regular.ttf", FontWeight.Normal),
-    Font("font/Exo2/Exo2-SemiBold.ttf", FontWeight.SemiBold),
-    Font("font/Exo2/Exo2-SemiBoldItalic.ttf", FontWeight.SemiBold, FontStyle.Italic),
-    Font("font/Exo2/Exo2-Thin.ttf", FontWeight.Thin),
-    Font("font/Exo2/Exo2-ThinItalic.ttf", FontWeight.Thin, FontStyle.Italic),
+val Exo2Font: FontFamily
+    @Composable get() = FontFamily(
+    Font(Res.font.Exo2_ExtraBold, FontWeight.ExtraBold),
+    Font(Res.font.Exo2_ExtraBoldItalic, FontWeight.ExtraBold, FontStyle.Italic),
+    Font(Res.font.Exo2_ExtraLight, FontWeight.ExtraLight),
+    Font(Res.font.Exo2_ExtraLightItalic, FontWeight.ExtraLight, FontStyle.Italic),
+    Font(Res.font.Exo2_Italic, FontWeight.Normal, FontStyle.Italic),
+    Font(Res.font.Exo2_Light, FontWeight.Light),
+    Font(Res.font.Exo2_LightItalic, FontWeight.Light, FontStyle.Italic),
+    Font(Res.font.Exo2_Medium, FontWeight.Medium),
+    Font(Res.font.Exo2_MediumItalic, FontWeight.Medium, FontStyle.Italic),
+    Font(Res.font.Exo2_Regular, FontWeight.Normal),
+    Font(Res.font.Exo2_SemiBold, FontWeight.SemiBold),
+    Font(Res.font.Exo2_SemiBoldItalic, FontWeight.SemiBold, FontStyle.Italic),
+    Font(Res.font.Exo2_Thin, FontWeight.Thin),
+    Font(Res.font.Exo2_ThinItalic, FontWeight.Thin, FontStyle.Italic),
 )
 
-val GgSansFont = FontFamily(
-    Font("font/GgSans/GgSans-SemiBold.ttf", FontWeight.SemiBold),
-    Font("font/GgSans/GgSans-Regular.ttf", FontWeight.Normal),
+val GgSansFont: FontFamily
+    @Composable get() = FontFamily(
+    Font(Res.font.GgSans_SemiBold, FontWeight.SemiBold),
+    Font(Res.font.GgSans_Regular, FontWeight.Normal),
 )
 
 @Composable
-fun typography() = rememberSaveable {
-    Typography(
+fun typography() = Typography(
         titleLarge = TextStyle(
             fontFamily = Exo2Font,
             fontWeight = FontWeight.SemiBold,
@@ -68,4 +69,3 @@ fun typography() = rememberSaveable {
             fontStyle = FontStyle.Italic,
         )
     )
-}

@@ -6,13 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import dev.treset.mcdl.resourcepacks.Texturepack
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.ListDisplay
+import org.jetbrains.compose.resources.imageResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.default_pack
 
 @Composable
 fun TexturepackButton(
@@ -22,7 +23,7 @@ fun TexturepackButton(
 ) {
     var showDeleteDialog by remember(texturepack) { mutableStateOf(false) }
 
-    val image = texturepack.image?.toComposeImageBitmap() ?: useResource("img/default_pack.png") { loadImageBitmap(it) }
+    val image = texturepack.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_pack)
 
     when(display) {
         ListDisplay.FULL -> ImageSelectorButton(

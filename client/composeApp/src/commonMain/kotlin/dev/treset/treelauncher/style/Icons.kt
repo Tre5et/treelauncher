@@ -10,8 +10,13 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import dev.treset.treelauncher.backend.util.ModProviderStatus
+import org.jetbrains.compose.resources.painterResource
+import treelauncher.composeapp.generated.resources.*
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.github
+import treelauncher.composeapp.generated.resources.modrinth
+import treelauncher.composeapp.generated.resources.play_arrow_scaled
 
 fun icons() = dev.treset.treelauncher.style.Icons
 
@@ -30,9 +35,9 @@ object Icons {
     val start = Icons.Rounded.PlayArrow
     val logout = Icons.AutoMirrored.Rounded.Logout
     val update = Icons.Rounded.Download
-    val gitHub: Painter @Composable get() = painterResource("icons/github.svg")
+    val gitHub: Painter @Composable get() = painterResource(Res.drawable.github)
     val sort = Icons.Rounded.SwapVert
-    val play: Painter @Composable get() = painterResource("icons/play_arrow_scaled.svg")
+    val play: Painter @Composable get() = painterResource(Res.drawable.play_arrow_scaled)
     val edit = Icons.Rounded.Edit
     val folder = Icons.Rounded.Folder
     val file = Icons.AutoMirrored.Rounded.InsertDriveFile
@@ -46,8 +51,8 @@ object Icons {
     val enabled = { enabled: Boolean -> if (enabled) disable else enable }
     val browser = Icons.Rounded.OpenInBrowser
     val search = Icons.Rounded.Search
-    val modrinth: Painter @Composable get() = painterResource("icons/modrinth.svg")
-    val curseforge: Painter @Composable get() = painterResource("icons/curseforge.svg")
+    val modrinth: Painter @Composable get() = painterResource(Res.drawable.modrinth)
+    val curseforge: Painter @Composable get() = painterResource(Res.drawable.curseforge)
     val selectFile = Icons.Rounded.FileOpen
     val news = Icons.Rounded.Newspaper
     val expand = Icons.Rounded.ExpandMore

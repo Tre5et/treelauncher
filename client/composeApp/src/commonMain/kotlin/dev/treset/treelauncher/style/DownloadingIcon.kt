@@ -11,8 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.downloading_inside
+import treelauncher.composeapp.generated.resources.downloading_outside
 
 @Composable
 fun DownloadingIcon(
@@ -20,8 +23,8 @@ fun DownloadingIcon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current
 ) {
-    val inside = painterResource("icons/downloading/inside.svg")
-    val outside = painterResource("icons/downloading/outside.svg")
+    val inside = painterResource(Res.drawable.downloading_inside)
+    val outside = painterResource(Res.drawable.downloading_outside)
 
     val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
     val rotate by infiniteTransition.animateFloat(

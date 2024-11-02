@@ -2,12 +2,13 @@ package dev.treset.treelauncher.components.saves
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import dev.treset.mcdl.saves.Server
 import dev.treset.treelauncher.generic.CompactSelectorButton
 import dev.treset.treelauncher.generic.ImageSelectorButton
 import dev.treset.treelauncher.util.ListDisplay
+import org.jetbrains.compose.resources.imageResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.default_save
 
 @Composable
 fun ServerButton(
@@ -20,7 +21,7 @@ fun ServerButton(
         ListDisplay.FULL -> ImageSelectorButton(
             selected = selected,
             onClick = onClick,
-            image = server.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) },
+            image = server.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_save),
             title = server.name,
             subtitle = server.ip
         )
@@ -29,7 +30,7 @@ fun ServerButton(
             selected = selected,
             onClick = onClick,
             title = server.name,
-            image = server.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) },
+            image = server.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_save),
             subtitle = server.ip
         )
 

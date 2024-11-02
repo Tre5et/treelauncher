@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,6 +24,9 @@ import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.DownloadingIcon
 import dev.treset.treelauncher.style.icons
+import org.jetbrains.compose.resources.painterResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.default_mod
 
 @Composable
 fun ModDataDisplay.ModSearchButton(
@@ -51,7 +53,7 @@ fun ModDataDisplay.ModSearchButton(
                     .size(72.dp)
             ) {
                 Image(
-                    image.value ?: painterResource("img/default_mod.png"),
+                    image.value ?: painterResource(Res.drawable.default_mod),
                     "Mod Icon",
                     modifier = Modifier
                         .fillMaxSize()

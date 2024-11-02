@@ -8,9 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -31,6 +28,9 @@ import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jetbrains.compose.resources.painterResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.icon
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -98,7 +98,7 @@ fun ApplicationScope.ConfigLoader(
             onCloseRequest = ::exitApplication,
             title = "TreeLauncher - Setup",
             state = windowState,
-            icon = BitmapPainter(useResource("icon_default.png", ::loadImageBitmap)),
+            icon = painterResource(Res.drawable.icon),
             visible = initializing || requiresPath
         ) {
             if (initializing) {

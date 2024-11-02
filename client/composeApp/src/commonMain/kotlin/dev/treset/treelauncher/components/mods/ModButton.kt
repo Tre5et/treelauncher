@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -30,6 +29,9 @@ import dev.treset.treelauncher.style.DownloadingIcon
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.ListDisplay
+import org.jetbrains.compose.resources.painterResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.default_mod
 
 @Composable
 fun LauncherMod.ModButton(
@@ -76,7 +78,7 @@ fun LauncherMod.ModButton(
                         .size(72.dp)
                 ) {
                     Image(
-                        image.value ?: painterResource("img/default_mod.png"),
+                        image.value ?: painterResource(Res.drawable.default_mod),
                         "Mod Icon",
                         modifier = Modifier
                             .fillMaxSize()
@@ -220,7 +222,7 @@ fun LauncherMod.ModButton(
                         .padding(3.dp)
                 ) {
                     Image(
-                        image.value ?: painterResource("img/default_mod.png"),
+                        image.value ?: painterResource(Res.drawable.default_mod),
                         "Icon",
                         modifier = Modifier.size(58.dp)
                     )

@@ -11,10 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
@@ -33,6 +30,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.intui.standalone.theme.darkThemeDefinition
@@ -42,6 +40,8 @@ import org.jetbrains.jewel.ui.ComponentStyling
 import org.jetbrains.jewel.window.DecoratedWindow
 import org.jetbrains.jewel.window.TitleBar
 import org.jetbrains.jewel.window.newFullscreenControls
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.icon
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
@@ -107,7 +107,7 @@ fun main() = application {
                 onCloseRequest = { app().exit() },
                 title = Strings.launcher.name(),
                 state = windowState,
-                icon = BitmapPainter(useResource("icon_default.png", ::loadImageBitmap)),
+                icon = painterResource(Res.drawable.icon)
             ) {
                 window.minimumSize = with(LocalDensity.current) {
                     Dimension(200.dp.toPx().roundToInt(), 100.dp.toPx().roundToInt())
@@ -168,10 +168,6 @@ fun main() = application {
             }
         }
     }
-}
-
-fun ensureSessionLock() {
-
 }
 
 actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {

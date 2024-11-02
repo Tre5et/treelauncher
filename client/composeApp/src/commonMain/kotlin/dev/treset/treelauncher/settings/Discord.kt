@@ -15,8 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +29,9 @@ import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.GgSansFont
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.disabledContent
+import org.jetbrains.compose.resources.imageResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.minecraft_logo
 
 @Composable
 fun Discord() {
@@ -140,7 +141,7 @@ fun Discord() {
                             .padding(12.dp)
                     ) {
                         Image(
-                            useResource("img/minecraft_logo.png") { loadImageBitmap(it) },
+                            imageResource(Res.drawable.minecraft_logo),
                             "Minecraft logo",
                             modifier = Modifier
                                 .size(64.dp)

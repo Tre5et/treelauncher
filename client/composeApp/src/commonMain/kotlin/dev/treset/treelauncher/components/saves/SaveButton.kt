@@ -6,13 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.ListDisplay
+import org.jetbrains.compose.resources.imageResource
+import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.default_save
 
 @Composable
 fun SaveButton(
@@ -24,7 +25,7 @@ fun SaveButton(
 ) {
     var showDeleteDialog by remember(save) { mutableStateOf(false) }
 
-    val image = save.image?.toComposeImageBitmap() ?: useResource("img/default_save.png") { loadImageBitmap(it) }
+    val image = save.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_save)
 
     when(display) {
         ListDisplay.FULL -> ImageSelectorButton(
