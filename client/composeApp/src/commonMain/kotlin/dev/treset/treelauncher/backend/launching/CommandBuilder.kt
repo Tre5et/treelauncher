@@ -3,8 +3,8 @@ package dev.treset.treelauncher.backend.launching
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.auth.data.UserData
 import dev.treset.treelauncher.backend.config.AppSettings
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.QuickPlayData
 import dev.treset.treelauncher.backend.util.exception.GameCommandException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -31,18 +31,18 @@ class CommandContext(
 
 class CommandBuilder(
     var processBuilder: ProcessBuilder,
-    private var instanceData: InstanceData,
+    private var instance: InstanceComponent,
     var offline: Boolean,
     var minecraftUser: UserData?,
     private var quickPlayData: QuickPlayData?
 ) {
     @Throws(GameCommandException::class)
     fun makeStartCommand() {
-        if (instanceData.versionComponents.isEmpty()) {
+        if (instance.versionComponents.value.isEmpty()) {
             throw GameCommandException("Unable to create start command: no version available")
         }
         var assetsIndex: String? = null
-        for (v in instanceData.versionComponents) {
+        for (v in instance.versionComponents.value) {
             if (!v.assets.value.isNullOrBlank()) {
                 assetsIndex = v.assets.value
                 break
@@ -53,7 +53,7 @@ class CommandBuilder(
         }
 
         var mainClass: String? = null
-        for (v in instanceData.versionComponents) {
+        for (v in instance.versionComponents.value) {
             if (v.mainClass.value.isNotBlank()) {
                 mainClass = v.mainClass.value
                 break
@@ -64,9 +64,9 @@ class CommandBuilder(
         }
 
         val libraries: MutableList<String> = mutableListOf()
-        for (v in instanceData.versionComponents) {
+        for (v in instance.versionComponents.value) {
             for (l in v.libraries) {
-                val library = LauncherFile.of(instanceData.librariesDir, l).absolutePath
+                val library = LauncherFile.of(instance.librariesDir, l).absolutePath
                 if(l.libraryContained(libraries)) {
                     LOGGER.debug { "Skipping declared library $l because another version is already present" }
                     continue
@@ -78,26 +78,26 @@ class CommandBuilder(
             throw GameCommandException("Unable to create start command: unable to determine libraries")
         }
 
-        for (v in instanceData.versionComponents) {
+        for (v in instance.versionComponents.value) {
             if (!v.mainFile.value.isNullOrBlank()) {
                 libraries.add(LauncherFile.of(v.directory, v.mainFile.value!!).absolutePath)
             }
         }
 
         val natives: MutableList<String> = mutableListOf()
-        for(v in instanceData.versionComponents) {
+        for(v in instance.versionComponents.value) {
             if(!v.natives.value.isNullOrBlank()) {
                 natives.add(LauncherFile.of(v.directory, v.natives.value!!).absolutePath)
             }
         }
         if(natives.isEmpty()) {
-            natives.add(LauncherFile.of(instanceData.javaComponent.value.directory, "libs").absolutePath)
+            natives.add(LauncherFile.of(instance.javaComponent.value.directory, "libs").absolutePath)
         }
         val nativesDir = natives.joinToString(File.pathSeparator)
 
         var resX: String? = null
         var resY: String? = null
-        for (f in instanceData.instance.features) {
+        for (f in instance.features) {
             if (f.feature == "resolution_x") {
                 resX = f.value
             }
@@ -105,17 +105,17 @@ class CommandBuilder(
                 resY = f.value
             }
         }
-        val gameDir: LauncherFile = instanceData.gameDataDir
+        val gameDir: LauncherFile = instance.gameDataDir
         if (!gameDir.isDirectory()) {
             throw GameCommandException("Unable to create start command: game directory is not a directory: directory=${gameDir.absolutePath}")
         }
 
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
-        processBuilder.command().add(LauncherFile.of(instanceData.javaComponent.value.directory, "bin", "java").path)
+        processBuilder.command().add(LauncherFile.of(instance.javaComponent.value.directory, "bin", "java").path)
 
-        val jvmArgs = instanceData.instance.jvmArguments.toMutableList()
-        for(v in instanceData.versionComponents) {
+        val jvmArgs = instance.jvmArguments.toMutableList()
+        for(v in instance.versionComponents.value) {
             v.jvmArguments.forEach {
                 if(!jvmArgs.contains(it)) {
                     jvmArgs.add(it)
@@ -124,7 +124,7 @@ class CommandBuilder(
         }
 
         val gameArgs = mutableListOf<LauncherLaunchArgument>()
-        for(v in instanceData.versionComponents) {
+        for(v in instance.versionComponents.value) {
             v.gameArguments.forEach {
                 if(!gameArgs.contains(it)) {
                     gameArgs.add(it)
@@ -137,15 +137,15 @@ class CommandBuilder(
         val context = CommandContext(
             offline,
             minecraftUser,
-            instanceData.gameDataDir.absolutePath,
-            instanceData.resourcepacksComponent.value.directory.absolutePath,
-            instanceData.assetsDir.absolutePath,
+            instance.gameDataDir.absolutePath,
+            instance.resourcepacksComponent.value.directory.absolutePath,
+            instance.assetsDir.absolutePath,
             assetsIndex,
             libraries,
-            instanceData.librariesDir.absolutePath,
+            instance.librariesDir.absolutePath,
             nativesDir,
-            Strings.game.versionName(instanceData),
-            Strings.game.versionType(instanceData),
+            Strings.game.versionName(instance),
+            Strings.game.versionType(instance),
             resX,
             resY,
             quickPlayData
@@ -160,7 +160,7 @@ class CommandBuilder(
         } catch (e: GameCommandException) {
             throw GameCommandException("Unable to create start command: unable to append arguments", e)
         }
-        LOGGER.info { "Created start command, instance=${instanceData.instance.id}" }
+        LOGGER.info { "Created start command, instance=${instance.id}" }
     }
 
     @Throws(GameCommandException::class)
@@ -193,7 +193,7 @@ class CommandBuilder(
         a: LauncherLaunchArgument,
         context: CommandContext
     ) {
-        if (a.isActive(instanceData.instance.features)) {
+        if (a.isActive(instance.features)) {
             val replacements: MutableMap<String, String> = mutableMapOf()
             val exceptionQueue: MutableList<GameCommandException> = mutableListOf()
             for (r in a.replacementValues) {

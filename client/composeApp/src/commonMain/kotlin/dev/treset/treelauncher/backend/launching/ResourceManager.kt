@@ -1,20 +1,21 @@
 package dev.treset.treelauncher.backend.launching
 
+import dev.treset.treelauncher.AppContext
 import io.github.oshai.kotlinlogging.KotlinLogging
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.manifest.Component
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.exception.GameResourceException
 import java.io.IOException
 import java.time.LocalDateTime
 import java.util.*
 
-class ResourceManager(private var instanceData: InstanceData) {
+class ResourceManager(private var instanceData: InstanceComponent) {
 
     @Throws(IOException::class)
     fun prepareResources() {
         try {
-            instanceData.mainManifest.activeInstance.value = instanceData.instance.id.value
-            instanceData.mainManifest.write()
+            AppContext.files.mainManifest.activeInstance.value = instanceData.id.value
+            AppContext.files.mainManifest.write()
         } catch (e: IOException) {
             throw IOException("Failed to prepare resources: unable to set instance active", e)
         }
@@ -25,18 +26,18 @@ class ResourceManager(private var instanceData: InstanceData) {
                     instanceData.modsComponent.value ?: return,
                     instanceData.resourcepacksComponent.value ,
                     instanceData.optionsComponent.value,
-                    instanceData.instance
+                    instanceData
                 )
             )
         } catch (e: GameResourceException) {
             throw GameResourceException("Unable to prepare game resources", e)
         }
-        LOGGER.info {"Prepared resources for launch, instance=${instanceData.instance.id}"}
+        LOGGER.info {"Prepared resources for launch, instance=${instanceData.id.value}"}
     }
 
     @Throws(IOException::class)
     fun cleanupResources() {
-        LOGGER.debug { "Cleaning up game files: instance=${instanceData.instance.id}" }
+        LOGGER.debug { "Cleaning up game files: instance=${instanceData.id.value}" }
         try {
             cleanComponents(
                 arrayOf(
@@ -44,15 +45,15 @@ class ResourceManager(private var instanceData: InstanceData) {
                     instanceData.modsComponent.value ?: return,
                     instanceData.resourcepacksComponent.value,
                     instanceData.optionsComponent.value,
-                    instanceData.instance
+                    instanceData
                 )
             )
         } catch (e: GameResourceException) {
             throw GameResourceException("Unable to cleanup game files", e)
         }
         try {
-            instanceData.mainManifest.activeInstance.value = null
-            instanceData.mainManifest.write()
+            AppContext.files.mainManifest.activeInstance.value = null
+            AppContext.files.mainManifest.write()
         } catch (e: IOException) {
             throw GameResourceException("Unable to cleanup game files: unable to set instance inactive", e)
         }
@@ -61,32 +62,32 @@ class ResourceManager(private var instanceData: InstanceData) {
 
     @Throws(IOException::class)
     fun setLastPlayedTime() {
-        LOGGER.debug { "Setting last played time: instance=${instanceData.instance.id}" }
+        LOGGER.debug { "Setting last played time: instance=${instanceData.id.value}" }
         val time = LocalDateTime.now()
-        instanceData.instance.lastUsedTime = time
+        instanceData.lastUsedTime = time
         instanceData.savesComponent.value.lastUsedTime = time
         instanceData.resourcepacksComponent.value.lastUsedTime = time
         instanceData.optionsComponent.value.lastUsedTime = time
         instanceData.modsComponent.value?.lastUsedTime = time
         instanceData.javaComponent.value.lastUsedTime = time
-        instanceData.versionComponents.forEach { it.lastUsedTime = time }
-        instanceData.instance.write()
+        instanceData.versionComponents.value.forEach { it.lastUsedTime = time }
+        instanceData.write()
         instanceData.savesComponent.value.write()
         instanceData.resourcepacksComponent.value.write()
         instanceData.optionsComponent.value.write()
         instanceData.modsComponent.value?.write()
         instanceData.javaComponent.value.write()
-        instanceData.versionComponents.forEach { it.write() }
-        LOGGER.debug { "Set last played time: instance=${instanceData.instance.id}" }
+        instanceData.versionComponents.value.forEach { it.write() }
+        LOGGER.debug { "Set last played time: instance=${instanceData.id.value}" }
     }
 
     @Throws(IOException::class)
     fun addPlayDuration(duration: Long) {
-        LOGGER.debug { "Adding play duration: instance=${instanceData.instance.id}, duration=$duration" }
+        LOGGER.debug { "Adding play duration: instance=${instanceData.id.value}, duration=$duration" }
 
-        instanceData.instance.totalTime.value += duration
-        instanceData.instance.write()
-        LOGGER.debug { "Added play duration: instance=${instanceData.instance.id}, duration=$duration, totalTime=${instanceData.instance.totalTime}" }
+        instanceData.totalTime.value += duration
+        instanceData.write()
+        LOGGER.debug { "Added play duration: instance=${instanceData.id.value}, duration=$duration, totalTime=${instanceData.totalTime.value}" }
     }
 
     @Throws(IOException::class)

@@ -9,9 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.launching.GameLauncher
-import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.components.FileImport
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
@@ -148,20 +146,13 @@ fun SharedSavesData.SavesDetails() {
             component = component,
             quickPlayData = it,
             onClose = { quickPlayData.value = null }
-        ) { playData, instance ->
-            val instanceData = try {
-                InstanceData.of(instance, AppContext.files)
-            } catch (e: FileLoadException) {
-                AppContext.severeError(e)
-                return@PlayPopup
-            }
-
+        ) { quickPlay, instance ->
             val launcher = GameLauncher(
-                instanceData,
+                instance,
                 AppContext.files,
                 LoginContext.isOffline(),
                 LoginContext.userAuth.minecraftUser,
-                playData
+                quickPlay
             )
 
             quickPlayData.value = null

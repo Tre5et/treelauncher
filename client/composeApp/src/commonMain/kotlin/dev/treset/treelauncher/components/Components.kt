@@ -18,6 +18,7 @@ import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.sort.ComponentSortProviders
+import dev.treset.treelauncher.backend.util.sort.SortProvider
 import dev.treset.treelauncher.backend.util.sort.sorted
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
@@ -31,15 +32,27 @@ fun <T: Component, D: SharedComponentData<T>> Components(
     components: MutableList<T>,
     componentManifest: ParentManifest,
     checkHasComponent: (InstanceComponent, T) -> Boolean,
-    isEnabled: T.() -> Boolean = {true},
+    isEnabled: T.() -> Boolean = { true },
     reload: () -> Unit,
     constructSharedData: (T, () -> Unit) -> D,
-    createContent: @Composable ColumnScope.(onDone: () -> Unit) -> Unit,
+    createContent: (@Composable ColumnScope.(onDone: () -> Unit) -> Unit)? = null,
     actionBarSpecial: @Composable D.(RowScope) -> Unit = { },
     actionBarBoxContent: @Composable D.(BoxScope) -> Unit = { },
+    actionBarFraction: Float = 1f,
     detailsContent: @Composable D.(ColumnScope) -> Unit = { },
     detailsOnDrop: (D.(DragData.FilesList) -> Unit)? = null,
     detailsScrollable: D.() -> Boolean = { true },
+    selectorButton: @Composable (component: T, selected: Boolean, enabled: Boolean, onSelect: () -> Unit) -> Unit = { component, selected, enabled, onSelect ->
+        ComponentButton(
+            component = component,
+            selected = selected,
+            enabled = enabled,
+            onClick = onSelect
+        )
+    },
+    selectorFraction: Float = 1/2f,
+    sorts: List<SortProvider<Component>> = ComponentSortProviders,
+    allowSettings: Boolean = true,
     settingsDefault: Boolean = false
 ) {
     @Suppress("NAME_SHADOWING")
@@ -71,19 +84,18 @@ fun <T: Component, D: SharedComponentData<T>> Components(
     Row(
         modifier = Modifier.fillMaxWidth(),
     ) {
-
         TitledColumn(
             headerContent = {
                 Text(title)
 
                 SortBox(
-                    sorts = ComponentSortProviders,
+                    sorts = sorts,
                     sort = componentManifest.sort,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )
             },
             modifier = Modifier.padding(12.dp),
-            parentModifier = Modifier.fillMaxWidth(1 / 2f),
+            parentModifier = Modifier.fillMaxWidth(selectorFraction),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             scrollable = false,
         ) {
@@ -95,32 +107,33 @@ fun <T: Component, D: SharedComponentData<T>> Components(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(actualComponents) { component ->
-                        ComponentButton(
-                            component = component,
-                            selected = component == selected,
-                            enabled = component.isEnabled(),
-                            onClick = {
-                                creatorSelected = false
-                                selected = if(component == selected) {
-                                    null
-                                } else {
-                                    component
-                                }
+                        selectorButton(
+                            component,
+                            component == selected,
+                            component.isEnabled()
+                        ) {
+                            creatorSelected = false
+                            selected = if (component == selected) {
+                                null
+                            } else {
+                                component
                             }
-                        )
+                        }
                     }
                 }
             }
 
-            SelectorButton(
-                title = Strings.components.create(),
-                icon = icons().add,
-                selected = creatorSelected,
-                onClick = {
-                    selected = null
-                    creatorSelected = !creatorSelected
-                }
-            )
+            createContent?.let {
+                SelectorButton(
+                    title = Strings.components.create(),
+                    icon = icons().add,
+                    selected = creatorSelected,
+                    onClick = {
+                        selected = null
+                        creatorSelected = !creatorSelected
+                    }
+                )
+            }
         }
 
         sharedData?.let {
@@ -155,7 +168,10 @@ fun <T: Component, D: SharedComponentData<T>> Components(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .fillMaxWidth(actionBarFraction)
                     ) {
                         sharedData.actionBarSpecial(this)
 
@@ -213,16 +229,19 @@ fun <T: Component, D: SharedComponentData<T>> Components(
                             sharedData.detailsContent(this)
                         }
 
-                        SelectorButton(
-                            title = Strings.manager.component.settings(),
-                            icon = icons().settings,
-                            selected = it.settingsOpen.value,
-                            onClick = { it.settingsOpen.value = true }
-                        )
+                        if(allowSettings) {
+                            SelectorButton(
+                                title = Strings.manager.component.settings(),
+                                icon = icons().settings,
+                                selected = it.settingsOpen.value,
+                                onClick = { it.settingsOpen.value = true }
+                            )
+                        }
                     }
                 }
 
-                if(it.settingsOpen.value) {
+
+                if(allowSettings && it.settingsOpen.value) {
                     ComponentSettings(it.component)
                 } else {
                     val dropFun = remember(it, detailsOnDrop) {
@@ -282,16 +301,18 @@ fun <T: Component, D: SharedComponentData<T>> Components(
 
         }
 
-        if(creatorSelected) {
-            TitledColumn(
-                title = Strings.components.create(),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(12.dp)
-            ) {
-                createContent {
-                    reload()
-                    creatorSelected = false
+        createContent?.let {
+            if (creatorSelected) {
+                TitledColumn(
+                    title = Strings.components.create(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    createContent {
+                        reload()
+                        creatorSelected = false
+                    }
                 }
             }
         }

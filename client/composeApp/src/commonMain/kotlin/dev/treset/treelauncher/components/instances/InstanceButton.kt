@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.instances
+package dev.treset.treelauncher.components.instances
 
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import dev.treset.treelauncher.backend.data.InstanceData
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.generic.SelectorButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
@@ -20,7 +20,7 @@ import dev.treset.treelauncher.style.icons
 
 @Composable
 fun InstanceButton(
-    instance: InstanceData,
+    component: InstanceComponent,
     selected: Boolean,
     enabled: Boolean = true,
     onClick: () -> Unit
@@ -34,10 +34,10 @@ fun InstanceButton(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                instance.instance.name.value,
+                component.name.value,
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(instance.versionComponents[0].name.value)
+            Text(component.versionComponents.value[0].name.value)
         }
 
         val interactionSource = remember { MutableInteractionSource() }
@@ -51,9 +51,9 @@ fun InstanceButton(
 
             Text(
                 if(hovered) {
-                    Strings.units.accurateTime(instance.instance.totalTime.value)
+                    Strings.units.accurateTime(component.totalTime.value)
                 } else {
-                    Strings.units.approxTime(instance.instance.totalTime.value)
+                    Strings.units.approxTime(component.totalTime.value)
                 }
             )
             Icon(

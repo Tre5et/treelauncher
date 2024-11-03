@@ -234,7 +234,7 @@ class LauncherFile(pathname: String) : File(pathname) {
         if (desktop != null && desktop.isSupported(Desktop.Action.OPEN)) {
             try {
                 desktop.open(this)
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 LOGGER.warn(e) { "Failed to open file: $this" }
             }
         }

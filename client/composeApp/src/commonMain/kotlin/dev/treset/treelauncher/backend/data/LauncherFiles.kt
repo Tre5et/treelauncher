@@ -59,11 +59,11 @@ open class LauncherFiles {
         reloadMain()
         reloadMods()
         reloadSaves()
-        reloadInstances()
         reloadJavas()
         reloadOptions()
         reloadResourcepacks()
         reloadVersions()
+        reloadInstances()
         LOGGER.debug { "Finished reloading all components" }
     }
 
@@ -220,8 +220,8 @@ open class LauncherFiles {
         LOGGER.debug { "Checking for used versions..." }
         val usedVersions: MutableList<String> = mutableListOf()
         for (instance in instanceComponents) {
-            usedVersions.add(instance.versionComponent.value)
-            LOGGER.debug { "Used version: ${instance.versionComponent.value}" }
+            usedVersions.add(instance.versionId.value)
+            LOGGER.debug { "Used version: ${instance.versionId.value}" }
         }
 
         var newFound: Boolean

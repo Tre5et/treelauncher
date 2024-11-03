@@ -1,4 +1,4 @@
-package dev.treset.treelauncher.instances
+package dev.treset.treelauncher.components.instances
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,16 +14,15 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.sun.management.OperatingSystemMXBean
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TextBox
-import dev.treset.treelauncher.generic.TitledColumn
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import java.io.BufferedReader
@@ -33,26 +32,34 @@ import java.lang.management.ManagementFactory
 import java.util.stream.Collectors
 
 @Composable
-fun InstanceSettings(
-    instance: InstanceData
-) {
-    var startMemory: Int? = remember(instance) { null }
+fun SharedInstanceData.InstanceSettings() {
+    var startMemory: Int? = remember(component) { null }
     var memory by remember(startMemory) {
         mutableStateOf(startMemory)
     }
 
-    val startRes = remember(instance) { getResolution(instance) }
-    var res by remember(instance) { mutableStateOf(startRes) }
+    val startRes = remember(component) { getResolution(component) }
+    var res by remember(component) { mutableStateOf(startRes) }
 
-    val startArgs = remember { instance.instance.jvmArguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
+    val startArgs = remember { component.jvmArguments.filter { !it.argument.startsWith("-Xmx") && !it.argument.startsWith("-Xms") } }
     var args by remember { mutableStateOf(startArgs) }
 
     var systemMemory: Int? by remember { mutableStateOf(null) }
 
-    DisposableEffect(instance) {
+    DisposableEffect(Unit) {
+        headerContent.value = {
+            Text(Strings.manager.instance.settings.title())
+        }
+
+        onDispose {
+            headerContent.value = {}
+        }
+    }
+
+    DisposableEffect(component) {
         Thread {
             try {
-                startMemory = getCurrentMemory(instance)
+                startMemory = getCurrentMemory(component)
                 memory = startMemory
             } catch(e: IOException) {
                 AppContext.error(e)
@@ -68,7 +75,7 @@ fun InstanceSettings(
                 startMemory?.let { startMem ->
                     try {
                         save(
-                            instance,
+                            component,
                             mem,
                             startMem,
                             res,
@@ -84,8 +91,8 @@ fun InstanceSettings(
         }
     }
 
-    TitledColumn(
-        title = Strings.manager.instance.settings.title(),
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Column(
@@ -235,8 +242,8 @@ fun InstanceSettings(
 }
 
 @Throws(IOException::class)
-private fun getCurrentMemory(instance: InstanceData): Int {
-    for (argument in instance.instance.jvmArguments) {
+private fun getCurrentMemory(instance: InstanceComponent): Int {
+    for (argument in instance.jvmArguments) {
         if ((argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) && argument.argument.endsWith("m")
         ) {
             try {
@@ -271,22 +278,22 @@ private fun getSystemMemory(): Int {
     return (bean.totalMemorySize / 1024 / 1024).toInt()
 }
 
-private fun saveMemory(instance: InstanceData, memory: Int, startMemory: Int) {
+private fun saveMemory(instance: InstanceComponent, memory: Int, startMemory: Int) {
     if (memory != startMemory) {
         val newArguments = mutableListOf<LauncherLaunchArgument>()
-        for (argument in instance.instance.jvmArguments) {
+        for (argument in instance.jvmArguments) {
             if (!argument.argument.startsWith("-Xmx") && !argument.argument.startsWith("-Xms")) {
                 newArguments.add(argument)
             }
         }
         newArguments.add(LauncherLaunchArgument("-Xmx${memory}m", null, null, null, null))
         newArguments.add(LauncherLaunchArgument("-Xms${memory}m", null, null, null, null))
-        instance.instance.jvmArguments.assignFrom(newArguments)
+        instance.jvmArguments.assignFrom(newArguments)
     }
 }
 
-private fun getResolution(instance: InstanceData): Pair<Int, Int> {
-    val features = instance.instance.features
+private fun getResolution(instance: InstanceComponent): Pair<Int, Int> {
+    val features = instance.features
     val resX = features.firstOrNull { it.feature == "resolution_x" }
     val resY = features.firstOrNull { it.feature == "resolution_y" }
 
@@ -296,32 +303,32 @@ private fun getResolution(instance: InstanceData): Pair<Int, Int> {
     )
 }
 
-private fun saveResolution(instance: InstanceData, res: Pair<Int, Int>, startRes: Pair<Int, Int>) {
+private fun saveResolution(instance: InstanceComponent, res: Pair<Int, Int>, startRes: Pair<Int, Int>) {
     if (res != startRes) {
-        val newFeatures = instance.instance.features
+        val newFeatures = instance.features
                 .filter { f -> f.feature != "resolution_x" && f.feature != "resolution_y" }
                 .toMutableList()
         newFeatures.add(LauncherFeature("resolution_x", res.first.toString()))
         newFeatures.add(LauncherFeature("resolution_y", res.second.toString()))
-        instance.instance.features.assignFrom(newFeatures)
+        instance.features.assignFrom(newFeatures)
     }
 }
 
-private fun saveArgs(instance: InstanceData, args: List<LauncherLaunchArgument>, startArgs: List<LauncherLaunchArgument>) {
+private fun saveArgs(instance: InstanceComponent, args: List<LauncherLaunchArgument>, startArgs: List<LauncherLaunchArgument>) {
     if (args != startArgs) {
         val mutArgs = args.toMutableList()
-        for (argument in instance.instance.jvmArguments) {
+        for (argument in instance.jvmArguments) {
             if (argument.argument.startsWith("-Xmx") || argument.argument.startsWith("-Xms")) {
                 mutArgs.add(argument)
             }
         }
-        instance.instance.jvmArguments.assignFrom(mutArgs)
+        instance.jvmArguments.assignFrom(mutArgs)
     }
 }
 
 @Throws(IOException::class)
 private fun save(
-    instance: InstanceData,
+    instance: InstanceComponent,
     memory: Int,
     startMemory: Int,
     res: Pair<Int, Int>,
@@ -332,5 +339,4 @@ private fun save(
     saveMemory(instance, memory, startMemory)
     saveResolution(instance, res, startRes)
     saveArgs(instance, args, startArgs)
-    instance.instance.write()
 }

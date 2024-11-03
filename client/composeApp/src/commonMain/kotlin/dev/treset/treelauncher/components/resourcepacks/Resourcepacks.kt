@@ -24,7 +24,7 @@ fun Resourcepacks() {
         Strings.selector.resourcepacks.title(),
         components = AppContext.files.resourcepackComponents,
         componentManifest = AppContext.files.resourcepackManifest,
-        checkHasComponent = { details, component -> details.resourcepacksComponent == component.id },
+        checkHasComponent = { details, component -> details.resourcepacksId == component.id },
         createContent = { onDone ->
             ComponentCreator(
                 components = AppContext.files.resourcepackComponents,

@@ -163,7 +163,7 @@ class GameLaunchHelper(
                         content = { Text(Strings.selector.instance.game.crashClose()) }
                     )
                     Button(
-                        onClick = { LauncherFile.of(launcher.instance.instance.directory, "crash-reports").open() },
+                        onClick = { LauncherFile.of(launcher.instance.directory, "crash-reports").open() },
                         content = { Text(Strings.selector.instance.game.crashReports()) }
                     )
                 }

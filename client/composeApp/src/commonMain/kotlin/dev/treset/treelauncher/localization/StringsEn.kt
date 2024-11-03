@@ -4,10 +4,11 @@ import dev.treset.mcdl.auth.AuthenticationStep
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.backend.config.AppSettings
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import dev.treset.treelauncher.instances.InstanceDetails
+import dev.treset.treelauncher.components.instances.InstanceDetailsType
+
 import kotlin.math.roundToInt
 
 open class StringsEn(
@@ -164,8 +165,8 @@ open class StringsEn(
     )
 
     data class Game(
-        val versionName: (instance: InstanceData) -> String = { instance -> "${Strings.launcher.slug()}:${Strings.launcher.version()}:${instance.instance.id.value.substring(0,3)}...${instance.instance.id.value.substring(instance.instance.id.value.length - 2)}"},
-        val versionType: (instance: InstanceData) -> String = { instance -> instance.instance.name.value }
+        val versionName: (instance: InstanceComponent) -> String = { instance -> "${Strings.launcher.slug()}:${Strings.launcher.version()}:${instance.id.value.substring(0,3)}...${instance.id.value.substring(instance.id.value.length - 2)}"},
+        val versionType: (instance: InstanceComponent) -> String = { instance -> instance.name.value }
     )
 
     data class Language(
@@ -352,14 +353,14 @@ open class StringsEn(
                 val noComponent: () -> String = { "No Component" },
                 val success: () -> String = { "Version Changed!" },
                 val title: () -> String = { "You are about to change the version of this Instance!" },
-                val activeTitle: (InstanceDetails, String?) -> String = { type, name ->
+                val activeTitle: (InstanceDetailsType, String?) -> String = { type, name ->
                     when(type) {
-                        InstanceDetails.SAVES -> Strings.manager.instance.details.saves()
-                        InstanceDetails.RESOURCE_PACKS -> Strings.manager.instance.details.resourcepacks()
-                        InstanceDetails.OPTIONS -> Strings.manager.instance.details.options()
-                        InstanceDetails.MODS -> Strings.manager.instance.details.mods()
-                        InstanceDetails.VERSION-> Strings.manager.instance.details.version()
-                        InstanceDetails.SETTINGS -> Strings.manager.instance.details.settings()
+                        InstanceDetailsType.SAVES -> Strings.manager.instance.details.saves()
+                        InstanceDetailsType.RESOURCE_PACKS -> Strings.manager.instance.details.resourcepacks()
+                        InstanceDetailsType.OPTIONS -> Strings.manager.instance.details.options()
+                        InstanceDetailsType.MODS -> Strings.manager.instance.details.mods()
+                        InstanceDetailsType.VERSION-> Strings.manager.instance.details.version()
+                        InstanceDetailsType.SETTINGS -> Strings.manager.instance.details.settings()
                     }.let { ts ->
                         name?.let {
                             "$ts: $name"
@@ -567,7 +568,7 @@ open class StringsEn(
             data class Delete(
                 val cancel: () -> String = { "Cancel" },
                 val confirm: () -> String = { "Delete" },
-                val message: () -> String = { "This action cannot be undone!\nAny data in this Component will be lost forever.\nThis Component is not currently used by any instance." },
+                val message: () -> String = { "This action cannot be undone!\nAny data in this Component will be lost forever." },
                 val title: () -> String = { "You are about to delete this Component!" },
                 val tooltip: () -> String = { "Delete Component" },
                 val unableClose: () -> String = { "Close" },
@@ -617,7 +618,7 @@ open class StringsEn(
                 val preparingMessage: () -> String = { "The Game will start shortly." },
                 val preparingTitle: () -> String = { "Preparing Game Resources..." },
                 val runningMessage: () -> String = { "Close the game to be able to perform actions in the launcher." },
-                val runningNotification: (InstanceData) -> String = { instance -> "Currently Playing: ${instance.instance.name.value}" },
+                val runningNotification: (InstanceComponent) -> String = { instance -> "Currently Playing: ${instance.name.value}" },
                 val runningOpen: () -> String = { "Open Game folder" },
                 val runningStop: () -> String = { "Kill Game process" },
                 val runningTitle: () -> String = { "The Game is running..." },

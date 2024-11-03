@@ -3,9 +3,7 @@ package dev.treset.treelauncher.util
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.launching.ResourceManager
-import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
@@ -105,15 +103,7 @@ fun FixFiles() {
                             return@Button
                         }
 
-                        val instanceData = try {
-                            InstanceData.of(instance, AppContext.files)
-                        } catch (e: FileLoadException) {
-                            AppContext.error(e)
-                            cleanupStatus = CleanupState.FAILURE
-                            return@Button
-                        }
-
-                        val resourceManager = ResourceManager(instanceData)
+                        val resourceManager = ResourceManager(instance)
 
                         try {
                             resourceManager.cleanupResources()

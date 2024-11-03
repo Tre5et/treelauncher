@@ -21,7 +21,7 @@ fun Options() {
         Strings.selector.options.title(),
         components = AppContext.files.optionsComponents,
         componentManifest = AppContext.files.optionsManifest,
-        checkHasComponent = { details, component -> details.optionsComponent == component.id },
+        checkHasComponent = { details, component -> details.optionsId == component.id },
         createContent = { onDone ->
             ComponentCreator(
                 components = AppContext.files.optionsComponents,

@@ -2,17 +2,16 @@ package dev.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.auth.data.UserData
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherFiles
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.QuickPlayData
-import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.backend.util.exception.GameCommandException
 import dev.treset.treelauncher.backend.util.exception.GameLaunchException
 import dev.treset.treelauncher.backend.util.exception.GameResourceException
 import java.io.IOException
 
 class GameLauncher(
-    val instance: InstanceData,
+    val instance: InstanceComponent,
     val files: LauncherFiles,
     val offline: Boolean,
     val minecraftUser: UserData?,
@@ -109,15 +108,9 @@ class GameLauncher(
     private fun cleanUpOldInstance() {
         LOGGER.debug { "Cleaning up old instance resources: id=${files.mainManifest.activeInstance}" }
         var found = false
-        for (i in files.instanceComponents) {
-            if (i.id == files.mainManifest.activeInstance) {
-                val instanceData: InstanceData = try {
-                    InstanceData.of(i, files)
-                } catch (e: FileLoadException) {
-                    throw GameLaunchException("Unable to cleanup old instance: unable to load instance data", e)
-                }
-
-                val resourceManager = ResourceManager(instanceData)
+        for (instance in files.instanceComponents) {
+            if (instance.id == files.mainManifest.activeInstance) {
+                val resourceManager = ResourceManager(instance)
                 try {
                     resourceManager.cleanupResources()
                 } catch (e: IOException) {

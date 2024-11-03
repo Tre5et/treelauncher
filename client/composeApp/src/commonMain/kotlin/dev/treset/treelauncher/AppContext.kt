@@ -8,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.backend.data.LauncherFiles
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.discord.DiscordIntegration
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
@@ -18,7 +18,7 @@ import dev.treset.treelauncher.style.ColorScheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 object AppContext {
-    var runningInstance: InstanceData? by mutableStateOf(null)
+    var runningInstance: InstanceComponent? by mutableStateOf(null)
     val files = LauncherFiles()
     var discord = DiscordIntegration()
     var resetWindowSize: () -> Unit = { }

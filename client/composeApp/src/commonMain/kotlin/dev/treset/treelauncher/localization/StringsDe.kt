@@ -1,6 +1,6 @@
 package dev.treset.treelauncher.localization
 
-import dev.treset.treelauncher.instances.InstanceDetails
+import dev.treset.treelauncher.components.instances.InstanceDetailsType
 
 class StringsDe : StringsEn(
     components = Components(
@@ -230,12 +230,12 @@ class StringsDe : StringsEn(
                 title = { "Die Version dieser Instanz wirklich ändern?" },
                 activeTitle = { type, name ->
                     when(type) {
-                        InstanceDetails.SAVES -> Strings.manager.instance.details.saves()
-                        InstanceDetails.RESOURCE_PACKS -> Strings.manager.instance.details.resourcepacks()
-                        InstanceDetails.OPTIONS -> Strings.manager.instance.details.options()
-                        InstanceDetails.MODS -> Strings.manager.instance.details.mods()
-                        InstanceDetails.VERSION-> Strings.manager.instance.details.version()
-                        InstanceDetails.SETTINGS -> Strings.manager.instance.details.settings()
+                        InstanceDetailsType.SAVES -> Strings.manager.instance.details.saves()
+                        InstanceDetailsType.RESOURCE_PACKS -> Strings.manager.instance.details.resourcepacks()
+                        InstanceDetailsType.OPTIONS -> Strings.manager.instance.details.options()
+                        InstanceDetailsType.MODS -> Strings.manager.instance.details.mods()
+                        InstanceDetailsType.VERSION-> Strings.manager.instance.details.version()
+                        InstanceDetailsType.SETTINGS -> Strings.manager.instance.details.settings()
                     }.let { ts ->
                         name?.let {
                             "$ts: $name"
@@ -439,7 +439,7 @@ class StringsDe : StringsEn(
                 preparingMessage = { "Das Spiel starten in Kürze." },
                 preparingTitle ={ "Spielressourcen werden vorbereitet..." },
                 runningMessage ={ "Das Spiel schließen, um Aktionen im Launcher durchzuführen." },
-                runningNotification = { instance -> "Aktuell läuft: ${instance.instance.name.value}" },
+                runningNotification = { instance -> "Aktuell läuft: ${instance.name.value}" },
                 runningOpen = { "Spielordner öffnen" },
                 runningStop = { "Spielprozess beenden" },
                 runningTitle = { "Das Spiel läuft..." },

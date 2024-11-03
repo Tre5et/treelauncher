@@ -5,8 +5,8 @@ import de.jcm.discordgamesdk.CreateParams
 import de.jcm.discordgamesdk.activity.Activity
 import de.jcm.discordgamesdk.activity.ActivityType
 import dev.treset.treelauncher.backend.config.AppSettings
+import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import io.github.oshai.kotlinlogging.KotlinLogging
-import dev.treset.treelauncher.backend.data.InstanceData
 import dev.treset.treelauncher.localization.Strings
 import java.time.Instant
 
@@ -39,7 +39,7 @@ class DiscordIntegration {
         }
     }
 
-    fun activateActivity(instance: InstanceData) {
+    fun activateActivity(instance: InstanceComponent) {
         if(!AppSettings.discordIntegration.value) {
             return
         }
@@ -55,8 +55,8 @@ class DiscordIntegration {
 
             activity.assets().largeImage = "pack"
             if (AppSettings.discordShowModLoader.value) {
-                activity.assets().smallImage = instance.versionComponents[0].versionType.value
-                activity.assets().smallText = instance.versionComponents[0].versionType.value
+                activity.assets().smallImage = instance.versionComponents.value[0].versionType.value
+                activity.assets().smallText = instance.versionComponents.value[0].versionType.value
             }
 
             if (AppSettings.discordShowTime.value) {
@@ -72,8 +72,8 @@ class DiscordIntegration {
         }
     }
 
-    private fun constructDetailsString(instance: InstanceData): String {
-        return Strings.settings.discord.details(instance.instance.name.value, instance.versionComponents[0].versionNumber.value, instance.versionComponents[0].versionType.value)
+    private fun constructDetailsString(instance: InstanceComponent): String {
+        return Strings.settings.discord.details(instance.name.value, instance.versionComponents.value[0].versionNumber.value, instance.versionComponents.value[0].versionType.value)
     }
 
     fun clearActivity() {

@@ -24,7 +24,7 @@ fun Saves() {
         Strings.selector.saves.title(),
         components = AppContext.files.savesComponents,
         componentManifest = AppContext.files.savesManifest,
-        checkHasComponent = { details, component -> details.savesComponent == component.id },
+        checkHasComponent = { details, component -> details.savesId == component.id },
         createContent = { onDone ->
             ComponentCreator(
                 components = AppContext.files.savesComponents,
