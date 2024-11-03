@@ -572,7 +572,7 @@ open class StringsEn(
                 val title: () -> String = { "You are about to delete this Component!" },
                 val tooltip: () -> String = { "Delete Component" },
                 val unableClose: () -> String = { "Close" },
-                val unableMessage: (dev.treset.treelauncher.backend.data.manifest.Component) -> String = { instance -> "It is used by the following instance: ${instance.name}" },
+                val unableMessage: (dev.treset.treelauncher.backend.data.manifest.Component) -> String = { instance -> "It is used by the following instance: ${instance.name.value}" },
                 val unableTitle: () -> String = { "Unable to delete this component!" },
             )
 

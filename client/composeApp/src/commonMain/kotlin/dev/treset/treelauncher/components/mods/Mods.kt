@@ -18,7 +18,7 @@ fun Mods() {
         title = Strings.selector.mods.title(),
         components = AppContext.files.modsComponents,
         componentManifest = AppContext.files.modsManifest,
-        checkHasComponent = { details, component -> details.modsId == component.id },
+        checkHasComponent = { details, component -> details.modsId.value == component.id.value },
         isEnabled = { id != AppContext.runningInstance?.modsComponent?.value?.id },
         reload = {
             try {

@@ -405,7 +405,7 @@ class StringsDe : StringsEn(
                 title = { "Diese Komponente wirklich löschen?" },
                 tooltip = { "Komponente löschen" },
                 unableClose = { "Schließen" },
-                unableMessage = { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name}." },
+                unableMessage = { instance -> "Sie wird von folgender Instanz verwendet: ${instance.name.value}." },
                 unableTitle = { "Diese Komponente kann nicht gelöscht werden!" },
             ),
             rename = Selector.Component.Rename(

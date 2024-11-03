@@ -151,154 +151,155 @@ fun <T: Component, D: SharedComponentData<T>> Components(
                 }
             }
 
-            TitledColumn(
-                headerContent = {
-                    if(it.settingsOpen.value && !settingsDefault) {
-                        Box(
-                            modifier = Modifier.align(Alignment.CenterStart)
+            if(sharedData.component.isEnabled()) {
+                TitledColumn(
+                    headerContent = {
+                        if (it.settingsOpen.value && !settingsDefault) {
+                            Box(
+                                modifier = Modifier.align(Alignment.CenterStart)
+                            ) {
+                                IconButton(
+                                    onClick = { it.settingsOpen.value = false },
+                                    icon = icons().back,
+                                    size = 32.dp,
+                                    tooltip = Strings.manager.component.back(),
+                                )
+                            }
+                        }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .fillMaxWidth(actionBarFraction)
                         ) {
+                            sharedData.actionBarSpecial(this)
+
+                            Text(it.component.name.value)
+
                             IconButton(
-                                onClick = { it.settingsOpen.value = false },
-                                icon = icons().back,
+                                onClick = {
+                                    showRename = true
+                                },
+                                icon = icons().edit,
                                 size = 32.dp,
-                                tooltip = Strings.manager.component.back(),
+                                tooltip = Strings.selector.component.rename.title()
+                            )
+                            IconButton(
+                                onClick = {
+                                    LauncherFile.of(it.component.directory).open()
+                                },
+                                icon = icons().folder,
+                                size = 32.dp,
+                                tooltip = Strings.selector.component.openFolder()
+                            )
+                            IconButton(
+                                onClick = {
+                                    showDelete = true
+                                },
+                                icon = icons().delete,
+                                size = 32.dp,
+                                interactionTint = MaterialTheme.colorScheme.error,
+                                tooltip = Strings.selector.component.delete.tooltip()
                             )
                         }
-                    }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .fillMaxWidth(actionBarFraction)
-                    ) {
-                        sharedData.actionBarSpecial(this)
-
-                        Text(it.component.name.value)
-
-                        IconButton(
-                            onClick = {
-                                showRename = true
-                            },
-                            icon = icons().edit,
-                            size = 32.dp,
-                            tooltip = Strings.selector.component.rename.title()
-                        )
-                        IconButton(
-                            onClick = {
-                                LauncherFile.of(it.component.directory).open()
-                            },
-                            icon = icons().folder,
-                            size = 32.dp,
-                            tooltip = Strings.selector.component.openFolder()
-                        )
-                        IconButton(
-                            onClick = {
-                                showDelete = true
-                            },
-                            icon = icons().delete,
-                            size = 32.dp,
-                            interactionTint = MaterialTheme.colorScheme.error,
-                            tooltip = Strings.selector.component.delete.tooltip()
-                        )
-                    }
-
-                    sharedData.actionBarBoxContent(this)
-                },
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(12.dp),
-                scrollable = false
-            ) {
-                val columnContent: @Composable () -> Unit = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
+                        sharedData.actionBarBoxContent(this)
+                    },
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(12.dp),
+                    scrollable = false
+                ) {
+                    val columnContent: @Composable () -> Unit = {
                         Column(
-                            modifier = Modifier
-                                .weight(1f, false)
-                                .let {mod ->
-                                    if(sharedData.detailsScrollable()) {
-                                        mod.verticalScroll(rememberScrollState())
-                                    } else {
-                                        mod
-                                    }
-                                },
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            sharedData.detailsContent(this)
-                        }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f, false)
+                                    .let { mod ->
+                                        if (sharedData.detailsScrollable()) {
+                                            mod.verticalScroll(rememberScrollState())
+                                        } else {
+                                            mod
+                                        }
+                                    },
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                sharedData.detailsContent(this)
+                            }
 
-                        if(allowSettings) {
-                            SelectorButton(
-                                title = Strings.manager.component.settings(),
-                                icon = icons().settings,
-                                selected = it.settingsOpen.value,
-                                onClick = { it.settingsOpen.value = true }
-                            )
-                        }
-                    }
-                }
-
-
-                if(allowSettings && it.settingsOpen.value) {
-                    ComponentSettings(it.component)
-                } else {
-                    val dropFun = remember(it, detailsOnDrop) {
-                        detailsOnDrop?.let { onDrop ->
-                            { files: DragData.FilesList ->
-                                it.onDrop(files)
+                            if (allowSettings) {
+                                SelectorButton(
+                                    title = Strings.manager.component.settings(),
+                                    icon = icons().settings,
+                                    selected = it.settingsOpen.value,
+                                    onClick = { it.settingsOpen.value = true }
+                                )
                             }
                         }
                     }
 
-                    dropFun?.let { onDrop ->
-                        FilesListDroppableArea(
-                            onDrop = dropFun,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            columnContent()
+
+                    if (allowSettings && it.settingsOpen.value) {
+                        ComponentSettings(it.component)
+                    } else {
+                        val dropFun = remember(it, detailsOnDrop) {
+                            detailsOnDrop?.let { onDrop ->
+                                { files: DragData.FilesList ->
+                                    it.onDrop(files)
+                                }
+                            }
                         }
-                    } ?: columnContent()
+
+                        dropFun?.let { onDrop ->
+                            FilesListDroppableArea(
+                                onDrop = dropFun,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                columnContent()
+                            }
+                        } ?: columnContent()
+                    }
                 }
-            }
 
 
-            if (showRename) {
-                RenamePopup(
-                    manifest = it.component,
-                    editValid = { name -> name.isNotBlank() && name != it.component.name.value },
-                    onDone = { name ->
-                        showRename = false
-                        name?.let { newName ->
-                            it.component.name.value = newName
+                if (showRename) {
+                    RenamePopup(
+                        manifest = it.component,
+                        editValid = { name -> name.isNotBlank() && name != it.component.name.value },
+                        onDone = { name ->
+                            showRename = false
+                            name?.let { newName ->
+                                it.component.name.value = newName
+                                try {
+                                    it.component.write()
+                                } catch (e: IOException) {
+                                    AppContext.severeError(e)
+                                }
+                            }
+                        }
+                    )
+                }
+
+                if (showDelete) {
+                    DeletePopup(
+                        component = it.component,
+                        checkHasComponent = { details -> checkHasComponent(details, it.component) },
+                        onClose = { showDelete = false },
+                        onConfirm = {
                             try {
-                                it.component.write()
+                                it.component.delete(componentManifest)
                             } catch (e: IOException) {
                                 AppContext.severeError(e)
                             }
+                            reload()
+                            showDelete = false
                         }
-                    }
-                )
+                    )
+                }
             }
-
-            if (showDelete) {
-                DeletePopup(
-                    component = it.component,
-                    checkHasComponent = { details -> checkHasComponent(details, it.component) },
-                    onClose = { showDelete = false },
-                    onConfirm = {
-                        try {
-                            it.component.delete(componentManifest)
-                        } catch(e: IOException) {
-                            AppContext.severeError(e)
-                        }
-                        reload()
-                        showDelete = false
-                    }
-                )
-            }
-
         }
 
         createContent?.let {

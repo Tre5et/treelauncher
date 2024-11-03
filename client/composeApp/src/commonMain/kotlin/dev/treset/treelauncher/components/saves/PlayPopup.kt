@@ -28,7 +28,7 @@ fun PlayPopup(
 
         instances = AppContext.files.instanceComponents
             .filter {
-                it.savesId == component.id
+                it.savesId.value == component.id.value
             }
     }
 
