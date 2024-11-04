@@ -15,6 +15,7 @@ class SortProviderSerializer<T>: KSerializer<SortProvider<T>> {
         val id = decoder.decodeString()
 
         try {
+            @Suppress("UNCHECKED_CAST")
             return sortProviders[id] as SortProvider<T>
         } catch (e: Exception) {
             throw SerializationException("Unknown comparator id: $id")
