@@ -1,9 +1,10 @@
 package dev.treset.treelauncher.generic
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.fabric.FabricProfile
 import dev.treset.mcdl.fabric.FabricVersion
@@ -19,6 +20,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StringProvider
 import dev.treset.treelauncher.localization.Strings
+import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
 import java.io.IOException
 
@@ -214,6 +216,28 @@ fun VersionSelector(
             }
 
             if(versionType == VersionType.FORGE) {
+                TooltipProvider(
+                    tooltip = Strings.version.forgeTooltip(),
+                    delay = 0
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            icons().warning,
+                            "",
+                            tint = LocalContentColor.current.disabledContent(),
+                            modifier = Modifier.size(18.dp).offset(y = (-1).dp)
+                        )
+                        Text(
+                            Strings.version.forgeHint(),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = LocalContentColor.current.disabledContent()
+                        )
+                    }
+                }
+
                 TitledComboBox(
                     title = Strings.creator.version.forge(),
                     items = forgeVersions,
@@ -291,8 +315,8 @@ enum class VersionType(
 ) {
     VANILLA("vanilla", { Strings.version.vanilla() }),
     FABRIC("fabric", { Strings.version.fabric() }),
-    FORGE("forge", { Strings.version.forge() }),
-    QUILT("quilt", { Strings.version.quilt() });
+    QUILT("quilt", { Strings.version.quilt() }),
+    FORGE("forge", { Strings.version.forge() });
 
     override fun toString(): String {
         return displayName()
