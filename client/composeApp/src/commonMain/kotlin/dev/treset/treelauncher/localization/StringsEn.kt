@@ -939,6 +939,8 @@ open class StringsEn(
     data class Version(
         val fabric: () -> String = { "Fabric" },
         val forge: () -> String = { "Forge" },
+        val forgeHint: () -> String = { "Forge support is currently experimental" },
+        val forgeTooltip: () -> String = { "Installing most common versions should work but installations may fail or produce unusable versions.\nFeel free to report any issues but don't expect quick fixes." },
         val quilt: () -> String = { "Quilt" },
         val vanilla: () -> String = { "Vanilla" },
     )

@@ -1,12 +1,7 @@
 package dev.treset.treelauncher.components.mods
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,11 +19,11 @@ import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.generic.IconButton
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledCheckBox
+import dev.treset.treelauncher.generic.TooltipProvider
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.style.inverted
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SharedModsData.ModsActionBar() {
     if(!settingsOpen.value && !showSearch.value && editingMod.value == null) {
@@ -165,48 +160,14 @@ fun SharedModsData.ModsActionBar() {
                         style = MaterialTheme.typography.titleSmall,
                     )
 
-                    val interactionSource = remember { MutableInteractionSource() }
-
-                    val pressed by interactionSource.collectIsPressedAsState()
-                    val hovered by interactionSource.collectIsHoveredAsState()
-                    val nativeFocused by interactionSource.collectIsFocusedAsState()
-                    val focused by remember(nativeFocused) { mutableStateOf(if(pressed) false else nativeFocused) }
-
-                    val tooltipState = rememberTooltipState(
-                        isPersistent = true
-                    )
-
-                    LaunchedEffect(focused) {
-                        if(focused) {
-                            tooltipState.show(MutatePriority.UserInput)
-                        } else {
-                            tooltipState.dismiss()
-                        }
-                    }
-
-                    LaunchedEffect(hovered) {
-                        if(hovered) {
-                            tooltipState.show(MutatePriority.UserInput)
-                        } else {
-                            tooltipState.dismiss()
-                        }
-                    }
-
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip {
-                                Text(Strings.manager.mods.settings.help())
-                            }
-                        },
-                        state = tooltipState,
-                        enableUserInput = false,
+                    TooltipProvider(
+                        tooltip = Strings.manager.mods.settings.help(),
+                        delay = 0
                     ) {
-                        IconButton(
-                            onClick = {},
-                            icon = icons().help,
-                            size = 20.dp,
-                            interactionSource = interactionSource,
+                        Icon(
+                            imageVector = icons().help,
+                            "Help",
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }

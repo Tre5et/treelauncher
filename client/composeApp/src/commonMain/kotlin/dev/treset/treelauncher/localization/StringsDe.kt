@@ -671,5 +671,8 @@ class StringsDe : StringsEn(
             warningTitle = { "Der Launcher wurde aktualisiert." }
         )
     ),
-    version = Version()
+    version = Version(
+        forgeHint = { "Forge Installation ist momentan experimentell" },
+        forgeTooltip = { "Das installieren der häufigsten Versionen sollte funktionieren, aber Installationen können fehlschlagen oder unnutzbare Versionen produzieren.\nFehler können gerne gemeldet werden, werden aber voraussichtlich nicht schnell behoben." }
+    )
 )

@@ -1,7 +1,6 @@
 package dev.treset.treelauncher.generic
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,7 +11,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,13 +25,9 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.hovered
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IconButton(
     onClick: () -> Unit,
@@ -92,40 +89,9 @@ fun IconButton(
         LocalContentColor provides foregroundColor
     ) {
         tooltip?.let {
-            val tooltipState = rememberTooltipState(
-                isPersistent = true
-            )
-
-            LaunchedEffect(focused) {
-                if(focused) {
-                    tooltipState.show(MutatePriority.UserInput)
-                } else {
-                    tooltipState.dismiss()
-                }
-            }
-
-            var job: Job? = remember { null }
-            LaunchedEffect(hovered) {
-                if(hovered) {
-                    job = launch {
-                        delay(1000)
-                        tooltipState.show(MutatePriority.UserInput)
-                    }
-                } else {
-                    job?.cancel()
-                    tooltipState.dismiss()
-                }
-            }
-
-            TooltipBox(
-                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                tooltip = {
-                    PlainTooltip {
-                        Text(it)
-                    }
-                },
-                state = tooltipState,
-                enableUserInput = false,
+            TooltipProvider(
+                tooltip = it,
+                interactionSource = interactionSource
             ) {
                 Box(
                     modifier = newModifier,
