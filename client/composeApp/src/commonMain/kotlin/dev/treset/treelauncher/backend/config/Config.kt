@@ -13,7 +13,8 @@ import java.nio.file.StandardCopyOption
 import kotlin.jvm.Throws
 
 class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = null) {
-    val dataVersion: Version = Version(2, 0, 0)
+    val launcherVersion = Version(3,0,0)
+    val dataVersion = Version(2,0,0)
     var baseDir: LauncherFile = LauncherFile.of(globalConfig.path)
     val syncFileName = "data.sync"
     val metaDir: LauncherFile = LauncherFile.of(baseDir, ".launcher")
@@ -74,7 +75,7 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
     val quiltDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
     val quiltDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
     val fabricDefaultClientFileName = "fabric-client.jar"
-    val modrinthUserAgent = "TreSet/treelauncher/v3.0.0"
+    val modrinthUserAgent = "TreSet/treelauncher/$launcherVersion"
     val curseforgeApiKey = "$2a$10$3rdQBL3FRS2RSSS4MF5F5uuOQpFr5flAzUCAdBvZDEfu1fIXFq.DW"
     val msClientId = "389304a5-70a6-4013-907f-98c4eb4b51fb"
 

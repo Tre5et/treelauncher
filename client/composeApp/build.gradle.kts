@@ -39,7 +39,7 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "2.1.0-SNAPSHOT"
+        val mcdlVersion = "2.1.0-beta.2"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -176,39 +176,17 @@ launcherTask(
         }
     }
 ) {
-    val stringsFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/localization/StringsEn.kt")
-    var found = false
-    val stringsLines = stringsFile.readLines()
-    stringsFile.writeText(
-        stringsLines.joinToString(System.lineSeparator()) { line ->
-            val match = "(?<=val version: \\(\\) -> String = \\{ \\\")([0123456789.]*)(?=\\\" \\})".toRegex().find(line)
-            match?.let { result ->
-                found = true
-                if(result.value != version) {
-                    line.replace(result.value, version).also {
-                        println("Replaced version in strings: ${result.value} -> $version")
-                    }
-                } else {
-                    line
-                }
-            } ?: line
-        }
-    )
-    if(!found) {
-        throw IllegalStateException("Could not find version string in Strings.kt")
-    }
-
-
     val configFile = project.file("src/commonMain/kotlin/dev/treset/treelauncher/backend/config/Config.kt")
-    found = false
+    var found = false
     val configLines = configFile.readLines()
     configFile.writeText(
         configLines.joinToString(System.lineSeparator()) { line ->
-            val match = "(?<=val modrinthUserAgent = \\\"TreSet/treelauncher/v)(.*)(?=\\\")".toRegex().find(line)
+            val match = "(?<=val launcherVersion = Version\\()(.*)(?=\\))".toRegex().find(line)
             match?.let { result ->
+                val versionInitializer = version.toString().replace(".", ",");
                 found = true
-                if(result.value != version) {
-                    line.replace(result.value, version).also {
+                if(result.value != versionInitializer) {
+                    line.replace(result.value, versionInitializer).also {
                         println("Replaced version in Config: ${result.value} -> $version")
                     }
                 } else {
@@ -218,7 +196,7 @@ launcherTask(
         }
     )
     if(!found) {
-        throw IllegalStateException("Could not find version string in Config.kt")
+        throw IllegalStateException("Could not find version in Config.kt")
     }
 }
 

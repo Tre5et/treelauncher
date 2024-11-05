@@ -4,6 +4,7 @@ import dev.treset.mcdl.auth.AuthenticationStep
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.backend.config.AppSettings
+import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -181,7 +182,7 @@ open class StringsEn(
         val setup: Setup = Setup(),
         val slug: () -> String = { "treelauncher" },
         val status: Status = Status(),
-        val version: () -> String = { "3.0.0" }
+        val version: () -> String = { appConfig().launcherVersion.toString() }
     ) {
         data class Setup(
             val initializing: () -> String = { "Initializing data directory" },

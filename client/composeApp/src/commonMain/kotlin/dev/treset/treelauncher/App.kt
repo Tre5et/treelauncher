@@ -3,6 +3,7 @@ package dev.treset.treelauncher
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import dev.treset.mcdl.mods.ModsDL
+import dev.treset.mcdl.util.HttpUtil
 import dev.treset.treelauncher.backend.config.*
 import dev.treset.treelauncher.backend.update.updater
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -12,7 +13,6 @@ import dev.treset.treelauncher.components.resourcepacks.Resourcepacks
 import dev.treset.treelauncher.components.saves.Saves
 import dev.treset.treelauncher.components.mods.Mods
 import dev.treset.treelauncher.creation.Create
-import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.login.LoginScreen
 import dev.treset.treelauncher.navigation.NavigationContainer
 import dev.treset.treelauncher.navigation.NavigationContext
@@ -90,7 +90,7 @@ class LauncherApp(
     val exitApplication: () -> Unit
 ) {
     init {
-        configureVersionLoader()
+        configureMcdl()
 
         try {
             loadSettings()
@@ -100,7 +100,8 @@ class LauncherApp(
         }
     }
 
-    private fun configureVersionLoader() {
+    private fun configureMcdl() {
+        HttpUtil.setUserAgent("treelauncher/${appConfig().launcherVersion}")
         ModsDL.setModrinthUserAgent(appConfig().modrinthUserAgent)
         ModsDL.setCurseforgeApiKey(appConfig().curseforgeApiKey)
     }
