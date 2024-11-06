@@ -112,19 +112,20 @@ class CommandBuilder(
 
         processBuilder.directory(gameDir)
         processBuilder.command(mutableListOf())
-        processBuilder.command().add(LauncherFile.of(instance.javaComponent.value.directory, "bin", "java").path)
+        processBuilder.command().add(LauncherFile.of(instance.javaComponent.value.directory, "bin", "javaw").path)
 
-        val jvmArgs = instance.jvmArguments.toMutableList()
-        for(v in instance.versionComponents.value) {
+        val jvmArgs = mutableListOf<LauncherLaunchArgument>()
+        for(v in instance.versionComponents.value.reversed()) {
             v.jvmArguments.forEach {
                 if(!jvmArgs.contains(it)) {
                     jvmArgs.add(it)
                 }
             }
         }
+        jvmArgs.addAll(instance.jvmArguments.toMutableList())
 
         val gameArgs = mutableListOf<LauncherLaunchArgument>()
-        for(v in instance.versionComponents.value) {
+        for(v in instance.versionComponents.value.reversed()) {
             v.gameArguments.forEach {
                 if(!gameArgs.contains(it)) {
                     gameArgs.add(it)

@@ -110,6 +110,8 @@ open class StringsEn(
                 val forge: () -> String = { "Creating forge version..." },
                 val forgeInstaller: () -> String = { "Running forge installer..." },
                 val libraries: () -> String = { "Downloading libraries..." },
+                val neoForge: () -> String = { "Creating NeoForge version..." },
+                val neoForgeInstaller: () -> String = { "Running NeoForge installer..." },
                 val quilt: () -> String = { "Creating quilt version..." },
                 val quiltLibraries: () -> String = { "Downloading quilt libraries..." },
                 val value: () -> String = { "Creating version..." },
@@ -130,6 +132,7 @@ open class StringsEn(
             val forge: () -> String = { "Forge version" },
             val showSnapshots: () -> String = { "Show Snapshots" },
             val loading: () -> String = { "Loading..." },
+            val neoForge: () -> String = { "NeoForge version" },
             val quilt: () -> String = { "Quilt version" },
             val type: () -> String = { "Version type" },
             val version: () -> String = { "Version" }
@@ -941,6 +944,7 @@ open class StringsEn(
         val forge: () -> String = { "Forge" },
         val forgeHint: () -> String = { "Forge support is currently experimental" },
         val forgeTooltip: () -> String = { "Installing most common versions should work but installations may fail or produce unusable versions.\nFeel free to report any issues but don't expect quick fixes." },
+        val neoForge: () -> String = { "NeoForge" },
         val quilt: () -> String = { "Quilt" },
         val vanilla: () -> String = { "Vanilla" },
     )

@@ -72,6 +72,11 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
     val fabricDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
     val forgeDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
     val forgeDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
+    val neoForgeDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
+    val neoForgeDefaultJvmArguments: List<LauncherLaunchArgument> = listOf(
+        //TODO ?
+        LauncherLaunchArgument("-XX:+UnlockExperimentalVMOptions")
+    )
     val quiltDefaultGameArguments: List<LauncherLaunchArgument> = listOf()
     val quiltDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
     val fabricDefaultClientFileName = "fabric-client.jar"

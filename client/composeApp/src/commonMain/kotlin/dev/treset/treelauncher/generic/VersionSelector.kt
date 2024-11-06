@@ -12,6 +12,7 @@ import dev.treset.mcdl.forge.ForgeInstaller
 import dev.treset.mcdl.forge.ForgeVersion
 import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.mcdl.minecraft.MinecraftVersionDetails
+import dev.treset.mcdl.neoforge.NeoForgeDL
 import dev.treset.mcdl.quiltmc.QuiltProfile
 import dev.treset.mcdl.quiltmc.QuiltVersion
 import dev.treset.treelauncher.AppContext
@@ -29,14 +30,16 @@ class VersionCreationContent(
     val minecraftVersion: MinecraftVersion?,
     val fabricVersion: FabricVersion?,
     val forgeVersion: String?,
+    val neoForgeVersion: String?,
     val quiltVersion: QuiltVersion?
 ) {
     fun isValid(): Boolean {
         return when(versionType) {
             VersionType.VANILLA -> minecraftVersion != null
             VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
-            VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
             VersionType.QUILT -> minecraftVersion != null && quiltVersion != null
+            VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
+            VersionType.NEO_FORGE -> minecraftVersion != null && neoForgeVersion != null
         }
     }
 }
@@ -48,7 +51,6 @@ fun VersionSelector(
     defaultLoaderVersion: String? = null,
     showChange: Boolean = true,
     getCreator: (data: VersionCreationContent, onStatus: (Status) -> Unit) -> VersionCreator<*> = {d,s -> VersionCreator.get(d,s) },
-    setExecute: (((onStatus: (Status) -> Unit) -> VersionComponent)?) -> Unit = {},
     setContent: (VersionCreationContent) -> Unit = {},
     onChange: (execute: () -> VersionComponent) -> Unit = { it() },
     onDone: (VersionComponent) -> Unit = {}
@@ -59,20 +61,23 @@ fun VersionSelector(
     var versionType: VersionType by remember { mutableStateOf(defaultVersionType) }
     var fabricVersions: List<FabricVersion> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
     var fabricVersion: FabricVersion? by remember { mutableStateOf(null) }
-    var forgeVersions: List<String> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
-    var forgeVersion: String? by remember { mutableStateOf(null) }
     var quiltVersions: List<QuiltVersion> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
     var quiltVersion: QuiltVersion? by remember { mutableStateOf(null) }
+    var forgeVersions: List<String> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
+    var forgeVersion: String? by remember { mutableStateOf(null) }
+    var neoForgeVersions: List<String> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
+    var neoForgeVersion: String? by remember { mutableStateOf(null) }
 
     var creationStatus: Status? by remember { mutableStateOf(null) }
 
-    val creationContent: VersionCreationContent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
+    val creationContent: VersionCreationContent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion, neoForgeVersion) {
         VersionCreationContent(
             versionType = versionType,
             minecraftVersion = minecraftVersion,
             fabricVersion = fabricVersion,
+            quiltVersion = quiltVersion,
             forgeVersion = forgeVersion,
-            quiltVersion = quiltVersion
+            neoForgeVersion = neoForgeVersion
         ).also {
             setContent(it)
         }
@@ -101,14 +106,7 @@ fun VersionSelector(
         }
     }
 
-    val valid = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
-        when(versionType) {
-            VersionType.VANILLA -> minecraftVersion != null
-            VersionType.FABRIC -> minecraftVersion != null && fabricVersion != null
-            VersionType.FORGE -> minecraftVersion != null && forgeVersion != null
-            VersionType.QUILT -> minecraftVersion != null && quiltVersion != null
-        }.also { setExecute(if(it) execute else null) }
-    }
+    val valid by derivedStateOf { creationContent.isValid() }
 
     LaunchedEffect(showSnapshots) {
         Thread {
@@ -131,15 +129,13 @@ fun VersionSelector(
     }
 
     LaunchedEffect(minecraftVersion) {
-        val prevFabric = fabricVersion
-        fabricVersion = null
         minecraftVersion?.also { mcVersion ->
             Thread {
                 try {
                     fabricVersions = FabricVersion.getAll(mcVersion.id)
                         .also { versions ->
-                            defaultLoaderVersion?.let { default ->
-                                fabricVersion = prevFabric?.let { current ->
+                            fabricVersion = defaultLoaderVersion?.let { default ->
+                                fabricVersion?.let { current ->
                                     versions.firstOrNull { it.loader.version == current.loader.version }
                                 } ?: versions.firstOrNull { it.loader.version == default }
                             }
@@ -151,8 +147,8 @@ fun VersionSelector(
                 try {
                 quiltVersions = QuiltVersion.getAll(mcVersion.id)
                     .also { versions ->
-                        defaultLoaderVersion?.let { default ->
-                            quiltVersion = quiltVersion?.let { current ->
+                        quiltVersion = defaultLoaderVersion?.let { default ->
+                            quiltVersion?.let { current ->
                                 versions.firstOrNull { it.loader.version == current.loader.version }
                             } ?: versions.firstOrNull { it.loader.version == default }
                         }
@@ -164,12 +160,25 @@ fun VersionSelector(
                 try {
                 forgeVersions = ForgeVersion.getAll(mcVersion.id)
                     .also { versions ->
-                        defaultLoaderVersion?.let { default ->
-                            forgeVersion = forgeVersion?.let { current ->
+                        forgeVersion = defaultLoaderVersion?.let { default ->
+                            forgeVersion?.let { current ->
                                 versions.firstOrNull { it == current }
                             } ?: versions.firstOrNull { it == default }
                         }
                     }
+                } catch (_: IOException) { }
+            }.start()
+
+            Thread {
+                try {
+                    neoForgeVersions = NeoForgeDL.getNeoForgeVersionsList(mcVersion.id)
+                        .also { versions ->
+                            neoForgeVersion = defaultLoaderVersion?.let { default ->
+                                neoForgeVersion?.let { current ->
+                                    versions.firstOrNull { it == current }
+                                } ?: versions.firstOrNull { it == default }
+                            }
+                        }
                 } catch (_: IOException) { }
             }.start()
         }
@@ -215,6 +224,19 @@ fun VersionSelector(
                     )
             }
 
+            if(versionType == VersionType.QUILT) {
+                TitledComboBox(
+                    title = Strings.creator.version.quilt(),
+                    items = quiltVersions,
+                    selected = quiltVersion,
+                    onSelected = { quiltVersion = it },
+                    loading = quiltVersions.isEmpty(),
+                    placeholder = Strings.creator.version.quilt(),
+                    loadingPlaceholder = Strings.creator.version.loading(),
+                    toDisplayString = { loader.version }
+                )
+            }
+
             if(versionType == VersionType.FORGE) {
                 TooltipProvider(
                     tooltip = Strings.version.forgeTooltip(),
@@ -257,16 +279,15 @@ fun VersionSelector(
                 )
             }
 
-            if(versionType == VersionType.QUILT) {
+            if(versionType == VersionType.NEO_FORGE) {
                 TitledComboBox(
-                    title = Strings.creator.version.quilt(),
-                    items = quiltVersions,
-                    selected = quiltVersion,
-                    onSelected = { quiltVersion = it },
-                    loading = quiltVersions.isEmpty(),
-                    placeholder = Strings.creator.version.quilt(),
+                    title = Strings.creator.version.neoForge(),
+                    items = neoForgeVersions,
+                    selected = neoForgeVersion,
+                    onSelected = { neoForgeVersion = it },
+                    loading = neoForgeVersions.isEmpty(),
+                    placeholder = Strings.creator.version.neoForge(),
                     loadingPlaceholder = Strings.creator.version.loading(),
-                    toDisplayString = { loader.version }
                 )
             }
         }
@@ -316,7 +337,8 @@ enum class VersionType(
     VANILLA("vanilla", { Strings.version.vanilla() }),
     FABRIC("fabric", { Strings.version.fabric() }),
     QUILT("quilt", { Strings.version.quilt() }),
-    FORGE("forge", { Strings.version.forge() });
+    FORGE("forge", { Strings.version.forge() }),
+    NEO_FORGE("neoforge", { Strings.version.neoForge() });
 
     override fun toString(): String {
         return displayName()
@@ -338,8 +360,9 @@ fun VersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status
     when(data.versionType) {
         VersionType.VANILLA -> return VanillaVersionCreator.get(data, onStatus)
         VersionType.FABRIC -> return FabricVersionCreator.get(data, onStatus)
-        VersionType.FORGE -> return ForgeVersionCreator.get(data, onStatus)
         VersionType.QUILT -> return QuiltVersionCreator.get(data, onStatus)
+        VersionType.FORGE -> return ForgeVersionCreator.get(data, onStatus)
+        VersionType.NEO_FORGE -> return NeoForgeVersionCreator.get(data, onStatus)
     }
 }
 
@@ -364,6 +387,18 @@ fun FabricVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (
 }
 
 @Throws(IOException::class)
+fun QuiltVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    return QuiltVersionCreator(
+        QuiltCreationData(
+            version = data.quiltVersion!!,
+            profile = QuiltProfile.get(data.minecraftVersion!!.id, data.quiltVersion.loader.version),
+            files = AppContext.files
+        ),
+        onStatus
+    )
+}
+
+@Throws(IOException::class)
 fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
     return ForgeVersionCreator(
         ForgeCreationData(
@@ -375,12 +410,11 @@ fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (S
     )
 }
 
-@Throws(IOException::class)
-fun QuiltVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
-    return QuiltVersionCreator(
-        QuiltCreationData(
-            version = data.quiltVersion!!,
-            profile = QuiltProfile.get(data.minecraftVersion!!.id, data.quiltVersion.loader.version),
+fun NeoForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+    return NeoForgeVersionCreator(
+        NeoForgeCreationData(
+            minecraftVersion = data.minecraftVersion!!.id,
+            version = data.neoForgeVersion!!,
             files = AppContext.files
         ),
         onStatus

@@ -62,6 +62,8 @@ class StringsDe : StringsEn(
                 forge = { "Forge Version wird erstellt..." },
                 forgeInstaller = { "Forge Installation wird ausgeführt..." },
                 libraries = { "Bibliotheken werden heruntergeladen..." },
+                neoForge = { "NeoForge Version wird erstellt..." },
+                neoForgeInstaller = { "NeoForge Installation wird ausgeführt..." },
                 quilt = { "Quilt Version wird erstellt..." },
                 quiltLibraries = { "Quilt Bibliotheken werden heruntergeladen..." },
                 value = { "Version wird erstellt..." },

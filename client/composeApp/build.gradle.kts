@@ -35,6 +35,7 @@ kotlin {
             "java",
             "minecraft",
             "mods",
+            "neoforge",
             "quiltmc",
             "resourcepacks",
             "saves"
