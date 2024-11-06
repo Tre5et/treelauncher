@@ -42,7 +42,7 @@ class ResourceManager(private var instanceData: InstanceComponent) {
             cleanComponents(
                 arrayOf(
                     instanceData.savesComponent.value,
-                    instanceData.modsComponent.value ?: return,
+                    instanceData.modsComponent.value,
                     instanceData.resourcepacksComponent.value,
                     instanceData.optionsComponent.value,
                     instanceData
@@ -108,15 +108,15 @@ class ResourceManager(private var instanceData: InstanceComponent) {
     }
 
     @Throws(IOException::class)
-    private fun cleanComponents(components: Array<out Component>, unexpected: Boolean = false) {
+    private fun cleanComponents(components: Array<out Component?>, unexpected: Boolean = false) {
         val files = instanceData.gameDataDir.listFiles().toMutableList()
 
         val exceptions: MutableList<IOException> = mutableListOf()
         for(component in components) {
             try {
-                component.getResourceProvider(instanceData.gameDataDir).removeResources(files, unexpected)
+                component?.getResourceProvider(instanceData.gameDataDir)?.removeResources(files, unexpected)
             } catch (e: IOException) {
-                LOGGER.error(e) { "Unable to clean resources: component=${component.id}" }
+                LOGGER.error(e) { "Unable to clean resources: component=${component?.id}" }
                 exceptions.add(e)
             }
         }

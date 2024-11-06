@@ -59,6 +59,10 @@ class JavaComponentCreator(
             throw IOException("Failed to create java component: failed to download java file manifest", e)
         }
 
+        if(!directory.isDirectory) {
+            directory.createDir()
+        }
+
         try {
             JavaFile.downloadAll(
                 files,

@@ -7,7 +7,8 @@ class Update(
     var id: String?,
     var changes: List<Change>?,
     var message: String?,
-    var latest: Boolean?
+    var latest: Boolean?,
+    var openFileInstead: Boolean?
 ) :
     GenericJsonParsable() {
     enum class Mode {

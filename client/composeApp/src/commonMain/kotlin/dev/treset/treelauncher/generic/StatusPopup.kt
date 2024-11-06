@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,10 +23,19 @@ fun StatusPopup(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 status.progress?.let {
-                    LinearProgressIndicator(
-                        progress = { it },
-                        modifier = Modifier.width(250.dp),
-                    )
+                    if(it < 0) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.width(250.dp),
+                            trackColor = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        LinearProgressIndicator(
+                            progress = {it},
+                            modifier = Modifier.width(250.dp),
+                            trackColor = MaterialTheme.colorScheme.secondary,
+                            drawStopIndicator = {}
+                        )
+                    }
                 }
                 Text(status.details)
             }

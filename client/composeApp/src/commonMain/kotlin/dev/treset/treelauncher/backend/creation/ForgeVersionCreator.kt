@@ -1,16 +1,15 @@
 package dev.treset.treelauncher.backend.creation
 
 import dev.treset.mcdl.exception.FileDownloadException
-import dev.treset.mcdl.forge.ForgeInstaller
+import dev.treset.mcdl.forge.ForgeInstallerExecutor
+import dev.treset.mcdl.minecraft.MinecraftProfile
 import dev.treset.mcdl.minecraft.MinecraftVersion
-import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
-import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -27,46 +26,70 @@ class ForgeVersionCreator(
 
     @Throws(IOException::class)
     override fun createNew(statusProvider: StatusProvider): VersionComponent {
-        LOGGER.debug { "Creating new forge version: id=${data.installer.version}..." }
+        LOGGER.debug { "Creating new forge version: id=${data.versionId}..." }
+
+        val installer = ForgeInstallerExecutor(data.versionId)
+
         statusProvider.next(Strings.creator.status.message.vanillaVersion())
+        LOGGER.debug { "Creating minecraft version ${data.minecraftVersion}..." }
 
-        if(data.installer.installData.inheritsFrom == null) {
-            throw IOException("Unable to create forge version: no valid forge version")
-        }
-
-        LOGGER.debug { "Creating minecraft version..." }
-
-        val inheritVersion = MinecraftVersion.get(data.installer.installData.inheritsFrom)?: throw IOException("Unable to create forge version: failed to find mc version: versionId=${data.installer.installData.inheritsFrom}")
-        val versionDetails = try {
-            MinecraftVersionDetails.get(inheritVersion.url)
+        val inheritVersion = MinecraftVersion.get(data.minecraftVersion)?: throw IOException("Unable to create forge version: failed to find mc version: versionId=${data.minecraftVersion}")
+        val vanillaProfile = try {
+            MinecraftProfile.get(inheritVersion.url)
         } catch (e: FileDownloadException) {
-            throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.installer.installData.inheritsFrom}", e)
+            throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.minecraftVersion}", e)
         }
 
         val creator = VanillaVersionCreator(
-            VanillaCreationData(versionDetails, data.files),
+            VanillaCreationData(vanillaProfile, data.files),
             statusProvider
         )
         val mc = try {
             creator.create()
         } catch (e: IOException) {
-            throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.installer.installData.inheritsFrom}", e)
+            throw IOException("Unable to create forge version: failed to create mc version: versionId=${data.minecraftVersion}", e)
         }
 
         LOGGER.debug { "Created minecraft version: id=${mc.id.value}" }
 
+        LOGGER.debug { "Creating libraries directory..." }
+        if (!data.files.librariesDir.isDirectory()) {
+            try {
+                data.files.librariesDir.createDir()
+            } catch (e: IOException) {
+                throw IOException("Unable to add fabric libraries: failed to create libraries directory: path=${data.files.librariesDir}", e)
+            }
+        }
+        LOGGER.debug { "Created libraries directory" }
+
+        val javaFile = LauncherFile.ofData(data.files.mainManifest.javasDir.value, data.files.javaManifest.prefix.value + "_" + mc.java.value, "bin", "java")
+
+        LOGGER.debug { "Running forge installer..." }
+        val installerStatus = statusProvider.subStep(VERSION_FORGE_INSTALLER, -1)
+
+        val profile = try {
+            installer.install(
+                data.files.librariesDir,
+                javaFile
+            ) { installerStatus.download(it, 0, 0) }
+        } catch (e: FileDownloadException) {
+            throw IOException("Unable to create forge version: failed to execute insatller: versionId=${data.versionId}", e)
+        }
+        installerStatus.finish()
+        LOGGER.debug { "Ran forge installer" }
+
         val version = VersionComponent(
             id = id,
-            name = data.name,
-            versionNumber = data.installer.installData.inheritsFrom,
+            name = profile.id,
+            versionNumber = data.minecraftVersion,
             versionType = "forge",
             loaderVersion = data.versionId,
-            assets = null,
+            assets = profile.assets,
             virtualAssets = null,
             natives = null,
             depends = mc.id.value,
             gameArguments = translateArguments(
-                data.installer.installData.arguments.game,
+                profile.launchArguments.game,
                 appConfig().forgeDefaultGameArguments
             ).map {
                 // Hack because forge uses ${version_name} in a questionable way in some versions
@@ -76,99 +99,27 @@ class ForgeVersionCreator(
                 it
             },
             jvmArguments = translateArguments(
-                data.installer.installData.arguments.jvm,
+                profile.launchArguments.jvm,
                 appConfig().forgeDefaultJvmArguments
             ),
             java = null,
-            libraries = listOf(),
-            mainClass = data.installer.installData.mainClass,
+            libraries = profile.libraries.mapNotNull {
+                it.downloads?.artifact?.path.let {
+                    if(it.isNullOrBlank()) {
+                        null
+                    } else {
+                        it
+                    }
+                }
+            },
+            mainClass = profile.mainClass,
             mainFile = null,
             versionId = data.versionId,
             file = file,
         )
 
-        try {
-            addLibraries(data, version, statusProvider)
-            createClient(data, version, mc, statusProvider)
-        } catch (e: IOException) {
-            throw IOException("Unable to create forge version: versionId=${data.installer.installData.inheritsFrom}", e)
-        }
-
         LOGGER.debug { "Created forge version: id=${version.id}" }
         return version
-    }
-
-    @Throws(IOException::class)
-    private fun addLibraries(data: ForgeCreationData, version: VersionComponent, statusProvider: StatusProvider) {
-        LOGGER.debug { "Adding forge libraries..." }
-        val libraryProvider = statusProvider.subStep(VERSION_FORGE_LIBRARIES, 3)
-        libraryProvider.next()
-        if (!data.files.librariesDir.isDirectory()) {
-            try {
-                data.files.librariesDir.createDir()
-            } catch (e: IOException) {
-                throw IOException("Unable to add fabric libraries: failed to create libraries directory: path=${data.files.librariesDir}", e)
-            }
-        }
-
-        val libs = try {
-            data.installer.downloadLibraries(
-                data.files.librariesDir,
-                LauncherFile.of(version.directory, appConfig().nativesDirName)
-            ) {
-                LOGGER.debug { "Downloading forge library: ${it.currentFile}" }
-                libraryProvider.download(it, 1, 1)
-            }
-        } catch (e: FileDownloadException) {
-            throw IOException("Unable to add forge libraries: failed to download libraries", e)
-        }
-        version.libraries.assignFrom(libs)
-        libraryProvider.finish()
-        LOGGER.debug { "Added forge libraries" }
-    }
-
-    @Throws(IOException::class)
-    private fun createClient(data: ForgeCreationData, version: VersionComponent, vanillaVersion: VersionComponent, statusProvider: StatusProvider) {
-        LOGGER.debug { "Creating forge client..." }
-        val clientProvider = statusProvider.subStep(VERSION_FORGE_FILE, 3)
-        clientProvider.next()
-
-        if (!version.directory.isDirectory()) {
-            try {
-                version.directory.createDir()
-            } catch (e: IOException) {
-                throw IOException("Unable to add forge main file: failed to create base dir: dir=${version.directory}", e)
-            }
-        }
-
-        LOGGER.debug { "Finding minecraft jar..." }
-        val minecraftBaseDir = vanillaVersion.directory
-        val minecraftFileName = vanillaVersion.mainFile.value ?: appConfig().minecraftDefaultFileName
-        val minecraftFile = LauncherFile.of(minecraftBaseDir, minecraftFileName)
-        if(!minecraftFile.isFile) {
-            throw IOException("Unable to create forge version: failed to find mc version client file: versionId=${data.installer.installData.inheritsFrom}")
-        }
-        LOGGER.debug { "Found minecraft jar" }
-
-        LOGGER.debug { "Finding minecraft java..." }
-        val javaFile = LauncherFile.ofData(data.files.mainManifest.javasDir.value, data.files.javaManifest.prefix.value + "_" + vanillaVersion.java.value, "bin", "java")
-        LOGGER.debug { "Found minecraft java" }
-
-        LOGGER.debug { "Patching forge client..."}
-        try {
-            data.installer.createClient(
-                data.files.librariesDir,
-                minecraftFile,
-                javaFile
-            ) {
-                LOGGER.debug { "Patching forge client: ${it.currentFile}" }
-                clientProvider.download(it, 1, 1)
-            }
-        } catch (e: FileDownloadException) {
-            throw IOException("Unable to create forge version: failed to create forge client", e)
-        }
-        clientProvider.finish()
-        LOGGER.debug { "Created forge client" }
     }
 
     override val step = VERSION_FORGE
@@ -180,10 +131,10 @@ class ForgeVersionCreator(
 }
 
 class ForgeCreationData(
-    val installer: ForgeInstaller,
+    val minecraftVersion: String,
+    version: String,
     files: LauncherFiles
-): VersionCreationData(installer.installData.id, installer.version, files)
+): VersionCreationData(version, version, files)
 
 val VERSION_FORGE = FormatStringProvider { Strings.creator.status.version.forge() }
-val VERSION_FORGE_LIBRARIES = FormatStringProvider { Strings.creator.status.version.forgeLibraries() }
-val VERSION_FORGE_FILE = FormatStringProvider { Strings.creator.status.version.forgeFile() }
+val VERSION_FORGE_INSTALLER = FormatStringProvider { Strings.creator.status.version.forgeInstaller() }

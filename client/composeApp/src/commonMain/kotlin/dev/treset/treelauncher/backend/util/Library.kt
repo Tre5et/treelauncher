@@ -4,10 +4,10 @@ import kotlin.jvm.Throws
 
 fun String.librarySame(other: String): Boolean {
     try {
-        val l1 = this.extractNameVersion()
-        val l2 = other.extractNameVersion()
+        val l1 = this.extractNameVersionFromLibraryPath()
+        val l2 = other.extractNameVersionFromLibraryPath()
         return l1.first == l2.first
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
         return false
     }
 }
@@ -17,14 +17,18 @@ fun String.libraryContained(libs: Collection<String>): Boolean {
 }
 
 @Throws(IllegalArgumentException::class)
-fun String.extractNameVersion(): Pair<String, String> {
+fun String.extractNameVersionFromLibraryPath(): Pair<String, String> {
     val parts = split("[/\\\\]".toRegex())
     val numberIndex = parts.size - 2
-    val fileResult = this.extractNameVersionFromJarFile()
-    val number = if(numberIndex < 0 || !parts[numberIndex].first().isDigit()) {
-        fileResult.second
-    } else parts[numberIndex]
-    return fileResult.first to number
+    if(numberIndex < 0 || !parts[numberIndex].first().isDigit()) {
+        throw IllegalArgumentException("No version number found")
+    }
+    val versionNumber = parts[numberIndex]
+    val name = parts[parts.size - 1]
+        .replace(versionNumber, "")
+        .replace("--", "-")
+        .replace("__", "_")
+    return name to versionNumber
 }
 
 @Throws(IllegalArgumentException::class)

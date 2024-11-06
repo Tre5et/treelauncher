@@ -367,7 +367,8 @@ fun FabricVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (
 fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
     return ForgeVersionCreator(
         ForgeCreationData(
-            installer = ForgeInstaller.getForVersion(data.forgeVersion!!),
+            minecraftVersion = data.minecraftVersion!!.id,
+            version = data.forgeVersion!!,
             files = AppContext.files
         ),
         onStatus

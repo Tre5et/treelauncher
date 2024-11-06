@@ -3,6 +3,7 @@ package dev.treset.treelauncher.backend.creation
 import dev.treset.mcdl.assets.AssetIndex
 import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.minecraft.MinecraftLibrary
+import dev.treset.mcdl.minecraft.MinecraftProfile
 import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFiles
@@ -192,7 +193,7 @@ class VanillaVersionCreator(
 }
 
 class VanillaCreationData(
-    val version: MinecraftVersionDetails,
+    val version: MinecraftProfile,
     files: LauncherFiles
 ): VersionCreationData(version.id, version.id, files)
 

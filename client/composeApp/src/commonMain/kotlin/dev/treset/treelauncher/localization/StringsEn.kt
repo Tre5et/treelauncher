@@ -35,7 +35,7 @@ open class StringsEn(
     val units: Units = Units(),
     val updater: Updater = Updater(),
     val version: Version = Version(),
-    val statusDetailsMessage: (String, Int, Int) -> String = { file, current, total -> if(file.isBlank()) "$current / $total" else "$file ($current/$total)" },
+    val statusDetailsMessage: (String, Int, Int) -> String = { file, current, total -> if(file.isBlank()) "$current / ${total.let { if(it < 0) "?" else it }}" else "$file ($current/${total.let { if(it < 0) "?" else it }})" },
 ) {
     data class Components(
         val create: () -> String = { "Create New" },
@@ -108,8 +108,7 @@ open class StringsEn(
                 val fabricLibraries: () -> String = { "Downloading fabric libraries..." },
                 val file: () -> String = { "Downloading version..." },
                 val forge: () -> String = { "Creating forge version..." },
-                val forgeFile: () -> String = { "Patching forge version..." },
-                val forgeLibraries: () -> String = { "Downloading forge libraries..." },
+                val forgeInstaller: () -> String = { "Running forge installer..." },
                 val libraries: () -> String = { "Downloading libraries..." },
                 val quilt: () -> String = { "Creating quilt version..." },
                 val quiltLibraries: () -> String = { "Downloading quilt libraries..." },
