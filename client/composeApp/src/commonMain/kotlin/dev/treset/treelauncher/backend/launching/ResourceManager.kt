@@ -23,7 +23,7 @@ class ResourceManager(private var instanceData: InstanceComponent) {
             prepareComponents(
                 arrayOf(
                     instanceData.savesComponent.value,
-                    instanceData.modsComponent.value ?: return,
+                    instanceData.modsComponent.value,
                     instanceData.resourcepacksComponent.value ,
                     instanceData.optionsComponent.value,
                     instanceData
@@ -91,17 +91,19 @@ class ResourceManager(private var instanceData: InstanceComponent) {
     }
 
     @Throws(IOException::class)
-    private fun prepareComponents(components: Array<out Component>) {
+    private fun prepareComponents(components: Array<out Component?>) {
         val undoable: MutableList<Component> = mutableListOf()
         for(component in components) {
-            undoable.add(component)
-            try {
-                component.getResourceProvider(instanceData.gameDataDir).includeResources()
-            } catch (e: IOException) {
+            component?.let {
+                undoable.add(component)
                 try {
-                    cleanComponents(undoable.toTypedArray(), true)
-                } catch (e2: IOException) {
-                    throw IOException("Unable to clean resources after launch fail: component=${component.id}: $e2", e)
+                    component.getResourceProvider(instanceData.gameDataDir).includeResources()
+                } catch (e: IOException) {
+                    try {
+                        cleanComponents(undoable.toTypedArray(), true)
+                    } catch (e2: IOException) {
+                        throw IOException("Unable to clean resources after launch fail: component=${component.id}: $e2", e)
+                    }
                 }
             }
         }

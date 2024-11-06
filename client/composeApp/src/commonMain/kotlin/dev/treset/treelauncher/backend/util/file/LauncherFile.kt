@@ -136,6 +136,14 @@ class LauncherFile(pathname: String) : File(pathname) {
         }
     }
 
+    fun atomicMoveOrMerge(dst: LauncherFile, vararg options: CopyOption) {
+        if(dst.exists()) {
+            moveTo(dst, *options)
+        } else {
+            atomicMoveTo(dst, *options)
+        }
+    }
+
     @Throws(IOException::class)
     fun write(content: ByteArray) {
         if (!exists()) {

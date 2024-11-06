@@ -37,7 +37,7 @@ open class GenericResourceProvider<T: Component>(
             LOGGER.debug { "Moving file: ${f.name}" }
             if (f.isFile() || f.isDirectory()) {
                 try {
-                    f.atomicMoveTo(LauncherFile.of(gameDataDir, f.getName()), StandardCopyOption.REPLACE_EXISTING)
+                    f.atomicMoveOrMerge(LauncherFile.of(gameDataDir, f.getName()), StandardCopyOption.REPLACE_EXISTING)
                 } catch (e: Exception) {
                     exceptionQueue.add(e)
                     LOGGER.warn(e) { "Unable to move included files: unable to copy file: manifestId=${component.id}" }
@@ -69,7 +69,7 @@ open class GenericResourceProvider<T: Component>(
             if(shouldRemove(f)) {
                 LOGGER.debug { "Moving file: ${f.name}" }
                 try {
-                    f.atomicMoveTo(LauncherFile.of(component.directory, f.getName()), StandardCopyOption.REPLACE_EXISTING)
+                    f.atomicMoveOrMerge(LauncherFile.of(component.directory, f.getName()), StandardCopyOption.REPLACE_EXISTING)
                     toRemove.add(f)
                 } catch (e: IOException) {
                     exceptionQueue.add(e)
