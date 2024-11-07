@@ -8,10 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.fabric.FabricProfile
 import dev.treset.mcdl.fabric.FabricVersion
-import dev.treset.mcdl.forge.ForgeInstaller
 import dev.treset.mcdl.forge.ForgeVersion
+import dev.treset.mcdl.minecraft.MinecraftProfile
 import dev.treset.mcdl.minecraft.MinecraftVersion
-import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import dev.treset.mcdl.neoforge.NeoForgeDL
 import dev.treset.mcdl.quiltmc.QuiltProfile
 import dev.treset.mcdl.quiltmc.QuiltVersion
@@ -369,7 +368,7 @@ fun VersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status
 @Throws(IOException::class)
 fun VanillaVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
     return VanillaVersionCreator(
-        VanillaCreationData(MinecraftVersionDetails.get(data.minecraftVersion!!.url), AppContext.files),
+        VanillaCreationData(MinecraftProfile.get(data.minecraftVersion!!.url), AppContext.files),
         onStatus
     )
 }

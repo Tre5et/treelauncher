@@ -1,8 +1,8 @@
 package dev.treset.treelauncher.backend.creation
 
 import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.minecraft.MinecraftProfile
 import dev.treset.mcdl.minecraft.MinecraftVersion
-import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import dev.treset.mcdl.quiltmc.QuiltLibrary
 import dev.treset.mcdl.quiltmc.QuiltProfile
 import dev.treset.mcdl.quiltmc.QuiltVersion
@@ -39,7 +39,7 @@ class QuiltVersionCreator(
 
         val inheritVersion = MinecraftVersion.get(data.profile.inheritsFrom)?: throw IOException("Unable to create quilt version: failed to find mc version: versionId=${data.profile.inheritsFrom}")
         val versionDetails = try {
-            MinecraftVersionDetails.get(inheritVersion.url)
+            MinecraftProfile.get(inheritVersion.url)
         } catch (e: FileDownloadException) {
             throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.profile.inheritsFrom}", e)
         }

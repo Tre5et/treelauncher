@@ -4,8 +4,8 @@ import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.fabric.FabricLibrary
 import dev.treset.mcdl.fabric.FabricProfile
 import dev.treset.mcdl.fabric.FabricVersion
+import dev.treset.mcdl.minecraft.MinecraftProfile
 import dev.treset.mcdl.minecraft.MinecraftVersion
-import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
@@ -40,7 +40,7 @@ class FabricVersionCreator(
         LOGGER.debug { "Creating minecraft version..." }
         val inheritVersion = MinecraftVersion.get(data.profile.inheritsFrom)?: throw IOException("Unable to create fabric version: failed to find mc version: versionId=${data.profile.inheritsFrom}")
         val versionDetails = try {
-            MinecraftVersionDetails.get(inheritVersion.url)
+            MinecraftProfile.get(inheritVersion.url)
         } catch (e: FileDownloadException) {
             throw IOException("Unable to create fabric version: failed to download mc version details: versionId=${data.profile.inheritsFrom}", e)
         }

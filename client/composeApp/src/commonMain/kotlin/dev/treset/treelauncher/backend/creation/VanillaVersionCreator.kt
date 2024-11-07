@@ -4,7 +4,6 @@ import dev.treset.mcdl.assets.AssetIndex
 import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.minecraft.MinecraftLibrary
 import dev.treset.mcdl.minecraft.MinecraftProfile
-import dev.treset.mcdl.minecraft.MinecraftVersionDetails
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
