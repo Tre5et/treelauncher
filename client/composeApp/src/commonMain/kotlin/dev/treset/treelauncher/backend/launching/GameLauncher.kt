@@ -89,7 +89,6 @@ class GameLauncher(
             throw GameLaunchException("Unable to launch game: unable to set start command", e)
         }
         LOGGER.info { "Starting game" }
-        LOGGER.debug { "command=" + pb.command() }
         try {
             val p = pb.start()
             resourceManager?.let { _ ->

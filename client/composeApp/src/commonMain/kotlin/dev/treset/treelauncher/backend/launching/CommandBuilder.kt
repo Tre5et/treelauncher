@@ -116,21 +116,13 @@ class CommandBuilder(
 
         val jvmArgs = mutableListOf<LauncherLaunchArgument>()
         for(v in instance.versionComponents.value.reversed()) {
-            v.jvmArguments.forEach {
-                if(!jvmArgs.contains(it)) {
-                    jvmArgs.add(it)
-                }
-            }
+            jvmArgs.addAll(v.jvmArguments)
         }
         jvmArgs.addAll(instance.jvmArguments.toMutableList())
 
         val gameArgs = mutableListOf<LauncherLaunchArgument>()
         for(v in instance.versionComponents.value.reversed()) {
-            v.gameArguments.forEach {
-                if(!gameArgs.contains(it)) {
-                    gameArgs.add(it)
-                }
-            }
+            gameArgs.addAll(v.gameArguments)
         }
 
         val args = jvmArgs + LauncherLaunchArgument(mainClass) + gameArgs
@@ -188,6 +180,7 @@ class CommandBuilder(
         }
     }
 
+    private var lastCheckedArgument: String? = null
     @Throws(GameCommandException::class)
     private fun appendArgument(
         pb: ProcessBuilder,
@@ -217,6 +210,8 @@ class CommandBuilder(
             if (!a.isFinished) {
                 throw GameCommandException("Unable to append argument: unable to replace all variables: argument=${a.argument}")
             }
+            LOGGER.debug { "Argument: ${if(lastCheckedArgument?.contains("accessToken") == true) "**********" else a.parsedArgument}" }
+            lastCheckedArgument = a.parsedArgument
             pb.command().add(a.parsedArgument)
         }
     }
