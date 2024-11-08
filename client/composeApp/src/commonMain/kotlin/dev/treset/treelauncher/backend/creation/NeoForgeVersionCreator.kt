@@ -1,14 +1,9 @@
 package dev.treset.treelauncher.backend.creation
 
 import dev.treset.mcdl.exception.FileDownloadException
-import dev.treset.mcdl.forge.ForgeInstallerExecutor
 import dev.treset.mcdl.minecraft.MinecraftProfile
-import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.mcdl.neoforge.NeoForgeInstallerExecutor
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.LauncherFiles
-import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
-import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
@@ -16,6 +11,7 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
+import kotlin.jvm.Throws
 
 class NeoForgeVersionCreator(
     data: NeoForgeCreationData,
@@ -35,6 +31,7 @@ class NeoForgeVersionCreator(
     override val defaultJvmArguments = appConfig().neoForgeDefaultJvmArguments
     override val defaultGameArguments = appConfig().neoForgeDefaultGameArguments
 
+    @Throws(IOException::class)
     override fun createVersion(javaFile: LauncherFile, statusProvider: StatusProvider): MinecraftProfile {
         LOGGER.debug { "Running neoforge installer..." }
         val installer = NeoForgeInstallerExecutor(data.versionId)
@@ -42,7 +39,10 @@ class NeoForgeVersionCreator(
             installer.install(
                 data.files.librariesDir,
                 javaFile
-            ) { statusProvider.download(it, 0, 0) }
+            ) {
+                statusProvider.download(it, 0, 0)
+                LOGGER.debug { "NeoForge Installer: ${it.currentFile}" }
+            }
         } catch (e: FileDownloadException) {
             throw IOException("Unable to create neoforge version: failed to execute insatller: versionId=${data.versionId}", e)
         }

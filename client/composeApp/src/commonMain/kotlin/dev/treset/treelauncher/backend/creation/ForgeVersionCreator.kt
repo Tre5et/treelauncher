@@ -3,10 +3,7 @@ package dev.treset.treelauncher.backend.creation
 import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.forge.ForgeInstallerExecutor
 import dev.treset.mcdl.minecraft.MinecraftProfile
-import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.LauncherFiles
-import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
@@ -33,6 +30,7 @@ class ForgeVersionCreator(
     override val defaultJvmArguments = appConfig().forgeDefaultJvmArguments
     override val defaultGameArguments = appConfig().forgeDefaultGameArguments
 
+    @Throws(IOException::class)
     override fun createVersion(javaFile: LauncherFile, statusProvider: StatusProvider): MinecraftProfile {
         LOGGER.debug { "Running forge installer..." }
         val installer = ForgeInstallerExecutor(data.versionId)
@@ -40,7 +38,10 @@ class ForgeVersionCreator(
             installer.install(
                 data.files.librariesDir,
                 javaFile
-            ) { statusProvider.download(it, 0, 0) }
+            ) {
+                statusProvider.download(it, 0, 0)
+                LOGGER.debug { "Forge installer: ${it.currentFile}" }
+            }
         } catch (e: FileDownloadException) {
             throw IOException("Unable to create forge version: failed to execute insatller: versionId=${data.versionId}", e)
         }

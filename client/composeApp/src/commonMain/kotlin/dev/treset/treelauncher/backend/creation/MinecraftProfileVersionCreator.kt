@@ -1,7 +1,6 @@
 package dev.treset.treelauncher.backend.creation
 
 import dev.treset.mcdl.exception.FileDownloadException
-import dev.treset.mcdl.forge.ForgeInstallerExecutor
 import dev.treset.mcdl.minecraft.MinecraftProfile
 import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.treelauncher.backend.config.appConfig
@@ -102,7 +101,7 @@ abstract class MinecraftProfileVersionCreator<T: MinecraftProfileCreationData>(
             ).map {
                 // Hack because forge uses ${version_name} in a questionable way in some versions
                 if(it.argument.contains("\${version_name}")) {
-                    it.argument = it.argument.replace("\${version_name}", profile.id)
+                    it.argument = it.argument.replace("\${version_name}", appConfig().minecraftDefaultFileName.dropLast(4))
                 }
                 it
             },
@@ -112,7 +111,7 @@ abstract class MinecraftProfileVersionCreator<T: MinecraftProfileCreationData>(
             ).map {
                 // Hack because forge uses ${version_name} in a questionable way in some versions
                 if(it.argument.contains("\${version_name}")) {
-                    it.argument = it.argument.replace("\${version_name}", profile.id)
+                    it.argument = it.argument.replace("\${version_name}", appConfig().minecraftDefaultFileName.dropLast(4))
                 }
                 it
             },
@@ -134,6 +133,23 @@ abstract class MinecraftProfileVersionCreator<T: MinecraftProfileCreationData>(
     }
 
     fun getJavaFile(minecraftVersion: VersionComponent): LauncherFile {
+        val path = System.getProperty("java.home")
+        if(path == null) {
+            LOGGER.warn { "Unable to get current jre path, using vanilla version jre" }
+            return getVersionJava(minecraftVersion)
+        }
+        val installation = LauncherFile.of(path, "bin")
+        val files = installation.listFiles()
+        val file = files.find { it.name == "java" || it.name == "java.exe" }
+        if(file == null) {
+            LOGGER.warn { "Couldn't find java file for current installation, using vanilla java" }
+            return getVersionJava(minecraftVersion)
+        }
+
+        return LauncherFile.of(file)
+    }
+
+    fun getVersionJava(minecraftVersion: VersionComponent): LauncherFile {
         return LauncherFile.ofData(data.files.mainManifest.javasDir.value, data.files.javaManifest.prefix.value + "_" + minecraftVersion.java.value, "bin", "java")
     }
 
