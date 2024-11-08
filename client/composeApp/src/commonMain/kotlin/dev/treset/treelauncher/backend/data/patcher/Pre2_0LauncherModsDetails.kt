@@ -4,14 +4,13 @@ import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.JsonUtils
 import dev.treset.mcdl.json.SerializationException
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 
 class Pre2_0LauncherModsDetails(
     var types: List<String>?,
     var versions: List<String>?,
-    var mods: MutableList<LauncherMod>
+    var mods: MutableList<Pre2_0LauncherMod>
 ) : GenericJsonParsable() {
 
     companion object {
@@ -42,6 +41,6 @@ fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherModsDetails>.toModsComponent(): 
         LauncherFile.of(first.directory, appConfig().manifestFileName),
         includedFiles = first.includedFiles,
         lastUsed = first.lastUsed ?: "",
-        mods = second.mods
+        mods = second.mods.map { it.toLauncherMod() }
     )
 }
