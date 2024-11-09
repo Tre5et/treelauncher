@@ -30,7 +30,7 @@ fun Saves() {
                 components = AppContext.files.savesComponents,
                 allowUse = false,
                 getCreator = SavesCreator::get,
-                onDone = { onDone() }
+                onDone = onDone
             )
         },
         reload = {

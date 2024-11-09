@@ -27,7 +27,7 @@ fun Options() {
                 components = AppContext.files.optionsComponents,
                 allowUse = false,
                 getCreator = OptionsCreator::get,
-                onDone = { onDone() }
+                onDone = onDone
             )
         },
         reload = {

@@ -30,7 +30,7 @@ fun Resourcepacks() {
                 components = AppContext.files.resourcepackComponents,
                 allowUse = false,
                 getCreator = ResourcepackCreator::get,
-                onDone = { onDone() }
+                onDone = onDone
             )
         },
         reload = {

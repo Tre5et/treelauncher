@@ -35,7 +35,7 @@ fun <T: Component, D: SharedComponentData<T>> Components(
     isEnabled: T.() -> Boolean = { true },
     reload: () -> Unit,
     constructSharedData: (T, () -> Unit) -> D,
-    createContent: (@Composable ColumnScope.(onDone: () -> Unit) -> Unit)? = null,
+    createContent: (@Composable ColumnScope.(onDone: (T?) -> Unit) -> Unit)? = null,
     actionBarSpecial: @Composable D.(RowScope) -> Unit = { },
     actionBarBoxContent: @Composable D.(BoxScope) -> Unit = { },
     actionBarFraction: Float = 1f,
@@ -58,7 +58,11 @@ fun <T: Component, D: SharedComponentData<T>> Components(
     @Suppress("NAME_SHADOWING")
     val components = components.toList()
 
-    var selected: T? by remember(components) { mutableStateOf(null) }
+    var selected: T? by remember { mutableStateOf(null) }
+    LaunchedEffect(components) {
+        val current = components.find { it.id.value == selected?.id?.value }
+        selected = current
+    }
 
     var creatorSelected by remember { mutableStateOf(false) }
 
@@ -313,66 +317,12 @@ fun <T: Component, D: SharedComponentData<T>> Components(
                     createContent {
                         reload()
                         creatorSelected = false
+                        it?.let {
+                            selected = it
+                        }
                     }
                 }
             }
         }
     }
 }
-
-/*@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun Components(
-    title: String,
-    componentManifest: ParentManifest,
-    components: List<ComponentManifest>,
-    checkHasComponent: (LauncherInstanceDetails, ComponentManifest) -> Boolean,
-    isEnabled: ComponentManifest.() -> Boolean = {true},
-    getCreator: (CreationState<ComponentManifest>) -> GenericComponentCreator?,
-    reload: () -> Unit,
-    actionBarSpecial: @Composable RowScope.(
-        ComponentManifest,
-        Boolean,
-        () -> Unit,
-        () -> Unit
-    ) -> Unit = {_,_,_,_->},
-    actionBarBoxContent: @Composable BoxScope.(
-        selected: ComponentManifest,
-        settingsOpen: Boolean,
-        redraw: () -> Unit,
-        reload: () -> Unit
-    ) -> Unit = {_,_,_,_->},
-    detailsContent: @Composable ColumnScope.(
-        selected: ComponentManifest,
-        redraw: () -> Unit,
-        reload: () -> Unit
-    ) -> Unit = {_,_,_->},
-    detailsOnDrop: ((DragData) -> Unit)? = null,
-    detailsScrollable: Boolean = false,
-    settingsDefault: Boolean = false,
-    sortContext: SortContext? = null
-) = Components(
-    title,
-    components,
-    componentManifest,
-    checkHasComponent,
-    { this },
-    isEnabled,
-    getCreator,
-    reload,
-    { onCreate ->
-        ComponentCreator(
-            existing = components.toList(),
-            toDisplayString = { name },
-            onCreate = onCreate,
-            allowUse = false
-        )
-    },
-    actionBarSpecial,
-    actionBarBoxContent,
-    detailsContent,
-    detailsOnDrop,
-    detailsScrollable,
-    settingsDefault,
-    sortContext
-)*/

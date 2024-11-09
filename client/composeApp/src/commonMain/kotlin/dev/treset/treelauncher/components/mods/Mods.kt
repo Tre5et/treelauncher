@@ -32,7 +32,7 @@ fun Mods() {
             ModsCreation(
                 components = AppContext.files.modsComponents,
                 showUse = false,
-                onDone = { onDone() }
+                onDone = onDone
             )
         },
         detailsContent = { ModsDetails(it) },
