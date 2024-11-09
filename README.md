@@ -14,9 +14,9 @@ A modern, component based Minecraft Launcher.
     - Mods
 - Instance creation and management
   - Create, delete, and edit instances
-  - Support for Vanilla, Fabric, Forge and Quilt
+  - Support for Vanilla, Fabric, Quilt, Forge and NeoForge
   - Smart version management so that the same version isn't installed multiple times
-- Support for fabric, forge and quilt Mods
+- Support for fabric, quilt, forge and neoforge Mods
   - Searching mods from [Modrinth](https://modrinth.com/) and [CurseForge](https://www.curseforge.com/)
   - Automatic installation and updates
   - Automatic dependency resolution
