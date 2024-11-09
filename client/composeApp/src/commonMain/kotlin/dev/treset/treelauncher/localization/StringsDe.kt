@@ -1,6 +1,7 @@
 package dev.treset.treelauncher.localization
 
 import dev.treset.treelauncher.components.instances.InstanceDetailsType
+import dev.treset.treelauncher.generic.VersionType
 
 class StringsDe : StringsEn(
     components = Components(
@@ -34,7 +35,15 @@ class StringsDe : StringsEn(
             version = { "Version" },
         ),
         mods = Creator.Mods (
-            quiltIncludeFabric = { "Fabric Mods nutzen" },
+            includeAlternateLoader = {
+                "${ 
+                    when(it) {
+                        VersionType.QUILT -> "Fabric"
+                        VersionType.NEO_FORGE -> "Forge"
+                        else -> "Alternative"
+                    }
+                } Mods nutzen"
+            },
             type = { "Mod-Loader"},
             version = { "Version" },
         ),

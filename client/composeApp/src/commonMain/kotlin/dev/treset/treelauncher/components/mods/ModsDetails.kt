@@ -43,7 +43,8 @@ fun SharedModsData.ModsDetails(scope: ColumnScope) {
     var selectedVersion: MinecraftVersion? by remember(component) { mutableStateOf(null) }
     var selectedType: VersionType by remember(types) { mutableStateOf(types[0]) }
     var includeAlternateLoader by remember(types) { mutableStateOf(
-        types[0] == VersionType.QUILT && types.size > 1
+        (types[0] == VersionType.QUILT || types[0] == VersionType.NEO_FORGE)
+                && types.size > 1
     ) }
 
     var popupData: PopupData? by remember { mutableStateOf(null) }
@@ -320,9 +321,9 @@ fun SharedModsData.ModsDetails(scope: ColumnScope) {
                 }
             )
 
-            if(selectedType == VersionType.QUILT) {
+            if(selectedType == VersionType.QUILT || selectedType == VersionType.NEO_FORGE) {
                 TitledCheckBox(
-                    title = Strings.creator.mods.quiltIncludeFabric(),
+                    title = Strings.creator.mods.includeAlternateLoader(selectedType),
                     checked = includeAlternateLoader,
                     onCheckedChange = {
                         includeAlternateLoader = it
@@ -357,6 +358,8 @@ fun SharedModsData.ModsDetails(scope: ColumnScope) {
                                             component.types.assignFrom(
                                                 if(selectedType == VersionType.QUILT && includeAlternateLoader) {
                                                     listOf(VersionType.QUILT.id, VersionType.FABRIC.id)
+                                                } else if(selectedType == VersionType.NEO_FORGE && includeAlternateLoader) {
+                                                    listOf(VersionType.NEO_FORGE.id, VersionType.FORGE.id)
                                                 } else {
                                                     listOf(selectedType.id)
                                                 }

@@ -79,7 +79,11 @@ fun ModsCreation(
     var creationStatus: Status? by remember { mutableStateOf(null) }
 
     val creationContent: ModsCreationContent = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
-        val additionalLoader = if (newType == VersionType.QUILT && alternateLoader) VersionType.FABRIC else null
+        val additionalLoader = if(newType == VersionType.QUILT && alternateLoader) {
+            VersionType.FABRIC
+        } else if(newType == VersionType.NEO_FORGE && alternateLoader) {
+            VersionType.FORGE
+        } else null
 
         ModsCreationContent(
             mode = mode,
@@ -197,9 +201,9 @@ fun ModsCreation(
                 placeholder = Strings.creator.mods.type(),
                 enabled = mode == CreationMode.NEW
             )
-            if(newType == VersionType.QUILT) {
+            if(newType == VersionType.QUILT || newType == VersionType.NEO_FORGE) {
                 TitledCheckBox(
-                    title = Strings.creator.mods.quiltIncludeFabric(),
+                    title = Strings.creator.mods.includeAlternateLoader(newType!!),
                     checked = alternateLoader,
                     onCheckedChange = {
                         alternateLoader = it

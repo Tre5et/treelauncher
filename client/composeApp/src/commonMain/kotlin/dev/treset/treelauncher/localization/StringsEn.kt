@@ -9,6 +9,7 @@ import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.instances.InstanceDetailsType
+import dev.treset.treelauncher.generic.VersionType
 
 import kotlin.math.roundToInt
 
@@ -84,7 +85,15 @@ open class StringsEn(
         }
 
         data class Mods(
-            val quiltIncludeFabric: () -> String = { "Include Fabric Mods" },
+            val includeAlternateLoader: (VersionType) -> String = {
+                "Include ${
+                    when(it) {
+                        VersionType.QUILT -> "Fabric"
+                        VersionType.NEO_FORGE -> "Forge"
+                        else -> "Alternate"
+                    }
+                } Mods"
+            },
             val type: () -> String = { "Mod Loader" },
             val version: () -> String = { "Version" }
         )
