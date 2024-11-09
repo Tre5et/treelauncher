@@ -123,6 +123,13 @@ class ModDownloader(
             "Downloading mod file: ${versionData.name}"
         }
         versionData.downloadProviders = modProviders
+        if(!directory.isDirectory) {
+            try {
+                directory.createDir()
+            } catch (e: IOException) {
+                throw FileDownloadException("Unable to create mods directory", e)
+            }
+        }
         val newMod = versionData.download(directory).toLauncherMod()
         if(!enabled) {
             LOGGER.debug { "Disabling new mod file: ${newMod.fileName.value}" }

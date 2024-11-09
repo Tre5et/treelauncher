@@ -146,7 +146,7 @@ class LauncherMod(
             modData ?: try {
                     loadModData()
                 } catch (e: FileDownloadException) {
-                    LOGGER.debug(e) { "Failed to get mod data for ${fileName}, this may be correct" }
+                    LOGGER.debug(e) { "Failed to get mod data for ${fileName.value}, this may be correct" }
                     versions.value = listOf()
                 }
             modData?.let {
@@ -216,7 +216,7 @@ class LauncherMod(
         updateAvailable.value = null
         version.downloadProviders = component.providers.getEnabled()
         component.registerJob { currentMods ->
-            LOGGER.debug { "Downloading mod ${fileName} version ${version.versionNumber}" }
+            LOGGER.debug { "Downloading mod ${fileName.value} version ${version.versionNumber}" }
 
             try {
                 ModDownloader(
@@ -280,7 +280,7 @@ class LauncherMod(
     fun delete(component: ModsComponent) {
         component.registerJob { mods ->
             val oldFile = component.modsDirectory.child(
-                "${fileName}${if (enabled.value) "" else ".disabled"}"
+                "${fileName.value}${if (enabled.value) "" else ".disabled"}"
             )
             LOGGER.debug { "Deleting mod file: ${oldFile.path}" }
             try {
