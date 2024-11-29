@@ -46,15 +46,17 @@ export default function Page({
                 <p className="text-xl mt-2">{{"de": "Ein kurzer Hinweis zur Accountverwaltung:"}[locale] || "A brief note on Account handling:"}</p>
                 {{
                     "de": <div>
-                        <p>Anmeldedaten werden durch die <a href="https://github.com/HyCraftHD/Minecraft-Authenticator">Minecraft-Authenticator</a> Java Bibliothek verwaltet.</p>
-                        <p className="mt-1">Die Anmeldung finded in einem eingebauten Browser-Fenster auf der offizierllen Microsoft Anemeldeseite statt. Das Ergebnis wird von Minecraft Authenticator verarbeitet. Der Laucher nutzt die verarbeiteten Nutzerdaten um den Minecraft Nutzer während des Spielstarts zu authentifizieren. Skin Daten werden über die offizielle <a href="https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape">Mojang API</a> abgerufen.</p>
-                        <p className="mt-1">Die durch Minecraft Authenticator erstellten Nutzerdaten werden im lokalen Verzeichnis gespeichert, falls &quot;Eingeloggt bleiben&quot; während des Anmeldens ausgewählt ist. Diese Datei wird gelöscht, wenn sich der Nutzer über die Einstellungen abmeldet. Sie wird durch Minecraft Authenticator gelesen und verarbeitet, um eine automatische Anmeldung bei Launcherstart zu ermöglichen.</p>
+                        <p>Die Anmeldung findet über die standard Micorsoft OAuth Methode statt.</p>
+                        <p className="mt-1">Die Anmeldung findet durch den Gerätebrowser statt. Dazu muss den angefragten Berechtigungen zugestimmt werden. Anschließend bekommt der Launcher einen Access-Token, der nur für die Minecraft Authentifizierung verwendet werden kann. Skin Daten werden über die offizielle <a href="https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape">Mojang API</a> abgerufen.</p>
+                        <p className="mt-1">Die Access-Daten werden im lokalen Launcher Verzeichnis gespeichert, falls &quot;Eingeloggt bleiben&quot; während des Anmeldens ausgewählt ist, um nach einem Neustart erneut angemeldet zu werden. Diese Datei wird gelöscht, wenn sich der Nutzer über die Einstellungen abmeldet.</p>
+                        <p className="mt-1">Die Implementierung wird vom <a href="https://github.com/Tre5et/mcdl">MCDL</a> Auth Modul bereitgestellt.</p>
                     </div>
                 }[locale] ||
                     <div>
-                        <p>Any login data is handled by the <a href="https://github.com/HyCraftHD/Minecraft-Authenticator">Minecraft-Authenticator</a> third-party Java library.</p>
-                        <p className="mt-1">Login is done through a built-in browser window to an official Microsoft Login page. The Login results are processed by Minecraft Authenticator. The launcher uses the User data provided to authenticate the Minecraft user at game launch. Skin data is retrieved from the official <a href="https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape">Mojang API</a>.</p>
-                        <p className="mt-1">The secrets file provided by Minecraft-Authenticator is saved to the launcher data directory if &quot;Keep logged in&quot; is selected on login. It is deleted when the logout from settings is used. The file is read and used by Minecraft-Authenticator to reauthenticate on each app start.</p>
+                        <p>Login is done using the official Microsoft OAuth process.</p>
+                        <p className="mt-1">The device browser is used for this process. The requested permissions need to be granted to obtain an access token, that can only be used to authenticate with minecraft. Skin data is retrieved from the official <a href="https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape">Mojang API</a>.</p>
+                        <p className="mt-1">The access data is saved to the launcher data directory if &quot;Keep logged in&quot; is selected on login, to allow re-authentication on login. It is deleted when the logout from settings is used.</p>
+                        <p className="mt-1">The login implementation is provided by the <a href="https://github.com/Tre5et/mcdl">MCDL</a> Auth module.</p>
                     </div>
                 }
                 <p className="text-3xl mt-6">{{"de": "Über Mich:"}[locale] || "About Me:"}</p>
