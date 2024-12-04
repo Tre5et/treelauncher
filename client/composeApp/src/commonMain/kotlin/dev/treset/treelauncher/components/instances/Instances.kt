@@ -3,6 +3,10 @@ package dev.treset.treelauncher.components.instances
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -13,6 +17,7 @@ import dev.treset.treelauncher.backend.launching.GameLauncher
 import dev.treset.treelauncher.backend.util.sort.InstanceSortProviders
 import dev.treset.treelauncher.components.Components
 import dev.treset.treelauncher.generic.IconButton
+import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.icons
@@ -90,5 +95,25 @@ fun Instances() {
         sorts = InstanceSortProviders,
         selectorFraction = 1/3f,
         allowSettings = false
-    )
+    ) {
+        Text(
+            Strings.selector.instance.emptyTitle(),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Strings.selector.instance.empty().let {
+                Text(it.first)
+                Icon(
+                    icons().add,
+                    "Add",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(it.second)
+            }
+        }
+    }
 }

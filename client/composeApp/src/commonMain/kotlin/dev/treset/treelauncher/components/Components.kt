@@ -53,10 +53,25 @@ fun <T: Component, D: SharedComponentData<T>> Components(
     selectorFraction: Float = 1/2f,
     sorts: List<SortProvider<Component>> = ComponentSortProviders,
     allowSettings: Boolean = true,
-    settingsDefault: Boolean = false
+    settingsDefault: Boolean = false,
+    noComponentsContent: @Composable (ColumnScope.() -> Unit)? = null
 ) {
     @Suppress("NAME_SHADOWING")
     val components = components.toList()
+
+    if(components.isEmpty()) {
+        noComponentsContent?.let {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                noComponentsContent()
+            }
+            return
+        }
+    }
 
     var selected: T? by remember { mutableStateOf(null) }
     LaunchedEffect(components) {
