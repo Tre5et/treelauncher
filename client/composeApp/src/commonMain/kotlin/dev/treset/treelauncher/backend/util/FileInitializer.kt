@@ -6,6 +6,7 @@ import dev.treset.treelauncher.backend.data.manifest.MainManifest
 import dev.treset.treelauncher.backend.data.manifest.Manifest
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import kotlinx.serialization.Serializable
 import java.io.IOException
 
 class FileInitializer(val directory: LauncherFile) {
@@ -65,9 +66,8 @@ class FileInitializer(val directory: LauncherFile) {
         }
     }
 
-    inner class InitializingManifest(
-        type: LauncherManifestType, prefix: String, vararg path: String
-    ) : ParentManifest(type, prefix, mutableListOf(), LauncherFile.of(directory, *path))
+    fun InitializingManifest(type: LauncherManifestType, prefix: String, vararg path: String)
+        = ParentManifest(type, prefix, mutableListOf(), LauncherFile.of(directory, *path))
 
     companion object {
         private val LOGGER = KotlinLogging.logger{}
