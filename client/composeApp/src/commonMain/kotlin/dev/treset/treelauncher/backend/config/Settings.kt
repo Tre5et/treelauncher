@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.mods.ModProvider
+import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.ColorData
 import dev.treset.treelauncher.backend.util.serialization.DpData
@@ -35,7 +36,10 @@ data class Window(
 
 
 @Serializable
-class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : GenericJsonParsable() {
+class Settings(
+    @Transient var file: LauncherFile = LauncherFile.of(""),
+    val dataVersion: MutableDataState<String> = mutableStateOf("0.0.1")
+) : GenericJsonParsable() {
     val language: MutableDataState<Language> = mutableStateOf(SystemLanguage)
     val theme: MutableDataState<Theme> = mutableStateOf(Theme.SYSTEM)
     val accentColor: MutableDataState<AccentColor> = mutableStateOf(AccentColor.GREEN)
@@ -69,7 +73,6 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
     val discordShowVersion: MutableDataState<Boolean> = mutableStateOf(true)
     val discordShowInstance: MutableDataState<Boolean> = mutableStateOf(true)
     val window: MutableDataState<Window?> = mutableStateOf(null)
-    val dataVersion: MutableDataState<String> = mutableStateOf("0.0.1")
     val clientId: MutableDataState<String> = mutableStateOf(UUID.randomUUID().toString())
 
     val isDebug: MutableDataState<Boolean> = mutableStateOf(System.getenv("debug") == "true")
@@ -98,8 +101,8 @@ class Settings(@Transient var file: LauncherFile = LauncherFile.of("")) : Generi
 
         @Throws(IOException::class)
         fun new(file: LauncherFile): Settings {
-            LOGGER.debug { "Creating new settings at: $file..." }
-            val result = Settings(file)
+            LOGGER.debug { "Creating new settings with data version: ${appConfig().dataVersion} at: $file..." }
+            val result = Settings(file, mutableStateOf(appConfig().dataVersion.toString()))
             AppSettings = result
             result.save()
             LOGGER.debug { "Created new settings" }
