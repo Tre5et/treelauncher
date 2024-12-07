@@ -40,7 +40,7 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "2.1.1"
+        val mcdlVersion = "2.1.2"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -74,7 +74,7 @@ kotlin {
 }
 
 
-val version = "3.0.2"
+val version = "3.0.3"
 val projectName = "TreeLauncher"
 val projectVendor = "TreSet"
 val resourcesDir = project.file("resources")
