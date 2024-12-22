@@ -521,9 +521,9 @@ open class StringsEn(
 
         data class Saves(
             val delete: () -> String = { "Delete World" },
-            val deleteTitle: (Save) -> String = { world -> "You are about to delete the world \"${world.name}\"!" },
-            val deleteMessage: (Save) -> String = { "This action cannot be undone!\nAny data in this world will be lost forever." },
-            val deleteConfirm: (Save) -> String = { world -> "Yes, delete the world \"${world.name}\" forever" },
+            val deleteTitle: (Save?) -> String = { world -> "You are about to delete the world${world?.let { " \"${world.name}\"" }}!" },
+            val deleteMessage: (Save?) -> String = { "This action cannot be undone!\nAny data in this world will be lost forever." },
+            val deleteConfirm: (Save?) -> String = { world -> "Yes, delete the world${world?.let { " \"${world.name}\"" }} forever" },
             val deleteCancel: () -> String = { "Cancel" },
             val import: Component.ImportStrings = Component.ImportStrings(
                 delete = { "Unselect World" },

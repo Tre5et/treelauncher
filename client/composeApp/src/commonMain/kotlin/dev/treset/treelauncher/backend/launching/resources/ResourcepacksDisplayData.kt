@@ -10,8 +10,8 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 data class ResourcepacksDisplayData(
-    val resourcepacks: MutableStateMap<Resourcepack, LauncherFile>,
-    val texturepacks: MutableStateMap<Texturepack, LauncherFile>,
+    val resourcepacks: MutableStateMap<Resourcepack?, LauncherFile>,
+    val texturepacks: MutableStateMap<Texturepack?, LauncherFile>,
     val onAddResourcepack: MutableState<ResourcepacksDisplayData.(source: List<LauncherFile>) -> Unit>,
     val onAddTexturepack: MutableState<ResourcepacksDisplayData.(source: List<LauncherFile>) -> Unit>
 ) {

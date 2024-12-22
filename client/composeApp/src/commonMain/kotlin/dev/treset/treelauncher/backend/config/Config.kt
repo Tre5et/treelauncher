@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption
 import kotlin.jvm.Throws
 
 class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = null) {
-    val launcherVersion = Version(3,0,2)
+    val launcherVersion = Version(3,0,3)
     val dataVersion = Version(2,0,0)
     var baseDir: LauncherFile = LauncherFile.of(globalConfig.path)
     val syncFileName = "data.sync"

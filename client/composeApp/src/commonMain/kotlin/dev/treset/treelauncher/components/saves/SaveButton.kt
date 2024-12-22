@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import dev.treset.mcdl.saves.Save
+import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
@@ -17,7 +18,8 @@ import treelauncher.composeapp.generated.resources.default_save
 
 @Composable
 fun SaveButton(
-    save: Save,
+    save: Save?,
+    file: LauncherFile,
     selected: Boolean,
     display: ListDisplay,
     onDelete: () -> Unit,
@@ -25,15 +27,15 @@ fun SaveButton(
 ) {
     var showDeleteDialog by remember(save) { mutableStateOf(false) }
 
-    val image = save.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_save)
+    val image = save?.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_save)
 
     when(display) {
         ListDisplay.FULL -> ImageSelectorButton(
             selected = selected,
             onClick = onClick,
             image = image,
-            title = save.name,
-            subtitle = save.fileName
+            title = save?.name ?: file.name,
+            subtitle = save?.fileName
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -53,8 +55,8 @@ fun SaveButton(
             selected = selected,
             onClick = onClick,
             image = image,
-            title = save.name,
-            subtitle = save.fileName
+            title = save?.name ?: file.name,
+            subtitle = save?.fileName
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -73,7 +75,7 @@ fun SaveButton(
         ListDisplay.MINIMAL -> CompactSelectorButton(
             selected = selected,
             onClick = onClick,
-            title = save.name,
+            title = save?.name ?: file.name,
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)

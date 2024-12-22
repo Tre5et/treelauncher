@@ -111,6 +111,7 @@ fun SharedResourcepacksData.ResourcepacksDetails() {
                 displayData.resourcepacks.forEach {
                     ResourcepackButton(
                         it.key,
+                        it.value,
                         display = listDisplay
                     ) {
                         try {
@@ -130,6 +131,7 @@ fun SharedResourcepacksData.ResourcepacksDetails() {
                 displayData.texturepacks.forEach {
                     TexturepackButton(
                         it.key,
+                        it.value,
                         display = listDisplay
                     ) {
                         try {

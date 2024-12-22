@@ -1,6 +1,5 @@
 package dev.treset.treelauncher.backend.data.manifest
 
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import dev.treset.mcdl.resourcepacks.Resourcepack
@@ -59,13 +58,13 @@ class ResourcepackComponent(
         val resourcepacksDirectory = LauncherFile.of(getContentDirectory(gameDataDir), "resourcepacks")
 
         resourcepacks.assignFrom(
-            resourcepacksDirectory.listFiles().mapNotNull {
+            resourcepacksDirectory.listFiles().associate {
                 try {
                     Resourcepack.get(it)
                 } catch (e: Exception) {
                     null
-                }?.let {rp -> rp to it}
-            }.toMap()
+                }.let { rp -> rp to it }
+            }
         )
     }
 
@@ -73,13 +72,13 @@ class ResourcepackComponent(
         val texturepacksDirectory = LauncherFile.of(getContentDirectory(gameDataDir), "texturepacks")
 
         texturepacks.assignFrom(
-            texturepacksDirectory.listFiles().mapNotNull {
+            texturepacksDirectory.listFiles().associate {
                 try {
                     Texturepack.get(it)
                 } catch (e: Exception) {
                     null
-                }?.let {tp -> tp to it}
-            }.toMap()
+                }.let { tp -> tp to it }
+            }
         )
     }
 

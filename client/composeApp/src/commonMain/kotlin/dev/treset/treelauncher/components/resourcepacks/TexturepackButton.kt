@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import dev.treset.mcdl.resourcepacks.Texturepack
+import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.icons
@@ -17,21 +18,22 @@ import treelauncher.composeapp.generated.resources.default_pack
 
 @Composable
 fun TexturepackButton(
-    texturepack: Texturepack,
+    texturepack: Texturepack?,
+    file: LauncherFile,
     display: ListDisplay,
     onDelete: () -> Unit
 ) {
     var showDeleteDialog by remember(texturepack) { mutableStateOf(false) }
 
-    val image = texturepack.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_pack)
+    val image = texturepack?.image?.toComposeImageBitmap() ?: imageResource(Res.drawable.default_pack)
 
     when(display) {
         ListDisplay.FULL -> ImageSelectorButton(
             selected = false,
             onClick = {},
             image = image,
-            title = texturepack.name,
-            subtitle = texturepack.description
+            title = texturepack?.name ?: file.name,
+            subtitle = texturepack?.description
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -51,8 +53,8 @@ fun TexturepackButton(
             selected = false,
             onClick = { },
             image = image,
-            title = texturepack.name,
-            subtitle = texturepack.description
+            title = texturepack?.name ?: file.name,
+            subtitle = texturepack?.description
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -71,7 +73,7 @@ fun TexturepackButton(
         ListDisplay.MINIMAL -> CompactSelectorButton(
             selected = false,
             onClick = { },
-            title = texturepack.name,
+            title = texturepack?.name ?: file.name,
         ) {
             Box(
                 modifier = Modifier.align(Alignment.CenterEnd)

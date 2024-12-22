@@ -12,7 +12,7 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import java.io.IOException
 
 data class SavesDisplayData(
-    val saves: MutableStateMap<Save, LauncherFile>,
+    val saves: MutableStateMap<Save?, LauncherFile>,
     val servers: MutableStateList<Server>,
     val onAdd: MutableState<SavesDisplayData.(source: List<LauncherFile>) -> Unit>,
 ) {

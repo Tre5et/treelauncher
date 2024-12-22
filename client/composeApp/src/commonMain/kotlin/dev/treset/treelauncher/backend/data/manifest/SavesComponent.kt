@@ -1,7 +1,5 @@
 package dev.treset.treelauncher.backend.data.manifest
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import dev.treset.mcdl.saves.Save
@@ -58,13 +56,13 @@ class SavesComponent(
         val savesDirectory = LauncherFile.of(getContentDirectory(gameDataDir), "saves")
 
         saves.assignFrom(
-            savesDirectory.listFiles().mapNotNull {
+            savesDirectory.listFiles().associate {
                 try {
                     Save.get(it) to it
                 } catch (e: IOException) {
-                    null
+                    null to it
                 }
-            }.toMap()
+            }
         )
     }
 
