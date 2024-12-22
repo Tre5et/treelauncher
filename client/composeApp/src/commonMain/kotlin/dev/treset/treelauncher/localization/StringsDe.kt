@@ -313,7 +313,6 @@ class StringsDe : StringsEn(
             empty = { "Keine Mods gefunden" },
             import = Manager.Mods.ImportStrings(
                 delete = { "Mod entfernen" },
-                displayName = { mod -> "${mod.name} v${mod.version}"},
                 import = { "Mods importieren" },
                 importComponent = { "Mods aus anderen Komponenten auswählen:" },
                 importFile = { "Lokale Moddateien kopieren:" },
