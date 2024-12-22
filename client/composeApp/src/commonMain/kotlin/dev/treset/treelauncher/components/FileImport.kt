@@ -101,7 +101,10 @@ fun <T> FileImport(
             }
     }
 
-    LaunchedEffect(filesToAdd) {
+    LaunchedEffect(filesToAdd.toList()) {
+        if(filesToAdd.isEmpty()) {
+            return@LaunchedEffect
+        }
         var interactingWithPopup = false
         for (file in filesToAdd) {
             while(interactingWithPopup) {
