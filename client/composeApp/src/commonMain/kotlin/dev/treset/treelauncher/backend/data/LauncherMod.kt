@@ -287,7 +287,6 @@ class LauncherMod(
                 oldFile.remove()
             } catch(e: IOException) {
                 AppContext.error(IOException("Failed to delete mod file", e))
-                return@registerJob
             }
             mods.remove(this)
             LOGGER.debug { "Mod file deleted" }
