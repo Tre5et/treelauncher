@@ -96,6 +96,7 @@ fun SharedSavesData.SavesDetails() {
             displayData.saves.toMap().forEach {
                 SaveButton(
                     it.key,
+                    it.value,
                     selectedSave == it.key,
                     display = listDisplay,
                     onDelete = {

@@ -366,9 +366,9 @@ class StringsDe : StringsEn(
         ),
         saves = Manager.Saves(
             delete = { "Welt löschen" },
-            deleteTitle = { world -> "Die Welt \"${world.name}\" wirklich löschen?" },
+            deleteTitle = { world -> "Die Welt${world?.let { " \"${world.name}\"" }} wirklich löschen?" },
             deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden.\nAlle Daten dieser Welt werden unwiederruflich gelöscht." },
-            deleteConfirm = { world -> "Ja, die Welt \"${world.name}\" permanent löschen" },
+            deleteConfirm = { world -> "Ja, die Welt${world?.let { " \"${world.name}\"" }} permanent löschen" },
             deleteCancel = { "Abbrechen" },
             import = Manager.Component.ImportStrings(
                 delete = { "Welt entfernen" },
