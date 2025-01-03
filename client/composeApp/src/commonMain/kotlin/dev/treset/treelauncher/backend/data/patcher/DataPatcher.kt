@@ -236,7 +236,7 @@ class DataPatcher {
         val modsStatusProvider = componentStatusProvider.subStep(PatchStep.UPGRADE_MODS, files.modsComponents.size)
         for(mods in files.modsComponents) {
             modsStatusProvider.next(mods.first.name)
-            upgradeComponent(mods.first) { mods.toModsComponent() }
+            upgradeComponent(mods.first) { mods.toPre3_1ModsComponent() }
         }
 
         componentStatusProvider.next("versions")

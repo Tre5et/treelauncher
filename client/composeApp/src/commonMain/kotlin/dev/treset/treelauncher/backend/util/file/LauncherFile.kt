@@ -86,7 +86,9 @@ class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
     private fun moveOrCopy(dst: LauncherFile, copyChecker: (String) -> Boolean, move: Boolean, vararg options: CopyOption) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
-        Files.createDirectories(dst.parentFile.toPath())
+        dst.parentFile?.let {
+            Files.createDirectories(it.toPath())
+        }
         if (isDirectory()) {
             dst.createDir()
             try {
@@ -128,7 +130,9 @@ class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
     fun atomicMoveTo(dst: LauncherFile, vararg options: CopyOption) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
-        Files.createDirectories(dst.parentFile.toPath())
+        dst.parentFile?.let {
+            Files.createDirectories(it.toPath())
+        }
         try {
             Files.move(toPath(), dst.toPath(), StandardCopyOption.ATOMIC_MOVE, *options)
         } catch(e: AtomicMoveNotSupportedException) {
@@ -250,6 +254,14 @@ class LauncherFile(pathname: String) : File(pathname) {
 
     fun child(vararg path: String): LauncherFile {
         return of(this, *path)
+    }
+
+    fun renamed(name: String): LauncherFile {
+        return parentFile?.child(name) ?: of(name)
+    }
+
+    override fun getParentFile(): LauncherFile? {
+        return parent?.let { of(it) }
     }
 
     val launcherName: String

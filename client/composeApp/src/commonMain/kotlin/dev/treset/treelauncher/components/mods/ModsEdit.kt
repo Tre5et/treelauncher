@@ -13,7 +13,7 @@ import dev.treset.mcdl.mods.curseforge.CurseforgeMod
 import dev.treset.mcdl.mods.modrinth.ModrinthMod
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.LauncherModDownload
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.assignFrom
@@ -36,7 +36,7 @@ fun ModsEdit(
     droppedFile: LauncherFile? = null,
     close: () -> Unit
 ) {
-    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.fileName?.value?.let { LauncherFile.of(component.modsDirectory, it) } }
+    val currentFile: LauncherFile? = remember(currentMod) { currentMod?.modFile }
     val currentCurseforge: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "curseforge" }?.id }
     val currentModrinth: String? = remember(currentMod) { currentMod?.downloads?.firstOrNull { it.provider == "modrinth" }?.id }
 
@@ -58,9 +58,9 @@ fun ModsEdit(
     }
 
     LaunchedEffect(tfFile) {
-        if(tfFile != currentFile?.path) {
+        if(tfFile != currentFile?.path || tfVersion.isBlank()) {
             try {
-                tfVersion = tfFile.extractNameVersionFromJarFile().second
+                tfVersion = tfFile.extractNameVersionFromJarFile().second ?: throw IllegalArgumentException("No version part")
             } catch (_: IllegalArgumentException) {}
         }
     }
@@ -156,7 +156,7 @@ fun ModsEdit(
                     }
 
                     val file = LauncherFile.of(tfFile)
-                    if(!file.isFile || !file.name.endsWith(".jar") || (currentFile?.let {file.path != it.path} != false && file.absolutePath.startsWith(appConfig().baseDir.absolutePath))) {
+                    if(!file.isFile || !(file.name.endsWith(".jar")  || file.name.endsWith(".jar.disabled")) || (currentFile?.let {file.path != it.path} != false && file.absolutePath.startsWith(appConfig().baseDir.absolutePath))) {
                         fileError = true
                         return@registerJob
                     }
@@ -175,44 +175,51 @@ fun ModsEdit(
                         it.name.value = name
                         it.description.value = description
                         it.iconUrl.value = iconUrl
-                        it.version.value = tfVersion
+                        it.setVersion(tfVersion)
                         it.downloads.assignFrom(downloads)
                         it.url.value = url
 
                         if(currentFile?.path != file.path) {
                             LOGGER.debug { "Changing file: ${currentFile?.path} -> ${file.path}" }
 
-                            val oldFile = component.modsDirectory.child(
-                                it.fileName.value.let { name -> if(it.enabled.value) name else "$name.disabled" }
-                            )
+                            val oldFile = it.modFile
 
                             val backupFile = component.modsDirectory.child(
-                                "${it.fileName}.old"
+                                "${it.jarName}.old"
                             )
                             try {
-                                LOGGER.debug { "Backing up old file: ${oldFile.path} -> ${backupFile.path}"}
-                                oldFile.moveTo(backupFile)
+                                LOGGER.debug { "Backing up old file: ${oldFile?.path} -> ${backupFile.path}"}
+                                oldFile?.moveTo(backupFile)
                             } catch (e: IOException) {
                                 AppContext.error(e)
                                 return@registerJob
                             }
 
+                            val newFile = component.modsDirectory.child(
+                                file.name.let { name -> if(it.enabled.value) name else "$name.disabled" }
+                            )
                             try {
-                                val newFile = component.modsDirectory.child(
-                                    file.name.let { name -> if(it.enabled.value) name else "$name.disabled" }
-                                )
 
                                 LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}"}
 
                                 file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
                             } catch (e: IOException) {
-                                LOGGER.warn { "Failed to copy new file: ${file.path} -> ${oldFile.path}, restoring backup"}
+                                LOGGER.warn { "Failed to copy new file: ${file.path} -> ${oldFile?.path}, restoring backup"}
                                 try {
-                                    backupFile.moveTo(oldFile)
+                                    oldFile?.let {
+                                        backupFile.moveTo(oldFile)
+                                    }
                                 } catch (e: IOException) {
                                     AppContext.error(e)
                                 }
                                 return@registerJob
+                            }
+
+                            it.currentProvider.value = null
+                            try {
+                                it.setModFile(newFile)
+                            } catch(e: IOException) {
+                                AppContext.error(e)
                             }
 
                             try {
@@ -221,9 +228,6 @@ fun ModsEdit(
                             } catch (_: IOException) {
                                 LOGGER.warn { "Failed to remove backup file: ${backupFile.path}" }
                             }
-
-                            it.currentProvider.value = null
-                            it.fileName.value = file.name
                         }
                         LOGGER.debug { "Edit completed" }
                     } ?: run {
@@ -232,13 +236,12 @@ fun ModsEdit(
                         val mod = LauncherMod(
                             null,
                             description,
-                            true,
+                            !file.name.endsWith(".disabled"),
                             url,
                             iconUrl,
                             name,
-                            file.name,
                             tfVersion,
-                            downloads,
+                            downloads
                         )
 
                         onNewMod?.let {

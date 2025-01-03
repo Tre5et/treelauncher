@@ -3,6 +3,7 @@ package dev.treset.treelauncher.backend.data
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.JsonUtils
 import dev.treset.mcdl.json.SerializationException
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 
 class LauncherModsDetails(
     var types: List<String>?,

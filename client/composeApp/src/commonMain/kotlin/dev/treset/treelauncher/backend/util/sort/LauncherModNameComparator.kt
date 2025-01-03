@@ -1,6 +1,6 @@
 package dev.treset.treelauncher.backend.util.sort
 
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.localization.Strings
 
 object LauncherModNameComparator : SortProvider<LauncherMod>() {

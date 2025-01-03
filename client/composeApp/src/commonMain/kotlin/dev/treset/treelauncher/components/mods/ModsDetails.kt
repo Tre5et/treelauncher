@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.sort.sorted
 import dev.treset.treelauncher.generic.*
@@ -81,6 +81,10 @@ fun SharedModsData.ModsDetails(scope: ColumnScope) {
     }
 
     var showUpdateBanner by remember(component) { mutableStateOf(false) }
+
+    LaunchedEffect(component) {
+        component.loadMods()
+    }
 
     LaunchedEffect(component.mods.toList(), component.versions.toList(), component.types.toList(), component.providers.toList()) {
         component.mods.forEach {

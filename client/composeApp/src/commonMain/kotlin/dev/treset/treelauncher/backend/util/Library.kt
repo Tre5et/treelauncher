@@ -32,20 +32,22 @@ fun String.extractNameVersionFromLibraryPath(): Pair<String, String> {
 }
 
 @Throws(IllegalArgumentException::class)
-fun String.extractNameVersionFromJarFile(): Pair<String, String> {
-    if(!endsWith(".jar")) {
-        throw IllegalArgumentException("Not a jar file")
-    }
+fun String.extractNameVersionFromJarFile(): Pair<String, String?> {
+    return extractNameVersionFromFile(".jar")
+}
+
+fun String.extractNameVersionFromFile(vararg extensions: String): Pair<String, String?> {
+    val extension = extensions.firstOrNull { endsWith(it) } ?: throw IllegalArgumentException("No matching file extension")
     val filePart = split("[/\\\\]".toRegex()).last()
     val firstNum = filePart.indexOfFirst { it.isDigit() }
     if(firstNum >= -1) {
         for(i in firstNum downTo 0) {
-            if(filePart[i] == '-' || filePart[i] == '_' || filePart[i] == ' ') {
-                val number = filePart.substring(i + 1, filePart.length - 4)
+            if(filePart[i] == '-' || filePart[i] == '_' || filePart[i] == ' ' || filePart[i] == '.') {
+                val number = filePart.substring(i + 1, filePart.length - extension.length)
                 val name = filePart.substring(0, i)
                 return name to number
             }
         }
     }
-    throw IllegalArgumentException("No part split found")
+    return filePart to null
 }

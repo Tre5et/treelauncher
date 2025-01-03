@@ -8,7 +8,7 @@ import dev.treset.mcdl.mods.ModData
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.ModVersionData
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.getEnabled
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.data.manifest.toVersionTypes

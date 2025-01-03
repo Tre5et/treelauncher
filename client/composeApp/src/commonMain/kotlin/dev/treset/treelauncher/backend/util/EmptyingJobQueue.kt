@@ -1,30 +1,25 @@
 package dev.treset.treelauncher.backend.util
 
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
+
 class EmptyingJobQueue<A>(
     private val onEmptied: () -> Unit,
     private val argumentSupplier: () -> A
 ) {
     private var finishProcessing = false
-    private val queue: ArrayDeque<(A) -> Unit> = ArrayDeque()
-    private var running = false
+    private val queue: BlockingQueue<(A) -> Unit> = LinkedBlockingQueue()
 
     init {
         Thread {
             while(true) {
-                if (queue.isEmpty()) {
-                    if(running) {
-                        running = false
-                        onEmptied()
+                if(queue.isEmpty()) {
+                    onEmptied()
+                    if(finishProcessing) {
+                        return@Thread
                     }
-
-                    if(finishProcessing)
-                        break
-
-                    Thread.sleep(100)
-                } else {
-                    running = true
-                    queue.removeFirst()(argumentSupplier())
                 }
+                queue.take()(argumentSupplier())
             }
         }.start()
     }

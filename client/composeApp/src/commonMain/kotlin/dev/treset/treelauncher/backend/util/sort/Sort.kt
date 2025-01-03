@@ -1,7 +1,7 @@
 package dev.treset.treelauncher.backend.util.sort
 
 import androidx.compose.runtime.mutableStateOf
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import kotlinx.serialization.Serializable

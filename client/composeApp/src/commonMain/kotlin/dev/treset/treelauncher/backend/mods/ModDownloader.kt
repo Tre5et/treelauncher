@@ -5,7 +5,7 @@ import dev.treset.mcdl.exception.FileDownloadException
 import dev.treset.mcdl.mods.ModData
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.ModVersionData
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.toLauncherMod
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -30,26 +30,17 @@ class ModDownloader(
         LOGGER.debug { "Downloading mod: name=${versionData.name}, version=${versionData.versionNumber}" }
 
         launcherMod?.let {
-            val fileName = "${it.fileName.value}${if (it.enabled.value) "" else ".disabled"}"
+            it.modFile?.let { oldFile ->
+                if (oldFile.isFile) {
+                    val newFile = oldFile.renamed("${oldFile.name}.old")
 
-            val oldFile: LauncherFile = LauncherFile.of(
-                directory,
-                fileName
-            )
+                    LOGGER.debug { "Renaming old mod file: ${oldFile.name} -> ${newFile.name}" }
 
-            if(oldFile.isFile) {
-                val newFile = LauncherFile.of(
-                    directory,
-                    "${fileName}.old"
-                )
-
-                LOGGER.debug { "Renaming old mod file: ${oldFile.name} -> ${newFile.name}" }
-
-                oldFile.moveTo(newFile, StandardCopyOption.REPLACE_EXISTING)
-            } else {
-                LOGGER.warn { "Mod is specified but old file does not exist: ${oldFile.name}" }
+                    oldFile.moveTo(newFile, StandardCopyOption.REPLACE_EXISTING)
+                } else {
+                    LOGGER.warn { "Mod is specified but old file does not exist: ${oldFile.name}" }
+                }
             }
-
         }
 
         val newMod = try {
@@ -60,36 +51,27 @@ class ModDownloader(
             )
         } catch(e: FileDownloadException) {
             launcherMod?.let {
-                val fileName = "${it.fileName.value}${if (it.enabled.value) "" else ".disabled"}"
+                it.modFile?.let { oldFile ->
+                    val newFile = oldFile.renamed("${oldFile.name}.old")
 
-                val newFile = LauncherFile.of(
-                    directory,
-                    "${fileName}.old"
-                )
+                    if (newFile.isFile) {
+                        LOGGER.debug { "Restoring old mod file: ${newFile.name} -> ${oldFile.name}" }
 
-                if(newFile.isFile) {
-                    val oldFile: LauncherFile = LauncherFile.of(
-                        directory,
-                        fileName
-                    )
-
-                    LOGGER.debug { "Restoring old mod file: ${newFile.name} -> ${oldFile.name}" }
-
-                    newFile.moveTo(oldFile, StandardCopyOption.REPLACE_EXISTING)
-                } else {
-                    LOGGER.warn { "Mod is specified but file to restore does not exist: ${newFile.name}" }
+                        newFile.moveTo(oldFile, StandardCopyOption.REPLACE_EXISTING)
+                    } else {
+                        LOGGER.warn { "Mod is specified but file to restore does not exist: ${newFile.name}" }
+                    }
                 }
             }
             throw e
         }
 
         launcherMod?.let {
-            val oldFileName = "${it.fileName.value}${if (it.enabled.value) "" else ".disabled"}.old"
+            val oldFile = it.modFile?.renamed("${it.modFile}.old")
 
-            it.version.value = newMod.version.value
+            it.setVersion(newMod.version.value)
             it.enabled.value = newMod.enabled.value
             it.downloads.assignFrom(newMod.downloads)
-            it.fileName.value = newMod.fileName.value
             it.name.value = newMod.name.value
             it.downloads.assignFrom(newMod.downloads)
             it.iconUrl.value = newMod.iconUrl.value
@@ -97,16 +79,13 @@ class ModDownloader(
             it.description.value = newMod.description.value
             it.url.value = newMod.url.value
 
-            val newFile = LauncherFile.of(
-                directory,
-                oldFileName
-            )
+            it.setModFile(newMod.modFile!!)
 
-            if (newFile.isFile) {
-                LOGGER.debug { "Deleting old mod file: ${newFile.name}" }
-                newFile.remove()
+            if (oldFile?.isFile == true) {
+                LOGGER.debug { "Deleting old mod file: ${oldFile.name}" }
+                oldFile.remove()
             } else {
-                LOGGER.warn { "Mod is specified but backup file does not exist: ${newFile.name}" }
+                LOGGER.warn { "Mod is specified but backup file does not exist: ${oldFile?.name}" }
             }
         }
 
@@ -132,13 +111,15 @@ class ModDownloader(
         }
         val newMod = versionData.download(directory).toLauncherMod()
         if(!enabled) {
-            LOGGER.debug { "Disabling new mod file: ${newMod.fileName.value}" }
-            val file = LauncherFile.of(directory, newMod.fileName.value)
-            val disabledFile = LauncherFile.of(directory, "${newMod.fileName.value}.disabled")
+            LOGGER.debug { "Disabling new mod file: ${newMod.jarName}" }
+            val file = newMod.modFile
+            val disabledFile = newMod.getModFile(false)
             try {
-                file.moveTo(disabledFile, StandardCopyOption.REPLACE_EXISTING)
+                disabledFile?.let {
+                    file?.moveTo(disabledFile, StandardCopyOption.REPLACE_EXISTING)
+                }
             } catch(e: IOException) {
-                throw FileDownloadException("Failed to disable new mod file: ${file.name}", e)
+                throw FileDownloadException("Failed to disable new mod file: ${file?.name}", e)
             }
         }
         newMod.enabled.value = enabled

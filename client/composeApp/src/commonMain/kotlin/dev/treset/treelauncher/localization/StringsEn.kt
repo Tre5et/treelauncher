@@ -5,7 +5,7 @@ import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.saves.Save
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.instances.InstanceDetailsType
@@ -414,7 +414,8 @@ open class StringsEn(
             val searchPlaceholder: () -> String = { "Search for a Mod" },
             val settings: Settings = Settings(),
             val update: Update = Update(),
-            val version: () -> String = { "Game Version" }
+            val version: () -> String = { "Game Version" },
+            val noVersion: () -> String = { "Version couldn't be determined" }
         ) {
             data class Add(
                 val addLocal: () -> String = { "Add mod manually" },

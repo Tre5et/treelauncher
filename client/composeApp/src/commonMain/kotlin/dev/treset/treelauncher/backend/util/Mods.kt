@@ -3,7 +3,7 @@ package dev.treset.treelauncher.backend.util
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toPainter
 import dev.treset.mcdl.mods.ModData
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.MalformedURLException

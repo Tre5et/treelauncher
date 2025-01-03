@@ -12,7 +12,7 @@ sealed class Manifest {
     abstract val type: LauncherManifestType
 
     val directory: LauncherFile
-        get() = LauncherFile.of(file.value.parentFile)
+        get() = file.value.parentFile ?: LauncherFile.of("")
 
     @Throws(IOException::class)
     open fun write() {

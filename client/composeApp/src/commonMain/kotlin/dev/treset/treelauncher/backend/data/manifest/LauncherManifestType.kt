@@ -26,6 +26,7 @@ enum class LauncherManifestType {
     @SerializedName("SAVES", alternate = ["saves"])
     SAVES,
     SAVES_COMPONENT,
+    LAUNCHER_MOD,
     UNKNOWN;
 
     fun asString(typeConversion: Map<String, LauncherManifestType>): String {

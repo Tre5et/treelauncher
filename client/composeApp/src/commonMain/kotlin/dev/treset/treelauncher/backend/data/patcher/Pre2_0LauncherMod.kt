@@ -1,6 +1,5 @@
 package dev.treset.treelauncher.backend.data.patcher
 
-import dev.treset.treelauncher.backend.data.LauncherMod
 import dev.treset.treelauncher.backend.data.LauncherModDownload
 
 class Pre2_0LauncherMod(
@@ -14,8 +13,8 @@ class Pre2_0LauncherMod(
     val version: String = "",
     val downloads: List<LauncherModDownload> = listOf()
 ) {
-    fun toLauncherMod(): LauncherMod {
-        return LauncherMod(
+    fun toPre3_1LauncherMod(): Pre3_1LauncherMod {
+        return Pre3_1LauncherMod(
             currentProvider,
             description,
             isEnabled,

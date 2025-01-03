@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.Button
@@ -157,7 +157,7 @@ fun ModsImport(
 
                                             IconButton(
                                                 onClick = {
-                                                    selectedMods += it to LauncherFile.of(component.modsDirectory, it.fileName.value)
+                                                    selectedMods += it to it.modFile!!
                                                 },
                                                 icon = icons().add,
                                                 tooltip = Strings.manager.mods.import.tooltipAdd(),
@@ -266,8 +266,7 @@ fun ModsImport(
                             } else {
                                 "${nameParts.dropLast(1).joinToString(".")}-.${nameParts.last()}"
                             }
-                            newFile = LauncherFile.of(component.directory, newName)
-                            mod.fileName.value = newName
+                            newFile = component.modsDirectory.child(newName)
                         }
                         if (!found) {
                             AppContext.error(IOException("Failed to find a unique name for mod file: ${file.path}"))
@@ -277,6 +276,7 @@ fun ModsImport(
                         try {
                             LOGGER.debug { "Copying mod file: ${file.path} -> ${newFile.path}" }
                             file.copyTo(newFile)
+                            mod.setModFile(newFile)
                         } catch (e: IOException) {
                             AppContext.error(e)
                         }
@@ -294,6 +294,6 @@ fun ModsImport(
     }
 }
 
-fun LauncherMod.clone() = LauncherMod(currentProvider, description, enabled, url, iconUrl, name, fileName, version, downloads)
+fun LauncherMod.clone() = LauncherMod(currentProvider, description, enabled, url, iconUrl, name, version, downloads, file)
 
 private val LOGGER = KotlinLogging.logger {}

@@ -17,8 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.treset.mcdl.mods.ModVersionData
-import dev.treset.treelauncher.backend.data.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
+import dev.treset.treelauncher.backend.mods.modVersionFromString
 import dev.treset.treelauncher.backend.util.string.openInBrowser
 import dev.treset.treelauncher.generic.ComboBox
 import dev.treset.treelauncher.generic.IconButton
@@ -31,6 +32,7 @@ import dev.treset.treelauncher.style.icons
 import dev.treset.treelauncher.util.ListDisplay
 import org.jetbrains.compose.resources.painterResource
 import treelauncher.composeapp.generated.resources.Res
+import treelauncher.composeapp.generated.resources.alert_mod
 import treelauncher.composeapp.generated.resources.default_mod
 
 @Composable
@@ -39,7 +41,7 @@ fun LauncherMod.ModButton(
     display: ListDisplay,
     onEdit: () -> Unit
 ) {
-    var selectedVersion: ModVersionData by rememberSaveable(currentVersion.value) { mutableStateOf(currentVersion.value)}
+    var selectedVersion: ModVersionData? by rememberSaveable(currentVersion.value) { mutableStateOf(currentVersion.value)}
 
     DisposableEffect(Unit) {
         visible.value = true
@@ -55,6 +57,38 @@ fun LauncherMod.ModButton(
                 selectedVersion = it[0]
             }
         }
+    }
+
+    val image = image.value ?: if(hasMetaData.value) painterResource(Res.drawable.default_mod) else painterResource(Res.drawable.alert_mod)
+
+    val versionRow = @Composable {
+        if(!downloading.value && selectedVersion != null && currentVersion.value?.versionNumber != selectedVersion?.versionNumber) {
+            IconButton(
+                onClick = {
+                    selectedVersion?.let {
+                        downloadVersion(it, component)
+                    }
+                },
+                icon = icons().download,
+                tooltip = Strings.manager.mods.card.download(),
+            )
+        }
+
+        if(downloading.value) {
+            DownloadingIcon(
+                "Downloading",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        ComboBox(
+            items = versions.value ?: emptyList(),
+            onSelected = {
+                selectedVersion = it
+            },
+            selected = selectedVersion ?: modVersionFromString(Strings.manager.mods.noVersion()),
+            loading = versions.value == null && selectLatest.value > 0,
+        )
     }
 
     when(display) {
@@ -78,7 +112,7 @@ fun LauncherMod.ModButton(
                         .size(72.dp)
                 ) {
                     Image(
-                        image.value ?: painterResource(Res.drawable.default_mod),
+                        image,
                         "Mod Icon",
                         modifier = Modifier
                             .fillMaxSize()
@@ -114,31 +148,7 @@ fun LauncherMod.ModButton(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
-                            IconButton(
-                                onClick = {
-                                    downloadVersion(selectedVersion, component)
-                                },
-                                icon = icons().download,
-                                tooltip = Strings.manager.mods.card.download(),
-                            )
-                        }
-
-                        if(downloading.value) {
-                            DownloadingIcon(
-                                "Downloading",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        ComboBox(
-                            items = versions.value ?: emptyList(),
-                            onSelected = {
-                                selectedVersion = it
-                            },
-                            selected = selectedVersion,
-                            loading = versions.value == null && selectLatest.value > 0
-                        )
+                        versionRow()
                     }
 
                     Row {
@@ -222,7 +232,7 @@ fun LauncherMod.ModButton(
                         .padding(3.dp)
                 ) {
                     Image(
-                        image.value ?: painterResource(Res.drawable.default_mod),
+                        image,
                         "Icon",
                         modifier = Modifier.size(58.dp)
                     )
@@ -257,31 +267,7 @@ fun LauncherMod.ModButton(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
-                            IconButton(
-                                onClick = {
-                                    downloadVersion(selectedVersion, component)
-                                },
-                                icon = icons().download,
-                                tooltip = Strings.manager.mods.card.download(),
-                            )
-                        }
-
-                        if(downloading.value) {
-                            DownloadingIcon(
-                                "Downloading",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        ComboBox(
-                            items = versions.value ?: emptyList(),
-                            onSelected = {
-                                selectedVersion = it
-                            },
-                            selected = selectedVersion,
-                            loading = versions.value == null && selectLatest.value > 0,
-                        )
+                        versionRow()
                     }
 
                     Row {
@@ -347,32 +333,7 @@ fun LauncherMod.ModButton(
                         .padding(end = 16.dp)
                 )
 
-                if(!downloading.value && currentVersion.value.versionNumber != selectedVersion.versionNumber) {
-                    IconButton(
-                        onClick = {
-                            downloadVersion(selectedVersion, component)
-                        },
-                        icon = icons().download,
-                        tooltip = Strings.manager.mods.card.download(),
-                    )
-                }
-
-                if(downloading.value) {
-                    DownloadingIcon(
-                        "Downloading",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                ComboBox(
-                    items = versions.value ?: emptyList(),
-                    onSelected = {
-                        selectedVersion = it
-                    },
-                    selected = selectedVersion,
-                    loading = versions.value == null && selectLatest.value > 0,
-                    modifier = Modifier.padding(end = 6.dp)
-                )
+                versionRow()
 
                 url.value?.let {
                     IconButton(
