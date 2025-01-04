@@ -40,7 +40,7 @@ kotlin {
             "resourcepacks",
             "saves"
         )
-        val mcdlVersion = "2.1.2"
+        val mcdlVersion = "2.1.3-SNAPSHOT"
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -184,7 +184,7 @@ launcherTask(
         configLines.joinToString(System.lineSeparator()) { line ->
             val match = "(?<=val launcherVersion = Version\\()(.*)(?=\\))".toRegex().find(line)
             match?.let { result ->
-                val versionInitializer = version.toString().replace(".", ",");
+                val versionInitializer = version.replace(".", ",")
                 found = true
                 if(result.value != versionInitializer) {
                     line.replace(result.value, versionInitializer).also {

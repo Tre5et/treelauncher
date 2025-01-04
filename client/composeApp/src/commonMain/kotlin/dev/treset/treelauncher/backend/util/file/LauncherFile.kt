@@ -57,20 +57,25 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun copyUniqueTo(dest: LauncherFile) {
+    fun copyUniqueTo(dest: LauncherFile): LauncherFile {
         val isFile = this.isFile
         var fileName = this.name
-        while (of(dest, fileName).exists()) {
-            fileName = if(isFile) {
-                fileName.split(".").toMutableList().apply {
-                    set(size - 2, get(size - 2) + "-")
-                }.joinToString(".")
+        for(cnt in 1..200) {
+            if(of(dest, fileName).exists()) {
+                fileName = if (isFile) {
+                    fileName.split(".").toMutableList().apply {
+                        set(size - 2, get(size - 2) + "-")
+                    }.joinToString(".")
+                } else {
+                    "$fileName-"
+                }
             } else {
-                "$fileName-"
+                val target = of(dest, fileName)
+                copyTo(target)
+                return target
             }
         }
-        val target = of(dest, fileName)
-        copyTo(target)
+        throw IOException("Unable to find unique file name")
     }
 
     @Throws(IOException::class)
@@ -140,6 +145,7 @@ class LauncherFile(pathname: String) : File(pathname) {
         }
     }
 
+    @Throws(IOException::class)
     fun atomicMoveOrMerge(dst: LauncherFile, vararg options: CopyOption) {
         if(dst.exists()) {
             moveTo(dst, *options)
@@ -254,6 +260,12 @@ class LauncherFile(pathname: String) : File(pathname) {
 
     fun child(vararg path: String): LauncherFile {
         return of(this, *path)
+    }
+
+    fun childIfExists(vararg path: String): LauncherFile? {
+        return child(*path).let {
+            if(it.exists()) it else null
+        }
     }
 
     fun renamed(name: String): LauncherFile {

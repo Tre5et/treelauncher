@@ -111,21 +111,7 @@ class ModsComponent(
         }
 
         val loadedMods = files.mapNotNull { f ->
-            val fileName = if(f.name.endsWith(".jar.disabled")) {
-                f.name.substring(0, f.name.length - 13)
-            } else {
-                f.nameWithoutExtension
-            }
-
-            val metaFile = modsDirectory.child("$fileName.json")
-            if(metaFile.isFile) {
-                try {
-                    return@mapNotNull readFile(metaFile)
-                } catch (e: IOException) {
-                    LOGGER.warn { "Unable to read mod metadata file: ${metaFile.name}" }
-                }
-            }
-            return@mapNotNull LauncherMod.rawFile(LauncherFile.of(f))
+            LauncherMod.loadOrRawFile(LauncherFile.of(f), modsDirectory)
         }
 
         mods.assignFrom(loadedMods)

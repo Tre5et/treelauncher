@@ -11,8 +11,9 @@ sealed class Manifest {
     abstract var expectedType: LauncherManifestType
     abstract val type: LauncherManifestType
 
-    val directory: LauncherFile
-        get() = file.value.parentFile ?: LauncherFile.of("")
+    val rawDirectory get() = file.value.parentFile
+
+    val directory get() = rawDirectory ?: LauncherFile.of("")
 
     @Throws(IOException::class)
     open fun write() {

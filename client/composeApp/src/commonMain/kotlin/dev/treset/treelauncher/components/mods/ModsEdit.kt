@@ -170,79 +170,31 @@ fun ModsEdit(
                         "https://www.curseforge.com/projects/${downloads[0].id}"
                     val (description, iconUrl) = getDescriptionIconUrl(tfCurseforge, tfModrinth)
 
-                    currentMod?.let {
-                        LOGGER.debug { "Editing existing mod: ${it.name}:v${it.version} -> $name:v$tfVersion" }
-                        it.name.value = name
-                        it.description.value = description
-                        it.iconUrl.value = iconUrl
-                        it.setVersion(tfVersion)
-                        it.downloads.assignFrom(downloads)
-                        it.url.value = url
-
-                        if(currentFile?.path != file.path) {
-                            LOGGER.debug { "Changing file: ${currentFile?.path} -> ${file.path}" }
-
-                            val oldFile = it.modFile
-
-                            val backupFile = component.modsDirectory.child(
-                                "${it.jarName}.old"
-                            )
-                            try {
-                                LOGGER.debug { "Backing up old file: ${oldFile?.path} -> ${backupFile.path}"}
-                                oldFile?.moveTo(backupFile)
-                            } catch (e: IOException) {
-                                AppContext.error(e)
-                                return@registerJob
-                            }
-
-                            val newFile = component.modsDirectory.child(
-                                file.name.let { name -> if(it.enabled.value) name else "$name.disabled" }
-                            )
-                            try {
-
-                                LOGGER.debug { "Copying new file: ${file.path} -> ${newFile.path}"}
-
-                                file.copyTo(newFile, StandardCopyOption.REPLACE_EXISTING)
-                            } catch (e: IOException) {
-                                LOGGER.warn { "Failed to copy new file: ${file.path} -> ${oldFile?.path}, restoring backup"}
-                                try {
-                                    oldFile?.let {
-                                        backupFile.moveTo(oldFile)
-                                    }
-                                } catch (e: IOException) {
-                                    AppContext.error(e)
-                                }
-                                return@registerJob
-                            }
-
-                            it.currentProvider.value = null
-                            try {
-                                it.setModFile(newFile)
-                            } catch(e: IOException) {
-                                AppContext.error(e)
-                            }
-
-                            try {
-                                LOGGER.debug { "Removing backup file: ${backupFile.path}" }
-                                backupFile.remove()
-                            } catch (_: IOException) {
-                                LOGGER.warn { "Failed to remove backup file: ${backupFile.path}" }
-                            }
+                    if(currentMod != null) {
+                        LOGGER.debug { "Editing existing mod: ${currentMod.name}:v${currentMod.version} -> $name:v$tfVersion" }
+                        try {
+                            currentMod.setImportingMod(file, component.modsDirectory)
+                        } catch (e: IOException) {
+                            AppContext.error(e)
                         }
-                        LOGGER.debug { "Edit completed" }
-                    } ?: run {
 
-                        LOGGER.debug { "Adding new mod: $name:v$tfVersion" }
-                        val mod = LauncherMod(
-                            null,
-                            description,
-                            !file.name.endsWith(".disabled"),
-                            url,
-                            iconUrl,
-                            name,
-                            tfVersion,
-                            downloads
-                        )
+                        LOGGER.debug { "Editing mod properties" }
+                        currentMod.name.value = name
+                        currentMod.description.value = description
+                        currentMod.iconUrl.value = iconUrl
+                        currentMod.setVersion(tfVersion)
+                        currentMod.downloads.assignFrom(downloads)
+                        currentMod.url.value = url
+                        currentMod.currentProvider.value = null
+                    } else {
+                        val mod = LauncherMod.rawFile(file, component.modsDirectory, false)
+                        mod.name.value = name
+                        mod.description.value = description
+                        mod.iconUrl.value = iconUrl
+                        mod.setVersion(tfVersion)
+                        mod.downloads.assignFrom(downloads)
+                        mod.url.value = url
+                        mod.currentProvider.value = null
 
                         onNewMod?.let {
                             LOGGER.debug { "Delegating mod handling to onNewMod function" }
@@ -253,7 +205,7 @@ fun ModsEdit(
                             tfName = ""
                             it(mod, file)
                         } ?: run {
-
+                            LOGGER.debug { "Adding new mod: $name:v$tfVersion" }
                             val newFile = component.modsDirectory.child(
                                 file.name
                             )
@@ -267,7 +219,6 @@ fun ModsEdit(
                             }
 
                             mods.add(mod)
-
                             LOGGER.debug { "Add completed" }
                         }
                     }

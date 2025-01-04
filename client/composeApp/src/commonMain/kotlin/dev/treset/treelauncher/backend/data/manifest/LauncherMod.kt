@@ -22,6 +22,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.io.IOException
+import java.nio.file.StandardCopyOption
 
 @Serializable
 class LauncherMod(
@@ -82,7 +83,7 @@ class LauncherMod(
     override val type = LauncherManifestType.LAUNCHER_MOD
     @Transient override var expectedType = LauncherManifestType.LAUNCHER_MOD
 
-    val jarName get() = file.value.nameWithoutExtension
+    @Transient val fileName = derivedStateOf { file.value.nameWithoutExtension }
 
     @Transient var modData: ModData? = null
 
@@ -118,6 +119,16 @@ class LauncherMod(
         loadImage()
         loadVersions(component)
         updateModProviders()
+    }
+
+    fun updateEnabled() {
+        if(getModFile(true)?.exists() == true) {
+            enabled.value = true
+        } else if(getModFile(false)?.exists() == true) {
+            enabled.value = false
+        } else {
+            AppContext.error(IllegalStateException("No enabled or disabled mod file found for ${fileName.value}"))
+        }
     }
 
     @Throws(FileDownloadException::class)
@@ -170,7 +181,7 @@ class LauncherMod(
             modData ?: try {
                     loadModData()
                 } catch (e: FileDownloadException) {
-                    LOGGER.debug(e) { "Failed to get mod data for $jarName, this may be correct" }
+                    LOGGER.debug(e) { "Failed to get mod data for ${fileName.value}, this may be correct" }
                     versions.value = listOf()
                 }
             modData?.let {
@@ -240,7 +251,7 @@ class LauncherMod(
         updateAvailable.value = null
         version.downloadProviders = component.providers.getEnabled()
         component.registerJob { currentMods ->
-            LOGGER.debug { "Downloading mod $jarName version ${version.versionNumber}" }
+            LOGGER.debug { "Downloading mod ${fileName.value} version ${version.versionNumber}" }
 
             try {
                 ModDownloader(
@@ -269,7 +280,7 @@ class LauncherMod(
 
     fun changeEnabled(component: ModsComponent) {
         component.registerJob {
-            LOGGER.debug { "Changing mod state of $jarName to ${!enabled.value}" }
+            LOGGER.debug { "Changing mod state of ${fileName.value} to ${!enabled.value}" }
 
             val newFile = getModFile(!enabled.value)
             if(modFile?.exists() != true && newFile?.exists() == true) {
@@ -278,7 +289,6 @@ class LauncherMod(
                 return@registerJob
             }
             if(modFile?.exists() != true) {
-                LOGGER.warn { "Can't change mod state, mod file not found" }
                 AppContext.error(IOException("Can't change mod state, mod file not found"))
             }
 
@@ -290,7 +300,7 @@ class LauncherMod(
                 AppContext.error(IOException("Failed to move mod file", e))
             }
 
-            enabled.value = !enabled.value
+            updateEnabled()
 
             LOGGER.debug { "Mod state changed" }
         }
@@ -324,7 +334,7 @@ class LauncherMod(
         val oldFile = this.file.value
 
         this.file.value = file.renamed("${file.nameWithoutExtension}.json")
-        this.enabled.value = !file.name.endsWith(".disabled")
+        updateEnabled()
 
         write()
 
@@ -333,10 +343,99 @@ class LauncherMod(
         }
     }
 
+    @Throws(IOException::class)
+    fun changeAssociatedMod(modFile: LauncherFile, directory: LauncherFile) {
+        changeAssociatedMod(nameFromModFile(modFile), directory)
+    }
+
+    @Throws(IOException::class)
+    fun changeAssociatedMod(modName: String, directory: LauncherFile) {
+        if(modName == this.fileName.value) {
+            LOGGER.debug { "Mod name is unchanged: $modName" }
+            return
+        }
+
+        val oldFile = file.value
+
+        this.file.value = directory.child("$modName.json")
+        updateEnabled()
+
+        LOGGER.debug { "Writing to new meta file: ${file.value.absolutePath}" }
+        write()
+
+        if(oldFile.isChildOf(directory) && oldFile.exists()) {
+            LOGGER.debug { "Deleting old meta file: ${oldFile.absolutePath}" }
+            oldFile.remove()
+        }
+    }
+
+    @Throws(IOException::class)
+    fun setImportingMod(file: LauncherFile, directory: LauncherFile, preserveEnabledState: Boolean = true) {
+        if(file == modFile) {
+            LOGGER.debug { "Mod file is unchanged: ${fileName.value}" }
+            return
+        }
+
+
+        val backupFile = try {
+            modFile.let {
+                if (it?.isChildOf(directory) == true) {
+                    LOGGER.debug { "Backing up old mod file: ${it.name}" }
+                    it.renamed("${it.name}.bak").also { bak ->
+                        it.moveTo(bak, StandardCopyOption.REPLACE_EXISTING)
+                    }
+                } else null
+            }
+        } catch (e: IOException) {
+            LOGGER.warn { "Unable to create backup file: ${modFile?.name}" }
+            null
+        }
+
+        var componentFile = file
+        try {
+            if (!file.isChildOf(directory)) {
+                LOGGER.debug { "Moving mod file to component directory: ${file.name}" }
+                componentFile = directory.child(file.name)
+
+                file.copyTo(componentFile, StandardCopyOption.REPLACE_EXISTING)
+            }
+
+            if (preserveEnabledState) {
+                val stateFile = fileAsState(file, enabled.value)
+                if (stateFile != componentFile) {
+                    componentFile.copyTo(stateFile, StandardCopyOption.REPLACE_EXISTING)
+                    componentFile = stateFile
+                }
+            }
+
+            changeAssociatedMod(nameFromModFile(componentFile), directory)
+        } catch (e: IOException) {
+            LOGGER.warn { "Failed mod import, restoring" }
+            try {
+                componentFile.remove()
+                modFile?.let {
+                    backupFile?.moveTo(it, StandardCopyOption.REPLACE_EXISTING)
+                }
+            } catch (e1: IOException) {
+                LOGGER.warn { "Failed to restore old mod file" }
+            }
+            throw e
+        }
+
+        backupFile?.let {
+            LOGGER.debug { "Removing old backup file: ${backupFile.name}" }
+            try {
+                it.remove()
+            } catch (e: IOException) {
+                LOGGER.warn { "Unable to remove backup file: ${backupFile.name}" }
+            }
+        }
+    }
+
     fun getModFile(enabled: Boolean? = null): LauncherFile? {
         val actualEnabled = enabled ?: this.enabled.value
 
-        return directory?.child("$jarName${if(actualEnabled) ".jar" else ".jar.disabled"}")
+        return rawDirectory?.child("${file.value.nameWithoutExtension}${if(actualEnabled) ".jar" else ".jar.disabled"}")
     }
 
     @Throws(IOException::class)
@@ -349,22 +448,69 @@ class LauncherMod(
     val modFile get() = getModFile()
 
     companion object {
-        fun rawFile(file: LauncherFile) = LauncherMod(
+        fun rawFile(file: LauncherFile, directory: LauncherFile, checkEnabled: Boolean = true) = LauncherMod(
             currentProvider = null,
             description = null,
-            enabled = !file.name.endsWith(".disabled"),
+            enabled = true,
             url = null,
             iconUrl = null,
             name = null,
             version = null,
             downloads = emptyList(),
-            file = file.renamed("${
-                if(file.name.endsWith(".disabled")) 
-                    file.nameWithoutExtension.substring(0, file.nameWithoutExtension.lastIndexOf('.')) 
-                else 
-                    file.nameWithoutExtension
-            }.json")
-        )
+            file = directory.child("${nameFromModFile(file)}.json")
+        ).apply {
+            if(checkEnabled) {
+                updateEnabled()
+            }
+        }
+
+        @Throws(IOException::class)
+        fun importing(file: LauncherFile, directory: LauncherFile) = LauncherMod(
+            currentProvider = null,
+            description = null,
+            enabled = true,
+            url = null,
+            iconUrl = null,
+            name = null,
+            version = null,
+            downloads = listOf(),
+            file = LauncherFile.of()
+        ).apply {
+            setImportingMod(file, directory, false)
+        }
+
+        fun loadOrRawFile(file: LauncherFile, directory: LauncherFile): LauncherMod {
+            val metaFile = directory.child("${nameFromModFile(file)}.json")
+
+            if(metaFile.isFile) {
+                try {
+                    return readFile(metaFile)
+                } catch (e: IOException) {
+                    LOGGER.warn { "Unable to read meta file: ${metaFile.absolutePath}" }
+                }
+            }
+
+
+            return rawFile(file, directory)
+         }
+
+        fun nameFromModFile(file: LauncherFile): String {
+            if(file.name.endsWith(".disabled")) {
+                return file.nameWithoutExtension.substring(0, file.nameWithoutExtension.lastIndexOf('.'))
+            }
+            return file.nameWithoutExtension
+        }
+
+        fun fileAsState(file: LauncherFile, enabled: Boolean): LauncherFile {
+            if(enabled != file.name.endsWith(".disabled")) {
+                return file
+            }
+
+            if(enabled) {
+                return file.renamed(file.nameWithoutExtension)
+            }
+            return file.renamed("${file.name}.disabled")
+        }
 
         private val LOGGER = KotlinLogging.logger {  }
     }

@@ -250,33 +250,13 @@ fun ModsImport(
                     selectedMods.forEach { orgMod ->
                         val mod = orgMod.first.clone()
                         val file = orgMod.second
-                        LOGGER.debug { "Importing mod: ${file.path}" }
-
-                        var newFile = LauncherFile.of(component.modsDirectory, file.name)
-                        var found = false
-                        for (i in 1..100) {
-                            if (!newFile.exists()) {
-                                found = true
-                                break
-                            }
-                            LOGGER.debug { "Mod file already exists: ${newFile.path}: finding unique name..." }
-                            val nameParts = newFile.name.split(".")
-                            val newName = if (nameParts.size == 1) {
-                                "${nameParts.first()}-"
-                            } else {
-                                "${nameParts.dropLast(1).joinToString(".")}-.${nameParts.last()}"
-                            }
-                            newFile = component.modsDirectory.child(newName)
-                        }
-                        if (!found) {
-                            AppContext.error(IOException("Failed to find a unique name for mod file: ${file.path}"))
-                            return@registerJob
-                        }
+                        LOGGER.debug { "Importing mod: ${file.name}" }
 
                         try {
-                            LOGGER.debug { "Copying mod file: ${file.path} -> ${newFile.path}" }
-                            file.copyTo(newFile)
-                            mod.setModFile(newFile)
+                            LOGGER.debug { "Copying mod file: ${file.name}" }
+                            val newFile = file.copyUniqueTo(component.modsDirectory)
+                            LOGGER.debug { "Changing file association: ${newFile.name}" }
+                            mod.changeAssociatedMod(newFile, component.modsDirectory)
                         } catch (e: IOException) {
                             AppContext.error(e)
                         }

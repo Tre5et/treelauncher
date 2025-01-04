@@ -7,7 +7,7 @@ import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.ModVersionData
 import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.toLauncherMod
-import dev.treset.treelauncher.backend.util.assignFrom
+import dev.treset.treelauncher.backend.data.updateModWith
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.isSame
 import dev.treset.treelauncher.generic.VersionType
@@ -46,8 +46,8 @@ class ModDownloader(
         val newMod = try {
             downloadRequired(
                 versionData,
-                launcherMod?.enabled?.value != false || enableOnDownload,
-                !existing.contains(launcherMod)
+                launcherMod,
+                !(launcherMod?.enabled?.value == false && enableOnDownload)
             )
         } catch(e: FileDownloadException) {
             launcherMod?.let {
@@ -66,66 +66,30 @@ class ModDownloader(
             throw e
         }
 
-        launcherMod?.let {
-            val oldFile = it.modFile?.renamed("${it.modFile}.old")
-
-            it.setVersion(newMod.version.value)
-            it.enabled.value = newMod.enabled.value
-            it.downloads.assignFrom(newMod.downloads)
-            it.name.value = newMod.name.value
-            it.downloads.assignFrom(newMod.downloads)
-            it.iconUrl.value = newMod.iconUrl.value
-            it.currentProvider.value = newMod.currentProvider.value
-            it.description.value = newMod.description.value
-            it.url.value = newMod.url.value
-
-            it.setModFile(newMod.modFile!!)
-
-            if (oldFile?.isFile == true) {
-                LOGGER.debug { "Deleting old mod file: ${oldFile.name}" }
-                oldFile.remove()
-            } else {
-                LOGGER.warn { "Mod is specified but backup file does not exist: ${oldFile?.name}" }
-            }
-        }
-
         return newMod
     }
 
-    @Throws(FileDownloadException::class)
+    @Throws(IOException::class)
     private fun downloadRequired(
         versionData: ModVersionData,
-        enabled: Boolean,
-        addToList: Boolean = true
+        mod: LauncherMod? = null,
+        preserveEnabled: Boolean = true
     ): LauncherMod {
         LOGGER.debug {
             "Downloading mod file: ${versionData.name}"
         }
         versionData.downloadProviders = modProviders
         if(!directory.isDirectory) {
-            try {
-                directory.createDir()
-            } catch (e: IOException) {
-                throw FileDownloadException("Unable to create mods directory", e)
-            }
+            directory.createDir()
         }
-        val newMod = versionData.download(directory).toLauncherMod()
-        if(!enabled) {
-            LOGGER.debug { "Disabling new mod file: ${newMod.jarName}" }
-            val file = newMod.modFile
-            val disabledFile = newMod.getModFile(false)
-            try {
-                disabledFile?.let {
-                    file?.moveTo(disabledFile, StandardCopyOption.REPLACE_EXISTING)
-                }
-            } catch(e: IOException) {
-                throw FileDownloadException("Failed to disable new mod file: ${file?.name}", e)
+        val newMod = versionData.download(directory).let {
+            if(mod != null) {
+                it.updateModWith(mod, directory, preserveEnabled)
+                return@let mod
             }
-        }
-        newMod.enabled.value = enabled
-
-        if(addToList) {
-            existing.add(newMod)
+            return@let it.toLauncherMod(directory).also {
+                existing.add(it)
+            }
         }
 
         versionData.setDependencyConstraints(versions, versionTypes.map { it.id }, modProviders)
@@ -135,7 +99,7 @@ class ModDownloader(
             }
             if (d.parentMod != null && !modExists(d.parentMod)) {
                 LOGGER.debug { "Downloading mod dependency file: ${d.name} for: ${versionData.name}" }
-                downloadRequired(d, true)
+                downloadRequired(d)
             } else {
                 LOGGER.debug { "Skipping mod dependency file: ${d.name}" }
             }
