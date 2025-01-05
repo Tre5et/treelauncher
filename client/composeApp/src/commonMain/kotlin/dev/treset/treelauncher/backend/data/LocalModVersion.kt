@@ -25,5 +25,16 @@ fun LocalModVersion.toLauncherMod(directory: LauncherFile): LauncherMod {
 
 @Throws(IOException::class)
 fun LocalModVersion.updateModWith(mod: LauncherMod, directory: LauncherFile, preserveEnabledState: Boolean = true) {
+    mod.currentProvider.value = activeProvider.toString()
+    mod.description.value = version.parentMod.description
+    mod.enabled.value = true
+    mod.url.value = version.parentMod.url
+    mod.iconUrl.value = version.parentMod.iconUrl
+    mod.name.value = version.parentMod.name
+    mod.version.value = version.versionNumber
+    mod.downloads.assignFrom(downloads.map {
+        LauncherModDownload(it.provider.toString(), it.id)
+    })
     mod.setImportingMod(directory.child(this.fileName), directory, preserveEnabledState)
+
 }

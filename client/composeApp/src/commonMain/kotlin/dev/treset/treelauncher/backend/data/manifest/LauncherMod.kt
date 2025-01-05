@@ -358,7 +358,6 @@ class LauncherMod(
             return
         }
 
-
         val backupFile = try {
             modFile.let {
                 if (it?.isChildOf(directory) == true) {
@@ -444,21 +443,6 @@ class LauncherMod(
             if(checkEnabled) {
                 updateEnabled()
             }
-        }
-
-        @Throws(IOException::class)
-        fun importing(file: LauncherFile, directory: LauncherFile) = LauncherMod(
-            currentProvider = null,
-            description = null,
-            enabled = true,
-            url = null,
-            iconUrl = null,
-            name = null,
-            version = null,
-            downloads = listOf(),
-            file = LauncherFile.of()
-        ).apply {
-            setImportingMod(file, directory, false)
         }
 
         fun loadOrRawFile(file: LauncherFile, directory: LauncherFile): LauncherMod {

@@ -12,7 +12,6 @@ import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.isSame
 import dev.treset.treelauncher.generic.VersionType
 import java.io.IOException
-import java.nio.file.StandardCopyOption
 
 class ModDownloader(
     val launcherMod: LauncherMod?,
@@ -29,44 +28,11 @@ class ModDownloader(
     ): LauncherMod {
         LOGGER.debug { "Downloading mod: name=${versionData.name}, version=${versionData.versionNumber}" }
 
-        launcherMod?.let {
-            it.modFile?.let { oldFile ->
-                if (oldFile.isFile) {
-                    val newFile = oldFile.renamed("${oldFile.name}.old")
-
-                    LOGGER.debug { "Renaming old mod file: ${oldFile.name} -> ${newFile.name}" }
-
-                    oldFile.moveTo(newFile, StandardCopyOption.REPLACE_EXISTING)
-                } else {
-                    LOGGER.warn { "Mod is specified but old file does not exist: ${oldFile.name}" }
-                }
-            }
-        }
-
-        val newMod = try {
-            downloadRequired(
-                versionData,
-                launcherMod,
-                !(launcherMod?.enabled?.value == false && enableOnDownload)
-            )
-        } catch(e: FileDownloadException) {
-            launcherMod?.let {
-                it.modFile?.let { oldFile ->
-                    val newFile = oldFile.renamed("${oldFile.name}.old")
-
-                    if (newFile.isFile) {
-                        LOGGER.debug { "Restoring old mod file: ${newFile.name} -> ${oldFile.name}" }
-
-                        newFile.moveTo(oldFile, StandardCopyOption.REPLACE_EXISTING)
-                    } else {
-                        LOGGER.warn { "Mod is specified but file to restore does not exist: ${newFile.name}" }
-                    }
-                }
-            }
-            throw e
-        }
-
-        return newMod
+        return downloadRequired(
+            versionData,
+            launcherMod,
+            !(launcherMod?.enabled?.value == false && enableOnDownload)
+        )
     }
 
     @Throws(IOException::class)
