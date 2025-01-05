@@ -44,6 +44,7 @@ class DataPatcher {
         val REMOVE_RESOURCEPACKS_ARGUMENT = FormatStringProvider { Strings.launcher.patch.status.removeResourcepacksArgument() }
         val TEXTUREPACKS_INCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.texturepacksIncludedFiles() }
         val REMOVE_LOGIN = FormatStringProvider { Strings.launcher.patch.status.removeLogin() }
+        val RESTRUCTURE_MODS = FormatStringProvider { Strings.launcher.patch.status.restructureMods() }
     }
 
     private class UpgradeFunction(
@@ -70,7 +71,8 @@ class DataPatcher {
         UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0)),
         UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
         UpgradeFunction(this::removeLoginFile, Version(2,0,0)),
-        UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0))
+        UpgradeFunction(this::restructureMods, Version(2, 1, 0)),
+        UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0), Version(2, 1, 0))
     )
 
     fun upgradeNeeded(): Boolean {
@@ -108,6 +110,27 @@ class DataPatcher {
         dir.copyTo(backupDir)
         backupProvider.finish("")
         LOGGER.info { "Created backup" }
+    }
+
+    @Throws(IOException::class)
+    fun restructureMods(statusProvider: StatusProvider) {
+        LOGGER.info { "Restructuring mods" }
+        val modsStatusProvider = statusProvider.subStep(PatchStep.RESTRUCTURE_MODS, 1)
+
+        val files = Pre2_1LauncherFiles()
+        files.reload()
+
+        val total = files.modsComponents.sumOf { it.mods.size }
+        modsStatusProvider.total = total
+        files.modsComponents.forEach { c ->
+            c.mods.forEach { m ->
+                modsStatusProvider.next("${c.name}: ${m.name}")
+                m.toLauncherMod(c.modsDirectory)
+            }
+        }
+
+        modsStatusProvider.finish()
+        LOGGER.info { "Finished restructuring mods" }
     }
 
     @Throws(IOException::class)

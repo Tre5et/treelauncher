@@ -13,8 +13,8 @@ class Pre2_0LauncherMod(
     val version: String = "",
     val downloads: List<LauncherModDownload> = listOf()
 ) {
-    fun toPre3_1LauncherMod(): Pre3_1LauncherMod {
-        return Pre3_1LauncherMod(
+    fun toPre3_1LauncherMod(): Pre2_1LauncherMod {
+        return Pre2_1LauncherMod(
             currentProvider,
             description,
             isEnabled,

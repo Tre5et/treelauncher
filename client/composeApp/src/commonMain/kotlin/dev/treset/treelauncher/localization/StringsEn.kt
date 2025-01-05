@@ -242,7 +242,8 @@ open class StringsEn(
                 val removeResourcepacksArgument: () -> String = { "Removing resoucepacks directory version arguments" },
                 val texturepacksIncludedFiles: () -> String = { "Adding texturepacks to included files" },
                 val removeLogin: () -> String = { "Removing old login storage" },
-                val upgradeSettings: () -> String = { "Upgrading Version in Settings" }
+                val upgradeSettings: () -> String = { "Upgrading Version in Settings" },
+                val restructureMods: () -> String = { "Restructuring Mods" }
             )
         }
     }

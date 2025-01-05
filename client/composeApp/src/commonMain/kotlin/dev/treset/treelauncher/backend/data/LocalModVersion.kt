@@ -25,5 +25,5 @@ fun LocalModVersion.toLauncherMod(directory: LauncherFile): LauncherMod {
 
 @Throws(IOException::class)
 fun LocalModVersion.updateModWith(mod: LauncherMod, directory: LauncherFile, preserveEnabledState: Boolean = true) {
-    mod.setImportingMod(LauncherFile.of(this.fileName), directory, preserveEnabledState)
+    mod.setImportingMod(directory.child(this.fileName), directory, preserveEnabledState)
 }

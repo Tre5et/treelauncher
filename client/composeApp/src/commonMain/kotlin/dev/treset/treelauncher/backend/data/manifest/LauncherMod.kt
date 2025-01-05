@@ -326,24 +326,6 @@ class LauncherMod(
     }
 
     @Throws(IOException::class)
-    fun setModFile(file: LauncherFile) {
-        if(file == modFile) {
-            LOGGER.debug { "Mod file is unchanged" }
-        }
-
-        val oldFile = this.file.value
-
-        this.file.value = file.renamed("${file.nameWithoutExtension}.json")
-        updateEnabled()
-
-        write()
-
-        if(oldFile.exists()) {
-            oldFile.delete()
-        }
-    }
-
-    @Throws(IOException::class)
     fun changeAssociatedMod(modFile: LauncherFile, directory: LauncherFile) {
         changeAssociatedMod(nameFromModFile(modFile), directory)
     }

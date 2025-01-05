@@ -4,7 +4,7 @@ import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.json.JsonUtils
 import dev.treset.mcdl.json.SerializationException
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.manifest.Pre3_1ModsComponent
+import dev.treset.treelauncher.backend.data.manifest.Pre2_1ModsComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 
 class Pre2_0LauncherModsDetails(
@@ -32,8 +32,8 @@ class Pre2_0LauncherModsDetails(
     }
 }
 
-fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherModsDetails>.toPre3_1ModsComponent(): Pre3_1ModsComponent {
-    return Pre3_1ModsComponent(
+fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherModsDetails>.toPre3_1ModsComponent(): Pre2_1ModsComponent {
+    return Pre2_1ModsComponent(
         first.id,
         first.name,
         second.types ?: emptyList(),

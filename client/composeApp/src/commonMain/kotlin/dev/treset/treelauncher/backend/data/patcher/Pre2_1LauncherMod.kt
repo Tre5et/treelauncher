@@ -13,7 +13,7 @@ import java.io.IOException
 import kotlin.jvm.Throws
 
 @Serializable
-class Pre3_1LauncherMod(
+class Pre2_1LauncherMod(
     val currentProvider: MutableDataState<String?> = mutableStateOf(null),
     val description: MutableDataState<String?> = mutableStateOf(null),
     @SerializedName("enabled", alternate = ["is_enabled"])
@@ -58,8 +58,8 @@ class Pre3_1LauncherMod(
             name.value,
             version.value,
             downloads.toList(),
-        ).apply {
-            setModFile(LauncherFile.of(fileName.value))
+        ).also {
+            it.changeAssociatedMod(directory.child(fileName.value), directory)
         }
     }
 }

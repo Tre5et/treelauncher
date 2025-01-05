@@ -8,16 +8,18 @@ import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.ModProviderData
 import dev.treset.treelauncher.backend.data.ModProviderList
 import dev.treset.treelauncher.backend.data.deepCopy
-import dev.treset.treelauncher.backend.data.patcher.Pre3_1LauncherMod
+import dev.treset.treelauncher.backend.data.patcher.Pre2_1LauncherMod
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.MutableDataState
 import dev.treset.treelauncher.backend.util.serialization.MutableDataStateList
 import dev.treset.treelauncher.backend.util.sort.LauncherModNameComparator
 import dev.treset.treelauncher.backend.util.sort.Sort
 import dev.treset.treelauncher.util.ListDisplay
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-class Pre3_1ModsComponent(
+@Serializable
+class Pre2_1ModsComponent(
     override val id: MutableDataState<String>,
     override val name: MutableDataState<String>,
     val types: MutableDataStateList<String>,
@@ -30,7 +32,7 @@ class Pre3_1ModsComponent(
     override val includedFiles: MutableDataStateList<String> = appConfig().modsDefaultIncludedFiles.toMutableStateList(),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
     override val active: MutableDataState<Boolean> = mutableStateOf(false),
-    val mods: MutableDataStateList<Pre3_1LauncherMod> = mutableStateListOf(),
+    val mods: MutableDataStateList<Pre2_1LauncherMod> = mutableStateListOf(),
     val sort: Sort<LauncherMod> = Sort(
         LauncherModNameComparator,
         false
@@ -56,7 +58,7 @@ class Pre3_1ModsComponent(
         active: Boolean = false,
         lastUsed: String = "",
         includedFiles: List<String> = appConfig().modsDefaultIncludedFiles,
-        mods: List<Pre3_1LauncherMod> = emptyList(),
+        mods: List<Pre2_1LauncherMod> = emptyList(),
         sort: Sort<LauncherMod> = Sort(
             LauncherModNameComparator,
             false
