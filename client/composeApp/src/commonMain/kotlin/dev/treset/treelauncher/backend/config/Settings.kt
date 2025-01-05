@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import dev.treset.mcdl.json.GenericJsonParsable
 import dev.treset.mcdl.mods.ModProvider
-import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.serialization.ColorData
 import dev.treset.treelauncher.backend.util.serialization.DpData
@@ -53,7 +52,7 @@ class Settings(
     val syncKey: MutableDataState<String?> = mutableStateOf(null)
     @OptIn(ExperimentalSerializationApi::class)
     @JsonNames("isModsAutoUpdate")
-    val modsDefaultAutoUpdate: MutableDataState<Boolean> = mutableStateOf(true)
+    val modsDefaultAutoUpdate: MutableDataState<Boolean> = mutableStateOf(false)
     @OptIn(ExperimentalSerializationApi::class)
     @JsonNames("isModsEnable")
     val modsDefaultEnableOnUpdate: MutableDataState<Boolean> = mutableStateOf(false)
