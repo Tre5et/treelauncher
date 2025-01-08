@@ -1,5 +1,6 @@
 package dev.treset.treelauncher.localization
 
+import dev.treset.mcdl.auth.AuthenticationStep
 import dev.treset.treelauncher.components.instances.InstanceDetailsType
 import dev.treset.treelauncher.generic.VersionType
 
@@ -89,6 +90,7 @@ class StringsDe : StringsEn(
             forge = { "Forge Version" },
             showSnapshots = { "Snapshots anzeigen" },
             loading = { "Laden..." },
+            neoForge = { "NeoForge Version" },
             quilt = { "Quilt Version" },
             type = { "Versionstyp" },
             version = { "Version" }
@@ -125,6 +127,8 @@ class StringsDe : StringsEn(
     ),
     launcher = Launcher(
         setup = Launcher.Setup(
+            dirPicker = { "Ein Verzeichnis auswählen" },
+            error = { "Kein valider Pfad: ${it.message}" },
             initializing = { "Datenverzeichnis wird initalisiert" },
             title = { "Datenverzeichnis auswählen" },
             message = { "Hier kann das Verzeichnis, in dem alle Instanzdaten gespeichert werden ausgewählt werden.\nDies kann ein leeres Verzeichis oder ein Verzeichnis mit bestehenden Launcher-Daten sein." }
@@ -165,6 +169,7 @@ class StringsDe : StringsEn(
                 removeResourcepacksArgument = { "Ressourcenpaket Argumente werden entfernt" },
                 texturepacksIncludedFiles = { "Texturenpakete werden einbegriffenen Dateien hinzugefügt" },
                 removeLogin = { "Gespeicherte Logindaten werden entfernt" },
+                restructureMods = { "Mods werden umstrukturiert" },
                 upgradeSettings = { "Einstellungen werden aktualisiert" },
             )
         ),
@@ -180,6 +185,17 @@ class StringsDe : StringsEn(
         keepLoggedIn = { "Eingeloggt bleiben" },
         label = Login.Label(
             authenticating = { "Einloggen..." },
+            authenticatingSub = { state ->
+                state?.let {
+                    when(it) {
+                        AuthenticationStep.MICROSOFT -> "Mit Microsoft einloggen"
+                        AuthenticationStep.XBOX_LIVE -> "Xbox Live Schlüssel abfragen"
+                        AuthenticationStep.XBOX_SECURITY -> "Xbox Sicherheitsschlüssel abfragen"
+                        AuthenticationStep.MOJANG -> "Mit Mojang einloggen"
+                        AuthenticationStep.MINECRAFT -> "Minecraft Profil abfragen"
+                    }
+                } ?: ""
+            },
             failure = { "Login fehlgeschlagen. Bitte erneut versuchen!" },
             success = { user -> "Willkommen, ${user ?: "Anonymer Nutzer"}!" },
             offline = { "Im Offline-Modus gestartet." }
@@ -319,6 +335,7 @@ class StringsDe : StringsEn(
                 importing = { "Mods werden importiert..." },
                 selectedFiles = { "Ausgewählte Mods:" },
                 tooltipAdd = { "Hinzufügen" },
+                tooltipExpand = { expanded -> if(expanded) "Einklappen" else "Ausklappen" },
                 tooltipFile = { "Moddatei auswählen" }
             ),
             searchPlaceholder = { "Nach einer Mod suchen" },
@@ -333,16 +350,20 @@ class StringsDe : StringsEn(
                 auto = { "Automatisch aktualisieren" },
                 disable = { "Mods ohne passende Version deaktivieren" },
                 enable = { "Deaktivierte Mods aktivieren"},
+                noUpdates = { "Keine Updates verfügbar" },
                 notViewed = { "$it weitere Update${if(it > 1) "s" else ""} verfügbar" },
                 remaining = { "$it Update${if(it > 1) "s" else ""} verbleiben..."},
                 settings = { "Aktualisierungseinstellungen" },
                 tooltip = { "Nach Updates suchen" }
             ),
-            version = { "Spielversion" }
+            version = { "Spielversion" },
+            noVersion = { "Version konnte nicht bestimmt werden" }
         ),
         resourcepacks = Manager.Resourcepacks(
             delete = { "Ressourcenpaket löschen" },
-            deleteTitle = { "Die Ressourcenpaket wirklich löschen?" },
+            deleteTexturepack = { "Texturenpaket löschen" },
+            deleteTexturepackTitle = { "Das Ressourcenpaket wirklich löschen?" },
+            deleteTitle = { "Das Ressourcenpaket wirklich löschen?" },
             deleteMessage = { "Diese Aktion kann nicht rückgängig gemacht werden." },
             deleteConfirm = { "Ja, löschen" },
             deleteCancel = { "Abbrechen" },

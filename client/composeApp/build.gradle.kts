@@ -70,6 +70,10 @@ kotlin {
 
             implementation("com.github.JnCrMx:discord-game-sdk4j:ae841453bd58af8279d0d43d8c65f997523f976d")
         }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }
 
