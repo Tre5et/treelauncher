@@ -4,12 +4,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.painter.Painter
 import dev.treset.mcdl.exception.FileDownloadException
+import dev.treset.mcdl.format.FormatUtils
 import dev.treset.mcdl.mods.ModData
 import dev.treset.mcdl.mods.ModProvider
 import dev.treset.mcdl.mods.ModVersionData
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.manifest.LauncherMod
 import dev.treset.treelauncher.backend.data.getEnabled
+import dev.treset.treelauncher.backend.data.manifest.LauncherMod
+import dev.treset.treelauncher.backend.data.manifest.ModVersionFromVersion
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
 import dev.treset.treelauncher.backend.data.manifest.toVersionTypes
 import dev.treset.treelauncher.backend.mods.ModDownloader
@@ -99,12 +101,10 @@ class ModDataDisplay(
     }
 
     private fun updateCurrentVersion() {
-        launcherMod.value?.let { lm ->
-            versions.value?.firstOrNull {
-                it.versionNumber == lm.version.value
-            }?.let {
-                currentVersion.value = it
-            }
+        launcherMod.value?.version?.value?.let { cv ->
+            currentVersion.value = versions.value?.firstOrNull {
+                FormatUtils.formatVersionComparison(cv) == FormatUtils.formatVersionComparison(it.versionNumber)
+            } ?: ModVersionFromVersion(cv)
         }
     }
 
