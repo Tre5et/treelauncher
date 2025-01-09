@@ -382,9 +382,9 @@ class LauncherMod(
             }
 
             if (preserveEnabledState) {
-                val stateFile = fileAsState(file, enabled.value)
+                val stateFile = fileAsState(componentFile, enabled.value)
                 if (stateFile != componentFile) {
-                    componentFile.copyTo(stateFile, StandardCopyOption.REPLACE_EXISTING)
+                    componentFile.moveTo(stateFile, StandardCopyOption.REPLACE_EXISTING)
                     componentFile = stateFile
                 }
             }
