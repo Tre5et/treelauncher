@@ -3,7 +3,6 @@ package dev.treset.treelauncher.backend.data.patcher
 import androidx.compose.runtime.MutableState
 import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.config.appConfig
-import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
@@ -345,7 +344,7 @@ class DataPatcher {
         val componentDirectoriesProvider = statusProvider.subStep(PatchStep.COMPONENT_DIRECTORIES, 10)
         componentDirectoriesProvider.next()
 
-        val files = LauncherFiles()
+        val files = Pre2_1LauncherFiles()
         files.reload()
 
         componentDirectoriesProvider.next("instances")
@@ -386,7 +385,7 @@ class DataPatcher {
         val includedFilesProvider = statusProvider.subStep(PatchStep.INCLUDED_FILES, 6)
         includedFilesProvider.next("")
 
-        val files = LauncherFiles()
+        val files = Pre2_1LauncherFiles()
         files.reload()
 
         includedFilesProvider.next("instances")
@@ -483,7 +482,7 @@ class DataPatcher {
         LOGGER.info { "Upgrading texturepacks included files..." }
         val texturepacksProvider = statusProvider.subStep(PatchStep.TEXTUREPACKS_INCLUDED_FILES, 2)
         texturepacksProvider.next()
-        val files = LauncherFiles()
+        val files = Pre2_1LauncherFiles()
         files.reload()
 
         texturepacksProvider.total = files.resourcepackComponents.size + 1
@@ -504,7 +503,7 @@ class DataPatcher {
         val resourcepacksProvider = statusProvider.subStep(PatchStep.REMOVE_RESOURCEPACKS_ARGUMENT, 2)
         resourcepacksProvider.next()
 
-        val files = LauncherFiles()
+        val files = Pre2_1LauncherFiles()
         files.reload()
 
         resourcepacksProvider.total = files.versionComponents.size + 1
