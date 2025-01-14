@@ -8,8 +8,10 @@ import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
+@Serializable
 class Pre2_0LauncherInstanceDetails(
     var features: List<LauncherFeature>,
     var ignoredFiles: List<String>,
