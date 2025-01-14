@@ -12,13 +12,15 @@ class EmptyingJobQueue<A>(
 
     init {
         Thread {
+            var started = false
             while(true) {
-                if(queue.isEmpty()) {
+                if(queue.isEmpty() && started) {
                     onEmptied()
                     if(finishProcessing) {
                         return@Thread
                     }
                 }
+                started = true
                 queue.take()(argumentSupplier())
             }
         }.start()

@@ -266,6 +266,7 @@ fun ModsCreation(
                                 }
                             } catch (e: IOException) {
                                 AppContext.error(e)
+                                creationStatus = null
                             }
                         }.start()
                     }
