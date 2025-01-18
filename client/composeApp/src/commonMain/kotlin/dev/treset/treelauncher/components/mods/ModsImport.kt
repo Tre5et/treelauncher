@@ -47,11 +47,20 @@ fun ModsImport(
 
     var popupContent: PopupData? by remember { mutableStateOf(null) }
 
-    val filteredComponents = remember(component) {
+    var loaded by remember { mutableStateOf(0) }
+
+    val filteredComponents = remember(component, loaded) {
         AppContext.files.modsComponents
             .filter {
                 it != component
             }
+    }
+
+    LaunchedEffect(Unit) {
+        AppContext.files.modsComponents.forEach {
+            it.loadMods()
+            loaded++
+        }
     }
 
     Column(
@@ -157,11 +166,11 @@ fun ModsImport(
 
                                             IconButton(
                                                 onClick = {
-                                                    selectedMods += it to it.modFile!!
+                                                    selectedMods += it.copy() to it.modFile!!
                                                 },
                                                 icon = icons().add,
                                                 tooltip = Strings.manager.mods.import.tooltipAdd(),
-                                                enabled = !selectedMods.map { it.first }.contains(it)
+                                                enabled = !selectedMods.any {f -> it.modFile!!.name == f.second.name}
                                             )
                                         }
                                     }

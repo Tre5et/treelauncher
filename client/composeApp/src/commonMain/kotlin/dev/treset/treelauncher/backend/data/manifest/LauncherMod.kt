@@ -413,6 +413,19 @@ class LauncherMod(
         }
     }
 
+    fun copy(): LauncherMod {
+        return LauncherMod(
+            currentProvider = currentProvider,
+            description = description,
+            enabled = enabled,
+            url = url,
+            iconUrl = iconUrl,
+            name = name,
+            version = version,
+            downloads = downloads
+        )
+    }
+
     fun getModFile(enabled: Boolean? = null): LauncherFile? {
         val actualEnabled = enabled ?: this.enabled.value
 
