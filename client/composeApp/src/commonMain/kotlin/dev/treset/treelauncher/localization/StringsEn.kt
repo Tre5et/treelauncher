@@ -711,9 +711,9 @@ open class StringsEn(
         val version: () -> String = { "Version: v${Strings.launcher.version()}" }
     ) {
         data class Appearance(
-            val decrement: () -> String = { "Decrease by 10%" },
+            val decrement: () -> String = { "Decrease" },
             val displayScale: () -> String = { "Display Scale:" },
-            val increment: () -> String = { "Increase by 10%" },
+            val increment: () -> String = { "Increase" },
             val largeHint: () -> String = { "Large display scaling may cut off content" },
             val scaling: (Int) -> String = {
                 "${(it / 10f).roundToInt()}%"

@@ -528,9 +528,9 @@ class StringsDe : StringsEn(
     ),
     settings = Settings(
         appearance = Settings.Appearance(
-            decrement = { "Um 10% erhöhen" },
+            decrement = { "Verringern" },
             displayScale = { "Anzeigegröße:" },
-            increment = { "Um 10% verringern" },
+            increment = { "Erhöhen" },
             largeHint = { "Große Anzeigegrößen können Inhalt abschneiden" },
             smallHint = { "Kleine Anzeigegrößen können die Lesbarkeit einschränken" },
             title = { "Darstellung" },
