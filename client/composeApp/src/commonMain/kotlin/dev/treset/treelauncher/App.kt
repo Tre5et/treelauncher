@@ -8,10 +8,10 @@ import dev.treset.treelauncher.backend.config.*
 import dev.treset.treelauncher.backend.update.updater
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.instances.Instances
+import dev.treset.treelauncher.components.mods.Mods
 import dev.treset.treelauncher.components.options.Options
 import dev.treset.treelauncher.components.resourcepacks.Resourcepacks
 import dev.treset.treelauncher.components.saves.Saves
-import dev.treset.treelauncher.components.mods.Mods
 import dev.treset.treelauncher.creation.Create
 import dev.treset.treelauncher.login.LoginScreen
 import dev.treset.treelauncher.navigation.NavigationContainer
@@ -153,3 +153,5 @@ class LauncherApp(
 expect fun getUpdaterProcess(updaterArgs: String): ProcessBuilder
 
 expect fun resetWindow()
+
+expect fun minimizeWindow(minimize: Boolean)

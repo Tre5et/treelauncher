@@ -22,6 +22,7 @@ object AppContext {
     val files = LauncherFiles()
     var discord = DiscordIntegration()
     var resetWindowSize: () -> Unit = { }
+    var minimizeWindow: (Boolean) -> Unit = { }
     var recheckData: () -> Unit = { }
     var notifications = mutableStateListOf<NotificationData>()
         private set
@@ -90,6 +91,7 @@ fun ContextProvider(
 ) {
     LaunchedEffect(Unit) {
         AppContext.resetWindowSize = ::resetWindow
+        AppContext.minimizeWindow = ::minimizeWindow
     }
 
     AppContext.popupData?.let {

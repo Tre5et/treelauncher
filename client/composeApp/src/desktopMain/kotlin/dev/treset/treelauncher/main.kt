@@ -97,6 +97,10 @@ fun main() = application {
                 windowState.size = with(density) { DpSize(min(1600.dp, Toolkit.getDefaultToolkit().screenSize.width.toDp() - 100.dp), min(900.dp, Toolkit.getDefaultToolkit().screenSize.height.toDp() - 100.dp)) }
                 windowState.placement = WindowPlacement.Floating
             }
+
+            minimize = {
+                windowState.isMinimized = it
+            }
         }
 
         IntUiTheme(
@@ -187,8 +191,11 @@ actual fun getUpdaterProcess(updaterArgs: String): ProcessBuilder {
     }
 }
 
-var resetSize: () -> Unit = {}
+private var resetSize: () -> Unit = {}
 actual fun resetWindow() = resetSize()
+
+private var minimize: (Boolean) -> Unit = {}
+actual fun minimizeWindow(minimize: Boolean) = minimize(minimize)
 
 
 private fun isValidSize(size: DpSize): Boolean {

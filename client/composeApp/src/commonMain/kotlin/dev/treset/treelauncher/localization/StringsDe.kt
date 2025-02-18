@@ -542,7 +542,8 @@ class StringsDe : StringsEn(
             text = { "Text" },
             textLight = { "Helle Textfarbe auswählen" },
             textDark = { "Dunkle Textfarbe auswählen" },
-            reset = { "Standardfarben wiederherstellen" }
+            reset = { "Standardfarben wiederherstellen" },
+            minimizeOnRunning = { "Minimieren während das Spiel läuft" },
         ),
         cleanup = Settings.Cleanup(
             button = { "Ungenutzte Dateien löschen" },

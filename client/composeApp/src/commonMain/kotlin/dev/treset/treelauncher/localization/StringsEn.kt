@@ -728,7 +728,8 @@ open class StringsEn(
             val text: () -> String = { "Text" },
             val textLight: () -> String = { "Choose Light Text Color" },
             val textDark: () -> String = { "Choose Dark Text Color" },
-            val reset: () -> String = { "Revert Colors to Default" }
+            val reset: () -> String = { "Revert Colors to Default" },
+            val minimizeOnRunning: () -> String = { "Minimize while Game is running" },
         )
 
         data class Cleanup(

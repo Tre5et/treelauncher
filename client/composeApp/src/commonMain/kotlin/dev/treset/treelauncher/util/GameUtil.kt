@@ -3,6 +3,7 @@ package dev.treset.treelauncher.util
 import androidx.compose.material3.MaterialTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.AppContext
+import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.backend.launching.GameLauncher
 import dev.treset.treelauncher.backend.util.exception.GameLaunchException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -61,6 +62,7 @@ class GameLaunchHelper(
     private fun onRunning() {
         AppContext.runningInstance = launcher.instance
         AppContext.discord.activateActivity(launcher.instance)
+
         notification = NotificationData(
             content = {
                 Text(Strings.selector.instance.game.runningNotification(launcher.instance))
@@ -83,6 +85,9 @@ class GameLaunchHelper(
             },
         ).also { AppContext.addNotification(it) }
         AppContext.setGlobalPopup(null)
+        if(AppSettings.minimizeWhileRunning.value) {
+            AppContext.minimizeWindow(true)
+        }
     }
 
     private fun onLaunchFailed(
@@ -104,6 +109,9 @@ class GameLaunchHelper(
     }
 
     private fun onGameExit() {
+        if(AppSettings.minimizeWhileRunning.value) {
+            AppContext.minimizeWindow(false)
+        }
         AppContext.setGlobalPopup(
             PopupData(
                 titleRow = { Text(Strings.selector.instance.game.exitingTitle()) },

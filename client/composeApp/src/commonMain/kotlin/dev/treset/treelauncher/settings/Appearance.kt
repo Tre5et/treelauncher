@@ -376,6 +376,14 @@ fun Appearance() {
                 }
             }
 
+            TitledCheckBox(
+                Strings.settings.appearance.minimizeOnRunning(),
+                AppSettings.minimizeWhileRunning.value,
+                {
+                    AppSettings.minimizeWhileRunning.value = it
+                }
+            )
+
         }
     }
 

@@ -47,6 +47,7 @@ class Settings(
     val lightColors: MutableDataState<UserColors> = mutableStateOf(UserColors())
     val displayScale: MutableDataState<Int> = mutableStateOf(1000)
     val fontScale: MutableDataState<Int> = mutableStateOf(1000)
+    val minimizeWhileRunning: MutableDataState<Boolean> = mutableStateOf(false)
     val syncUrl: MutableDataState<String?> = mutableStateOf(null)
     val syncPort: MutableDataState<String?> = mutableStateOf(null)
     val syncKey: MutableDataState<String?> = mutableStateOf(null)
