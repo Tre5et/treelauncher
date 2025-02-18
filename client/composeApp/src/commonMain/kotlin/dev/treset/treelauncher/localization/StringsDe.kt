@@ -563,7 +563,6 @@ class StringsDe : StringsEn(
             instanceExample = { "MeineInstanz"},
             instanceToggle = { "Instanznamen anzeigen" },
             modLoaderToggle = { "Mod-Loader anzeigen" },
-            timeSuffix = { " vergangen" },
             timeToggle = { "Spielzeit anzeigen" },
             title = { "Discord Integration" },
             versionToggle = { "Spielversion anzeigen" },

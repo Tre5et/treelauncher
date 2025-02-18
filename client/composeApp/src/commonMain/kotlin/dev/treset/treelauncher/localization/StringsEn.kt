@@ -784,7 +784,6 @@ open class StringsEn(
             val modLoaderExample: () -> String = { "Fabric" },
             val modLoaderToggle: () -> String = { "Show mod loader" },
             val timeExample: () -> String = { "01:36" },
-            val timeSuffix: () -> String = { " elapsed" },
             val timeToggle: () -> String = { "Show playtime" },
             val title: () -> String = { "Discord Integration" },
             val versionExample: () -> String = { "1.20.5" },

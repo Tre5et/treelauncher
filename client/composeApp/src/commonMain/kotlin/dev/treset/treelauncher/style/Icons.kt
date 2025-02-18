@@ -71,6 +71,7 @@ object Icons {
     val copy = Icons.Rounded.ContentCopy
     val reset = Icons.Rounded.Replay
     val auto = Icons.Rounded.HdrAuto
+    val discordActivity: Painter @Composable get() = painterResource(Res.drawable.activity_game)
 
     val modrinthColor = @Composable { modrinthStatus: ModProviderStatus ->
         when (modrinthStatus) {

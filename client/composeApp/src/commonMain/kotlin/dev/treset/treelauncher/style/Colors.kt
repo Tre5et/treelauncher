@@ -109,6 +109,8 @@ data class ExtensionColors(
     val info: Color = Color.Cyan,
     val onInfo: Color = Color.Black,
     val popupScrim: Color = Color.Black.copy(alpha = 0.8f),
+    val discordBlack: Color = Color(0xFF111214),
+    val discordGreen: Color = Color(0xFF43B581),
 )
 
 data class Colors(

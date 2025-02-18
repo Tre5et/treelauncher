@@ -7,15 +7,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -26,9 +29,7 @@ import dev.treset.treelauncher.backend.config.AppSettings
 import dev.treset.treelauncher.generic.Text
 import dev.treset.treelauncher.generic.TitledSwitch
 import dev.treset.treelauncher.localization.Strings
-import dev.treset.treelauncher.style.GgSansFont
-import dev.treset.treelauncher.style.disabledContainer
-import dev.treset.treelauncher.style.disabledContent
+import dev.treset.treelauncher.style.*
 import org.jetbrains.compose.resources.imageResource
 import treelauncher.composeapp.generated.resources.Res
 import treelauncher.composeapp.generated.resources.minecraft_logo
@@ -137,7 +138,7 @@ fun Discord() {
                         modifier = Modifier
                             .width(295.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF111214))
+                            .background(ColorScheme.extensions.discordBlack)
                             .padding(12.dp)
                     ) {
                         Image(
@@ -162,12 +163,6 @@ fun Discord() {
                                 textAlign = TextAlign.Start,
                             )
 
-                            val textStyle = TextStyle(
-                                fontFamily = GgSansFont,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp
-                            )
-
                             val details = remember(AppSettings.discordShowInstance.value, AppSettings.discordShowVersion.value, AppSettings.discordShowModLoader.value, AppSettings.discordShowWatermark.value) {
                                 Strings.settings.discord.details(
                                     Strings.settings.discord.instanceExample(),
@@ -179,20 +174,40 @@ fun Discord() {
                             if (details.isNotBlank()) {
                                 Text(
                                     details,
-                                    style = textStyle,
+                                    style = TextStyle(
+                                        fontFamily = GgSansFont,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 14.sp
+                                    ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     textAlign = TextAlign.Start,
                                 )
                             }
                             if (AppSettings.discordShowTime.value) {
-                                Text(
-                                    Strings.settings.discord.timeExample() + Strings.settings.discord.timeSuffix(),
-                                    style = textStyle,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    textAlign = TextAlign.Start,
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Icon(
+                                        Icons.discordActivity,
+                                        "Activity icon",
+                                        tint = ColorScheme.extensions.discordGreen,
+                                        modifier = Modifier.size(14.dp).offset(y = (-2).dp)
+                                    )
+                                    Text(
+                                        Strings.settings.discord.timeExample(),
+                                        style = TextStyle(
+                                            fontFamily = FontFamily.Monospace,
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = 12.sp
+                                        ),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        textAlign = TextAlign.Start,
+                                        color = ColorScheme.extensions.discordGreen
+                                    )
+                                }
                             }
                         }
                     }

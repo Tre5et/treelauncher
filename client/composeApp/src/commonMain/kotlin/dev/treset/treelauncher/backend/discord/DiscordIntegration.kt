@@ -1,5 +1,7 @@
 package dev.treset.treelauncher.backend.discord
 
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import de.jcm.discordgamesdk.Core
 import de.jcm.discordgamesdk.CreateParams
 import de.jcm.discordgamesdk.activity.Activity
@@ -73,7 +75,11 @@ class DiscordIntegration {
     }
 
     private fun constructDetailsString(instance: InstanceComponent): String {
-        return Strings.settings.discord.details(instance.name.value, instance.versionComponents.value[0].versionNumber.value, instance.versionComponents.value[0].versionType.value)
+        return Strings.settings.discord.details(
+            instance.name.value,
+            instance.versionComponents.value[0].versionNumber.value,
+            instance.versionComponents.value[0].versionType.value.capitalize(Locale.current)
+        )
     }
 
     fun clearActivity() {
