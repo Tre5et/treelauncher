@@ -99,7 +99,7 @@ class DataPatcher {
     @Throws(IOException::class)
     fun backupFiles(statusProvider: StatusProvider) {
         LOGGER.info { "Creating backup..." }
-        val backupProvider = statusProvider.subStep(PatchStep.CREATE_BACKUP, 1)
+        val backupProvider = statusProvider.subStep(PatchStep.CREATE_BACKUP, -1)
         backupProvider.next("")
         val dir = LauncherFile.ofData()
         val backupDir = LauncherFile.ofData(".backup")
