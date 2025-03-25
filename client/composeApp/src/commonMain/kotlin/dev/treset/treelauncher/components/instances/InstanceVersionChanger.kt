@@ -59,6 +59,12 @@ fun SharedInstanceData.InstanceVersionChanger() {
                     AppContext.error(e)
                 }
                 component.versionId.value = it.id.value
+                try {
+                    component.write()
+                } catch (e: IOException) {
+                    AppContext.error(e)
+                }
+
             },
             defaultVersionId = component.versionComponents.value[0].versionNumber.value,
             defaultVersionType = when(component.versionComponents.value[0].versionType.value) {
