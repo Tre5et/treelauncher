@@ -71,6 +71,7 @@ fun SharedInstanceData.InstanceVersionChanger() {
                 "fabric" -> VersionType.FABRIC
                 "forge" -> VersionType.FORGE
                 "quilt" -> VersionType.QUILT
+                "neoforge" -> VersionType.NEO_FORGE
                 else -> VersionType.VANILLA
             },
             defaultLoaderVersion = component.versionComponents.value[0].loaderVersion.value,
