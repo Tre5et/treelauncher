@@ -155,7 +155,7 @@ class FabricCreationData(
     val version: FabricVersion,
     val profile: FabricProfile,
     files: LauncherFiles
-): VersionCreationData(profile.id, version.loader.version, files)
+): VersionCreationData(profile.id, profile.id, files)
 
 val CreationStep.VERSION_FABRIC: FormatStringProvider
     get() = FormatStringProvider { Strings.creator.status.version.fabric() }
