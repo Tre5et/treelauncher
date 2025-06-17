@@ -6,7 +6,7 @@ import dev.treset.mcdl.json.SerializationException
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
-import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
+import dev.treset.treelauncher.backend.data.manifest.Pre2_2InstanceComponent
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
@@ -39,8 +39,8 @@ class Pre2_0LauncherInstanceDetails(
     }
 }
 
-fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherInstanceDetails>.toInstanceComponent(): InstanceComponent {
-    return InstanceComponent(
+fun Pair<Pre2_0ComponentManifest, Pre2_0LauncherInstanceDetails>.toInstanceComponent(): Pre2_2InstanceComponent {
+    return Pre2_2InstanceComponent(
         first.id,
         first.name,
         second.versionComponent,

@@ -3,9 +3,11 @@ package dev.treset.treelauncher.backend.data.manifest
 import androidx.compose.runtime.*
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
+import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
-import dev.treset.treelauncher.backend.launching.resources.InstanceResourceProvider
+import dev.treset.treelauncher.backend.data.manifest.*
+import dev.treset.treelauncher.backend.data.patcher.Pre2_2LauncherFiles
 import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -19,7 +21,7 @@ import kotlinx.serialization.json.JsonNames
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
-class InstanceComponent(
+class Pre2_2InstanceComponent(
     override val id: MutableDataState<String>,
     override val name: MutableDataState<String>,
     @JsonNames("version_component")
@@ -36,23 +38,14 @@ class InstanceComponent(
     override val active: MutableDataState<Boolean> = mutableStateOf(false),
     override val lastUsed: MutableDataState<String> = mutableStateOf(""),
     override val includedFiles: MutableDataStateList<String> = appConfig().instanceDefaultIncludedFiles.toMutableStateList(),
-    val features: MutableDataStateList<String> = appConfig().instanceDefaultFeatures.toMutableStateList(),
+    val features: MutableDataStateList<LauncherFeature> = mutableStateListOf(),
     val jvmArguments: MutableDataStateList<LauncherLaunchArgument> = appConfig().instanceDefaultJvmArguments.toMutableStateList(),
     val ignoredFiles: MutableDataStateList<String> = appConfig().instanceDefaultIgnoredFiles.toMutableStateList(),
     val totalTime: MutableDataState<Long> = mutableStateOf(0),
-    val resX: MutableDataState<Int?> = mutableStateOf(null),
-    val resY: MutableDataState<Int?> = mutableStateOf(null),
     override val listDisplay: MutableDataState<ListDisplay?> = mutableStateOf(null)
 ): Component() {
     override val type = LauncherManifestType.INSTANCE_COMPONENT
     @Transient override var expectedType = LauncherManifestType.INSTANCE_COMPONENT
-
-    @Transient val versionComponents = derivedStateOf { getVersionComponents(versionId.value, AppContext.files) }
-    @Transient val javaComponent = derivedStateOf { getJavaComponent(versionComponents.value, AppContext.files) }
-    @Transient val savesComponent = derivedStateOf { getSavesComponent(savesId.value, AppContext.files) }
-    @Transient val resourcepacksComponent = derivedStateOf { getResourcepacksComponent(resourcepacksId.value, AppContext.files) }
-    @Transient val optionsComponent = derivedStateOf { getOptionsComponent(optionsId.value, AppContext.files) }
-    @Transient val modsComponent = derivedStateOf { getModsComponent(modsId.value, AppContext.files) }
 
     val librariesDir: LauncherFile
         get() = AppContext.files.librariesDir
@@ -75,12 +68,10 @@ class InstanceComponent(
         active: Boolean = false,
         lastUsed: String = "",
         includedFiles: List<String> = appConfig().instanceDefaultIncludedFiles,
-        features: List<String> = appConfig().instanceDefaultFeatures,
+        features: List<LauncherFeature> = listOf(),
         jvmArguments: List<LauncherLaunchArgument> = appConfig().instanceDefaultJvmArguments,
         ignoredFiles: List<String> = appConfig().instanceDefaultIgnoredFiles,
-        totalTime: Long = 0,
-        resX: Int? = null,
-        resY: Int? = null
+        totalTime: Long = 0
     ): this(
         mutableStateOf(id),
         mutableStateOf(name),
@@ -96,19 +87,13 @@ class InstanceComponent(
         features.toMutableStateList(),
         jvmArguments.toMutableStateList(),
         ignoredFiles.toMutableStateList(),
-        mutableStateOf(totalTime),
-        mutableStateOf(resX),
-        mutableStateOf(resY),
+        mutableStateOf(totalTime)
     )
-
-    override fun getResourceProvider(gameDataDir: LauncherFile): InstanceResourceProvider {
-        return InstanceResourceProvider(this, gameDataDir)
-    }
 
     override fun copyData(other: Component) {
         super.copyData(other)
 
-        if(other is InstanceComponent) {
+        if(other is Pre2_2InstanceComponent) {
             features.copyTo(other.features)
             ignoredFiles.copyTo(other.ignoredFiles)
             jvmArguments.copyTo(other.jvmArguments)
@@ -118,17 +103,15 @@ class InstanceComponent(
             other.savesId.value = savesId.value
             other.versionId.value = versionId.value
             other.totalTime.value = totalTime.value
-            other.resX.value = resX.value
-            other.resY.value = resY.value
         }
     }
 
     companion object {
         @Throws(FileLoadException::class)
-        fun getVersionComponents(id: String, files: LauncherFiles): List<VersionComponent> {
-            val versionComponents: MutableList<VersionComponent> = mutableListOf()
+        fun getVersionComponents(id: String, files: Pre2_2LauncherFiles): List<Pre2_2VersionComponent> {
+            val versionComponents: MutableList<Pre2_2VersionComponent> = mutableListOf()
 
-            var firstComponent: VersionComponent? = null
+            var firstComponent: Pre2_2VersionComponent? = null
             for (v in files.versionComponents) {
                 if (v.id.value == id) {
                     firstComponent = v
@@ -136,7 +119,7 @@ class InstanceComponent(
                 }
             }
             firstComponent?: throw FileLoadException("Failed to load instance data: unable to find version component: versionId=${id}")
-            var currentComponent: VersionComponent = firstComponent
+            var currentComponent: Pre2_2VersionComponent = firstComponent
             versionComponents.add(currentComponent)
             while (!currentComponent.depends.value.isNullOrBlank()) {
                 var found = false
@@ -157,7 +140,7 @@ class InstanceComponent(
         }
 
         @Throws(FileLoadException::class)
-        fun getJavaComponent(versionComponents: List<VersionComponent>, files: LauncherFiles): JavaComponent {
+        fun getJavaComponent(versionComponents: List<Pre2_2VersionComponent>, files: LauncherFiles): JavaComponent {
             for (v in versionComponents) {
                 if (!v.java.value.isNullOrBlank()) {
                     for (j in files.javaComponents) {
@@ -213,5 +196,32 @@ class InstanceComponent(
             }
             return null
         }
+    }
+
+    fun toInstanceComponent(): InstanceComponent {
+        val resX = features.firstOrNull { it.feature == "resolution_x" }?.value?.toIntOrNull()
+        val resY = features.firstOrNull { it.feature == "resolution_y" }?.value?.toIntOrNull()
+
+
+        return InstanceComponent(
+            id,
+            name,
+            versionId,
+            savesId,
+            resourcepacksId,
+            optionsId,
+            modsId,
+            file,
+            active,
+            lastUsed,
+            includedFiles.toMutableStateList(),
+            appConfig().instanceDefaultFeatures.toMutableStateList(),
+            jvmArguments.toMutableStateList(),
+            ignoredFiles.toMutableStateList(),
+            totalTime,
+            mutableStateOf(resX),
+            mutableStateOf(resY),
+            listDisplay
+        )
     }
 }

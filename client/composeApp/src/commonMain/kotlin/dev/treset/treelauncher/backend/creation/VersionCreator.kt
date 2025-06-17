@@ -7,6 +7,7 @@ import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.copyTo
 import java.io.IOException
 
 abstract class VersionCreator<D: VersionCreationData>(
@@ -33,19 +34,13 @@ abstract class VersionCreator<D: VersionCreationData>(
     ): List<LauncherLaunchArgument> {
         val result: MutableList<LauncherLaunchArgument> = mutableListOf()
         for (a in args) {
-            var feature: String? = null
+            var features: MutableMap<String, Boolean> = mutableMapOf()
             var osName: String? = null
             var osVersion: String? = null
             var osArch: String? = null
             if (a.isGated) {
                 for (r in a.rules) {
-                    r.features?.let { features ->
-                        if (features.isHasCustomResolution) {
-                            feature = "resolution_x"
-                        } else if (features.isDemoUser) {
-                            feature = "is_demo_user"
-                        }
-                    }
+                    r.features?.copyTo(features)
                     r.os?.let { os ->
                         osName = os.name
                         osVersion = os.version
@@ -53,7 +48,7 @@ abstract class VersionCreator<D: VersionCreationData>(
                     }
                 }
             }
-            result.add(LauncherLaunchArgument(a.name, feature, osName, osVersion, osArch))
+            result.add(LauncherLaunchArgument(a.name, features, osName, osVersion, osArch))
         }
         for(a in defaultArgs) {
             if(result.none { it.argument == a.argument }) {

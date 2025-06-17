@@ -71,7 +71,8 @@ class DataPatcher {
         UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
         UpgradeFunction(this::removeLoginFile, Version(2,0,0)),
         UpgradeFunction(this::restructureMods, Version(2, 1, 0)),
-        UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0), Version(2, 1, 0))
+        UpgradeFunction(this::upgrade2_2Components, Version(2, 2, 0)),
+        UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0), Version(2, 1, 0), Version(2, 2, 0))
     )
 
     fun upgradeNeeded(): Boolean {
@@ -530,6 +531,35 @@ class DataPatcher {
         }
         loginFileProvider.finish()
         LOGGER.info { "Removed login file" }
+    }
+
+    @Throws(IOException::class)
+    fun upgrade2_2Components(statusProvider: StatusProvider) {
+        LOGGER.info { "Upgrading components..." }
+        val upgradeComponentsProvider = statusProvider.subStep(PatchStep.UPGRADE_COMPONENTS, 2)
+        upgradeComponentsProvider.next()
+
+        val files = Pre2_2LauncherFiles()
+        files.reload()
+
+        val upgradeInstanceProvider = upgradeComponentsProvider.subStep(PatchStep.UPGRADE_INSTANCES, files.instanceComponents.size)
+        for(instance in files.instanceComponents) {
+            upgradeInstanceProvider.next(instance.name.value)
+            val newI = instance.toInstanceComponent()
+            newI.write()
+        }
+        upgradeInstanceProvider.finish()
+
+        val upgradeVersionsProvider = upgradeComponentsProvider.subStep(PatchStep.UPGRADE_VERSIONS, files.versionComponents.size)
+        for(version in files.versionComponents) {
+            upgradeVersionsProvider.next(version.name.value)
+            val newV = version.toVersionComponent()
+            newV.write()
+        }
+        upgradeVersionsProvider.finish()
+
+        upgradeComponentsProvider.finish()
+        LOGGER.info { "Upgraded instances" }
     }
 
     @Throws(IOException::class)

@@ -95,16 +95,6 @@ class CommandBuilder(
         }
         val nativesDir = natives.joinToString(File.pathSeparator)
 
-        var resX: String? = null
-        var resY: String? = null
-        for (f in instance.features) {
-            if (f.feature == "resolution_x") {
-                resX = f.value
-            }
-            if (f.feature == "resolution_y") {
-                resY = f.value
-            }
-        }
         val gameDir: LauncherFile = instance.gameDataDir
         if (!gameDir.isDirectory()) {
             throw GameCommandException("Unable to create start command: game directory is not a directory: directory=${gameDir.absolutePath}")
@@ -139,8 +129,8 @@ class CommandBuilder(
             nativesDir,
             Strings.game.versionName(instance),
             Strings.game.versionType(instance),
-            resX,
-            resY,
+            instance.resX.value?.toString(),
+            instance.resY.value?.toString(),
             quickPlayData
         )
 
@@ -156,19 +146,37 @@ class CommandBuilder(
         LOGGER.info { "Created start command, instance=${instance.id}" }
     }
 
+    private fun constructFeatures(): List<String> {
+        val features: MutableList<String> = mutableListOf()
+        features.addAll(instance.features)
+        quickPlayData?.let {
+            when (it.type) {
+                QuickPlayData.Type.WORLD -> features.add("is_quick_play_singleplayer")
+                QuickPlayData.Type.SERVER -> features.add("is_quick_play_multiplayer")
+                QuickPlayData.Type.REALM -> features.add("is_quick_play_realms")
+            }
+        }
+        if(instance.resX.value != null && instance.resY.value != null) {
+            features.add("has_custom_resolution")
+        }
+        return features
+    }
+
     @Throws(GameCommandException::class)
     private fun appendArguments(
         pb: ProcessBuilder,
         args: List<LauncherLaunchArgument>,
         context: CommandContext
     ) {
+        val features = constructFeatures()
         val exceptionQueue: MutableList<GameCommandException> = mutableListOf()
         for (a in args) {
             try {
                 appendArgument(
                     pb,
                     a,
-                    context
+                    context,
+                    features
                 )
             } catch (e: GameCommandException) {
                 exceptionQueue.add(e)
@@ -185,9 +193,10 @@ class CommandBuilder(
     private fun appendArgument(
         pb: ProcessBuilder,
         a: LauncherLaunchArgument,
-        context: CommandContext
+        context: CommandContext,
+        features: List<String>
     ) {
-        if (a.isActive(instance.features)) {
+        if (a.isActive(features)) {
             val replacements: MutableMap<String, String> = mutableMapOf()
             val exceptionQueue: MutableList<GameCommandException> = mutableListOf()
             for (r in a.replacementValues) {

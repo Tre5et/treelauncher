@@ -1,14 +1,16 @@
-package dev.treset.treelauncher.backend.data
+package dev.treset.treelauncher.backend.data.patcher
 
 import dev.treset.mcdl.format.FormatUtils
 import dev.treset.mcdl.util.OsUtil
+import dev.treset.treelauncher.backend.data.LauncherFeature
+import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-class LauncherLaunchArgument(
+class Pre2_2LauncherLaunchArgument(
     var argument: String,
-    var features: Map<String, Boolean>? = null,
+    var feature: String? = null,
     var osName: String? = null,
     var osVersion: String? = null,
     var osArch: String? = null
@@ -35,9 +37,9 @@ class LauncherLaunchArgument(
         return allReplaced
     }
 
-    fun isActive(activeFeatures: List<String>): Boolean {
-        features?.let { feat ->
-            if(feat.any { e -> activeFeatures.contains(e.key) != e.value }) {
+    fun isActive(features: List<LauncherFeature>): Boolean {
+        if (feature?.isNotBlank() == true) {
+            if (features.none { f: LauncherFeature -> f.feature == feature }) {
                 return false
             }
         }
@@ -61,26 +63,29 @@ class LauncherLaunchArgument(
         get() = replacementValues.isEmpty()
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LauncherLaunchArgument
-
-        if (argument != other.argument) return false
-        if (features != other.features) return false
-        if (osName != other.osName) return false
-        if (osVersion != other.osVersion) return false
-        if (osArch != other.osArch) return false
-
-        return true
+        return argument == (other as? Pre2_2LauncherLaunchArgument)?.argument
+                && feature == (other as? Pre2_2LauncherLaunchArgument)?.feature
+                && osName == (other as? Pre2_2LauncherLaunchArgument)?.osName
+                && osVersion == (other as? Pre2_2LauncherLaunchArgument)?.osVersion
+                && osArch == (other as? Pre2_2LauncherLaunchArgument)?.osArch
     }
 
     override fun hashCode(): Int {
         var result = argument.hashCode()
-        result = 31 * result + (features?.hashCode() ?: 0)
+        result = 31 * result + (feature?.hashCode() ?: 0)
         result = 31 * result + (osName?.hashCode() ?: 0)
         result = 31 * result + (osVersion?.hashCode() ?: 0)
         result = 31 * result + (osArch?.hashCode() ?: 0)
         return result
+    }
+
+    fun toLauncherLaunchArgument(): LauncherLaunchArgument {
+        return LauncherLaunchArgument(
+            argument = argument,
+            features = if(feature == null) mapOf() else if(feature!! == "resolution_x" || feature!! == "resolution_y") mapOf(Pair("has_custom_resolution", true)) else mapOf(Pair(feature!!, true)),
+            osName = osName,
+            osVersion = osVersion,
+            osArch = osArch
+        )
     }
 }

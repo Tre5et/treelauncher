@@ -14,7 +14,6 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.sun.management.OperatingSystemMXBean
 import dev.treset.treelauncher.AppContext
-import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.assignFrom
@@ -293,24 +292,16 @@ private fun saveMemory(instance: InstanceComponent, memory: Int, startMemory: In
 }
 
 private fun getResolution(instance: InstanceComponent): Pair<Int, Int> {
-    val features = instance.features
-    val resX = features.firstOrNull { it.feature == "resolution_x" }
-    val resY = features.firstOrNull { it.feature == "resolution_y" }
-
     return Pair(
-        resX?.value?.toIntOrNull() ?: 854,
-        resY?.value?.toIntOrNull() ?: 480
+        instance.resX.value ?: 854,
+        instance.resY.value ?: 480
     )
 }
 
 private fun saveResolution(instance: InstanceComponent, res: Pair<Int, Int>, startRes: Pair<Int, Int>) {
     if (res != startRes) {
-        val newFeatures = instance.features
-                .filter { f -> f.feature != "resolution_x" && f.feature != "resolution_y" }
-                .toMutableList()
-        newFeatures.add(LauncherFeature("resolution_x", res.first.toString()))
-        newFeatures.add(LauncherFeature("resolution_y", res.second.toString()))
-        instance.features.assignFrom(newFeatures)
+        instance.resX.value = res.first
+        instance.resY.value = res.second
     }
 }
 

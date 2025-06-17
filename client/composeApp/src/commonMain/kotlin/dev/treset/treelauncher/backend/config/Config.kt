@@ -2,7 +2,6 @@ package dev.treset.treelauncher.backend.config
 
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.app
-import dev.treset.treelauncher.backend.data.LauncherFeature
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
@@ -13,8 +12,8 @@ import java.nio.file.StandardCopyOption
 import kotlin.jvm.Throws
 
 class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = null) {
-    val launcherVersion = Version(3,1,1)
-    val dataVersion = Version(2,1,0)
+    val launcherVersion = Version(3,2,0)
+    val dataVersion = Version(2,2,0)
     var baseDir: LauncherFile = LauncherFile.of(globalConfig.path)
     val syncFileName = "data.sync"
     val metaDir: LauncherFile = LauncherFile.of(baseDir, ".launcher")
@@ -23,7 +22,7 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
     val manifestFileName = "manifest.json"
     val nativesDirName = "natives"
     val includedFilesBackupDir = ".included_files.bak"
-    val instanceDefaultFeatures: List<LauncherFeature> = listOf()
+    val instanceDefaultFeatures: List<String> = listOf("has_quick_play_support")
     val instanceDefaultIncludedFiles: List<String> = listOf()
     val instanceDefaultIgnoredFiles: List<String> = listOf()
     val instanceDefaultJvmArguments: List<LauncherLaunchArgument> = listOf()
