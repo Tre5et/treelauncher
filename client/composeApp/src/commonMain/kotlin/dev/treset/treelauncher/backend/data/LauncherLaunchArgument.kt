@@ -75,6 +75,10 @@ class LauncherLaunchArgument(
         return true
     }
 
+    override fun toString(): String {
+        return "Argument(argument='$argument', features=$features, osName=$osName, osVersion=$osVersion, osArch=$osArch)"
+    }
+
     override fun hashCode(): Int {
         var result = argument.hashCode()
         result = 31 * result + (features?.hashCode() ?: 0)

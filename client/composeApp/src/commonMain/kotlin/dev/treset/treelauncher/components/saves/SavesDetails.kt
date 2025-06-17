@@ -97,12 +97,12 @@ fun SharedSavesData.SavesDetails() {
                 SaveButton(
                     it.key,
                     it.value,
-                    selectedSave == it.key,
+                    selectedSave.value == it.key,
                     display = listDisplay,
                     onDelete = {
                         try {
                             it.value.remove()
-                            if (selectedSave == it.key) {
+                            if (selectedSave.value == it.key) {
                                 selectedSave.value = null
                             }
                             reloadSaves()
@@ -112,7 +112,7 @@ fun SharedSavesData.SavesDetails() {
                     },
                 ) {
                     selectedServer.value = null
-                    selectedSave.value = if (selectedSave == it.key) {
+                    selectedSave.value = if (selectedSave.value == it.key) {
                         null
                     } else {
                         it.key
@@ -128,11 +128,11 @@ fun SharedSavesData.SavesDetails() {
             displayData.servers.forEach {
                 ServerButton(
                     it,
-                    selectedServer == it,
+                    selectedServer.value == it,
                     display = listDisplay,
                 ) {
                     selectedSave.value = null
-                    selectedServer.value = if (selectedServer == it) {
+                    selectedServer.value = if (selectedServer.value == it) {
                         null
                     } else {
                         it
