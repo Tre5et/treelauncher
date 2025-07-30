@@ -7,6 +7,7 @@ import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.copyTo
 import java.io.IOException
 
@@ -16,7 +17,7 @@ abstract class VersionCreator<D: VersionCreationData>(
 ) : NewComponentCreator<VersionComponent, D>(data, statusProvider) {
     constructor(
         data: D,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)

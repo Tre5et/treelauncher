@@ -9,6 +9,7 @@ import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
 
@@ -18,7 +19,7 @@ class JavaComponentCreator(
 ) : NewComponentCreator<JavaComponent, JavaCreationData>(data, statusProvider) {
     constructor(
         data: JavaCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)

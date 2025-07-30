@@ -6,6 +6,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.SavesComponent
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.assignFrom
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.components.BoxContent
@@ -52,7 +53,7 @@ fun Saves() {
     )
 }
 
-fun SavesCreator.get(content: CreationContent<SavesComponent>, onStatus: (Status) -> Unit): ComponentCreator<SavesComponent, out CreationData> {
+fun SavesCreator.get(content: CreationContent<SavesComponent>, onStatus: StatusReceiver): ComponentCreator<SavesComponent, out CreationData> {
     return when(content.mode) {
         CreationMode.NEW -> new(NewCreationData(content.newName!!, AppContext.files.savesManifest), onStatus)
         CreationMode.INHERIT -> inherit(InheritCreationData(content.inheritName!!, content.inheritComponent!!, AppContext.files.savesManifest), onStatus)

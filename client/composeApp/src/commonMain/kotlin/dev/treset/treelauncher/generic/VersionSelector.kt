@@ -17,8 +17,11 @@ import dev.treset.mcdl.quiltmc.QuiltVersion
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.VersionComponent
+import dev.treset.treelauncher.backend.util.MutableStateList
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.StringProvider
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
@@ -49,7 +52,7 @@ fun VersionSelector(
     defaultVersionType: VersionType = VersionType.VANILLA,
     defaultLoaderVersion: String? = null,
     showChange: Boolean = true,
-    getCreator: (data: VersionCreationContent, onStatus: (Status) -> Unit) -> VersionCreator<*> = {d,s -> VersionCreator.get(d,s) },
+    getCreator: (data: VersionCreationContent, onStatus: StatusReceiver) -> VersionCreator<*> = {d,s -> VersionCreator.get(d,s) },
     setContent: (VersionCreationContent) -> Unit = {},
     onChange: (execute: () -> VersionComponent) -> Unit = { it() },
     onDone: (VersionComponent) -> Unit = {}
@@ -67,7 +70,7 @@ fun VersionSelector(
     var neoForgeVersions: List<String> by remember(minecraftVersion) { mutableStateOf(emptyList()) }
     var neoForgeVersion: String? by remember { mutableStateOf(null) }
 
-    var creationStatus: Status? by remember { mutableStateOf(null) }
+    var creationStatus: List<Status> by remember { mutableStateOf(emptyList()) }
 
     val creationContent: VersionCreationContent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion, neoForgeVersion) {
         VersionCreationContent(
@@ -82,13 +85,15 @@ fun VersionSelector(
         }
     }
 
-    val execute: (onStatus: (Status) -> Unit) -> VersionComponent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
+    val execute: (onStatus: StatusReceiver) -> VersionComponent = remember(minecraftVersion, versionType, fabricVersion, forgeVersion, quiltVersion) {
         @Throws(IOException::class) { onStatus ->
             if(!creationContent.isValid()) {
                 throw IOException("Invalid version creation content")
             }
 
-            onStatus(Status(CreationStep.STARTING, object : StringProvider { override fun get() = "" }))
+            creationStatus = emptyList()
+            creationStatus = listOf(Status(CreationStep.STARTING, object : StringProvider { override fun get() = "" }))
+            onStatus(creationStatus)
 
             val creator = getCreator(
                 creationContent,
@@ -301,7 +306,7 @@ fun VersionSelector(
                                     execute {
                                         creationStatus = it
                                     }.also {
-                                        creationStatus = null
+                                        creationStatus = emptyList()
                                     }
                                 }
                             } catch (e: IOException) {
@@ -323,8 +328,8 @@ fun VersionSelector(
             )
         }
 
-        creationStatus?.let {
-            StatusPopup(it)
+        if(creationStatus.isNotEmpty()) {
+            StatusPopup(creationStatus)
         }
     }
 }
@@ -355,7 +360,7 @@ enum class VersionType(
 }
 
 @Throws(IOException::class)
-fun VersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+fun VersionCreator.Companion.get(data: VersionCreationContent, onStatus: StatusReceiver): VersionCreator<out VersionCreationData> {
     when(data.versionType) {
         VersionType.VANILLA -> return VanillaVersionCreator.get(data, onStatus)
         VersionType.FABRIC -> return FabricVersionCreator.get(data, onStatus)
@@ -366,7 +371,7 @@ fun VersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status
 }
 
 @Throws(IOException::class)
-fun VanillaVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+fun VanillaVersionCreator.Companion.get(data: VersionCreationContent, onStatus: StatusReceiver): VersionCreator<out VersionCreationData> {
     return VanillaVersionCreator(
         VanillaCreationData(MinecraftProfile.get(data.minecraftVersion!!.url), AppContext.files),
         onStatus
@@ -374,7 +379,7 @@ fun VanillaVersionCreator.Companion.get(data: VersionCreationContent, onStatus: 
 }
 
 @Throws(IOException::class)
-fun FabricVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+fun FabricVersionCreator.Companion.get(data: VersionCreationContent, onStatus: StatusReceiver): VersionCreator<out VersionCreationData> {
     return FabricVersionCreator(
         FabricCreationData(
             version = data.fabricVersion!!,
@@ -386,7 +391,7 @@ fun FabricVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (
 }
 
 @Throws(IOException::class)
-fun QuiltVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+fun QuiltVersionCreator.Companion.get(data: VersionCreationContent, onStatus: StatusReceiver): VersionCreator<out VersionCreationData> {
     return QuiltVersionCreator(
         QuiltCreationData(
             version = data.quiltVersion!!,
@@ -398,7 +403,7 @@ fun QuiltVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (S
 }
 
 @Throws(IOException::class)
-fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: StatusReceiver): VersionCreator<out VersionCreationData> {
     return ForgeVersionCreator(
         ForgeCreationData(
             minecraftVersion = data.minecraftVersion!!.id,
@@ -409,7 +414,7 @@ fun ForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (S
     )
 }
 
-fun NeoForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: (Status) -> Unit): VersionCreator<out VersionCreationData> {
+fun NeoForgeVersionCreator.Companion.get(data: VersionCreationContent, onStatus: StatusReceiver): VersionCreator<out VersionCreationData> {
     return NeoForgeVersionCreator(
         NeoForgeCreationData(
             minecraftVersion = data.minecraftVersion!!.id,

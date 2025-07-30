@@ -7,6 +7,7 @@ import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.localization.Strings
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -18,7 +19,7 @@ class ForgeVersionCreator(
 ) : MinecraftProfileVersionCreator<ForgeCreationData>(data, statusProvider) {
     constructor(
         data: ForgeCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = VERSION_FORGE

@@ -4,6 +4,7 @@ import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.localization.Strings
 
 class NewOptionCreator(
@@ -12,7 +13,7 @@ class NewOptionCreator(
 ): NewComponentCreator<OptionsComponent, NewCreationData>(data, statusProvider) {
     constructor(
         data: NewCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createNew(statusProvider: StatusProvider): OptionsComponent {
@@ -32,7 +33,7 @@ class InheritOptionsCreator(
 ): InheritComponentCreator<OptionsComponent, InheritCreationData<OptionsComponent>>(data, statusProvider) {
     constructor(
         data: InheritCreationData<OptionsComponent>,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createInherit(statusProvider: StatusProvider): OptionsComponent {
@@ -52,22 +53,22 @@ class UseOptionsCreator(
 ): UseComponentCreator<OptionsComponent, UseCreationData<OptionsComponent>>(data, statusProvider) {
     constructor(
         data: UseCreationData<OptionsComponent>,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.OPTIONS
 }
 
 object OptionsCreator {
-    fun new(data: NewCreationData, onStatus: (Status) -> Unit): NewOptionCreator {
+    fun new(data: NewCreationData, onStatus: StatusReceiver): NewOptionCreator {
         return NewOptionCreator(data, onStatus)
     }
 
-    fun inherit(data: InheritCreationData<OptionsComponent>, onStatus: (Status) -> Unit): InheritOptionsCreator {
+    fun inherit(data: InheritCreationData<OptionsComponent>, onStatus: StatusReceiver): InheritOptionsCreator {
         return InheritOptionsCreator(data, onStatus)
     }
 
-    fun use(data: UseCreationData<OptionsComponent>, onStatus: (Status) -> Unit): UseOptionsCreator {
+    fun use(data: UseCreationData<OptionsComponent>, onStatus: StatusReceiver): UseOptionsCreator {
         return UseOptionsCreator(data, onStatus)
     }
 }

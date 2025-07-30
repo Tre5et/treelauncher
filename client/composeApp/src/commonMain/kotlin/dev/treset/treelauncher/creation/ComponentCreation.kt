@@ -7,7 +7,10 @@ import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.ComponentCreator
 import dev.treset.treelauncher.backend.data.manifest.Component
+import dev.treset.treelauncher.backend.util.MutableStateList
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusReceiver
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
@@ -37,13 +40,13 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
     components: MutableList<T>,
     allowUse: Boolean = true,
     showCreate: Boolean = true,
-    getCreator: (content: CreationContent<T>, onStatus: (Status) -> Unit) -> C,
+    getCreator: (content: CreationContent<T>, onStatus: StatusReceiver) -> C,
     defaultMode: CreationMode = CreationMode.NEW,
     defaultNewName: String = "",
     defaultInheritName: String = "",
     defaultInheritComponent: T? = null,
     defaultUseComponent: T? = null,
-    setExecute: (((onStatus: (Status) -> Unit) -> T)?) -> Unit = {},
+    setExecute: (((onStatus: StatusReceiver) -> T)?) -> Unit = {},
     setContent: (CreationContent<T>) -> Unit = {},
     onDone: (T) -> Unit = {}
 ) {
@@ -60,7 +63,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
 
     var useSelected: T? by remember(components, defaultUseComponent) { mutableStateOf(defaultUseComponent) }
 
-    var creationStatus: Status? by remember { mutableStateOf(null) }
+    var creationStatus: List<Status> by remember { mutableStateOf(emptyList()) }
 
     val creationContent: CreationContent<T> = remember(mode, newName, inheritName, inheritSelected, useSelected) {
         CreationContent(
@@ -74,7 +77,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
         }
     }
 
-    val execute: (onStatus: (Status) -> Unit) -> T = remember(creationContent) {
+    val execute: (onStatus: StatusReceiver) -> T = remember(creationContent) {
         { onStatus ->
             if(!creationContent.isValid()) {
                 throw IOException("Invalid version creation content")
@@ -175,6 +178,7 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
                             } catch (e: IOException) {
                                 AppContext.error(e)
                             }
+                            creationStatus = emptyList()
                         }.start()
                     }
                 }
@@ -183,8 +187,8 @@ fun <T: Component, C: ComponentCreator<T, *>> ComponentCreator(
             }
         }
 
-        creationStatus?.let {
-            StatusPopup(it)
+        if(creationStatus.isNotEmpty()) {
+            StatusPopup(creationStatus)
         }
     }
 }

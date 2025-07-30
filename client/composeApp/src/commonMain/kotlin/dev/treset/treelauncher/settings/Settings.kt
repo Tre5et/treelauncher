@@ -41,6 +41,8 @@ fun Settings() {
             Cleanup()
 
             Update()
+
+            Debug()
         }
     }
 }

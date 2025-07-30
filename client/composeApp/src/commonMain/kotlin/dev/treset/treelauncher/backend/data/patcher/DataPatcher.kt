@@ -8,6 +8,7 @@ import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
@@ -80,7 +81,7 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun performUpgrade(backup: Boolean, onStatus: (Status) -> Unit) {
+    fun performUpgrade(backup: Boolean, onStatus: StatusReceiver) {
         if(!upgradeNeeded()) {
             return
         }

@@ -2,6 +2,9 @@ package dev.treset.treelauncher.backend.util
 
 import dev.treset.mcdl.util.DownloadStatus
 import dev.treset.treelauncher.localization.Strings
+import java.util.Stack
+
+typealias StatusReceiver = (List<Status>) -> Unit
 
 open class Status(
     private val stepProvider: StringProvider,
@@ -17,6 +20,12 @@ open class Status(
 
 interface StringProvider {
     fun get(): String
+}
+
+class SimpleStringProvider(
+    private val string: String
+) : StringProvider {
+    override fun get(): String = string
 }
 
 open class FormatStringProvider(
@@ -42,12 +51,20 @@ class DetailsProvider(
 class StatusProvider(
     val step: StringProvider?,
     var total: Int,
-    val onStatus: (Status) -> Unit,
+    val onStatus: StatusReceiver,
     val parent: StatusProvider? = null
 ) {
     var index = 1
     var lastStatus: Status? = null
     var finished = false
+
+    val status: Status?
+        get() = lastStatus
+
+    val statusList: MutableList<Status>
+        get() = parent?.let {
+                it.statusList.also { l -> status?.let { s -> l.add(s) } }
+            } ?: status?.let { mutableListOf(it) } ?: mutableListOf()
 
     fun next(
         message: () -> String
@@ -56,8 +73,9 @@ class StatusProvider(
             lastStatus = Status(
                 step,
                 DetailsProvider(message, index, if (total >= index) total else index),
-                if(total < 0) -1f else ((index.toFloat() - 1f) / total.toFloat())
-            ).also(onStatus)
+                if(total < 0) -1f else ((index.toFloat()) / (total.toFloat() + 1f))
+            )
+            onStatus(statusList)
             index++
         }
     }
@@ -75,8 +93,9 @@ class StatusProvider(
             lastStatus = Status(
                 step,
                 DetailsProvider(status.currentFile, index, total),
-                if(total < 0) -1f else ((index.toFloat() - 1f) / total.toFloat())
-            ).also(onStatus)
+                if(total < 0) -1f else ((index.toFloat()) / (total.toFloat() + 1f))
+            )
+            onStatus(statusList)
         }
     }
 
@@ -89,7 +108,8 @@ class StatusProvider(
                 step,
                 object : StringProvider { override fun get(): String = message() },
                 1f
-            ).also(onStatus)
+            )
+            onStatus(statusList)
             parent?.resend()
         }
     }
@@ -106,7 +126,7 @@ class StatusProvider(
     ) = StatusProvider(step, total, onStatus, this)
 
     private fun resend() {
-        lastStatus?.let(onStatus)
+        onStatus(statusList)
         if(finished) {
             parent?.resend()
         }

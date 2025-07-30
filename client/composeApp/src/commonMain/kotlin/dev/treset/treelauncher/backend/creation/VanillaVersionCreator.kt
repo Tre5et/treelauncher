@@ -10,6 +10,7 @@ import dev.treset.treelauncher.backend.data.manifest.VersionComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.localization.Strings
@@ -22,7 +23,7 @@ class VanillaVersionCreator(
 ) : VersionCreator<VanillaCreationData>(data, statusProvider) {
     constructor(
         data: VanillaCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)

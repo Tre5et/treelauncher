@@ -5,6 +5,7 @@ import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.localization.Strings
 
 class NewModsCreator(
@@ -13,7 +14,7 @@ class NewModsCreator(
 ) : NewComponentCreator<ModsComponent, NewModsCreationData>(data, statusProvider) {
     constructor(
         data: NewModsCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createNew(statusProvider: StatusProvider): ModsComponent {
@@ -35,7 +36,7 @@ class InheritModsCreator(
 ) : InheritComponentCreator<ModsComponent, InheritModsCreationData>(data, statusProvider) {
     constructor(
         data: InheritModsCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createInherit(statusProvider: StatusProvider): ModsComponent {
@@ -57,22 +58,22 @@ class UseModsCreator(
 ) : UseComponentCreator<ModsComponent, UseModsCreationData>(data, statusProvider) {
     constructor(
         data: UseModsCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.MODS
 }
 
 object ModsCreator {
-    fun new(data: NewModsCreationData, onStatus: (Status) -> Unit): NewModsCreator {
+    fun new(data: NewModsCreationData, onStatus: StatusReceiver): NewModsCreator {
         return NewModsCreator(data, onStatus)
     }
 
-    fun inherit(data: InheritModsCreationData, onStatus: (Status) -> Unit): InheritModsCreator {
+    fun inherit(data: InheritModsCreationData, onStatus: StatusReceiver): InheritModsCreator {
         return InheritModsCreator(data, onStatus)
     }
 
-    fun use(data: UseModsCreationData, onStatus: (Status) -> Unit): UseModsCreator {
+    fun use(data: UseModsCreationData, onStatus: StatusReceiver): UseModsCreator {
         return UseModsCreator(data, onStatus)
     }
 }

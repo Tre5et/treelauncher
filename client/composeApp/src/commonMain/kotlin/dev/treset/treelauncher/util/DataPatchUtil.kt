@@ -7,7 +7,9 @@ import androidx.compose.ui.text.style.TextAlign
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.app
 import dev.treset.treelauncher.backend.data.patcher.DataPatcher
+import dev.treset.treelauncher.backend.util.MutableStateList
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
@@ -21,7 +23,7 @@ fun DataPatcher(
     val dataPatcher = remember(recheck) { DataPatcher() }
     var upgraded by remember(recheck) { mutableStateOf(!dataPatcher.upgradeNeeded()) }
     var error by remember(recheck) { mutableStateOf<Exception?>(null) }
-    var status: Status? by remember { mutableStateOf(null) }
+    var status: List<Status> by remember { mutableStateOf(emptyList()) }
     var backup by remember(recheck) { mutableStateOf(true) }
 
 
@@ -48,37 +50,39 @@ fun DataPatcher(
     } else if(upgraded) {
         content { recheck++ }
     } else {
-        status?.let {
-            StatusPopup(it)
-        } ?: PopupOverlay(
-            titleRow = { Text(Strings.launcher.patch.title()) },
-            buttonRow = {
-                Button(
-                    onClick = {
-                        Thread {
-                            try {
-                                dataPatcher.performUpgrade(backup) { state -> status = state }
-                                AppContext.files.reload()
-                                upgraded = true
-                            } catch (e: Exception) {
-                                error = IOException("Failed to upgrade launcher data. RETRY MAY CORRUPT USER DATA!", e)
-                            }
-                        }.start()
+        if(status.isNotEmpty()) {
+            StatusPopup(status)
+        } else {
+            PopupOverlay(
+                titleRow = { Text(Strings.launcher.patch.title()) },
+                buttonRow = {
+                    Button(
+                        onClick = {
+                            Thread {
+                                try {
+                                    dataPatcher.performUpgrade(backup) { status = it }
+                                    AppContext.files.reload()
+                                    upgraded = true
+                                } catch (e: Exception) {
+                                    error = IOException("Failed to upgrade launcher data. RETRY MAY CORRUPT USER DATA!", e)
+                                }
+                            }.start()
+                        }
+                    ) {
+                        Text(Strings.launcher.patch.start())
                     }
-                ) {
-                    Text(Strings.launcher.patch.start())
                 }
+            ) {
+                Text(Strings.launcher.patch.message())
+                TitledCheckBox(
+                    checked = backup,
+                    onCheckedChange = {
+                        backup = it
+                    },
+                    title = Strings.launcher.patch.backup()
+                )
+                Text(Strings.launcher.patch.backupHint())
             }
-        ) {
-            Text(Strings.launcher.patch.message())
-            TitledCheckBox(
-                checked = backup,
-                onCheckedChange = {
-                    backup = it
-                },
-                title = Strings.launcher.patch.backup()
-            )
-            Text(Strings.launcher.patch.backupHint())
         }
     }
 }

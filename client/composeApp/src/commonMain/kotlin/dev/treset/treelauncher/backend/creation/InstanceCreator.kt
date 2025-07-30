@@ -5,6 +5,7 @@ import dev.treset.treelauncher.backend.data.manifest.*
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.exception.ComponentCreationException
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
@@ -15,7 +16,7 @@ class InstanceCreator(
 ) : NewComponentCreator<InstanceComponent, InstanceCreationData>(data, statusProvider) {
     constructor(
         data: InstanceCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
 

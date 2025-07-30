@@ -4,6 +4,7 @@ import dev.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.localization.Strings
 
 class NewResourcepackCreator(
@@ -12,7 +13,7 @@ class NewResourcepackCreator(
 ) : NewComponentCreator<ResourcepackComponent, NewCreationData>(data, statusProvider) {
     constructor(
         data: NewCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createNew(statusProvider: StatusProvider): ResourcepackComponent {
@@ -32,7 +33,7 @@ class InheritResourcepackCreator(
 ) : InheritComponentCreator<ResourcepackComponent, InheritCreationData<ResourcepackComponent>>(data, statusProvider) {
     constructor(
         data: InheritCreationData<ResourcepackComponent>,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createInherit(statusProvider: StatusProvider): ResourcepackComponent {
@@ -52,22 +53,22 @@ class UseResourcepackCreator(
 ) : UseComponentCreator<ResourcepackComponent, UseCreationData<ResourcepackComponent>>(data, statusProvider) {
     constructor(
         data: UseCreationData<ResourcepackComponent>,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.RESOURCEPACKS
 }
 
 object ResourcepackCreator {
-    fun new(data: NewCreationData, onStatus: (Status) -> Unit): NewResourcepackCreator {
+    fun new(data: NewCreationData, onStatus: StatusReceiver): NewResourcepackCreator {
         return NewResourcepackCreator(data, onStatus)
     }
 
-    fun inherit(data: InheritCreationData<ResourcepackComponent>, onStatus: (Status) -> Unit): InheritResourcepackCreator {
+    fun inherit(data: InheritCreationData<ResourcepackComponent>, onStatus: StatusReceiver): InheritResourcepackCreator {
         return InheritResourcepackCreator(data, onStatus)
     }
 
-    fun use(data: UseCreationData<ResourcepackComponent>, onStatus: (Status) -> Unit): UseResourcepackCreator {
+    fun use(data: UseCreationData<ResourcepackComponent>, onStatus: StatusReceiver): UseResourcepackCreator {
         return UseResourcepackCreator(data, onStatus)
     }
 }

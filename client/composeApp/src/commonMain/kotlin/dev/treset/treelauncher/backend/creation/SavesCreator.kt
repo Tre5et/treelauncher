@@ -4,6 +4,7 @@ import dev.treset.treelauncher.backend.data.manifest.SavesComponent
 import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.localization.Strings
 
 class NewSavesCreator(
@@ -12,7 +13,7 @@ class NewSavesCreator(
 ): NewComponentCreator<SavesComponent, NewCreationData>(data, statusProvider) {
     constructor(
         data: NewCreationData,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createNew(statusProvider: StatusProvider): SavesComponent {
@@ -32,7 +33,7 @@ class InheritSavesCreator(
 ): InheritComponentCreator<SavesComponent, InheritCreationData<SavesComponent>>(data, statusProvider) {
     constructor(
         data: InheritCreationData<SavesComponent>,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override fun createInherit(statusProvider: StatusProvider): SavesComponent {
@@ -52,22 +53,22 @@ class UseSaveCreator(
 ): UseComponentCreator<SavesComponent, UseCreationData<SavesComponent>>(data, statusProvider) {
     constructor(
         data: UseCreationData<SavesComponent>,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     override val step = CreationStep.SAVES
 }
 
 object SavesCreator {
-    fun new(data: NewCreationData, onStatus: (Status) -> Unit): NewSavesCreator {
+    fun new(data: NewCreationData, onStatus: StatusReceiver): NewSavesCreator {
         return NewSavesCreator(data, onStatus)
     }
 
-    fun inherit(data: InheritCreationData<SavesComponent>, onStatus: (Status) -> Unit): InheritSavesCreator {
+    fun inherit(data: InheritCreationData<SavesComponent>, onStatus: StatusReceiver): InheritSavesCreator {
         return InheritSavesCreator(data, onStatus)
     }
 
-    fun use(data: UseCreationData<SavesComponent>, onStatus: (Status) -> Unit): UseSaveCreator {
+    fun use(data: UseCreationData<SavesComponent>, onStatus: StatusReceiver): UseSaveCreator {
         return UseSaveCreator(data, onStatus)
     }
 }

@@ -19,7 +19,7 @@ abstract class ComponentCreator<T: Component, D: CreationData>(
 ) {
     constructor(
         data: D,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     var id = createHash()
@@ -59,7 +59,7 @@ abstract class NewComponentCreator<T: Component, D: NewCreationData>(
 ): ComponentCreator<T, D>(data, statusProvider) {
     constructor(
         data: D,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
@@ -89,7 +89,7 @@ abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
 ): ComponentCreator<T, D>(data, statusProvider) {
     constructor(
         data: D,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)
@@ -128,7 +128,7 @@ abstract class UseComponentCreator<T: Component, D: UseCreationData<T>>(
 ): ComponentCreator<T, D>(data, statusProvider) {
     constructor(
         data: D,
-        onStatus: (Status) -> Unit
+        onStatus: StatusReceiver
     ) : this(data, StatusProvider(null, 0, onStatus))
 
     @Throws(IOException::class)

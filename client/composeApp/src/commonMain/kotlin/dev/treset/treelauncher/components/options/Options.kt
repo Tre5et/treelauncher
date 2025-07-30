@@ -6,6 +6,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.components.Components
 import dev.treset.treelauncher.components.SharedComponentData
 import dev.treset.treelauncher.creation.ComponentCreator
@@ -44,7 +45,7 @@ fun Options() {
     )
 }
 
-fun OptionsCreator.get(content: CreationContent<OptionsComponent>, onStatus: (Status) -> Unit): ComponentCreator<OptionsComponent, out CreationData> {
+fun OptionsCreator.get(content: CreationContent<OptionsComponent>, onStatus: StatusReceiver): ComponentCreator<OptionsComponent, out CreationData> {
     return when(content.mode) {
         CreationMode.NEW -> new(NewCreationData(content.newName!!, AppContext.files.optionsManifest), onStatus)
         CreationMode.INHERIT -> inherit(InheritCreationData(content.inheritName!!, content.inheritComponent!!, AppContext.files.optionsManifest), onStatus)

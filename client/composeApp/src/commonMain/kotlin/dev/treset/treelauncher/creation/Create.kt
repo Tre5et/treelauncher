@@ -16,7 +16,9 @@ import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.OptionsComponent
 import dev.treset.treelauncher.backend.data.manifest.ResourcepackComponent
 import dev.treset.treelauncher.backend.data.manifest.SavesComponent
+import dev.treset.treelauncher.backend.util.MutableStateList
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.components.saves.get
 import dev.treset.treelauncher.components.mods.ModsCreation
 import dev.treset.treelauncher.components.mods.ModsCreationContent
@@ -44,7 +46,7 @@ fun Create() {
         !((versionContent?.versionType == VersionType.VANILLA  || versionContent?.versionType == null) && (modsContent?.newName.isNullOrBlank() || modsContent?.newName == instanceName) && modsContent?.inheritName.isNullOrBlank() && modsContent?.inheritComponent == null && modsContent?.useComponent == null && modsContent?.newVersions?.getOrNull(0) == versionContent?.minecraftVersion?.id)
     ) }
 
-    var creationStatus: Status? by remember { mutableStateOf(null) }
+    var creationStatus: List<Status> by remember { mutableStateOf(emptyList()) }
     var showCreationDone: Boolean by remember { mutableStateOf(false) }
     var creationException: Exception? by remember { mutableStateOf(null) }
 
@@ -219,13 +221,14 @@ fun Create() {
             onClick = {
                 if (instanceName.isBlank() || versionContent?.isValid() != true || savesContent?.isValid() != true || resourcepackContent?.isValid() != true || optionsContent?.isValid() != true || (hasMods && modsContent?.isValid() != true)) return@Button
                 Thread {
-                    creationStatus = Status(CreationStep.STARTING)
+                    creationStatus = emptyList()
+                    creationStatus = listOf(Status(CreationStep.STARTING))
 
                     val start = System.currentTimeMillis()
                     val versionCreator = try {
                         VersionCreator.get(versionContent!!, {})
                     } catch (e: IOException) {
-                        creationStatus = null
+                        creationStatus = emptyList()
                         AppContext.error(e)
                         return@Thread
                     }
@@ -246,8 +249,8 @@ fun Create() {
                             modsCreator,
                             AppContext.files.instanceManifest
                         )
-                    ) { status ->
-                        creationStatus = status
+                    ) {
+                        creationStatus = it
                     }
 
                     try {
@@ -256,7 +259,7 @@ fun Create() {
                         creationException = e
                     }
                     showCreationDone = true
-                    creationStatus = null
+                    creationStatus = emptyList()
                 }.start()
             },
             enabled =
@@ -273,8 +276,8 @@ fun Create() {
         }
     }
 
-    creationStatus?.let {
-        StatusPopup(it)
+    if(creationStatus.isNotEmpty()) {
+        StatusPopup(creationStatus)
     }
 
     if(showCreationDone) {

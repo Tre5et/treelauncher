@@ -11,7 +11,10 @@ import dev.treset.mcdl.minecraft.MinecraftVersion
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.creation.*
 import dev.treset.treelauncher.backend.data.manifest.ModsComponent
+import dev.treset.treelauncher.backend.util.MutableStateList
 import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusReceiver
+import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.creation.CreationContent
 import dev.treset.treelauncher.creation.CreationMode
 import dev.treset.treelauncher.generic.*
@@ -54,8 +57,8 @@ fun ModsCreation(
     defaultInheritName: String = "",
     defaultInheritComponent: ModsComponent? = null,
     defaultUseComponent: ModsComponent? = null,
-    getCreator: (content: ModsCreationContent, onStatus: (Status) -> Unit) -> ComponentCreator<ModsComponent, *> = ModsCreator::get,
-    setExecute: (((onStatus: (Status) -> Unit) -> ModsComponent)?) -> Unit = {},
+    getCreator: (content: ModsCreationContent, onStatus: StatusReceiver) -> ComponentCreator<ModsComponent, *> = ModsCreator::get,
+    setExecute: (((onStatus: StatusReceiver) -> ModsComponent)?) -> Unit = {},
     setContent: (ModsCreationContent) -> Unit = {},
     onDone: (ModsComponent) -> Unit = { _->}
 ) {
@@ -76,7 +79,7 @@ fun ModsCreation(
     var showSnapshots by remember { mutableStateOf(false) }
     var versions: List<MinecraftVersion> by remember(showSnapshots) { mutableStateOf(emptyList()) }
 
-    var creationStatus: Status? by remember { mutableStateOf(null) }
+    var creationStatus: List<Status> by remember { mutableStateOf(emptyList()) }
 
     val creationContent: ModsCreationContent = remember(mode, newName, newVersion, newType, alternateLoader, inheritName, inheritSelected, useSelected) {
         val additionalLoader = if(newType == VersionType.QUILT && alternateLoader) {
@@ -99,7 +102,7 @@ fun ModsCreation(
         }
     }
 
-    val execute: (onStatus: (Status) -> Unit) -> ModsComponent = remember(creationContent) {
+    val execute: (onStatus: StatusReceiver) -> ModsComponent = remember(creationContent) {
         { onStatus ->
             if(!creationContent.isValid()) {
                 throw IOException("Invalid version creation content")
@@ -266,8 +269,8 @@ fun ModsCreation(
                                 }
                             } catch (e: IOException) {
                                 AppContext.error(e)
-                                creationStatus = null
                             }
+                            creationStatus = emptyList()
                         }.start()
                     }
                 }
@@ -276,13 +279,13 @@ fun ModsCreation(
             }
         }
 
-        creationStatus?.let {
-            StatusPopup(it)
+        if(creationStatus.isNotEmpty()) {
+            StatusPopup(creationStatus)
         }
     }
 }
 
-fun ModsCreator.get(content: ModsCreationContent, onStatus: (Status) -> Unit): ComponentCreator<ModsComponent, out CreationData> {
+fun ModsCreator.get(content: ModsCreationContent, onStatus: StatusReceiver): ComponentCreator<ModsComponent, out CreationData> {
     return when(content.mode) {
         CreationMode.NEW -> new(
             NewModsCreationData(
