@@ -14,7 +14,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 
-    kotlin("plugin.serialization") version "2.0.20"
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 kotlin {
@@ -50,25 +50,25 @@ kotlin {
 
             implementation(kotlin("reflect"))
 
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
             implementation("dev.treset.mcdl:mcdl:$mcdlVersion")
             mcdlModules.forEach {
                 implementation("dev.treset.mcdl:mcdl-$it:$mcdlVersion")
             }
 
-            implementation("io.github.oshai:kotlin-logging:6.0.3")
-            implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
-            implementation("org.slf4j:slf4j-api:2.0.12")
-            implementation("ch.qos.logback:logback-classic:1.5.3")
+            implementation("io.github.oshai:kotlin-logging:7.0.7")
+            implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
+            implementation("org.slf4j:slf4j-api:2.0.17")
+            implementation("ch.qos.logback:logback-classic:1.5.18")
 
-            implementation("org.jetbrains.jewel:jewel-int-ui-standalone-241:0.19.5")
-            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window-241:0.19.5")
+            implementation("org.jetbrains.jewel:jewel-int-ui-standalone:0.29.0-252.24604")
+            implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window:0.29.0-252.24604")
 
             implementation("com.darkrockstudios:mpfilepicker:3.1.0")
-            implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.5")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.1.0")
 
-            implementation("com.github.JnCrMx:discord-game-sdk4j:ae841453bd58af8279d0d43d8c65f997523f976d")
+            implementation("com.github.JnCrMx:discord-game-sdk4j:v1.0.0")
         }
 
         commonTest.dependencies {
