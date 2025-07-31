@@ -21,6 +21,8 @@ sealed class Component: Manifest() {
     abstract val active: MutableDataState<Boolean>
     abstract val listDisplay: MutableDataState<ListDisplay?>
 
+    var deleted = false
+
     var lastUsedTime: LocalDateTime
         get() = try {
             FormatUtils.parseLocalDateTime(lastUsed.value)
@@ -52,6 +54,7 @@ sealed class Component: Manifest() {
     open fun delete(parent: ParentManifest) {
         parent.components.remove(id.value)
         parent.write()
+        deleted = true
         directory.remove()
     }
 

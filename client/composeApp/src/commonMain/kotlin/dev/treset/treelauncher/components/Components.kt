@@ -162,10 +162,12 @@ fun <T: Component, D: SharedComponentData<T>> Components(
 
             DisposableEffect(it.component) {
                 onDispose {
-                    try {
-                        sharedData.component.write()
-                    } catch (e: IOException) {
-                        AppContext.error(e)
+                    if(!sharedData.component.deleted) {
+                        try {
+                            sharedData.component.write()
+                        } catch (e: IOException) {
+                            AppContext.error(e)
+                        }
                     }
                 }
             }
