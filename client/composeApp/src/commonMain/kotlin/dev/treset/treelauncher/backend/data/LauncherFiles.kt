@@ -3,6 +3,7 @@ package dev.treset.treelauncher.backend.data
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import dev.treset.treelauncher.backend.config.Config
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.manifest.*
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
@@ -207,6 +208,43 @@ open class LauncherFiles {
             currentComponents.find { it.id.value == component.id.value }?.let {
                 component.copyTo(it)
             } ?: currentComponents.add(component)
+        }
+    }
+
+    @Throws(IOException::class)
+    fun cleanupStrayComponents() {
+        cleanupStrayFiles(
+            instanceManifest.directory,
+            instanceComponents.map { "${instanceManifest.prefix.value}_${it.id.value}" } + listOf(appConfig().manifestFileName)
+        )
+        cleanupStrayFiles(
+            savesManifest.directory,
+            savesComponents.map { "${savesManifest.prefix.value}_${it.id.value}" } + listOf(appConfig().manifestFileName)
+        )
+        cleanupStrayFiles(
+            resourcepackManifest.directory,
+            resourcepackComponents.map { "${resourcepackManifest.prefix.value}_${it.id.value}" } + listOf(appConfig().manifestFileName)
+        )
+        cleanupStrayFiles(
+            optionsManifest.directory,
+            optionsComponents.map { "${optionsManifest.prefix.value}_${it.id.value}" } + listOf(appConfig().manifestFileName)
+        )
+        cleanupStrayFiles(
+            modsManifest.directory,
+            modsComponents.map { "${modsManifest.prefix.value}_${it.id.value}" } + listOf(appConfig().manifestFileName)
+        )
+    }
+
+    @Throws(IOException::class)
+    fun cleanupStrayFiles(
+        directory: LauncherFile,
+        expectedFiles: List<String>
+    ) {
+        for(file in directory.listFiles()) {
+            if(!expectedFiles.contains(file.name)) {
+                LOGGER.debug { "Deleting stray file: ${file.name}" }
+                file.remove()
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.util.exception.FileLoadException
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
+import java.io.IOException
 
 @Composable
 fun Cleanup() {
@@ -61,9 +62,10 @@ fun Cleanup() {
                         onClick = {
                             Thread {
                                 try {
+                                    AppContext.files.cleanupStrayComponents()
                                     AppContext.files.cleanupVersions(includeLibraries)
                                     state = 2
-                                } catch(e: FileLoadException) {
+                                } catch(e: IOException) {
                                     AppContext.error(e)
                                     state = 3
                                 }

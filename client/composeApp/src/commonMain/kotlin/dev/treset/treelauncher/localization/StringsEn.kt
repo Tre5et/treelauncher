@@ -740,8 +740,8 @@ open class StringsEn(
             val deleting: () -> String = { "Deleting Files..." },
             val failureMessage: () -> String = { "The files could not be deleted.\nThis will probably not affect launcher functionality.\nDetails were written to the logs." },
             val failureTitle: () -> String = { "Failed to delete unused files!" },
-            val libraries: () -> String = { "Also delete unused Libraries" },
-            val message: () -> String = { "This will delete all version files that are not used by any Instance to free up space.\nVersions can be reinstalled at any time." },
+            val libraries: () -> String = { "Delete unused Libraries" },
+            val message: () -> String = { "This will delete any unexpected files in component directories and all versions that are not used by any instance.\nVersions can be reinstalled at any time.\n\nDeleting unused libraries may cause issues if versions - especially Forge - implicitly require libraries. If this causes issues, delete the affected instance, rerun this cleanup and reinstall the instance." },
             val success: () -> String = { "Unused files have been deleted." },
             val title: () -> String = { "Delete unused Files" }
         )

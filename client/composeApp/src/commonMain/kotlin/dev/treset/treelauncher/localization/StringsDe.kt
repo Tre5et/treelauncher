@@ -553,8 +553,8 @@ class StringsDe : StringsEn(
             deleting = { "Dateien werden gelöscht..." },
             failureMessage = { "Nicht alle Dateien konnten gelöscht werden.\nDies beeinflusst die funktionalität des Launchers wahrscheinlich nicht.\nDetails wurden in die Logs geschrieben." },
             failureTitle = { "Löschen fehlgeschlagen." },
-            libraries = { "Auch ungenutzte Bibliotheken löschen" },
-            message = { "Alle versionsdateien, die von keiner Instanz genutzt werden, werden gelöscht um Speicherplatz zu sparen.\n Versionen können jederzeit wieder installiert werden." },
+            libraries = { "Ungenutzte Bibliotheken löschen" },
+            message = { "Alle unerwarteten Dateien in Komponentenverzeichnissen und alle Versionen, die von keiner Instanz genutzt werden, werden gelösch.\nVersionen können jederzeit wieder installiert werden.\n\nUngenutzte Bibliotheken zu löschen kann Probleme verursachen, falls Versionen - speziell Forge - implizit Bibliotheken erwarten. Falls Probleme beim Starten auftreten, die betroffene Instanz löschen, diesen Prozess erneut ausführen und die Instanz neu erstellen." },
             success = { "Ungenutzte Dateien gelöscht." },
             title = { "Ungenutzte Dateien löschen?" }
         ),
