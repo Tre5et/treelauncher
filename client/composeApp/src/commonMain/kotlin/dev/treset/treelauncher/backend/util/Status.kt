@@ -2,7 +2,6 @@ package dev.treset.treelauncher.backend.util
 
 import dev.treset.mcdl.util.DownloadStatus
 import dev.treset.treelauncher.localization.Strings
-import java.util.Stack
 
 typealias StatusReceiver = (List<Status>) -> Unit
 
@@ -65,6 +64,44 @@ class StatusProvider(
         get() = parent?.let {
                 it.statusList.also { l -> status?.let { s -> l.add(s) } }
             } ?: status?.let { mutableListOf(it) } ?: mutableListOf()
+
+    fun custom(
+        current: Int,
+        total: Int,
+        message: () -> String
+    ) {
+        step?.let {
+            lastStatus = Status(
+                step,
+                DetailsProvider(message, current, total),
+                ((index.toFloat()) / (total.toFloat() + 1f))
+            )
+        }
+        onStatus(statusList)
+    }
+
+    fun custom(
+        current: Int,
+        total: Int,
+        message: String
+    ) = custom(current, total, { message })
+
+    fun unknown(
+        message: () -> String,
+    ) {
+        step?.let {
+            lastStatus = Status(
+                step,
+                DetailsProvider(message, -1, -1),
+                -1f
+            )
+        }
+        onStatus(statusList)
+    }
+
+    fun unknown(
+        message: String,
+    ) = unknown({ message })
 
     fun next(
         message: () -> String

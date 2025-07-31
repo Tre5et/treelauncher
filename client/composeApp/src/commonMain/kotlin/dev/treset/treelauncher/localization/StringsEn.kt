@@ -36,7 +36,21 @@ open class StringsEn(
     val units: Units = Units(),
     val updater: Updater = Updater(),
     val version: Version = Version(),
-    val statusDetailsMessage: (String, Int, Int) -> String = { file, current, total -> if(file.isBlank()) "$current / ${total.let { if(it < 0) "?" else it }}" else "$file ($current/${total.let { if(it < 0) "?" else it }})" },
+    val statusDetailsMessage: (String, Int, Int) -> String = { message, current, total ->
+        if(message.isBlank()) {
+            if(total >= 0 || current >= 0) {
+                "${current.let { if(it >= 0) it else "?" }} / ${total.let { if(it >= 0) it else "?" }}"
+            } else {
+                ""
+            }
+        } else {
+            if(total >= 0 || current >= 0) {
+                "${current.let { if(it >= 0) it else "?" }} / ${total.let { if(it >= 0) it else "?" }}\n$message"
+            } else {
+                message
+            }
+        }
+    },
 ) {
     data class Components(
         val create: () -> String = { "Create New" },
@@ -188,6 +202,7 @@ open class StringsEn(
     )
 
     data class Launcher(
+        val copyTitle: () -> String = { "Copying Files" },
         val name: () -> String = { "TreeLauncher" },
         val patch: Patch = Patch(),
         val setup: Setup = Setup(),
@@ -795,7 +810,7 @@ open class StringsEn(
         data class Path(
             val apply: () -> String = { "Apply" },
             val changing: () -> String = { "Changing path..." },
-            val close: () -> String = { "Logout" },
+            val close: () -> String = { "Close" },
             val errorTitle: () -> String = { "Failed to change path" },
             val errorMessage: (Exception) -> String = { e -> "An error occurred:\n$e" },
             val invalid: () -> String = { "No valid folder provided" },

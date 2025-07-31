@@ -14,6 +14,9 @@ import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.LauncherFiles
+import dev.treset.treelauncher.backend.util.FormatStringProvider
+import dev.treset.treelauncher.backend.util.Status
+import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
@@ -27,6 +30,8 @@ import java.io.IOException
 fun Directory() {
     var popupContent: PopupData? by remember { mutableStateOf(null) }
     val instanceRunning = remember(AppContext.runningInstance) { AppContext.runningInstance != null }
+
+    var changeStatus: List<Status> by remember { mutableStateOf(emptyList()) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -123,13 +128,19 @@ fun Directory() {
                             }
                         )
                     } else {
-                        popupContent = PopupData(
-                            titleRow = { Text(Strings.settings.path.changing()) }
+                        popupContent = null
+
+                        val statusProvider = StatusProvider(
+                            FormatStringProvider(Strings.settings.path.changing),
+                            1,
+                            { changeStatus = it }
                         )
+                        statusProvider.next()
 
                         Thread {
                             try {
-                                appConfig().setBaseDir(dir, copy, remove)
+                                val copyStatus = statusProvider.subStep(FormatStringProvider(Strings.launcher.copyTitle), -1)
+                                appConfig().setBaseDir(dir, copy, remove, copyStatus)
 
                                 popupContent = PopupData(
                                     type = PopupType.SUCCESS,
@@ -144,6 +155,9 @@ fun Directory() {
                                         }
                                     }
                                 )
+
+                                statusProvider.finish()
+                                changeStatus = emptyList()
                             } catch (e: IOException) {
                                 popupContent = PopupData(
                                     type = PopupType.ERROR,
@@ -157,6 +171,7 @@ fun Directory() {
                                         }
                                     }
                                 )
+                                changeStatus = emptyList()
                                 AppContext.error(e)
                             }
                         }.start()
@@ -173,5 +188,9 @@ fun Directory() {
 
     popupContent?.let {
         PopupOverlay(it)
+    }
+
+    if(changeStatus.isNotEmpty()) {
+        StatusPopup(changeStatus)
     }
 }

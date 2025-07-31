@@ -126,6 +126,7 @@ class StringsDe : StringsEn(
         systemLanguage = { "Systemsprache" }
     ),
     launcher = Launcher(
+        copyTitle = { "Dateien werden kopiert" },
         setup = Launcher.Setup(
             dirPicker = { "Ein Verzeichnis auswählen" },
             error = { "Kein valider Pfad: ${it.message}" },

@@ -4,6 +4,7 @@ import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.app
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
 import dev.treset.treelauncher.backend.util.FileInitializer
+import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.login.LoginContext
@@ -87,7 +88,7 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
     val msClientId = "389304a5-70a6-4013-907f-98c4eb4b51fb"
 
     @Throws(IOException::class)
-    fun setBaseDir(newBaseDir: LauncherFile, copyFiles: Boolean, removeOld: Boolean) {
+    fun setBaseDir(newBaseDir: LauncherFile, copyFiles: Boolean, removeOld: Boolean, statusProvider: StatusProvider) {
         LOGGER.info { "Updating path: path=${newBaseDir.absolutePath}" }
 
         try {
@@ -103,10 +104,11 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
         if(copyFiles) {
             if(removeOld) {
                 LOGGER.info { "Moving files from ${appConfig().baseDir.absolutePath} to ${newBaseDir.absolutePath}..." }
-                appConfig().baseDir.atomicMoveTo(newBaseDir, StandardCopyOption.REPLACE_EXISTING)
+                appConfig().baseDir.atomicMoveTo(newBaseDir, StandardCopyOption.REPLACE_EXISTING, statusProvider = statusProvider)
             } else {
                 LOGGER.info { "Copying files from ${appConfig().baseDir.absolutePath} to ${newBaseDir.absolutePath}..." }
-                appConfig().baseDir.copyTo(newBaseDir, StandardCopyOption.REPLACE_EXISTING)
+                statusProvider
+                appConfig().baseDir.copyTo(newBaseDir, StandardCopyOption.REPLACE_EXISTING, statusProvider = statusProvider)
             }
         }
 

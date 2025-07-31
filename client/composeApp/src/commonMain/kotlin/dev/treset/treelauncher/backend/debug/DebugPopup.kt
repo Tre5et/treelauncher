@@ -69,7 +69,7 @@ fun debugStatusSequence(
     onStatus: StatusReceiver,
 ) {
     val p = StatusProvider(SimpleStringProvider("Base step"), -1, onStatus)
-    p.next("We KNOW nothing!")
+    p.unknown("We KNOW nothing!")
     sleep(1000)
     p.total = 10
     p.next("Now we know the value")

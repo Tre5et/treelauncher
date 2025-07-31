@@ -6,7 +6,6 @@ import dev.treset.treelauncher.backend.config.appConfig
 import dev.treset.treelauncher.backend.data.manifest.Component
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.FormatStringProvider
-import dev.treset.treelauncher.backend.util.Status
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.Version
@@ -62,7 +61,7 @@ class DataPatcher {
         }
     }
 
-    private val upgradeMap: Array<UpgradeFunction> = arrayOf(
+    private val possibleUpgrades: Array<UpgradeFunction> = arrayOf(
         UpgradeFunction(this::moveGameDataComponents, Version(1,0,0)),
         UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
         UpgradeFunction(this::upgradeComponents, Version(2,0,0)),
@@ -77,7 +76,7 @@ class DataPatcher {
     )
 
     fun upgradeNeeded(): Boolean {
-        return upgradeMap.any { it.applies() }
+        return possibleUpgrades.any { it.applies() }
     }
 
     @Throws(IOException::class)
@@ -86,13 +85,17 @@ class DataPatcher {
             return
         }
 
-        val statusProvider = StatusProvider(null, 0, onStatus)
+        val requiredUpgrades = possibleUpgrades.filter { it.applies() }
+
+        val statusProvider = StatusProvider(FormatStringProvider(Strings.launcher.patch.running), requiredUpgrades.size, onStatus)
+        statusProvider.unknown("Preparing")
 
         LOGGER.info { "Performing data upgrade: v${AppSettings.dataVersion.value} -> v${appConfig().dataVersion} " }
         if(backup) {
             backupFiles(statusProvider)
         }
-        for(upgrade in upgradeMap) {
+        for(upgrade in requiredUpgrades) {
+            statusProvider.next()
             upgrade.execute(statusProvider)
         }
         LOGGER.info { "Data upgrade complete" }
@@ -102,14 +105,14 @@ class DataPatcher {
     fun backupFiles(statusProvider: StatusProvider) {
         LOGGER.info { "Creating backup..." }
         val backupProvider = statusProvider.subStep(PatchStep.CREATE_BACKUP, -1)
-        backupProvider.next("")
+        backupProvider.unknown("Removing old backup")
         val dir = LauncherFile.ofData()
         val backupDir = LauncherFile.ofData(".backup")
         if(backupDir.exists()) {
             backupDir.remove()
         }
-        dir.copyTo(backupDir)
-        backupProvider.finish("")
+        dir.copyTo(backupDir, statusProvider = backupProvider)
+        backupProvider.finish()
         LOGGER.info { "Created backup" }
     }
 

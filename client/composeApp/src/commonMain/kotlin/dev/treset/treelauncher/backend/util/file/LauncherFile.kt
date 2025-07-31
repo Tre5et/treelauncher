@@ -2,10 +2,10 @@ package dev.treset.treelauncher.backend.util.file
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.treelauncher.backend.config.appConfig
+import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.serialization.Serializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import java.awt.Desktop
 import java.io.File
 import java.io.IOException
@@ -19,6 +19,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 import kotlin.io.path.isDirectory
+import kotlin.io.path.pathString
 
 class LauncherFile(pathname: String) : File(pathname) {
     @Throws(IOException::class)
@@ -47,13 +48,13 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, vararg options: CopyOption) {
-        copyTo(dst, { true }, *options)
+    fun copyTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
+        copyTo(dst, { true }, *options, statusProvider = statusProvider)
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption) {
-        moveOrCopy(dst, copyChecker, false, *options)
+    fun copyTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
+        moveOrCopy(dst, copyChecker, false, *options, statusProvider = statusProvider)
     }
 
     @Throws(IOException::class)
@@ -79,17 +80,17 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun moveTo(dst: LauncherFile, vararg options: CopyOption) {
-        moveTo(dst, { true }, *options)
+    fun moveTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
+        moveTo(dst, { true }, *options, statusProvider = statusProvider)
     }
 
     @Throws(IOException::class)
-    fun moveTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption) {
-        moveOrCopy(dst, copyChecker, true, *options)
+    fun moveTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
+        moveOrCopy(dst, copyChecker, true, *options, statusProvider = statusProvider)
     }
 
     @Throws(IOException::class)
-    private fun moveOrCopy(dst: LauncherFile, copyChecker: (String) -> Boolean, move: Boolean, vararg options: CopyOption) {
+    private fun moveOrCopy(dst: LauncherFile, copyChecker: (String) -> Boolean, move: Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
         dst.parentFile?.let {
             Files.createDirectories(it.toPath())
@@ -97,10 +98,15 @@ class LauncherFile(pathname: String) : File(pathname) {
         if (isDirectory()) {
             dst.createDir()
             try {
-                Files.walk(Path.of(path)).use { stream ->
+                statusProvider?.unknown("Collecting files")
+                val srcPath = Path.of(path)
+                Files.walk(srcPath).use { stream ->
+                    val paths = stream.toList()
+                    statusProvider?.total = paths.size
                     val exceptions: MutableList<IOException> = ArrayList()
                     val sourceLength = path.length
-                    stream.forEach { src: Path ->
+                    paths.forEach { src: Path ->
+                        statusProvider?.next(srcPath.relativize(src).pathString)
                         if (!copyChecker(src.fileName.toString()) || src.toString() == absolutePath) {
                             return@forEach
                         }
@@ -120,6 +126,7 @@ class LauncherFile(pathname: String) : File(pathname) {
                             exceptions[0]
                         )
                     }
+                    statusProvider?.finish()
                 }
             } catch (e: IOException) {
                 throw IOException("Unable to copy directory: source=$this, destination=$dst", e)
@@ -133,24 +140,26 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun atomicMoveTo(dst: LauncherFile, vararg options: CopyOption) {
+    fun atomicMoveTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
         dst.parentFile?.let {
             Files.createDirectories(it.toPath())
         }
         try {
+            statusProvider?.next()
             Files.move(toPath(), dst.toPath(), StandardCopyOption.ATOMIC_MOVE, *options)
+            statusProvider?.finish()
         } catch(e: AtomicMoveNotSupportedException) {
-            moveTo(dst, *options)
+            moveTo(dst, *options, statusProvider = statusProvider)
         }
     }
 
     @Throws(IOException::class)
-    fun atomicMoveOrMerge(dst: LauncherFile, vararg options: CopyOption) {
+    fun atomicMoveOrMerge(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
         if(dst.exists()) {
-            moveTo(dst, *options)
+            moveTo(dst, *options, statusProvider = statusProvider)
         } else {
-            atomicMoveTo(dst, *options)
+            atomicMoveTo(dst, *options, statusProvider = statusProvider)
         }
     }
 

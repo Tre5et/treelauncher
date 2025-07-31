@@ -67,7 +67,7 @@ abstract class NewComponentCreator<T: Component, D: NewCreationData>(
         LOGGER.debug { "Creating new component ${data.name}" }
 
         val newProvider = statusProvider.subStep(step, total + 2)
-        newProvider.next()
+        newProvider.unknown("Preparing")
 
         val new = createNew(newProvider)
         new.write()
@@ -97,23 +97,28 @@ abstract class InheritComponentCreator<T: Component, D: InheritCreationData<T>>(
         LOGGER.debug { "Inheriting component ${data.component.id} -> $id" }
 
         val inheritProvider = statusProvider.subStep(step, total + 2)
-        inheritProvider.next()
+        inheritProvider.unknown("Preparing")
 
         val new = createInherit(inheritProvider)
+
+        inheritProvider.next(Strings.creator.status.message.inheritFiles())
+        val copyProvider = inheritProvider.subStep(FormatStringProvider(Strings.launcher.copyTitle), -1)
+        copyProvider.unknown("Copying manifest")
+
         data.component.copyData(new)
         new.write()
 
-        inheritProvider.next(Strings.creator.status.message.inheritFiles())
         data.component.directory.listFiles().forEach {
             if(it.name != appConfig().manifestFileName) {
-                it.copyTo(LauncherFile.of(new.directory, it.name))
+                it.copyTo(LauncherFile.of(new.directory, it.name), statusProvider = copyProvider)
             }
         }
 
-        inheritProvider.finish()
+        copyProvider.finish()
 
         data.parent.components += new.id.value
         data.parent.write()
+        inheritProvider.finish()
         return new
     }
 
