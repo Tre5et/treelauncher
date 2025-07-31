@@ -225,7 +225,7 @@ val sessionFile = configPath.child("session.lock")
 private var fileChannel: FileChannel? = null
 private var lock: FileLock? = null
 
-private fun validateSessionLock(): Boolean {
+fun validateSessionLock(): Boolean {
     LOGGER.info { "Validating session lock..." }
     if (!sessionFile.exists()) {
         LOGGER.debug { "Session file does not exist, creating..." }

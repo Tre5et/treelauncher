@@ -6,12 +6,12 @@ import dev.treset.treelauncher.backend.data.manifest.MainManifest
 import dev.treset.treelauncher.backend.data.manifest.Manifest
 import dev.treset.treelauncher.backend.data.manifest.ParentManifest
 import dev.treset.treelauncher.backend.util.file.LauncherFile
-import kotlinx.serialization.Serializable
 import java.io.IOException
 
 class FileInitializer(val directory: LauncherFile) {
     private val dirs: Array<LauncherFile>
-    private val files: Array<Manifest>
+    private val manifests: Array<Manifest>
+    private val otherFiles: Array<Pair<LauncherFile, String>>
 
     init {
         require(directory.isDirectory() || directory.mkdirs()) { "Cannot create directory" }
@@ -27,7 +27,7 @@ class FileInitializer(val directory: LauncherFile) {
             LauncherFile.of(directory, "version_components"),
             LauncherFile.of(directory, "java_components")
         )
-        files = arrayOf(
+        manifests = arrayOf(
             MainManifest(
                 activeInstance = null,
                 assetsDir = "assets",
@@ -50,6 +50,10 @@ class FileInitializer(val directory: LauncherFile) {
             InitializingManifest(LauncherManifestType.VERSIONS, "version", "version_components", "manifest.json"),
             InitializingManifest(LauncherManifestType.JAVAS, "java", "java_components", "manifest.json")
         )
+
+        otherFiles = arrayOf(
+            LauncherFile.of(directory, "DO_NOT_CHANGE_THESE_FILES.txt") to "DO NOT mess with the files in this directory or any subdirectories unless explicitly instructed to!\n\nMaking any changes, adding or deleting files WILL BREAK functionality of TreeLauncher. "
+        )
     }
 
     @Throws(IOException::class)
@@ -60,9 +64,15 @@ class FileInitializer(val directory: LauncherFile) {
         }
         for (dir in dirs) {
             dir.createDir()
+            LOGGER.info { "Initializing directory: ${dir.name}" }
         }
-        for (file in files) {
+        for (file in manifests) {
             file.write()
+            LOGGER.info { "Initializing manifest: ${file.type}" }
+        }
+        for(f in otherFiles) {
+            f.first.write(f.second)
+            LOGGER.info { "Initializing file: ${f.first.name}"}
         }
     }
 

@@ -13,9 +13,11 @@ import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.config.appConfig
+import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
+import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.disabledContainer
 import dev.treset.treelauncher.style.disabledContent
 import dev.treset.treelauncher.style.icons
@@ -134,7 +136,9 @@ fun Directory() {
                                     titleRow = { Text(Strings.settings.path.success()) },
                                     buttonRow = {
                                         Button(
-                                            onClick = { popupContent = null }
+                                            onClick = {
+                                                popupContent = null
+                                            }
                                         ) {
                                             Text(Strings.settings.path.close())
                                         }
@@ -153,6 +157,7 @@ fun Directory() {
                                         }
                                     }
                                 )
+                                AppContext.error(e)
                             }
                         }.start()
                     }

@@ -3,9 +3,12 @@ package dev.treset.treelauncher.backend.config
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.app
 import dev.treset.treelauncher.backend.data.LauncherLaunchArgument
+import dev.treset.treelauncher.backend.util.FileInitializer
 import dev.treset.treelauncher.backend.util.Version
 import dev.treset.treelauncher.backend.util.file.LauncherFile
+import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.util.configFile
+import dev.treset.treelauncher.util.validateSessionLock
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.IOException
 import java.nio.file.StandardCopyOption
@@ -113,6 +116,12 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
         globalConfig.path = newBaseDir.absolutePath
         globalConfig.writeToFile(configFile.absolutePath)
 
+        if(!copyFiles && !GlobalConfig.isLauncherDataPath(newBaseDir)) {
+            LOGGER.info { "Initializing new directory..." }
+            FileInitializer(newBaseDir).create()
+            LOGGER.info { "Initialized new directory" }
+        }
+
         app().loadSettings()
         AppContext.recheckData()
 
@@ -121,6 +130,10 @@ class Config(private val globalConfig: GlobalConfig, val updateUrl: String? = nu
             oldDir.remove()
         }
         LOGGER.info { "Successfully changed directory" }
+
+        LOGGER.info { "Reloading data" }
+        AppContext.files.reload()
+        LOGGER.info { "Successfully reloaded data" }
     }
 
     companion object {

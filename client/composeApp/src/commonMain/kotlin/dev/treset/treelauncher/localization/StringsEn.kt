@@ -795,7 +795,7 @@ open class StringsEn(
         data class Path(
             val apply: () -> String = { "Apply" },
             val changing: () -> String = { "Changing path..." },
-            val close: () -> String = { "Close" },
+            val close: () -> String = { "Logout" },
             val errorTitle: () -> String = { "Failed to change path" },
             val errorMessage: (Exception) -> String = { e -> "An error occurred:\n$e" },
             val invalid: () -> String = { "No valid folder provided" },
