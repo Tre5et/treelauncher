@@ -228,7 +228,8 @@ open class StringsEn(
             val message: () -> String = { "The data needs to be upgraded in order to work with this version of the launcher." },
             val title: () -> String = { "Launcher Data needs to be upgraded" },
             val backup: () -> String = { "Create Data Backup before upgrading" },
-            val backupHint: () -> String = { "Depending on the amount of launcher data this may take a significant amount of time and storage." },
+            val fullBackup: () -> String = { "Backup only affected files" },
+            val fullBackupHint: () -> String = { "Leaving this box checked will typically result in a much smaller backup. But affected files may not be included in the backup, especially on highly custom configurations." },
             val start: () -> String = { "Start Upgrade" },
             val status: Status = Status()
         ) {

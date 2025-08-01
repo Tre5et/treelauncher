@@ -1,15 +1,15 @@
 package dev.treset.treelauncher.util
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.app
 import dev.treset.treelauncher.backend.data.patcher.DataPatcher
-import dev.treset.treelauncher.backend.util.MutableStateList
 import dev.treset.treelauncher.backend.util.Status
-import dev.treset.treelauncher.backend.util.copyTo
 import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import java.io.IOException
@@ -25,6 +25,7 @@ fun DataPatcher(
     var error by remember(recheck) { mutableStateOf<Exception?>(null) }
     var status: List<Status> by remember { mutableStateOf(emptyList()) }
     var backup by remember(recheck) { mutableStateOf(true) }
+    var fullBackup by remember(recheck) { mutableStateOf(false) }
 
 
     if(error != null) {
@@ -60,11 +61,13 @@ fun DataPatcher(
                         onClick = {
                             Thread {
                                 try {
-                                    dataPatcher.performUpgrade(backup) { status = it }
+                                    dataPatcher.performUpgrade(backup, fullBackup) { status = it }
                                     AppContext.files.reload()
+                                    status = emptyList()
                                     upgraded = true
                                 } catch (e: Exception) {
                                     error = IOException("Failed to upgrade launcher data. RETRY MAY CORRUPT USER DATA!", e)
+                                    AppContext.severeError(e)
                                 }
                             }.start()
                         }
@@ -74,14 +77,30 @@ fun DataPatcher(
                 }
             ) {
                 Text(Strings.launcher.patch.message())
-                TitledCheckBox(
-                    checked = backup,
-                    onCheckedChange = {
-                        backup = it
-                    },
-                    title = Strings.launcher.patch.backup()
-                )
-                Text(Strings.launcher.patch.backupHint())
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    TitledCheckBox(
+                        checked = backup,
+                        onCheckedChange = {
+                            backup = it
+                        },
+                        title = Strings.launcher.patch.backup()
+                    )
+                    if (backup) {
+                        TitledCheckBox(
+                            checked = !fullBackup,
+                            onCheckedChange = {
+                                fullBackup = !it
+                            },
+                            title = Strings.launcher.patch.fullBackup()
+                        )
+                        Text(
+                            Strings.launcher.patch.fullBackupHint(),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
             }
         }
     }

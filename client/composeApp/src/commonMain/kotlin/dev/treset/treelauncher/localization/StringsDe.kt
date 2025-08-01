@@ -143,7 +143,8 @@ class StringsDe : StringsEn(
             message = { "Die Daten müssen aktualisiert werden, um mit der neuen Version kompatibel zu sein." },
             title = { "Die Launcher Daten müssen aktualisiert werden" },
             backup = { "Backup vor dem Aktualisieren erstellen" },
-            backupHint = { "Abhängig von der Datengröße kann dies viel Zeit und Speicherplatz in Anspruch nehmen."},
+            fullBackup = { "Nur von geänderten Dateien ein Backup erstellen"},
+            fullBackupHint = { "Diese Box aktiv zu lassen bewirkt in der Regel ein deutlich kleineres Backup. Allerdings ist es speziell bei stark personalisierten Konfigurationen möglich, dass geänderte Dateien nicht im Backup einbehalten sind."},
             start = { "Aktualisierung starten" },
             status = Launcher.Patch.Status(
                 createBackup = { "Backup wird erstellt" },

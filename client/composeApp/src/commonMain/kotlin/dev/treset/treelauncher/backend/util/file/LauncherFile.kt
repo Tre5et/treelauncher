@@ -48,13 +48,8 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
-        copyTo(dst, { true }, *options, statusProvider = statusProvider)
-    }
-
-    @Throws(IOException::class)
-    fun copyTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
-        moveOrCopy(dst, copyChecker, false, *options, statusProvider = statusProvider)
+    fun copyTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null, fileChecker: FileChecker? = null) {
+        moveOrCopy(dst, false, *options, statusProvider = statusProvider, fileChecker = fileChecker)
     }
 
     @Throws(IOException::class)
@@ -80,17 +75,12 @@ class LauncherFile(pathname: String) : File(pathname) {
     }
 
     @Throws(IOException::class)
-    fun moveTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
-        moveTo(dst, { true }, *options, statusProvider = statusProvider)
+    fun moveTo(dst: LauncherFile, vararg options: CopyOption, statusProvider: StatusProvider? = null, fileChecker: FileChecker? = null) {
+        moveOrCopy(dst, true, *options, statusProvider = statusProvider, fileChecker = fileChecker)
     }
 
     @Throws(IOException::class)
-    fun moveTo(dst: LauncherFile, copyChecker: (String) -> Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
-        moveOrCopy(dst, copyChecker, true, *options, statusProvider = statusProvider)
-    }
-
-    @Throws(IOException::class)
-    private fun moveOrCopy(dst: LauncherFile, copyChecker: (String) -> Boolean, move: Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null) {
+    private fun moveOrCopy(dst: LauncherFile, move: Boolean, vararg options: CopyOption, statusProvider: StatusProvider? = null, fileChecker: FileChecker? = null) {
         if (!exists()) throw IOException("File does not exist: $absolutePath")
         dst.parentFile?.let {
             Files.createDirectories(it.toPath())
@@ -98,18 +88,19 @@ class LauncherFile(pathname: String) : File(pathname) {
         if (isDirectory()) {
             dst.createDir()
             try {
+                LOGGER.debug { "Collecting files to move or copy..." }
                 statusProvider?.unknown("Collecting files")
                 val srcPath = Path.of(path)
                 Files.walk(srcPath).use { stream ->
-                    val paths = stream.toList()
+                    val paths = stream.toList().let {
+                        fileChecker?.let { f -> it.filter { e -> f.check(e, srcPath) } } ?: it
+                    }
+                    LOGGER.debug { "Collected ${paths.size} files to move or copy" }
                     statusProvider?.total = paths.size
                     val exceptions: MutableList<IOException> = ArrayList()
                     val sourceLength = path.length
                     paths.forEach { src: Path ->
                         statusProvider?.next(srcPath.relativize(src).pathString)
-                        if (!copyChecker(src.fileName.toString()) || src.toString() == absolutePath) {
-                            return@forEach
-                        }
                         val destinationF = of(dst.path, src.toString().substring(sourceLength))
                         if(src.isDirectory() && destinationF.isDirectory) {
                             return@forEach
@@ -131,11 +122,16 @@ class LauncherFile(pathname: String) : File(pathname) {
             } catch (e: IOException) {
                 throw IOException("Unable to copy directory: source=$this, destination=$dst", e)
             }
+            LOGGER.debug { "Copied files" }
         } else {
+            LOGGER.debug { "Copying or moving single file ${toPath()}" }
             Files.copy(toPath(), dst.toPath(), *options)
+            LOGGER.debug { "Copied file" }
         }
         if(move) {
+            LOGGER.debug { "Removing files from source" }
             remove()
+            LOGGER.debug { "Moved files" }
         }
     }
 

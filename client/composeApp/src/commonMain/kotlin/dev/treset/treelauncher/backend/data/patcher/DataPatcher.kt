@@ -9,6 +9,8 @@ import dev.treset.treelauncher.backend.util.FormatStringProvider
 import dev.treset.treelauncher.backend.util.StatusProvider
 import dev.treset.treelauncher.backend.util.StatusReceiver
 import dev.treset.treelauncher.backend.util.Version
+import dev.treset.treelauncher.backend.util.file.CombinedFileChecker
+import dev.treset.treelauncher.backend.util.file.FileChecker
 import dev.treset.treelauncher.backend.util.file.LauncherFile
 import dev.treset.treelauncher.backend.util.string.PatternString
 import dev.treset.treelauncher.localization.Strings
@@ -23,7 +25,8 @@ class DataPatcher {
         val GAME_DATA_COMPONENTS = FormatStringProvider { Strings.launcher.patch.status.gameDataComponents() }
         val GAME_DATA_SAVES = FormatStringProvider { Strings.launcher.patch.status.gameDataSaves() }
         val GAME_DATA_MODS = FormatStringProvider { Strings.launcher.patch.status.gameDataMods() }
-        val REMOVE_BACKUP_EXCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.removeBackupIncludedFiles() }
+        val REMOVE_BACKUP_EXCLUDED_FILES =
+            FormatStringProvider { Strings.launcher.patch.status.removeBackupIncludedFiles() }
         val UPGRADE_COMPONENTS = FormatStringProvider { Strings.launcher.patch.status.upgradeComponents() }
         val UPGRADE_MAIN_MANIFEST = FormatStringProvider { Strings.launcher.patch.status.upgradeMainManifest() }
         val UPGRADE_INSTANCES = FormatStringProvider { Strings.launcher.patch.status.upgradeInstances() }
@@ -37,42 +40,30 @@ class DataPatcher {
         val INCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.includedFiles() }
         val INCLUDED_FILES_INSTANCE = FormatStringProvider { Strings.launcher.patch.status.includedFilesInstances() }
         val INCLUDED_FILES_SAVES = FormatStringProvider { Strings.launcher.patch.status.includedFilesSaves() }
-        val INCLUDED_FILES_RESOURCEPACKS = FormatStringProvider { Strings.launcher.patch.status.includedFilesResourcepacks() }
+        val INCLUDED_FILES_RESOURCEPACKS =
+            FormatStringProvider { Strings.launcher.patch.status.includedFilesResourcepacks() }
         val INCLUDED_FILES_OPTIONS = FormatStringProvider { Strings.launcher.patch.status.includedFilesOptions() }
         val INCLUDED_FILES_MODS = FormatStringProvider { Strings.launcher.patch.status.includedFilesMods() }
-        val REMOVE_RESOURCEPACKS_ARGUMENT = FormatStringProvider { Strings.launcher.patch.status.removeResourcepacksArgument() }
-        val TEXTUREPACKS_INCLUDED_FILES = FormatStringProvider { Strings.launcher.patch.status.texturepacksIncludedFiles() }
+        val REMOVE_RESOURCEPACKS_ARGUMENT =
+            FormatStringProvider { Strings.launcher.patch.status.removeResourcepacksArgument() }
+        val TEXTUREPACKS_INCLUDED_FILES =
+            FormatStringProvider { Strings.launcher.patch.status.texturepacksIncludedFiles() }
         val REMOVE_LOGIN = FormatStringProvider { Strings.launcher.patch.status.removeLogin() }
         val RESTRUCTURE_MODS = FormatStringProvider { Strings.launcher.patch.status.restructureMods() }
     }
 
-    private class UpgradeFunction(
-        val function: (StatusProvider) -> Unit,
-        val applies: () -> Boolean
-    ) {
-        constructor(function: (StatusProvider) -> Unit, vararg version: Version) : this(function, {
-            version.any { appConfig().dataVersion >= it && Version.fromString(AppSettings.dataVersion.value) < it }
-        })
-
-        fun execute(statusProvider: StatusProvider) {
-            if(applies()) {
-                function(statusProvider)
-            }
-        }
-    }
-
     private val possibleUpgrades: Array<UpgradeFunction> = arrayOf(
-        UpgradeFunction(this::moveGameDataComponents, Version(1,0,0)),
-        UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0)),
-        UpgradeFunction(this::upgradeComponents, Version(2,0,0)),
-        UpgradeFunction(this::upgradeComponentDirectories, Version(2,0,0)),
-        UpgradeFunction(this::upgradeIncludedFiles, Version(2,0,0)),
-        UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0)),
-        UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0)),
-        UpgradeFunction(this::removeLoginFile, Version(2,0,0)),
-        UpgradeFunction(this::restructureMods, Version(2, 1, 0)),
-        UpgradeFunction(this::upgrade2_2Components, Version(2, 2, 0)),
-        UpgradeFunction(this::upgradeSettings, Version(1,0,0), Version(2,0,0), Version(2, 1, 0), Version(2, 2, 0))
+        UpgradeFunction(this::moveGameDataComponents, Version(1,0,0), FileChecker.ALL),
+        UpgradeFunction(this::removeBackupExcludedFiles, Version(1,0,0), FileChecker.ALL),
+        UpgradeFunction(this::upgradeComponents, Version(2,0,0), FileChecker.ALL),
+        UpgradeFunction(this::upgradeComponentDirectories, Version(2,0,0), FileChecker.ALL),
+        UpgradeFunction(this::upgradeIncludedFiles, Version(2,0,0), FileChecker.ALL),
+        UpgradeFunction(this::removeResourcepacksDirGameArguments, Version(2,0,0), FileChecker.VERSION_MANIFESTS),
+        UpgradeFunction(this::upgradeTexturePacksIncludedFiles, Version(2,0,0), FileChecker.RESOURCEPACKS_MANIFESTS),
+        UpgradeFunction(this::removeLoginFile, Version(2,0,0), FileChecker.META),
+        UpgradeFunction(this::restructureMods, Version(2, 1, 0), FileChecker.MODS_FILES),
+        UpgradeFunction(this::upgrade2_2Components, Version(2, 2, 0), FileChecker.INSTANCE_FILES, FileChecker.VERSION_FILES),
+        UpgradeFunction(this::upgradeSettings, FileChecker.META)
     )
 
     fun upgradeNeeded(): Boolean {
@@ -80,11 +71,7 @@ class DataPatcher {
     }
 
     @Throws(IOException::class)
-    fun performUpgrade(backup: Boolean, onStatus: StatusReceiver) {
-        if(!upgradeNeeded()) {
-            return
-        }
-
+    fun performUpgrade(backup: Boolean, fullBackup: Boolean, onStatus: StatusReceiver) {
         val requiredUpgrades = possibleUpgrades.filter { it.applies() }
 
         val statusProvider = StatusProvider(FormatStringProvider(Strings.launcher.patch.running), requiredUpgrades.size, onStatus)
@@ -92,28 +79,41 @@ class DataPatcher {
 
         LOGGER.info { "Performing data upgrade: v${AppSettings.dataVersion.value} -> v${appConfig().dataVersion} " }
         if(backup) {
-            backupFiles(statusProvider)
+            backupFiles(requiredUpgrades, fullBackup, statusProvider)
         }
         for(upgrade in requiredUpgrades) {
             statusProvider.next()
             upgrade.execute(statusProvider)
         }
+        statusProvider.finish()
         LOGGER.info { "Data upgrade complete" }
     }
 
     @Throws(IOException::class)
-    fun backupFiles(statusProvider: StatusProvider) {
+    fun backupFiles(requiredUpgrades: List<UpgradeFunction>, fullBackup: Boolean, statusProvider: StatusProvider) {
         LOGGER.info { "Creating backup..." }
         val backupProvider = statusProvider.subStep(PatchStep.CREATE_BACKUP, -1)
+
         backupProvider.unknown("Removing old backup")
         val dir = LauncherFile.ofData()
         val backupDir = LauncherFile.ofData(".backup")
         if(backupDir.exists()) {
             backupDir.remove()
         }
-        dir.copyTo(backupDir, statusProvider = backupProvider)
-        backupProvider.finish()
+
+        if(!fullBackup) {
+            LOGGER.debug { "Finding partial backup requirements..." }
+            backupProvider.unknown("Finding partial backup requirements")
+            val fileCheckers = requiredUpgrades.map { it.fileCheckers }.flatten()
+            val combinedChecker = CombinedFileChecker(fileCheckers)
+            LOGGER.debug { "Found partial backup requirements, creating partial backup..." }
+            dir.copyTo(backupDir, statusProvider = backupProvider, fileChecker = combinedChecker)
+        } else {
+            LOGGER.debug { "Creating full backup..." }
+            dir.copyTo(backupDir, statusProvider = backupProvider)
+        }
         LOGGER.info { "Created backup" }
+        backupProvider.finish()
     }
 
     @Throws(IOException::class)
