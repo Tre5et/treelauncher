@@ -173,6 +173,7 @@ open class StringsEn(
         val severeMessage: (error: Exception) -> String = { error -> "Error:\n${error.message ?: "Unknown Error"}\nPlease report this error." },
         val severeTitle: () -> String = { "A severe error occurred!" },
         val unknown: () -> String = { "Unknown error" },
+        val fileAccessHint: () -> String = { "This error may be caused by an open folder in file explorer.\nClose any file explorer windows in the launcher data directory before trying again." }
     )
 
     data class FixFiles(

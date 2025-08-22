@@ -105,7 +105,8 @@ class StringsDe : StringsEn(
         severeClose = { "Launcher schließen" },
         severeMessage = { error -> "Fehler:\n${error.message ?: "Unbekannter Fehler"}\nDiesen Fehler bitte melden." },
         severeTitle = { "Ein kritischen Fehler ist aufgetreten!" },
-        unknown = { "Unbekannter Fehler" }
+        unknown = { "Unbekannter Fehler" },
+        fileAccessHint = { "Dieser Fehler kann dadurch verursacht werden, dass Ordner im Dateiexplorer geöffnet sind.\nVor dem erneuten versuchen, alle Dateiexplorerfenster im Launcher Verzeichnis schließen." }
     ),
     fixFiles = FixFiles(
         cancel = { "Nicht versuchen" },

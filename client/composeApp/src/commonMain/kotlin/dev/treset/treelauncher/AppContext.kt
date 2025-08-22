@@ -1,13 +1,17 @@
 package dev.treset.treelauncher
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.discord.DiscordIntegration
@@ -15,6 +19,7 @@ import dev.treset.treelauncher.generic.*
 import dev.treset.treelauncher.localization.Strings
 import dev.treset.treelauncher.login.LoginContext
 import dev.treset.treelauncher.style.ColorScheme
+import dev.treset.treelauncher.style.Icons
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 object AppContext {
@@ -103,10 +108,24 @@ fun ContextProvider(
             onDismissRequest = {},
             title = { Text(Strings.error.severeTitle()) },
             text = {
-                Text(
-                    Strings.error.severeMessage(e),
-                    textAlign = TextAlign.Start
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        Strings.error.severeMessage(e),
+                        textAlign = TextAlign.Start
+                    )
+                    if(e is java.nio.file.FileSystemException || e is kotlin.io.FileSystemException || e.cause is java.nio.file.FileSystemException || e.cause is kotlin.io.FileSystemException ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.warning, "Warning")
+                            Text(Strings.error.fileAccessHint(), style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+                }
             },
             containerColor = MaterialTheme.colorScheme.errorContainer,
             confirmButton = {
