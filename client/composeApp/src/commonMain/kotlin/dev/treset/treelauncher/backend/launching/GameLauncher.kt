@@ -2,6 +2,7 @@ package dev.treset.treelauncher.backend.launching
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import dev.treset.mcdl.auth.data.UserData
+import dev.treset.treelauncher.AppContext
 import dev.treset.treelauncher.backend.data.LauncherFiles
 import dev.treset.treelauncher.backend.data.manifest.InstanceComponent
 import dev.treset.treelauncher.backend.util.QuickPlayData
@@ -40,6 +41,7 @@ class GameLauncher(
                 throw GameLaunchException("Unable to launch game: unable to clean up old instance", e)
             }
         }
+        AppContext.files.mainManifest.activeInstance.value = instance.id.value
         resourceManager = ResourceManager(instance)
         Thread(Runnable {
             try {
